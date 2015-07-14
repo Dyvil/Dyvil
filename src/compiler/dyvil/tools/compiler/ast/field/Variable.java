@@ -271,7 +271,7 @@ public final class Variable extends Member implements IVariable
 			{
 				writer.writeInsn(Opcodes.AUTO_DUP_X1);
 			}
-			c.writeInvoke(writer);
+			c.writeInvoke(writer, this.getLineNumber());
 			
 			this.index = writer.localCount();
 			
@@ -290,7 +290,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
@@ -298,7 +298,7 @@ public final class Variable extends Member implements IVariable
 			
 			IClass c = this.refType.getTheClass();
 			IDataMember f = c.getBody().getField(0);
-			f.writeGet(writer, null);
+			f.writeGet(writer, null, lineNumber);
 			
 			if (c == Types.OBJECT_REF_CLASS)
 			{
@@ -315,14 +315,14 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
 			ReferenceType.writeGetRef(writer, value, this.index);
 			
 			IDataMember f = this.refType.getTheClass().getBody().getField(0);
-			f.writeSet(writer, null, null);
+			f.writeSet(writer, null, null, lineNumber);
 			return;
 		}
 		

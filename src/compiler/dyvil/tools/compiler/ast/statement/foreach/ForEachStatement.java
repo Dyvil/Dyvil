@@ -28,6 +28,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
@@ -37,6 +38,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 {
 	protected transient IContext	context;
 	protected IStatement			parent;
+	protected ICodePosition			position;
 	
 	public Variable					variable;
 	public IValue					action;
@@ -62,9 +64,20 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IValue action1 = this.action.withType(type, typeContext, markers, context);
+		if (type != Types.VOID)
+		{
+			return null;
+		}
+		
+		IValue action1 = this.action.withType(Types.VOID, typeContext, markers, context);
 		if (action1 == null)
 		{
 			// TODO Handle error
@@ -74,7 +87,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 			this.action = action1;
 		}
 		
-		return type == Types.VOID ? this : null;
+		return this;
 	}
 	
 	@Override

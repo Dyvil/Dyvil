@@ -190,7 +190,7 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 			
 			IDataMember field = iclass.getParameter(i);
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, this.getLineNumber());
 			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
 		

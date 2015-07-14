@@ -65,7 +65,7 @@ public class BoxPattern implements IPattern
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		}
-		this.boxingMethod.writeInvoke(writer, null, null);
+		this.boxingMethod.writeInvoke(writer, null, null, this.pattern.getLineNumber());
 		this.pattern.writeJump(writer, -1, elseLabel);
 	}
 	
@@ -76,7 +76,7 @@ public class BoxPattern implements IPattern
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 		}
-		this.boxingMethod.writeInvoke(writer, null, null);
+		this.boxingMethod.writeInvoke(writer, null, null, this.pattern.getLineNumber());
 		this.pattern.writeInvJump(writer, -1, elseLabel);
 	}
 	

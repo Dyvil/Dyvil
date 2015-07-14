@@ -294,16 +294,54 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitLabel(label);
 	}
 	
+	@Override
+	public void writeLineNumber(int lineNumber)
+	{
+		Label label = new Label();
+		this.mv.visitLabel(label);
+		this.mv.visitLineNumber(lineNumber, label);
+	}
+	
 	// Other Instructions
+	
+	@Override
+	public void writeInsn(int opcode, int lineNumber) throws BytecodeException
+	{
+		switch (opcode)
+		{
+		// NullPointerException, ArrayIndexOutOfBoundsException
+		case ARRAYLENGTH:
+		case IALOAD:
+		case LALOAD:
+		case FALOAD:
+		case DALOAD:
+		case AALOAD:
+		case BALOAD:
+		case CALOAD:
+		case SALOAD:
+		case IASTORE:
+		case LASTORE:
+		case FASTORE:
+		case DASTORE:
+		case BASTORE:
+		case CASTORE:
+		case SASTORE:
+			// ..., ArrayStoreException
+		case AASTORE:
+			// NullPointerException, any unchecked Exception
+		case OBJECT_EQUALS:
+			// ArithmeticException
+		case IDIV:
+		case LDIV:
+			this.writeLineNumber(lineNumber);
+		}
+		
+		this.writeInsn(opcode);
+	}
 	
 	@Override
 	public void writeInsn(int opcode) throws BytecodeException
 	{
-		if (opcode <= 0)
-		{
-			return;
-		}
-		
 		if (opcode > 255)
 		{
 			switch (opcode)

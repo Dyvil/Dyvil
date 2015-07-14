@@ -99,6 +99,7 @@ public class ArrayForStatement extends ForEachStatement
 		Variable arrayVar = this.arrayVar;
 		Variable indexVar = this.indexVar;
 		Variable lengthVar = this.lengthVar;
+		int lineNumber = this.getLineNumber();
 		
 		org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
 		writer.writeLabel(scopeLabel);
@@ -111,6 +112,7 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeInsn(Opcodes.DUP);
 		arrayVar.writeInit(writer, null);
 		// Load the length
+		writer.writeLineNumber(lineNumber);
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
@@ -123,13 +125,14 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeTargetLabel(startLabel);
 		
 		// Load the element
-		arrayVar.writeGet(writer, null);
-		indexVar.writeGet(writer, null);
+		arrayVar.writeGet(writer, null, lineNumber);
+		indexVar.writeGet(writer, null, lineNumber);
+		writer.writeLineNumber(lineNumber);
 		writer.writeInsn(arrayVar.type.getElementType().getArrayLoadOpcode());
 		// Auto(un)boxing
 		if (this.boxMethod != null)
 		{
-			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
 		}
 		// Store variable
 		var.writeInit(writer, null);
@@ -144,8 +147,8 @@ public class ArrayForStatement extends ForEachStatement
 		// Increase index
 		writer.writeIINC(indexVar.index, 1);
 		// Boundary Check
-		indexVar.writeGet(writer, null);
-		lengthVar.writeGet(writer, null);
+		indexVar.writeGet(writer, null, lineNumber);
+		lengthVar.writeGet(writer, null, lineNumber);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables

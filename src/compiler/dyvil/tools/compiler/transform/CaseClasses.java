@@ -79,10 +79,10 @@ public interface CaseClasses
 		{
 			// Push 'this'
 			writer.writeVarInsn(ALOAD, 0);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			// Push 'var'
 			writer.writeVarInsn(ALOAD, 2);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			
 			Label label = new Label();
 			switch (((PrimitiveType) type).typecode)
@@ -117,19 +117,20 @@ public interface CaseClasses
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
 		writer.writeVarInsn(ALOAD, 0);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		writer.writeJumpInsn(IFNONNULL, elseLabel);
 		writer.writeVarInsn(ALOAD, 2);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		writer.writeJumpInsn(IFNULL, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
 		writer.writeLabel(elseLabel);
 		writer.writeVarInsn(ALOAD, 0);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		writer.writeVarInsn(ALOAD, 2);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		
+		writer.writeLineNumber(0);
 		if (type.isArrayType())
 		{
 			writeArrayEquals(writer, type.getElementType());
@@ -198,7 +199,7 @@ public interface CaseClasses
 			IDataMember field = theClass.getParameter(i);
 			// Load the value of the field
 			writer.writeVarInsn(ALOAD, 0);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			// Write the hashing strategy for the field
 			writeHashCode(writer, field.getType());
 			// Add the hash to the previous result
@@ -255,11 +256,13 @@ public interface CaseClasses
 				return;
 			case ClassFormat.T_FLOAT:
 				// Write a float hashing snippet using Float.floatToIntBits
+				writer.writeLineNumber(0);
 				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false);
 				return;
 			case ClassFormat.T_DOUBLE:
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
+				writer.writeLineNumber(0);
 				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false);
 				writer.writeInsn(DUP2);
 				writer.writeLDC(32);
@@ -279,6 +282,7 @@ public interface CaseClasses
 		writer.writeInsn(DUP);
 		writer.writeJumpInsn(IFNULL, elseLabel);
 		// then
+		writer.writeLineNumber(0);
 		if (type.isArrayType())
 		{
 			writeArrayHashCode(writer, type.getElementType());
@@ -357,7 +361,7 @@ public interface CaseClasses
 			
 			// Get the field
 			writer.writeVarInsn(ALOAD, 0);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			
 			writeToString(writer, type);
 			if (i + 1 < params)
@@ -384,6 +388,8 @@ public interface CaseClasses
 	{
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
+		
+		writer.writeLineNumber(0);
 		
 		if (type.isArrayType())
 		{

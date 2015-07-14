@@ -27,9 +27,9 @@ public interface IDataMember extends IASTNode, IMember, IValued
 	
 	// Compilation
 	
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException;
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException;
 	
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException;
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException;
 	
 	public String getDescription();
 	

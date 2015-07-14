@@ -172,7 +172,7 @@ public final class ClassAccess extends ASTNode implements IValue
 			IDataMember field = iclass.getMetadata().getInstanceField();
 			if (field != null)
 			{
-				field.writeGet(writer, null);
+				field.writeGet(writer, null, this.getLineNumber());
 			}
 		}
 	}

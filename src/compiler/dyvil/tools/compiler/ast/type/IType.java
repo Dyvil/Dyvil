@@ -413,6 +413,15 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		return this.getInternalName();
 	}
 	
+	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
+	{
+		if (target != this && !target.isSuperClassOf(this))
+		{
+			writer.writeLineNumber(lineNumber);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+		}
+	}
+	
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
 	public default void writeDefaultValue(MethodWriter writer) throws BytecodeException

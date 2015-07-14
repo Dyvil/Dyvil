@@ -265,7 +265,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		if (this.getter != null)
 		{
 			// Getter
-			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE, Types.VOID);
+			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE, Types.VOID, 0);
 		}
 		else
 		{
@@ -289,7 +289,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				value.writeExpression(writer);
 				writer.writeInsn(Opcodes.DUP);
 				writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, property.fullName, value.getType().getExtendedName());
-				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Types.VOID);
+				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Types.VOID, 0);
 			}
 			else if (value.valueTag() == NODE)
 			{

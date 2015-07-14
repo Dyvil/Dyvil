@@ -65,9 +65,13 @@ public interface MethodWriter
 	
 	public void writeTargetLabel(Label label);
 	
+	public void writeLineNumber(int lineNumber);
+	
 	// Instructions
 	
 	public void writeInsn(int opcode) throws BytecodeException;
+	
+	public void writeInsn(int opcode, int lineNumber) throws BytecodeException;
 	
 	public void writeIntInsn(int opcode, int operand) throws BytecodeException;
 	

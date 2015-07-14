@@ -101,10 +101,13 @@ public final class AndOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		// Left value is false
 		if (this.left.valueTag() == BOOLEAN && !((BooleanValue) this.left).value)
 		{
 			return BooleanValue.FALSE;
+		}
+		if (this.bothTrue())
+		{
+			return BooleanValue.TRUE;
 		}
 		
 		this.left = this.left.foldConstants();
@@ -113,11 +116,21 @@ public final class AndOperator extends ASTNode implements IValue
 		return this;
 	}
 	
+	private boolean bothTrue()
+	{
+		return this.left.valueTag() == BOOLEAN && ((BooleanValue) this.left).value && this.right.valueTag() == BOOLEAN && ((BooleanValue) this.right).value;
+	}
+	
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.left = this.left.cleanup(context, compilableList);
 		this.right = this.right.cleanup(context, compilableList);
+		
+		if (this.bothTrue())
+		{
+			return BooleanValue.TRUE;
+		}
 		
 		return this;
 	}

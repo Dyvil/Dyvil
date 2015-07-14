@@ -63,9 +63,9 @@ public interface IConstructor extends IASTNode, IClassMember, ICallableMember, I
 	
 	public String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type) throws BytecodeException;
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
 	
-	public void writeInvoke(MethodWriter writer) throws BytecodeException;
+	public void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException;
 	
 	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException;
 	

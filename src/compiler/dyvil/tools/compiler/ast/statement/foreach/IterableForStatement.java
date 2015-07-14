@@ -75,12 +75,14 @@ public class IterableForStatement extends ForEachStatement
 		
 		Variable var = this.variable;
 		Variable iteratorVar = this.iteratorVar;
+		int lineNumber = this.getLineNumber();
 		
 		org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
 		writer.writeLabel(scopeLabel);
 		
 		// Get the iterator
 		var.value.writeExpression(writer);
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;", true);
 		
 		// Local Variables
@@ -96,13 +98,14 @@ public class IterableForStatement extends ForEachStatement
 		
 		// Invoke Iterator.next()
 		writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
 		// Cast to the variable type
 		// Auto(un)boxing
 		if (this.boxMethod != null)
 		{
 			writer.writeTypeInsn(Opcodes.CHECKCAST, this.boxMethod.getTheClass().getInternalName());
-			this.boxMethod.writeInvoke(writer, null, null);
+			this.boxMethod.writeInvoke(writer, null, null, lineNumber);
 		}
 		else if (!var.type.equals(Types.OBJECT))
 		{
@@ -121,6 +124,7 @@ public class IterableForStatement extends ForEachStatement
 		// Load Iterator
 		writer.writeVarInsn(Opcodes.ALOAD, iteratorVar.index);
 		// Check hasNext
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "hasNext", "()Z", true);
 		// Go back to start if Iterator.hasNext() returned true
 		writer.writeJumpInsn(Opcodes.IFNE, startLabel);

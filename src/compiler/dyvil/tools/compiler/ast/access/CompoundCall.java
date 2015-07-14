@@ -181,9 +181,10 @@ public final class CompoundCall extends AbstractCall implements INamed
 			FieldAccess access = (FieldAccess) this.instance;
 			IDataMember f = access.field;
 			
+			int lineNumber = this.instance.getLineNumber();
 			if (this.writeIINC(writer, f))
 			{
-				f.writeGet(writer, null);
+				f.writeGet(writer, null, lineNumber);
 				return;
 			}
 			
@@ -194,10 +195,10 @@ public final class CompoundCall extends AbstractCall implements INamed
 				writer.writeInsn(Opcodes.AUTO_DUP);
 			}
 			
-			f.writeGet(writer, null);
-			this.method.writeCall(writer, null, this.arguments, null);
+			f.writeGet(writer, null, lineNumber);
+			this.method.writeCall(writer, null, this.arguments, null, lineNumber);
 			writer.writeInsn(Opcodes.AUTO_DUP);
-			f.writeSet(writer, null, null);
+			f.writeSet(writer, null, null, lineNumber);
 		}
 		else if (i == APPLY_CALL || i == SUBSCRIPT_GET)
 		{
@@ -212,10 +213,11 @@ public final class CompoundCall extends AbstractCall implements INamed
 			
 			writer.writeInsn(Opcodes.DUP2);
 			
-			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null);
-			this.method.writeCall(writer, null, this.arguments, null);
+			int line = this.instance.getLineNumber();
+			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null, line);
+			this.method.writeCall(writer, null, this.arguments, null, line);
 			writer.writeInsn(Opcodes.DUP_X2);
-			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, line);
 		}
 	}
 	
@@ -240,9 +242,10 @@ public final class CompoundCall extends AbstractCall implements INamed
 				writer.writeInsn(Opcodes.AUTO_DUP);
 			}
 			
-			f.writeGet(writer, null);
-			this.method.writeCall(writer, null, this.arguments, null);
-			f.writeSet(writer, null, null);
+			int lineNumber = this.instance.getLineNumber();
+			f.writeGet(writer, null, lineNumber);
+			this.method.writeCall(writer, null, this.arguments, null, lineNumber);
+			f.writeSet(writer, null, null, lineNumber);
 		}
 		else if (i == APPLY_CALL || i == SUBSCRIPT_SET)
 		{
@@ -257,9 +260,10 @@ public final class CompoundCall extends AbstractCall implements INamed
 			
 			writer.writeInsn(Opcodes.DUP2);
 			
-			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null);
-			this.method.writeCall(writer, null, this.arguments, null);
-			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+			int lineNumber = this.instance.getLineNumber();
+			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
+			this.method.writeCall(writer, null, this.arguments, null, lineNumber);
+			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
 		}
 	}
 	

@@ -732,7 +732,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		writer.writeTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
 		if (type != Types.VOID)
@@ -741,12 +741,14 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		this.writeArguments(writer, arguments);
-		this.writeInvoke(writer);
+		this.writeInvoke(writer, lineNumber);
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
+		writer.writeLineNumber(lineNumber);
+		
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();

@@ -1248,6 +1248,10 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		writer.visit(DyvilCompiler.classVersion, mods, internalName, signature, superClass, interfaces);
 		
+		// Source
+		
+		writer.visitSource(this.getUnit().getName() + ".dyvil", null);
+		
 		// Outer Class
 		
 		if (this.outerClass != null)

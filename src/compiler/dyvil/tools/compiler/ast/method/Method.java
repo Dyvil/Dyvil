@@ -1233,6 +1233,8 @@ public class Method extends Member implements IMethod
 		mw.setThisType(this.theClass.getInternalName());
 		mw.writeVarInsn(Opcodes.ALOAD, 0);
 		
+		int lineNumber = this.getLineNumber();
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.overrideMethod.getParameter(i);
@@ -1241,37 +1243,35 @@ public class Method extends Member implements IMethod
 			
 			param.write(mw);
 			mw.writeVarInsn(type1.getLoadOpcode(), param.getIndex());
-			if (!type1.equals(type2))
-			{
-				mw.writeTypeInsn(Opcodes.CHECKCAST, type1.getInternalName());
-			}
+			type2.writeCast(mw, type1, lineNumber);
 		}
 		
+		mw.writeLineNumber(lineNumber);
 		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
 		mw.writeInsn(this.type.getReturnOpcode());
 		mw.end();
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
-				this.writeIntrinsic(writer, instance, arguments);
+				this.writeIntrinsic(writer, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
 		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeIntrinsic(writer, instance, arguments);
+			this.writeIntrinsic(writer, instance, arguments, lineNumber);
 			return;
 		}
 		
-		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		
 		if (type == Types.VOID)
 		{
@@ -1284,55 +1284,52 @@ public class Method extends Member implements IMethod
 		
 		if (type != null)
 		{
-			if (type != this.type && !type.isSuperClassOf(this.type))
-			{
-				writer.writeTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
-			}
+			this.type.writeCast(writer, type, lineNumber);
 		}
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
-				this.writeIntrinsic(writer, dest, instance, arguments);
+				this.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
 		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeIntrinsic(writer, dest, instance, arguments);
+			this.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
 		}
-		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
-				this.writeInvIntrinsic(writer, dest, instance, arguments);
+				this.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
 		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeInvIntrinsic(writer, dest, instance, arguments);
+			this.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
 		}
 		
-		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		
 		writer.writeJumpInsn(IFEQ, dest);
 	}
@@ -1373,7 +1370,7 @@ public class Method extends Member implements IMethod
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
 		{
@@ -1396,7 +1393,7 @@ public class Method extends Member implements IMethod
 					}
 					else
 					{
-						writer.writeInsn(insn);
+						writer.writeInsn(insn, lineNumber);
 					}
 				}
 				return;
@@ -1404,7 +1401,7 @@ public class Method extends Member implements IMethod
 			
 			Label ifEnd = new Label();
 			Label elseEnd = new Label();
-			this.writeIntrinsic(writer, ifEnd, instance, arguments);
+			this.writeIntrinsic(writer, ifEnd, instance, arguments, lineNumber);
 			
 			// If Block
 			writer.writeLDC(0);
@@ -1431,12 +1428,12 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.writeInsn(i);
+				writer.writeInsn(i, lineNumber);
 			}
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1454,12 +1451,12 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.writeInsn(i);
+				writer.writeInsn(i, lineNumber);
 			}
 		}
 	}
 	
-	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1477,26 +1474,30 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.writeInsn(i);
+				writer.writeInsn(i, lineNumber);
 			}
 		}
 	}
 	
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
 		this.writeArguments(writer, instance, arguments);
-		this.writeInvoke(writer, instance, arguments);
+		this.writeInvoke(writer, instance, arguments, lineNumber);
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
+		writer.writeLineNumber(lineNumber);
+		
 		int opcode;
 		int modifiers = this.modifiers;
+		String owner = this.theClass.getInternalName();
+		
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			opcode = Opcodes.INVOKESTATIC;
@@ -1518,7 +1519,6 @@ public class Method extends Member implements IMethod
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		
-		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));

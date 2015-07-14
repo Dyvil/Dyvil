@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -237,11 +236,12 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.field.writeGet(writer, this.instance);
+		int lineNumber = this.getLineNumber();
+		this.field.writeGet(writer, this.instance, lineNumber);
 		
-		if (this.type != null && !this.type.isSuperTypeOf(this.field.getType()))
+		if (this.type != null)
 		{
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+			this.field.getType().writeCast(writer, this.type, lineNumber);
 		}
 	}
 	

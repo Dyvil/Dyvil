@@ -143,7 +143,7 @@ public final class CaseClassMetadata extends ClassMetadata
 				param.write(mw);
 				mw.writeVarInsn(param.getType().getLoadOpcode(), i);
 			}
-			this.constructor.writeInvoke(mw);
+			this.constructor.writeInvoke(mw, 0);
 			mw.writeInsn(Opcodes.ARETURN);
 			mw.end(this.theClass.getType());
 		}

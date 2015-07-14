@@ -81,7 +81,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 				list.addValue(this.values[i]);
 			}
 			
-			return new LiteralExpression(list).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, list).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

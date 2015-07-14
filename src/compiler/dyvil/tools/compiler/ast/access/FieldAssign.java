@@ -230,7 +230,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 			this.value.writeExpression(writer);
 			writer.writeInsn(Opcodes.AUTO_DUP_X1);
 		}
-		this.field.writeSet(writer, null, null);
+		this.field.writeSet(writer, null, null, this.getLineNumber());
 	}
 	
 	@Override
@@ -241,7 +241,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 			return;
 		}
 		
-		this.field.writeSet(writer, this.instance, this.value);
+		this.field.writeSet(writer, this.instance, this.value, this.getLineNumber());
 	}
 	
 	@Override

@@ -70,6 +70,7 @@ public class StringForStatement extends ForEachStatement
 		Variable stringVar = this.stringVar;
 		Variable indexVar = this.indexVar;
 		Variable lengthVar = this.lengthVar;
+		int lineNumber = this.getLineNumber();
 		
 		org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
 		writer.writeLabel(scopeLabel);
@@ -82,6 +83,7 @@ public class StringForStatement extends ForEachStatement
 		writer.writeInsn(Opcodes.DUP);
 		stringVar.writeInit(writer, null);
 		// Get the length
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
@@ -94,8 +96,9 @@ public class StringForStatement extends ForEachStatement
 		writer.writeTargetLabel(startLabel);
 		
 		// Get the char at the index
-		stringVar.writeGet(writer, null);
-		indexVar.writeGet(writer, null);
+		stringVar.writeGet(writer, null, lineNumber);
+		indexVar.writeGet(writer, null, lineNumber);
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
 		var.writeInit(writer, null);
 		
@@ -109,8 +112,8 @@ public class StringForStatement extends ForEachStatement
 		// Increase index
 		writer.writeIINC(indexVar.index, 1);
 		// Boundary Check
-		indexVar.writeGet(writer, null);
-		lengthVar.writeGet(writer, null);
+		indexVar.writeGet(writer, null, lineNumber);
+		lengthVar.writeGet(writer, null, lineNumber);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables

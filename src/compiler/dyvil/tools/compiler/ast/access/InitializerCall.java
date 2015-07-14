@@ -112,7 +112,7 @@ public class InitializerCall extends ASTNode implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
-		this.constructor.writeInvoke(writer);
+		this.constructor.writeInvoke(writer, this.getLineNumber());
 	}
 	
 	@Override

@@ -352,7 +352,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -368,12 +368,13 @@ public class Field extends Member implements IField
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 		}
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -393,6 +394,7 @@ public class Field extends Member implements IField
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}

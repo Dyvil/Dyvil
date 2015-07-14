@@ -171,7 +171,7 @@ public final class NilValue implements IValue
 			return;
 		}
 		
-		this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType);
+		this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.getLineNumber());
 	}
 	
 	@Override

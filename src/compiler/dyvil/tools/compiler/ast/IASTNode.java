@@ -13,6 +13,12 @@ public interface IASTNode
 		return null;
 	}
 	
+	public default int getLineNumber()
+	{
+		ICodePosition position = this.getPosition();
+		return position == null ? 0 : position.startLine();
+	}
+	
 	public default void expandPosition(ICodePosition position)
 	{
 	}

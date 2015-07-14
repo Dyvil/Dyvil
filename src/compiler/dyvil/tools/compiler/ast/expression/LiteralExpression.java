@@ -17,6 +17,7 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LiteralExpression implements IValue
 {
+	private IValue literal;
 	private IArguments	arguments;
 	private IType		type;
 	
@@ -24,16 +25,19 @@ public final class LiteralExpression implements IValue
 	
 	public LiteralExpression(IValue literal)
 	{
+		this.literal = literal;
 		this.arguments = new SingleArgument(literal);
 	}
 	
-	public LiteralExpression(IArguments arguments)
+	public LiteralExpression(IValue literal, IArguments arguments)
 	{
+		this.literal = literal;
 		this.arguments = arguments;
 	}
 	
 	public LiteralExpression(IValue literal, IMethod method)
 	{
+		this.literal = literal;
 		this.arguments = new SingleArgument(literal);
 		this.method = method;
 	}
@@ -136,18 +140,18 @@ public final class LiteralExpression implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, null, this.arguments, null);
+		this.method.writeCall(writer, null, this.arguments, null, this.literal.getLineNumber());
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.arguments.getFirstValue().writeStatement(writer);
+		this.literal.writeStatement(writer);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.arguments.getFirstValue().toString(prefix, buffer);
+		this.literal.toString(prefix, buffer);
 	}
 }

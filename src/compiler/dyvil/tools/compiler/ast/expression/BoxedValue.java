@@ -87,7 +87,7 @@ public final class BoxedValue implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.boxed, EmptyArguments.INSTANCE, null);
+		this.method.writeCall(writer, this.boxed, EmptyArguments.INSTANCE, null, this.boxed.getLineNumber());
 	}
 	
 	@Override

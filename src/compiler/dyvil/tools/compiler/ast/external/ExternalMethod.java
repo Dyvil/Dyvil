@@ -279,32 +279,32 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeCall(writer, instance, arguments, type);
+		super.writeCall(writer, instance, arguments, type, lineNumber);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeJump(writer, dest, instance, arguments);
+		super.writeJump(writer, dest, instance, arguments, lineNumber);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeInvJump(writer, dest, instance, arguments);
+		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
 	}
 }

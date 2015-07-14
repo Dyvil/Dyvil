@@ -122,8 +122,7 @@ public final class ThrowStatement implements IValue, IValued
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
-		writer.writeInsn(Opcodes.ATHROW);
+		this.writeStatement(writer);
 	}
 	
 	@Override

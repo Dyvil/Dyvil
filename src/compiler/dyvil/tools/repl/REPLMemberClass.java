@@ -530,7 +530,9 @@ public class REPLMemberClass implements IClass
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Opcodes.ACC_SUPER, this.name.qualified, null, "java/lang/Object", null);
+		String name = this.name.qualified;
+		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object", null);
+		writer.visitSource(name, null);
 		
 		this.member.write(writer);
 		

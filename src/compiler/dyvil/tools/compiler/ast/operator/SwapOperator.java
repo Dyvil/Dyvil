@@ -124,6 +124,7 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		int lineNumber = this.getLineNumber();
 		IValue leftInstance = this.left.instance;
 		IDataMember leftField = this.left.field;
 		IValue rightInstance = this.right.instance;
@@ -133,25 +134,25 @@ public class SwapOperator extends ASTNode implements IValue
 		{
 			leftInstance.writeExpression(writer);
 		}
-		leftField.writeGet(writer, null);
+		leftField.writeGet(writer, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer);
 		}
-		rightField.writeGet(writer, null);
+		rightField.writeGet(writer, null, lineNumber);
 		
 		if (leftInstance != null)
 		{
 			leftInstance.writeExpression(writer);
 		}
-		leftField.writeSet(writer, null, null);
+		leftField.writeSet(writer, null, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer);
 		}
-		rightField.writeSet(writer, null, null);
+		rightField.writeSet(writer, null, null, lineNumber);
 	}
 	
 	@Override

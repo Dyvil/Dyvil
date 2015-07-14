@@ -100,6 +100,10 @@ public final class OrOperator extends ASTNode implements IValue
 		{
 			return BooleanValue.TRUE;
 		}
+		if (this.bothFalse())
+		{
+			return BooleanValue.FALSE;
+		}
 		
 		this.left = this.left.foldConstants();
 		this.right = this.right.foldConstants();
@@ -107,11 +111,21 @@ public final class OrOperator extends ASTNode implements IValue
 		return this;
 	}
 	
+	private boolean bothFalse()
+	{
+		return this.left.valueTag() == BOOLEAN && !((BooleanValue) this.left).value && this.right.valueTag() == BOOLEAN && !((BooleanValue) this.right).value;
+	}
+	
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.left = this.left.cleanup(context, compilableList);
 		this.right = this.right.cleanup(context, compilableList);
+		
+		if (this.bothFalse())
+		{
+			return BooleanValue.FALSE;
+		}
 		
 		return this;
 	}

@@ -258,7 +258,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			return;
 		}
 		
-		this.constructor.writeCall(writer, this.arguments, null);
+		this.constructor.writeCall(writer, this.arguments, null, this.getLineNumber());
 	}
 	
 	@Override

@@ -23,7 +23,7 @@ public abstract class AbstractCall implements ICall, IValued
 {
 	protected ICodePosition	position;
 	public IValue			instance;
-	public IArguments		arguments = EmptyArguments.INSTANCE;
+	public IArguments		arguments	= EmptyArguments.INSTANCE;
 	
 	public IMethod			method;
 	protected IType			type;
@@ -192,28 +192,39 @@ public abstract class AbstractCall implements ICall, IValued
 		return this;
 	}
 	
+	// Inlined for performance
+	@Override
+	public int getLineNumber()
+	{
+		if (this.position == null)
+		{
+			return 0;
+		}
+		return this.position.startLine();
+	}
+	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, this.type);
+		this.method.writeCall(writer, this.instance, this.arguments, this.type, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID);
+		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeJump(writer, dest, this.instance, this.arguments);
+		this.method.writeJump(writer, dest, this.instance, this.arguments, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeInvJump(writer, dest, this.instance, this.arguments);
+		this.method.writeInvJump(writer, dest, this.instance, this.arguments, this.getLineNumber());
 	}
 	
 	@Override

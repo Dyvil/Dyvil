@@ -295,7 +295,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	{
 		if (this.method != null)
 		{
-			this.method.writeCall(writer, null, this.arguments, this.tupleType);
+			this.method.writeCall(writer, null, this.arguments, this.tupleType, this.getLineNumber());
 			return;
 		}
 		

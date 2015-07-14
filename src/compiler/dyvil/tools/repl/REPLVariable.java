@@ -154,6 +154,8 @@ public class REPLVariable extends Field
 		// Generate Class Header
 		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
 		
+		writer.visitSource(className, null);
+		
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
@@ -214,7 +216,7 @@ public class REPLVariable extends Field
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (this.isConstant())
 		{
@@ -233,7 +235,7 @@ public class REPLVariable extends Field
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (this.className == null)
 		{

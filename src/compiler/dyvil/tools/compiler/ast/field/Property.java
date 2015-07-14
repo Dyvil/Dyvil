@@ -538,7 +538,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -552,6 +552,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		
@@ -562,7 +563,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -580,6 +581,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		

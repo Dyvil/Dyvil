@@ -19,6 +19,12 @@ public abstract class ASTNode implements IASTNode
 	}
 	
 	@Override
+	public int getLineNumber()
+	{
+		return this.position == null ? 0 : this.position.startLine();
+	}
+	
+	@Override
 	public void expandPosition(ICodePosition position)
 	{
 		if (this.position != null)

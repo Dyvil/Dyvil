@@ -257,20 +257,20 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		int index = this.variable.getIndex();
 		this.variable.setIndex(this.index);
-		this.variable.writeGet(writer, instance);
+		this.variable.writeGet(writer, instance, lineNumber);
 		this.variable.setIndex(index);
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		int index = this.variable.getIndex();
 		this.variable.setIndex(this.index);
-		this.variable.writeSet(writer, instance, value);
+		this.variable.writeSet(writer, instance, value, lineNumber);
 		this.variable.setIndex(index);
 	}
 	

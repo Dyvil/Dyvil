@@ -479,6 +479,8 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
 		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
 		Handle handle = new Handle(handleType, this.owner, name, desc);
+		
+		writer.writeLineNumber(this.getLineNumber());
 		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, type1, handle, type2);
 	}
 	

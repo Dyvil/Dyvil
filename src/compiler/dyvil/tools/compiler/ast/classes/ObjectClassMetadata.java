@@ -19,7 +19,6 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 public final class ObjectClassMetadata extends ClassMetadata
 {
 	protected IField	instanceField;
-	private boolean		hasToString;
 	
 	public ObjectClassMetadata(IClass iclass)
 	{
@@ -54,7 +53,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		}
 		
 		Field f = new Field(this.theClass, Name.instance, this.theClass.getType());
-		f.modifiers = Modifiers.PUBLIC | Modifiers.CONST | Modifiers.SYNTHETIC;
+		f.modifiers = Modifiers.PUBLIC | Modifiers.CONST;
 		this.instanceField = f;
 		
 		ConstructorCall call = new ConstructorCall(null);
@@ -65,7 +64,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		
 		if (this.theClass.getMethod(Name.toString, null, 0, null) != null)
 		{
-			this.hasToString = true;
+			this.methods |= TOSTRING;
 		}
 	}
 	
@@ -98,7 +97,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		
 		super.write(writer, instanceFields);
 		
-		if (!this.hasToString)
+		if ((this.methods & TOSTRING) == 0)
 		{
 			// Generate a toString() method that simply returns the name of this
 			// object type.
