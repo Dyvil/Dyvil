@@ -171,12 +171,6 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return this.getValue(param.getName()).getType();
-	}
-	
-	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
 		Name key = param.getName();
@@ -228,6 +222,18 @@ public final class ArgumentMap implements IArguments, IValueMap
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		this.checkValue(index, param, typeContext, markers, context);
+	}
+	
+	@Override
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
+	{
+		param.getType().inferTypes(this.getValue(param.getName()).getType(), typeContext);
+	}
+	
+	@Override
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	{
+		this.inferType(index, param, typeContext);
 	}
 	
 	@Override

@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -117,12 +116,6 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return index == 0 ? this.value.getType() : Types.UNKNOWN;
-	}
-	
-	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
 		if (index == 0)
@@ -139,7 +132,8 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			return DEFAULT_MATCH;
 		}
-		if (index > 1) {
+		if (index > 1)
+		{
 			return 0;
 		}
 		
@@ -201,6 +195,33 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			this.value = value1;
 		}
+	}
+	
+	@Override
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
+	{
+		if (index == 0)
+		{
+			param.getType().inferTypes(this.value.getType(), typeContext);
+		}
+	}
+	
+	@Override
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	{
+		if (index != 0)
+		{
+			return;
+		}
+		
+		IType type = this.value.getType();
+		if (type.isArrayType())
+		{
+			param.getType().inferTypes(type, typeContext);
+			return;
+		}
+		
+		param.getType().getElementType().inferTypes(type, typeContext);
 	}
 	
 	@Override

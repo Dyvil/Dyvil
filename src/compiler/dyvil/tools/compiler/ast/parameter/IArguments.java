@@ -48,8 +48,6 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public IValue getValue(int index, IParameter param);
 	
-	public IType getType(int index, IParameter param);
-	
 	public float getTypeMatch(int index, IParameter param);
 	
 	public float getVarargsTypeMatch(int index, IParameter param);
@@ -57,6 +55,10 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
+	
+	public void inferType(int index, IParameter param, ITypeContext typeContext);
+	
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext);
 	
 	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException;
 	

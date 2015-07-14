@@ -94,12 +94,6 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return null;
-	}
-	
-	@Override
 	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
 	{
 		if (defaultValue != null)
@@ -113,6 +107,16 @@ public final class EmptyArguments implements IArguments
 	{
 		writer.writeLDC(0);
 		writer.writeNewArray(type, 1);
+	}
+	
+	@Override
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
+	{
+	}
+	
+	@Override
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	{
 	}
 	
 	@Override

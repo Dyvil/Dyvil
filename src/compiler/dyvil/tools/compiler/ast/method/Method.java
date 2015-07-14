@@ -516,7 +516,7 @@ public class Method extends Member implements IMethod
 			if (m.getDescriptor().equals(desc))
 			{
 				markers.add(this.position, "method.duplicate", this.name, desc);
-			}			
+			}
 		}
 	}
 	
@@ -720,7 +720,7 @@ public class Method extends Member implements IMethod
 		
 		int parIndex = 0;
 		int match = 1;
-		int len = arguments.size();
+		int argumentCount = arguments.size();
 		
 		// infix modifier implementation
 		if (instance != null)
@@ -745,15 +745,10 @@ public class Method extends Member implements IMethod
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int parCount = this.parameterCount - 1;
-			if (len <= parCount)
-			{
-				return 0;
-			}
+			int len = this.parameterCount - 1 - parIndex;
 			
 			float m;
-			IParameter varParam = this.parameters[parCount];
-			for (int i = parIndex; i < parCount; i++)
+			for (int i = parIndex; i < len; i++)
 			{
 				IParameter par = this.parameters[i + parIndex];
 				m = arguments.getTypeMatch(i, par);
@@ -763,25 +758,23 @@ public class Method extends Member implements IMethod
 				}
 				match += m;
 			}
-			for (int i = parCount + parIndex; i < len; i++)
+			m = arguments.getVarargsTypeMatch(len, this.parameters[len + parIndex]);
+			if (m == 0)
 			{
-				m = arguments.getVarargsTypeMatch(i, varParam);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
+				return 0;
 			}
-			return match;
+			return match + m;
 		}
-		else if (len + parIndex > this.parameterCount)
+		
+		int len = this.parameterCount - parIndex;
+		if (argumentCount > len)
 		{
 			return 0;
 		}
 		
-		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
+		for (int i = 0; i < len; i++)
 		{
-			IParameter par = this.parameters[parIndex];
+			IParameter par = this.parameters[i + parIndex];
 			float m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
@@ -948,26 +941,32 @@ public class Method extends Member implements IMethod
 			genericData.instanceType = this.theClass.getType();
 		}
 		
-		int len = arguments.size();
+		int parIndex = 0;
 		IParameter param;
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
-			
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + 1];
-				param.getType().inferTypes(arguments.getType(i, param), genericData);
-			}
+			parIndex = 1;
 		}
-		else
+		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			len = Math.min(this.parameterCount, len);
+			int len = this.parameterCount - parIndex - 1;
 			for (int i = 0; i < len; i++)
 			{
-				param = this.parameters[i];
-				param.getType().inferTypes(arguments.getType(i, param), genericData);
+				param = this.parameters[i + parIndex];
+				arguments.inferType(i, param, genericData);
 			}
+			
+			arguments.inferVarargsType(len, this.parameters[len + parIndex], genericData);
+			return;
+		}
+		
+		int len = this.parameterCount - parIndex;
+		for (int i = 0; i < len; i++)
+		{
+			param = this.parameters[i + parIndex];
+			arguments.inferType(i, param, genericData);
 		}
 	}
 	
@@ -1340,43 +1339,25 @@ public class Method extends Member implements IMethod
 	
 	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			int len = this.parameterCount;
-			if ((this.modifiers & Modifiers.VARARGS) != 0)
-			{
-				len--;
-				IParameter param;
-				for (int i = 1, j = 0; i < len; i++, j++)
-				{
-					param = this.parameters[i];
-					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				}
-				param = this.parameters[len];
-				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				return;
-			}
-			
-			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
-			{
-				IParameter param = this.parameters[i];
-				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-			}
-			return;
-		}
+		int parIndex = 0;
+		
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
 			return;
 		}
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			parIndex = 1;
+		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int len = this.parameterCount - 1;
+			int len = this.parameterCount - 1 - parIndex;
 			IParameter param;
 			for (int i = 0; i < len; i++)
 			{
-				param = this.parameters[i];
+				param = this.parameters[i + parIndex];
 				arguments.writeValue(i, param.getName(), param.getValue(), writer);
 			}
 			param = this.parameters[len];
@@ -1384,9 +1365,10 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		int len = this.parameterCount - parIndex;
+		for (int i = 0; i < len; i++)
 		{
-			IParameter param = this.parameters[i];
+			IParameter param = this.parameters[i + parIndex];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
 		}
 	}
