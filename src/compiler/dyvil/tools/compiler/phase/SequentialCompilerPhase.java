@@ -3,16 +3,15 @@ package dyvil.tools.compiler.phase;
 import java.util.function.Consumer;
 
 import dyvil.collection.Collection;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
-public class ParallelCompilerPhase implements ICompilerPhase
+public class SequentialCompilerPhase implements ICompilerPhase
 {
 	private int							id;
 	private String						name;
 	private Consumer<ICompilationUnit>	apply;
 	
-	public ParallelCompilerPhase(int id, String name, Consumer<ICompilationUnit> apply)
+	public SequentialCompilerPhase(int id, String name, Consumer<ICompilationUnit> apply)
 	{
 		this.id = id;
 		this.name = name;
@@ -34,18 +33,7 @@ public class ParallelCompilerPhase implements ICompilerPhase
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		for (ICompilationUnit unit : units)
-		{
-			try
-			{
-				this.apply.accept(unit);
-			}
-			catch (Throwable t)
-			{
-				DyvilCompiler.logger.warning(this.name + " failed on Compilation Unit '" + unit.getInputFile() + "'");
-				DyvilCompiler.logger.throwing(this.name, "apply", t);
-			}
-		}
+		units.forEach(this.apply);
 	}
 	
 	@Override
