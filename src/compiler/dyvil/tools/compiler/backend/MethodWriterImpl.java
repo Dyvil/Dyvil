@@ -572,8 +572,10 @@ public final class MethodWriterImpl implements MethodWriter
 		this.visitFrame = true;
 		this.frame.visitJumpInsn(opcode);
 		
-		target.info = this.frame;
-		this.frame = this.frame.copy();
+		if (target.info == null)
+		{
+			target.info = this.frame.copy();
+		}
 		
 		this.mv.visitJumpInsn(opcode, target);
 	}
