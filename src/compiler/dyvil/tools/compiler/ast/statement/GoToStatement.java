@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -13,10 +14,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class GoToStatement extends ASTNode implements IStatement
 {
-	public Label		label;
-	public Name			name;
-	
-	private IStatement	parent;
+	public Label	label;
+	public Name		name;
 	
 	public GoToStatement(ICodePosition position)
 	{
@@ -35,45 +34,34 @@ public class GoToStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.name == null)
+		{
+			return;
+		}
+		
+		this.label = context.resolveLabel(this.name);
+		if (this.label == null)
+		{
+			markers.add(this.position, "resolve.label", this.name);
+		}
+	}
+	
+	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.parent == null)
+		markers.add(this.position, "goto.warning");
+		if (this.label == null)
 		{
 			markers.add(this.position, "goto.invalid");
 			return this;
 		}
-		
-		if (this.name != null)
-		{
-			this.label = this.parent.resolveLabel(this.name);
-			
-			if (this.label == null)
-			{
-				markers.add(this.position, "resolve.label", this.name);
-			}
-		}
-		else
-		{
-			markers.add(this.position, "goto.invalid");
-		}
-		markers.add(this.position, "goto.warning");
 		
 		return this;
 	}

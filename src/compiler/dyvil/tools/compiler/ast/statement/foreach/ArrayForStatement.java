@@ -85,7 +85,7 @@ public class ArrayForStatement extends ForEachStatement
 			return this.arrayVar;
 		}
 		
-		return this.context.resolveField(name);
+		return null;
 	}
 	
 	@Override

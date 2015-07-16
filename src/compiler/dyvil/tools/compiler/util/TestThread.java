@@ -19,7 +19,7 @@ public final class TestThread extends Thread
 	{
 		List<Library> libraries = DyvilCompiler.config.libraries;
 		URL[] urls = new URL[1 + libraries.size()];
-		urls[0] = DyvilCompiler.config.outputDir.toURI().toURL();
+		urls[0] = DyvilCompiler.config.getOutputDir().toURI().toURL();
 		
 		int index = 1;
 		for (Library l : libraries)
@@ -33,7 +33,7 @@ public final class TestThread extends Thread
 	@Override
 	public void run()
 	{
-		String mainType = DyvilCompiler.config.mainType;
+		String mainType = DyvilCompiler.config.getMainType();
 		String[] args = DyvilCompiler.config.getMainArgs();
 		PrintStream out = System.out;
 		PrintStream err = System.err;

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
@@ -26,6 +27,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -52,7 +54,7 @@ import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
 import static dyvil.reflect.Opcodes.INSTANCE;
 
-public class Method extends Member implements IMethod
+public class Method extends Member implements IMethod, ILabelContext
 {
 	protected IClass			theClass;
 	
@@ -452,6 +454,7 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
+			this.value.resolveStatement(this, markers);
 			this.value.checkTypes(markers, this);
 		}
 		
@@ -657,6 +660,18 @@ public class Method extends Member implements IMethod
 		}
 		
 		return this.theClass.resolveField(name);
+	}
+	
+	@Override
+	public dyvil.tools.compiler.ast.statement.Label resolveLabel(Name name)
+	{
+		return null;
+	}
+	
+	@Override
+	public ILoop getEnclosingLoop()
+	{
+		return null;
 	}
 	
 	@Override

@@ -56,7 +56,7 @@ public class StringForStatement extends ForEachStatement
 		{
 			return this.stringVar;
 		}
-		return this.context.resolveField(name);
+		return null;
 	}
 	
 	@Override

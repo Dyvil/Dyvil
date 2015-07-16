@@ -3,27 +3,21 @@ package dyvil.tools.compiler.ast.statement;
 import java.util.Iterator;
 
 import dyvil.collection.Entry;
-import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -33,7 +27,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StatementList extends ASTNode implements IStatement, IValueList, IContext
+public final class StatementList extends ASTNode implements IStatement, IValueList, IDefaultContext, ILabelContext
 {
 	private IValue[]			values	= new IValue[3];
 	private int					valueCount;
@@ -41,9 +35,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	private Label[]				labels;
 	private Map<Name, Variable>	variables;
 	private IType				requiredType;
-	
-	private IContext			context;
-	private IStatement			parent;
 	
 	public StatementList()
 	{
@@ -58,18 +49,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	public int valueTag()
 	{
 		return STATEMENT_LIST;
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
 	}
 	
 	@Override
@@ -217,30 +196,70 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public IDataMember resolveField(Name name)
+	{
+		if (this.variables != null)
+		{
+			IDataMember field = this.variables.get(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public Label resolveLabel(Name name)
+	{
+		if (this.labels != null)
+		{
+			for (Label label : this.labels)
+			{
+				if (label != null && name == label.name)
+				{
+					return label;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public ILoop getEnclosingLoop()
+	{
+		return null;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.context = context;
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v = this.values[i];
-			if (v.isStatement())
-			{
-				((IStatement) v).setParent(this);
-			}
-			
-			v.resolveTypes(markers, this);
+			this.values[i].resolveTypes(markers, context);
 		}
-		this.context = null;
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].resolveStatement(context, markers);
+		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
+		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue v1 = this.values[i];
-			IValue v2 = v1.resolve(markers, this);
+			IValue v2 = v1.resolve(markers, context1);
 			if (v1 != v2)
 			{
 				this.values[i] = v2;
@@ -258,7 +277,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				this.variables.put(var.name, var);
 			}
 		}
-		this.context = null;
 		return this;
 	}
 	
@@ -270,12 +288,13 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		this.context = context;
+		IContext context1 = this.variables == null ? context : new CombiningContext(this, context);
+		
 		int len = this.valueCount - 1;
 		for (int i = 0; i < len; i++)
 		{
 			IValue v = this.values[i];
-			IValue v1 = v.withType(Types.VOID, null, markers, context);
+			IValue v1 = v.withType(Types.VOID, Types.VOID, markers, context1);
 			if (v1 == null)
 			{
 				Marker marker = markers.create(v.getPosition(), "statement.type");
@@ -286,35 +305,39 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				v = this.values[i] = v1;
 			}
 			
-			v.checkTypes(markers, this);
+			v.checkTypes(markers, context1);
 		}
 		
 		IValue lastValue = this.values[len];
-		if (this.requiredType != null)
+		IType type = this.requiredType == null ? lastValue.getType() : this.requiredType;
+		IValue lastValue1 = lastValue.withType(type, type, markers, context1);
+		
+		if (lastValue1 == null)
 		{
-			if (!lastValue.isType(this.requiredType))
-			{
-				Marker marker = markers.create(lastValue.getPosition(), "block.type");
-				marker.addInfo("Block Type: " + this.requiredType);
-				marker.addInfo("Returning Type: " + lastValue.getType());
-			}
+			Marker marker = markers.create(lastValue.getPosition(), "block.type");
+			marker.addInfo("Block Type: " + this.requiredType);
+			marker.addInfo("Returning Type: " + lastValue.getType());
 		}
 		else
 		{
-			this.requiredType = lastValue.getType();
+			lastValue = lastValue1;
+			if (this.requiredType == null)
+			{
+				this.requiredType = lastValue.getType();
+			}
 		}
-		lastValue.checkTypes(markers, this);
 		
-		this.context = null;
+		lastValue.checkTypes(markers, context1);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		IContext context1 = this.variables == null ? context : new CombiningContext(this, context);
+		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].check(markers, context);
+			this.values[i].check(markers, context1);
 		}
 	}
 	
@@ -346,104 +369,6 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 		return this;
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (this.variables != null)
-		{
-			IDataMember field = this.variables.get(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
-		
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return this.context.handleException(type);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		if (this.labels != null)
-		{
-			for (Label label : this.labels)
-			{
-				if (label != null && name == label.name)
-				{
-					return label;
-				}
-			}
-		}
-		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
 	}
 	
 	@Override

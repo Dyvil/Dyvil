@@ -1,21 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -24,25 +15,22 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ForStatement implements IStatement, IContext, ILoop
+public class ForStatement implements IStatement, IDefaultContext, ILoop
 {
-	public static final Name		$forStart	= Name.getQualified("$forStart");
-	public static final Name		$forUpdate	= Name.getQualified("$forCondition");
-	public static final Name		$forEnd		= Name.getQualified("$forEnd");
+	public static final Name	$forStart	= Name.getQualified("$forStart");
+	public static final Name	$forUpdate	= Name.getQualified("$forCondition");
+	public static final Name	$forEnd		= Name.getQualified("$forEnd");
 	
-	protected transient IContext	context;
-	protected IStatement			parent;
+	public Variable				variable;
 	
-	public Variable					variable;
+	public IValue				condition;
+	public IValue				update;
 	
-	public IValue					condition;
-	public IValue					update;
+	public IValue				action;
 	
-	public IValue					action;
-	
-	protected Label					startLabel;
-	protected Label					updateLabel;
-	protected Label					endLabel;
+	protected Label				startLabel;
+	protected Label				updateLabel;
+	protected Label				endLabel;
 	
 	public ForStatement(Variable variable, IValue condition, IValue update, IValue action)
 	{
@@ -82,60 +70,6 @@ public class ForStatement implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		if (this.variable != null && this.variable.name == name)
@@ -143,31 +77,7 @@ public class ForStatement implements IStatement, IContext, ILoop
 			return this.variable;
 		}
 		
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return this.context.handleException(type);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
+		return null;
 	}
 	
 	@Override
@@ -186,7 +96,7 @@ public class ForStatement implements IStatement, IContext, ILoop
 			return this.endLabel;
 		}
 		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		return null;
 	}
 	
 	@Override
@@ -207,39 +117,41 @@ public class ForStatement implements IStatement, IContext, ILoop
 		
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				((IStatement) this.action).setParent(this);
-			}
-			
 			this.action.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null)
+		{
+			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.context = context;
-		
+		IContext context1 = new CombiningContext(this, context);
 		if (this.variable != null)
 		{
 			this.variable.resolve(markers, context);
 		}
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, this);
+			this.condition = this.condition.resolve(markers, context1);
 		}
 		if (this.update != null)
 		{
-			this.update = this.update.resolve(markers, this);
+			this.update = this.update.resolve(markers, context1);
 		}
 		
 		if (this.action != null)
 		{
-			this.action = this.action.resolve(markers, this);
+			this.action = this.action.resolve(markers, context1);
 		}
 		
-		this.context = null;
 		return this;
 	}
 	
@@ -250,14 +162,14 @@ public class ForStatement implements IStatement, IContext, ILoop
 		{
 			this.variable.checkTypes(markers, context);
 		}
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
 		if (this.update != null)
 		{
-			this.update.checkTypes(markers, this);
+			this.update.checkTypes(markers, context1);
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "for.condition.type");
@@ -268,19 +180,18 @@ public class ForStatement implements IStatement, IContext, ILoop
 				this.condition = condition1;
 			}
 			
-			this.condition.checkTypes(markers, this);
+			this.condition.checkTypes(markers, context1);
 		}
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, this);
+			this.action.checkTypes(markers, context1);
 		}
-		this.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
 		
 		if (this.variable != null)
 		{
@@ -288,18 +199,16 @@ public class ForStatement implements IStatement, IContext, ILoop
 		}
 		if (this.update != null)
 		{
-			this.update.check(markers, this);
+			this.update.check(markers, context1);
 		}
 		if (this.condition != null)
 		{
-			this.condition.check(markers, this);
+			this.condition.check(markers, context1);
 		}
 		if (this.action != null)
 		{
-			this.action.check(markers, this);
+			this.action.check(markers, context1);
 		}
-		
-		this.context = null;
 	}
 	
 	@Override
@@ -327,26 +236,25 @@ public class ForStatement implements IStatement, IContext, ILoop
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
 		
 		if (this.variable != null)
 		{
-			this.variable.cleanup(context, compilableList);
+			this.variable.cleanup(context1, compilableList);
 		}
 		if (this.update != null)
 		{
-			this.update.cleanup(this, compilableList);
+			this.update.cleanup(context1, compilableList);
 		}
 		if (this.condition != null)
 		{
-			this.condition.cleanup(this, compilableList);
+			this.condition.cleanup(context1, compilableList);
 		}
 		if (this.action != null)
 		{
-			this.action.cleanup(this, compilableList);
+			this.action.cleanup(context1, compilableList);
 		}
 		
-		this.context = null;
 		return this;
 	}
 	

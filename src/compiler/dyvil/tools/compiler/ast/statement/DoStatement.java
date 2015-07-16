@@ -25,8 +25,6 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	public IValue				action;
 	public IValue				condition;
 	
-	private IStatement			parent;
-	
 	public Label				startLabel;
 	public Label				conditionLabel;
 	public Label				endLabel;
@@ -40,6 +38,12 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		this.endLabel = new Label($doEnd);
 	}
 	
+	@Override
+	public int valueTag()
+	{
+		return DO_WHILE;
+	}
+
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
@@ -61,24 +65,6 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public int valueTag()
-	{
-		return DO_WHILE;
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
 	public Label getContinueLabel()
 	{
 		return this.conditionLabel;
@@ -91,19 +77,26 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
+	public Label resolveLabel(Name name)
+	{
+		if (name == $doCondition)
+		{
+			return this.conditionLabel;
+		}
+		if (name == $doEnd)
+		{
+			return this.endLabel; 
+		}
+		
+		return null;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				((IStatement) this.action).setParent(this);
-				this.action.resolveTypes(markers, context);
-			}
-			else
-			{
-				this.action.resolveTypes(markers, context);
-			}
+			this.action.resolveTypes(markers, context);
 		}
 		if (this.condition != null)
 		{
@@ -192,21 +185,6 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 			this.condition = this.condition.cleanup(context, compilableList);
 		}
 		return this;
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		if (name == $doCondition)
-		{
-			return this.conditionLabel;
-		}
-		if (name == $doEnd)
-		{
-			return this.endLabel;
-		}
-		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
 	}
 	
 	@Override

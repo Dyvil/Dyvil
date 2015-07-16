@@ -5,9 +5,9 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -25,8 +25,6 @@ public final class IfStatement extends ASTNode implements IStatement
 	public IValue		elseThen;
 	
 	private IType		commonType;
-	
-	private IStatement	parent;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -67,18 +65,6 @@ public final class IfStatement extends ASTNode implements IStatement
 	public IValue getElse()
 	{
 		return this.elseThen;
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
 	}
 	
 	@Override
@@ -170,21 +156,26 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.then != null)
 		{
-			if (this.then.isStatement())
-			{
-				((IStatement) this.then).setParent(this);
-			}
 			this.then.resolveTypes(markers, context);
 		}
 		
 		if (this.elseThen != null)
 		{
-			if (this.elseThen.isStatement())
-			{
-				((IStatement) this.elseThen).setParent(this);
-			}
-			
 			this.elseThen.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.then != null)
+		{
+			this.then.resolveStatement(context, markers);
+		}
+		
+		if (this.elseThen != null)
+		{
+			this.elseThen.resolveStatement(context, markers);
 		}
 	}
 	
@@ -310,12 +301,6 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public Label resolveLabel(Name name)
-	{
-		return this.parent == null ? null : this.parent.resolveLabel(name);
-	}
-	
-	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
@@ -393,15 +378,6 @@ public final class IfStatement extends ASTNode implements IStatement
 			
 			if (this.elseThen != null)
 			{
-				if (this.then.isStatement())
-				{
-					buffer.append('\n').append(prefix);
-				}
-				else
-				{
-					buffer.append(' ');
-				}
-				
 				buffer.append(Formatting.Statements.ifElse);
 				this.elseThen.toString(prefix, buffer);
 			}

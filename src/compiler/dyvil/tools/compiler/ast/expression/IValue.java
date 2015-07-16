@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.reference.IReference;
@@ -106,11 +107,6 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 	
-	public default boolean isStatement()
-	{
-		return false;
-	}
-	
 	public default boolean isPrimitive()
 	{
 		return this.getType().isPrimitive();
@@ -173,6 +169,11 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	public void resolveTypes(MarkerList markers, IContext context);
+	
+	public default void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		
+	}
 	
 	public IValue resolve(MarkerList markers, IContext context);
 	

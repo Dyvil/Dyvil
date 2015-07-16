@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -157,6 +158,15 @@ public final class MatchExpression extends ASTNode implements IValue
 			CaseExpression caseStatement = this.cases[i];
 			caseStatement.setMatchCase();
 			caseStatement.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			this.cases[i].value.resolveStatement(context, markers);
 		}
 	}
 	

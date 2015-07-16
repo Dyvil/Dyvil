@@ -4,7 +4,9 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -23,8 +25,6 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	
 	public IValue				condition;
 	public IValue				action;
-	
-	private IStatement			parent;
 	
 	public Label				startLabel;
 	public Label				endLabel;
@@ -64,18 +64,6 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
 	public Label getContinueLabel()
 	{
 		return this.startLabel;
@@ -96,15 +84,15 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				((IStatement) this.action).setParent(this);
-				this.action.resolveTypes(markers, context);
-			}
-			else
-			{
-				this.action.resolveTypes(markers, context);
-			}
+			this.action.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null) {
+			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
 	
@@ -207,7 +195,7 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 			return this.endLabel;
 		}
 		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		return null;
 	}
 	
 	@Override

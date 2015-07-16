@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -35,18 +36,6 @@ public class BreakStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
@@ -54,54 +43,50 @@ public class BreakStatement extends ASTNode implements IStatement
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.parent == null)
-		{
-			markers.add(this.position, "break.invalid");
-			return this;
-		}
-		
-		if (this.name != null)
-		{
-			this.label = this.parent.resolveLabel(this.name);
-			
-			if (this.label == null)
-			{
-				markers.add(this.position, "resolve.label", this.name);
-			}
-			else if (this.label.value instanceof ILoop)
-			{
-				this.label = ((ILoop) this.label.value).getBreakLabel();
-			}
-			else
-			{
-				markers.add(this.position, "break.invalid.label", this.name);
-			}
-		}
-		else
-		{
-			IStatement parent = this.parent;
-			while (parent != null)
-			{
-				if (parent instanceof ILoop)
-				{
-					this.label = ((ILoop) parent).getBreakLabel();
-					break;
-				}
-				parent = parent.getParent();
-			}
-			
-			if (this.label == null)
-			{
-				markers.add(this.position, "break.invalid");
-			}
-		}
-		
 		return this;
 	}
 	
 	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.name == null)
+		{
+			ILoop loop = context.getEnclosingLoop();
+			if (loop == null)
+			{
+				markers.add(this.position, "break.invalid");
+				return;
+			}
+			
+			this.label = loop.getBreakLabel();
+			return;
+		}
+		
+		this.label = context.resolveLabel(this.name);
+		
+		if (!(this.label.value instanceof ILoop))
+		{
+			markers.add(this.position, "break.invalid.type", this.name);
+			return;
+		}
+		
+		this.label = ((ILoop) this.label.value).getBreakLabel();
+	}
+
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.label == null)
+		{
+			if (this.name == null)
+			{
+				markers.add(this.position, "break.invalid");
+			}
+			else
+			{
+				markers.add(this.position, "resolve.label", this.name);
+			}
+		}
 	}
 	
 	@Override

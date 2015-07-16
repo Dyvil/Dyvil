@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -163,24 +164,6 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		return this.parent == null ? this.parent.resolveLabel(name) : null;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
@@ -198,6 +181,24 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null)
+		{
+			this.action.resolveStatement(context, markers);
+		}
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			this.catchBlocks[i].action.resolveStatement(context, markers);
+		}
+		
+		if (this.finallyBlock != null)
+		{
+			this.finallyBlock.resolveStatement(context, markers);
 		}
 	}
 	

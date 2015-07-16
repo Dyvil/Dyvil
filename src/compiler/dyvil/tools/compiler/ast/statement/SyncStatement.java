@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -28,17 +27,6 @@ public final class SyncStatement extends ASTNode implements IStatement
 	public int valueTag()
 	{
 		return SYNCHRONIZED;
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return null;
 	}
 	
 	@Override
@@ -70,12 +58,6 @@ public final class SyncStatement extends ASTNode implements IStatement
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.lock.resolveTypes(markers, context);
-		
-		if (this.block.isStatement())
-		{
-			((IStatement) this.block).setParent(this);
-		}
-		
 		this.block.resolveTypes(markers, context);
 	}
 	
@@ -115,12 +97,6 @@ public final class SyncStatement extends ASTNode implements IStatement
 		this.lock = this.lock.cleanup(context, compilableList);
 		this.block = this.block.cleanup(context, compilableList);
 		return this;
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		return null;
 	}
 	
 	@Override

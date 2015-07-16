@@ -309,18 +309,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		String prefix1 = prefix + '\t';
 		for (DWTProperty property : this.properties)
 		{
-			buffer.append('\n').append(prefix1).append(property.key).append(Formatting.Field.keyValueSeperator);
-			IValue value = property.value;
-			if (value.isStatement())
-			{
-				buffer.append('\n').append(prefix1);
-				value.toString(prefix1, buffer);
-			}
-			else
-			{
-				buffer.append(' ');
-				value.toString(prefix1, buffer);
-			}
+			buffer.append('\n').append(prefix1).append(property.key).append(Formatting.Field.keyValueSeperator).append(' ');
+			property.value.toString(prefix1, buffer);
 		}
 		buffer.append('\n').append(prefix).append('}');
 	}

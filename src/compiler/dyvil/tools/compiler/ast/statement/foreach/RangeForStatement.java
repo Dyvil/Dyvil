@@ -73,20 +73,6 @@ public class RangeForStatement extends ForEachStatement
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.value1.checkTypes(markers, context);
-		this.value2.checkTypes(markers, context);
-		
-		if (this.action != null)
-		{
-			this.context = context;
-			this.action.checkTypes(markers, this);
-			this.context = null;
-		}
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		// Determine the 'type' of the range to fasten up compilation.

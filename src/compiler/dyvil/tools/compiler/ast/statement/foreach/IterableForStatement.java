@@ -63,7 +63,7 @@ public class IterableForStatement extends ForEachStatement
 			return this.iteratorVar;
 		}
 		
-		return this.context.resolveField(name);
+		return null;
 	}
 	
 	@Override
