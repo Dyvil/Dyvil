@@ -55,6 +55,9 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public Iterator<E> iterator();
 	
 	@Override
+	public Iterator<E> reverseIterator();
+	
+	@Override
 	public default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED | Spliterator.IMMUTABLE);

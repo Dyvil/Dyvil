@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -50,9 +51,39 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public Iterator<E> reverseIterator()
+	{
+		return new SingletonIterator<E>(this.element);
+	}
+	
+	@Override
 	public void forEach(Consumer<? super E> action)
 	{
 		action.accept(this.element);
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		return reducer.apply(initialValue, this.element);
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		return reducer.apply(initialValue, this.element);
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		return this.element;
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		return this.element;
 	}
 	
 	@Override

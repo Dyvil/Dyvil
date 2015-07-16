@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
-import dyvil.collection.immutable.ArrayList;
 
+import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.*;
 
 public class LinkedList<E> implements MutableList<E>, Deque<E>
@@ -83,7 +84,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 	
 	@Override
-	public Iterator<E> descendingIterator()
+	public Iterator<E> reverseIterator()
 	{
 		return new Iterator<E>()
 		{
@@ -127,6 +128,68 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 				return "LinkedListDescendingIterator(" + LinkedList.this + ")";
 			}
 		};
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (Node<E> node = this.first; node != null; node = node.next)
+		{
+			initialValue = reducer.apply(initialValue, node.item);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (Node<E> node = this.last; node != null; node = node.prev)
+		{
+			initialValue = reducer.apply(initialValue, node.item);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		Node<E> node = this.first;
+		E initialValue = node.item;
+		do
+		{
+			if ((node = node.next) == null)
+			{
+				return initialValue;
+			}
+			initialValue = reducer.apply(initialValue, node.item);
+		}
+		while (true);
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		Node<E> node = this.last;
+		E initialValue = node.item;
+		do
+		{
+			if ((node = node.prev) == null)
+			{
+				return initialValue;
+			}
+			initialValue = reducer.apply(initialValue, node.item);
+		}
+		while (true);
 	}
 	
 	@Override

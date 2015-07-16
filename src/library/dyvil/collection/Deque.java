@@ -18,7 +18,7 @@ public interface Deque<E> extends Queue<E>, Stack<E>
 	@Override
 	public Iterator<E> iterator();
 	
-	public Iterator<E> descendingIterator();
+	public Iterator<E> reverseIterator();
 	
 	// Deque Methods
 	

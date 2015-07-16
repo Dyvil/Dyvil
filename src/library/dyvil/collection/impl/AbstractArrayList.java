@@ -2,6 +2,7 @@ package dyvil.collection.impl;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import dyvil.collection.Collection;
@@ -113,6 +114,95 @@ public abstract class AbstractArrayList<E> implements List<E>
 				return "ListIterator(" + AbstractArrayList.this + ")";
 			}
 		};
+	}
+	
+	@Override
+	public Iterator<E> reverseIterator()
+	{
+		return new Iterator<E>()
+		{
+			int	index	= AbstractArrayList.this.size - 1;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index >= 0;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArrayList.this.elements[this.index--];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index >= AbstractArrayList.this.size - 1)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArrayList.this.removeAt(++this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ReverseListIterator(" + AbstractArrayList.this + ")";
+			}
+		};
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (int i = this.size - 1; i >= 0; i--)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		E initialValue = (E) this.elements[0];
+		for (int i = 1; i < this.size; i++)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		E initialValue = (E) this.elements[this.size - 1];
+		for (int i = this.size - 2; i >= 0; i--)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
 	}
 	
 	@Override

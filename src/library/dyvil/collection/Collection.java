@@ -5,11 +5,8 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -47,7 +44,7 @@ import dyvil.util.ImmutableException;
  */
 @NilConvertible
 @ArrayConvertible
-public interface Collection<E> extends Iterable<E>
+public interface Collection<E> extends Queryable<E>
 {
 	/**
 	 * Returns an empty, mutable collection. This method is primarily for use
@@ -85,6 +82,7 @@ public interface Collection<E> extends Iterable<E>
 	 * 
 	 * @return the size of this collection
 	 */
+	@Override
 	public int size();
 	
 	/**
@@ -94,6 +92,7 @@ public interface Collection<E> extends Iterable<E>
 	 * 
 	 * @return true, if this collection is empty
 	 */
+	@Override
 	public default boolean isEmpty()
 	{
 		return this.size() == 0;
@@ -120,25 +119,6 @@ public interface Collection<E> extends Iterable<E>
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
 	
-	public default Stream<E> stream()
-	{
-		return StreamSupport.stream(this.spliterator(), false);
-	}
-	
-	public default Stream<E> parallelStream()
-	{
-		return StreamSupport.stream(this.spliterator(), true);
-	}
-	
-	@Override
-	public default void forEach(Consumer<? super E> action)
-	{
-		for (E element : this)
-		{
-			action.accept(element);
-		}
-	}
-	
 	/**
 	 * Returns true if and if only this collection contains the element
 	 * specified by {@code element}.
@@ -160,6 +140,7 @@ public interface Collection<E> extends Iterable<E>
 	 *            the element
 	 * @return true, if this collection contains the element
 	 */
+	@Override
 	public default boolean contains(Object element)
 	{
 		return iterableContains(this, element);
@@ -445,6 +426,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @param mapper
 	 *            the mapping function
 	 */
+	@Override
 	public void map(Function<? super E, ? extends E> mapper);
 	
 	/**
@@ -456,6 +438,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @param mapper
 	 *            the mapping function
 	 */
+	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	/**
@@ -467,6 +450,7 @@ public interface Collection<E> extends Iterable<E>
 	 * @param condition
 	 *            the filter condition predicate
 	 */
+	@Override
 	public default void filter(Predicate<? super E> condition)
 	{
 		Iterator<E> iterator = this.iterator();

@@ -48,6 +48,9 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public Iterator<E> iterator();
 	
 	@Override
+	public Iterator<E> reverseIterator();
+	
+	@Override
 	public E subscript(int index);
 	
 	@Override
