@@ -86,14 +86,14 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();
-		attributes.putValue("Name", config.jarName);
-		attributes.putValue("Version", config.jarVersion);
-		attributes.putValue("Vendor", config.jarVendor);
+		attributes.putValue("Name", config.getJarName());
+		attributes.putValue("Version", config.getJarVersion());
+		attributes.putValue("Vendor", config.getJarVendor());
 		attributes.putValue("Created-By", "Dyvil Compiler");
-		attributes.put(Attributes.Name.MAIN_CLASS, config.mainType);
+		attributes.put(Attributes.Name.MAIN_CLASS, config.getMainType());
 		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		
-		String outputDir = DyvilCompiler.config.outputDir.getAbsolutePath();
+		String outputDir = DyvilCompiler.config.getOutputDir().getAbsolutePath();
 		int len = outputDir.length();
 		if (!outputDir.endsWith("/"))
 		{

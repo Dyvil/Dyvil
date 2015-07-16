@@ -30,7 +30,6 @@ public final class DyvilCompiler
 	public static final String			DYVIL_VERSION		= "1.0.0";
 	
 	public static boolean				parseStack;
-	public static String				logFile;
 	public static boolean				debug;
 	public static int					constantFolding;
 	
@@ -52,30 +51,27 @@ public final class DyvilCompiler
 		long now = System.nanoTime();
 		long totalTime = now;
 		
+		System.err.println("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
+		System.err.println();
+		
 		// Sets up States from arguments
-		for (int i = 1; i < args.length; i++)
+		for (int i = 0; i < args.length; i++)
 		{
-			addStates(args[i]);
+			processArgument(args[i]);
 		}
 		
 		// Sets up the logger
 		initLogger();
 		
-		// Loads the config
-		loadConfig(args[0]);
-		
-		File sourceDir = config.sourceDir;
+		File sourceDir = config.getSourceDir();
 		if (!sourceDir.exists())
 		{
 			logger.severe("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
 		}
 		
-		File outputDir = config.outputDir;
+		File outputDir = config.getOutputDir();
 		int phases = DyvilCompiler.phases.size();
 		int libs = config.libraries.size();
-		
-		logger.info("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
-		logger.info("");
 		
 		logger.fine("Loaded Config (" + Util.toTime(System.nanoTime() - now) + ")");
 		
@@ -204,9 +200,10 @@ public final class DyvilCompiler
 			ch.setLevel(Level.ALL);
 			logger.addHandler(ch);
 			
+			File logFile = config.getLogFile();
 			if (logFile != null)
 			{
-				FileHandler fh = new FileHandler(logFile, true);
+				FileHandler fh = new FileHandler(logFile.getAbsolutePath(), true);
 				fh.setLevel(Level.ALL);
 				fh.setFormatter(formatter);
 				logger.addHandler(fh);
@@ -219,13 +216,15 @@ public final class DyvilCompiler
 	
 	private static void loadConfig(String source)
 	{
+		System.out.println("Loading Configuration File from '" + source + "'");
 		CodeFile file = new CodeFile(source);
+		config.setConfigFile(file);
 		ConfigParser.parse(file.getCode(), config);
 	}
 	
-	private static void addStates(String s)
+	private static void processArgument(String arg)
 	{
-		switch (s)
+		switch (arg)
 		{
 		case "compile":
 			phases.add(ICompilerPhase.TOKENIZE);
@@ -237,9 +236,6 @@ public final class DyvilCompiler
 			phases.add(ICompilerPhase.COMPILE);
 			phases.add(ICompilerPhase.CLEANUP);
 			return;
-			// case "obfuscate":
-			// case "doc":
-			// case "decompile":
 		case "optimize":
 			phases.add(ICompilerPhase.FOLD_CONSTANTS);
 			constantFolding = 1;
@@ -272,39 +268,42 @@ public final class DyvilCompiler
 			return;
 		}
 		
-		if (s.startsWith("--logFile="))
-		{
-			logFile = s.substring(10);
-			return;
-		}
-		if (s.startsWith("-o"))
+		if (arg.startsWith("-o"))
 		{
 			try
 			{
 				phases.add(ICompilerPhase.FOLD_CONSTANTS);
-				constantFolding = Integer.parseInt(s.substring(2));
+				constantFolding = Integer.parseInt(arg.substring(2));
 				return;
 			}
 			catch (Exception ex)
 			{
 			}
 		}
+		if (arg.charAt(0) == '@')
+		{
+			loadConfig(arg.substring(1));
+			return;
+		}
 		
-		System.err.println("Invalid Argument '" + s + "'. Ignoring.");
+		if (!ConfigParser.readProperty(config, arg))
+		{
+			System.err.println("Invalid Argument '" + arg + "'. Ignoring.");
+		}
 	}
 	
 	public static void test()
 	{
-		String mainType = config.mainType;
+		String mainType = config.getMainType();
 		if (mainType == null)
 		{
 			return;
 		}
 		
-		File file = new File(config.outputDir, config.mainType.replace('.', '/') + ".class");
+		File file = new File(config.getOutputDir(), config.getMainType().replace('.', '/') + ".class");
 		if (!file.exists())
 		{
-			DyvilCompiler.logger.info("The Main Type '" + config.mainType + "' does not exist or was not compiled, skipping test.");
+			DyvilCompiler.logger.info("The Main Type '" + config.getMainType() + "' does not exist or was not compiled, skipping test.");
 			return;
 		}
 		
@@ -313,7 +312,7 @@ public final class DyvilCompiler
 	
 	public static void clean()
 	{
-		File[] files = config.outputDir.listFiles();
+		File[] files = config.getOutputDir().listFiles();
 		if (files == null)
 		{
 			return;

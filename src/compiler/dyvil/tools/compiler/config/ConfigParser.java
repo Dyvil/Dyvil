@@ -103,29 +103,46 @@ public final class ConfigParser
 		}
 	}
 	
-	private static void setProperty(CompilerConfig config, String name, String value)
+	public static boolean readProperty(CompilerConfig config, String arg)
+	{
+		int index = arg.indexOf('=');
+		if (index >= 0)
+		{
+			String name = arg.substring(0, index);
+			String value = arg.substring(index + 1);
+			setProperty(config, name, value);
+			return true;
+		}
+		return false;
+	}
+	
+	public static void setProperty(CompilerConfig config, String name, String value)
 	{
 		switch (name)
 		{
 		case "jar_name":
-			config.jarName = value;
+			config.setJarName(value);
 			return;
 		case "jar_vendor":
-			config.jarVendor = value;
+			config.setJarVendor(value);
 			return;
 		case "jar_version":
-			config.jarVersion = value;
+			config.setJarVersion(value);
 			return;
 		case "jar_format":
-			config.jarNameFormat = value;
+			config.setJarNameFormat(value);
+			return;
+		case "log_file":
+			config.setLogFile(value);
+			return;
 		case "source_dir":
-			config.sourceDir = new File(value);
+			config.setSourceDir(value);
 			return;
 		case "output_dir":
-			config.outputDir = new File(value);
+			config.setOutputDir(value);
 			return;
 		case "main_type":
-			config.mainType = value;
+			config.setMainType(value);
 			return;
 		case "main_args":
 			config.mainArgs.add(value);
