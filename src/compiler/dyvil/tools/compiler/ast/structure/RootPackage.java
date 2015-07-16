@@ -2,13 +2,27 @@ package dyvil.tools.compiler.ast.structure;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.library.Library;
 
 public final class RootPackage extends Package
 {
 	public RootPackage()
 	{
+		this.internalName = this.fullName = "";
+		this.name = Name.getQualified("");
+	}
+	
+	@Override
+	public void check(PackageDeclaration packageDecl, MarkerList markers)
+	{
+		if (packageDecl != null)
+		{
+			markers.add(packageDecl.getPosition(), "package.default");
+		}
 	}
 	
 	@Override

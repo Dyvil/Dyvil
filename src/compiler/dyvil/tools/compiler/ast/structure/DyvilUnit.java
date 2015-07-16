@@ -145,7 +145,7 @@ public class DyvilUnit extends DyvilHeader
 	@Override
 	public void check()
 	{
-		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
+		this.pack.check(this.packageDeclaration, this.markers);
 		
 		for (int i = 0; i < this.classCount; i++)
 		{

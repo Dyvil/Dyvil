@@ -376,7 +376,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void check()
 	{
-		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
+		this.pack.check(this.packageDeclaration, this.markers);
 	}
 	
 	@Override

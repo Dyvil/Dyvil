@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
@@ -59,7 +58,7 @@ public class Package implements INamed, IContext
 		this.name = name;
 		this.parent = parent;
 		
-		if (parent == null || parent.name == null)
+		if (parent == null || parent == rootPackage)
 		{
 			this.fullName = name.qualified;
 			this.internalName = ClassFormat.packageToInternal(name.qualified) + "/";
@@ -128,26 +127,17 @@ public class Package implements INamed, IContext
 		return pack;
 	}
 	
-	public void check(PackageDeclaration packageDecl, CodeFile file, MarkerList markers)
+	public void check(PackageDeclaration packageDecl, MarkerList markers)
 	{
 		if (packageDecl == null)
 		{
-			if (this.fullName != null)
-			{
-				markers.add(new CodePosition(0, 0, 1), "package.missing");
-			}
-			return;
-		}
-		
-		if (this.fullName == null)
-		{
-			markers.add(packageDecl.getPosition(), "package.default");
+			markers.add(new CodePosition(0, 0, 1), "package.missing");
 			return;
 		}
 		
 		if (!this.fullName.equals(packageDecl.thePackage))
 		{
-			markers.add(packageDecl.getPosition(), "package.invalid");
+			markers.add(packageDecl.getPosition(), "package.invalid", this.fullName);
 		}
 	}
 	
