@@ -76,6 +76,12 @@ public interface Collection<E> extends Queryable<E>
 	
 	// Accessors
 	
+	/**
+	 * Returns {@code true} iff this collection is immutable, i.e. the number
+	 * and order of it's elements cannot be changed after it's creation.
+	 * 
+	 * @return true, iff this collection is immutable
+	 */
 	public boolean isImmutable();
 	
 	/**
@@ -497,11 +503,38 @@ public interface Collection<E> extends Queryable<E>
 		return array;
 	}
 	
+	/**
+	 * Stores all elements of this collection sequentially in the given
+	 * {@code store} array, starting at the index {@code 0}. The order in which
+	 * the element are added to the array is the same order in which they would
+	 * appear in this collection's {@link #iterator()}. Note that this method
+	 * usually doesn't do boundary checking on the array, so passing an array of
+	 * insufficient size to hold all elements of this collection will likely
+	 * result in an {@link ArrayIndexOutOfBoundsException}.
+	 * 
+	 * @param store
+	 *            the array to store the elements in
+	 */
 	public default void toArray(Object[] store)
 	{
 		this.toArray(0, store);
 	}
 	
+	/**
+	 * Stores all elements of this collection sequentially in the given
+	 * {@code store} array, starting at given {@code index}. The order in which
+	 * the element are added to the array is the same order in which they would
+	 * appear in this collection's {@link #iterator()}. Note that this method
+	 * usually doesn't do boundary checking on the array, so passing an array of
+	 * insufficient size to hold all elements of this collection will likely
+	 * result in an {@link ArrayIndexOutOfBoundsException}.
+	 * 
+	 * @param index
+	 *            the index in the array at which the first element of this
+	 *            collection should be placed
+	 * @param store
+	 *            the array to store the elements in
+	 */
 	public default void toArray(int index, Object[] store)
 	{
 		for (E e : this)
@@ -526,27 +559,54 @@ public interface Collection<E> extends Queryable<E>
 	public Collection<E> copy();
 	
 	/**
-	 * Returns a mutable copy of this collection. Already mutable collections
-	 * should return themselves when this method is called on them, while
-	 * immutable collections should return a copy that can be modified.
+	 * Returns a mutable collection that contains the exact same elements as
+	 * this collection. Already mutable collections should return themselves
+	 * when this method is called on them, while immutable collections should
+	 * return a copy that can be modified.
 	 * 
-	 * @return a mutable copy of this collection
+	 * @return a mutable collection with the same elements as this collection
 	 */
 	public MutableCollection<E> mutable();
 	
+	/**
+	 * Returns a mutable copy of this collection. For mutable collections, this
+	 * method has the same result as the {@link #copy()} method, while for
+	 * immutable collections, the result of this method is the equivalent of a
+	 * call to {@link #mutable()}.
+	 * 
+	 * @return a mutable copy of this collection
+	 */
 	public MutableCollection<E> mutableCopy();
 	
 	/**
-	 * Returns an immutable copy of this collection. Already immutable
-	 * collections should return themselves when this method is called on them,
-	 * while mutable collections should return a copy that cannot be modified.
+	 * Returns an immutable collection that contains the exact same elements as
+	 * this collection. Already immutable collections should return themselves
+	 * when this method is called on them, while mutable collections should
+	 * return a copy that cannot be modified.
 	 * 
-	 * @return an immutable copy of this collection
+	 * @return a immutable collection with the same elements as this collection
 	 */
 	public ImmutableCollection<E> immutable();
 	
+	/**
+	 * Returns a immutable copy of this collection. For immutable collections,
+	 * this method has the same result as the {@link #copy()} method, while for
+	 * mutable collections, the result of this method is the equivalent of a
+	 * call to {@link #mutable()}.
+	 * 
+	 * @return an immutable copy of this collection
+	 */
 	public ImmutableCollection<E> immutableCopy();
 	
+	/**
+	 * Returns a view on the elements of this collection. Immutable collections
+	 * return themselves, as they are already immutable and therefore already
+	 * provide a view. Mutable collections return a special collection that
+	 * references them, and modifications such as element addition or removal in
+	 * the original collection are reflect in the view.
+	 * 
+	 * @return a view on the elements of this collection
+	 */
 	public ImmutableCollection<E> view();
 	
 	// toString, equals and hashCode

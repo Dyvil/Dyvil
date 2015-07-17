@@ -10,7 +10,6 @@ import dyvil.tuple.Tuple2;
  * An <b>Entry</b> is a union of a Key and Value, as used in {@linkplain Map
  * maps}.
  * 
- * @author Clashsoft
  * @param <K>
  *            the type of the key
  * @param <V>
@@ -32,26 +31,61 @@ public interface Entry<K, V>
 	 */
 	public V getValue();
 	
+	/**
+	 * Converts this entry to a {@link Tuple2 Tuple}.
+	 * 
+	 * @return a tuple with this entry's key and value
+	 */
 	public default Tuple2<K, V> toTuple()
 	{
 		return new Tuple2<K, V>(this.getKey(), this.getValue());
 	}
 	
+	/**
+	 * Returns a comparator that compares entries by key. The ordering is
+	 * defined by the <i>natural order</i> of the key, i.e. the ordering given
+	 * by {@link Comparable#compareTo(Object)}.
+	 * 
+	 * @return a comparator that compares entries by key.
+	 */
 	public static <K extends Comparable<? super K>, V> Comparator<Entry<K, V>> comparingByKey()
 	{
 		return (c1, c2) -> c1.getKey().compareTo(c2.getKey());
 	}
 	
+	/**
+	 * Returns a comparator that compares entries by value. The ordering is
+	 * defined by the <i>natural order</i> of the value, i.e. the ordering given
+	 * by {@link Comparable#compareTo(Object)}.
+	 * 
+	 * @return a comparator that compares entries by value.
+	 */
 	public static <K, V extends Comparable<? super V>> Comparator<Entry<K, V>> comparingByValue()
 	{
 		return (c1, c2) -> c1.getValue().compareTo(c2.getValue());
 	}
 	
+	/**
+	 * Returns a comparator that compares entries by key. The ordering is
+	 * defined by the given {@code comparator}.
+	 * 
+	 * @param cmp
+	 *            the comparator the defines the ordering of the keys
+	 * @return a comparator that compares entries by key.
+	 */
 	public static <K, V> Comparator<Entry<K, V>> comparingByKey(Comparator<? super K> cmp)
 	{
 		return (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
 	}
 	
+	/**
+	 * Returns a comparator that compares entries by value. The ordering is
+	 * defined by the given {@code comparator}.
+	 * 
+	 * @param cmp
+	 *            the comparator the defines the ordering of the values
+	 * @return a comparator that compares entries by value.
+	 */
 	public static <K, V> Comparator<Entry<K, V>> comparingByValue(Comparator<? super V> cmp)
 	{
 		return (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());

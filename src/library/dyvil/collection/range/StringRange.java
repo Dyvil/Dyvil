@@ -112,7 +112,7 @@ public class StringRange implements Range<String>
 	}
 	
 	@Override
-	public boolean $qmark(Object o)
+	public boolean contains(Object o)
 	{
 		String s = (String) o;
 		return s.compareTo(this.first) >= 0 && s.compareTo(this.last) <= 0;

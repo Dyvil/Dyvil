@@ -108,7 +108,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
-	public boolean $qmark(Object o)
+	public boolean contains(Object o)
 	{
 		for (Ordered<T> current = this.first; current.$lt$eq(this.last); current = current.next())
 		{

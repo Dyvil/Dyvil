@@ -26,12 +26,36 @@ public interface Range<@Covariant T> extends Iterable<T>
 		return new StringRange(first, last);
 	}
 	
+	/**
+	 * Returns the first element in this range
+	 * 
+	 * @return the first element in this range
+	 */
 	public T first();
 	
+	/**
+	 * Returns the last element in this range
+	 * 
+	 * @return the last element in this range
+	 */
 	public T last();
 	
+	/**
+	 * Returns the exact number of elements in this range, i.e. the number of
+	 * elements that would be returned by the {@link #iterator()}.
+	 * 
+	 * @return the number of elements in this range
+	 */
 	public int count();
 	
+	/**
+	 * Returns an estimate of the number of elements in this range. If the
+	 * number of elements cannot be directly computed, {@code -1} should be
+	 * returned. Otherwise, the result should equal the result of
+	 * {@link #count()}.
+	 * 
+	 * @return the estimated number of elements in this range
+	 */
 	public default int estimateCount()
 	{
 		return this.count();
@@ -55,7 +79,14 @@ public interface Range<@Covariant T> extends Iterable<T>
 	@Override
 	public void forEach(Consumer<? super T> action);
 	
-	public boolean $qmark(Object o);
+	public default boolean $qmark(Object o)
+	{
+		return this.contains(o);
+	}
+	
+	public boolean contains(Object o);
+	
+	// toArray
 	
 	public default Object[] toArray()
 	{
@@ -70,8 +101,6 @@ public interface Range<@Covariant T> extends Iterable<T>
 		this.toArray(0, array);
 		return array;
 	}
-	
-	// toArray
 	
 	public default void toArray(Object[] store)
 	{

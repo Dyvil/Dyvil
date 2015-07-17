@@ -102,7 +102,7 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
-	public boolean $qmark(Object o)
+	public boolean contains(Object o)
 	{
 		for (int i = 0; i < this.count; i++)
 		{
