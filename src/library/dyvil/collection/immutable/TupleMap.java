@@ -142,6 +142,24 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public void forEachKey(Consumer<? super K> action)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			action.accept(this.entries[i]._1);
+		}
+	}
+	
+	@Override
+	public void forEachValue(Consumer<? super V> action)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			action.accept(this.entries[i]._2);
+		}
+	}
+	
+	@Override
 	public boolean containsKey(Object key)
 	{
 		for (int i = 0; i < this.size; i++)
@@ -395,7 +413,8 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		{
 			Tuple2<K, V> entry = this.entries[i];
 			
-			outer: for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry._1, entry._2))
+			outer:
+			for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry._1, entry._2))
 			{
 				Tuple2<? extends U, ? extends R> newTuple = newEntry.toTuple();
 				U key = newTuple._1;

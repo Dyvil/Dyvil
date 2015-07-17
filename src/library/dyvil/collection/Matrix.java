@@ -4,7 +4,6 @@ import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
@@ -36,6 +35,8 @@ public interface Matrix<E> extends Iterable<E>
 	}
 	
 	// Accessors
+	
+	public boolean isImmutable();
 	
 	public int rows();
 	
@@ -69,9 +70,6 @@ public interface Matrix<E> extends Iterable<E>
 	{
 		return StreamSupport.stream(this.spliterator(), true);
 	}
-	
-	@Override
-	public void forEach(Consumer<? super E> action);
 	
 	public default boolean $qmark(Object element)
 	{
@@ -199,7 +197,7 @@ public interface Matrix<E> extends Iterable<E>
 	
 	public void toCellArray(Object[] store);
 	
-	// Copying
+	// Copying and Views
 	
 	public Matrix<E> copy();
 	
@@ -210,6 +208,8 @@ public interface Matrix<E> extends Iterable<E>
 	public ImmutableMatrix<E> immutable();
 	
 	public ImmutableMatrix<E> immutableCopy();
+	
+	public ImmutableMatrix<E> view();
 	
 	// toString, equals and hashCode
 	

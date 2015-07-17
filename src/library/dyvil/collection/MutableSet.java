@@ -10,6 +10,7 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.mutable.MapBasedSet;
+import dyvil.collection.view.SetView;
 
 @NilConvertible
 @ArrayConvertible
@@ -164,5 +165,11 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	public default ImmutableSet<E> immutableCopy()
 	{
 		return this.immutable();
+	}
+	
+	@Override
+	public default ImmutableSet<E> view()
+	{
+		return new SetView(this);
 	}
 }

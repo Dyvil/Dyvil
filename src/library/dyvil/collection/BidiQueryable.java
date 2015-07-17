@@ -22,11 +22,55 @@ public interface BidiQueryable<T> extends Queryable<T>
 		return this.reduceLeft(reducer);
 	}
 	
-	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super T, ? extends R> reducer);
+	public default <R> R foldLeft(R initialValue, BiFunction<? super R, ? super T, ? extends R> reducer)
+	{
+		Iterator<T> iterator = this.iterator();
+		while (iterator.hasNext())
+		{
+			initialValue = reducer.apply(initialValue, iterator.next());
+		}
+		return initialValue;
+	}
 	
-	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super T, ? extends R> reducer);
+	public default <R> R foldRight(R initialValue, BiFunction<? super R, ? super T, ? extends R> reducer)
+	{
+		Iterator<T> iterator = this.reverseIterator();
+		while (iterator.hasNext())
+		{
+			initialValue = reducer.apply(initialValue, iterator.next());
+		}
+		return initialValue;
+	}
 	
-	public T reduceLeft(BiFunction<? super T, ? super T, ? extends T> reducer);
+	public default T reduceLeft(BiFunction<? super T, ? super T, ? extends T> reducer)
+	{
+		if (this.isEmpty())
+		{
+			return null;
+		}
+		
+		Iterator<T> iterator = this.iterator();
+		T initialValue = iterator.next();
+		while (iterator.hasNext())
+		{
+			initialValue = reducer.apply(initialValue, iterator.next());
+		}
+		return initialValue;
+	}
 	
-	public T reduceRight(BiFunction<? super T, ? super T, ? extends T> reducer);
+	public default T reduceRight(BiFunction<? super T, ? super T, ? extends T> reducer)
+	{
+		if (this.isEmpty())
+		{
+			return null;
+		}
+		
+		Iterator<T> iterator = this.reverseIterator();
+		T initialValue = iterator.next();
+		while (iterator.hasNext())
+		{
+			initialValue = reducer.apply(initialValue, iterator.next());
+		}
+		return initialValue;
+	}
 }

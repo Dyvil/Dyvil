@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -97,18 +96,6 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
-	
-	@Override
-	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer);
-	
-	@Override
-	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer);
-	
-	@Override
-	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer);
-	
-	@Override
-	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer);
 	
 	/**
 	 * Returns the element at the given {@code index}. This method throws an
@@ -382,7 +369,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 */
 	public int lastIndexOf(Object element);
 	
-	// Copying
+	// Copying and Views
 	
 	@Override
 	public List<E> copy();
@@ -391,7 +378,18 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	public MutableList<E> mutable();
 	
 	@Override
+	public MutableList<E> mutableCopy();
+	
+	@Override
 	public ImmutableList<E> immutable();
+	
+	@Override
+	public ImmutableList<E> immutableCopy();
+	
+	@Override
+	public ImmutableList<E> view();
+	
+	// Utility Methods
 	
 	public static <E> boolean listEquals(List<E> list, Object o)
 	{

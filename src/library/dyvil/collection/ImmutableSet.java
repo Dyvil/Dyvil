@@ -236,4 +236,10 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	{
 		return this.copy();
 	}
+	
+	@Override
+	public default ImmutableSet<E> view()
+	{
+		return this;
+	}
 }

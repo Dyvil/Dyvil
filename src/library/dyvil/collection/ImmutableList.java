@@ -285,7 +285,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	@Override
 	public int lastIndexOf(Object element);
 	
-	// Copying
+	// Copying and Views
 	
 	@Override
 	public ImmutableList<E> copy();
@@ -309,5 +309,11 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public default ImmutableList<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableList<E> view()
+	{
+		return this;
 	}
 }

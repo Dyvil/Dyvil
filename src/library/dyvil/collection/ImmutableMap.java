@@ -55,6 +55,12 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	// Simple Getters
 	
 	@Override
+	public default boolean isImmutable()
+	{
+		return true;
+	}
+	
+	@Override
 	public int size();
 	
 	@Override
@@ -313,5 +319,11 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public default ImmutableMap<K, V> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableMap<K, V> view()
+	{
+		return this;
 	}
 }

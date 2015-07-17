@@ -36,6 +36,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	// Simple Getters
 	
+	public boolean isImmutable();
+	
 	/**
 	 * Returns the size of this map, i.e. the number of mappings contained in
 	 * this map.
@@ -135,6 +137,22 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		for (Entry<K, V> entry : this)
 		{
 			action.accept(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public default void forEachKey(Consumer<? super K> action)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			action.accept(entry.getKey());
+		}
+	}
+	
+	public default void forEachValue(Consumer<? super V> action)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			action.accept(entry.getValue());
 		}
 	}
 	
@@ -437,7 +455,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public void filter(BiPredicate<? super K, ? super V> condition);
 	
-	// Copying
+	// Copying and Views
 	
 	public Map<K, V> copy();
 	
@@ -448,6 +466,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public ImmutableMap<K, V> immutable();
 	
 	public ImmutableMap<K, V> immutableCopy();
+	
+	public ImmutableMap<K, V> view();
 	
 	// toString, equals and hashCode
 	

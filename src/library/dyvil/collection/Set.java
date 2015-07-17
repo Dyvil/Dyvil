@@ -173,7 +173,7 @@ public interface Set<E> extends Collection<E>
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
-	// Copying
+	// Copying and Views
 	
 	@Override
 	public Set<E> copy();
@@ -182,7 +182,18 @@ public interface Set<E> extends Collection<E>
 	public MutableSet<E> mutable();
 	
 	@Override
+	public MutableSet<E> mutableCopy();
+	
+	@Override
 	public ImmutableSet<E> immutable();
+	
+	@Override
+	public ImmutableSet<E> immutableCopy();
+	
+	@Override
+	public ImmutableSet<E> view();
+	
+	// Utility Methods
 	
 	public static <E> boolean setEquals(Set<E> set, Object o)
 	{

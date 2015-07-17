@@ -9,6 +9,7 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.LinkedList;
+import dyvil.collection.view.MapView;
 
 @NilConvertible
 @ArrayConvertible
@@ -42,6 +43,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	// Simple Getters
+	
+	@Override
+	public default boolean isImmutable()
+	{
+		return false;
+	}
 	
 	@Override
 	public int size();
@@ -319,5 +326,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public default ImmutableMap<K, V> immutableCopy()
 	{
 		return this.immutable();
+	}
+	
+	@Override
+	public default ImmutableMap<K, V> view()
+	{
+		return new MapView(this);
 	}
 }

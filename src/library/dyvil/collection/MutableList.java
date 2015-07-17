@@ -9,6 +9,7 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.view.ListView;
 
 @NilConvertible
 @ArrayConvertible
@@ -286,5 +287,11 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public default ImmutableList<E> immutableCopy()
 	{
 		return this.immutable();
+	}
+	
+	@Override
+	public default ImmutableList<E> view()
+	{
+		return new ListView(this);
 	}
 }

@@ -28,6 +28,12 @@ public interface ImmutableMatrix<@Covariant E> extends Matrix<E>, Immutable
 	// Accessors
 	
 	@Override
+	public default boolean isImmutable()
+	{
+		return true;
+	}
+	
+	@Override
 	public int rows();
 	
 	@Override
@@ -187,5 +193,11 @@ public interface ImmutableMatrix<@Covariant E> extends Matrix<E>, Immutable
 	public default ImmutableMatrix<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableMatrix<E> view()
+	{
+		return this;
 	}
 }

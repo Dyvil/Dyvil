@@ -76,6 +76,8 @@ public interface Collection<E> extends Queryable<E>
 	
 	// Accessors
 	
+	public boolean isImmutable();
+	
 	/**
 	 * Returns the size of this collection, i.e. the number of elements
 	 * contained in this collection.
@@ -508,7 +510,7 @@ public interface Collection<E> extends Queryable<E>
 		}
 	}
 	
-	// Copying
+	// Copying and Views
 	
 	/**
 	 * Creates a copy of this collection. The general contract of this method is
@@ -544,6 +546,8 @@ public interface Collection<E> extends Queryable<E>
 	public ImmutableCollection<E> immutable();
 	
 	public ImmutableCollection<E> immutableCopy();
+	
+	public ImmutableCollection<E> view();
 	
 	// toString, equals and hashCode
 	

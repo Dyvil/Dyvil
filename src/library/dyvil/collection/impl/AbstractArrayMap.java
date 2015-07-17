@@ -50,9 +50,9 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	protected  int	size;
-	protected  Object[]	keys;
-	protected  Object[]	values;
+	protected int		size;
+	protected Object[]	keys;
+	protected Object[]	values;
 	
 	public AbstractArrayMap(K[] keys, V[] values)
 	{
@@ -143,6 +143,24 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		for (int i = 0; i < this.size; i++)
 		{
 			action.accept((K) this.keys[i], (V) this.values[i]);
+		}
+	}
+	
+	@Override
+	public void forEachKey(Consumer<? super K> action)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			action.accept((K) this.keys[i]);
+		}
+	}
+	
+	@Override
+	public void forEachValue(Consumer<? super V> action)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			action.accept((V) this.values[i]);
 		}
 	}
 	
@@ -242,8 +260,9 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return null;
 	}
 	
-	protected abstract class ArrayIterator<R> implements Iterator<R>{
-		protected int index;
+	protected abstract class ArrayIterator<R> implements Iterator<R>
+	{
+		protected int	index;
 		
 		@Override
 		public boolean hasNext()
@@ -254,7 +273,8 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		@Override
 		public void remove()
 		{
-			if (this.index == 0) {
+			if (this.index == 0)
+			{
 				throw new IllegalStateException();
 			}
 			

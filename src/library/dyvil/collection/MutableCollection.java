@@ -24,6 +24,12 @@ public interface MutableCollection<E> extends Collection<E>
 	// Accessors
 	
 	@Override
+	public default boolean isImmutable()
+	{
+		return false;
+	}
+	
+	@Override
 	public int size();
 	
 	@Override
@@ -99,4 +105,7 @@ public interface MutableCollection<E> extends Collection<E>
 	{
 		return this.immutable();
 	}
+	
+	@Override
+	public ImmutableCollection<E> view();
 }

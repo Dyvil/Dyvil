@@ -24,6 +24,12 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	// Accessors
 	
 	@Override
+	public default boolean isImmutable()
+	{
+		return true;
+	}
+	
+	@Override
 	public int size();
 	
 	@Override
@@ -186,5 +192,11 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immuta
 	public default ImmutableCollection<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableCollection<E> view()
+	{
+		return this;
 	}
 }
