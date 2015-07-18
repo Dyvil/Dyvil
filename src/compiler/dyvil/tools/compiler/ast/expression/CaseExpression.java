@@ -6,7 +6,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -18,6 +17,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -35,7 +35,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
-public final class CaseExpression extends ASTNode implements IValue, IValued, IPatternConsumer, IClassCompilable, IContext
+public final class CaseExpression extends ASTNode implements IValue, ICase, IClassCompilable, IContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
 	public static final ClassType		PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
@@ -44,7 +44,7 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	
 	protected IPattern					pattern;
 	protected IValue					condition;
-	protected IValue					value;
+	protected IValue					action;
 	
 	protected IType						type;
 	private String						internalClassName;
@@ -92,9 +92,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			}
 			gt.addType(t1);
 			
-			if (this.value != null)
+			if (this.action != null)
 			{
-				t1 = this.value.getType();
+				t1 = this.action.getType();
 				if (t1.isPrimitive())
 				{
 					t1 = t1.getReferenceType();
@@ -118,43 +118,46 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			this.type = type;
 			
 			IType type1 = this.type.resolveType(RETURN_TYPE);
-			this.value = this.value.withType(type1, typeContext, markers, context);
+			this.action = this.action.withType(type1, typeContext, markers, context);
 			return this;
 		}
 		return null;
 	}
 	
 	@Override
-	public void setValue(IValue value)
+	public IValue getAction()
 	{
-		this.value = value;
+		return this.action;
 	}
 	
 	@Override
-	public IValue getValue()
+	public void setAction(IValue action)
 	{
-		return this.value;
+		this.action = action;
 	}
 	
-	public void setCondition(IValue condition)
-	{
-		this.condition = condition;
-	}
-	
+	@Override
 	public IValue getCondition()
 	{
 		return this.condition;
 	}
 	
 	@Override
-	public void setPattern(IPattern pattern)
+	public void setCondition(IValue condition)
 	{
-		this.pattern = pattern;
+		this.condition = condition;
 	}
 	
+	@Override
 	public IPattern getPattern()
 	{
 		return this.pattern;
+	}
+	
+	@Override
+	public void setPattern(IPattern pattern)
+	{
+		this.pattern = pattern;
 	}
 	
 	// IContext
@@ -210,10 +213,6 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			return f;
 		}
 		
-		if (this.type == Types.UNKNOWN)
-		{
-			return this.context.resolveField(name);
-		}
 		return null;
 	}
 	
@@ -250,9 +249,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		{
 			this.condition.resolveTypes(markers, context);
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value.resolveTypes(markers, context);
+			this.action.resolveTypes(markers, context);
 		}
 	}
 	
@@ -263,25 +262,23 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		if (this.pattern != null)
 		{
 			this.pattern.resolve(markers, context);
-		}
-		if (this.condition != null)
-		{
-			this.condition = this.condition.resolve(markers, this);
-		}
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, this);
-		}
-		
-		if (this.type != Types.UNKNOWN)
-		{
+			
 			if (this.type == null)
 			{
 				this.getType();
 			}
 			
 			IType type1 = this.type.resolveType(PAR_TYPE);
-			this.pattern = this.pattern.withType(type1);
+			this.pattern = this.pattern.withType(type1, markers);
+			// TODO Handle error
+		}
+		if (this.condition != null)
+		{
+			this.condition = this.condition.resolve(markers, this);
+		}
+		if (this.action != null)
+		{
+			this.action = this.action.resolve(markers, this);
 		}
 		
 		this.context = null;
@@ -297,13 +294,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		{
 			this.condition.checkTypes(markers, this);
 		}
-		if (this.pattern != null)
+		if (this.action != null)
 		{
-			this.pattern.checkTypes(markers, context);
-		}
-		if (this.value != null)
-		{
-			this.value.checkTypes(markers, this);
+			this.action.checkTypes(markers, this);
 		}
 		
 		this.context = null;
@@ -317,9 +310,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		{
 			this.condition.check(markers, this);
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value.check(markers, this);
+			this.action.check(markers, this);
 		}
 		this.context = null;
 	}
@@ -331,9 +324,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		{
 			this.condition = this.condition.foldConstants();
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value = this.value.foldConstants();
+			this.action = this.action.foldConstants();
 		}
 		return this;
 	}
@@ -341,18 +334,15 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.type != Types.UNKNOWN)
-		{
-			context.getHeader().addInnerClass(this);
-		}
+		context.getHeader().addInnerClass(this);
 		
 		if (this.condition != null)
 		{
 			this.condition = this.condition.cleanup(context, compilableList);
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.action = this.action.cleanup(context, compilableList);
 		}
 		return this;
 	}
@@ -437,9 +427,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		mw.writeInsn(Opcodes.ACONST_NULL);
 		mw.writeInsn(Opcodes.ARETURN);
 		mw.writeLabel(elseLabel);
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value.writeExpression(mw);
+			this.action.writeExpression(mw);
 		}
 		else
 		{
@@ -504,10 +494,10 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			buffer.append(" if ");
 			this.condition.toString(prefix, buffer);
 		}
-		buffer.append(" : ");
-		if (this.value != null)
+		buffer.append(" => ");
+		if (this.action != null)
 		{
-			this.value.toString(prefix, buffer);
+			this.action.toString(prefix, buffer);
 		}
 	}
 }

@@ -56,7 +56,7 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		if (type.isPrimitive())
 		{
@@ -92,7 +92,7 @@ public class TypeCheckPattern implements IPattern
 			
 			if (this.pattern != null && this.pattern.getPatternType() != WILDCARD)
 			{
-				this.pattern = this.pattern.withType(this.type);
+				this.pattern = this.pattern.withType(this.type, markers);
 			}
 			
 			if (this.type.isPrimitive())
@@ -106,15 +106,6 @@ public class TypeCheckPattern implements IPattern
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.pattern != null)
-		{
-			this.pattern.checkTypes(markers, context);
-		}
 	}
 	
 	@Override

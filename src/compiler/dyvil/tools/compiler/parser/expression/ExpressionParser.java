@@ -380,6 +380,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = io;
 				return;
 			}
+			if (type == Keywords.MATCH)
+			{
+				MatchExpression me = new MatchExpression(token.raw(), this.value);
+				pm.pushParser(new MatchExpressionParser(me));
+				this.value = me;
+				return;
+			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				SubscriptGetter getter = new SubscriptGetter(token, this.value);

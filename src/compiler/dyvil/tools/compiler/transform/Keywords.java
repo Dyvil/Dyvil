@@ -32,6 +32,7 @@ public interface Keywords
 	int	IS				= Tokens.KEYWORD | 0x001E0000;
 	int	LAZY			= Tokens.KEYWORD | 0x001F0000;
 	int	MACRO			= Tokens.KEYWORD | 0x003A0000;
+	int	MATCH			= Tokens.KEYWORD | 0x003C0000;
 	int	NEW				= Tokens.KEYWORD | 0x00200000;
 	int	NIL				= Tokens.KEYWORD | 0x00210000;
 	int	NULL			= Tokens.KEYWORD | 0x00220000;
@@ -123,6 +124,8 @@ public interface Keywords
 			return LAZY;
 		case "macro":
 			return MACRO;
+		case "match":
+			return MATCH;
 		case "new":
 			return NEW;
 		case "nil":
@@ -243,6 +246,8 @@ public interface Keywords
 			return "lazy";
 		case MACRO:
 			return "macro";
+		case MATCH:
+			return "match";
 		case NEW:
 			return "new";
 		case NIL:

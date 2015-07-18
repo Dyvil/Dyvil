@@ -52,7 +52,7 @@ public interface IPattern extends IASTNode, ITyped
 	{
 	};
 	
-	public IPattern withType(IType type);
+	public IPattern withType(IType type, MarkerList markers);
 	
 	public static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
 	{
@@ -82,10 +82,6 @@ public interface IPattern extends IASTNode, ITyped
 	public default IPattern resolve(MarkerList markers, IContext context)
 	{
 		return this;
-	}
-	
-	public default void checkTypes(MarkerList markers, IContext context)
-	{
 	}
 	
 	public default int intValue()

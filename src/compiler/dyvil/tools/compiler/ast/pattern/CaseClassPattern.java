@@ -49,17 +49,51 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (type.equals(this.type))
+		if (!type.isSuperTypeOf(this.type))
+		{
+			return null;
+		}
+		
+		IClass iclass = this.type.getTheClass();
+		if (iclass == null)
+		{
+			return this; // skip
+		}
+		
+		int paramCount = iclass.parameterCount();
+		if (this.patternCount != paramCount)
+		{
+			Marker m = markers.create(this.position, "pattern.class.count", this.type.toString());
+			m.addInfo("Pattern Count: " + this.patternCount);
+			m.addInfo("Class Parameter Count: " + paramCount);
+			return this;
+		}
+		
+		for (int i = 0; i < paramCount; i++)
+		{
+			IParameter param = iclass.getParameter(i);
+			IType type1 = param.getType().getConcreteType(this.type);
+			IPattern pattern = this.patterns[i];
+			IPattern pattern1 = pattern.withType(type1, markers);
+			if (pattern1 == null)
+			{
+				Marker m = markers.create(this.position, "pattern.class.type", param.getName());
+				m.addInfo("Pattern Type: " + pattern.getType());
+				m.addInfo("Parameter Type: " + type1);
+			}
+			else
+			{
+				this.patterns[i] = pattern1;
+			}
+		}
+		
+		if (type.classEquals(this.type))
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(this.type))
-		{
-			return new TypeCheckPattern(this, this.type);
-		}
-		return null;
+		return new TypeCheckPattern(this, this.type);
 	}
 	
 	@Override
@@ -127,45 +161,6 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		IClass iclass = this.type.getTheClass();
-		if (iclass == null)
-		{
-			return; // skip
-		}
-		
-		int paramCount = iclass.parameterCount();
-		if (this.patternCount != paramCount)
-		{
-			Marker m = markers.create(this.position, "pattern.class.count", this.type.toString());
-			m.addInfo("Pattern Count: " + this.patternCount);
-			m.addInfo("Class Parameter Count: " + paramCount);
-			return;
-		}
-		
-		for (int i = 0; i < paramCount; i++)
-		{
-			IParameter param = iclass.getParameter(i);
-			IType type = param.getType().getConcreteType(this.type);
-			IPattern pattern = this.patterns[i];
-			IPattern pattern1 = pattern.withType(type);
-			if (pattern1 == null)
-			{
-				Marker m = markers.create(this.position, "pattern.class.type", param.getName());
-				m.addInfo("Pattern Type: " + pattern.getType());
-				m.addInfo("Parameter Type: " + type);
-			}
-			else
-			{
-				this.patterns[i] = pattern = pattern1;
-			}
-			
-			pattern.checkTypes(markers, context);
-		}
-	}
-	
-	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 	}
@@ -193,8 +188,6 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 			field.writeGet(writer, null, this.getLineNumber());
 			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
-		
-		writer.resetLocals(varIndex);
 	}
 	
 	@Override

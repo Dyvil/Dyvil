@@ -12,21 +12,27 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import org.objectweb.asm.Label;
 
 public final class MatchExpression extends ASTNode implements IValue
 {
-	private IValue				value;
-	private CaseExpression[]	cases;
-	private int					caseCount;
-	private boolean				exhaustive;
+	private IValue		value;
+	private MatchCase[]	cases	= new MatchCase[3];
+	private int			caseCount;
+	private boolean		exhaustive;
 	
-	private IType				type;
+	private IType		type;
 	
-	public MatchExpression(IValue value, CaseExpression[] cases)
+	public MatchExpression(ICodePosition position, IValue value)
+	{
+		this.position = position;
+		this.value = value;
+	}
+	
+	public MatchExpression(IValue value, MatchCase[] cases)
 	{
 		this.value = value;
 		this.cases = cases;
@@ -39,18 +45,30 @@ public final class MatchExpression extends ASTNode implements IValue
 		return MATCH;
 	}
 	
+	public void addCase(MatchCase matchCase)
+	{
+		int index = this.caseCount++;
+		if (index >= this.cases.length)
+		{
+			MatchCase[] temp = new MatchCase[this.caseCount];
+			System.arraycopy(this.cases, 0, temp, 0, index);
+			this.cases = temp;
+		}
+		this.cases[index] = matchCase;
+	}
+	
 	@Override
 	public boolean isPrimitive()
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].value;
-			if (v != null && v.isPrimitive())
+			IValue v = this.cases[i].action;
+			if (v != null && !v.isPrimitive())
 			{
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -71,7 +89,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		IType t = null;
 		for (int i = 0; i < len; i++)
 		{
-			IValue v = this.cases[i].value;
+			IValue v = this.cases[i].action;
 			if (v == null)
 			{
 				continue;
@@ -113,7 +131,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].value;
+			IValue v = this.cases[i].action;
 			if (v != null && !v.isType(type))
 			{
 				return false;
@@ -133,7 +151,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		float total = 0F;
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].value;
+			IValue v = this.cases[i].action;
 			if (v == null)
 			{
 				continue;
@@ -155,9 +173,7 @@ public final class MatchExpression extends ASTNode implements IValue
 		this.value.resolveTypes(markers, context);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			CaseExpression caseStatement = this.cases[i];
-			caseStatement.setMatchCase();
-			caseStatement.resolveTypes(markers, context);
+			this.cases[i].resolveTypes(markers, context);
 		}
 	}
 	
@@ -166,7 +182,7 @@ public final class MatchExpression extends ASTNode implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].value.resolveStatement(context, markers);
+			this.cases[i].action.resolveStatement(context, markers);
 		}
 	}
 	
@@ -174,53 +190,25 @@ public final class MatchExpression extends ASTNode implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.value = this.value.resolve(markers, context);
-		
 		IType type = this.value.getType();
+		
+		this.value = this.value.withType(type, type, markers, context);
+		
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			CaseExpression c = this.cases[i];
+			MatchCase c = this.cases[i];
 			if (this.exhaustive)
 			{
-				markers.add(c.getPosition(), "pattern.dead");
+				markers.add(c.getPattern().getPosition(), "pattern.dead");
 			}
 			
-			IPattern pattern = c.pattern;
-			if (pattern == null)
+			c.resolve(markers, type, context);
+			if (c.isExhaustive())
 			{
-				continue;
+				this.exhaustive = true;
 			}
-			
-			pattern = pattern.resolve(markers, context);
-			
-			if (pattern.isExhaustive())
-			{
-				if (c.condition == null)
-				{
-					this.exhaustive = true;
-				}
-			}
-			
-			IPattern pattern1 = pattern.withType(type);
-			if (pattern1 == null)
-			{
-				Marker marker = markers.create(pattern.getPosition(), "pattern.type");
-				marker.addInfo("Pattern Type: " + pattern.getType());
-				marker.addInfo("Value Type: " + type);
-			}
-			else
-			{
-				pattern = pattern1;
-			}
-			
-			c.pattern = pattern;
-			
-			this.cases[i].resolve(markers, context);
 		}
 		
-		if (type == Types.BOOLEAN && this.caseCount >= 2)
-		{
-			this.exhaustive = true;
-		}
 		return this;
 	}
 	
@@ -293,10 +281,10 @@ public final class MatchExpression extends ASTNode implements IValue
 		Label endLabel = new Label();
 		for (int i = 0; i < this.caseCount;)
 		{
-			CaseExpression c = this.cases[i];
+			MatchCase c = this.cases[i];
 			IPattern pattern = c.pattern;
 			IValue condition = c.condition;
-			IValue value = c.value;
+			IValue value = c.action;
 			
 			pattern.writeInvJump(writer, varIndex, elseLabel);
 			if (condition != null)

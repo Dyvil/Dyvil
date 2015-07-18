@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -69,16 +68,6 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (this.instance != null)
 		{
 			this.instance = this.instance.resolve(markers, context);
-		}
-		
-		if (args == 1 && this.name == Name.match)
-		{
-			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
-			if (me != null)
-			{
-				me.position = this.position;
-				return me.resolve(markers, context);
-			}
 		}
 		
 		this.arguments.resolve(markers, context);

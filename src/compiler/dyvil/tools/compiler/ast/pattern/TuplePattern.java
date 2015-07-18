@@ -52,9 +52,9 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (!TupleType.tupleClasses[this.patternCount].isSubTypeOf(type))
+		if (!TupleType.getTupleClass(this.patternCount).isSubTypeOf(type))
 		{
 			return null;
 		}
@@ -74,6 +74,23 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			}
 		}
 		this.tupleType = type;
+		
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			IType type1 = typeList.getType(i);
+			IPattern pattern = this.patterns[i];
+			IPattern pattern1 = pattern.withType(type1, markers);
+			if (pattern1 == null)
+			{
+				Marker m = markers.create(pattern.getPosition(), "tuple.pattern.type");
+				m.addInfo("Pattern Type: " + pattern.getType());
+				m.addInfo("Tuple Type: " + type1);
+			}
+			else
+			{
+				this.patterns[i] = pattern1; 
+			}
+		}
 		return this;
 	}
 	
@@ -145,31 +162,6 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		ITypeList typeList = (ITypeList) this.tupleType;
-		
-		for (int i = 0; i < this.patternCount; i++)
-		{
-			IType type = typeList.getType(i);
-			IPattern pattern = this.patterns[i];
-			IPattern pattern1 = pattern.withType(type);
-			if (pattern1 == null)
-			{
-				Marker m = markers.create(pattern.getPosition(), "tuple.pattern.type");
-				m.addInfo("Pattern Type: " + pattern.getType());
-				m.addInfo("Tuple Type: " + type);
-			}
-			else
-			{
-				this.patterns[i] = pattern = pattern1;
-			}
-			
-			pattern.checkTypes(markers, context);
-		}
-	}
-	
-	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		ITypeList typeList = (ITypeList) this.tupleType;
@@ -197,7 +189,6 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			this.patterns[i].writeInvJump(writer, -1, target);
 		}
 		
-		writer.resetLocals(varIndex);
 		writer.writeJumpInsn(Opcodes.GOTO, elseLabel);
 		writer.writeLabel(target);
 	}
@@ -228,8 +219,6 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			writer.writeTypeInsn(Opcodes.CHECKCAST, typeList.getType(i).getInternalName());
 			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
-		
-		writer.resetLocals(varIndex);
 	}
 	
 	@Override

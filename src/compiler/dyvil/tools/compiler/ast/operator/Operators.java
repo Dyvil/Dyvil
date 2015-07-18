@@ -156,35 +156,4 @@ public interface Operators
 		}
 		return null;
 	}
-	
-	public static MatchExpression getMatchExpression(IValue arg1, IValue arg2)
-	{
-		if (arg2.valueTag() == IValue.STATEMENT_LIST)
-		{
-			IValueList list = (IValueList) arg2;
-			int len = list.valueCount();
-			CaseExpression[] cases = new CaseExpression[len];
-			for (int i = 0; i < len; i++)
-			{
-				IValue v = list.getValue(i);
-				if (v.valueTag() != IValue.CASE_STATEMENT)
-				{
-					// All values have to be patterns.
-					return null;
-				}
-				
-				cases[i] = (CaseExpression) v;
-				cases[i].setMatchCase();
-			}
-			
-			return new MatchExpression(arg1, cases);
-		}
-		if (arg2.valueTag() == IValue.CASE_STATEMENT)
-		{
-			CaseExpression cs = (CaseExpression) arg2;
-			cs.setMatchCase();
-			return new MatchExpression(arg1, new CaseExpression[] { cs });
-		}
-		return null;
-	}
 }

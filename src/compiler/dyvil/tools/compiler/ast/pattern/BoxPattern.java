@@ -34,7 +34,7 @@ public class BoxPattern implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		return this;
 	}
@@ -50,12 +50,6 @@ public class BoxPattern implements IPattern
 	{
 		this.pattern = this.pattern.resolve(markers, context);
 		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.pattern = this.pattern.resolve(markers, context);
 	}
 	
 	@Override
