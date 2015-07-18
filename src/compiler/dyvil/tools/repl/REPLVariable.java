@@ -179,15 +179,18 @@ public class REPLVariable extends Field
 		
 		// Write the value
 		
-		if (this.type != Types.VOID)
+		if (this.value != null)
 		{
-			this.value.writeExpression(mw);
-			// Store the value to the field
-			mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
-		}
-		else
-		{
-			this.value.writeStatement(mw);
+			if (this.type != Types.VOID)
+			{
+				this.value.writeExpression(mw);
+				// Store the value to the field
+				mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
+			}
+			else
+			{
+				this.value.writeStatement(mw);
+			}
 		}
 		
 		// Finish Method compilation

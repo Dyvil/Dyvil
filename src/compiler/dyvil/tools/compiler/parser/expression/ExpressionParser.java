@@ -569,7 +569,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		if (nextType == Symbols.ARROW_OPERATOR)
 		{
-			LambdaExpression lv = new LambdaExpression(next.raw(), name);
+			LambdaExpression lv = new LambdaExpression(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
 			this.mode = 0;
 			this.value = lv;
 			pm.pushParser(pm.newExpressionParser(lv));

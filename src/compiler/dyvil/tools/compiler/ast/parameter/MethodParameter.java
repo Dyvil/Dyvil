@@ -23,9 +23,11 @@ public final class MethodParameter extends Parameter
 	{
 	}
 	
-	public MethodParameter(Name name)
+	public MethodParameter(ICodePosition position, Name name)
 	{
+		this.position = position;
 		this.name = name;
+		this.type = Types.UNKNOWN;
 	}
 	
 	public MethodParameter(Name name, IType type)

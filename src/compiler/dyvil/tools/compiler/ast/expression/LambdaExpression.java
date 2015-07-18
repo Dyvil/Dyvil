@@ -21,7 +21,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -78,11 +77,11 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		this.parameters = new IParameter[2];
 	}
 	
-	public LambdaExpression(ICodePosition position, Name name)
+	public LambdaExpression(ICodePosition position, IParameter param)
 	{
 		this.position = position;
 		this.parameters = new IParameter[1];
-		this.parameters[0] = new MethodParameter(name);
+		this.parameters[0] = param;
 		this.parameterCount = 1;
 	}
 	
@@ -138,8 +137,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			LambdaType lt = new LambdaType(this.parameterCount);
 			for (int i = 0; i < this.parameterCount; i++)
 			{
-				IType t = this.parameters[i].getType();
-				lt.addType(t == null ? Types.ANY : t);
+				lt.addType(this.parameters[i].getType());
 			}
 			lt.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
 			this.type = lt;
@@ -161,34 +159,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		
 		if (this.method != null)
 		{
-			if (this.method.hasTypeVariables())
-			{
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					IParameter param = this.parameters[i];
-					IType parType = param.getType();
-					if (parType == null)
-					{
-						parType = this.method.getParameter(i).getType().getConcreteType(this.type).getParameterType();
-						param.setType(parType);
-					}
-				}
-				
-				this.returnType = this.method.getType().getConcreteType(this.type).getReturnType();
-			}
-			else
-			{
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					IParameter param = this.parameters[i];
-					if (param.getType() == null)
-					{
-						param.setType(this.method.getParameter(i).getType());
-					}
-				}
-				
-				this.returnType = this.method.getType();
-			}
+			inferTypes(markers);
 			
 			this.context = context;
 			this.value = this.value.resolve(markers, this);
@@ -231,6 +202,47 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		
 		return this;
+	}
+	
+	private void inferTypes(MarkerList markers)
+	{
+		if (!this.method.hasTypeVariables())
+		{
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				IParameter param = this.parameters[i];
+				if (param.getType() == Types.UNKNOWN)
+				{
+					param.setType(this.method.getParameter(i).getType());
+				}
+			}
+			
+			this.returnType = this.method.getType();
+			return;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IParameter param = this.parameters[i];
+			IType parType = param.getType();
+			if (parType != Types.UNKNOWN)
+			{
+				continue;
+			}
+			
+			IType methodParamType = this.method.getParameter(i).getType();
+			IType concreteType = methodParamType.getConcreteType(this.type).getParameterType();
+			
+			// Can't infer parameter type
+			if (concreteType == methodParamType && concreteType.hasTypeVariables())
+			{
+				markers.add(param.getPosition(), "lambda.parameter.type", param.getName());
+			}
+			param.setType(concreteType);
+		}
+		
+		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType();
+		return;
 	}
 	
 	@Override
@@ -582,7 +594,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		if (this.parameterCount == 1)
 		{
 			IParameter param = this.parameters[0];
-			if (param.getType() != null)
+			if (param.getType() == Types.UNKNOWN)
 			{
 				buffer.append('(');
 				param.toString(prefix, buffer);
@@ -596,8 +608,21 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		else if (this.parameterCount > 1)
 		{
-			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-			buffer.append(' ');
+			buffer.append('(');
+			IParameter first = this.parameters[0];
+			if (first.getType() == Types.UNKNOWN)
+			{
+				buffer.append(first.getName());
+				for (int i = 1; i < this.parameterCount; i++)
+				{
+					buffer.append(", ").append(this.parameters[i].getName());
+				}
+			}
+			else
+			{
+				Util.astToString(prefix, parameters, parameterCount, ", ", buffer);
+			}
+			buffer.append(") ");
 		}
 		
 		buffer.append(Formatting.Expression.lambdaSeperator);

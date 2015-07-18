@@ -584,6 +584,11 @@ public class Method extends Member implements IMethod, ILabelContext
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(this, compilableList);
+			
+			if (this.theClass.isInterface() && !this.isStatic())
+			{
+				this.modifiers |= Modifiers.BRIDGE | Modifiers.SYNTHETIC;
+			}
 		}
 	}
 	
@@ -1517,7 +1522,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
-		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS) && this.value == null)
+		else if (this.theClass.isInterface())
 		{
 			opcode = Opcodes.INVOKEINTERFACE;
 		}
@@ -1536,7 +1541,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
+		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.isInterface());
 	}
 	
 	@Override
