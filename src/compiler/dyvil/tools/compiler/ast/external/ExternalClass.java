@@ -628,7 +628,7 @@ public final class ExternalClass extends CodeClass
 	
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
-		Name name1 = Name.get(name);
+		Name name1 = Name.getQualified(name);
 		
 		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
 		{
@@ -638,6 +638,16 @@ public final class ExternalClass extends CodeClass
 			param.type = ClassFormat.readReturnType(desc);
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
+		}
+		
+		int index = -1;
+		if ((access & Modifiers.SYNTHETIC) != 0)
+		{
+			index = name.indexOf('$');
+			if (index == -1)
+			{
+				return null;
+			}
 		}
 		
 		if ("<init>".equals(name))
@@ -685,21 +695,10 @@ public final class ExternalClass extends CodeClass
 			method.setVarargsParameter();
 		}
 		
-		boolean flag = true;
-		if ((access & Modifiers.SYNTHETIC) != 0)
-		{
-			int index = name.indexOf('$');
-			if (index != -1)
-			{
-				flag = this.addSpecialMethod(name.substring(0, index), name.substring(index + 1), method);
-			}
-		}
-		
-		if (flag)
+		if (index == -1 || this.addSpecialMethod(name.substring(0, index), name.substring(index + 1), method))
 		{
 			this.body.addMethod(method);
 		}
-		
 		return new BytecodeVisitor(method);
 	}
 	

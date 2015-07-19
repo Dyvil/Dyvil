@@ -584,11 +584,6 @@ public class Method extends Member implements IMethod, ILabelContext
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(this, compilableList);
-			
-			if (this.theClass.isInterface() && !this.isStatic())
-			{
-				this.modifiers |= Modifiers.BRIDGE | Modifiers.SYNTHETIC;
-			}
 		}
 	}
 	
@@ -714,10 +709,6 @@ public class Method extends Member implements IMethod, ILabelContext
 	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != null && name != this.name)
-		{
-			return 0;
-		}
-		if ((this.modifiers & Modifiers.SYNTHETIC) != 0)
 		{
 			return 0;
 		}
