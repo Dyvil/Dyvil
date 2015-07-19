@@ -29,51 +29,14 @@
  */
 package dyvil.tools.asm.signature;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.SignatureVisitor;
 
-/**
- * A signature visitor that generates signatures in string format.
- * 
- * @author Thomas Hallgren
- * @author Eric Bruneton
- */
-public class SignatureWriter extends SignatureVisitor
+public class SignatureWriter implements SignatureVisitor
 {
-	
-	/**
-	 * Buffer used to construct the signature.
-	 */
 	private final StringBuffer	buf	= new StringBuffer();
-	
-	/**
-	 * Indicates if the signature contains formal type parameters.
-	 */
 	private boolean				hasFormals;
-	
-	/**
-	 * Indicates if the signature contains method parameter types.
-	 */
 	private boolean				hasParameters;
-	
-	/**
-	 * Stack used to keep track of class types that have arguments. Each element
-	 * of this stack is a boolean encoded in one bit. The top of the stack is
-	 * the lowest order bit. Pushing false = *2, pushing true = *2+1, popping =
-	 * /2.
-	 */
 	private int					argumentStack;
-	
-	/**
-	 * Constructs a new {@link SignatureWriter} object.
-	 */
-	public SignatureWriter()
-	{
-		super(Opcodes.ASM5);
-	}
-	
-	// ------------------------------------------------------------------------
-	// Implementation of the SignatureVisitor interface
-	// ------------------------------------------------------------------------
 	
 	@Override
 	public void visitFormalTypeParameter(final String name)
@@ -215,24 +178,12 @@ public class SignatureWriter extends SignatureVisitor
 		this.buf.append(';');
 	}
 	
-	/**
-	 * Returns the signature that was built by this signature writer.
-	 * 
-	 * @return the signature that was built by this signature writer.
-	 */
 	@Override
 	public String toString()
 	{
 		return this.buf.toString();
 	}
 	
-	// ------------------------------------------------------------------------
-	// Utility methods
-	// ------------------------------------------------------------------------
-	
-	/**
-	 * Ends the formal type parameters section of the signature.
-	 */
 	private void endFormals()
 	{
 		if (this.hasFormals)
@@ -242,9 +193,6 @@ public class SignatureWriter extends SignatureVisitor
 		}
 	}
 	
-	/**
-	 * Ends the type arguments of a class or inner class type.
-	 */
 	private void endArguments()
 	{
 		if (this.argumentStack % 2 != 0)

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
@@ -13,7 +12,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
-public final class BytecodeVisitor extends MethodVisitor
+public final class BytecodeVisitor implements MethodVisitor
 {
 	private ExternalMethod	method;
 	
@@ -22,7 +21,6 @@ public final class BytecodeVisitor extends MethodVisitor
 	
 	public BytecodeVisitor(ExternalMethod method)
 	{
-		super(DyvilCompiler.asmVersion);
 		this.method = method;
 	}
 	

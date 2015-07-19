@@ -29,205 +29,33 @@
  */
 package dyvil.tools.asm;
 
-/**
- * Information about the input and output stack map frames of a basic block.
- * 
- * @author Eric Bruneton
- */
 final class Frame
 {
-	
-	/*
-	 * Frames are computed in a two steps process: during the visit of each
-	 * instruction, the state of the frame at the end of current basic block is
-	 * updated by simulating the action of the instruction on the previous state
-	 * of this so called "output frame". In visitMaxs, a fix point algorithm is
-	 * used to compute the "input frame" of each basic block, i.e. the stack map
-	 * frame at the beginning of the basic block, starting from the input frame
-	 * of the first basic block (which is computed from the method descriptor),
-	 * and by using the previously computed output frames to compute the input
-	 * state of the other blocks. All output and input frames are stored as
-	 * arrays of integers. Reference and array types are represented by an index
-	 * into a type table (which is not the same as the constant pool of the
-	 * class, in order to avoid adding unnecessary constants in the pool - not
-	 * all computed frames will end up being stored in the stack map table).
-	 * This allows very fast type comparisons. Output stack map frames are
-	 * computed relatively to the input frame of the basic block, which is not
-	 * yet known when output frames are computed. It is therefore necessary to
-	 * be able to represent abstract types such as
-	 * "the type at position x in the input frame locals" or "the type at
-	 * position x from the top of the input frame stack" or even "the type at
-	 * position x in the input frame, with y more (or less) array dimensions".
-	 * This explains the rather complicated type format used in output frames.
-	 * This format is the following: DIM KIND VALUE (4, 4 and 24 bits). DIM is a
-	 * signed number of array dimensions (from -8 to 7). KIND is either BASE,
-	 * LOCAL or STACK. BASE is used for types that are not relative to the input
-	 * frame. LOCAL is used for types that are relative to the input local
-	 * variable types. STACK is used for types that are relative to the input
-	 * stack types. VALUE depends on KIND. For LOCAL types, it is an index in
-	 * the input local variable types. For STACK types, it is a position
-	 * relatively to the top of input frame stack. For BASE types, it is either
-	 * one of the constants defined below, or for OBJECT and UNINITIALIZED
-	 * types, a tag and an index in the type table. Output frames can contain
-	 * types of any kind and with a positive or negative dimension (and even
-	 * unassigned types, represented by 0 - which does not correspond to any
-	 * valid type value). Input frames can only contain BASE types of positive
-	 * or null dimension. In all cases the type table contains only internal
-	 * type names (array type descriptors are forbidden - dimensions must be
-	 * represented through the DIM field). The LONG and DOUBLE types are always
-	 * represented by using two slots (LONG + TOP or DOUBLE + TOP), for local
-	 * variable types as well as in the operand stack. This is necessary to be
-	 * able to simulate DUPx_y instructions, whose effect would be dependent on
-	 * the actual type values if types were always represented by a single slot
-	 * in the stack (and this is not possible, since actual type values are not
-	 * always known - cf LOCAL and STACK type kinds).
-	 */
-	
-	/**
-	 * Mask to get the dimension of a frame type. This dimension is a signed
-	 * integer between -8 and 7.
-	 */
 	static final int			DIM						= 0xF0000000;
-	
-	/**
-	 * Constant to be added to a type to get a type with one more dimension.
-	 */
 	static final int			ARRAY_OF				= 0x10000000;
-	
-	/**
-	 * Constant to be added to a type to get a type with one less dimension.
-	 */
 	static final int			ELEMENT_OF				= 0xF0000000;
-	
-	/**
-	 * Mask to get the kind of a frame type.
-	 * 
-	 * @see #BASE
-	 * @see #LOCAL
-	 * @see #STACK
-	 */
 	static final int			KIND					= 0xF000000;
-	
-	/**
-	 * Flag used for LOCAL and STACK types. Indicates that if this type happens
-	 * to be a long or double type (during the computations of input frames),
-	 * then it must be set to TOP because the second word of this value has been
-	 * reused to store other data in the basic block. Hence the first word no
-	 * longer stores a valid long or double value.
-	 */
 	static final int			TOP_IF_LONG_OR_DOUBLE	= 0x800000;
-	
-	/**
-	 * Mask to get the value of a frame type.
-	 */
 	static final int			VALUE					= 0x7FFFFF;
-	
-	/**
-	 * Mask to get the kind of base types.
-	 */
 	static final int			BASE_KIND				= 0xFF00000;
-	
-	/**
-	 * Mask to get the value of base types.
-	 */
 	static final int			BASE_VALUE				= 0xFFFFF;
-	
-	/**
-	 * Kind of the types that are not relative to an input stack map frame.
-	 */
 	static final int			BASE					= 0x1000000;
-	
-	/**
-	 * Base kind of the base reference types. The BASE_VALUE of such types is an
-	 * index into the type table.
-	 */
 	static final int			OBJECT					= BASE | 0x700000;
-	
-	/**
-	 * Base kind of the uninitialized base types. The BASE_VALUE of such types
-	 * in an index into the type table (the Item at that index contains both an
-	 * instruction offset and an internal class name).
-	 */
 	static final int			UNINITIALIZED			= BASE | 0x800000;
-	
-	/**
-	 * Kind of the types that are relative to the local variable types of an
-	 * input stack map frame. The value of such types is a local variable index.
-	 */
 	private static final int	LOCAL					= 0x2000000;
-	
-	/**
-	 * Kind of the the types that are relative to the stack of an input stack
-	 * map frame. The value of such types is a position relatively to the top of
-	 * this stack.
-	 */
 	private static final int	STACK					= 0x3000000;
-	
-	/**
-	 * The TOP type. This is a BASE type.
-	 */
 	static final int			TOP						= BASE | 0;
-	
-	/**
-	 * The BOOLEAN type. This is a BASE type mainly used for array types.
-	 */
 	static final int			BOOLEAN					= BASE | 9;
-	
-	/**
-	 * The BYTE type. This is a BASE type mainly used for array types.
-	 */
 	static final int			BYTE					= BASE | 10;
-	
-	/**
-	 * The CHAR type. This is a BASE type mainly used for array types.
-	 */
 	static final int			CHAR					= BASE | 11;
-	
-	/**
-	 * The SHORT type. This is a BASE type mainly used for array types.
-	 */
 	static final int			SHORT					= BASE | 12;
-	
-	/**
-	 * The INTEGER type. This is a BASE type.
-	 */
 	static final int			INTEGER					= BASE | 1;
-	
-	/**
-	 * The FLOAT type. This is a BASE type.
-	 */
 	static final int			FLOAT					= BASE | 2;
-	
-	/**
-	 * The DOUBLE type. This is a BASE type.
-	 */
 	static final int			DOUBLE					= BASE | 3;
-	
-	/**
-	 * The LONG type. This is a BASE type.
-	 */
 	static final int			LONG					= BASE | 4;
-	
-	/**
-	 * The NULL type. This is a BASE type.
-	 */
 	static final int			NULL					= BASE | 5;
-	
-	/**
-	 * The UNINITIALIZED_THIS type. This is a BASE type.
-	 */
 	static final int			UNINITIALIZED_THIS		= BASE | 6;
-	
-	/**
-	 * The stack size variation corresponding to each JVM instruction. This
-	 * stack variation is equal to the size of the values produced by an
-	 * instruction, minus the size of the values consumed by this instruction.
-	 */
 	static final int[]			SIZE;
-	
-	/**
-	 * Computes the stack size variation corresponding to each JVM instruction.
-	 */
 	static
 	{
 		int i;
@@ -239,286 +67,16 @@ final class Frame
 			b[i] = s.charAt(i) - 'E';
 		}
 		SIZE = b;
-		
-		// code to generate the above string
-		//
-		// int NA = 0; // not applicable (unused opcode or variable size opcode)
-		//
-		// b = new int[] {
-		// 0, //NOP, // visitInsn
-		// 1, //ACONST_NULL, // -
-		// 1, //ICONST_M1, // -
-		// 1, //ICONST_0, // -
-		// 1, //ICONST_1, // -
-		// 1, //ICONST_2, // -
-		// 1, //ICONST_3, // -
-		// 1, //ICONST_4, // -
-		// 1, //ICONST_5, // -
-		// 2, //LCONST_0, // -
-		// 2, //LCONST_1, // -
-		// 1, //FCONST_0, // -
-		// 1, //FCONST_1, // -
-		// 1, //FCONST_2, // -
-		// 2, //DCONST_0, // -
-		// 2, //DCONST_1, // -
-		// 1, //BIPUSH, // visitIntInsn
-		// 1, //SIPUSH, // -
-		// 1, //LDC, // visitLdcInsn
-		// NA, //LDC_W, // -
-		// NA, //LDC2_W, // -
-		// 1, //ILOAD, // visitVarInsn
-		// 2, //LLOAD, // -
-		// 1, //FLOAD, // -
-		// 2, //DLOAD, // -
-		// 1, //ALOAD, // -
-		// NA, //ILOAD_0, // -
-		// NA, //ILOAD_1, // -
-		// NA, //ILOAD_2, // -
-		// NA, //ILOAD_3, // -
-		// NA, //LLOAD_0, // -
-		// NA, //LLOAD_1, // -
-		// NA, //LLOAD_2, // -
-		// NA, //LLOAD_3, // -
-		// NA, //FLOAD_0, // -
-		// NA, //FLOAD_1, // -
-		// NA, //FLOAD_2, // -
-		// NA, //FLOAD_3, // -
-		// NA, //DLOAD_0, // -
-		// NA, //DLOAD_1, // -
-		// NA, //DLOAD_2, // -
-		// NA, //DLOAD_3, // -
-		// NA, //ALOAD_0, // -
-		// NA, //ALOAD_1, // -
-		// NA, //ALOAD_2, // -
-		// NA, //ALOAD_3, // -
-		// -1, //IALOAD, // visitInsn
-		// 0, //LALOAD, // -
-		// -1, //FALOAD, // -
-		// 0, //DALOAD, // -
-		// -1, //AALOAD, // -
-		// -1, //BALOAD, // -
-		// -1, //CALOAD, // -
-		// -1, //SALOAD, // -
-		// -1, //ISTORE, // visitVarInsn
-		// -2, //LSTORE, // -
-		// -1, //FSTORE, // -
-		// -2, //DSTORE, // -
-		// -1, //ASTORE, // -
-		// NA, //ISTORE_0, // -
-		// NA, //ISTORE_1, // -
-		// NA, //ISTORE_2, // -
-		// NA, //ISTORE_3, // -
-		// NA, //LSTORE_0, // -
-		// NA, //LSTORE_1, // -
-		// NA, //LSTORE_2, // -
-		// NA, //LSTORE_3, // -
-		// NA, //FSTORE_0, // -
-		// NA, //FSTORE_1, // -
-		// NA, //FSTORE_2, // -
-		// NA, //FSTORE_3, // -
-		// NA, //DSTORE_0, // -
-		// NA, //DSTORE_1, // -
-		// NA, //DSTORE_2, // -
-		// NA, //DSTORE_3, // -
-		// NA, //ASTORE_0, // -
-		// NA, //ASTORE_1, // -
-		// NA, //ASTORE_2, // -
-		// NA, //ASTORE_3, // -
-		// -3, //IASTORE, // visitInsn
-		// -4, //LASTORE, // -
-		// -3, //FASTORE, // -
-		// -4, //DASTORE, // -
-		// -3, //AASTORE, // -
-		// -3, //BASTORE, // -
-		// -3, //CASTORE, // -
-		// -3, //SASTORE, // -
-		// -1, //POP, // -
-		// -2, //POP2, // -
-		// 1, //DUP, // -
-		// 1, //DUP_X1, // -
-		// 1, //DUP_X2, // -
-		// 2, //DUP2, // -
-		// 2, //DUP2_X1, // -
-		// 2, //DUP2_X2, // -
-		// 0, //SWAP, // -
-		// -1, //IADD, // -
-		// -2, //LADD, // -
-		// -1, //FADD, // -
-		// -2, //DADD, // -
-		// -1, //ISUB, // -
-		// -2, //LSUB, // -
-		// -1, //FSUB, // -
-		// -2, //DSUB, // -
-		// -1, //IMUL, // -
-		// -2, //LMUL, // -
-		// -1, //FMUL, // -
-		// -2, //DMUL, // -
-		// -1, //IDIV, // -
-		// -2, //LDIV, // -
-		// -1, //FDIV, // -
-		// -2, //DDIV, // -
-		// -1, //IREM, // -
-		// -2, //LREM, // -
-		// -1, //FREM, // -
-		// -2, //DREM, // -
-		// 0, //INEG, // -
-		// 0, //LNEG, // -
-		// 0, //FNEG, // -
-		// 0, //DNEG, // -
-		// -1, //ISHL, // -
-		// -1, //LSHL, // -
-		// -1, //ISHR, // -
-		// -1, //LSHR, // -
-		// -1, //IUSHR, // -
-		// -1, //LUSHR, // -
-		// -1, //IAND, // -
-		// -2, //LAND, // -
-		// -1, //IOR, // -
-		// -2, //LOR, // -
-		// -1, //IXOR, // -
-		// -2, //LXOR, // -
-		// 0, //IINC, // visitIincInsn
-		// 1, //I2L, // visitInsn
-		// 0, //I2F, // -
-		// 1, //I2D, // -
-		// -1, //L2I, // -
-		// -1, //L2F, // -
-		// 0, //L2D, // -
-		// 0, //F2I, // -
-		// 1, //F2L, // -
-		// 1, //F2D, // -
-		// -1, //D2I, // -
-		// 0, //D2L, // -
-		// -1, //D2F, // -
-		// 0, //I2B, // -
-		// 0, //I2C, // -
-		// 0, //I2S, // -
-		// -3, //LCMP, // -
-		// -1, //FCMPL, // -
-		// -1, //FCMPG, // -
-		// -3, //DCMPL, // -
-		// -3, //DCMPG, // -
-		// -1, //IFEQ, // visitJumpInsn
-		// -1, //IFNE, // -
-		// -1, //IFLT, // -
-		// -1, //IFGE, // -
-		// -1, //IFGT, // -
-		// -1, //IFLE, // -
-		// -2, //IF_ICMPEQ, // -
-		// -2, //IF_ICMPNE, // -
-		// -2, //IF_ICMPLT, // -
-		// -2, //IF_ICMPGE, // -
-		// -2, //IF_ICMPGT, // -
-		// -2, //IF_ICMPLE, // -
-		// -2, //IF_ACMPEQ, // -
-		// -2, //IF_ACMPNE, // -
-		// 0, //GOTO, // -
-		// 1, //JSR, // -
-		// 0, //RET, // visitVarInsn
-		// -1, //TABLESWITCH, // visiTableSwitchInsn
-		// -1, //LOOKUPSWITCH, // visitLookupSwitch
-		// -1, //IRETURN, // visitInsn
-		// -2, //LRETURN, // -
-		// -1, //FRETURN, // -
-		// -2, //DRETURN, // -
-		// -1, //ARETURN, // -
-		// 0, //RETURN, // -
-		// NA, //GETSTATIC, // visitFieldInsn
-		// NA, //PUTSTATIC, // -
-		// NA, //GETFIELD, // -
-		// NA, //PUTFIELD, // -
-		// NA, //INVOKEVIRTUAL, // visitMethodInsn
-		// NA, //INVOKESPECIAL, // -
-		// NA, //INVOKESTATIC, // -
-		// NA, //INVOKEINTERFACE, // -
-		// NA, //INVOKEDYNAMIC, // visitInvokeDynamicInsn
-		// 1, //NEW, // visitTypeInsn
-		// 0, //NEWARRAY, // visitIntInsn
-		// 0, //ANEWARRAY, // visitTypeInsn
-		// 0, //ARRAYLENGTH, // visitInsn
-		// NA, //ATHROW, // -
-		// 0, //CHECKCAST, // visitTypeInsn
-		// 0, //INSTANCEOF, // -
-		// -1, //MONITORENTER, // visitInsn
-		// -1, //MONITOREXIT, // -
-		// NA, //WIDE, // NOT VISITED
-		// NA, //MULTIANEWARRAY, // visitMultiANewArrayInsn
-		// -1, //IFNULL, // visitJumpInsn
-		// -1, //IFNONNULL, // -
-		// NA, //GOTO_W, // -
-		// NA, //JSR_W, // -
-		// };
-		// for (i = 0; i < b.length; ++i) {
-		// System.err.print((char)('E' + b[i]));
-		// }
-		// System.err.println();
 	}
-	
-	/**
-	 * The label (i.e. basic block) to which these input and output stack map
-	 * frames correspond.
-	 */
 	Label						owner;
-	
-	/**
-	 * The input stack map frame locals.
-	 */
 	int[]						inputLocals;
-	
-	/**
-	 * The input stack map frame stack.
-	 */
 	int[]						inputStack;
-	
-	/**
-	 * The output stack map frame locals.
-	 */
 	private int[]				outputLocals;
-	
-	/**
-	 * The output stack map frame stack.
-	 */
 	private int[]				outputStack;
-	
-	/**
-	 * Relative size of the output stack. The exact semantics of this field
-	 * depends on the algorithm that is used. When only the maximum stack size
-	 * is computed, this field is the size of the output stack relatively to the
-	 * top of the input stack. When the stack map frames are completely
-	 * computed, this field is the actual number of types in
-	 * {@link #outputStack}.
-	 */
 	private int					outputStackTop;
-	
-	/**
-	 * Number of types that are initialized in the basic block.
-	 * 
-	 * @see #initializations
-	 */
 	private int					initializationCount;
-	
-	/**
-	 * The types that are initialized in the basic block. A constructor
-	 * invocation on an UNINITIALIZED or UNINITIALIZED_THIS type must replace
-	 * <i>every occurence</i> of this type in the local variables and in the
-	 * operand stack. This cannot be done during the first phase of the
-	 * algorithm since, during this phase, the local variables and the operand
-	 * stack are not completely computed. It is therefore necessary to store the
-	 * types on which constructors are invoked in the basic block, in order to
-	 * do this replacement during the second phase of the algorithm, where the
-	 * frames are fully computed. Note that this array can contain types that
-	 * are relative to input locals or to the input stack (see below for the
-	 * description of the algorithm).
-	 */
 	private int[]				initializations;
 	
-	/**
-	 * Returns the output frame local variable type at the given index.
-	 * 
-	 * @param local
-	 *            the index of the local that must be returned.
-	 * @return the output frame local variable type at the given index.
-	 */
 	private int get(final int local)
 	{
 		if (this.outputLocals == null || local >= this.outputLocals.length)
@@ -537,14 +95,6 @@ final class Frame
 		return type;
 	}
 	
-	/**
-	 * Sets the output frame local variable type at the given index.
-	 * 
-	 * @param local
-	 *            the index of the local that must be set.
-	 * @param type
-	 *            the value of the local that must be set.
-	 */
 	private void set(final int local, final int type)
 	{
 		// creates and/or resizes the output local variables array if necessary
@@ -563,12 +113,6 @@ final class Frame
 		this.outputLocals[local] = type;
 	}
 	
-	/**
-	 * Pushes a new type onto the output frame stack.
-	 * 
-	 * @param type
-	 *            the type that must be pushed.
-	 */
 	private void push(final int type)
 	{
 		// creates and/or resizes the output stack array if necessary
@@ -593,16 +137,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Pushes a new type onto the output frame stack.
-	 * 
-	 * @param cw
-	 *            the ClassWriter to which this label belongs.
-	 * @param desc
-	 *            the descriptor of the type to be pushed. Can also be a method
-	 *            descriptor (in this case this method pushes its return type
-	 *            onto the output frame stack).
-	 */
 	private void push(final ClassWriter cw, final String desc)
 	{
 		int type = type(cw, desc);
@@ -616,15 +150,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Returns the int encoding of the given type.
-	 * 
-	 * @param cw
-	 *            the ClassWriter to which this label belongs.
-	 * @param desc
-	 *            a type descriptor.
-	 * @return the int encoding of the given type.
-	 */
 	private static int type(final ClassWriter cw, final String desc)
 	{
 		String t;
@@ -694,11 +219,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Pops a type from the output frame stack and returns its value.
-	 * 
-	 * @return the type that has been popped from the output frame stack.
-	 */
 	private int pop()
 	{
 		if (this.outputStackTop > 0)
@@ -709,12 +229,6 @@ final class Frame
 		return STACK | -(--this.owner.inputStackTop);
 	}
 	
-	/**
-	 * Pops the given number of types from the output frame stack.
-	 * 
-	 * @param elements
-	 *            the number of types that must be popped.
-	 */
 	private void pop(final int elements)
 	{
 		if (this.outputStackTop >= elements)
@@ -731,14 +245,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Pops a type from the output frame stack.
-	 * 
-	 * @param desc
-	 *            the descriptor of the type to be popped. Can also be a method
-	 *            descriptor (in this case this method pops the types
-	 *            corresponding to the method arguments).
-	 */
 	private void pop(final String desc)
 	{
 		char c = desc.charAt(0);
@@ -756,13 +262,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Adds a new type to the list of types on which a constructor is invoked in
-	 * the basic block.
-	 * 
-	 * @param var
-	 *            a type on a which a constructor is invoked.
-	 */
 	private void init(final int var)
 	{
 		// creates and/or resizes the initializations array if necessary
@@ -781,17 +280,6 @@ final class Frame
 		this.initializations[this.initializationCount++] = var;
 	}
 	
-	/**
-	 * Replaces the given type with the appropriate type if it is one of the
-	 * types on which a constructor is invoked in the basic block.
-	 * 
-	 * @param cw
-	 *            the ClassWriter to which this label belongs.
-	 * @param t
-	 *            a type
-	 * @return t or, if t is one of the types on which a constructor is invoked
-	 *         in the basic block, the type corresponding to this constructor.
-	 */
 	private int init(final ClassWriter cw, final int t)
 	{
 		int s;
@@ -829,19 +317,6 @@ final class Frame
 		return t;
 	}
 	
-	/**
-	 * Initializes the input frame of the first basic block from the method
-	 * descriptor.
-	 * 
-	 * @param cw
-	 *            the ClassWriter to which this label belongs.
-	 * @param access
-	 *            the access flags of the method to which this label belongs.
-	 * @param args
-	 *            the formal parameter types of this method.
-	 * @param maxLocals
-	 *            the maximum number of local variables of this method.
-	 */
 	void initInputFrame(final ClassWriter cw, final int access, final Type[] args, final int maxLocals)
 	{
 		this.inputLocals = new int[maxLocals];
@@ -873,18 +348,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Simulates the action of the given instruction on the output stack frame.
-	 * 
-	 * @param opcode
-	 *            the opcode of the instruction.
-	 * @param arg
-	 *            the operand of the instruction, if any.
-	 * @param cw
-	 *            the class writer to which this label belongs.
-	 * @param item
-	 *            the operand of the instructions, if any.
-	 */
 	void execute(final int opcode, final int arg, final ClassWriter cw, final Item item)
 	{
 		int t1, t2, t3, t4;
@@ -1325,21 +788,6 @@ final class Frame
 		}
 	}
 	
-	/**
-	 * Merges the input frame of the given basic block with the input and output
-	 * frames of this basic block. Returns <tt>true</tt> if the input frame of
-	 * the given label has been changed by this operation.
-	 * 
-	 * @param cw
-	 *            the ClassWriter to which this label belongs.
-	 * @param frame
-	 *            the basic block whose input frame must be updated.
-	 * @param edge
-	 *            the kind of the {@link Edge} between this label and 'label'.
-	 *            See {@link Edge#info}.
-	 * @return <tt>true</tt> if the input frame of the given label has been
-	 *         changed by this operation.
-	 */
 	boolean merge(final ClassWriter cw, final Frame frame, final int edge)
 	{
 		boolean changed = false;
@@ -1463,22 +911,6 @@ final class Frame
 		return changed;
 	}
 	
-	/**
-	 * Merges the type at the given index in the given type array with the given
-	 * type. Returns <tt>true</tt> if the type array has been modified by this
-	 * operation.
-	 * 
-	 * @param cw
-	 *            the ClassWriter to which this label belongs.
-	 * @param t
-	 *            the type with which the type array element must be merged.
-	 * @param types
-	 *            an array of types.
-	 * @param index
-	 *            the index of the type that must be merged in 'types'.
-	 * @return <tt>true</tt> if the type array has been modified by this
-	 *         operation.
-	 */
 	private static boolean merge(final ClassWriter cw, int t, final int[] types, final int index)
 	{
 		int u = types[index];

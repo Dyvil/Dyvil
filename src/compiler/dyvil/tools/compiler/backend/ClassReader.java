@@ -7,13 +7,12 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 
-public class ClassReader extends ClassVisitor
+public class ClassReader implements ClassVisitor
 {
 	protected ExternalClass	theClass;
 	
 	public ClassReader(ExternalClass theClass)
 	{
-		super(DyvilCompiler.asmVersion);
 		this.theClass = theClass;
 	}
 	

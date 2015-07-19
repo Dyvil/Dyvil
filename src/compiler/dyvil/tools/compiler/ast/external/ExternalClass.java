@@ -568,12 +568,11 @@ public final class ExternalClass extends CodeClass
 	
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		TypeReference ref = new TypeReference(typeRef);
-		switch (ref.getSort())
+		switch (TypeReference.getSort(typeRef))
 		{
 		// TODO implement other sorts
 		case TypeReference.CLASS_TYPE_PARAMETER:
-			ITypeVariable typeVar = this.generics[ref.getTypeParameterIndex()];
+			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
 			switch (desc)
 			{
 			case "Ldyvil/annotation/Covariant;":

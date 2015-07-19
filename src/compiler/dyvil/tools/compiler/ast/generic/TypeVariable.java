@@ -266,7 +266,7 @@ public final class TypeVariable implements ITypeVariable
 	{
 		if (this.variance != Variance.INVARIANT)
 		{
-			int typeRef = TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, this.index).getValue();
+			int typeRef = TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, this.index);
 			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/Contravariant;" : "Ldyvil/annotation/Covariant;";
 			writer.visitTypeAnnotation(typeRef, null, type, true);
 		}

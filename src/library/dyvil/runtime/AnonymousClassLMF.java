@@ -9,13 +9,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jdk.internal.org.objectweb.asm.ClassWriter;
+import jdk.internal.org.objectweb.asm.FieldVisitor;
+import jdk.internal.org.objectweb.asm.MethodVisitor;
+
 import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
-import dyvil.tools.asm.ClassWriter;
-import dyvil.tools.asm.FieldVisitor;
-import dyvil.tools.asm.MethodVisitor;
 
 import sun.invoke.util.BytecodeDescriptor;
 import sun.misc.Unsafe;

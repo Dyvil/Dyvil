@@ -29,48 +29,17 @@
  */
 package dyvil.tools.asm.signature;
 
-/**
- * A type signature parser to make a signature visitor visit an existing
- * signature.
- * 
- * @author Thomas Hallgren
- * @author Eric Bruneton
- */
+import dyvil.tools.asm.SignatureVisitor;
+
 public class SignatureReader
 {
-	
-	/**
-	 * The signature to be read.
-	 */
 	private final String	signature;
 	
-	/**
-	 * Constructs a {@link SignatureReader} for the given signature.
-	 * 
-	 * @param signature
-	 *            A <i>ClassSignature</i>, <i>MethodTypeSignature</i>, or
-	 *            <i>FieldTypeSignature</i>.
-	 */
 	public SignatureReader(final String signature)
 	{
 		this.signature = signature;
 	}
 	
-	/**
-	 * Makes the given visitor visit the signature of this
-	 * {@link SignatureReader}. This signature is the one specified in the
-	 * constructor (see {@link #SignatureReader(String) SignatureReader}). This
-	 * method is intended to be called on a {@link SignatureReader} that was
-	 * created using a <i>ClassSignature</i> (such as the <code>signature</code>
-	 * parameter of the {@link dyvil.tools.asm.ClassVisitor#visit
-	 * ClassVisitor.visit} method) or a <i>MethodTypeSignature</i> (such as the
-	 * <code>signature</code> parameter of the
-	 * {@link dyvil.tools.asm.ClassVisitor#visitMethod ClassVisitor.visitMethod}
-	 * method).
-	 * 
-	 * @param v
-	 *            the visitor that must visit this signature.
-	 */
 	public void accept(final SignatureVisitor v)
 	{
 		String signature = this.signature;

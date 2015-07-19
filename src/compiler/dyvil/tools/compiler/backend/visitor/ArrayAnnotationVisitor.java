@@ -5,13 +5,12 @@ import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 
-public final class ArrayAnnotationVisitor extends AnnotationVisitor
+public final class ArrayAnnotationVisitor implements AnnotationVisitor
 {
 	private IValueList	array;
 	
-	public ArrayAnnotationVisitor(int api, IValueList array)
+	public ArrayAnnotationVisitor(IValueList array)
 	{
-		super(api);
 		this.array = array;
 	}
 	
@@ -32,10 +31,22 @@ public final class ArrayAnnotationVisitor extends AnnotationVisitor
 	}
 	
 	@Override
+	public AnnotationVisitor visitAnnotation(String name, String desc)
+	{
+		// FIXME
+		return null;
+	}
+	
+	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
 		Array valueList = new Array(null);
 		this.array.addValue(valueList);
-		return new ArrayAnnotationVisitor(this.api, valueList);
+		return new ArrayAnnotationVisitor(valueList);
+	}
+	
+	@Override
+	public void visitEnd()
+	{
 	}
 }

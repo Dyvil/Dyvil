@@ -27,67 +27,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package dyvil.tools.asm.util;
+package dyvil.tools.asm;
 
-import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.Opcodes;
-
-/**
- * An {@link AnnotationVisitor} that prints the annotations it visits with a
- * {@link Printer}.
- * 
- * @author Eric Bruneton
- */
-public final class TraceAnnotationVisitor extends AnnotationVisitor
+public interface SignatureVisitor
 {
+	public final static char	EXTENDS		= '+';
+	public final static char	SUPER		= '-';
+	public final static char	INSTANCEOF	= '=';
 	
-	private final Printer	p;
+	public void visitFormalTypeParameter(String name);
 	
-	public TraceAnnotationVisitor(final Printer p)
-	{
-		this(null, p);
-	}
+	public SignatureVisitor visitClassBound();
 	
-	public TraceAnnotationVisitor(final AnnotationVisitor av, final Printer p)
-	{
-		super(Opcodes.ASM5, av);
-		this.p = p;
-	}
+	public SignatureVisitor visitInterfaceBound();
 	
-	@Override
-	public void visit(final String name, final Object value)
-	{
-		this.p.visit(name, value);
-		super.visit(name, value);
-	}
+	public SignatureVisitor visitSuperclass();
 	
-	@Override
-	public void visitEnum(final String name, final String desc, final String value)
-	{
-		this.p.visitEnum(name, desc, value);
-		super.visitEnum(name, desc, value);
-	}
+	public SignatureVisitor visitInterface();
 	
-	@Override
-	public AnnotationVisitor visitAnnotation(final String name, final String desc)
-	{
-		Printer p = this.p.visitAnnotation(name, desc);
-		AnnotationVisitor av = this.av == null ? null : this.av.visitAnnotation(name, desc);
-		return new TraceAnnotationVisitor(av, p);
-	}
+	public SignatureVisitor visitParameterType();
 	
-	@Override
-	public AnnotationVisitor visitArray(final String name)
-	{
-		Printer p = this.p.visitArray(name);
-		AnnotationVisitor av = this.av == null ? null : this.av.visitArray(name);
-		return new TraceAnnotationVisitor(av, p);
-	}
+	public SignatureVisitor visitReturnType();
 	
-	@Override
-	public void visitEnd()
-	{
-		this.p.visitAnnotationEnd();
-		super.visitEnd();
-	}
+	public SignatureVisitor visitExceptionType();
+	
+	public void visitBaseType(char descriptor);
+	
+	public void visitTypeVariable(String name);
+	
+	public SignatureVisitor visitArrayType();
+	
+	public void visitClassType(String name);
+	
+	public void visitInnerClassType(String name);
+	
+	public void visitTypeArgument();
+	
+	public SignatureVisitor visitTypeArgument(char wildcard);
+	
+	public void visitEnd();
 }

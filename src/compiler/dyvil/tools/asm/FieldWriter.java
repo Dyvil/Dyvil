@@ -29,105 +29,34 @@
  */
 package dyvil.tools.asm;
 
-/**
- * An {@link FieldVisitor} that generates Java fields in bytecode form.
- * 
- * @author Eric Bruneton
- */
-final class FieldWriter extends FieldVisitor
+final class FieldWriter implements FieldVisitor
 {
-	
-	/**
-	 * The class writer to which this field must be added.
-	 */
 	private final ClassWriter	cw;
-	
-	/**
-	 * Access flags of this field.
-	 */
 	private final int			access;
-	
-	/**
-	 * The index of the constant pool item that contains the name of this
-	 * method.
-	 */
 	private final int			name;
-	
-	/**
-	 * The index of the constant pool item that contains the descriptor of this
-	 * field.
-	 */
 	private final int			desc;
-	
-	/**
-	 * The index of the constant pool item that contains the signature of this
-	 * field.
-	 */
 	private int					signature;
-	
-	/**
-	 * The index of the constant pool item that contains the constant value of
-	 * this field.
-	 */
 	private int					value;
 	
-	/**
-	 * The runtime visible annotations of this field. May be <tt>null</tt>.
-	 */
 	private AnnotationWriter	anns;
-	
-	/**
-	 * The runtime invisible annotations of this field. May be <tt>null</tt>.
-	 */
 	private AnnotationWriter	ianns;
-	
-	/**
-	 * The runtime visible type annotations of this field. May be <tt>null</tt>.
-	 */
 	private AnnotationWriter	tanns;
-	
-	/**
-	 * The runtime invisible type annotations of this field. May be
-	 * <tt>null</tt>.
-	 */
 	private AnnotationWriter	itanns;
-	
-	/**
-	 * The non standard attributes of this field. May be <tt>null</tt>.
-	 */
 	private Attribute			attrs;
 	
-	// ------------------------------------------------------------------------
-	// Constructor
-	// ------------------------------------------------------------------------
+	FieldWriter					next;
 	
-	/**
-	 * Constructs a new {@link FieldWriter}.
-	 * 
-	 * @param cw
-	 *            the class writer to which this field must be added.
-	 * @param access
-	 *            the field's access flags (see {@link Opcodes}).
-	 * @param name
-	 *            the field's name.
-	 * @param desc
-	 *            the field's descriptor (see {@link Type}).
-	 * @param signature
-	 *            the field's signature. May be <tt>null</tt>.
-	 * @param value
-	 *            the field's constant value. May be <tt>null</tt>.
-	 */
 	FieldWriter(final ClassWriter cw, final int access, final String name, final String desc, final String signature, final Object value)
 	{
-		super(Opcodes.ASM5);
 		if (cw.firstField == null)
 		{
 			cw.firstField = this;
 		}
 		else
 		{
-			cw.lastField.fv = this;
+			cw.lastField.next = this;
 		}
+		
 		cw.lastField = this;
 		this.cw = cw;
 		this.access = access;
@@ -142,10 +71,6 @@ final class FieldWriter extends FieldVisitor
 			this.value = cw.newConstItem(value).index;
 		}
 	}
-	
-	// ------------------------------------------------------------------------
-	// Implementation of the FieldVisitor abstract class
-	// ------------------------------------------------------------------------
 	
 	@Override
 	public AnnotationVisitor visitAnnotation(final String desc, final boolean visible)
@@ -209,15 +134,6 @@ final class FieldWriter extends FieldVisitor
 	{
 	}
 	
-	// ------------------------------------------------------------------------
-	// Utility methods
-	// ------------------------------------------------------------------------
-	
-	/**
-	 * Returns the size of this field.
-	 * 
-	 * @return the size of this field.
-	 */
 	int getSize()
 	{
 		int size = 8;
@@ -271,12 +187,6 @@ final class FieldWriter extends FieldVisitor
 		return size;
 	}
 	
-	/**
-	 * Puts the content of this field into the given byte vector.
-	 * 
-	 * @param out
-	 *            where the content of this field must be put.
-	 */
 	void put(final ByteVector out)
 	{
 		final int FACTOR = ClassWriter.TO_ACC_SYNTHETIC;
