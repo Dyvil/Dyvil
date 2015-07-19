@@ -208,8 +208,8 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		// Condition
 		writer.writeTargetLabel(startLabel);

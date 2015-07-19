@@ -6,6 +6,7 @@ import dyvil.annotation.mutating;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -46,8 +47,6 @@ import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
-
-import org.objectweb.asm.Label;
 
 import static dyvil.reflect.Opcodes.ARGUMENTS;
 import static dyvil.reflect.Opcodes.IFEQ;

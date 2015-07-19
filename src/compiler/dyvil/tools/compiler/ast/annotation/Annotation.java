@@ -4,6 +4,8 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
@@ -27,9 +29,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.FieldVisitor;
 
 public final class Annotation extends ASTNode implements ITyped
 {

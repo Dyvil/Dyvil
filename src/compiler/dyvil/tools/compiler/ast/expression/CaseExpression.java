@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -31,9 +33,6 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
 
 public final class CaseExpression extends ASTNode implements IValue, ICase, IClassCompilable, IContext
 {

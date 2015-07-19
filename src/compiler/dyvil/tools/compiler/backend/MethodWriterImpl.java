@@ -1,12 +1,11 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-
-import org.objectweb.asm.*;
 
 import static dyvil.reflect.Opcodes.*;
 

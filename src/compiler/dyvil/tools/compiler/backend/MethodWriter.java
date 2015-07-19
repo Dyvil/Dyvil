@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.Handle;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
 
 public interface MethodWriter
 {

@@ -12,7 +12,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.config.CompilerConfig;
 
-public class ClassWriter extends org.objectweb.asm.ClassWriter
+public class ClassWriter extends dyvil.tools.asm.ClassWriter
 {
 	public ClassWriter()
 	{

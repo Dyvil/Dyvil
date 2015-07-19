@@ -91,9 +91,9 @@ public class ArrayForStatement extends ForEachStatement
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		Variable var = this.variable;
 		Variable arrayVar = this.arrayVar;
@@ -101,7 +101,7 @@ public class ArrayForStatement extends ForEachStatement
 		Variable lengthVar = this.lengthVar;
 		int lineNumber = this.getLineNumber();
 		
-		org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
 		
 		// Load the array

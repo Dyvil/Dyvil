@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -16,8 +17,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
 
 public abstract class AbstractCall implements ICall, IValued
 {

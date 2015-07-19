@@ -2,11 +2,10 @@ package dyvil.tools.compiler.backend;
 
 import java.io.InputStream;
 
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-
-import org.objectweb.asm.*;
 
 public class ClassReader extends ClassVisitor
 {
@@ -22,9 +21,9 @@ public class ClassReader extends ClassVisitor
 	{
 		try
 		{
-			org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(is);
+			dyvil.tools.asm.ClassReader reader = new dyvil.tools.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
-			reader.accept(visitor, org.objectweb.asm.ClassReader.SKIP_CODE | org.objectweb.asm.ClassReader.SKIP_FRAMES);
+			reader.accept(visitor, dyvil.tools.asm.ClassReader.SKIP_CODE | dyvil.tools.asm.ClassReader.SKIP_FRAMES);
 			
 			return bclass;
 		}

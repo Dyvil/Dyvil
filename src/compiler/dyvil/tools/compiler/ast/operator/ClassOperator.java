@@ -183,7 +183,7 @@ public final class ClassOperator extends ASTNode implements IValue
 			return;
 		}
 		
-		org.objectweb.asm.Type t = org.objectweb.asm.Type.getType(this.type.getExtendedName());
+		dyvil.tools.asm.Type t = dyvil.tools.asm.Type.getType(this.type.getExtendedName());
 		writer.writeLDC(t);
 	}
 	

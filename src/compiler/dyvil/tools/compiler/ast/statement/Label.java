@@ -8,7 +8,7 @@ public class Label
 	public Name						name;
 	public IValue					value;
 	
-	public org.objectweb.asm.Label	target;
+	public dyvil.tools.asm.Label	target;
 	
 	public Label(Name name)
 	{

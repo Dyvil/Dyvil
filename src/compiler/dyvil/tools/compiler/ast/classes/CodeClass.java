@@ -4,6 +4,8 @@ import java.lang.annotation.ElementType;
 
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldAssign;
@@ -43,9 +45,6 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Opcodes;
 
 public class CodeClass extends ASTNode implements IClass
 {

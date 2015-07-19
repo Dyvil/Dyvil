@@ -8,13 +8,14 @@ import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
+import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
-	public static final IDyvilHeader		LANG_HEADER				= Package.dyvilLang.resolveHeader("lang");
+	public static IDyvilHeader				LANG_HEADER				= Package.dyvilLang.resolveHeader("lang");
 	
 	public static final PrimitiveType		VOID					= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType		BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
@@ -77,12 +78,14 @@ public final class Types
 	
 	public static void init()
 	{
-		VOID.theClass = VOID_CLASS;
-		if (VOID_CLASS != null)
+		if (LANG_HEADER == null)
 		{
-			VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
-			VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
+			LANG_HEADER = new DyvilHeader("");
 		}
+		
+		VOID.theClass = VOID_CLASS;
+		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
+		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
 		BOOLEAN.theClass = BOOLEAN_CLASS;
 		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
 		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
@@ -109,31 +112,31 @@ public final class Types
 		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
 	}
 	
-	public static IType fromASMType(org.objectweb.asm.Type type)
+	public static IType fromASMType(dyvil.tools.asm.Type type)
 	{
 		switch (type.getSort())
 		{
-		case org.objectweb.asm.Type.VOID:
+		case dyvil.tools.asm.Type.VOID:
 			return VOID;
-		case org.objectweb.asm.Type.BOOLEAN:
+		case dyvil.tools.asm.Type.BOOLEAN:
 			return BOOLEAN;
-		case org.objectweb.asm.Type.BYTE:
+		case dyvil.tools.asm.Type.BYTE:
 			return BYTE;
-		case org.objectweb.asm.Type.SHORT:
+		case dyvil.tools.asm.Type.SHORT:
 			return SHORT;
-		case org.objectweb.asm.Type.CHAR:
+		case dyvil.tools.asm.Type.CHAR:
 			return CHAR;
-		case org.objectweb.asm.Type.INT:
+		case dyvil.tools.asm.Type.INT:
 			return INT;
-		case org.objectweb.asm.Type.LONG:
+		case dyvil.tools.asm.Type.LONG:
 			return LONG;
-		case org.objectweb.asm.Type.FLOAT:
+		case dyvil.tools.asm.Type.FLOAT:
 			return FLOAT;
-		case org.objectweb.asm.Type.DOUBLE:
+		case dyvil.tools.asm.Type.DOUBLE:
 			return DOUBLE;
-		case org.objectweb.asm.Type.OBJECT:
+		case dyvil.tools.asm.Type.OBJECT:
 			return new InternalType(type.getInternalName());
-		case org.objectweb.asm.Type.ARRAY:
+		case dyvil.tools.asm.Type.ARRAY:
 			return new ArrayType(fromASMType(type.getElementType()));
 		}
 		return null;

@@ -6,6 +6,7 @@ import java.security.ProtectionDomain;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -31,8 +32,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-
-import org.objectweb.asm.Opcodes;
 
 public class REPLMemberClass implements IClass
 {

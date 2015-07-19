@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -16,8 +17,6 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-
-import org.objectweb.asm.Label;
 
 public interface IValue extends IASTNode, ITyped
 {
@@ -322,9 +321,9 @@ public interface IValue extends IASTNode, ITyped
 			}
 			return valueList;
 		}
-		else if (c == org.objectweb.asm.Type.class)
+		else if (c == dyvil.tools.asm.Type.class)
 		{
-			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
+			dyvil.tools.asm.Type type = (dyvil.tools.asm.Type) o;
 			return new ClassOperator(Types.fromASMType(type));
 		}
 		return null;

@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.ClassWriter;
+import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -10,9 +12,6 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.TypeReference;
 
 public final class TypeVariable implements ITypeVariable
 {

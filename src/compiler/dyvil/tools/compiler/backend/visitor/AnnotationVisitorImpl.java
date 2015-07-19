@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.backend.visitor;
 
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -12,8 +13,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-
-import org.objectweb.asm.AnnotationVisitor;
 
 public class AnnotationVisitorImpl extends AnnotationVisitor
 {

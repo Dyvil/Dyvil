@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.external;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
@@ -34,8 +35,6 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-
-import org.objectweb.asm.*;
 
 public final class ExternalClass extends CodeClass
 {

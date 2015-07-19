@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -37,8 +38,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
-
-import org.objectweb.asm.Handle;
 
 public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
 {
@@ -488,8 +487,8 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		String desc = this.getLambdaDescriptor();
 		String invokedName = this.method.getName().qualified;
 		String invokedType = this.getInvokeDescriptor();
-		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
-		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
+		dyvil.tools.asm.Type type1 = dyvil.tools.asm.Type.getMethodType(this.method.getDescriptor());
+		dyvil.tools.asm.Type type2 = dyvil.tools.asm.Type.getMethodType(this.getSpecialDescriptor());
 		Handle handle = new Handle(handleType, this.owner, name, desc);
 		
 		writer.writeLineNumber(this.getLineNumber());

@@ -188,7 +188,7 @@ public final class Bytecode extends ASTNode implements IValue
 		{
 			if (label != null)
 			{
-				label.target = new org.objectweb.asm.Label();
+				label.target = new dyvil.tools.asm.Label();
 			}
 		}
 		

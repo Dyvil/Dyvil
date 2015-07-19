@@ -380,8 +380,8 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			return;
 		}
 		
-		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		
 		writer.writeLabel(start);
 		int count = writer.localCount();
@@ -435,8 +435,8 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		
 		writer.writeLabel(start);
 		int count = writer.localCount();

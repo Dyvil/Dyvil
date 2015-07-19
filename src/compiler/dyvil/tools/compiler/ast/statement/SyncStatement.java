@@ -113,11 +113,11 @@ public final class SyncStatement extends ASTNode implements IStatement
 	
 	private void write(MethodWriter writer, boolean expression) throws BytecodeException
 	{
-		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label handlerStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label throwLabel = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label handlerEnd = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label handlerStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label throwLabel = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label handlerEnd = new dyvil.tools.asm.Label();
 		
 		this.lock.writeExpression(writer);
 		writer.writeInsn(Opcodes.DUP);

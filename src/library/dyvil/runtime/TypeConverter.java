@@ -1,10 +1,9 @@
 package dyvil.runtime;
 
+import dyvil.tools.asm.MethodVisitor;
+
 import jdk.internal.org.objectweb.asm.Opcodes;
 import jdk.internal.org.objectweb.asm.Type;
-
-import org.objectweb.asm.MethodVisitor;
-
 import sun.invoke.util.BytecodeDescriptor;
 
 import static dyvil.runtime.Wrapper.*;

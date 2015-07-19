@@ -13,10 +13,9 @@ import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
-
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
+import dyvil.tools.asm.ClassWriter;
+import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.asm.MethodVisitor;
 
 import sun.invoke.util.BytecodeDescriptor;
 import sun.misc.Unsafe;
@@ -195,7 +194,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 	{
 		String samIntf = this.samBase.getName().replace('.', '/');
 		
-		this.cw.visit(CLASSFILE_VERSION, org.objectweb.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null, JAVA_LANG_OBJECT,
+		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null, JAVA_LANG_OBJECT,
 				new String[] { samIntf });
 		
 		// Generate final fields to be filled in by constructor
@@ -287,7 +286,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		
 		ForwardingMethodGenerator(MethodVisitor mv)
 		{
-			super(org.objectweb.asm.Opcodes.ASM5, mv);
+			super(dyvil.tools.asm.Opcodes.ASM5, mv);
 		}
 		
 		void generate(MethodType methodType)

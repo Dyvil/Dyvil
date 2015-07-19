@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -10,8 +11,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
 
 public final class BindingPattern extends ASTNode implements IPattern
 {

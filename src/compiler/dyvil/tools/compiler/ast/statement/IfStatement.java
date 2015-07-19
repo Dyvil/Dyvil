@@ -303,8 +303,8 @@ public final class IfStatement extends ASTNode implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 		Object commonFrameType = this.commonType.getFrameType();
 		
 		// Condition
@@ -337,11 +337,11 @@ public final class IfStatement extends ASTNode implements IStatement
 			return;
 		}
 		
-		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 		
 		if (this.elseThen != null)
 		{
-			org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block

@@ -406,9 +406,9 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label tryStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label tryEnd = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
 		
 		writer.writeTargetLabel(tryStart);
 		if (this.action != null)
@@ -421,7 +421,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			org.objectweb.asm.Label handlerLabel = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
 			String type = block.type.getInternalName();
 			
 			writer.writeTargetLabel(handlerLabel);
@@ -454,7 +454,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		
 		if (this.finallyBlock != null)
 		{
-			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
 			
 			writer.writeLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");

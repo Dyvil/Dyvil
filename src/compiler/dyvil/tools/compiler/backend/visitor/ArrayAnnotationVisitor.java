@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.backend.visitor;
 
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-
-import org.objectweb.asm.AnnotationVisitor;
 
 public final class ArrayAnnotationVisitor extends AnnotationVisitor
 {

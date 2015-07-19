@@ -11,6 +11,7 @@ import java.util.logging.*;
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -21,8 +22,6 @@ import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
-
-import org.objectweb.asm.Opcodes;
 
 public final class DyvilCompiler
 {

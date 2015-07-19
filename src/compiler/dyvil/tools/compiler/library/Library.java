@@ -3,6 +3,7 @@ package dyvil.tools.compiler.library;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.LinkOption;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,12 +64,7 @@ public abstract class Library
 		}
 	}
 	
-	protected static final Map<String, String>	env					= new HashMap<>();
-	
-	static
-	{
-		env.put("create", "true");
-	}
+	protected static final Map<String, String>	env					= Collections.singletonMap("create", "true");
 	
 	protected static final String[]				emptyStrings		= {};
 	protected static final LinkOption[]			emptyLinkOptions	= {};
