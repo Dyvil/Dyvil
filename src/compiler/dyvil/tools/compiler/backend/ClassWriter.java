@@ -42,8 +42,8 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		catch (IOException ex)
 		{
 			// If file saving fails, simply report the error.
-			DyvilCompiler.logger.warning("Failed to save file '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			DyvilCompiler.error("Failed to save file '" + file + "': " + ex);
+			DyvilCompiler.error("ClassWriter", "compile", ex);
 		}
 	}
 	
@@ -59,8 +59,8 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			DyvilCompiler.error("Error during compilation of '" + file + "': " + ex);
+			DyvilCompiler.error("ClassWriter", "compile", ex);
 			return;
 		}
 		
@@ -115,7 +115,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		}
 		catch (Exception ex)
 		{
-			DyvilCompiler.logger.throwing("ClassWriter", "jar", ex);
+			DyvilCompiler.error("ClassWriter", "jar", ex);
 		}
 	}
 	
@@ -135,7 +135,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		}
 		catch (Exception ex)
 		{
-			DyvilCompiler.logger.throwing("ClassWriter", "createEntry", ex);
+			DyvilCompiler.error("ClassWriter", "createEntry", ex);
 		}
 	}
 }

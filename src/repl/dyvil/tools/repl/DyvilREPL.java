@@ -23,7 +23,7 @@ public class DyvilREPL
 	
 	public static void main(String[] args) throws Exception
 	{
-		System.out.println("Dyvil REPL " + VERSION);
+		System.err.println("Dyvil REPL " + VERSION);
 		
 		Library.javaLibrary.loadLibrary();
 		Library.dyvilLibrary.loadLibrary();

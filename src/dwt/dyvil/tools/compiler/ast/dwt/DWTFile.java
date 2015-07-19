@@ -105,8 +105,8 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 			{
 				marker.log(code, buf);
 			}
-			DyvilCompiler.logger.info(buf.toString());
-			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
+			DyvilCompiler.log(buf.toString());
+			DyvilCompiler.warn(this.name + " contains Syntax Errors. Skipping.");
 		}
 	}
 	

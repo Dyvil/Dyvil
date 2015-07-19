@@ -7,7 +7,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
-import java.util.logging.Level;
 
 import dyvil.collection.List;
 import dyvil.tools.compiler.DyvilCompiler;
@@ -52,7 +51,7 @@ public final class TestThread extends Thread
 			System.setOut(out);
 			System.setErr(err);
 			
-			DyvilCompiler.logger.log(Level.INFO, "Test completed (" + Util.toTime(now) + ")");
+			DyvilCompiler.log("Test completed (" + Util.toTime(now) + ")");
 			
 			return;
 		}
@@ -65,7 +64,7 @@ public final class TestThread extends Thread
 			builder.append("Main Type: ").append(mainType).append('\n');
 			builder.append("Main Args: ").append(Arrays.toString(args));
 			builder.append("\n\n----- ERROR -----\n");
-			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ve);
+			DyvilCompiler.error(builder.toString(), ve);
 			
 			return;
 		}
@@ -74,7 +73,7 @@ public final class TestThread extends Thread
 			System.setOut(out);
 			System.setErr(err);
 			
-			DyvilCompiler.logger.log(Level.SEVERE, "TEST EXCEPTION", ex.getCause());
+			failTest(mainType, args, ex.getCause());
 			return;
 		}
 		catch (Throwable ex)
@@ -82,13 +81,21 @@ public final class TestThread extends Thread
 			System.setOut(out);
 			System.setErr(err);
 			
-			StringBuilder builder = new StringBuilder("TEST FAILED\n\n");
-			builder.append("Main Type: ").append(mainType).append('\n');
-			builder.append("Main Args: ").append(Arrays.toString(args));
-			builder.append("\n\n----- ERROR -----\n");
-			DyvilCompiler.logger.log(Level.SEVERE, builder.toString(), ex);
-			
+			failTest(mainType, args, ex);
 			return;
 		}
+	}
+
+	private static void failTest(String mainType, String[] args, Throwable ex)
+	{
+		StringBuilder builder = new StringBuilder("Test Failed\n\n");
+		builder.append("Main Type: ").append(mainType).append('\n');
+		builder.append("Main Args: ").append(Arrays.toString(args));
+		builder.append("\n\n----- ERROR -----\n");
+		DyvilCompiler.error(builder.toString(), ex);
+	}
+	
+	private static void testError(Throwable t) {
+		
 	}
 }

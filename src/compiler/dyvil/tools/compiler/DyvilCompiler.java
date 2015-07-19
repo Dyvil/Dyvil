@@ -37,7 +37,7 @@ public final class DyvilCompiler
 	public static int					asmVersion			= Opcodes.ASM5;
 	public static int					maxConstantDepth	= 10;
 	
-	public static Logger				logger				= Logger.getLogger("DYVILC");
+	private static Logger				logger;
 	public static LoggerOutputStream	loggerOut			= new LoggerOutputStream(logger, "TEST-OUT");
 	public static LoggerOutputStream	loggerErr			= new LoggerOutputStream(logger, "TEST-ERR");
 	public static DateFormat			format				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -45,6 +45,52 @@ public final class DyvilCompiler
 	public static CompilerConfig		config				= new CompilerConfig();
 	public static Set<ICompilerPhase>	phases				= new TreeSet();
 	public static FileFinder			fileFinder			= new FileFinder();
+	
+	public static void log(String message)
+	{
+		System.out.println(message);
+		if (logger != null)
+		{
+			logger.info(message);
+		}
+	}
+	
+	public static void warn(String message)
+	{
+		System.err.println(message);
+		if (logger != null)
+		{
+			logger.warning(message);
+		}
+	}
+	
+	public static void error(String message)
+	{
+		System.err.println(message);
+		if (logger != null)
+		{
+			logger.severe(message);
+		}
+	}
+	
+	public static void error(String message, Throwable throwable)
+	{
+		System.err.println(message);
+		throwable.printStackTrace();
+		if (logger != null)
+		{
+			logger.log(Level.SEVERE, message, throwable);
+		}
+	}
+	
+	public static void error(String className, String methodName, Throwable throwable)
+	{
+		throwable.printStackTrace();
+		if (logger != null)
+		{
+			logger.throwing(className, methodName, throwable);
+		}
+	}
 	
 	public static void main(String[] args)
 	{
@@ -66,14 +112,14 @@ public final class DyvilCompiler
 		File sourceDir = config.getSourceDir();
 		if (!sourceDir.exists())
 		{
-			logger.severe("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
+			log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
 		}
 		
 		File outputDir = config.getOutputDir();
 		int phases = DyvilCompiler.phases.size();
 		int libs = config.libraries.size();
 		
-		logger.fine("Loaded Config (" + Util.toTime(System.nanoTime() - now) + ")");
+		log("Loaded Config (" + Util.toTime(System.nanoTime() - now) + ")");
 		
 		if (DyvilCompiler.phases.contains(ICompilerPhase.RESOLVE_TYPES))
 		{
@@ -87,18 +133,18 @@ public final class DyvilCompiler
 			
 			long now1 = System.nanoTime();
 			now = now1 - now;
-			logger.fine("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(now) + ")");
+			log("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(now) + ")");
 			
 			// Inits primitive data types
 			Package.init();
 			Types.init();
 			
 			now1 = System.nanoTime() - now1;
-			logger.fine("Loaded Base Types (" + Util.toTime(now1) + ")");
+			log("Loaded Base Types (" + Util.toTime(now1) + ")");
 		}
 		
 		now = System.nanoTime();
-		logger.info("Compiling '" + sourceDir + "' to '" + outputDir + "'");
+		log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
 		
 		// Scan for Packages and Compilation Units
 		config.findUnits(fileFinder);
@@ -107,32 +153,32 @@ public final class DyvilCompiler
 		int unitCount = fileFinder.units.size();
 		int packages = Package.rootPackage.subPackages.size();
 		now = System.nanoTime() - now;
-		logger.info("Found " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount
+		log("Found " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount
 				+ (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)") + " (" + Util.toTime(now) + ")");
-		logger.info("");
+		log("");
 		
 		now = System.nanoTime();
 		
 		// Apply states
 		if (debug)
 		{
-			logger.info("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + DyvilCompiler.phases);
+			log("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + DyvilCompiler.phases);
 			for (ICompilerPhase phase : DyvilCompiler.phases)
 			{
 				long now1 = System.nanoTime();
-				logger.info("Applying " + phase.getName());
+				log("Applying " + phase.getName());
 				try
 				{
 					phase.apply(fileFinder.units);
 					now1 = System.nanoTime() - now1;
-					logger.info(phase.getName() + " completed (" + Util.toTime(now1) + ")");
+					log(phase.getName() + " completed (" + Util.toTime(now1) + ")");
 				}
 				catch (Throwable t)
 				{
-					logger.info(phase.getName() + " failed!");
-					logger.throwing(phase.getName(), "apply", t);
-					logger.info("");
-					logger.info("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
+					log(phase.getName() + " failed!");
+					error(phase.getName(), "apply", t);
+					log("");
+					log("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
 					return;
 				}
 			}
@@ -147,9 +193,9 @@ public final class DyvilCompiler
 				}
 				catch (Throwable t)
 				{
-					logger.throwing(phase.getName(), "apply", t);
-					logger.info("");
-					logger.info("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
+					error(phase.getName(), "apply", t);
+					log("");
+					log("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
 					return;
 				}
 			}
@@ -157,12 +203,18 @@ public final class DyvilCompiler
 		
 		long l = System.nanoTime();
 		
-		logger.info("");
-		logger.info("Compilation finished (" + Util.toTime(l - now) + ", Total Running Time: " + Util.toTime(l - totalTime) + ")");
+		log("");
+		log("Compilation finished (" + Util.toTime(l - now) + ", Total Running Time: " + Util.toTime(l - totalTime) + ")");
 	}
 	
-	private static void initLogger()
+	public static void initLogger()
 	{
+		File logFile = config.getLogFile();
+		if (logFile == null)
+		{
+			return;
+		}
+		
 		try
 		{
 			logger.setUseParentHandlers(false);
@@ -196,18 +248,11 @@ public final class DyvilCompiler
 					return builder.toString();
 				}
 			};
-			StreamHandler ch = new StreamHandler(System.out, formatter);
-			ch.setLevel(Level.ALL);
-			logger.addHandler(ch);
 			
-			File logFile = config.getLogFile();
-			if (logFile != null)
-			{
-				FileHandler fh = new FileHandler(logFile.getAbsolutePath(), true);
-				fh.setLevel(Level.ALL);
-				fh.setFormatter(formatter);
-				logger.addHandler(fh);
-			}
+			FileHandler fh = new FileHandler(logFile.getAbsolutePath(), true);
+			fh.setLevel(Level.ALL);
+			fh.setFormatter(formatter);
+			logger.addHandler(fh);
 		}
 		catch (Exception ex)
 		{
@@ -303,7 +348,7 @@ public final class DyvilCompiler
 		File file = new File(config.getOutputDir(), config.getMainType().replace('.', '/') + ".class");
 		if (!file.exists())
 		{
-			DyvilCompiler.logger.info("The Main Type '" + config.getMainType() + "' does not exist or was not compiled, skipping test.");
+			DyvilCompiler.log("The Main Type '" + config.getMainType() + "' does not exist or was not compiled, skipping test.");
 			return;
 		}
 		

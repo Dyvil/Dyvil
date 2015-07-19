@@ -30,7 +30,7 @@ public class ClassReader extends ClassVisitor
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.logger.throwing("ClassReader", "loadClass", ex);
+			DyvilCompiler.error("ClassReader", "loadClass", ex);
 		}
 		
 		return null;

@@ -34,8 +34,8 @@ public class HeaderFile
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			DyvilCompiler.warn("Error during compilation of '" + file + "': " + ex);
+			DyvilCompiler.error("ClassWriter", "compile", ex);
 			return;
 		}
 		
@@ -52,7 +52,7 @@ public class HeaderFile
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.logger.throwing("HeaderFile", "read", ex);
+			DyvilCompiler.error("HeaderFile", "read", ex);
 		}
 		return null;
 	}

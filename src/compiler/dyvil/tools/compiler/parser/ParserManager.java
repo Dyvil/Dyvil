@@ -119,7 +119,7 @@ public class ParserManager implements IParserManager
 				// }
 				// else
 				{
-					DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
+					DyvilCompiler.error("ParserManager", "parseToken", ex);
 					markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 				}
 			}

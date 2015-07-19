@@ -36,7 +36,7 @@ public class CodeFile extends File
 		}
 		catch (IOException ex)
 		{
-			DyvilCompiler.logger.throwing("CodeFile", "load", ex);
+			DyvilCompiler.error("CodeFile", "load", ex);
 		}
 	}
 	

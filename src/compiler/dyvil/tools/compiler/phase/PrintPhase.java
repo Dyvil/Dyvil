@@ -28,10 +28,10 @@ public class PrintPhase implements ICompilerPhase
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		DyvilCompiler.logger.info("--- Syntax Trees at the end of PARSER ---");
+		DyvilCompiler.log("--- Syntax Trees at the end of PARSER ---");
 		for (ICompilationUnit unit : units)
 		{
-			DyvilCompiler.logger.info(unit.getInputFile() + ":\n" + unit.toString());
+			DyvilCompiler.log(unit.getInputFile() + ":\n" + unit.toString());
 		}
 	}
 	
