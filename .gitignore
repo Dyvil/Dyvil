@@ -3,6 +3,7 @@
 bin/
 dbin/
 testbin/
+build/
 .gradle/
 
 *.log*

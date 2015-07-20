@@ -1,0 +1,87 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+sourceSets
+{
+	library
+    {
+        java
+        {
+        	srcDir 'src/library'
+        	srcDir 'src/asm'
+        }
+        resources
+        {
+        	srcDir 'dbin'
+        }
+    }
+    compiler
+    {
+    	java
+    	{
+    		srcDir 'src/compiler'
+    		compileClasspath += library.output
+            runtimeClasspath += library.output
+    	}
+    }
+    repl
+    {
+    	java
+    	{
+    		compileClasspath += library.output + compiler.output
+    		runtimeClasspath += library.output + compiler.output
+    		srcDir 'src/repl'
+    	}
+    }
+}
+
+processResources {
+	from('dbin') {
+		include '**/*.dyo'
+	}
+}
+
+group = 'dyvil-team'
+version = '0.1.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+jar {
+	baseName = 'dyvil'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+
+/**
+ * Compiles the Dyvil Files by running the compiler
+ */
+task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
+	main = 'dyvil.tools.compiler.DyvilCompiler'
+	classpath += sourceSets.compiler.output + sourceSets.library.output
+	args = [ '@lib.txt', 'compile' ]
+}
+
+task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
+	from sourceSets.library.output
+	from sourceSets.library.resources
+	
+	archiveName = "dyvil-library-${version}.jar"
+}
+
+task buildCompiler(type: Jar, dependsOn: 'classes') {
+	from sourceSets.compiler.output
+	
+	archiveName = "dyvil-compiler-${version}.jar"
+}
+
+task buildREPL(type: Jar, dependsOn: 'classes') {
+	from sourceSets.repl.output
+	
+	archiveName = "dyvil-repl-${version}.jar"
+}
+
+task buildAll(dependsOn: [ 'buildLibrary', 'buildCompiler', 'buildREPL' ])
