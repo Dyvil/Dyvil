@@ -65,13 +65,18 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.5'
 }
 
-/**
- * Compiles the Dyvil Files by running the compiler
- */
-task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
+task compileDyvilLibrary(type: JavaExec, dependsOn: 'compileDyvilLibrary_quiet') {
+	println 'Compliling Dyvil Runtime Library...'
+	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
 	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
 	args = [ '@lib.txt', 'compile' ]
+}
+
+task compileDyvilLibrary_quiet(type: JavaExec, dependsOn: 'compilerClasses') {
+	main = 'dyvil.tools.compiler.DyvilCompiler'
+	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
+	args = [ '@lib.txt', 'compile', '--quiet' ]
 }
 
 task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {

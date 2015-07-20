@@ -66,7 +66,7 @@ public abstract class Library
 			throw new Error("Could not load Java Runtime Library");
 		}
 		
-		bin = new File("dbin");
+		bin = new File("build/dyvilbin");
 		if (bin.exists())
 		{
 			dyvilBinLibrary = load(bin);
