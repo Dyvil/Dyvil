@@ -174,6 +174,12 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		return copy;
 	}
 	
+	/*
+	 * Copying + in-place reversing the list is generally really slow, so force implementors to implement this method.
+	 */
+	@Override
+	public List<E> reversed();
+	
 	@Override
 	public default MutableList<E> sorted()
 	{
@@ -241,6 +247,9 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	
+	@Override
+	public void reverse();
 	
 	@Override
 	public void sort();

@@ -190,6 +190,12 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		return new SingletonMap<V, K>(this.value, this.key);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return new SingletonMap(this.key, this.value);

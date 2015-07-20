@@ -151,9 +151,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (Objects.equals(this.element, element))
 		{
-			return ImmutableList.apply();
+			return EmptyList.instance;
 		}
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
@@ -161,9 +161,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (collection.contains(this.element))
 		{
-			return ImmutableList.apply();
+			return EmptyList.instance;
 		}
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
@@ -171,7 +171,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (!collection.contains(this.element))
 		{
-			return ImmutableList.apply();
+			return EmptyList.instance;
 		}
 		return this;
 	}
@@ -179,13 +179,13 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return ImmutableList.apply(mapper.apply(this.element));
+		return new SingletonList(mapper.apply(this.element));
 	}
 	
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return (ImmutableList<R>) ImmutableList.apply(mapper.apply(this.element));
+		return new SingletonList(mapper.apply(this.element));
 	}
 	
 	@Override
@@ -193,33 +193,39 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (condition.test(this.element))
 		{
-			return ImmutableList.apply(this.element);
+			return this;
 		}
-		return ImmutableList.apply();
+		return EmptyList.instance;
+	}
+	
+	@Override
+	public ImmutableList<E> reversed()
+	{
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> sorted()
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> sorted(Comparator<? super E> comparator)
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> distinct()
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> distinct(Comparator<? super E> comparator)
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
@@ -245,7 +251,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return ImmutableList.apply(this.element);
+		return new SingletonList(this.element);
 	}
 	
 	@Override

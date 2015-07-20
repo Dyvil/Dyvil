@@ -146,6 +146,9 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
+	@Override
+	public ImmutableMap<V, K> inverted();
+	
 	// Mutating Operations
 	
 	@Override

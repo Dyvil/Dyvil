@@ -143,6 +143,12 @@ public class ListView<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public ImmutableList<E> reversed()
+	{
+		return new ListView(this.list.reversed());
+	}
+	
+	@Override
 	public ImmutableList< E> sorted()
 	{
 		return new ListView(this.list.sorted());

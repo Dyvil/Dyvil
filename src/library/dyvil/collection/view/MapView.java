@@ -151,6 +151,12 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		return new MapView(this.map.inverted());
+	}
+	
+	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return new MapView(this.map.copy());

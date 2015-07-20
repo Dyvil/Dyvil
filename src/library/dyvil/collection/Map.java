@@ -369,6 +369,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
+	public Map<V, K> inverted();
+	
 	// Mutating Operations
 	
 	public default void $plus$eq(K key, V value)

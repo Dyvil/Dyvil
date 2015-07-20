@@ -178,6 +178,17 @@ public interface MutableMap<K, V> extends Map<K, V>
 		return copy;
 	}
 	
+	@Override
+	public default MutableMap<V, K> inverted()
+	{
+		MutableMap<V, K> map = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			map.put(entry.getValue(), entry.getKey());
+		}
+		return map;
+	}
+	
 	// Mutating Operations
 	
 	@Override

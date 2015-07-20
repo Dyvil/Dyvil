@@ -181,6 +181,12 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public ImmutableList<E> reversed()
+	{
+		return this;
+	}
+	
+	@Override
 	public ImmutableList<E> sorted()
 	{
 		return this;

@@ -182,6 +182,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	@Override
 	public List<E> filtered(Predicate<? super E> condition);
 	
+	public List<E> reversed();
+	
 	/**
 	 * Returns a list that contains the same elements as this list, but in a
 	 * sorted order. The sorting order is given by the <i>natural order</i> of
@@ -324,6 +326,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	
+	public void reverse();
 	
 	/**
 	 * Sorts the elements of this list. The sorting order is given by the

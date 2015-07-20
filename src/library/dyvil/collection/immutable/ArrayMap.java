@@ -283,6 +283,16 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		Object[] keys = new Object[this.size];
+		Object[] values = new Object[this.size];
+		System.arraycopy(this.keys, 0, values, 0, this.size);
+		System.arraycopy(this.values, 0, keys, 0, this.size);
+		return new ArrayMap(keys, values, this.size, true);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return new ArrayMap(this.keys, this.values, this.size);

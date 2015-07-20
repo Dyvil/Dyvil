@@ -31,6 +31,17 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	protected Node<E>	first;
 	protected Node<E>	last;
 	
+	public LinkedList()
+	{
+	}
+	
+	LinkedList(Node<E> first, Node<E> last, int size)
+	{
+		this.first = first;
+		this.last = last;
+		this.size = size;
+	}
+	
 	@Override
 	public int size()
 	{
@@ -262,6 +273,18 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 		
 		return copy;
+	}
+	
+	@Override
+	public List<E> reversed()
+	{
+		LinkedList<E> ll = new LinkedList();
+		
+		for (Node<E> node = this.first; node != null; node = node.next)
+		{
+			ll.addFirst(node.item);
+		}
+		return ll;
 	}
 	
 	@Override
@@ -543,6 +566,21 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 				this.unlink(node);
 			}
 			node = next;
+		}
+	}
+	
+	@Override
+	public void reverse()
+	{
+		Node temp = first;
+		first = last;
+		Node p = last = temp;
+		
+		while (p != null)
+		{
+			temp = p.next;
+			p.next = p.prev;
+			p = p.prev = temp;
 		}
 	}
 	

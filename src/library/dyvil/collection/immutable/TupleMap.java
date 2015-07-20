@@ -458,6 +458,33 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		Tuple2<V, K>[] entries = new Tuple2[this.size];
+		int index = 0;
+		outer:
+		for (int i = 0; i < this.size; i++)
+		{
+			Tuple2<K, V> entry = this.entries[i];
+			V value = entry._2;
+			Tuple2<V, K> newEntry = new Tuple2<V, K>(value, entry._1);
+			
+			for (int j = 0; j < index; j++)
+			{
+				if (Objects.equals(entries[j]._1, value))
+				{
+					entries[j] = newEntry;
+					continue outer;
+				}
+			}
+			
+			entries[index++] = newEntry;
+		}
+		
+		return new TupleMap(entries, index, true);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return new TupleMap(this.entries);

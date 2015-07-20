@@ -185,6 +185,18 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
+	public ImmutableList<E> reversed()
+	{
+		Object[] newArray = new Object[this.size];
+		int index = this.size;
+		for (Object o : this.elements)
+		{
+			newArray[--index] = o;
+		}
+		return new ArrayList(newArray, this.size, true);
+	}
+	
+	@Override
 	public ImmutableList<E> sorted()
 	{
 		Object[] array = new Object[this.size];

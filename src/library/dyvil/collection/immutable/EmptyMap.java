@@ -157,6 +157,12 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		return (ImmutableMap) this;
+	}
+	
+	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return this;

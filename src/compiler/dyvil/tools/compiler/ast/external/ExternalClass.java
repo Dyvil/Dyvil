@@ -626,7 +626,7 @@ public final class ExternalClass extends CodeClass
 	
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
-		Name name1 = Name.getQualified(name);
+		Name name1 = Name.get(name);
 		
 		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
 		{

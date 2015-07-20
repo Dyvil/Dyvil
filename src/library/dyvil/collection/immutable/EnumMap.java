@@ -202,7 +202,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
 	{
-		dyvil.collection.mutable.HashMap<U, R> hashMap = new dyvil.collection.mutable.HashMap(this.size);
+		MutableMap<U, R> mutableMap = new dyvil.collection.mutable.ArrayMap(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -216,17 +216,17 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			Entry<? extends U, ? extends R> entry = mapper.apply(this.keys[i], (V) value);
 			if (entry != null)
 			{
-				hashMap.put(entry);
+				mutableMap.put(entry);
 			}
 		}
 		
-		return hashMap.immutable();
+		return mutableMap.immutable();
 	}
 	
 	@Override
 	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
-		dyvil.collection.mutable.ArrayMap<U, R> hashMap = new dyvil.collection.mutable.ArrayMap(this.size);
+		MutableMap<U, R> mutableMap = new dyvil.collection.mutable.ArrayMap(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -239,11 +239,11 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			
 			for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], (V) value))
 			{
-				hashMap.put(entry);
+				mutableMap.put(entry);
 			}
 		}
 		
-		return hashMap.immutable();
+		return mutableMap.immutable();
 	}
 	
 	@Override
@@ -266,6 +266,19 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			}
 		}
 		return new EnumMap(this.type, this.keys, newValues, newSize);
+	}
+	
+	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		MutableMap<V, K> mutableMap = new dyvil.collection.mutable.ArrayMap();
+		
+		int len = this.values.length;
+		for (int i = 0; i < len; i++)
+		{
+			mutableMap.put((V) this.values[i], this.keys[i]);
+		}
+		return mutableMap.immutable();
 	}
 	
 	@Override

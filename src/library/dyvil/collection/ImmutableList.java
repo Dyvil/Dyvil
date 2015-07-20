@@ -99,6 +99,9 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public ImmutableList<E> filtered(Predicate<? super E> condition);
 	
 	@Override
+	public ImmutableList<E> reversed();
+	
+	@Override
 	public ImmutableList<E> sorted();
 	
 	@Override
@@ -247,6 +250,13 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void reverse()
+	{
+		throw new ImmutableException("reverse() on Immutable List");
 	}
 	
 	@Override

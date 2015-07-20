@@ -9,10 +9,7 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayList;
 
 @NilConvertible
@@ -83,7 +80,19 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	{
 		Object[] newArray = new Object[Math.max(this.size, newCapacity)];
 		System.arraycopy(this.elements, 0, newArray, 0, this.size);
-		return new ArrayList(newArray, this.size, false);
+		return new ArrayList(newArray, this.size, true);
+	}
+	
+	@Override
+	public MutableList<E> reversed()
+	{
+		Object[] newArray = new Object[this.size];
+		int index = this.size;
+		for (Object o : this.elements)
+		{
+			newArray[--index] = o;
+		}
+		return new ArrayList(newArray, this.size, true);
 	}
 	
 	@Override
@@ -337,6 +346,17 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		
 		this.elements = array;
 		this.size = index;
+	}
+	
+	@Override
+	public void reverse()
+	{
+		for (int start = 0, end = this.size - 1; start <= end; start++, end--)
+		{
+			Object temp = this.elements[start];
+			this.elements[start] = this.elements[end];
+			this.elements[end] = temp;
+		}
 	}
 	
 	@Override
