@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.external.ExternalPackage;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -32,7 +33,7 @@ public abstract class Library
 		}
 		else
 		{
-			throw new Error("Could not locate rt.jar - 'sun.boot.clas.path' = " + s);
+			throw new Error("Could not locate rt.jar - " + s);
 		}
 		
 		File bin = new File("bin");
@@ -50,8 +51,20 @@ public abstract class Library
 			dyvilLibraryLocation = new File(s);
 		}
 		
-		dyvilLibrary = load(dyvilLibraryLocation);
-		javaLibrary = load(javaLibraryLocation);
+		if (DyvilCompiler.debug)
+		{
+			DyvilCompiler.log("Dyvil Runtime Library: " + dyvilLibraryLocation);
+			DyvilCompiler.log("Java Runtime Library: " + javaLibraryLocation);
+		}
+		
+		if ((dyvilLibrary = load(dyvilLibraryLocation)) == null)
+		{
+			throw new Error("Could not load Dyvil Runtime Library");
+		}
+		if ((javaLibrary = load(javaLibraryLocation)) == null)
+		{
+			throw new Error("Could not load Java Runtime Library");
+		}
 		
 		bin = new File("dbin");
 		if (bin.exists())
@@ -87,6 +100,7 @@ public abstract class Library
 		{
 			return new JarLibrary(file);
 		}
+		DyvilCompiler.error("Invalid Library File: " + file);
 		return null;
 	}
 	
