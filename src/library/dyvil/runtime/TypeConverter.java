@@ -1,9 +1,8 @@
 package dyvil.runtime;
 
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-import jdk.internal.org.objectweb.asm.Opcodes;
-import jdk.internal.org.objectweb.asm.Type;
-import sun.invoke.util.BytecodeDescriptor;
+import dyvil.tools.asm.MethodVisitor;
+import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.Type;
 
 import static dyvil.runtime.Wrapper.*;
 
@@ -207,7 +206,7 @@ public class TypeConverter
 			else
 			{
 				// Primitive argument to reference target
-				String dTarget = BytecodeDescriptor.unparse(target);
+				String dTarget = Type.getDescriptor(target);
 				Wrapper wPrimTarget = wrapperOrNullFromDescriptor(dTarget);
 				if (wPrimTarget != null)
 				{
@@ -226,7 +225,7 @@ public class TypeConverter
 		}
 		else
 		{
-			String dArg = BytecodeDescriptor.unparse(arg);
+			String dArg = Type.getDescriptor(arg);
 			String dSrc;
 			if (functional.isPrimitive())
 			{
@@ -236,10 +235,10 @@ public class TypeConverter
 			{
 				// Cast to convert to possibly more specific type, and generate
 				// CCE for invalid arg
-				dSrc = BytecodeDescriptor.unparse(functional);
+				dSrc = Type.getDescriptor(functional);
 				cast(mv, dArg, dSrc);
 			}
-			String dTarget = BytecodeDescriptor.unparse(target);
+			String dTarget = Type.getDescriptor(target);
 			if (target.isPrimitive())
 			{
 				Wrapper wTarget = toWrapper(dTarget);

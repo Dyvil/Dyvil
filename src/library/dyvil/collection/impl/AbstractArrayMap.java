@@ -133,7 +133,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			action.accept(new Tuple2(this.keys[i], this.values[i]));
+			action.accept(new Tuple2<K, V>((K) this.keys[i], (V) this.values[i]));
 		}
 	}
 	

@@ -218,6 +218,13 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	public E set(int index, E element);
 	
 	@Override
+	public default boolean add(E element)
+	{
+		this.$plus$eq(element);
+		return true;
+	}
+	
+	@Override
 	public E add(int index, E element);
 	
 	@Override

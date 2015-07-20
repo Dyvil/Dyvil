@@ -11,7 +11,6 @@ import dyvil.lang.Void;
 
 public enum Wrapper
 {
-	VOID('V', void.class, Void.class, 0),
 	BOOLEAN('Z', boolean.class, Boolean.class, 1),
 	BYTE('B', byte.class, Byte.class, 1),
 	SHORT('S', short.class, Short.class, 2),
@@ -20,11 +19,13 @@ public enum Wrapper
 	LONG('J', long.class, Long.class, 8),
 	FLOAT('F', float.class, Float.class, 4 | 1 << 5),
 	DOUBLE('D', double.class, Double.class, 8 | 1 << 5),
-	OBJECT('J', Object.class, Object.class, 8);
+	OBJECT('L', Object.class, Object.class, 8 | 1 << 6),
+	VOID('V', void.class, Void.class, 1 << 6);
 	
 	private static final int		SIZE_MASK		= (1 << 4) - 1;
 	private static final int		UNSIGNED		= 1 << 4;
 	private static final int		FLOATING		= 1 << 5;
+	private static final int		OTHER			= 1 << 6;
 	
 	private char					basicTypeChar;
 	private Class					primitiveClass;
@@ -32,7 +33,7 @@ public enum Wrapper
 	private String					primitiveSimpleName;
 	private String					wrapperSimpleName;
 	
-	// 0 0 FLOATING SIGNED SIZE3 SIZE2 SIZE1 SIZE0
+	// 0 OTHER FLOATING SIGNED SIZE3 SIZE2 SIZE1 SIZE0
 	private byte					flags;
 	
 	private static final Wrapper[]	FROM_PRIMITIVE	= new Wrapper[16];
@@ -81,6 +82,12 @@ public enum Wrapper
 		return FROM_WRAPPER[hashWrapper(c)];
 	}
 	
+	public static boolean isWrapperType(Class c)
+	{
+		Wrapper w = FROM_WRAPPER[hashWrapper(c)];
+		return w != null && w.wrapperClass == c;
+	}
+	
 	private static int hashPrimitive(Class<?> paramClass)
 	{
 		String str = paramClass.getName();
@@ -103,12 +110,22 @@ public enum Wrapper
 	
 	private static int hashChar(char paramChar)
 	{
-		return (paramChar + (paramChar >> '\1')) % 16;
+		return (paramChar + (paramChar >> 1)) & 15;
 	}
 	
 	public char basicTypeChar()
 	{
 		return this.basicTypeChar;
+	}
+	
+	public Class primitiveType()
+	{
+		return this.primitiveClass;
+	}
+	
+	public Class wrapperType()
+	{
+		return this.wrapperClass;
 	}
 	
 	public String primitiveSimpleName()
@@ -119,6 +136,34 @@ public enum Wrapper
 	public String wrapperSimpleName()
 	{
 		return this.wrapperSimpleName;
+	}
+	
+	public boolean isConvertibleFrom(Wrapper wrapper)
+	{
+		if (this == wrapper)
+		{
+			return true;
+		}
+		if (this.compareTo(wrapper) < 0)
+		{
+			return false;
+		}
+		// All conversions are allowed in the enum order between floats and
+		// signed ints.
+		// First detect non-signed non-float types (boolean, char, Object,
+		// void).
+		if ((this.flags & wrapper.flags & UNSIGNED) != 0)
+		{
+			if ((this.flags & OTHER) != 0)
+			{
+				return true;
+			}
+			// can convert char to int or wider, but nothing else
+			// no other conversions are classified as widening
+			return wrapper == CHAR;
+		}
+		
+		return true;
 	}
 	
 	public boolean isSigned()

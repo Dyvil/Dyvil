@@ -9,16 +9,15 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.FieldVisitor;
-import jdk.internal.org.objectweb.asm.MethodVisitor;
-
 import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
+import dyvil.tools.asm.ClassWriter;
+import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.asm.MethodVisitor;
+import dyvil.tools.asm.Type;
 
-import sun.invoke.util.BytecodeDescriptor;
 import sun.misc.Unsafe;
 
 import static dyvil.reflect.Modifiers.*;
@@ -136,7 +135,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 			for (int i = 0; i < parameterCount; i++)
 			{
 				this.argNames[i] = "arg$" + (i + 1);
-				this.argDescs[i] = BytecodeDescriptor.unparse(invokedType.parameterType(i));
+				this.argDescs[i] = Type.getDescriptor(invokedType.parameterType(i));
 			}
 		}
 		else
@@ -282,44 +281,45 @@ public final class AnonymousClassLMF extends AbstractLMF
 		mv.visitEnd();
 	}
 	
-	private class ForwardingMethodGenerator extends MethodVisitor
+	private class ForwardingMethodGenerator
 	{
+		private MethodVisitor	mv;
 		
 		ForwardingMethodGenerator(MethodVisitor mv)
 		{
-			super(dyvil.tools.asm.Opcodes.ASM5, mv);
+			this.mv = mv;
 		}
 		
 		void generate(MethodType methodType)
 		{
-			this.visitCode();
+			this.mv.visitCode();
 			
 			if (AnonymousClassLMF.this.implKind == MethodHandleInfo.REF_newInvokeSpecial)
 			{
-				this.visitTypeInsn(NEW, AnonymousClassLMF.this.implMethodClassName);
-				this.visitInsn(DUP);
+				this.mv.visitTypeInsn(NEW, AnonymousClassLMF.this.implMethodClassName);
+				this.mv.visitInsn(DUP);
 			}
 			for (int i = 0; i < AnonymousClassLMF.this.argNames.length; i++)
 			{
-				this.visitVarInsn(ALOAD, 0);
-				this.visitFieldInsn(GETFIELD, AnonymousClassLMF.this.lambdaClassName, AnonymousClassLMF.this.argNames[i], AnonymousClassLMF.this.argDescs[i]);
+				this.mv.visitVarInsn(ALOAD, 0);
+				this.mv.visitFieldInsn(GETFIELD, AnonymousClassLMF.this.lambdaClassName, AnonymousClassLMF.this.argNames[i], AnonymousClassLMF.this.argDescs[i]);
 			}
 			
 			this.convertArgumentTypes(methodType);
 			
 			// Invoke the method we want to forward to
-			this.visitMethodInsn(this.invocationOpcode(), AnonymousClassLMF.this.implMethodClassName, AnonymousClassLMF.this.implMethodName,
+			this.mv.visitMethodInsn(this.invocationOpcode(), AnonymousClassLMF.this.implMethodClassName, AnonymousClassLMF.this.implMethodName,
 					AnonymousClassLMF.this.implMethodDesc, AnonymousClassLMF.this.implDefiningClass.isInterface());
 			
 			// Convert the return value (if any) and return it
 			// Note: if adapting from non-void to void, the 'return'
 			// instruction will pop the unneeded result
 			Class<?> samReturnClass = methodType.returnType();
-			TypeConverter.convertType(this, AnonymousClassLMF.this.implMethodReturnClass, samReturnClass, samReturnClass);
-			this.visitInsn(getReturnOpcode(samReturnClass));
+			TypeConverter.convertType(this.mv, AnonymousClassLMF.this.implMethodReturnClass, samReturnClass, samReturnClass);
+			this.mv.visitInsn(getReturnOpcode(samReturnClass));
 			// Maxs computed by ClassWriter.COMPUTE_MAXS,these arguments ignored
-			this.visitMaxs(-1, -1);
-			this.visitEnd();
+			this.mv.visitMaxs(-1, -1);
+			this.mv.visitEnd();
 		}
 		
 		private void convertArgumentTypes(MethodType samType)
@@ -331,9 +331,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 			{
 				// push receiver
 				Class<?> rcvrType = samType.parameterType(0);
-				this.visitVarInsn(getLoadOpcode(rcvrType), lvIndex + 1);
+				this.mv.visitVarInsn(getLoadOpcode(rcvrType), lvIndex + 1);
 				lvIndex += getParameterSize(rcvrType);
-				TypeConverter.convertType(this, rcvrType, AnonymousClassLMF.this.implDefiningClass,
+				TypeConverter.convertType(this.mv, rcvrType, AnonymousClassLMF.this.implDefiningClass,
 						AnonymousClassLMF.this.instantiatedMethodType.parameterType(0));
 			}
 			int samParametersLength = samType.parameterCount();
@@ -341,9 +341,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 			for (int i = samReceiverLength; i < samParametersLength; i++)
 			{
 				Class<?> argType = samType.parameterType(i);
-				this.visitVarInsn(getLoadOpcode(argType), lvIndex + 1);
+				this.mv.visitVarInsn(getLoadOpcode(argType), lvIndex + 1);
 				lvIndex += getParameterSize(argType);
-				TypeConverter.convertType(this, argType, AnonymousClassLMF.this.implMethodType.parameterType(argOffset + i),
+				TypeConverter.convertType(this.mv, argType, AnonymousClassLMF.this.implMethodType.parameterType(argOffset + i),
 						AnonymousClassLMF.this.instantiatedMethodType.parameterType(i));
 			}
 		}

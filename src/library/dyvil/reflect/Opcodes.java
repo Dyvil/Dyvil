@@ -1,8 +1,7 @@
 package dyvil.reflect;
 
-import jdk.internal.org.objectweb.asm.Label;
-
 import dyvil.annotation.Intrinsic;
+import dyvil.tools.asm.Label;
 import dyvil.tools.asm.util.Printer;
 
 /**

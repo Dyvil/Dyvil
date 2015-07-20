@@ -2,11 +2,6 @@ package dyvil.runtime;
 
 import java.lang.invoke.*;
 
-import sun.invoke.util.Wrapper;
-import static sun.invoke.util.Wrapper.forPrimitiveType;
-import static sun.invoke.util.Wrapper.forWrapperType;
-import static sun.invoke.util.Wrapper.isWrapperType;
-
 public abstract class AbstractLMF
 {
 	
@@ -251,11 +246,11 @@ public abstract class AbstractLMF
 		}
 		if (fromType.isPrimitive())
 		{
-			Wrapper wfrom = forPrimitiveType(fromType);
+			Wrapper wfrom = Wrapper.forPrimitiveType(fromType);
 			if (toType.isPrimitive())
 			{
 				// both are primitive: widening
-				Wrapper wto = forPrimitiveType(toType);
+				Wrapper wto = Wrapper.forPrimitiveType(toType);
 				return wto.isConvertibleFrom(wfrom);
 			}
 			// from primitive to reference: boxing
@@ -265,10 +260,10 @@ public abstract class AbstractLMF
 		{
 			// from reference to primitive: unboxing
 			Wrapper wfrom;
-			if (isWrapperType(fromType) && (wfrom = forWrapperType(fromType)).primitiveType().isPrimitive())
+			if (Wrapper.isWrapperType(fromType) && (wfrom = Wrapper.forWrapperType(fromType)).primitiveType().isPrimitive())
 			{
 				// fromType is a primitive wrapper; unbox+widen
-				Wrapper wto = forPrimitiveType(toType);
+				Wrapper wto = Wrapper.forPrimitiveType(toType);
 				return wto.isConvertibleFrom(wfrom);
 			}
 			// must be convertible to primitive

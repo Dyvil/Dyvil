@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.*;
@@ -528,6 +529,21 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		this.size = size;
 		this.first = first;
 		this.last = last;
+	}
+	
+	@Override
+	public void filter(Predicate<? super E> condition)
+	{
+		Node<E> node = this.first;
+		while (node != null)
+		{
+			Node<E> next = node.next;
+			if (!condition.test(node.item))
+			{
+				this.unlink(node);
+			}
+			node = next;
+		}
 	}
 	
 	@Override
