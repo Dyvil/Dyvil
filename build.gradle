@@ -22,7 +22,11 @@ sourceSets
     	{
     		srcDir 'src/compiler'
     		compileClasspath += library.output
-            runtimeClasspath += library.output
+            runtimeClasspath += library.output + compiler.resources
+    	}
+    	resources
+    	{
+    		srcDir 'src/resources'
     	}
     }
     repl
@@ -30,7 +34,7 @@ sourceSets
     	java
     	{
     		compileClasspath += library.output + compiler.output
-    		runtimeClasspath += library.output + compiler.output
+    		runtimeClasspath += compiler.runtimeClasspath
     		srcDir 'src/repl'
     	}
     }
@@ -66,7 +70,7 @@ task wrapper(type: Wrapper) {
  */
 task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
 	main = 'dyvil.tools.compiler.DyvilCompiler'
-	classpath += sourceSets.compiler.output + sourceSets.library.output
+	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
 	args = [ '@lib.txt', 'compile' ]
 }
 
