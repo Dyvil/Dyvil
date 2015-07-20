@@ -480,6 +480,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.popParser(true);
 				return;
 			}
+			if (type == Symbols.HASH || type == Symbols.COLON)
+			{
+				throw new SyntaxError(token, "Invalid Access - Invalid " + token);
+			}
 			
 			IToken prev = token.prev();
 			if (ParserUtil.isIdentifier(prev.type()))
@@ -790,30 +794,18 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return true;
 		case Keywords.CLASS:
 		{
-			if (token.next().type() != Symbols.OPEN_SQUARE_BRACKET)
-			{
-				return false;
-			}
-			
 			ClassOperator co = new ClassOperator(token);
 			this.value = co;
-			pm.skip();
 			pm.pushParser(pm.newTypeParser(co));
-			this.mode = ARRAY_END;
+			this.mode = ACCESS;
 			return true;
 		}
 		case Keywords.TYPE:
 		{
-			if (token.next().type() != Symbols.OPEN_SQUARE_BRACKET)
-			{
-				return false;
-			}
-			
 			TypeOperator to = new TypeOperator(token);
 			this.value = to;
-			pm.skip();
 			pm.pushParser(pm.newTypeParser(to));
-			this.mode = ARRAY_END;
+			this.mode = ACCESS;
 			return true;
 		}
 		case Keywords.NEW:

@@ -51,12 +51,6 @@ public abstract class Library
 			dyvilLibraryLocation = new File(s);
 		}
 		
-		if (DyvilCompiler.debug)
-		{
-			DyvilCompiler.log("Dyvil Runtime Library: " + dyvilLibraryLocation);
-			DyvilCompiler.log("Java Runtime Library: " + javaLibraryLocation);
-		}
-		
 		if ((dyvilLibrary = load(dyvilLibraryLocation)) == null)
 		{
 			throw new Error("Could not load Dyvil Runtime Library");
