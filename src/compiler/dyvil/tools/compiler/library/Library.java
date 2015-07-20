@@ -100,7 +100,12 @@ public abstract class Library
 		{
 			return new JarLibrary(file);
 		}
-		DyvilCompiler.error("Invalid Library File: " + file);
+		String error = "Invalid Library File: " + file.getAbsolutePath();
+		if (!file.exists())
+		{
+			error += " (File does not exist)";
+		}
+		DyvilCompiler.error(error);
 		return null;
 	}
 	
