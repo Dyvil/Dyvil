@@ -22,7 +22,7 @@ public abstract class Library
 	
 	static
 	{
-		String s = System.getProperty("sun.boot.class.path");
+		String s = String.class.getResource("/java/lang/String.class").getFile();
 		int index = s.indexOf("rt.jar");
 		if (index != -1)
 		{
@@ -32,7 +32,7 @@ public abstract class Library
 		}
 		else
 		{
-			javaLibraryLocation = null;
+			throw new Error("Could not locate rt.jar - 'sun.boot.clas.path' = " + s);
 		}
 		
 		File bin = new File("bin");
