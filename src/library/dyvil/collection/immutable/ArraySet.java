@@ -17,7 +17,12 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 {
 	public static <E> ArraySet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
+	}
+	
+	public static <E> Builder<E> builder()
+	{
+		return new Builder();
 	}
 	
 	public ArraySet(E... elements)
@@ -43,6 +48,47 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	public ArraySet(Collection<E> elements)
 	{
 		super(elements);
+	}
+	
+	public static class Builder<E> implements ImmutableSet.Builder<E>
+	{
+		private Object[]	elements;
+		private int			size;
+		
+		@Override
+		public void add(E element)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			
+			for (int i = 0; i < this.size; i++)
+			{
+				if (Objects.equals(this.elements[i], element))
+				{
+					this.elements[i] = element;
+					return;
+				}
+			}
+			
+			int index = this.size++;
+			if (index >= this.elements.length)
+			{
+				Object[] temp = new Object[(int) (this.size * 1.1F)];
+				System.arraycopy(this.elements, 0, temp, 0, index);
+				this.elements = temp;
+			}
+			this.elements[index] = element;
+		}
+		
+		@Override
+		public ArraySet<E> build()
+		{
+			ArraySet<E> set = new ArraySet(this.elements, this.size, true);
+			this.size = -1;
+			return set;
+		}
 	}
 	
 	@Override

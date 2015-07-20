@@ -11,6 +11,7 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.immutable.TupleMap;
@@ -22,6 +23,26 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Immutable
 {
+	public static interface Builder<K, V>
+	{
+		public void put(K key, V value);
+		
+		public default void put(Entry<? extends K, ? extends V> entry)
+		{
+			this.put(entry.getKey(), entry.getValue());
+		}
+		
+		public default void putAll(Map<? extends K, ? extends V> map)
+		{
+			for (Entry<? extends K, ? extends V> entry : map)
+			{
+				this.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		public ImmutableMap<K, V> build();
+	}
+	
 	public static <K, V> ImmutableMap<K, V> apply()
 	{
 		return EmptyMap.apply();
@@ -50,6 +71,16 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 		default:
 			return new TupleMap(entries, len, true);
 		}
+	}
+	
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new ArrayMap.Builder<K, V>();
+	}
+	
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new ArrayMap.Builder<K, V>(capacity);
 	}
 	
 	// Simple Getters

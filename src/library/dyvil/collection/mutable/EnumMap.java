@@ -60,7 +60,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public V put(K key, V value)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return null;
 		}
@@ -78,7 +78,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public V removeKey(Object key)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return null;
 		}
@@ -98,7 +98,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public boolean remove(Object key, Object value)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return false;
 		}

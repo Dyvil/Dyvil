@@ -10,6 +10,16 @@ import dyvil.util.ImmutableException;
 
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableMap<K, V>
 {
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder<K, V>();
+	}
+	
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new Builder<K, V>(capacity);
+	}
+	
 	public ArrayMap(K[] keys, V[] values)
 	{
 		super(keys, values);
@@ -33,6 +43,66 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	public ArrayMap(Map<K, V> map)
 	{
 		super(map);
+	}
+	
+	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
+	{
+		private Object[]			keys;
+		private Object[]			values;
+		private int					size;
+		
+		public Builder()
+		{
+			this.keys = new Object[10];
+			this.values = new Object[10];
+		}
+		
+		public Builder(int capacity)
+		{
+			this.keys = new Object[capacity];
+			this.values = new Object[capacity];
+		}
+		
+		@Override
+		public void put(K key, V value)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			
+			for (int i = 0; i < this.size; i++)
+			{
+				if (Objects.equals(this.keys[i], key))
+				{
+					this.keys[i] = key;
+					this.values[i] = value;
+					return;
+				}
+			}
+			
+			int index = this.size++;
+			if (index >= this.keys.length)
+			{
+				int newCapacity = (int) (this.size * 1.1F);
+				Object[] keys = new Object[newCapacity];
+				Object[] values = new Object[newCapacity];
+				System.arraycopy(this.keys, 0, keys, 0, index);
+				System.arraycopy(this.values, 0, values, 0, index);
+				this.keys = keys;
+				this.values = values;
+			}
+			this.keys[index] = key;
+			this.values[index] = value;
+		}
+		
+		@Override
+		public ArrayMap<K, V> build()
+		{
+			ArrayMap<K, V> map = new ArrayMap<K, V>(this.keys, this.values, this.size, true);
+			this.size = -1;
+			return map;
+		}
 	}
 	
 	@Override

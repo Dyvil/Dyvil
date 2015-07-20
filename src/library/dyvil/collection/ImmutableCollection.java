@@ -6,19 +6,26 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
 import dyvil.util.Immutable;
 import dyvil.util.ImmutableException;
 
-@NilConvertible
 public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immutable
 {
-	public static <E> ImmutableCollection<E> apply()
+	public static interface Builder<E>
 	{
-		return ImmutableList.apply();
+		public void add(E element);
+		
+		public default void addAll(Iterable<? extends E> elements)
+		{
+			for (E element : elements)
+			{
+				this.add(element);
+			}
+		}
+		
+		public ImmutableCollection<E> build();
 	}
 	
 	// Accessors

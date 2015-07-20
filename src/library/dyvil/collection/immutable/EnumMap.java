@@ -17,6 +17,16 @@ import dyvil.util.ImmutableException;
 @TypeConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
 {
+	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
+	{
+		return new Builder(type.getTheClass());
+	}
+	
+	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
+	{
+		return new Builder(type);
+	}
+	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Type<K> type)
 	{
 		return new EnumMap(type);
@@ -42,6 +52,47 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		super(type.getTheClass());
 	}
 	
+	public static class Builder<K extends Enum<K>, V> implements ImmutableMap.Builder<K, V>
+	{
+		private Class<K>	type;
+		private Object[]	values;
+		private int			size;
+		
+		public Builder(Class<K> type)
+		{
+			this.type = type;
+			this.values = new Object[getKeys(type).length];
+		}
+		
+		@Override
+		public void put(K key, V value)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			if (!checkType(this.type, key))
+			{
+				return;
+			}
+			
+			int index = index(key);
+			if (this.values[index] == null)
+			{
+				this.size++;
+			}
+			this.values[index] = value;
+		}
+		
+		@Override
+		public EnumMap<K, V> build()
+		{
+			EnumMap<K, V> map = new EnumMap(this.type, getKeys(type), this.values, this.size);
+			this.size = -1;
+			return map;
+		}
+	}
+	
 	@Override
 	protected void removeAt(int index)
 	{
@@ -51,7 +102,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return this;
 		}
@@ -90,7 +141,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus$at(Object key)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return this;
 		}
@@ -109,7 +160,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return this;
 		}
@@ -202,7 +253,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
 	{
-		MutableMap<U, R> mutableMap = new dyvil.collection.mutable.ArrayMap(this.size);
+		ImmutableMap.Builder<U, R> builder = new ArrayMap.Builder(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -216,17 +267,17 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			Entry<? extends U, ? extends R> entry = mapper.apply(this.keys[i], (V) value);
 			if (entry != null)
 			{
-				mutableMap.put(entry);
+				builder.put(entry);
 			}
 		}
 		
-		return mutableMap.immutable();
+		return builder.build();
 	}
 	
 	@Override
 	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
-		MutableMap<U, R> mutableMap = new dyvil.collection.mutable.ArrayMap(this.size);
+		ImmutableMap.Builder<U, R> builder = new ArrayMap.Builder(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -239,11 +290,11 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			
 			for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], (V) value))
 			{
-				mutableMap.put(entry);
+				builder.put(entry);
 			}
 		}
 		
-		return mutableMap.immutable();
+		return builder.build();
 	}
 	
 	@Override
@@ -271,14 +322,14 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		MutableMap<V, K> mutableMap = new dyvil.collection.mutable.ArrayMap();
+		ImmutableMap.Builder<V, K> builder = new ArrayMap.Builder(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
 		{
-			mutableMap.put((V) this.values[i], this.keys[i]);
+			builder.put((V) this.values[i], this.keys[i]);
 		}
-		return mutableMap.immutable();
+		return builder.build();
 	}
 	
 	@Override

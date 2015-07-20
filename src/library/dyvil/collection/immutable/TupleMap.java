@@ -19,6 +19,11 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	private final int				size;
 	private final Tuple2<K, V>[]	entries;
 	
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder();
+	}
+	
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		return new TupleMap(entries);
@@ -59,6 +64,73 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 		for (Entry<K, V> entry : map)
 		{
 			this.entries[index++] = entry.toTuple();
+		}
+	}
+	
+	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
+	{
+		private Tuple2<K, V>[]		entries;
+		private int					size;
+		
+		public Builder()
+		{
+			this.entries = new Tuple2[10];
+		}
+		
+		public Builder(int capacity)
+		{
+			this.entries = new Tuple2[capacity];
+		}
+		
+		private void put(K key, Tuple2<K, V> newEntry)
+		{
+			for (int i = 0; i < this.size; i++)
+			{
+				if (Objects.equals(this.entries[i]._1, key))
+				{
+					this.entries[i] = newEntry;
+					return;
+				}
+			}
+			
+			int index = this.size++;
+			if (index >= this.entries.length)
+			{
+				Tuple2<K, V>[] temp = new Tuple2[(int) (this.size * 1.1F)];
+				System.arraycopy(this.entries, 0, temp, 0, index);
+				this.entries = temp;
+			}
+			this.entries[index] = newEntry;
+		}
+		
+		@Override
+		public void put(K key, V value)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			
+			this.put(key, new Tuple2<K, V>(key, value));
+		}
+		
+		@Override
+		public void put(Entry<? extends K, ? extends V> entry)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			
+			this.put(entry.getKey(), (Tuple2) entry.toTuple());
+		}
+		
+		@Override
+		public TupleMap<K, V> build()
+		{
+			TupleMap<K, V> map = new TupleMap(this.entries, this.size, true);
+			this.size = -1;
+			return map;
 		}
 	}
 	

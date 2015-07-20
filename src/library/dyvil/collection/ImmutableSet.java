@@ -18,6 +18,12 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>
 {
+	public static interface Builder<E> extends ImmutableCollection.Builder<E>
+	{
+		@Override
+		public ImmutableSet<E> build();
+	}
+	
 	public static <E> ImmutableSet<E> apply()
 	{
 		return EmptySet.instance;
@@ -25,7 +31,12 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	
 	public static <E> ImmutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
+	}
+	
+	public static <E> Builder<E> builder()
+	{
+		return new ArraySet.Builder();
 	}
 	
 	// Accessors

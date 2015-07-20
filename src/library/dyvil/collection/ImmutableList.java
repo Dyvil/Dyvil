@@ -21,6 +21,12 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {
+	public static interface Builder<E> extends ImmutableCollection.Builder<E>
+	{
+		@Override
+		public ImmutableList<E> build();
+	}
+	
 	public static <E> ImmutableList<E> apply()
 	{
 		return EmptyList.apply();
@@ -44,6 +50,16 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public static <E> ImmutableList<E> apply(E... array)
 	{
 		return new ArrayList(array);
+	}
+	
+	public static <E> Builder<E> builder()
+	{
+		return new ArrayList.Builder();
+	}
+	
+	public static <E> Builder<E> builder(int capacity)
+	{
+		return new ArrayList.Builder(capacity);
 	}
 	
 	// Accessors
