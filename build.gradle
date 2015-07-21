@@ -13,7 +13,7 @@ sourceSets
         }
         resources
         {
-        	srcDir 'dbin'
+        	srcDir 'build/dyvilbin'
         }
     }
     compiler
@@ -65,18 +65,22 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.5'
 }
 
-task compileDyvilLibrary(type: JavaExec, dependsOn: 'compileDyvilLibrary_quiet') {
+/**
+ * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
+ */
+task clean(overwrite: true) << {
+	file('build/dyvilbin').mkdirs()
+}
+
+/**
+ * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
+ */
+task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
 	println 'Compliling Dyvil Runtime Library...'
 	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
 	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
 	args = [ '@lib.txt', 'compile' ]
-}
-
-task compileDyvilLibrary_quiet(type: JavaExec, dependsOn: 'compilerClasses') {
-	main = 'dyvil.tools.compiler.DyvilCompiler'
-	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
-	args = [ '@lib.txt', 'compile', '--quiet' ]
 }
 
 task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
