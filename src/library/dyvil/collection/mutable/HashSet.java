@@ -12,7 +12,7 @@ import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.math.MathUtils;
 
-import static dyvil.collection.mutable.HashMap.*;
+import static dyvil.collection.impl.AbstractHashMap.*;
 
 public class HashSet<E> implements MutableSet<E>
 {
