@@ -12,7 +12,7 @@ public final class RootPackage extends Package
 {
 	public RootPackage()
 	{
-		this.internalName = this.fullName = "";
+		this.setInternalName(this.fullName = "");
 		this.name = Name.getQualified("");
 	}
 	

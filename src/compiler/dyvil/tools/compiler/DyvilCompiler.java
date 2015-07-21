@@ -12,8 +12,6 @@ import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
 import dyvil.io.LoggerOutputStream;
 import dyvil.tools.asm.Opcodes;
-import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
@@ -112,35 +110,27 @@ public final class DyvilCompiler
 		if (!sourceDir.exists())
 		{
 			log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
+			return;
 		}
 		
 		File outputDir = config.getOutputDir();
 		int phases = DyvilCompiler.phases.size();
-		int libs = config.libraries.size();
 		
 		log("Loaded Config (" + Util.toTime(System.nanoTime() - now) + ")");
 		
-		if (DyvilCompiler.phases.contains(ICompilerPhase.RESOLVE_TYPES))
+		int libs = 0;
+		now = System.nanoTime();
+		
+		// Loads libraries
+		for (Library library : DyvilCompiler.config.libraries)
 		{
-			now = System.nanoTime();
-			
-			// Loads libraries
-			for (Library library : config.libraries)
-			{
-				library.loadLibrary();
-			}
-			
-			long now1 = System.nanoTime();
-			now = now1 - now;
-			log("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(now) + ")");
-			
-			// Inits primitive data types
-			Package.init();
-			Types.init();
-			
-			now1 = System.nanoTime() - now1;
-			log("Loaded Base Types (" + Util.toTime(now1) + ")");
+			library.loadLibrary();
+			libs++;
 		}
+		
+		long now1 = System.nanoTime();
+		now = now1 - now;
+		DyvilCompiler.log("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(now) + ")");
 		
 		now = System.nanoTime();
 		log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
@@ -150,10 +140,9 @@ public final class DyvilCompiler
 		
 		int fileCount = fileFinder.files.size();
 		int unitCount = fileFinder.units.size();
-		int packages = Package.rootPackage.subPackages.size();
 		now = System.nanoTime() - now;
-		log("Found " + packages + (packages == 1 ? " Package, " : " Packages, ") + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount
-				+ (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)") + " (" + Util.toTime(now) + ")");
+		log("Found " + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount + (unitCount == 1 ? " Compilation Unit)" : " Compilation Units)")
+				+ " (" + Util.toTime(now) + ")");
 		log("");
 		
 		now = System.nanoTime();
@@ -164,7 +153,7 @@ public final class DyvilCompiler
 			log("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + DyvilCompiler.phases);
 			for (ICompilerPhase phase : DyvilCompiler.phases)
 			{
-				long now1 = System.nanoTime();
+				now1 = System.nanoTime();
 				log("Applying " + phase.getName());
 				try
 				{

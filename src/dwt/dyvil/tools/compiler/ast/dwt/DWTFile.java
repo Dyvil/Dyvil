@@ -58,7 +58,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		int start = name.lastIndexOf('/');
 		int end = name.lastIndexOf('.');
 		this.name = name.substring(start + 1, end);
-		this.internalName = pack.internalName + this.name;
+		this.internalName = pack.getInternalName() + this.name;
 		
 		name = output.getPath();
 		start = name.lastIndexOf('/');

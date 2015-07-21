@@ -5,7 +5,6 @@ import java.util.Iterator;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -13,10 +12,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -27,8 +26,6 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Tuple extends ASTNode implements IValue, IValueList
 {
-	public static final IClass	TUPLE_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("TupleConvertible");
-	
 	private IValue[]			values;
 	private int					valueCount;
 	
@@ -147,7 +144,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].withType(type, typeContext, markers, context);
 		}
 		
-		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null)
 		{
 			this.tupleType = type;
 			return this;
@@ -185,7 +182,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 		
-		return TupleType.isSuperType(type, this.values, this.valueCount) || type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null;
+		return TupleType.isSuperType(type, this.values, this.valueCount) || type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null;
 	}
 	
 	@Override

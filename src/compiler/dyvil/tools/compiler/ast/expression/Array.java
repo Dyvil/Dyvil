@@ -25,8 +25,6 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Array extends ASTNode implements IValue, IValueList
 {
-	public static final IClass	ARRAY_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
-	
 	protected IValue[]			values;
 	protected int				valueCount;
 	
@@ -122,7 +120,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		if (!arrayType.isArrayType())
 		{
 			IClass iclass = arrayType.getTheClass();
-			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
+			if (iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null)
 			{
 				return new LiteralExpression(this).withType(arrayType, typeContext, markers, context);
 			}
@@ -186,13 +184,13 @@ public final class Array extends ASTNode implements IValue, IValueList
 		{
 			return ARRAY_TO_ITERABLE;
 		}
-		return ARRAY_TO_ITERABLE = Types.PREDEF_CLASS.getBody().getMethod(Name.getQualified("toIterable"));
+		return ARRAY_TO_ITERABLE = Package.dyvilLang.resolveClass("Predef").getBody().getMethod(Name.getQualified("toIterable"));
 	}
 	
 	private boolean isConvertibleFrom(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null || Types.ITERABLE.isSuperClassOf(type);
+		return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || Types.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override

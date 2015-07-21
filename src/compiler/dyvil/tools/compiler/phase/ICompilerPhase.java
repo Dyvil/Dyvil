@@ -50,7 +50,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	/**
 	 * Resolves packages, classes and types.
 	 */
-	ICompilerPhase	RESOLVE_TYPES	= new SequentialCompilerPhase(50, "RESOLVE_TYPES", ICompilationUnit::resolveTypes);
+	ICompilerPhase	RESOLVE_TYPES	= new ResolveTypesPhase(50);
 	
 	/**
 	 * Resolves methods and field names.

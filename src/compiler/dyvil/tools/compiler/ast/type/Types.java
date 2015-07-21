@@ -8,14 +8,13 @@ import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
-	public static IDyvilHeader				LANG_HEADER				= Package.dyvilLang.resolveHeader("lang");
+	public static IDyvilHeader				LANG_HEADER;
 	
 	public static final PrimitiveType		VOID					= new PrimitiveType(Name._void, 0);
 	public static final PrimitiveType		BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
@@ -32,40 +31,54 @@ public final class Types
 	public static final NullType			NULL					= new NullType();
 	public static final AnyType				ANY						= new AnyType();
 	
-	public static final IClass				VOID_CLASS				= Package.dyvilLang.resolveClass("Void");
-	public static final IClass				BOOLEAN_CLASS			= Package.dyvilLang.resolveClass("Boolean");
-	public static final IClass				BYTE_CLASS				= Package.dyvilLang.resolveClass("Byte");
-	public static final IClass				SHORT_CLASS				= Package.dyvilLang.resolveClass("Short");
-	public static final IClass				CHAR_CLASS				= Package.dyvilLang.resolveClass("Char");
-	public static final IClass				INT_CLASS				= Package.dyvilLang.resolveClass("Int");
-	public static final IClass				LONG_CLASS				= Package.dyvilLang.resolveClass("Long");
-	public static final IClass				FLOAT_CLASS				= Package.dyvilLang.resolveClass("Float");
-	public static final IClass				DOUBLE_CLASS			= Package.dyvilLang.resolveClass("Double");
+	public static final ClassType			OBJECT					= new ClassType();
+	public static final ClassType			STRING					= new ClassType();
+	public static final ClassType			CLASS					= new ClassType();
+	public static final ClassType			TYPE					= new ClassType();
+	public static final ClassType			ITERABLE				= new ClassType();
+	public static final ClassType			THROWABLE				= new ClassType();
+	public static final ClassType			RUNTIME_EXCEPTION		= new ClassType();
+	public static final ClassType			IMMUTABLE				= new ClassType();
 	
-	public static final IClass				OBJECT_CLASS			= Package.javaLang.resolveClass("Object");
-	public static final IClass				STRING_CLASS			= Package.javaLang.resolveClass("String");
-	public static final IClass				CLASS_CLASS				= Package.javaLang.resolveClass("Class");
-	public static final IClass				TYPE_CLASS				= Package.dyvilLang.resolveClass("Type");
-	public static final IClass				ITERABLE_CLASS			= Package.javaLang.resolveClass("Iterable");
-	public static final IClass				THROWABLE_CLASS			= Package.javaLang.resolveClass("Throwable");
-	public static final IClass				RUNTIME_EXCEPTION_CLASS	= Package.javaLang.resolveClass("RuntimeException");
+	public static IClass					VOID_CLASS;
+	public static IClass					BOOLEAN_CLASS;
+	public static IClass					BYTE_CLASS;
+	public static IClass					SHORT_CLASS;
+	public static IClass					CHAR_CLASS;
+	public static IClass					INT_CLASS;
+	public static IClass					LONG_CLASS;
+	public static IClass					FLOAT_CLASS;
+	public static IClass					DOUBLE_CLASS;
 	
-	public static final IClass				INTRINSIC_CLASS			= Package.dyvilAnnotation.resolveClass("Intrinsic");
-	public static final IClass				OVERRIDE_CLASS			= Package.javaLang.resolveClass("Override");
-	public static final IClass				RETENTION_CLASS			= Package.javaLangAnnotation.resolveClass("Retention");
-	public static final IClass				TARGET_CLASS			= Package.javaLangAnnotation.resolveClass("Target");
-	public static final IClass				MUTATING_CLASS			= Package.dyvilAnnotation.resolveClass("mutating");
+	public static IClass					OBJECT_CLASS;
+	public static IClass					STRING_CLASS;
+	public static IClass					CLASS_CLASS;
+	public static IClass					NULL_CLASS;
+	public static IClass					TYPE_CLASS;
+	public static IClass					ITERABLE_CLASS;
+	public static IClass					THROWABLE_CLASS;
+	public static IClass					RUNTIME_EXCEPTION_CLASS;
+	public static IClass					IMMUTABLE_CLASS;
 	
-	public static final ClassType			OBJECT					= new ClassType(OBJECT_CLASS);
-	public static final ClassType			STRING					= new ClassType(STRING_CLASS);
-	public static final ClassType			CLASS					= new ClassType(CLASS_CLASS);
-	public static final ClassType			TYPE					= new ClassType(TYPE_CLASS);
-	public static final IType				ITERABLE				= new ClassType(ITERABLE_CLASS);
-	public static final ClassType			THROWABLE				= new ClassType(THROWABLE_CLASS);
-	public static final ClassType			RUNTIME_EXCEPTION		= new ClassType(RUNTIME_EXCEPTION_CLASS);
-	public static final ClassType			IMMUTABLE				= new ClassType(Package.dyvilUtil.resolveClass("Immutable"));
+	public static IClass					INTRINSIC_CLASS;
+	public static IClass					OVERRIDE_CLASS;
+	public static IClass					RETENTION_CLASS;
+	public static IClass					TARGET_CLASS;
+	public static IClass					MUTATING_CLASS;
 	
-	public static final IClass				PREDEF_CLASS			= Package.dyvilLang.resolveClass("Predef");
+	public static IClass					BOOLEAN_CONVERTIBLE_CLASS;
+	public static IClass					CHAR_CONVERTIBLE_CLASS;
+	public static IClass					INT_CONVERTIBLE_CLASS;
+	public static IClass					LONG_CONVERTIBLE_CLASS;
+	public static IClass					FLOAT_CONVERTIBLE_CLASS;
+	public static IClass					DOUBLE_CONVERTIBLE_CLASS;
+	public static IClass					STRING_CONVERTIBLE_CLASS;
+	public static IClass					FORMAT_STRING_CONVERTIBLE;
+	public static IClass					NIL_CONVERTIBLE_CLASS;
+	public static IClass					ARRAY_CONVERTIBLE;
+	public static IClass					TUPLE_CONVERTIBLE;
+	public static IClass					CLASS_CONVERTIBLE;
+	public static IClass					TYPE_CONVERTIBLE;
 	
 	private static IClass					OBJECT_ARRAY_CLASS;
 	private static final IClass[]			PRIMITIVE_ARRAY_CLASS	= new IClass[16];
@@ -78,36 +91,64 @@ public final class Types
 	
 	public static void init()
 	{
-		if (LANG_HEADER == null)
-		{
-			LANG_HEADER = new DyvilHeader("");
-		}
+		LANG_HEADER = Package.dyvilLang.resolveHeader("lang");
 		
-		VOID.theClass = VOID_CLASS;
+		VOID.theClass = VOID_CLASS = Package.dyvilLang.resolveClass("Void");
+		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");
+		BYTE.theClass = BYTE_CLASS = Package.dyvilLang.resolveClass("Byte");
+		SHORT.theClass = SHORT_CLASS = Package.dyvilLang.resolveClass("Short");
+		CHAR.theClass = CHAR_CLASS = Package.dyvilLang.resolveClass("Char");
+		INT.theClass = INT_CLASS = Package.dyvilLang.resolveClass("Int");
+		LONG.theClass = LONG_CLASS = Package.dyvilLang.resolveClass("Long");
+		FLOAT.theClass = FLOAT_CLASS = Package.dyvilLang.resolveClass("Float");
+		DOUBLE.theClass = DOUBLE_CLASS = Package.dyvilLang.resolveClass("Double");
+		
+		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
+		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
+		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
+		CLASS.theClass = CLASS_CLASS = Package.javaLang.resolveClass("Class");
+		TYPE.theClass = TYPE_CLASS = Package.dyvilLang.resolveClass("Type");
+		ITERABLE.theClass = ITERABLE_CLASS = Package.javaLang.resolveClass("Iterable");
+		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
+		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
+		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
+		
+		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
+		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");
+		RETENTION_CLASS = Package.javaLangAnnotation.resolveClass("Retention");
+		TARGET_CLASS = Package.javaLangAnnotation.resolveClass("Target");
+		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("mutating");
+		
+		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");
+		BOOLEAN_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
+		CHAR_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("CharConvertible");
+		LONG_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("LongConvertible");
+		FLOAT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("FloatConvertible");
+		DOUBLE_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("DoubleConvertible");
+		STRING_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("StringConvertible");
+		NIL_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("NilConvertible");
+		FORMAT_STRING_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
+		ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
+		TUPLE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TupleConvertible");
+		CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
+		TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
+		
 		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
 		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
-		BOOLEAN.theClass = BOOLEAN_CLASS;
 		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
 		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
-		BYTE.theClass = BYTE_CLASS;
 		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Name.apply);
 		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Name.unapply);
-		SHORT.theClass = SHORT_CLASS;
 		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Name.apply);
 		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Name.unapply);
-		CHAR.theClass = CHAR_CLASS;
 		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Name.apply);
 		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Name.unapply);
-		INT.theClass = INT_CLASS;
 		INT.boxMethod = INT_CLASS.getBody().getMethod(Name.apply);
 		INT.unboxMethod = INT_CLASS.getBody().getMethod(Name.unapply);
-		LONG.theClass = LONG_CLASS;
 		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Name.apply);
 		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Name.unapply);
-		FLOAT.theClass = FLOAT_CLASS;
 		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Name.apply);
 		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Name.unapply);
-		DOUBLE.theClass = DOUBLE_CLASS;
 		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Name.apply);
 		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
 	}

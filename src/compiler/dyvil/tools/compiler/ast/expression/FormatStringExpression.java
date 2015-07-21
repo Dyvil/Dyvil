@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -19,8 +18,6 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class FormatStringExpression extends ASTNode implements IValue
 {
-	public static final IClass	FORMAT_STRING_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
-	
 	private IValue[]			values						= new IValue[1];
 	private String[]			strings						= new String[2];
 	private int					count;
@@ -50,11 +47,11 @@ public final class FormatStringExpression extends ASTNode implements IValue
 			return this;
 		}
 		IClass iclass = type.getTheClass();
-		if (iclass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
+		if (iclass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
 			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
-		if (iclass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null)
+		if (iclass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null)
 		{
 			StringValue string;
 			int len = this.count / 2;
@@ -100,7 +97,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	private boolean isConvertible(IType type)
 	{
 		IClass theClass = type.getTheClass();
-		return theClass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null || theClass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null;
+		return theClass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null || theClass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override

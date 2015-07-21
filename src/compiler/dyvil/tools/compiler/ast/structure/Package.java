@@ -1,53 +1,54 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.io.InputStream;
+
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.ClassReader;
+import dyvil.tools.compiler.backend.HeaderFile;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.sources.FileType;
 
-public class Package implements INamed, IContext
+public class Package implements INamed, IDefaultContext
 {
-	public static RootPackage	rootPackage	= new RootPackage();
+	public static RootPackage		rootPackage	= new RootPackage();
 	
-	public static Package		dyvil;
-	public static Package		dyvilAnnotation;
-	public static Package		dyvilArray;
-	public static Package		dyvilFunction;
-	public static Package		dyvilLang;
-	public static Package		dyvilLangLiteral;
-	public static Package		dyvilLangRef;
-	public static Package		dyvilLangRefSimple;
-	public static Package		dyvilTuple;
-	public static Package		dyvilUtil;
-	public static Package		java;
-	public static Package		javaLang;
-	public static Package		javaLangAnnotation;
+	public static Package			dyvil;
+	public static Package			dyvilAnnotation;
+	public static Package			dyvilArray;
+	public static Package			dyvilFunction;
+	public static Package			dyvilLang;
+	public static Package			dyvilLangLiteral;
+	public static Package			dyvilLangRef;
+	public static Package			dyvilLangRefSimple;
+	public static Package			dyvilTuple;
+	public static Package			dyvilUtil;
+	public static Package			java;
+	public static Package			javaLang;
+	public static Package			javaLangAnnotation;
 	
-	public Package				parent;
-	public Name					name;
-	public String				fullName;
-	public String				internalName;
+	protected Package				parent;
+	protected Name					name;
+	protected String				fullName;
+	private String					internalName;
 	
-	public List<IDyvilHeader>	headers		= new ArrayList();
-	public Map<String, Package>	subPackages	= new HashMap();
+	private List<IClass>			classes		= new ArrayList();
+	protected List<IDyvilHeader>	headers		= new ArrayList();
+	protected Map<String, Package>	subPackages	= new HashMap();
 	
 	protected Package()
 	{
@@ -61,18 +62,18 @@ public class Package implements INamed, IContext
 		if (parent == null || parent == rootPackage)
 		{
 			this.fullName = name.qualified;
-			this.internalName = ClassFormat.packageToInternal(name.qualified) + "/";
+			this.setInternalName(ClassFormat.packageToInternal(name.qualified) + "/");
 		}
 		else
 		{
 			this.fullName = parent.fullName + "." + name.qualified;
-			this.internalName = parent.internalName + name.qualified + "/";
+			this.setInternalName(parent.getInternalName() + name.qualified + "/");
 		}
 	}
 	
 	public static void init()
 	{
-		dyvil = Library.dyvilLibrary.resolvePackage("dyvil");
+		dyvil = rootPackage.resolvePackage("dyvil");
 		dyvilAnnotation = dyvil.resolvePackage("annotation");
 		dyvilArray = dyvil.resolvePackage("array");
 		dyvilFunction = dyvil.resolvePackage("function");
@@ -83,7 +84,7 @@ public class Package implements INamed, IContext
 		dyvilTuple = dyvil.resolvePackage("tuple");
 		dyvilUtil = dyvil.resolvePackage("util");
 		
-		java = Library.javaLibrary.resolvePackage("java");
+		java = rootPackage.resolvePackage("java");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
 	}
@@ -103,6 +104,16 @@ public class Package implements INamed, IContext
 	}
 	
 	// Units
+	
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
+	}
+	
+	public String getInternalName()
+	{
+		return internalName;
+	}
 	
 	public void addHeader(IDyvilHeader unit)
 	{
@@ -142,24 +153,6 @@ public class Package implements INamed, IContext
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
-	}
-	
-	@Override
 	public Package resolvePackage(Name name)
 	{
 		return this.resolvePackage(name.qualified);
@@ -167,7 +160,22 @@ public class Package implements INamed, IContext
 	
 	public Package resolvePackage(String name)
 	{
-		return this.subPackages.get(name);
+		Package pack = this.subPackages.get(name);
+		if (pack != null)
+		{
+			return pack;
+		}
+		
+		String internal = this.internalName + name;
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			if (library.isSubPackage(internal))
+			{
+				return this.createSubPackage(name);
+			}
+		}
+		
+		return null;
 	}
 	
 	public IDyvilHeader resolveHeader(String name)
@@ -179,7 +187,7 @@ public class Package implements INamed, IContext
 				return unit;
 			}
 		}
-		return null;
+		return this.loadHeader(name);
 	}
 	
 	public IClass resolveClass(String name)
@@ -198,6 +206,69 @@ public class Package implements INamed, IContext
 			}
 		}
 		
+		for (IClass c : this.classes)
+		{
+			if (c.getName() == name)
+			{
+				return c;
+			}
+		}
+		return this.loadClass(name.qualified);
+	}
+	
+	private IClass loadClass(String name)
+	{
+		String fileName = this.getInternalName() + name + FileType.CLASS_EXTENSION;
+		
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			IClass iclass = this.loadClass(fileName, name, library);
+			if (iclass != null)
+			{
+				return iclass;
+			}
+		}
+		
+		return null;
+	}
+	
+	private IDyvilHeader loadHeader(String name)
+	{
+		String fileName = this.getInternalName() + name + FileType.OBJECT_EXTENSION;
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			IDyvilHeader header = this.loadHeader(fileName, name, library);
+			if (header != null)
+			{
+				return header;
+			}
+		}
+		
+		return null;
+	}
+	
+	private IClass loadClass(String fileName, String name, Library library)
+	{
+		InputStream is = library.getInputStream(fileName);
+		if (is != null)
+		{
+			ExternalClass bclass = new ExternalClass(Name.getQualified(name));
+			this.classes.add(bclass);
+			return ClassReader.loadClass(bclass, is, false);
+		}
+		return null;
+	}
+	
+	private IDyvilHeader loadHeader(String fileName, String name, Library library)
+	{
+		InputStream is = library.getInputStream(fileName);
+		if (is != null)
+		{
+			DyvilHeader header = HeaderFile.read(is);
+			header.pack = this;
+			this.headers.add(header);
+			return header;
+		}
 		return null;
 	}
 	
@@ -210,40 +281,6 @@ public class Package implements INamed, IContext
 			return new ClassType(iclass);
 		}
 		return null;
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return 0;
 	}
 	
 	@Override

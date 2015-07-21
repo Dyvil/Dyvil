@@ -566,7 +566,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public String getInternalName()
 	{
-		return this.pack.internalName + this.name;
+		return this.pack.getInternalName() + this.name;
 	}
 	
 	@Override
@@ -576,7 +576,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		{
 			name = this.name + '$' + name;
 		}
-		return this.pack.internalName + name;
+		return this.pack.getInternalName() + name;
 	}
 	
 	@Override

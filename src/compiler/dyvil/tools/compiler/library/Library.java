@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.external.ExternalPackage;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
 
 public abstract class Library
@@ -123,7 +121,7 @@ public abstract class Library
 			if (this.isSubPackage(internal))
 			{
 				String s = internal.substring(0, index);
-				pack = this.resolvePackage2(s);
+				pack = Package.rootPackage.createSubPackage(s);
 				
 				if (pack == null)
 				{
@@ -150,27 +148,7 @@ public abstract class Library
 		}
 		if (this.isSubPackage(internal))
 		{
-			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(internal), this);
-			Package.rootPackage.addSubPackage(pack);
-			this.packages.put(internal, pack);
-			return pack;
-		}
-		return null;
-	}
-	
-	public Package resolvePackage2(String name)
-	{
-		Package pack = this.packages.get(name);
-		if (pack != null)
-		{
-			return pack;
-		}
-		if (this.isSubPackage(name))
-		{
-			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(name), this);
-			Package.rootPackage.addSubPackage(pack);
-			this.packages.put(name, pack);
-			return pack;
+			return Package.rootPackage.createSubPackage(internal);
 		}
 		return null;
 	}

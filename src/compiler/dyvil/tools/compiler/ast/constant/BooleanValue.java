@@ -3,13 +3,11 @@ package dyvil.tools.compiler.ast.constant;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -19,8 +17,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BooleanValue extends ASTNode implements IConstantValue
 {
-	public static final IClass			BOOLEAN_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
-	
 	public static final BooleanValue	TRUE				= new BooleanValue(true);
 	public static final BooleanValue	FALSE				= new BooleanValue(false);
 	
@@ -66,7 +62,7 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 		{
 			return new BoxedValue(this, Types.BOOLEAN.boxMethod);
 		}
-		if (type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{
 			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
@@ -76,13 +72,13 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null;
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

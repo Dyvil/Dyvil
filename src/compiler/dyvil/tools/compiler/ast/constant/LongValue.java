@@ -2,13 +2,11 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -18,8 +16,6 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class LongValue extends ASTNode implements INumericValue
 {
-	public static final IClass	LONG_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("LongConvertible");
-	
 	private static LongValue	NULL;
 	
 	public long					value;
@@ -67,7 +63,7 @@ public class LongValue extends ASTNode implements INumericValue
 		{
 			return new BoxedValue(this, Types.LONG.boxMethod);
 		}
-		if (type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
 		{
 			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
@@ -77,13 +73,13 @@ public class LongValue extends ASTNode implements INumericValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.LONG || type.isSuperTypeOf(Types.LONG) || type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null;
+		return type == Types.LONG || type.isSuperTypeOf(Types.LONG) || type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(LONG_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
