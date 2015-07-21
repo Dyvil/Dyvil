@@ -23,25 +23,26 @@ import dyvil.tools.compiler.util.Util;
 
 public final class DyvilCompiler
 {
-	public static final String			VERSION				= "1.0.0";
-	public static final String			DYVIL_VERSION		= "1.0.0";
+	public static final String	VERSION			= "1.0.0";
+	public static final String	DYVIL_VERSION	= "1.0.0";
 	
-	public static boolean				parseStack;
-	public static boolean				debug;
-	public static int					constantFolding;
+	public static boolean	parseStack;
+	public static boolean	debug;
+	public static int		constantFolding;
 	
-	public static int					classVersion		= Opcodes.V1_8;
-	public static int					asmVersion			= Opcodes.ASM5;
-	public static int					maxConstantDepth	= 10;
+	public static int		classVersion		= Opcodes.V1_8;
+	public static int		asmVersion			= Opcodes.ASM5;
+	public static int		maxConstantDepth	= 10;
+	public static boolean	compilationFailed;
 	
 	private static Logger				logger;
-	public static LoggerOutputStream	loggerOut			= new LoggerOutputStream(logger, "TEST-OUT");
-	public static LoggerOutputStream	loggerErr			= new LoggerOutputStream(logger, "TEST-ERR");
-	public static DateFormat			format				= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static LoggerOutputStream	loggerOut	= new LoggerOutputStream(logger, "TEST-OUT");
+	public static LoggerOutputStream	loggerErr	= new LoggerOutputStream(logger, "TEST-ERR");
+	public static DateFormat			format		= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
-	public static CompilerConfig		config				= new CompilerConfig();
-	public static Set<ICompilerPhase>	phases				= new TreeSet();
-	public static FileFinder			fileFinder			= new FileFinder();
+	public static CompilerConfig		config		= new CompilerConfig();
+	public static Set<ICompilerPhase>	phases		= new TreeSet();
+	public static FileFinder			fileFinder	= new FileFinder();
 	
 	public static void log(String message)
 	{
@@ -110,6 +111,7 @@ public final class DyvilCompiler
 		if (!sourceDir.exists())
 		{
 			log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
+			System.exit(1);
 			return;
 		}
 		
@@ -167,6 +169,7 @@ public final class DyvilCompiler
 					error(phase.getName(), "apply", t);
 					log("");
 					log("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
+					System.exit(1);
 					return;
 				}
 			}
@@ -184,15 +187,24 @@ public final class DyvilCompiler
 					error(phase.getName(), "apply", t);
 					log("");
 					log("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
+					System.exit(1);
 					return;
 				}
 			}
 		}
 		
-		long l = System.nanoTime();
+		now1 = System.nanoTime();
 		
 		log("");
-		log("Compilation finished (" + Util.toTime(l - now) + ", Total Running Time: " + Util.toTime(l - totalTime) + ")");
+		
+		if (compilationFailed)
+		{
+			log("Compilation FAILED (" + Util.toTime(now1 - now) + ", Total Running Time: " + Util.toTime(now1 - totalTime) + ")");
+			System.exit(1);
+			return;
+		}
+		
+		log("Compilation finished (" + Util.toTime(now1 - now) + ", Total Running Time: " + Util.toTime(now1 - totalTime) + ")");
 	}
 	
 	public static void initLogger()

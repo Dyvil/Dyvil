@@ -29,6 +29,7 @@ public interface ICompilationUnit extends IASTNode
 			DyvilCompiler.log(buf.toString());
 			if (errors > 0)
 			{
+				DyvilCompiler.compilationFailed = true;
 				DyvilCompiler.warn(name + " was not compiled due to errors in the Compilation Unit\n");
 				return true;
 			}
