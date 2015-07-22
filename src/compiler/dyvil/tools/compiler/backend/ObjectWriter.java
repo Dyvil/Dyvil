@@ -4,8 +4,10 @@ import java.io.*;
 
 public class ObjectWriter extends OutputStream implements DataOutput
 {
-	private int						constantPoolSize;
-	private String[]				constantPool	= new String[16];
+	protected static final int FILE_VERSION = 1;
+	
+	private int			constantPoolSize;
+	private String[]	constantPool	= new String[16];
 	
 	private ByteArrayOutputStream	bufferData;
 	private DataOutputStream		buffer;
@@ -120,17 +122,21 @@ public class ObjectWriter extends OutputStream implements DataOutput
 		this.buffer.writeShort(index);
 	}
 	
-	public byte[] toByteArray() throws IOException
+	public void writeTo(OutputStream os) throws IOException
 	{
-		ByteArrayOutputStream output = new ByteArrayOutputStream(2 + this.constantPoolSize * 24 + this.buffer.size());
-		DataOutputStream dos = new DataOutputStream(output);
+		DataOutputStream dos = new DataOutputStream(os);
+		
+		// Write the .dyo File Version
+		dos.writeShort(FILE_VERSION);
+		
+		// Write the constant pool
 		dos.writeShort(this.constantPoolSize);
 		for (int i = 0; i < this.constantPoolSize; i++)
 		{
 			dos.writeUTF(this.constantPool[i]);
 		}
-		this.bufferData.writeTo(output);
-		return output.toByteArray();
+		
+		this.bufferData.writeTo(os);
 	}
 	
 	@Override

@@ -9,22 +9,21 @@ public class ObjectReader implements DataInput, AutoCloseable
 	private final DataInputStream	input;
 	private String[]				constantPool;
 	
-	public ObjectReader(DataInputStream input)
+	public ObjectReader(DataInputStream input) throws IOException
 	{
 		this.input = input;
 		
-		try
+		int version = input.readShort();
+		if (version > ObjectWriter.FILE_VERSION)
 		{
-			int constPoolSize = input.readShort();
-			this.constantPool = new String[constPoolSize];
-			for (int i = 0; i < constPoolSize; i++)
-			{
-				this.constantPool[i] = input.readUTF();
-			}
+			throw new IllegalStateException("Unknown Dyvil Object File Version: " + version);
 		}
-		catch (IOException ex)
+		
+		int constPoolSize = input.readShort();
+		this.constantPool = new String[constPoolSize];
+		for (int i = 0; i < constPoolSize; i++)
 		{
-			ex.printStackTrace();
+			this.constantPool[i] = input.readUTF();
 		}
 	}
 	

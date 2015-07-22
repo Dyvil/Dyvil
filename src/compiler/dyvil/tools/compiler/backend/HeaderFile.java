@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.backend;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
@@ -19,17 +17,20 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 
 public class HeaderFile
 {
-	private static final int	FILE_VERSION	= 1;
+	private static final int FILE_VERSION = 1;
 	
 	public static void write(File file, IDyvilHeader header)
 	{
-		byte[] bytes;
-		
-		// First try to compile the file to a byte array
-		try (ObjectWriter writer = new ObjectWriter())
+		try (ObjectWriter writer = new ObjectWriter(); OutputStream fo = new BufferedOutputStream(new FileOutputStream(file)))
 		{
+			FileUtils.createFile(file);
+			
+			writer.writeShort(FILE_VERSION);
 			write(writer, header);
-			bytes = writer.toByteArray();
+			
+			// Directly write the DyO byte code to the file output to save some
+			// unnecessary byte array allocations
+			writer.writeTo(fo);
 		}
 		catch (Throwable ex)
 		{
@@ -38,16 +39,17 @@ public class HeaderFile
 			DyvilCompiler.error("ClassWriter", "compile", ex);
 			return;
 		}
-		
-		// If the compilation was successful, we can try to write the newly
-		// created byte array to a newly created, empty file.
-		ClassWriter.save(file, bytes);
 	}
 	
 	public static DyvilHeader read(InputStream is)
 	{
 		try (ObjectReader reader = new ObjectReader(new DataInputStream(is)))
 		{
+			int fileVersion = reader.readShort();
+			if (fileVersion > FILE_VERSION)
+			{
+				throw new IllegalStateException("Unknown Dyvil Header File Version: " + fileVersion);
+			}
 			return read(reader);
 		}
 		catch (Throwable ex)
@@ -59,8 +61,6 @@ public class HeaderFile
 	
 	private static void write(DataOutput writer, IDyvilHeader header) throws Throwable
 	{
-		writer.writeShort(FILE_VERSION);
-		
 		// Header Name
 		writer.writeUTF(header.getName());
 		
@@ -105,12 +105,6 @@ public class HeaderFile
 	
 	private static DyvilHeader read(ObjectReader reader) throws Throwable
 	{
-		int fileVersion = reader.readShort();
-		if (fileVersion > FILE_VERSION)
-		{
-			throw new IllegalStateException("Unknown Dyvil Header File Version: " + fileVersion);
-		}
-		
 		String name = reader.readUTF();
 		DyvilHeader header = new ExternalHeader(name);
 		
