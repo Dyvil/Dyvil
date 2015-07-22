@@ -32,33 +32,33 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ExpressionParser extends Parser implements ITypeConsumer, IValueConsumer
 {
-	public static final int		VALUE				= 0x1;
-	public static final int		LIST_END			= 0x2;
-	private static final int	ARRAY_END			= 0x4;
+	public static final int		VALUE		= 0x1;
+	public static final int		LIST_END	= 0x2;
+	private static final int	ARRAY_END	= 0x4;
 	
-	public static final int		ACCESS				= 0x10;
-	public static final int		ACCESS_2			= 0x20;
+	public static final int	ACCESS		= 0x10;
+	public static final int	ACCESS_2	= 0x20;
 	
-	public static final int		STATEMENT			= 0x80;
-	public static final int		TYPE				= 0x100;
-	public static final int		CONSTRUCTOR			= 0x200;
-	public static final int		CONSTRUCTOR_END		= 0x400;
-	public static final int		PARAMETERS_END		= 0x800;
-	public static final int		SUBSCRIPT_END		= 0x1000;
-	public static final int		TYPE_ARGUMENTS_END	= 0x2000;
+	public static final int	STATEMENT			= 0x80;
+	public static final int	TYPE				= 0x100;
+	public static final int	CONSTRUCTOR			= 0x200;
+	public static final int	CONSTRUCTOR_END		= 0x400;
+	public static final int	PARAMETERS_END		= 0x800;
+	public static final int	SUBSCRIPT_END		= 0x1000;
+	public static final int	TYPE_ARGUMENTS_END	= 0x2000;
 	
-	public static final int		BYTECODE_END		= 0x10000;
+	public static final int BYTECODE_END = 0x10000;
 	
-	public static final int		PATTERN_IF			= 0x20000;
-	public static final int		PATTERN_END			= 0x40000;
+	public static final int	PATTERN_IF	= 0x20000;
+	public static final int	PATTERN_END	= 0x40000;
 	
-	protected IValueConsumer	field;
+	protected IValueConsumer field;
 	
-	private IValue				value;
+	private IValue value;
 	
-	private boolean				dotless;
-	private Operator			operator;
-	private boolean				prefix;
+	private boolean		dotless;
+	private Operator	operator;
+	private boolean		prefix;
 	
 	public ExpressionParser(IValueConsumer field)
 	{
@@ -440,33 +440,37 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				if (this.prefix)
+				if (this.dotless)
 				{
-					this.field.setValue(this.value);
-					pm.popParser(true);
-					return;
-				}
-				if (this.dotless && this.operator != null)
-				{
-					Operator operator = pm.getOperator(name);
-					int p;
-					if (operator == null || (p = this.operator.precedence) > operator.precedence)
+					if (this.prefix)
 					{
 						this.field.setValue(this.value);
 						pm.popParser(true);
 						return;
 					}
-					if (p == operator.precedence)
+					
+					if (this.operator != null)
 					{
-						switch (operator.type)
+						Operator operator = pm.getOperator(name);
+						int p;
+						if (operator == null || (p = this.operator.precedence) > operator.precedence)
 						{
-						case Operator.INFIX_LEFT:
 							this.field.setValue(this.value);
 							pm.popParser(true);
 							return;
-						case Operator.INFIX_NONE:
-							throw new SyntaxError(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
-						case Operator.INFIX_RIGHT:
+						}
+						if (p == operator.precedence)
+						{
+							switch (operator.type)
+							{
+							case Operator.INFIX_LEFT:
+								this.field.setValue(this.value);
+								pm.popParser(true);
+								return;
+							case Operator.INFIX_NONE:
+								throw new SyntaxError(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
+							case Operator.INFIX_RIGHT:
+							}
 						}
 					}
 				}

@@ -83,8 +83,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		int len = this.valueCount;
 		if (len == 0)
 		{
-			this.elementType = Types.ANY;
-			return this.requiredType = new ArrayType(Types.ANY);
+			return this.elementType = Types.ANY;
 		}
 		
 		IType t = this.values[0].getType();

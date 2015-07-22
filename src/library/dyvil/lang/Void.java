@@ -19,4 +19,22 @@ public final @object class Void
 	public void unapply()
 	{
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "Void";
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return obj == instance;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return 0;
+	}
 }
