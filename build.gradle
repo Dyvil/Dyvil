@@ -2,52 +2,45 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
 
-sourceSets
-{
-	library
-    {
-        java
-        {
-        	srcDir 'src/library'
-        	srcDir 'src/asm'
-        }
-        resources
-        {
-        	srcDir 'build/dyvilbin'
-        }
-    }
-    compiler
-    {
-    	java
-    	{
-    		srcDir 'src/compiler'
-    		compileClasspath += library.output
-            runtimeClasspath += library.output + compiler.resources
-    	}
-    	resources
-    	{
-    		srcDir 'src/resources'
-    	}
-    }
-    repl
-    {
-    	java
-    	{
-    		compileClasspath += library.output + compiler.output
-    		runtimeClasspath += compiler.runtimeClasspath
-    		srcDir 'src/repl'
-    	}
-    }
+sourceSets {
+	library {
+		java {
+			srcDir 'src/library'
+			srcDir 'src/asm'
+		}
+		resources {
+			srcDir 'build/dyvilbin'
+		}
+	}
+	compiler {
+		java {
+			srcDir 'src/compiler'
+			compileClasspath += library.output
+			runtimeClasspath += library.output + compiler.resources
+		}
+		resources {
+			srcDir 'src/resources'
+		}
+	}
+	repl {
+		java {
+			compileClasspath += library.output + compiler.output
+			runtimeClasspath += compiler.runtimeClasspath
+			srcDir 'src/repl'
+		}
+	}
 }
 
 processResources {
 	from('dbin') {
+		// Explicity include Compiled Dyvil Headers (.dyo)
 		include '**/*.dyo'
 	}
 }
 
 group = 'dyvil-team'
 version = '0.1.0'
+mainClassName = 'dyvil.tools.repl.DyvilREPL'
 
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
@@ -57,10 +50,9 @@ if (ENV.DRONE_BUILD_NUMBER) {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-jar {
-	baseName = 'dyvil'
-}
-
+/**
+ * Creates the Gradle Wrapper (gradlew)
+ */
 task wrapper(type: Wrapper) {
     gradleVersion = '2.5'
 }
@@ -78,11 +70,22 @@ task clean(overwrite: true) << {
 task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
 	println 'Compliling Dyvil Runtime Library...'
 	
+	// Required to make UP-TO-DATE work
+	outputs.upToDateSpec = new org.gradle.api.specs.AndSpec()
+	
+	// All Dyvil Class and Header files
+	inputs.dir 'src/library'
+	// All possible Output Files (.class, .dyo)
+	outputs.dir 'build/dyvilbin/'
+	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
 	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
 	args = [ '@lib.txt', 'compile' ]
 }
 
+/**
+ * Creates a Jar file that contains all library classes (from src/library), including ASM
+ */
 task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
@@ -90,16 +93,33 @@ task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
 	archiveName = "dyvil-library-${version}.jar"
 }
 
+/**
+ * Creates a Jar file that contains all compiler classes (from src/compiler)
+ */
 task buildCompiler(type: Jar, dependsOn: 'classes') {
 	from sourceSets.compiler.output
 	
 	archiveName = "dyvil-compiler-${version}.jar"
 }
 
+/**
+ * Creates a Jar file that contains all REPL classes (from src/repl)
+ */
 task buildREPL(type: Jar, dependsOn: 'classes') {
 	from sourceSets.repl.output
 	
 	archiveName = "dyvil-repl-${version}.jar"
 }
 
-task buildAll(dependsOn: [ 'buildLibrary', 'buildCompiler', 'buildREPL' ])
+/**
+ * Creates a Jar file that combines all classes from library, compiler and REPL.
+ */
+task build(type: Jar, overwrite: true) {
+	from sourceSets.library.output
+	from sourceSets.compiler.output
+	from sourceSets.repl.output
+	
+	archiveName = "dyvil-${version}.jar"
+}
+
+task buildAll(dependsOn: [ 'build', 'buildLibrary', 'buildCompiler', 'buildREPL' ])
