@@ -10,13 +10,14 @@ import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;
 
 import dyvil.annotation.sealed;
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
 
 @ClassConvertible
 @TypeConvertible
-public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements MutableMap<K, V>
+public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements MutableMap<K, V>
 {
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Type<K> type)
 	{
@@ -72,6 +73,62 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		{
 			this.size++;
 		}
+		return oldValue;
+	}
+	
+	@Override
+	public boolean putIfAbsent(K key, V value)
+	{
+		if (!checkType(this.type, key))
+		{
+			return false;
+		}
+		
+		int index = index(key);
+		if (this.values[index] == null)
+		{
+			this.values[index] = value;
+			this.size++;
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue)
+	{
+		if (!checkType(this.type, key))
+		{
+			return false;
+		}
+		
+		int index = index(key);
+		V value = (V) this.values[index];
+		if (value == null || !Objects.equals(value, newValue))
+		{
+			return false;
+		}
+		
+		this.values[index] = newValue;
+		return true;
+	}
+	
+	@Override
+	public V replace(K key, V newValue)
+	{
+		if (!checkType(this.type, key))
+		{
+			return null;
+		}
+		
+		int index = index(key);
+		V oldValue = (V) this.values[index];
+		if (oldValue == null)
+		{
+			return null;
+		}
+		
+		this.values[index] = newValue;
 		return oldValue;
 	}
 	
@@ -157,6 +214,45 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 				this.size--;
 			}
 		}
+	}
+	
+	@Override
+	public <U, R> MutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	{
+		MutableMap<U, R> map = new ArrayMap(this.size);
+		int len = this.values.length;
+		for (int i = 0; i < len; i++)
+		{
+			V v = (V) this.values[i];
+			if (v != null)
+			{
+				Entry<? extends U, ? extends R> entry = mapper.apply(this.keys[i], v);
+				if (entry != null)
+				{
+					map.put(entry);
+				}
+			}
+		}
+		return map;
+	}
+	
+	@Override
+	public <U, R> MutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	{
+		MutableMap<U, R> map = new ArrayMap(this.size);
+		int len = this.values.length;
+		for (int i = 0; i < len; i++)
+		{
+			V v = (V) this.values[i];
+			if (v != null)
+			{
+				for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], v))
+				{
+					map.put(entry);
+				}
+			}
+		}
+		return map;
 	}
 	
 	@Override

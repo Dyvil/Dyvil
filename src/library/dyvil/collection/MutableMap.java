@@ -142,7 +142,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default <U, R> Map<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public default <U, R> MutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
 	{
 		MutableMap<U, R> copy = this.emptyCopy();
 		for (Entry<K, V> entry : this)
@@ -157,7 +157,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default <U, R> Map<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public default <U, R> MutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
 		MutableMap<U, R> copy = (MutableMap<U, R>) this.emptyCopy();
 		for (Entry<K, V> entry : this)
@@ -210,17 +210,33 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default boolean putAll(Map<? extends K, ? extends V> map)
+	public default void putAll(Map<? extends K, ? extends V> map)
 	{
-		boolean added = false;
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			if (this.put(entry) == null)
-			{
-				added = true;
-			}
+			this.put(entry);
 		}
-		return added;
+	}
+	
+	@Override
+	public boolean putIfAbsent(K key, V value);
+	
+	@Override
+	public default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	{
+		return this.putIfAbsent(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue);
+	
+	@Override
+	public V replace(K key, V newValue);
+	
+	@Override
+	public default V replace(Entry<? extends K, ? extends V> entry)
+	{
+		return this.replace(entry.getKey(), entry.getValue());
 	}
 	
 	@Override

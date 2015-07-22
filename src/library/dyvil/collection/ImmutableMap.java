@@ -254,9 +254,44 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	@mutating
-	public default boolean putAll(Map<? extends K, ? extends V> map)
+	public default void putAll(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("putAll() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	public default boolean putIfAbsent(K key, V value)
+	{
+		throw new ImmutableException("putIfAbsent() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	public default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	{
+		throw new ImmutableException("putIfAbsent() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	default boolean replace( K key,  V oldValue,  V newValue)
+	{
+		throw new ImmutableException("replace() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	default V replace(Entry<? extends  K, ? extends  V> entry)
+	{
+		throw new ImmutableException("replace() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	default V replace( K key,  V newValue)
+	{
+		throw new ImmutableException("replace() on Immutable Map");
 	}
 	
 	@Override

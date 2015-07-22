@@ -435,7 +435,17 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public V put(Entry<? extends K, ? extends V> entry);
 	
-	public boolean putAll(Map<? extends K, ? extends V> map);
+	public boolean putIfAbsent(K key, V value);
+	
+	public boolean putIfAbsent(Entry<? extends K, ? extends V> entry);
+	
+	public void putAll(Map<? extends K, ? extends V> map);
+	
+	public boolean replace(K key, V oldValue, V newValue);
+	
+	public V replace(K key, V newValue);
+	
+	public V replace(Entry<? extends K, ? extends V> entry);
 	
 	public V removeKey(Object key);
 	

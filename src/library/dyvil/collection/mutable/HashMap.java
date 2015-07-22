@@ -142,7 +142,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
 		{
 			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 			{
 				e.value = value;
 				return;
@@ -160,7 +160,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
 		{
 			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 			{
 				V oldValue = e.value;
 				e.value = value;
@@ -169,6 +169,64 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		}
 		
 		this.addEntry(hash, key, value, i);
+		return null;
+	}
+	
+	@Override
+	public boolean putIfAbsent(K key, V value)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+		{
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				return false;
+			}
+		}
+		
+		this.addEntry(hash, key, value, i);
+		return true;
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+		{
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				if (!Objects.equals(oldValue, newValue)) {
+					return false;
+				}
+				e.value = newValue;
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public V replace(K key, V newValue)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+		{
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				V oldValue = e.value;
+				e.value = newValue;
+				return oldValue;
+			}
+		}
+		
 		return null;
 	}
 	

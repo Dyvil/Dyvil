@@ -76,14 +76,14 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 		}
 	}
 	
-	private static final boolean		RED		= false;
+	private static final boolean RED = false;
 	
-	private static final boolean		BLACK	= true;
+	private static final boolean BLACK = true;
 	
-	private final Comparator<? super K>	comparator;
+	private final Comparator<? super K> comparator;
 	
-	private TreeEntry<K, V>				root	= null;
-	private int							size	= 0;
+	private TreeEntry<K, V>	root	= null;
+	private int				size	= 0;
 	
 	public TreeMap()
 	{
@@ -276,7 +276,7 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 		}
 	}
 	
-	static final class KeySpliterator<K, V> extends TreeMapSpliterator<K, V> implements Spliterator<K>
+	static final class KeySpliterator<K, V> extends TreeMapSpliterator<K, V>implements Spliterator<K>
 	{
 		KeySpliterator(TreeMap<K, V> tree, TreeMap.TreeEntry<K, V> origin, TreeMap.TreeEntry<K, V> fence, int side, int est)
 		{
@@ -291,8 +291,8 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 				this.getEstimate();
 			}
 			int d = this.side;
-			TreeMap.TreeEntry<K, V> e = this.current, f = this.fence, s = e == null || e == f ? null : d == 0 ? this.tree.root : d > 0 ? e.right : d < 0
-					&& f != null ? f.left : null;
+			TreeMap.TreeEntry<K, V> e = this.current, f = this.fence,
+					s = e == null || e == f ? null : d == 0 ? this.tree.root : d > 0 ? e.right : d < 0 && f != null ? f.left : null;
 			if (s != null && s != e && s != f && this.tree.compare(e.key, s.key) < 0)
 			{
 				this.side = 1;
@@ -373,7 +373,7 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 		
 	}
 	
-	static final class ValueSpliterator<K, V> extends TreeMapSpliterator<K, V> implements Spliterator<V>
+	static final class ValueSpliterator<K, V> extends TreeMapSpliterator<K, V>implements Spliterator<V>
 	{
 		ValueSpliterator(TreeMap<K, V> tree, TreeMap.TreeEntry<K, V> origin, TreeMap.TreeEntry<K, V> fence, int side, int est)
 		{
@@ -388,8 +388,8 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 				this.getEstimate();
 			}
 			int d = this.side;
-			TreeMap.TreeEntry<K, V> e = this.current, f = this.fence, s = e == null || e == f ? null : d == 0 ? this.tree.root : d > 0 ? e.right : d < 0
-					&& f != null ? f.left : null;
+			TreeMap.TreeEntry<K, V> e = this.current, f = this.fence,
+					s = e == null || e == f ? null : d == 0 ? this.tree.root : d > 0 ? e.right : d < 0 && f != null ? f.left : null;
 			if (s != null && s != e && s != f && this.tree.compare(e.key, s.key) < 0)
 			{
 				this.side = 1;
@@ -463,7 +463,7 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 		}
 	}
 	
-	static final class EntrySpliterator<K, V> extends TreeMapSpliterator<K, V> implements Spliterator<Entry<K, V>>
+	static final class EntrySpliterator<K, V> extends TreeMapSpliterator<K, V>implements Spliterator<Entry<K, V>>
 	{
 		EntrySpliterator(TreeMap<K, V> tree, TreeMap.TreeEntry<K, V> origin, TreeMap.TreeEntry<K, V> fence, int side, int est)
 		{
@@ -478,8 +478,8 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 				this.getEstimate();
 			}
 			int d = this.side;
-			TreeMap.TreeEntry<K, V> e = this.current, f = this.fence, s = e == null || e == f ? null : d == 0 ? this.tree.root : d > 0 ? e.right : d < 0
-					&& f != null ? f.left : null;
+			TreeMap.TreeEntry<K, V> e = this.current, f = this.fence,
+					s = e == null || e == f ? null : d == 0 ? this.tree.root : d > 0 ? e.right : d < 0 && f != null ? f.left : null;
 			if (s != null && s != e && s != f && this.tree.compare(e.key, s.key) < 0)
 			{
 				this.side = 1;
@@ -656,6 +656,13 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
+	public void clear()
+	{
+		this.size = 0;
+		this.root = null;
+	}
+	
+	@Override
 	public V put(K key, V value)
 	{
 		TreeEntry<K, V> t = this.root;
@@ -734,10 +741,40 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public void clear()
+	public boolean putIfAbsent(K key, V value)
 	{
-		this.size = 0;
-		this.root = null;
+		if (this.contains(key, value))
+		{
+			return false;
+		}
+		
+		this.put(key, value);
+		return true;
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue)
+	{
+		TreeEntry<K, V> p = this.getEntry(key);
+		if (p != null && Objects.equals(oldValue, p.value))
+		{
+			p.value = newValue;
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public V replace(K key, V value)
+	{
+		TreeEntry<K, V> p = this.getEntry(key);
+		if (p != null)
+		{
+			V oldValue = p.value;
+			p.value = value;
+			return oldValue;
+		}
+		return null;
 	}
 	
 	@Override
@@ -779,29 +816,6 @@ public class TreeMap<K, V> implements MutableMap<K, V>
 		
 		this.deleteEntry(entry);
 		return true;
-	}
-	
-	public boolean replace(K key, V oldValue, V newValue)
-	{
-		TreeEntry<K, V> p = this.getEntry(key);
-		if (p != null && Objects.equals(oldValue, p.value))
-		{
-			p.value = newValue;
-			return true;
-		}
-		return false;
-	}
-	
-	public V replace(K key, V value)
-	{
-		TreeEntry<K, V> p = this.getEntry(key);
-		if (p != null)
-		{
-			V oldValue = p.value;
-			p.value = value;
-			return oldValue;
-		}
-		return null;
 	}
 	
 	@Override

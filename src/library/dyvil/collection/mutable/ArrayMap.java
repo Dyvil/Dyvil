@@ -10,9 +10,9 @@ import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractArrayMap;
 
-public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap<K, V>
+public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<K, V>
 {
-	protected static final int	DEFAULT_CAPACITY	= 10;
+	protected static final int DEFAULT_CAPACITY = 10;
 	
 	public ArrayMap()
 	{
@@ -57,6 +57,23 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 		this.values = ObjectArray.EMPTY;
 	}
 	
+	private void putNew(K key, V value)
+	{
+		int index = this.size++;
+		if (index >= this.keys.length)
+		{
+			int newCapacity = (int) (this.size * 1.1F);
+			Object[] newKeys = new Object[newCapacity];
+			Object[] newValues = new Object[newCapacity];
+			System.arraycopy(this.keys, 0, newKeys, 0, index);
+			System.arraycopy(values, 0, newValues, 0, newCapacity);
+			this.keys = newKeys;
+			this.values = newValues;
+		}
+		this.keys[index] = key;
+		this.values[index] = value;
+	}
+	
 	@Override
 	public V put(K key, V value)
 	{
@@ -70,7 +87,57 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 			}
 		}
 		
+		this.putNew(key, value);
 		return null;
+	}
+	
+	@Override
+	public boolean putIfAbsent(K key, V value)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (Objects.equals(key, this.keys[i]))
+			{
+				return false;
+			}
+		}
+		
+		this.putNew(key, value);
+		return true;
+	}
+	
+	@Override
+	public V replace(K key, V newValue)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (Objects.equals(key, this.keys[i]))
+			{
+				V oldValue = (V) this.values[i];
+				this.values[i] = newValue;
+				return oldValue;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (Objects.equals(key, this.keys[i]))
+			{
+				if (!Objects.equals(oldValue, this.values[i]))
+				{
+					return false;
+				}
+				
+				this.values[i] = newValue;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override

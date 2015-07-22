@@ -20,7 +20,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 {
 	private final class TableEntry implements Entry<K, V>
 	{
-		int	index;
+		int index;
 		
 		public TableEntry(int index)
 		{
@@ -272,7 +272,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		};
 	}
 	
-	static final Object	NULL	= new Object();
+	static final Object NULL = new Object();
 	
 	static Object maskNull(Object o)
 	{
@@ -435,7 +435,6 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		{
 			if (item == k)
 			{
-				@SuppressWarnings("unchecked")
 				V oldValue = (V) tab[i + 1];
 				tab[i + 1] = value;
 				return oldValue;
@@ -449,6 +448,82 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		{
 			this.resize(len);
 		}
+		return null;
+	}
+	
+	@Override
+	public boolean putIfAbsent(K key, V value)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		
+		Object item;
+		while ((item = tab[i]) != null)
+		{
+			if (item == k)
+			{
+				return false;
+			}
+			i = nextKeyIndex(i, len);
+		}
+		
+		tab[i] = k;
+		tab[i + 1] = value;
+		if (++this.size >= this.threshold)
+		{
+			this.resize(len);
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		
+		Object item;
+		while ((item = tab[i]) != null)
+		{
+			if (item == k)
+			{
+				if (tab[i + 1] != oldValue)
+				{
+					return false;
+				}
+				tab[i + 1] = newValue;
+				return true;
+			}
+			i = nextKeyIndex(i, len);
+		}
+		
+		return false;
+	}
+
+	@Override
+	public V replace(K key, V newValue)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		
+		Object item;
+		while ((item = tab[i]) != null)
+		{
+			if (item == k)
+			{
+				V oldValue = (V) tab[i + 1];
+				tab[i + 1] = newValue;
+				return oldValue;
+			}
+			i = nextKeyIndex(i, len);
+		}
+		
 		return null;
 	}
 	
