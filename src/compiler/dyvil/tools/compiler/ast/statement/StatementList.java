@@ -74,7 +74,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.VOID || type == Types.UNKNOWN)
+		if (type == Types.VOID)
 		{
 			this.requiredType = Types.VOID;
 			return this;
@@ -86,7 +86,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			if (v != null)
 			{
 				this.values[this.valueCount - 1] = v;
-				this.requiredType = type;
+				this.requiredType = v.getType();
 				return this;
 			}
 		}

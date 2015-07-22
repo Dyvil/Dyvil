@@ -14,80 +14,80 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class Types
 {
-	public static IDyvilHeader				LANG_HEADER;
+	public static IDyvilHeader LANG_HEADER;
 	
-	public static final PrimitiveType		VOID					= new PrimitiveType(Name._void, 0);
-	public static final PrimitiveType		BOOLEAN					= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
-	public static final PrimitiveType		BYTE					= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
-	public static final PrimitiveType		SHORT					= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
-	public static final PrimitiveType		CHAR					= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
-	public static final PrimitiveType		INT						= new PrimitiveType(Name._int, ClassFormat.T_INT);
-	public static final PrimitiveType		LONG					= new PrimitiveType(Name._long, ClassFormat.T_LONG);
-	public static final PrimitiveType		FLOAT					= new PrimitiveType(Name._float, ClassFormat.T_FLOAT);
-	public static final PrimitiveType		DOUBLE					= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
+	public static final PrimitiveType	VOID	= new PrimitiveType(Name._void, 0);
+	public static final PrimitiveType	BOOLEAN	= new PrimitiveType(Name._boolean, ClassFormat.T_BOOLEAN);
+	public static final PrimitiveType	BYTE	= new PrimitiveType(Name._byte, ClassFormat.T_BYTE);
+	public static final PrimitiveType	SHORT	= new PrimitiveType(Name._short, ClassFormat.T_SHORT);
+	public static final PrimitiveType	CHAR	= new PrimitiveType(Name._char, ClassFormat.T_CHAR);
+	public static final PrimitiveType	INT		= new PrimitiveType(Name._int, ClassFormat.T_INT);
+	public static final PrimitiveType	LONG	= new PrimitiveType(Name._long, ClassFormat.T_LONG);
+	public static final PrimitiveType	FLOAT	= new PrimitiveType(Name._float, ClassFormat.T_FLOAT);
+	public static final PrimitiveType	DOUBLE	= new PrimitiveType(Name._double, ClassFormat.T_DOUBLE);
 	
-	public static final DynamicType			DYNAMIC					= new DynamicType();
-	public static final UnknownType			UNKNOWN					= new UnknownType();
-	public static final NullType			NULL					= new NullType();
-	public static final AnyType				ANY						= new AnyType();
+	public static final DynamicType	DYNAMIC	= new DynamicType();
+	public static final UnknownType	UNKNOWN	= new UnknownType();
+	public static final NullType	NULL	= new NullType();
+	public static final AnyType		ANY		= new AnyType();
 	
-	public static final ClassType			OBJECT					= new ClassType();
-	public static final ClassType			STRING					= new ClassType();
-	public static final ClassType			CLASS					= new ClassType();
-	public static final ClassType			TYPE					= new ClassType();
-	public static final ClassType			ITERABLE				= new ClassType();
-	public static final ClassType			THROWABLE				= new ClassType();
-	public static final ClassType			RUNTIME_EXCEPTION		= new ClassType();
-	public static final ClassType			IMMUTABLE				= new ClassType();
+	public static final ClassType	OBJECT				= new ClassType();
+	public static final ClassType	STRING				= new ClassType();
+	public static final ClassType	CLASS				= new ClassType();
+	public static final ClassType	TYPE				= new ClassType();
+	public static final ClassType	ITERABLE			= new ClassType();
+	public static final ClassType	THROWABLE			= new ClassType();
+	public static final ClassType	RUNTIME_EXCEPTION	= new ClassType();
+	public static final ClassType	IMMUTABLE			= new ClassType();
 	
-	public static IClass					VOID_CLASS;
-	public static IClass					BOOLEAN_CLASS;
-	public static IClass					BYTE_CLASS;
-	public static IClass					SHORT_CLASS;
-	public static IClass					CHAR_CLASS;
-	public static IClass					INT_CLASS;
-	public static IClass					LONG_CLASS;
-	public static IClass					FLOAT_CLASS;
-	public static IClass					DOUBLE_CLASS;
+	public static IClass	VOID_CLASS;
+	public static IClass	BOOLEAN_CLASS;
+	public static IClass	BYTE_CLASS;
+	public static IClass	SHORT_CLASS;
+	public static IClass	CHAR_CLASS;
+	public static IClass	INT_CLASS;
+	public static IClass	LONG_CLASS;
+	public static IClass	FLOAT_CLASS;
+	public static IClass	DOUBLE_CLASS;
 	
-	public static IClass					OBJECT_CLASS;
-	public static IClass					STRING_CLASS;
-	public static IClass					CLASS_CLASS;
-	public static IClass					NULL_CLASS;
-	public static IClass					TYPE_CLASS;
-	public static IClass					ITERABLE_CLASS;
-	public static IClass					THROWABLE_CLASS;
-	public static IClass					RUNTIME_EXCEPTION_CLASS;
-	public static IClass					IMMUTABLE_CLASS;
+	public static IClass	OBJECT_CLASS;
+	public static IClass	STRING_CLASS;
+	public static IClass	CLASS_CLASS;
+	public static IClass	NULL_CLASS;
+	public static IClass	TYPE_CLASS;
+	public static IClass	ITERABLE_CLASS;
+	public static IClass	THROWABLE_CLASS;
+	public static IClass	RUNTIME_EXCEPTION_CLASS;
+	public static IClass	IMMUTABLE_CLASS;
 	
-	public static IClass					INTRINSIC_CLASS;
-	public static IClass					OVERRIDE_CLASS;
-	public static IClass					RETENTION_CLASS;
-	public static IClass					TARGET_CLASS;
-	public static IClass					MUTATING_CLASS;
+	public static IClass	INTRINSIC_CLASS;
+	public static IClass	OVERRIDE_CLASS;
+	public static IClass	RETENTION_CLASS;
+	public static IClass	TARGET_CLASS;
+	public static IClass	MUTATING_CLASS;
 	
-	public static IClass					BOOLEAN_CONVERTIBLE_CLASS;
-	public static IClass					CHAR_CONVERTIBLE_CLASS;
-	public static IClass					INT_CONVERTIBLE_CLASS;
-	public static IClass					LONG_CONVERTIBLE_CLASS;
-	public static IClass					FLOAT_CONVERTIBLE_CLASS;
-	public static IClass					DOUBLE_CONVERTIBLE_CLASS;
-	public static IClass					STRING_CONVERTIBLE_CLASS;
-	public static IClass					FORMAT_STRING_CONVERTIBLE;
-	public static IClass					NIL_CONVERTIBLE_CLASS;
-	public static IClass					ARRAY_CONVERTIBLE;
-	public static IClass					TUPLE_CONVERTIBLE;
-	public static IClass					CLASS_CONVERTIBLE;
-	public static IClass					TYPE_CONVERTIBLE;
+	public static IClass	BOOLEAN_CONVERTIBLE_CLASS;
+	public static IClass	CHAR_CONVERTIBLE_CLASS;
+	public static IClass	INT_CONVERTIBLE_CLASS;
+	public static IClass	LONG_CONVERTIBLE_CLASS;
+	public static IClass	FLOAT_CONVERTIBLE_CLASS;
+	public static IClass	DOUBLE_CONVERTIBLE_CLASS;
+	public static IClass	STRING_CONVERTIBLE_CLASS;
+	public static IClass	FORMAT_STRING_CONVERTIBLE;
+	public static IClass	NIL_CONVERTIBLE_CLASS;
+	public static IClass	ARRAY_CONVERTIBLE;
+	public static IClass	TUPLE_CONVERTIBLE;
+	public static IClass	CLASS_CONVERTIBLE;
+	public static IClass	TYPE_CONVERTIBLE;
 	
-	private static IClass					OBJECT_ARRAY_CLASS;
-	private static final IClass[]			PRIMITIVE_ARRAY_CLASS	= new IClass[16];
+	private static IClass			OBJECT_ARRAY_CLASS;
+	private static final IClass[]	PRIMITIVE_ARRAY_CLASS	= new IClass[16];
 	
-	public static IClass					OBJECT_SIMPLE_REF_CLASS;
-	private static final ClassType[]		PRIMITIVE_SIMPLE_REF	= new ClassType[16];
+	public static IClass				OBJECT_SIMPLE_REF_CLASS;
+	private static final ClassType[]	PRIMITIVE_SIMPLE_REF	= new ClassType[16];
 	
 	public static IClass					OBJECT_REF_CLASS;
-	private static final ReferenceType[]	PRIMITIVE_REF			= new ReferenceType[16];
+	private static final ReferenceType[]	PRIMITIVE_REF	= new ReferenceType[16];
 	
 	public static void init()
 	{
@@ -263,6 +263,14 @@ public final class Types
 		if (type1.equals(type2))
 		{
 			return type1;
+		}
+		if (type1.typeTag() == IType.NULL)
+		{
+			return type2.getReferenceType();
+		}
+		if (type2.typeTag() == IType.NULL)
+		{
+			return type1.getReferenceType();
 		}
 		
 		Set<IType> types1 = superTypes(type1);

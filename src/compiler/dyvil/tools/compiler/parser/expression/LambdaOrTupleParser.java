@@ -88,7 +88,9 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 		case PARAMETER_NAME:
 			if (!ParserUtil.isIdentifier(token.type()))
 			{
-				throw new SyntaxError(token, "Invalid Lambda Parameter - Identifier expected");
+				pm.jump(this.firstToken);
+				this.mode = TUPLE;
+				return;
 			}
 			this.mode = SEPARATOR;
 			this.addParameter(new MethodParameter(token.raw(), token.nameValue()));

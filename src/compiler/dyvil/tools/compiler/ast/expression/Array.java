@@ -25,11 +25,11 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Array extends ASTNode implements IValue, IValueList
 {
-	protected IValue[]			values;
-	protected int				valueCount;
+	protected IValue[]	values;
+	protected int		valueCount;
 	
-	protected IType				requiredType;
-	protected IType				elementType;
+	protected IType	requiredType;
+	protected IType	elementType;
 	
 	public Array()
 	{
@@ -170,13 +170,19 @@ public final class Array extends ASTNode implements IValue, IValueList
 			}
 		}
 		
+		if (arrayType.hasTypeVariables())
+		{
+			this.getType();
+			return this;
+		}
+		
 		this.elementType = elementType;
 		this.requiredType = arrayType;
 		
 		return this;
 	}
 	
-	private static IMethod	ARRAY_TO_ITERABLE;
+	private static IMethod ARRAY_TO_ITERABLE;
 	
 	private static IMethod getArrayToIterable()
 	{

@@ -20,11 +20,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class IfStatement extends ASTNode implements IStatement
 {
-	public IValue		condition;
-	public IValue		then;
-	public IValue		elseThen;
+	public IValue	condition;
+	public IValue	then;
+	public IValue	elseThen;
 	
-	private IType		commonType;
+	private IType commonType;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -109,9 +109,11 @@ public final class IfStatement extends ASTNode implements IStatement
 				return null;
 			}
 			this.elseThen = then1;
+			this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
+			return this;
 		}
 		
-		this.commonType = type;
+		this.commonType = this.then.getType();
 		return this;
 	}
 	
@@ -296,6 +298,11 @@ public final class IfStatement extends ASTNode implements IStatement
 		if (this.elseThen != null)
 		{
 			this.elseThen = this.elseThen.cleanup(context, compilableList);
+		}
+		
+		if ((this.condition.valueTag() == BOOLEAN))
+		{
+			return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
 		}
 		return this;
 	}
