@@ -21,9 +21,14 @@ public class HeaderFile
 	
 	public static void write(File file, IDyvilHeader header)
 	{
+		if (!FileUtils.createFile(file))
+		{
+			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
+			return;
+		}
+		
 		try (ObjectWriter writer = new ObjectWriter(); OutputStream fo = new BufferedOutputStream(new FileOutputStream(file)))
 		{
-			FileUtils.createFile(file);
 			
 			writer.writeShort(FILE_VERSION);
 			write(writer, header);
@@ -35,7 +40,7 @@ public class HeaderFile
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.warn("Error during compilation of '" + file + "': " + ex);
+			DyvilCompiler.warn("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
 			DyvilCompiler.error("ClassWriter", "compile", ex);
 			return;
 		}

@@ -34,7 +34,11 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 	
 	public static void save(File file, byte[] bytes)
 	{
-		FileUtils.createFile(file);
+		if (!FileUtils.createFile(file))
+		{
+			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
+		}
+		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
 			os.write(bytes, 0, bytes.length);
@@ -42,7 +46,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		catch (IOException ex)
 		{
 			// If file saving fails, simply report the error.
-			DyvilCompiler.error("Failed to save file '" + file + "': " + ex);
+			DyvilCompiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
 			DyvilCompiler.error("ClassWriter", "compile", ex);
 		}
 	}
