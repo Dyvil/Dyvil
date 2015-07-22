@@ -64,6 +64,7 @@ public final class DyvilCompiler
 	
 	public static void error(String message)
 	{
+		compilationFailed = true;
 		System.err.println(message);
 		if (logger != null)
 		{
@@ -73,6 +74,7 @@ public final class DyvilCompiler
 	
 	public static void error(String message, Throwable throwable)
 	{
+		compilationFailed = true;
 		System.err.println(message);
 		throwable.printStackTrace();
 		if (logger != null)
@@ -83,6 +85,7 @@ public final class DyvilCompiler
 	
 	public static void error(String className, String methodName, Throwable throwable)
 	{
+		compilationFailed = true;
 		throwable.printStackTrace();
 		if (logger != null)
 		{
