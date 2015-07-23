@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -38,12 +39,16 @@ public class REPLMemberClass implements IClass
 	private static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
 	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
 	
-	private Name							name;
-	private IClassMember					member;
+	private Name			name;
+	private IClassMember	member;
 	
 	public REPLMemberClass(Name name, IClassMember member)
 	{
 		this.name = name;
+		this.member = member;
+	}
+	
+	public void setMember(IClassMember member) {
 		this.member = member;
 	}
 	
@@ -429,7 +434,28 @@ public class REPLMemberClass implements IClass
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		return DyvilREPL.context.getVisibility(member);
+		IClass iclass = member.getTheClass();
+		if (iclass == null || iclass == this || iclass instanceof REPLMemberClass)
+		{
+			return VISIBLE;
+		}
+		
+		int level = member.getAccessLevel();
+		if ((level & Modifiers.SEALED) != 0)
+		{
+			if (iclass instanceof ExternalClass)
+			{
+				return SEALED;
+			}
+			// Clear the SEALED bit by ANDing with 0b1111
+			level &= 0b1111;
+		}
+		if (level == Modifiers.PUBLIC)
+		{
+			return VISIBLE;
+		}
+		
+		return INVISIBLE;
 	}
 	
 	@Override

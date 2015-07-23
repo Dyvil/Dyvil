@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -49,6 +48,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	protected static List<IClassCompilable>	compilableList	= new ArrayList();
 	private static List<IClassCompilable>	innerClassList	= new ArrayList();
+	private static IClass memberClass;
 	
 	public REPLContext()
 	{
@@ -153,6 +153,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void setValue(IValue value)
 	{
 		Name name = Name.getQualified("res" + resultIndex);
+		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value, className);
+		field.modifiers = Modifiers.FINAL;
+		memberClass = getREPLClass(field);
 		
 		MarkerList markers = new MarkerList();
 		value.resolveTypes(markers, this);
@@ -180,9 +183,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		value = value.cleanup(this, this);
-		
-		REPLVariable field = new REPLVariable(CODE_POSITION, name, type, value, className);
-		field.modifiers = Modifiers.FINAL;
+		field.setValue(value1);
+		field.type = type;
 		
 		this.compileVariable(field);
 		if (type != Types.VOID)
@@ -326,8 +328,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void addField(IField field)
 	{
 		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue(), className);
+		
 		var.setAnnotations(field.getAnnotations(), field.annotationCount());
 		var.modifiers = field.getModifiers();
+		memberClass = getREPLClass(var);
 		
 		if (this.computeVariable(var))
 		{
@@ -454,30 +458,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	}
 	
 	@Override
-	public byte getVisibility(IClassMember member)
+	public IClass getThisClass()
 	{
-		IClass iclass = member.getTheClass();
-		if (iclass == null || iclass instanceof REPLMemberClass)
-		{
-			return VISIBLE;
-		}
-		
-		int level = member.getAccessLevel();
-		if ((level & Modifiers.SEALED) != 0)
-		{
-			if (iclass instanceof ExternalClass)
-			{
-				return SEALED;
-			}
-			// Clear the SEALED bit by ANDing with 0b1111
-			level &= 0b1111;
-		}
-		if (level == Modifiers.PUBLIC)
-		{
-			return VISIBLE;
-		}
-		
-		return INVISIBLE;
+		return memberClass;
 	}
 	
 	@Override
