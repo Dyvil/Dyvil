@@ -248,7 +248,7 @@ public final class TryStatement extends ASTNode implements IStatement, IDefaultC
 			CatchBlock block = this.catchBlocks[i];
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
-				Marker marker = markers.create(block.type.getPosition(), "try.catch.type");
+				Marker marker = markers.create(block.position, "try.catch.type");
 				marker.addInfo("Exception Type: " + block.type);
 			}
 			

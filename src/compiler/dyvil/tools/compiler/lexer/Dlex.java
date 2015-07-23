@@ -196,6 +196,10 @@ public final class Dlex
 					addToken = true;
 					reparse = false;
 				}
+				else if (c == '-' && buf.length() == 0)
+				{
+					buf.append('-');
+				}
 				else if (subtype == MOD_DEC)
 				{
 					if (isDigit(c))
@@ -475,6 +479,12 @@ public final class Dlex
 		case '_':
 		case '$':
 			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
+		case '-':
+			if (isDigit(code.charAt(i + 1)))
+			{
+				return INT;
+			}
+			return IDENTIFIER | MOD_SYMBOL;
 		}
 		if (isDigit(c))
 		{

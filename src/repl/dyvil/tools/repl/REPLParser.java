@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.lexer.TokenIterator;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.InferredSemicolon;
@@ -20,7 +21,7 @@ public class REPLParser implements IParserManager
 	private int				skip;
 	private boolean			reparse;
 	
-	public boolean parse(TokenIterator tokens, Parser parser)
+	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser)
 	{
 		this.tokens = tokens;
 		this.parser = parser;
@@ -78,7 +79,12 @@ public class REPLParser implements IParserManager
 			}
 			catch (SyntaxError ex)
 			{
-				return false;
+				if (markers == null)
+				{
+					return false;
+				}
+				
+				markers.add(ex);
 			}
 			catch (Exception ex)
 			{

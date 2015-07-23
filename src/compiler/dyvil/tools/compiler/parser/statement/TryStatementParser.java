@@ -20,8 +20,8 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	private static final int	CATCH_VAR	= 16;
 	private static final int	CATCH_CLOSE	= 32;
 	
-	protected TryStatement		statement;
-	private CatchBlock			catchBlock;
+	protected TryStatement	statement;
+	private CatchBlock		catchBlock;
 	
 	public TryStatementParser(TryStatement statement)
 	{
@@ -63,8 +63,15 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			}
 			if (ParserUtil.isTerminator(type))
 			{
-				int next = token.next().type();
-				if (next != Keywords.CATCH && next != Keywords.FINALLY)
+				IToken next = token.getNext();
+				if (next == null)
+				{
+					pm.popParser(true);
+					return;
+				}
+				
+				int nextType = token.next().type();
+				if (nextType != Keywords.CATCH && nextType != Keywords.FINALLY)
 				{
 					pm.popParser(true);
 				}

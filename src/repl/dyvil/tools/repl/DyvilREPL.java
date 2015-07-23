@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
+import dyvil.tools.compiler.lexer.marker.Marker;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
@@ -14,7 +16,7 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 
 public class DyvilREPL
 {
-	public static final String		VERSION	= "1.0.0";
+	public static final String VERSION = "1.0.0";
 	
 	private static BufferedReader	reader;
 	protected static REPLContext	context	= new REPLContext();
@@ -54,18 +56,24 @@ public class DyvilREPL
 			TokenIterator tokens = Dlex.tokenIterator(currentCode + ";");
 			REPLContext.newClassName();
 			
-			if (parser.parse(tokens, new DyvilUnitParser(context)))
+			if (parser.parse(null, tokens, new DyvilUnitParser(context)))
 			{
 				return;
 			}
-			if (parser.parse(tokens, new ClassBodyParser(context)))
+			if (parser.parse(null, tokens, new ClassBodyParser(context)))
 			{
 				return;
 			}
-			if (parser.parse(tokens, new ExpressionParser(context)))
+			
+			MarkerList markers = new MarkerList();
+			parser.parse(markers, tokens, new ExpressionParser(context));
+			
+			StringBuilder buf = new StringBuilder();
+			for (Marker m : markers)
 			{
-				return;
+				m.log(currentCode, buf);
 			}
+			System.out.println(buf.toString());
 		}
 		catch (Throwable t)
 		{

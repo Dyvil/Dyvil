@@ -23,7 +23,7 @@ public final class MatchExpression extends ASTNode implements IValue
 	private int			caseCount;
 	private boolean		exhaustive;
 	
-	private IType		type;
+	private IType type;
 	
 	public MatchExpression(ICodePosition position, IValue value)
 	{
@@ -169,7 +169,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.value.resolveTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].resolveTypes(markers, context);
@@ -188,10 +191,19 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.value = this.value.resolve(markers, context);
-		IType type = this.value.getType();
-		
-		this.value = this.value.withType(type, type, markers, context);
+		IType type;
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+			type = this.value.getType();
+			
+			this.value = this.value.withType(type, type, markers, context);
+		}
+		else
+		{
+			type = Types.ANY;
+			markers.add(this.position, "match.invalid");
+		}
 		
 		for (int i = 0; i < this.caseCount; i++)
 		{
@@ -214,7 +226,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.value.checkTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].checkTypes(markers, context);
@@ -224,7 +239,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.value.check(markers, context);
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].check(markers, context);
@@ -234,7 +252,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		this.value = this.value.foldConstants();
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].foldConstants();
@@ -245,7 +266,10 @@ public final class MatchExpression extends ASTNode implements IValue
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.value = this.value.cleanup(context, compilableList);
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
+		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].cleanup(context, compilableList);
@@ -325,6 +349,7 @@ public final class MatchExpression extends ASTNode implements IValue
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
 			String desc = "(" + (type.isPrimitive() ? type.getExtendedName() + ")V" : "Ljava/lang/Object;)V");
+			writer.writeLineNumber(this.getLineNumber());
 			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", desc, false);
 			writer.writeInsn(Opcodes.ATHROW);
 			writer.setHasReturn(false);
