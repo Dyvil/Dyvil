@@ -97,16 +97,19 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			return;
 		case SEPARATOR:
 			int type = token.type();
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == Symbols.COMMA)
+			{
+				this.mode = PARAMETER_NAME;
+				return;
+			}
+			if (type == Symbols.CLOSE_PARENTHESIS && token.next().type() == Symbols.ARROW_OPERATOR)
 			{
 				this.mode = ARROW;
 				return;
 			}
-			this.mode = PARAMETER_NAME;
-			if (token.type() != Symbols.COMMA)
-			{
-				throw new SyntaxError(token, "Invalid Lambda Parameter - ',' expected");
-			}
+			
+			pm.jump(this.firstToken);
+			this.mode = TUPLE;
 			return;
 		case TUPLE:
 			if (token.type() == Symbols.OPEN_PARENTHESIS)

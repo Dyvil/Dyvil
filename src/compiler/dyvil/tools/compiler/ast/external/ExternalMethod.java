@@ -203,6 +203,10 @@ public final class ExternalMethod extends Method
 		{
 			this.resolveGenerics();
 		}
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
 		return super.getGenericData(genericData, instance, arguments);
 	}
 	
