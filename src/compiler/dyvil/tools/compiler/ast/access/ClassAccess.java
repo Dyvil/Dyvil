@@ -125,7 +125,7 @@ public final class ClassAccess extends ASTNode implements IValue
 				markers.add(this.position, "type.access.deprecated", iclass.getName());
 			}
 			
-			if (context.getVisibility(iclass) == IContext.SEALED)
+			if (context.getThisClass().getVisibility(iclass) == IContext.SEALED)
 			{
 				markers.add(this.position, "type.access.sealed", iclass.getName());
 			}

@@ -92,6 +92,8 @@ public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IPar
 	
 	public boolean isMember(IClassMember member);
 	
+	public byte getVisibility(IClassMember member);
+	
 	// Other Compilables (Lambda Expressions, ...)
 	
 	@Override

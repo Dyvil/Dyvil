@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -155,7 +154,7 @@ public class Property extends Member implements IProperty, IContext
 			markers.add(position, "property.access.deprecated", this.name);
 		}
 		
-		switch (context.getVisibility(this))
+		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.SEALED:
 			markers.add(position, "property.access.sealed", this.name);
@@ -450,12 +449,6 @@ public class Property extends Member implements IProperty, IContext
 	public boolean handleException(IType type)
 	{
 		return false;
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.theClass.getVisibility(member);
 	}
 	
 	// Compilation

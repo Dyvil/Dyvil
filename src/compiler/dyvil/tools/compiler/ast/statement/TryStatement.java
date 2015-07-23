@@ -1,23 +1,14 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
@@ -28,7 +19,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class TryStatement extends ASTNode implements IStatement, IContext
+public final class TryStatement extends ASTNode implements IStatement, IDefaultContext
 {
 	public IValue			action;
 	private CatchBlock[]	catchBlocks	= new CatchBlock[1];
@@ -36,9 +27,6 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	public IValue			finallyBlock;
 	
 	private IType			commonType;
-	
-	private IStatement		parent;
-	private IContext		context;
 	
 	public TryStatement(ICodePosition position)
 	{
@@ -230,7 +218,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	{
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, context);
+			this.action.checkTypes(markers, new CombiningContext(this, context));
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -252,9 +240,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	{
 		if (this.action != null)
 		{
-			this.context = context;
-			this.action.check(markers, this);
-			this.context = null;
+			this.action.check(markers, new CombiningContext(this, context));
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -318,72 +304,6 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
-	}
-	
-	@Override
 	public boolean handleException(IType type)
 	{
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -393,7 +313,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 				return true;
 			}
 		}
-		return this.context.handleException(type);
+		return false;
 	}
 	
 	@Override

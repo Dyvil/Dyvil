@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
@@ -16,7 +18,6 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -346,12 +347,6 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
-	
-	@Override
-	public default byte getVisibility(IClassMember member)
-	{
-		return 0;
-	}
 	
 	@Override
 	public default boolean handleException(IType type)

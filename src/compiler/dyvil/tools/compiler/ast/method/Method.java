@@ -22,7 +22,6 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -699,12 +698,6 @@ public class Method extends Member implements IMethod, ILabelContext
 	}
 	
 	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.theClass.getVisibility(member);
-	}
-	
-	@Override
 	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != null && name != this.name)
@@ -1002,7 +995,7 @@ public class Method extends Member implements IMethod, ILabelContext
 			markers.add(position, "method.access.deprecated", this.name);
 		}
 		
-		switch (context.getVisibility(this))
+		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.SEALED:
 			markers.add(position, "method.access.sealed", this.name);

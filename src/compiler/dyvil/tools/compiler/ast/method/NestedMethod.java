@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -143,12 +142,6 @@ public class NestedMethod extends Method
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
 	}
 	
 	@Override

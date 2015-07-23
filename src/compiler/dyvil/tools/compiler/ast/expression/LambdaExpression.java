@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -396,12 +395,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	public boolean handleException(IType type)
 	{
 		return false;
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
 	}
 	
 	@Override

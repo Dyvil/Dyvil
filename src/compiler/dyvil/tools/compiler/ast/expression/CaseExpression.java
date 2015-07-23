@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -231,12 +230,6 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	public boolean handleException(IType type)
 	{
 		return this.context.handleException(type);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
 	}
 	
 	// Phases

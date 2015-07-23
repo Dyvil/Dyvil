@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -45,8 +44,6 @@ public interface IContext
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
 	
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
-	
-	public byte getVisibility(IClassMember member);
 	
 	public boolean handleException(IType type);
 	

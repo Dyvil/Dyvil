@@ -154,7 +154,7 @@ public class Field extends Member implements IField
 			markers.add(position, "field.access.deprecated", this.name);
 		}
 		
-		switch (context.getVisibility(this))
+		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.SEALED:
 			markers.add(position, "field.access.sealed", this.name);

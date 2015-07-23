@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -501,12 +500,6 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.theClass.getVisibility(member);
-	}
-	
-	@Override
 	public float getSignatureMatch(IArguments arguments)
 	{
 		int match = 1;
@@ -592,7 +585,7 @@ public class Constructor extends Member implements IConstructor
 			markers.add(position, "constructor.access.deprecated", this.theClass.getName());
 		}
 		
-		switch (context.getVisibility(this))
+		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.SEALED:
 			markers.add(position, "constructor.access.sealed", this.theClass.getName());

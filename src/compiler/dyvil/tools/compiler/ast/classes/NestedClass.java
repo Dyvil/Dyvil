@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.field.CaptureField;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -152,11 +151,5 @@ public class NestedClass extends CodeClass
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
 	}
 }

@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -92,12 +91,6 @@ public class CombiningContext implements IContext
 	{
 		this.context1.getConstructorMatches(list, arguments);
 		this.context2.getConstructorMatches(list, arguments);
-	}
-
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return 0;
 	}
 
 	@Override
