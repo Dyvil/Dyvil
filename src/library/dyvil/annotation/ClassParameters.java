@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface ClassParameters
 {
-	public String[] names();
+	public String[]names();
 }

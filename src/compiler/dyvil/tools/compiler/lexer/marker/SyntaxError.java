@@ -4,9 +4,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class SyntaxError extends Marker
 {
-	private static final long	serialVersionUID	= -2234451954260010124L;
+	private static final long serialVersionUID = -2234451954260010124L;
 	
-	public boolean				reparse;
+	public boolean reparse;
 	
 	public SyntaxError(ICodePosition position)
 	{

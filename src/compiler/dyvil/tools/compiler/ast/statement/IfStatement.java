@@ -300,7 +300,7 @@ public final class IfStatement extends ASTNode implements IStatement
 			this.elseThen = this.elseThen.cleanup(context, compilableList);
 		}
 		
-		if ((this.condition.valueTag() == BOOLEAN))
+		if (this.condition.valueTag() == BOOLEAN)
 		{
 			return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
 		}

@@ -8,7 +8,7 @@ import dyvil.annotation.object;
 @NilConvertible
 public @object class AnyType implements Type<Object>
 {
-	public static final AnyType	instance	= new AnyType();
+	public static final AnyType instance = new AnyType();
 	
 	public static AnyType apply()
 	{

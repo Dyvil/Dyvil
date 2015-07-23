@@ -33,7 +33,7 @@ import dyvil.tools.asm.SignatureVisitor;
 
 public class SignatureReader
 {
-	private final String	signature;
+	private final String signature;
 	
 	public SignatureReader(final String signature)
 	{
@@ -187,7 +187,7 @@ public class SignatureReader
 					visited = false;
 					inner = true;
 					break;
-				
+					
 				case '<':
 					name = signature.substring(start, pos - 1);
 					if (inner)

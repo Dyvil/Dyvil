@@ -34,10 +34,10 @@ import dyvil.tools.compiler.util.ModifierTypes;
 
 public class Property extends Member implements IProperty, IContext
 {
-	protected IClass			theClass;
+	protected IClass theClass;
 	
-	public IValue				get;
-	public IValue				set;
+	public IValue	get;
+	public IValue	set;
 	
 	protected MethodParameter	setterParameter;
 	private IProperty			overrideProperty;
@@ -472,9 +472,9 @@ public class Property extends Member implements IProperty, IContext
 		String signature = this.type.getSignature();
 		if (this.get != null)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified, "()" + extended, signature == null ? null
-					: "()" + signature, null));
-			
+			MethodWriter mw = new MethodWriterImpl(writer,
+					writer.visitMethod(this.modifiers, this.name.qualified, "()" + extended, signature == null ? null : "()" + signature, null));
+					
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
@@ -502,7 +502,7 @@ public class Property extends Member implements IProperty, IContext
 		{
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
 					signature == null ? null : "(" + signature + ")V", null));
-			
+					
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());

@@ -65,7 +65,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	{
 		return new Iterator<E>()
 		{
-			int	index;
+			int index;
 			
 			@Override
 			public boolean hasNext()

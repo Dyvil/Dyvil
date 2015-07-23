@@ -9,9 +9,9 @@ import dyvil.tools.compiler.DyvilCompiler;
 
 public class CodeFile extends File
 {
-	private static final long	serialVersionUID	= 130988432718494125L;
+	private static final long serialVersionUID = 130988432718494125L;
 	
-	private String				code;
+	private String code;
 	
 	public CodeFile(File parent, String child)
 	{

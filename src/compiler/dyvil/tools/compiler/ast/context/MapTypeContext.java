@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Types;
 
 public final class MapTypeContext implements ITypeContext
 {
-	private Map<ITypeVariable, IType>	map	= new IdentityHashMap();
+	private Map<ITypeVariable, IType> map = new IdentityHashMap();
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)

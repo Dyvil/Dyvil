@@ -17,10 +17,10 @@ public abstract class Member extends ASTNode implements IMember
 	protected Annotation[]	annotations;
 	protected int			annotationCount;
 	
-	public int				modifiers;
+	public int modifiers;
 	
-	public IType			type;
-	public Name				name;
+	public IType	type;
+	public Name		name;
 	
 	protected Member()
 	{

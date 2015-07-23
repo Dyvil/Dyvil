@@ -23,7 +23,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class InternalGenericType extends GenericType
 {
-	protected String	internalName;
+	protected String internalName;
 	
 	public InternalGenericType(String internal)
 	{

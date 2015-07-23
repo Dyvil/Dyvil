@@ -1,9 +1,10 @@
 package dyvil.util;
 
-import dyvil.lang.*;
 import dyvil.lang.Byte;
+import dyvil.lang.Char;
 import dyvil.lang.Double;
 import dyvil.lang.Float;
+import dyvil.lang.Int;
 import dyvil.lang.Long;
 import dyvil.lang.Short;
 
@@ -19,9 +20,9 @@ import dyvil.lang.Short;
  */
 public class MatchError extends RuntimeException
 {
-	private static final long	serialVersionUID	= 2882649299151786454L;
+	private static final long serialVersionUID = 2882649299151786454L;
 	
-	private Object				match;
+	private Object match;
 	
 	public MatchError(byte match)
 	{

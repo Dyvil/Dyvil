@@ -60,7 +60,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	{
 		return new Iterator<T>()
 		{
-			private T	current	= SimpleRange.this.first;
+			private T current = SimpleRange.this.first;
 			
 			@Override
 			public T next()

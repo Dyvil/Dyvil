@@ -18,9 +18,9 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class FormatStringExpression extends ASTNode implements IValue
 {
-	private IValue[]			values						= new IValue[1];
-	private String[]			strings						= new String[2];
-	private int					count;
+	private IValue[]	values	= new IValue[1];
+	private String[]	strings	= new String[2];
+	private int			count;
 	
 	public FormatStringExpression(ICodePosition position)
 	{

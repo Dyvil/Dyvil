@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface ByteArray
 {
-	public static final byte[]	EMPTY	= new byte[0];
+	public static final byte[] EMPTY = new byte[0];
 	
 	public static byte[] apply()
 	{

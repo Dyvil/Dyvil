@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class PrintPhase implements ICompilerPhase
 {
-	private final int	id;
+	private final int id;
 	
 	public PrintPhase(int id)
 	{

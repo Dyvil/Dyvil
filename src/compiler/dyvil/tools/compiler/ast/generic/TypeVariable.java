@@ -15,16 +15,16 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TypeVariable implements ITypeVariable
 {
-	protected ICodePosition	position;
+	protected ICodePosition position;
 	
-	protected Variance		variance	= Variance.INVARIANT;
-	protected Name			name;
-	protected IType[]		upperBounds	= new IType[1];
-	protected int			upperBoundCount;
-	protected IType			lowerBound;
+	protected Variance	variance	= Variance.INVARIANT;
+	protected Name		name;
+	protected IType[]	upperBounds	= new IType[1];
+	protected int		upperBoundCount;
+	protected IType		lowerBound;
 	
-	private int				index;
-	private IGeneric		generic;
+	private int			index;
+	private IGeneric	generic;
 	
 	public TypeVariable(IGeneric generic)
 	{

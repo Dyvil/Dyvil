@@ -13,7 +13,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class REPLResult implements IConstantValue
 {
-	private final Object	value;
+	private final Object value;
 	
 	public REPLResult(Object value)
 	{

@@ -13,9 +13,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class NullValue implements IConstantValue
 {
-	private static NullValue	NULL;
+	private static NullValue NULL;
 	
-	private ICodePosition		position;
+	private ICodePosition position;
 	
 	public NullValue()
 	{

@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface IntArray
 {
-	public static final int[]	EMPTY	= new int[0];
+	public static final int[] EMPTY = new int[0];
 	
 	public static int[] apply()
 	{

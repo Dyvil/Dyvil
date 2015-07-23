@@ -26,7 +26,7 @@ public final class TryStatement extends ASTNode implements IStatement, IDefaultC
 	private int				catchBlockCount;
 	public IValue			finallyBlock;
 	
-	private IType			commonType;
+	private IType commonType;
 	
 	public TryStatement(ICodePosition position)
 	{

@@ -54,7 +54,7 @@ public class TypeReference
 	public final static int	CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT		= 0x4A;
 	public final static int	METHOD_REFERENCE_TYPE_ARGUMENT			= 0x4B;
 	
-	private int				value;
+	private int value;
 	
 	public TypeReference(int typeRef)
 	{
@@ -63,43 +63,43 @@ public class TypeReference
 	
 	public static int newint(int sort)
 	{
-		return (sort << 24);
+		return sort << 24;
 	}
 	
 	public static int newTypeParameterReference(int sort, int paramIndex)
 	{
-		return (sort << 24 | paramIndex << 16);
+		return sort << 24 | paramIndex << 16;
 	}
 	
 	public static int newTypeParameterBoundReference(int sort, int paramIndex, int boundIndex)
 	{
-		return (sort << 24 | paramIndex << 16 | boundIndex << 8);
+		return sort << 24 | paramIndex << 16 | boundIndex << 8;
 	}
 	
 	public static int newSuperint(int itfIndex)
 	{
 		itfIndex &= 0xFFFF;
-		return (CLASS_EXTENDS << 24 | itfIndex << 8);
+		return CLASS_EXTENDS << 24 | itfIndex << 8;
 	}
 	
 	public static int newFormalParameterReference(int paramIndex)
 	{
-		return (METHOD_FORMAL_PARAMETER << 24 | paramIndex << 16);
+		return METHOD_FORMAL_PARAMETER << 24 | paramIndex << 16;
 	}
 	
 	public static int newExceptionReference(int exceptionIndex)
 	{
-		return (THROWS << 24 | exceptionIndex << 8);
+		return THROWS << 24 | exceptionIndex << 8;
 	}
 	
 	public static int newTryCatchReference(int tryCatchBlockIndex)
 	{
-		return (EXCEPTION_PARAMETER << 24 | tryCatchBlockIndex << 8);
+		return EXCEPTION_PARAMETER << 24 | tryCatchBlockIndex << 8;
 	}
 	
 	public static int newTypeArgumentReference(int sort, int argIndex)
 	{
-		return (sort << 24 | argIndex);
+		return sort << 24 | argIndex;
 	}
 	
 	public static int getSort(int value)

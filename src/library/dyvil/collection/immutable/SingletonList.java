@@ -20,7 +20,7 @@ import dyvil.collection.iterator.SingletonIterator;
 @TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>
 {
-	private E	element;
+	private E element;
 	
 	public static <E> SingletonList<E> apply(E element)
 	{

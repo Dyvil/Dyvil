@@ -22,9 +22,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CompoundCall extends AbstractCall implements INamed
 {
-	public Name		name;
+	public Name name;
 	
-	public IMethod	updateMethod;
+	public IMethod updateMethod;
 	
 	public CompoundCall(ICodePosition position)
 	{

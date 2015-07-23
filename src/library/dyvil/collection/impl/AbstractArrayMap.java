@@ -12,7 +12,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 {
 	protected class ArrayEntry implements Entry<K, V>
 	{
-		private int	index;
+		private int index;
 		
 		public ArrayEntry(int index)
 		{
@@ -262,7 +262,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	
 	protected abstract class ArrayIterator<R> implements Iterator<R>
 	{
-		protected int	index;
+		protected int index;
 		
 		@Override
 		public boolean hasNext()

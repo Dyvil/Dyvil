@@ -18,7 +18,7 @@ import dyvil.collection.iterator.SingletonIterator;
 @TupleConvertible
 public class SingletonSet<E> implements ImmutableSet<E>
 {
-	private E	element;
+	private E element;
 	
 	public static <E> SingletonSet<E> apply(E element)
 	{

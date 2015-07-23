@@ -8,7 +8,7 @@ import dyvil.lang.literal.StringConvertible;
 @ClassConvertible
 public class GenericType<T> extends NamedType<T>
 {
-	protected final Type[]	generics;
+	protected final Type[] generics;
 	
 	public static <T> GenericType<T> apply(String className)
 	{

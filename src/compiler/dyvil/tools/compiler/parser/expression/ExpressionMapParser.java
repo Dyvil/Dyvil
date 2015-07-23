@@ -17,9 +17,9 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 	public static final int	VALUE		= 2;
 	public static final int	SEPERATOR	= 4;
 	
-	protected IValueMap		valueMap;
+	protected IValueMap valueMap;
 	
-	private Name			key;
+	private Name key;
 	
 	public ExpressionMapParser(IValueMap valueMap)
 	{

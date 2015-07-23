@@ -36,19 +36,19 @@ import dyvil.tools.compiler.util.Util;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
-	private static final CodePosition		CODE_POSITION	= new CodePosition(1, 0, 1);
+	private static final CodePosition CODE_POSITION = new CodePosition(1, 0, 1);
 	
-	private static int						resultIndex;
-	private static int						classIndex;
-	private static String					className;
+	private static int		resultIndex;
+	private static int		classIndex;
+	private static String	className;
 	
-	private static Map<Name, IField>		fields			= new IdentityHashMap();
-	private static List<IMethod>			methods			= new ArrayList();
-	private static Map<Name, IClass>		classes			= new IdentityHashMap();
+	private static Map<Name, IField>	fields	= new IdentityHashMap();
+	private static List<IMethod>		methods	= new ArrayList();
+	private static Map<Name, IClass>	classes	= new IdentityHashMap();
 	
 	protected static List<IClassCompilable>	compilableList	= new ArrayList();
 	private static List<IClassCompilable>	innerClassList	= new ArrayList();
-	private static IClass memberClass;
+	private static IClass					memberClass;
 	
 	public REPLContext()
 	{

@@ -18,11 +18,11 @@ public class ArrayForStatement extends ForEachStatement
 	public static final Name	$length	= Name.getQualified("$length");
 	public static final Name	$array	= Name.getQualified("$array");
 	
-	protected Variable			indexVar;
-	protected Variable			lengthVar;
-	protected Variable			arrayVar;
+	protected Variable	indexVar;
+	protected Variable	lengthVar;
+	protected Variable	arrayVar;
 	
-	protected IMethod			boxMethod;
+	protected IMethod boxMethod;
 	
 	public ArrayForStatement(Variable var, IValue action)
 	{

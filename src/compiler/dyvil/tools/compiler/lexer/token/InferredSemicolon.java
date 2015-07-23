@@ -7,8 +7,8 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class InferredSemicolon implements IToken
 {
-	public IToken		prev;
-	public IToken		next;
+	public IToken	prev;
+	public IToken	next;
 	
 	public final int	lineNumber;
 	public final int	start;

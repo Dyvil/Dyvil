@@ -6,7 +6,7 @@ import dyvil.lang.ref.BooleanRef;
 @BooleanConvertible
 public class SimpleBooleanRef implements BooleanRef
 {
-	public boolean	value;
+	public boolean value;
 	
 	public static SimpleBooleanRef apply(boolean value)
 	{

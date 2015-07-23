@@ -8,7 +8,7 @@ package dyvil.util;
  */
 public class ImmutableException extends RuntimeException
 {
-	private static final long	serialVersionUID	= -5032047108183334569L;
+	private static final long serialVersionUID = -5032047108183334569L;
 	
 	public ImmutableException()
 	{

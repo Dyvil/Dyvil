@@ -56,10 +56,10 @@ public class Type
 	public static final Type	LONG_TYPE		= new Type(LONG, null, 'J' << 24 | 1 << 16 | 1 << 8 | 2, 1);
 	public static final Type	DOUBLE_TYPE		= new Type(DOUBLE, null, 'D' << 24 | 3 << 16 | 3 << 8 | 2, 1);
 	
-	private final int			sort;
-	private final char[]		buf;
-	private final int			off;
-	private final int			len;
+	private final int		sort;
+	private final char[]	buf;
+	private final int		off;
+	private final int		len;
 	
 	private Type(final int sort, final char[] buf, final int off, final int len)
 	{
@@ -127,7 +127,7 @@ public class Type
 				return FLOAT_TYPE;
 			}
 			else
-			/* if (c == Long.TYPE) */{
+			/* if (c == Long.TYPE) */ {
 				return LONG_TYPE;
 			}
 		}
@@ -288,7 +288,7 @@ public class Type
 				++len;
 			}
 			return new Type(OBJECT, buf, off + 1, len - 1);
-			// case '(':
+		// case '(':
 		default:
 			return new Type(METHOD, buf, off, buf.length - off);
 		}
@@ -489,7 +489,7 @@ public class Type
 					car = 'F';
 				}
 				else
-				/* if (d == Long.TYPE) */{
+				/* if (d == Long.TYPE) */ {
 					car = 'J';
 				}
 				buf.append(car);

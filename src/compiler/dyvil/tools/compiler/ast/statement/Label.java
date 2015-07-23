@@ -5,10 +5,10 @@ import dyvil.tools.compiler.ast.member.Name;
 
 public class Label
 {
-	public Name						name;
-	public IValue					value;
+	public Name		name;
+	public IValue	value;
 	
-	public dyvil.tools.asm.Label	target;
+	public dyvil.tools.asm.Label target;
 	
 	public Label(Name name)
 	{

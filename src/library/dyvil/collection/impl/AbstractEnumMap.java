@@ -15,7 +15,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
 	protected class EnumEntry implements Entry<K, V>
 	{
-		int	index;
+		int index;
 		
 		EnumEntry(int index)
 		{

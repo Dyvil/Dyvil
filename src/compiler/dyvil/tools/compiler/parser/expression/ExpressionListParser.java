@@ -17,9 +17,9 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 	private static final int	EXPRESSION	= 1;
 	private static final int	SEPARATOR	= 2;
 	
-	protected IValueList		valueList;
+	protected IValueList valueList;
 	
-	private Name				label;
+	private Name label;
 	
 	public ExpressionListParser(IValueList valueList)
 	{

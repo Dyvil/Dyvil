@@ -19,9 +19,9 @@ public final class ImportParser extends Parser
 	public static final Name	annotation	= Name.getQualified("annotation");
 	public static final Name	type		= Name.getQualified("type");
 	
-	public static final int		IMPORT		= 1;
-	public static final int		DOT_ALIAS	= 2;
-	public static final int		MULTIIMPORT	= 4;
+	public static final int	IMPORT		= 1;
+	public static final int	DOT_ALIAS	= 2;
+	public static final int	MULTIIMPORT	= 4;
 	
 	protected IImportConsumer	consumer;
 	protected IImport			theImport;

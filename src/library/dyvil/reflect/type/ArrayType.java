@@ -8,7 +8,7 @@ import dyvil.array.ObjectArray;
 @TypeConvertible
 public class ArrayType<T> implements Type<T[]>
 {
-	protected final Type	componentType;
+	protected final Type componentType;
 	
 	public static <T> ArrayType<T> apply(Type<T> type)
 	{

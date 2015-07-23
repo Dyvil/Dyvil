@@ -7,9 +7,9 @@ import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.collection.mutable.HashMap;
 
-public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements ImmutableSet<E>
 {
-	protected ImmutableMap<E, Object>	map;
+	protected ImmutableMap<E, Object> map;
 	
 	public MapBasedSet(ImmutableMap<E, ? extends Object> map)
 	{

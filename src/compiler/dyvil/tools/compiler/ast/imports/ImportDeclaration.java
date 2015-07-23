@@ -22,8 +22,8 @@ public final class ImportDeclaration extends ASTNode
 	public static final int	IMPORT	= 0;
 	public static final int	USING	= 1;
 	
-	public IImport			theImport;
-	public boolean			isStatic;
+	public IImport	theImport;
+	public boolean	isStatic;
 	
 	public ImportDeclaration(ICodePosition position)
 	{

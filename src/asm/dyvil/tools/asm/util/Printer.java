@@ -34,20 +34,20 @@ public abstract class Printer
 	/**
 	 * The names of the Java Virtual Machine opcodes.
 	 */
-	public static final String[]	OPCODES;
+	public static final String[] OPCODES;
 	
 	/**
 	 * The names of the for <code>operand</code> parameter values of the
 	 * {@link dyvil.tools.asm.MethodVisitor#visitIntInsn} method when
 	 * <code>opcode</code> is <code>NEWARRAY</code>.
 	 */
-	public static final String[]	TYPES;
+	public static final String[] TYPES;
 	
 	/**
 	 * The names of the <code>tag</code> field values for
 	 * {@link dyvil.tools.asm.Handle}.
 	 */
-	public static final String[]	HANDLE_TAG;
+	public static final String[] HANDLE_TAG;
 	
 	static
 	{

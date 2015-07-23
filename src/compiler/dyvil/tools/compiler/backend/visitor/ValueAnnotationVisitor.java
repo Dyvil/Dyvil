@@ -13,7 +13,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public class ValueAnnotationVisitor implements AnnotationVisitor
 {
-	private IValued	valued;
+	private IValued valued;
 	
 	public ValueAnnotationVisitor(IValued valued)
 	{

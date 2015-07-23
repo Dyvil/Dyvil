@@ -25,7 +25,7 @@ import dyvil.random.RandomUtils;
 @Utility(String.class)
 public interface StringUtils
 {
-	public static final String[]	EMPTY_STRING_ARRAY	= new String[0];
+	public static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
 	public static @infix String $times(String string, int count)
 	{

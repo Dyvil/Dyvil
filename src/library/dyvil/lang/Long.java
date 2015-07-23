@@ -15,7 +15,7 @@ public class Long implements Integer
 	public static final long	max		= java.lang.Long.MAX_VALUE;
 	public static final byte	size	= java.lang.Long.SIZE;
 	
-	protected long				value;
+	protected long value;
 	
 	public static Long apply(long value)
 	{

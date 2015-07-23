@@ -20,7 +20,7 @@ public class DyvilHeaderParser extends Parser
 	protected static final int	PACKAGE	= 1;
 	protected static final int	IMPORT	= 2;
 	
-	protected IDyvilHeader		unit;
+	protected IDyvilHeader unit;
 	
 	public DyvilHeaderParser(IDyvilHeader unit)
 	{
@@ -99,7 +99,8 @@ public class DyvilHeaderParser extends Parser
 		{
 			return;
 		}
-		switch (this.mode) {
+		switch (this.mode)
+		{
 		case PACKAGE:
 			if (this.parsePackage(pm, token))
 			{
@@ -110,7 +111,7 @@ public class DyvilHeaderParser extends Parser
 			if (this.parseImport(pm, token))
 			{
 				return;
-			}			
+			}
 		}
 		throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
 	}

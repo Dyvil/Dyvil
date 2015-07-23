@@ -20,11 +20,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class MatchCase implements ICase, IContext
 {
-	protected IPattern			pattern;
-	protected IValue			condition;
-	protected IValue			action;
+	protected IPattern	pattern;
+	protected IValue	condition;
+	protected IValue	action;
 	
-	private transient IContext	context;
+	private transient IContext context;
 	
 	@Override
 	public IPattern getPattern()
@@ -153,20 +153,20 @@ public class MatchCase implements ICase, IContext
 	
 	public void resolve(MarkerList markers, IType type, IContext context)
 	{
-		if (pattern != null)
+		if (this.pattern != null)
 		{
-			pattern = pattern.resolve(markers, context);
+			this.pattern = this.pattern.resolve(markers, context);
 			
-			IPattern pattern1 = pattern.withType(type, markers);
+			IPattern pattern1 = this.pattern.withType(type, markers);
 			if (pattern1 == null)
 			{
-				Marker marker = markers.create(pattern.getPosition(), "pattern.type");
-				marker.addInfo("Pattern Type: " + pattern.getType());
+				Marker marker = markers.create(this.pattern.getPosition(), "pattern.type");
+				marker.addInfo("Pattern Type: " + this.pattern.getType());
 				marker.addInfo("Value Type: " + type);
 			}
 			else
 			{
-				pattern = pattern1;
+				this.pattern = pattern1;
 			}
 		}
 		

@@ -12,9 +12,9 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class PatternListParser extends Parser implements IPatternConsumer
 {
-	protected IPatternList	patternList;
+	protected IPatternList patternList;
 	
-	private IPattern		pattern;
+	private IPattern pattern;
 	
 	public PatternListParser(IPatternList list)
 	{

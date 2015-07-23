@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 
 public class ClassReader implements ClassVisitor
 {
-	protected ExternalClass	theClass;
+	protected ExternalClass theClass;
 	
 	public ClassReader(ExternalClass theClass)
 	{

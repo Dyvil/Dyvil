@@ -16,7 +16,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	public static final int	LOCK_END	= 2;
 	public static final int	THEN		= 4;
 	
-	protected SyncStatement	statement;
+	protected SyncStatement statement;
 	
 	public SyncStatementParser(SyncStatement statement)
 	{

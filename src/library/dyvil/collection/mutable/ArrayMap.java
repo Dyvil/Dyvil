@@ -66,7 +66,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 			Object[] newKeys = new Object[newCapacity];
 			Object[] newValues = new Object[newCapacity];
 			System.arraycopy(this.keys, 0, newKeys, 0, index);
-			System.arraycopy(values, 0, newValues, 0, newCapacity);
+			System.arraycopy(this.values, 0, newValues, 0, newCapacity);
 			this.keys = newKeys;
 			this.values = newValues;
 		}

@@ -25,26 +25,26 @@ import dyvil.tools.compiler.sources.FileType;
 
 public class Package implements INamed, IDefaultContext
 {
-	public static RootPackage		rootPackage	= new RootPackage();
+	public static RootPackage rootPackage = new RootPackage();
 	
-	public static Package			dyvil;
-	public static Package			dyvilAnnotation;
-	public static Package			dyvilArray;
-	public static Package			dyvilFunction;
-	public static Package			dyvilLang;
-	public static Package			dyvilLangLiteral;
-	public static Package			dyvilLangRef;
-	public static Package			dyvilLangRefSimple;
-	public static Package			dyvilTuple;
-	public static Package			dyvilUtil;
-	public static Package			java;
-	public static Package			javaLang;
-	public static Package			javaLangAnnotation;
+	public static Package	dyvil;
+	public static Package	dyvilAnnotation;
+	public static Package	dyvilArray;
+	public static Package	dyvilFunction;
+	public static Package	dyvilLang;
+	public static Package	dyvilLangLiteral;
+	public static Package	dyvilLangRef;
+	public static Package	dyvilLangRefSimple;
+	public static Package	dyvilTuple;
+	public static Package	dyvilUtil;
+	public static Package	java;
+	public static Package	javaLang;
+	public static Package	javaLangAnnotation;
 	
-	protected Package				parent;
-	protected Name					name;
-	protected String				fullName;
-	private String					internalName;
+	protected Package	parent;
+	protected Name		name;
+	protected String	fullName;
+	private String		internalName;
 	
 	private List<IClass>			classes		= new ArrayList();
 	protected List<IDyvilHeader>	headers		= new ArrayList();
@@ -112,7 +112,7 @@ public class Package implements INamed, IDefaultContext
 	
 	public String getInternalName()
 	{
-		return internalName;
+		return this.internalName;
 	}
 	
 	public void addHeader(IDyvilHeader unit)

@@ -14,7 +14,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ReferenceType extends ClassType
 {
-	private IType	type;
+	private IType type;
 	
 	public ReferenceType(IClass iclass, IType type)
 	{

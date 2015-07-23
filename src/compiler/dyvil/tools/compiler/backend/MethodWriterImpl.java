@@ -11,20 +11,20 @@ import static dyvil.reflect.Opcodes.*;
 
 public final class MethodWriterImpl implements MethodWriter
 {
-	private static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
+	private static final Long LONG_MINUS_ONE = Long.valueOf(-1);
 	
-	public ClassWriter			cw;
-	protected MethodVisitor		mv;
+	public ClassWriter		cw;
+	protected MethodVisitor	mv;
 	
-	protected Frame				frame			= new Frame();
-	private boolean				visitFrame;
-	private int					maxLocals;
-	private int					maxStack;
+	protected Frame	frame	= new Frame();
+	private boolean	visitFrame;
+	private int		maxLocals;
+	private int		maxStack;
 	
-	private boolean				hasReturn;
+	private boolean hasReturn;
 	
-	private int[]				syncLocals;
-	private int					syncCount;
+	private int[]	syncLocals;
+	private int		syncCount;
 	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{

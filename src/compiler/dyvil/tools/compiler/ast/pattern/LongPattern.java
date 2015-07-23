@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class LongPattern extends ASTNode implements IPattern
 {
-	private long	value;
+	private long value;
 	
 	public LongPattern(ICodePosition position, long value)
 	{

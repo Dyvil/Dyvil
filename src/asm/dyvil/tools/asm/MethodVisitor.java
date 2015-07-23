@@ -89,8 +89,9 @@ public interface MethodVisitor
 	
 	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index);
 	
-	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible);
-	
+	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc,
+			boolean visible);
+			
 	public void visitLineNumber(int line, Label start);
 	
 	public void visitMaxs(int maxStack, int maxLocals);

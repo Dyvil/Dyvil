@@ -8,7 +8,7 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public final class DyvilUnitParser extends DyvilHeaderParser
 {
-	private static final int	CLASS	= 4;
+	private static final int CLASS = 4;
 	
 	public DyvilUnitParser(IDyvilHeader unit)
 	{
@@ -26,7 +26,8 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
 		int type = token.type();
-		switch (this.mode) {
+		switch (this.mode)
+		{
 		case PACKAGE:
 			if (this.parsePackage(pm, token))
 			{

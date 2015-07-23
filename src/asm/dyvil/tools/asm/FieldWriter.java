@@ -44,7 +44,7 @@ final class FieldWriter implements FieldVisitor
 	private AnnotationWriter	itanns;
 	private Attribute			attrs;
 	
-	FieldWriter					next;
+	FieldWriter next;
 	
 	FieldWriter(final ClassWriter cw, final int access, final String name, final String desc, final String signature, final Object value)
 	{

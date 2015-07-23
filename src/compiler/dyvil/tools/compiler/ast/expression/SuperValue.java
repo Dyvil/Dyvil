@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class SuperValue extends ASTNode implements IValue
 {
-	public IType	type	= Types.UNKNOWN;
+	public IType type = Types.UNKNOWN;
 	
 	public SuperValue(ICodePosition position)
 	{

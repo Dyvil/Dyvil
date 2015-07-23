@@ -41,12 +41,12 @@ public class ByteVector
 	/**
 	 * The content of this vector.
 	 */
-	byte[]	data;
+	byte[] data;
 	
 	/**
 	 * Actual number of bytes in this vector.
 	 */
-	int		length;
+	int length;
 	
 	/**
 	 * Constructs a new {@link ByteVector ByteVector} with a default initial

@@ -9,7 +9,7 @@ import dyvil.lang.literal.NilConvertible;
 @NilConvertible
 public class EmptyIterator<E> implements Iterator<E>
 {
-	static final EmptyIterator	emptyIterator	= new EmptyIterator();
+	static final EmptyIterator emptyIterator = new EmptyIterator();
 	
 	public static <E> EmptyIterator<E> apply()
 	{

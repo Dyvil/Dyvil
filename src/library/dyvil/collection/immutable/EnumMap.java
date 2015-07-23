@@ -15,7 +15,7 @@ import dyvil.util.ImmutableException;
 
 @ClassConvertible
 @TypeConvertible
-public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
+public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements ImmutableMap<K, V>
 {
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
 	{
@@ -87,7 +87,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		@Override
 		public EnumMap<K, V> build()
 		{
-			EnumMap<K, V> map = new EnumMap(this.type, getKeys(type), this.values, this.size);
+			EnumMap<K, V> map = new EnumMap(this.type, getKeys(this.type), this.values, this.size);
 			this.size = -1;
 			return map;
 		}

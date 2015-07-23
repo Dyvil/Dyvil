@@ -18,7 +18,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata
 {
-	protected IField	instanceField;
+	protected IField instanceField;
 	
 	public ObjectClassMetadata(IClass iclass)
 	{

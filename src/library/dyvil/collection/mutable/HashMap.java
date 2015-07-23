@@ -200,7 +200,8 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 			Object k;
 			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 			{
-				if (!Objects.equals(oldValue, newValue)) {
+				if (!Objects.equals(oldValue, newValue))
+				{
 					return false;
 				}
 				e.value = newValue;

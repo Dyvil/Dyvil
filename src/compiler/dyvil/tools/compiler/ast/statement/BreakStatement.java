@@ -14,10 +14,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class BreakStatement extends ASTNode implements IStatement
 {
-	public Label		label;
-	public Name			name;
+	public Label	label;
+	public Name		name;
 	
-	private IStatement	parent;
+	private IStatement parent;
 	
 	public BreakStatement(ICodePosition position)
 	{
@@ -72,7 +72,7 @@ public class BreakStatement extends ASTNode implements IStatement
 		
 		this.label = ((ILoop) this.label.value).getBreakLabel();
 	}
-
+	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{

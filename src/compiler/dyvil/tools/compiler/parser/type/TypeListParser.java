@@ -10,7 +10,7 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class TypeListParser extends Parser
 {
-	protected ITypeConsumer	consumer;
+	protected ITypeConsumer consumer;
 	
 	public TypeListParser(ITypeConsumer consumer)
 	{

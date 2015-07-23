@@ -15,7 +15,7 @@ import dyvil.collection.iterator.EmptyIterator;
 @NilConvertible
 public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
-	public static final EmptyMap	instance	= new EmptyMap();
+	public static final EmptyMap instance = new EmptyMap();
 	
 	public static <K, V> EmptyMap<K, V> apply()
 	{

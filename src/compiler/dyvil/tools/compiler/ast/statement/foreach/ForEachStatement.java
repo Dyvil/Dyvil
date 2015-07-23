@@ -27,14 +27,14 @@ import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
 
 public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 {
-	protected ICodePosition	position;
+	protected ICodePosition position;
 	
-	public Variable			variable;
-	public IValue			action;
+	public Variable	variable;
+	public IValue	action;
 	
-	protected Label			startLabel;
-	protected Label			updateLabel;
-	protected Label			endLabel;
+	protected Label	startLabel;
+	protected Label	updateLabel;
+	protected Label	endLabel;
 	
 	public ForEachStatement(Variable var, IValue action)
 	{
@@ -188,7 +188,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new RangeForStatement(this.variable, value1, value2, resolveAction(markers, context));
+			return new RangeForStatement(this.variable, value1, value2, this.resolveAction(markers, context));
 		}
 		
 		IType valueType = value.getType();
@@ -209,7 +209,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new ArrayForStatement(this.variable, resolveAction(markers, context), valueType);
+			return new ArrayForStatement(this.variable, this.resolveAction(markers, context), valueType);
 		}
 		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
@@ -229,7 +229,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				m.addInfo("Variable Type: " + varType);
 			}
 			
-			return new IterableForStatement(this.variable, resolveAction(markers, context), valueType, iterableType);
+			return new IterableForStatement(this.variable, this.resolveAction(markers, context), valueType, iterableType);
 		}
 		if (Types.STRING.isSuperTypeOf(valueType))
 		{
@@ -243,14 +243,14 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new StringForStatement(this.variable, resolveAction(markers, context));
+			return new StringForStatement(this.variable, this.resolveAction(markers, context));
 		}
 		
 		Marker m = markers.create(this.variable.position, "for.invalid");
 		m.addInfo("Variable Type: " + varType);
 		m.addInfo("Value Type: " + valueType);
 		
-		this.action = resolveAction(markers, context);
+		this.action = this.resolveAction(markers, context);
 		
 		return this;
 	}

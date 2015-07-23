@@ -20,7 +20,7 @@ public class NestedClass extends CodeClass
 	protected CaptureField[]	capturedFields;
 	protected int				capturedFieldCount;
 	
-	public transient IContext	context;
+	public transient IContext context;
 	
 	public NestedClass()
 	{

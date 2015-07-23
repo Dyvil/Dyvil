@@ -307,9 +307,9 @@ public class Field extends Member implements IField
 			{
 				signature = "()" + signature;
 			}
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc,
-					signature, null));
-			
+			MethodWriter mw = new MethodWriterImpl(writer,
+					writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
+					
 			for (int i = 0; i < this.annotationCount; i++)
 			{
 				this.annotations[i].write(mw);

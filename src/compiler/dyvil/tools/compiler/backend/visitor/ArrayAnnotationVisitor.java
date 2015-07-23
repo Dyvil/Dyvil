@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 
 public final class ArrayAnnotationVisitor implements AnnotationVisitor
 {
-	private IValueList	array;
+	private IValueList array;
 	
 	public ArrayAnnotationVisitor(IValueList array)
 	{

@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StringValue extends ASTNode implements IConstantValue
 {
-	public String				value;
+	public String value;
 	
 	public StringValue(String value)
 	{

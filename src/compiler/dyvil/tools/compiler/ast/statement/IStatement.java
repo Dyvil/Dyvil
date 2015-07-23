@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IStatement extends IValue
-{	
+{
 	@Override
 	public default IType getType()
 	{

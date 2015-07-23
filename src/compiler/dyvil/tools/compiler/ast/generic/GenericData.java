@@ -18,7 +18,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	public int		genericCount;
 	public IType	instanceType;
 	
-	public int		computedGenerics	= -1;
+	public int computedGenerics = -1;
 	
 	public GenericData()
 	{

@@ -101,7 +101,7 @@ public class ObjectWriter extends OutputStream implements DataOutput
 		int hash = s.hashCode();
 		for (int i = 0; i < this.constantPoolSize; i++)
 		{
-			String constPoolEntry = constantPool[i];
+			String constPoolEntry = this.constantPool[i];
 			if (constPoolEntry.hashCode() == hash && s.equals(constPoolEntry))
 			{
 				// Found the string in the constant pool

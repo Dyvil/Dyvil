@@ -14,7 +14,7 @@ import dyvil.annotation.sealed;
 public interface Set<E> extends Collection<E>
 {
 	@sealed
-	Object	VALUE	= new Object();
+	Object VALUE = new Object();
 	
 	public static <E> MutableSet<E> apply()
 	{

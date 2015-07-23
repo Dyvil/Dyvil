@@ -33,21 +33,21 @@ import dyvil.tools.compiler.parser.dwt.DWTParser;
 
 public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilable
 {
-	public static final Package		javaxSwing	= Library.javaLibrary.resolvePackage("javax.swing");
+	public static final Package javaxSwing = Library.javaLibrary.resolvePackage("javax.swing");
 	
-	public final CodeFile			inputFile;
-	public final File				outputDirectory;
-	public final File				outputFile;
+	public final CodeFile	inputFile;
+	public final File		outputDirectory;
+	public final File		outputFile;
 	
-	public final String				name;
-	public final String				internalName;
-	public final Package			pack;
-	protected TokenIterator			tokens;
-	protected MarkerList			markers		= new MarkerList();
+	public final String		name;
+	public final String		internalName;
+	public final Package	pack;
+	protected TokenIterator	tokens;
+	protected MarkerList	markers	= new MarkerList();
 	
-	protected DWTNode				rootNode;
+	protected DWTNode rootNode;
 	
-	protected Map<String, IType>	fields		= new TreeMap();
+	protected Map<String, IType> fields = new TreeMap();
 	
 	public DWTFile(Package pack, CodeFile input, File output)
 	{
@@ -182,17 +182,17 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		
 		// Write init Method
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null,
-				new String[] { "java/lang/Exception" }));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null, new String[] { "java/lang/Exception" }));
+				
 		mw.begin();
 		this.rootNode.write(this.internalName, mw);
 		mw.end(Types.VOID);
 		
 		// Write public static void main(String[] args)
 		
-		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null,
-				new String[] { "java/lang/Exception" }));
+		mw = new MethodWriterImpl(writer,
+				writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null, new String[] { "java/lang/Exception" }));
 		mw.resetLocals(1);
 		mw.begin();
 		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", false);

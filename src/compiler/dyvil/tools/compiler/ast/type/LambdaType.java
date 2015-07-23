@@ -26,11 +26,11 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LambdaType implements IType, ITyped, ITypeList
 {
-	public static final IClass[]	functionClasses	= new IClass[22];
+	public static final IClass[] functionClasses = new IClass[22];
 	
-	protected IType					returnType;
-	protected IType[]				parameterTypes;
-	protected int					parameterCount;
+	protected IType		returnType;
+	protected IType[]	parameterTypes;
+	protected int		parameterCount;
 	
 	public LambdaType()
 	{

@@ -32,16 +32,16 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Annotation extends ASTNode implements ITyped
 {
-	public static final MethodParameter	VALUE		= new MethodParameter();
+	public static final MethodParameter VALUE = new MethodParameter();
 	
 	static
 	{
 		VALUE.name = Name.getQualified("value");
 	}
 	
-	public Name							name;
-	public IType						type;
-	public IArguments					arguments	= EmptyArguments.INSTANCE;
+	public Name			name;
+	public IType		type;
+	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	public Annotation(IType type)
 	{

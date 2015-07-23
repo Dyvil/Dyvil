@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class FieldInitializer extends ASTNode implements IValue, IValued
 {
-	public Variable	variable;
+	public Variable variable;
 	
 	public FieldInitializer(ICodePosition position, Name name, IType type)
 	{

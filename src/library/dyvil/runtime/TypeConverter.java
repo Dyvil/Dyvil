@@ -8,23 +8,23 @@ import static dyvil.runtime.Wrapper.*;
 
 public class TypeConverter
 {
-	private static final String		DYVIL_LANG_NUMBER	= "dyvil/lang/Number";
+	private static final String DYVIL_LANG_NUMBER = "dyvil/lang/Number";
 	
-	private static final int		NUM_WRAPPERS		= Wrapper.values().length;
+	private static final int NUM_WRAPPERS = Wrapper.values().length;
 	
-	private static final String		NAME_OBJECT			= "java/lang/Object";
-	private static final String		WRAPPER_PREFIX		= "Ldyvil/lang/";
+	private static final String	NAME_OBJECT		= "java/lang/Object";
+	private static final String	WRAPPER_PREFIX	= "Ldyvil/lang/";
 	
 	// Same for all primitives; name of the boxing method
-	private static final String		NAME_BOX_METHOD		= "apply";
+	private static final String NAME_BOX_METHOD = "apply";
 	
 	// Table of opcodes for widening primitive conversions
-	private static final int[][]	wideningOpcodes		= new int[NUM_WRAPPERS][NUM_WRAPPERS];
+	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];
 	
-	private static final Wrapper[]	FROM_WRAPPER_NAME	= new Wrapper[16];
+	private static final Wrapper[] FROM_WRAPPER_NAME = new Wrapper[16];
 	
 	// Table of wrappers for primitives, indexed by ASM type sorts
-	private static final Wrapper[]	FROM_TYPE_SORT		= new Wrapper[16];
+	private static final Wrapper[] FROM_TYPE_SORT = new Wrapper[16];
 	
 	static
 	{

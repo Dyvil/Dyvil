@@ -19,7 +19,7 @@ public final class EmptyArguments implements IArguments
 	public static final EmptyArguments	VISIBLE		= new EmptyArguments(true);
 	public static final EmptyArguments	INSTANCE	= new EmptyArguments(false);
 	
-	private boolean						visible;
+	private boolean visible;
 	
 	private EmptyArguments()
 	{

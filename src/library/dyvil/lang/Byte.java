@@ -12,7 +12,7 @@ public class Byte implements Integer
 	public static final byte	max		= java.lang.Byte.MAX_VALUE;
 	public static final byte	size	= java.lang.Byte.SIZE;
 	
-	protected byte				value;
+	protected byte value;
 	
 	public static Byte apply(byte v)
 	{

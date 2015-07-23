@@ -275,21 +275,21 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	@mutating
-	default boolean replace( K key,  V oldValue,  V newValue)
+	default boolean replace(K key, V oldValue, V newValue)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	default V replace(Entry<? extends  K, ? extends  V> entry)
+	default V replace(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 	
 	@Override
 	@mutating
-	default V replace( K key,  V newValue)
+	default V replace(K key, V newValue)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}

@@ -17,9 +17,9 @@ public final class StringConversions
 	private static final String[]	ROMANDIGIT	= { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
 	private static final int[]		ROMANNUMBER	= { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
 	
-	private static final String[]	ROMANCACHE	= { "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI",
-			"XVII", "XVIII", "XIX", "XX"		};
-	
+	private static final String[] ROMANCACHE = { "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI",
+			"XVII", "XVIII", "XIX", "XX" };
+			
 	private StringConversions()
 	{
 		// no instances

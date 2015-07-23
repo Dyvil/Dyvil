@@ -14,30 +14,33 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.Types;
 
 public final class ClassFormat
 {
-	public static final int		H_GETFIELD			= Opcodes.H_GETFIELD;
-	public static final int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
-	public static final int		H_PUTFIELD			= Opcodes.H_PUTFIELD;
-	public static final int		H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
-	public static final int		H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
-	public static final int		H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
-	public static final int		H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
-	public static final int		H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
-	public static final int		H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
+	public static final int	H_GETFIELD			= Opcodes.H_GETFIELD;
+	public static final int	H_GETSTATIC			= Opcodes.H_GETSTATIC;
+	public static final int	H_PUTFIELD			= Opcodes.H_PUTFIELD;
+	public static final int	H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
+	public static final int	H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
+	public static final int	H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
+	public static final int	H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
+	public static final int	H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
+	public static final int	H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
 	
-	public static final int		T_BOOLEAN			= 4;
-	public static final int		T_CHAR				= 5;
-	public static final int		T_FLOAT				= 6;
-	public static final int		T_DOUBLE			= 7;
-	public static final int		T_BYTE				= 8;
-	public static final int		T_SHORT				= 9;
-	public static final int		T_INT				= 10;
-	public static final int		T_LONG				= 11;
+	public static final int	T_BOOLEAN	= 4;
+	public static final int	T_CHAR		= 5;
+	public static final int	T_FLOAT		= 6;
+	public static final int	T_DOUBLE	= 7;
+	public static final int	T_BYTE		= 8;
+	public static final int	T_SHORT		= 9;
+	public static final int	T_INT		= 10;
+	public static final int	T_LONG		= 11;
 	
-	public static final int		ACC_SUPER			= Opcodes.ACC_SUPER;
+	public static final int ACC_SUPER = Opcodes.ACC_SUPER;
 	
 	public static final Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
 	public static final Integer	NULL				= Opcodes.NULL;

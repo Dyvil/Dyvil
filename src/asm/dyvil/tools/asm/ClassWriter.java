@@ -31,65 +31,65 @@ package dyvil.tools.asm;
 
 public class ClassWriter implements ClassVisitor
 {
-	public static final int		COMPUTE_MAXS			= 1;
-	public static final int		COMPUTE_FRAMES			= 2;
-	static final int			ACC_SYNTHETIC_ATTRIBUTE	= 0x40000;
-	static final int			TO_ACC_SYNTHETIC		= ACC_SYNTHETIC_ATTRIBUTE / Opcodes.ACC_SYNTHETIC;
-	static final int			NOARG_INSN				= 0;
-	static final int			SBYTE_INSN				= 1;
-	static final int			SHORT_INSN				= 2;
-	static final int			VAR_INSN				= 3;
-	static final int			IMPLVAR_INSN			= 4;
-	static final int			TYPE_INSN				= 5;
-	static final int			FIELDORMETH_INSN		= 6;
-	static final int			ITFMETH_INSN			= 7;
-	static final int			INDYMETH_INSN			= 8;
-	static final int			LABEL_INSN				= 9;
-	static final int			LABELW_INSN				= 10;
-	static final int			LDC_INSN				= 11;
-	static final int			LDCW_INSN				= 12;
-	static final int			IINC_INSN				= 13;
-	static final int			TABL_INSN				= 14;
-	static final int			LOOK_INSN				= 15;
-	static final int			MANA_INSN				= 16;
-	static final int			WIDE_INSN				= 17;
+	public static final int	COMPUTE_MAXS			= 1;
+	public static final int	COMPUTE_FRAMES			= 2;
+	static final int		ACC_SYNTHETIC_ATTRIBUTE	= 0x40000;
+	static final int		TO_ACC_SYNTHETIC		= ACC_SYNTHETIC_ATTRIBUTE / Opcodes.ACC_SYNTHETIC;
+	static final int		NOARG_INSN				= 0;
+	static final int		SBYTE_INSN				= 1;
+	static final int		SHORT_INSN				= 2;
+	static final int		VAR_INSN				= 3;
+	static final int		IMPLVAR_INSN			= 4;
+	static final int		TYPE_INSN				= 5;
+	static final int		FIELDORMETH_INSN		= 6;
+	static final int		ITFMETH_INSN			= 7;
+	static final int		INDYMETH_INSN			= 8;
+	static final int		LABEL_INSN				= 9;
+	static final int		LABELW_INSN				= 10;
+	static final int		LDC_INSN				= 11;
+	static final int		LDCW_INSN				= 12;
+	static final int		IINC_INSN				= 13;
+	static final int		TABL_INSN				= 14;
+	static final int		LOOK_INSN				= 15;
+	static final int		MANA_INSN				= 16;
+	static final int		WIDE_INSN				= 17;
 	
-	static final byte[]			TYPE;
-	static final int			CLASS					= 7;
-	static final int			FIELD					= 9;
-	static final int			METH					= 10;
-	static final int			IMETH					= 11;
-	static final int			STR						= 8;
-	static final int			INT						= 3;
-	static final int			FLOAT					= 4;
-	static final int			LONG					= 5;
-	static final int			DOUBLE					= 6;
-	static final int			NAME_TYPE				= 12;
-	static final int			UTF8					= 1;
-	static final int			MTYPE					= 16;
-	static final int			HANDLE					= 15;
-	static final int			INDY					= 18;
+	static final byte[]	TYPE;
+	static final int	CLASS		= 7;
+	static final int	FIELD		= 9;
+	static final int	METH		= 10;
+	static final int	IMETH		= 11;
+	static final int	STR			= 8;
+	static final int	INT			= 3;
+	static final int	FLOAT		= 4;
+	static final int	LONG		= 5;
+	static final int	DOUBLE		= 6;
+	static final int	NAME_TYPE	= 12;
+	static final int	UTF8		= 1;
+	static final int	MTYPE		= 16;
+	static final int	HANDLE		= 15;
+	static final int	INDY		= 18;
 	
-	static final int			HANDLE_BASE				= 20;
-	static final int			TYPE_NORMAL				= 30;
-	static final int			TYPE_UNINIT				= 31;
-	static final int			TYPE_MERGED				= 32;
-	static final int			BSM						= 33;
+	static final int	HANDLE_BASE	= 20;
+	static final int	TYPE_NORMAL	= 30;
+	static final int	TYPE_UNINIT	= 31;
+	static final int	TYPE_MERGED	= 32;
+	static final int	BSM			= 33;
 	
-	ClassReader					cr;
-	int							version;
-	int							index;
-	final ByteVector			pool;
-	Item[]						items;
-	int							threshold;
+	ClassReader			cr;
+	int					version;
+	int					index;
+	final ByteVector	pool;
+	Item[]				items;
+	int					threshold;
 	
-	final Item					key;
-	final Item					key2;
-	final Item					key3;
-	final Item					key4;
+	final Item	key;
+	final Item	key2;
+	final Item	key3;
+	final Item	key4;
 	
-	Item[]						typeTable;
-	private short				typeCount;
+	Item[]			typeTable;
+	private short	typeCount;
 	
 	private int					access;
 	private int					name;
@@ -130,7 +130,6 @@ public class ClassWriter implements ClassVisitor
 			b[i] = (byte) (s.charAt(i) - 'A');
 		}
 		TYPE = b;
-		
 		
 	}
 	

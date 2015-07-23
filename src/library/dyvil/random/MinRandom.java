@@ -1,6 +1,5 @@
 package dyvil.random;
 
-
 /**
  * A {@link Random} implementation that always returns the minimum value.
  * 
@@ -8,9 +7,9 @@ package dyvil.random;
  */
 public final class MinRandom implements Random
 {
-	private static final long		serialVersionUID	= 4703419198212688268L;
+	private static final long serialVersionUID = 4703419198212688268L;
 	
-	public static final MinRandom	instance			= new MinRandom();
+	public static final MinRandom instance = new MinRandom();
 	
 	private MinRandom()
 	{

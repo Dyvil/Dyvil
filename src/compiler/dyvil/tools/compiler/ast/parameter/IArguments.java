@@ -13,7 +13,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
-	public static final float	DEFAULT_MATCH	= 1000;
+	public static final float DEFAULT_MATCH = 1000;
 	
 	public int size();
 	

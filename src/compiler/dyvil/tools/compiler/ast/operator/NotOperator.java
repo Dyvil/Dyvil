@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class NotOperator extends ASTNode implements IValue
 {
-	public IValue	value;
+	public IValue value;
 	
 	public NotOperator(IValue right)
 	{

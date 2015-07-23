@@ -14,7 +14,7 @@ import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
 
 @ArrayConvertible
-public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
+public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E>
 {
 	public static <E> ArrayList<E> apply(E... elements)
 	{

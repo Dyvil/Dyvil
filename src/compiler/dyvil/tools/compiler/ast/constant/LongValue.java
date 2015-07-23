@@ -16,9 +16,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class LongValue extends ASTNode implements INumericValue
 {
-	private static LongValue	NULL;
+	private static LongValue NULL;
 	
-	public long					value;
+	public long value;
 	
 	public LongValue(long value)
 	{

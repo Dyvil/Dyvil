@@ -30,7 +30,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		
+	
 	}
 	
 	@Override

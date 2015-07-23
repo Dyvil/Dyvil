@@ -1468,8 +1468,8 @@ public class ClassReader
 				if (this.readByte(tann2) >> 1 == 0x40 >> 1)
 				{
 					int v = this.readAnnotationTarget(context, tann2);
-					v = this.readAnnotationValues(v + 2, c, true, mv.visitLocalVariableAnnotation(context.typeRef, context.typePath, context.start,
-							context.end, context.index, this.readUTF8(v, c), true));
+					v = this.readAnnotationValues(v + 2, c, true, mv.visitLocalVariableAnnotation(context.typeRef, context.typePath, context.start, context.end,
+							context.index, this.readUTF8(v, c), true));
 				}
 			}
 		}
@@ -1480,8 +1480,8 @@ public class ClassReader
 				if (this.readByte(itann2) >> 1 == 0x40 >> 1)
 				{
 					int v = this.readAnnotationTarget(context, itann2);
-					v = this.readAnnotationValues(v + 2, c, true, mv.visitLocalVariableAnnotation(context.typeRef, context.typePath, context.start,
-							context.end, context.index, this.readUTF8(v, c), false));
+					v = this.readAnnotationValues(v + 2, c, true, mv.visitLocalVariableAnnotation(context.typeRef, context.typePath, context.start, context.end,
+							context.index, this.readUTF8(v, c), false));
 				}
 			}
 		}
@@ -2176,12 +2176,12 @@ public class ClassReader
 					st = 2;
 				}
 				break;
-			
+				
 			case 1: // byte 2 of 2-byte char or byte 3 of 3-byte char
 				buf[strLen++] = (char) (cc << 6 | c & 0x3F);
 				st = 0;
 				break;
-			
+				
 			case 2: // byte 2 of 3-byte char
 				cc = (char) (cc << 6 | c & 0x3F);
 				st = 1;

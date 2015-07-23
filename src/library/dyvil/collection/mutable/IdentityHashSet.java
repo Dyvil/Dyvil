@@ -10,6 +10,7 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
+import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
 
 import static dyvil.collection.mutable.IdentityHashMap.*;
@@ -59,12 +60,12 @@ public class IdentityHashSet<E> implements MutableSet<E>
 		}
 		
 		this.table = new Object[MathUtils.powerOfTwo(size << 1)];
-		this.threshold = (int) Math.min(size * loadFactor, HashMap.MAX_ARRAY_SIZE + 1);
+		this.threshold = (int) Math.min(size * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
 	
 	public IdentityHashSet(Collection<E> collection)
 	{
-		this(HashMap.grow(collection.size()), DEFAULT_LOAD_FACTOR);
+		this(AbstractHashMap.grow(collection.size()), DEFAULT_LOAD_FACTOR);
 		for (E element : collection)
 		{
 			this.$plus$eq(element);
@@ -77,13 +78,13 @@ public class IdentityHashSet<E> implements MutableSet<E>
 		
 		Object[] oldTable = this.table;
 		int oldLength = oldTable.length;
-		if (newLength - HashMap.MAX_ARRAY_SIZE > 0)
+		if (newLength - AbstractHashMap.MAX_ARRAY_SIZE > 0)
 		{
-			if (oldLength == HashMap.MAX_ARRAY_SIZE)
+			if (oldLength == AbstractHashMap.MAX_ARRAY_SIZE)
 			{
 				return;
 			}
-			newLength = HashMap.MAX_ARRAY_SIZE;
+			newLength = AbstractHashMap.MAX_ARRAY_SIZE;
 		}
 		
 		Object[] newTable = new Object[newLength];
@@ -122,10 +123,10 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	{
 		return new Iterator<E>()
 		{
-			int			index				= IdentityHashSet.this.size != 0 ? 0 : IdentityHashSet.this.table.length;
-			int			lastReturnedIndex	= -1;
-			boolean		indexValid;
-			Object[]	traversalTable		= IdentityHashSet.this.table;
+			int index = IdentityHashSet.this.size != 0 ? 0 : IdentityHashSet.this.table.length;
+			int lastReturnedIndex = -1;
+			boolean indexValid;
+			Object[] traversalTable = IdentityHashSet.this.table;
 			
 			@Override
 			public boolean hasNext()
@@ -363,7 +364,7 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		int newLen = MathUtils.powerOfTwo(HashMap.grow(this.size));
+		int newLen = MathUtils.powerOfTwo(AbstractHashMap.grow(this.size));
 		Object[] newTable = new Object[newLen];
 		for (Object o : this.table)
 		{

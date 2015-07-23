@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface ShortArray
 {
-	public static final short[]	EMPTY	= new short[0];
+	public static final short[] EMPTY = new short[0];
 	
 	public static short[] apply()
 	{

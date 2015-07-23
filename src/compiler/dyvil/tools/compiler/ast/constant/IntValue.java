@@ -16,9 +16,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class IntValue extends ASTNode implements INumericValue
 {
-	private static IntValue		NULL;
+	private static IntValue NULL;
 	
-	public int					value;
+	public int value;
 	
 	public IntValue(int value)
 	{

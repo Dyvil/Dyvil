@@ -23,11 +23,11 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	public static final Name	$whileStart	= Name.getQualified("$whileStart");
 	public static final Name	$whileEnd	= Name.getQualified("$whileEnd");
 	
-	public IValue				condition;
-	public IValue				action;
+	public IValue	condition;
+	public IValue	action;
 	
-	public Label				startLabel;
-	public Label				endLabel;
+	public Label	startLabel;
+	public Label	endLabel;
 	
 	public WhileStatement(ICodePosition position)
 	{
@@ -91,7 +91,8 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void resolveStatement(ILabelContext context, MarkerList markers)
 	{
-		if (this.action != null) {
+		if (this.action != null)
+		{
 			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}

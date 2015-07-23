@@ -18,7 +18,7 @@ public class Float implements Number
 	public static final float	negative_infinity	= java.lang.Float.NEGATIVE_INFINITY;
 	public static final byte	size				= java.lang.Float.SIZE;
 	
-	protected float				value;
+	protected float value;
 	
 	public static Float apply(float v)
 	{

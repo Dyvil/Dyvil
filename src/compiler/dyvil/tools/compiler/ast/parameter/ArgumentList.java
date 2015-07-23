@@ -22,7 +22,7 @@ public final class ArgumentList implements IArguments, IValueList
 	private IValue[]	values;
 	private int			size;
 	
-	private boolean		varargs;
+	private boolean varargs;
 	
 	public ArgumentList()
 	{
@@ -264,7 +264,8 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		if (index >= this.size) {
+		if (index >= this.size)
+		{
 			return;
 		}
 		param.getType().inferTypes(this.values[index].getType(), typeContext);

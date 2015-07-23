@@ -18,8 +18,8 @@ public class TypeAliasParser extends Parser
 	private static final int	NAME	= 2;
 	private static final int	EQUAL	= 4;
 	
-	protected ITypeAliasMap		map;
-	protected ITypeAlias		typeAlias;
+	protected ITypeAliasMap	map;
+	protected ITypeAlias	typeAlias;
 	
 	public TypeAliasParser(ITypeAliasMap map)
 	{

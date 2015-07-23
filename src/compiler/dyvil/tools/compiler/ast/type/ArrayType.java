@@ -23,7 +23,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ArrayType implements IType, ITyped
 {
-	private IType	type;
+	private IType type;
 	
 	public ArrayType()
 	{

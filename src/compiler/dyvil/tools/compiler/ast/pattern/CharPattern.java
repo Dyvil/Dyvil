@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CharPattern extends ASTNode implements IPattern
 {
-	private char	value;
+	private char value;
 	
 	public CharPattern(ICodePosition position, char value)
 	{

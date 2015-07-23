@@ -69,8 +69,8 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
-		private Tuple2<K, V>[]		entries;
-		private int					size;
+		private Tuple2<K, V>[]	entries;
+		private int				size;
 		
 		public Builder()
 		{
@@ -157,7 +157,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	{
 		return new Iterator<K>()
 		{
-			private int	index;
+			private int index;
 			
 			@Override
 			public boolean hasNext()
@@ -178,7 +178,7 @@ public class TupleMap<K, V> implements ImmutableMap<K, V>
 	{
 		return new Iterator<V>()
 		{
-			private int	index;
+			private int index;
 			
 			@Override
 			public boolean hasNext()

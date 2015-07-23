@@ -18,9 +18,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class TypeOperator extends ASTNode implements IValue
 {
-	private IType				type;
-	private IType				genericType;
-	public boolean				dotless;
+	private IType	type;
+	private IType	genericType;
+	public boolean	dotless;
 	
 	public TypeOperator(ICodePosition position)
 	{

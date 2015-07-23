@@ -44,19 +44,19 @@ public class Label
 	static final int	VISITED		= 1024;
 	static final int	VISITED2	= 2048;
 	
-	public Object		info;
-	int					status;
-	int					line;
-	int					position;
-	private int			referenceCount;
-	private int[]		srcAndRefPositions;
+	public Object	info;
+	int				status;
+	int				line;
+	int				position;
+	private int		referenceCount;
+	private int[]	srcAndRefPositions;
 	
-	int					inputStackTop;
-	int					outputStackMax;
-	Frame				frame;
-	Label				successor;
-	Edge				successors;
-	Label				next;
+	int		inputStackTop;
+	int		outputStackMax;
+	Frame	frame;
+	Label	successor;
+	Edge	successors;
+	Label	next;
 	
 	public Label()
 	{

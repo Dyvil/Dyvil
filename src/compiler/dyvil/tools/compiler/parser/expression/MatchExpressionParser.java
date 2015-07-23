@@ -20,10 +20,10 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 	private static final int	ACTION			= 8;
 	private static final int	SEPARATOR		= 16;
 	
-	protected MatchExpression	matchExpression;
+	protected MatchExpression matchExpression;
 	
-	private MatchCase			currentCase;
-	private boolean				singleCase;
+	private MatchCase	currentCase;
+	private boolean		singleCase;
 	
 	public MatchExpressionParser(MatchExpression matchExpression)
 	{

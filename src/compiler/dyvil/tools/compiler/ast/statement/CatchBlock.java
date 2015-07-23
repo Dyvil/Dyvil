@@ -25,9 +25,9 @@ public class CatchBlock implements IValued, ITyped, IContext
 	public Name				varName;
 	public IValue			action;
 	
-	protected Variable		variable;
+	protected Variable variable;
 	
-	protected IContext		context;
+	protected IContext context;
 	
 	public CatchBlock(ICodePosition position)
 	{

@@ -55,23 +55,21 @@ public interface IType extends IASTNode, IContext, ITypeContext
 		 * Allows Class Types, Parameterized Types and Type Variable Types, but
 		 * the latter cannot be contravariant.
 		 */
-		RETURN_TYPE,
-		/**
-		 * Allows Class Types, Parameterized Types and Type Variable Types, but
-		 * the latter cannot be covariant.
-		 */
-		PARAMETER_TYPE,
-		/**
-		 * Allows all Types.
-		 */
+		RETURN_TYPE, /**
+						 * Allows Class Types, Parameterized Types and Type
+						 * Variable Types, but the latter cannot be covariant.
+						 */
+		PARAMETER_TYPE, /**
+						 * Allows all Types.
+						 */
 		GENERIC_ARGUMENT;
 	}
 	
-	int	UNKNOWN				= 0;
-	int	NULL				= 1;
-	int	ANY					= 2;
-	int	DYNAMIC				= 3;
-	int	PRIMITIVE			= 4;
+	int	UNKNOWN		= 0;
+	int	NULL		= 1;
+	int	ANY			= 2;
+	int	DYNAMIC		= 3;
+	int	PRIMITIVE	= 4;
 	
 	int	CLASS				= 8;
 	int	NAMED				= 9;
@@ -80,9 +78,9 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	int	GENERIC_NAMED		= 12;
 	int	GENERIC_INTERNAL	= 13;
 	
-	int	TUPLE				= 16;
-	int	LAMBDA				= 17;
-	int	ARRAY				= 18;
+	int	TUPLE	= 16;
+	int	LAMBDA	= 17;
+	int	ARRAY	= 18;
 	
 	int	TYPE_VAR_TYPE		= 32;
 	int	INTERNAL_TYPE_VAR	= 33;

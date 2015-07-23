@@ -1,12 +1,12 @@
 package dyvil.tests;
 
-import dyvil.string.CharUtils;
-
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import dyvil.string.CharUtils;
+
+import org.junit.Test;
 
 public class CharTests
 {

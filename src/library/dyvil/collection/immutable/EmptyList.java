@@ -22,7 +22,7 @@ import dyvil.collection.iterator.EmptyIterator;
 @NilConvertible
 public @object class EmptyList<E> implements ImmutableList<E>
 {
-	public static final EmptyList	instance	= new EmptyList();
+	public static final EmptyList instance = new EmptyList();
 	
 	public static <E> EmptyList<E> apply()
 	{

@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class MethodParameter extends Parameter
 {
-	public ICallableMember	method;
+	public ICallableMember method;
 	
 	public MethodParameter()
 	{

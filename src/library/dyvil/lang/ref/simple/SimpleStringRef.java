@@ -6,7 +6,7 @@ import dyvil.lang.ref.StringRef;
 @StringConvertible
 public class SimpleStringRef implements StringRef
 {
-	public String	value;
+	public String value;
 	
 	public static SimpleStringRef apply(String value)
 	{

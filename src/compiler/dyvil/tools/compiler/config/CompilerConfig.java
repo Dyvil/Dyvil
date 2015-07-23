@@ -10,23 +10,23 @@ import dyvil.tools.compiler.sources.FileFinder;
 
 public class CompilerConfig
 {
-	private String				directory		= ".";
+	private String directory = ".";
 	
-	private String				jarName;
-	private String				jarVendor;
-	private String				jarVersion;
-	private String				jarNameFormat	= "%1$s-%2$s.jar";
+	private String	jarName;
+	private String	jarVendor;
+	private String	jarVersion;
+	private String	jarNameFormat	= "%1$s-%2$s.jar";
 	
 	private File				logFile;
 	private File				sourceDir;
 	private File				outputDir;
-	public final List<Library>	libraries		= new ArrayList();
+	public final List<Library>	libraries	= new ArrayList();
 	
 	public final List<String>	includedFiles	= new ArrayList();
 	public final List<String>	excludedFiles	= new ArrayList();
 	
 	private String				mainType;
-	public final List<String>	mainArgs		= new ArrayList();
+	public final List<String>	mainArgs	= new ArrayList();
 	
 	public CompilerConfig()
 	{

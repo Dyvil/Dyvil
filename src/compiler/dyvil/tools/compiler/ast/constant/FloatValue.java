@@ -16,9 +16,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class FloatValue extends ASTNode implements INumericValue
 {
-	private static FloatValue	NULL;
+	private static FloatValue NULL;
 	
-	public float				value;
+	public float value;
 	
 	public FloatValue(float value)
 	{

@@ -4,7 +4,7 @@ import dyvil.lang.ref.ObjectRef;
 
 public class SimpleObjectRef<T> implements ObjectRef<T>
 {
-	public T	value;
+	public T value;
 	
 	public static <T> SimpleObjectRef<T> apply(T value)
 	{

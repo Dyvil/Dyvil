@@ -29,8 +29,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class StatementList extends ASTNode implements IStatement, IValueList, IDefaultContext, ILabelContext
 {
-	private IValue[]			values	= new IValue[3];
-	private int					valueCount;
+	private IValue[]	values	= new IValue[3];
+	private int			valueCount;
 	
 	private Label[]				labels;
 	private Map<Name, Variable>	variables;

@@ -26,12 +26,12 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int	HASHCODE	= 8;
 	protected static final int	TOSTRING	= 16;
 	
-	protected final IClass		theClass;
+	protected final IClass theClass;
 	
-	protected IConstructor		constructor;
-	protected IConstructor		superConstructor;
+	protected IConstructor	constructor;
+	protected IConstructor	superConstructor;
 	
-	protected byte				methods;
+	protected byte methods;
 	
 	public ClassMetadata(IClass iclass)
 	{

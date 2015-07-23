@@ -15,7 +15,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ThrowStatement implements IValue, IValued
 {
-	private IValue	value;
+	private IValue value;
 	
 	public ThrowStatement()
 	{

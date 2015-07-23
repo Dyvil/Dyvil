@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BooleanPattern extends ASTNode implements IPattern
 {
-	private boolean	value;
+	private boolean value;
 	
 	public BooleanPattern(ICodePosition position, boolean value)
 	{

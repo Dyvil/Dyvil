@@ -22,11 +22,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class SimpleImport extends Import
 {
-	public Name				name;
-	public Name				alias;
+	public Name	name;
+	public Name	alias;
 	
-	private IClass			theClass;
-	private Package			thePackage;
+	private IClass	theClass;
+	private Package	thePackage;
 	
 	private IDataMember		field;
 	private List<IMethod>	methods;

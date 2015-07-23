@@ -40,26 +40,25 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
-													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
-															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
-															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
-	
-	public IParameter[]			parameters;
-	public int					parameterCount;
-	public IValue				value;
+	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
+			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodType;"
+					+ "Ljava/lang/invoke/MethodHandle;" + "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
+					
+	public IParameter[]	parameters;
+	public int			parameterCount;
+	public IValue		value;
 	
 	/**
 	 * The instantiated type this lambda expression represents
 	 */
-	protected IType				type;
+	protected IType type;
 	
 	/**
 	 * The abstract method this lambda expression implements
 	 */
-	protected IMethod			method;
+	protected IMethod method;
 	
-	private IContext			context;
+	private IContext context;
 	
 	private String				owner;
 	private String				name;
@@ -157,7 +156,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		
 		if (this.method != null)
 		{
-			inferTypes(markers);
+			this.inferTypes(markers);
 			
 			this.context = context;
 			this.value = this.value.resolve(markers, this);
@@ -612,7 +611,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			}
 			else
 			{
-				Util.astToString(prefix, parameters, parameterCount, ", ", buffer);
+				Util.astToString(prefix, this.parameters, this.parameterCount, ", ", buffer);
 			}
 			buffer.append(") ");
 		}

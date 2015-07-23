@@ -8,8 +8,8 @@ import dyvil.tools.compiler.lexer.token.IToken;
 
 public abstract class EmulatorParser extends Parser implements IParserManager
 {
-	protected IToken			firstToken;
-	protected Parser			tryParser;
+	protected IToken	firstToken;
+	protected Parser	tryParser;
 	
 	protected Parser			parser;
 	protected IParserManager	pm;

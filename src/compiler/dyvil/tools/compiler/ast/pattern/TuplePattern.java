@@ -87,7 +87,7 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			}
 			else
 			{
-				this.patterns[i] = pattern1; 
+				this.patterns[i] = pattern1;
 			}
 		}
 		return this;

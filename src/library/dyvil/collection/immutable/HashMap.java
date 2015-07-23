@@ -273,7 +273,8 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
-			if (condition.test(entryKey, entryValue)) {
+			if (condition.test(entryKey, entryValue))
+			{
 				builder.put(entryKey, entryValue);
 			}
 		}

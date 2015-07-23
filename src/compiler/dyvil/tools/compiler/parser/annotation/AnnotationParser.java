@@ -21,7 +21,7 @@ public class AnnotationParser extends Parser
 	public static final int	PARAMETERS_START	= 2;
 	public static final int	PARAMETERS_END		= 4;
 	
-	private Annotation		annotation;
+	private Annotation annotation;
 	
 	public AnnotationParser(Annotation annotation)
 	{

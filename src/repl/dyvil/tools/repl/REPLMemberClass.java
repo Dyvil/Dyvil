@@ -48,7 +48,8 @@ public class REPLMemberClass implements IClass
 		this.member = member;
 	}
 	
-	public void setMember(IClassMember member) {
+	public void setMember(IClassMember member)
+	{
 		this.member = member;
 	}
 	

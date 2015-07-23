@@ -13,7 +13,7 @@ import dyvil.collection.impl.AbstractArraySet;
 import dyvil.util.ImmutableException;
 
 @ArrayConvertible
-public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
+public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 {
 	public static <E> ArraySet<E> apply(E... elements)
 	{

@@ -11,7 +11,7 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public final class FormatStringParser extends Parser implements IValued
 {
-	protected FormatStringExpression	value;
+	protected FormatStringExpression value;
 	
 	public FormatStringParser(FormatStringExpression value)
 	{

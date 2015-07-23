@@ -26,9 +26,9 @@ public final class TypeParser extends Parser
 	public static final int	LAMBDA_TYPE		= 256;
 	public static final int	LAMBDA_END		= 512;
 	
-	protected ITypeConsumer	typed;
+	protected ITypeConsumer typed;
 	
-	private IType			type;
+	private IType type;
 	
 	public TypeParser(ITypeConsumer consumer)
 	{

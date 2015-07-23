@@ -12,11 +12,11 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class WhileStatementParser extends Parser implements IValueConsumer
 {
-	public static final int		CONDITION		= 1;
-	public static final int		CONDITION_END	= 2;
-	public static final int		BLOCK			= 4;
+	public static final int	CONDITION		= 1;
+	public static final int	CONDITION_END	= 2;
+	public static final int	BLOCK			= 4;
 	
-	protected WhileStatement	statement;
+	protected WhileStatement statement;
 	
 	public WhileStatementParser(WhileStatement statement)
 	{

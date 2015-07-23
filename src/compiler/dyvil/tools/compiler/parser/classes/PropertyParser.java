@@ -13,13 +13,13 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public class PropertyParser extends Parser implements IValued
 {
-	public static final int		GET	= 1;
-	public static final int		SET	= 2;
+	public static final int	GET	= 1;
+	public static final int	SET	= 2;
 	
 	public static final Name	get	= Name.getQualified("get");
 	public static final Name	set	= Name.getQualified("set");
 	
-	protected Property			property;
+	protected Property property;
 	
 	public PropertyParser(Property property)
 	{

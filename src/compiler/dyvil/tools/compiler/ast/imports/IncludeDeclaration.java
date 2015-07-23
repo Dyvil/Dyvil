@@ -22,12 +22,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IncludeDeclaration implements IASTNode
 {
-	private ICodePosition	position;
+	private ICodePosition position;
 	
-	private Name[]			nameParts	= new Name[3];
-	private int				namePartCount;
+	private Name[]	nameParts	= new Name[3];
+	private int		namePartCount;
 	
-	private IDyvilHeader	header;
+	private IDyvilHeader header;
 	
 	public IncludeDeclaration(ICodePosition position)
 	{

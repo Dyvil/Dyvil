@@ -175,7 +175,8 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	/*
-	 * Copying + in-place reversing the list is generally really slow, so force implementors to implement this method.
+	 * Copying + in-place reversing the list is generally really slow, so force
+	 * implementors to implement this method.
 	 */
 	@Override
 	public List<E> reversed();

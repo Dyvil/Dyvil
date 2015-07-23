@@ -25,13 +25,13 @@ public class ForStatementParser extends Parser implements IValued
 	public static final int	STATEMENT		= 128;
 	public static final int	STATEMENT_END	= 256;
 	
-	public IValueConsumer	field;
+	public IValueConsumer field;
 	
-	private Variable		variable;
-	private IValue			update;
-	private IValue			condition;
-	private IValue			action;
-	private boolean			forEach;
+	private Variable	variable;
+	private IValue		update;
+	private IValue		condition;
+	private IValue		action;
+	private boolean		forEach;
 	
 	public ForStatementParser(IValueConsumer field)
 	{

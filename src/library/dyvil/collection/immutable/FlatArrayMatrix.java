@@ -7,7 +7,7 @@ import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
 
-public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements ImmutableMatrix<E>
+public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements ImmutableMatrix<E>
 {
 	public FlatArrayMatrix()
 	{

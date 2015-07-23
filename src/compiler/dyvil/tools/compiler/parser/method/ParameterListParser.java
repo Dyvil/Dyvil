@@ -20,19 +20,19 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
 {
-	public static final int		TYPE		= 1;
-	public static final int		NAME		= 2;
-	public static final int		SEPERATOR	= 4;
+	public static final int	TYPE		= 1;
+	public static final int	NAME		= 2;
+	public static final int	SEPERATOR	= 4;
 	
-	protected IParameterList	paramList;
+	protected IParameterList paramList;
 	
-	private int					modifiers;
-	private Annotation[]		annotations	= new Annotation[2];
-	private int					annotationCount;
+	private int				modifiers;
+	private Annotation[]	annotations	= new Annotation[2];
+	private int				annotationCount;
 	
-	private IType				type;
-	private IParameter			parameter;
-	private boolean				varargs;
+	private IType		type;
+	private IParameter	parameter;
+	private boolean		varargs;
 	
 	public ParameterListParser(IParameterList paramList)
 	{
@@ -101,8 +101,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					this.type = new ArrayType(this.type);
 				}
 				
-				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type) : new MethodParameter(token.nameValue(),
-						this.type);
+				this.parameter = this.paramList instanceof IClass ? new ClassParameter(token.nameValue(), this.type)
+						: new MethodParameter(token.nameValue(), this.type);
 				this.parameter.setPosition(token.raw());
 				this.parameter.setModifiers(this.modifiers);
 				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);

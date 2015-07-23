@@ -140,16 +140,15 @@ public abstract class AbstractLMF
 		final int instantiatedArity = this.instantiatedMethodType.parameterCount();
 		if (implArity + receiverArity != capturedArity + samArity)
 		{
-			throw new LambdaConversionException(
-					String.format(
-							"Incorrect number of parameters for %s method %s; %d captured parameters, %d functional interface method parameters, %d implementation parameters",
-							this.implIsInstanceMethod ? "instance" : "static", this.implInfo, capturedArity, samArity, implArity));
+			throw new LambdaConversionException(String.format(
+					"Incorrect number of parameters for %s method %s; %d captured parameters, %d functional interface method parameters, %d implementation parameters",
+					this.implIsInstanceMethod ? "instance" : "static", this.implInfo, capturedArity, samArity, implArity));
 		}
 		if (instantiatedArity != samArity)
 		{
-			throw new LambdaConversionException(String.format(
-					"Incorrect number of parameters for %s method %s; %d instantiated parameters, %d functional interface method parameters",
-					this.implIsInstanceMethod ? "instance" : "static", this.implInfo, instantiatedArity, samArity));
+			throw new LambdaConversionException(
+					String.format("Incorrect number of parameters for %s method %s; %d instantiated parameters, %d functional interface method parameters",
+							this.implIsInstanceMethod ? "instance" : "static", this.implInfo, instantiatedArity, samArity));
 		}
 		
 		// If instance: first captured arg (receiver) must be subtype of class
@@ -180,15 +179,15 @@ public abstract class AbstractLMF
 			// check receiver type
 			if (!this.implDefiningClass.isAssignableFrom(receiverClass))
 			{
-				throw new LambdaConversionException(String.format("Invalid receiver type %s; not a subtype of implementation type %s", receiverClass,
-						this.implDefiningClass));
+				throw new LambdaConversionException(
+						String.format("Invalid receiver type %s; not a subtype of implementation type %s", receiverClass, this.implDefiningClass));
 			}
 			
 			Class<?> implReceiverClass = this.implMethod.type().parameterType(0);
 			if (implReceiverClass != this.implDefiningClass && !implReceiverClass.isAssignableFrom(receiverClass))
 			{
-				throw new LambdaConversionException(String.format("Invalid receiver type %s; not a subtype of implementation receiver type %s", receiverClass,
-						implReceiverClass));
+				throw new LambdaConversionException(
+						String.format("Invalid receiver type %s; not a subtype of implementation receiver type %s", receiverClass, implReceiverClass));
 			}
 		}
 		else
@@ -206,8 +205,8 @@ public abstract class AbstractLMF
 			Class<?> capturedParamType = this.invokedType.parameterType(i + capturedStart);
 			if (!capturedParamType.equals(implParamType))
 			{
-				throw new LambdaConversionException(String.format("Type mismatch in captured lambda parameter %d: expecting %s, found %s", i,
-						capturedParamType, implParamType));
+				throw new LambdaConversionException(
+						String.format("Type mismatch in captured lambda parameter %d: expecting %s, found %s", i, capturedParamType, implParamType));
 			}
 		}
 		// Check for adaptation match on SAM arguments
@@ -218,8 +217,8 @@ public abstract class AbstractLMF
 			Class<?> instantiatedParamType = this.instantiatedMethodType.parameterType(i + samOffset);
 			if (!isAdaptableTo(instantiatedParamType, implParamType, true))
 			{
-				throw new LambdaConversionException(String.format("Type mismatch for lambda argument %d: %s is not convertible to %s", i,
-						instantiatedParamType, implParamType));
+				throw new LambdaConversionException(
+						String.format("Type mismatch for lambda argument %d: %s is not convertible to %s", i, instantiatedParamType, implParamType));
 			}
 		}
 		
@@ -233,8 +232,8 @@ public abstract class AbstractLMF
 		}
 		if (!isAdaptableToAsReturnStrict(expectedType, samReturnType))
 		{
-			throw new LambdaConversionException(String.format("Type mismatch for lambda expected return: %s is not convertible to %s", expectedType,
-					samReturnType));
+			throw new LambdaConversionException(
+					String.format("Type mismatch for lambda expected return: %s is not convertible to %s", expectedType, samReturnType));
 		}
 	}
 	

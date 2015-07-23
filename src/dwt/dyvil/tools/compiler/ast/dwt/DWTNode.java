@@ -32,21 +32,21 @@ import dyvil.tools.compiler.util.Util;
 
 public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 {
-	public static final int		NODE		= 256;
-	public static final int		LIST		= 257;
-	public static final int		REFERENCE	= 258;
+	public static final int	NODE		= 256;
+	public static final int	LIST		= 257;
+	public static final int	REFERENCE	= 258;
 	
-	public DWTNode				parent;
+	public DWTNode parent;
 	
 	public Name					name;
 	public String				fullName;
 	public IType				type;
 	public List<DWTProperty>	properties	= new ArrayList();
 	
-	protected IClass			theClass;
-	protected IMethod			getter;
+	protected IClass	theClass;
+	protected IMethod	getter;
 	
-	private int					varIndex;
+	private int varIndex;
 	
 	public DWTNode()
 	{

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class LDCInstruction implements IInstruction
 {
-	private IValue	argument;
+	private IValue argument;
 	
 	public LDCInstruction(Object object)
 	{

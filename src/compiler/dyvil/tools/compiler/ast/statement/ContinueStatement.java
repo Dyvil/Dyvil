@@ -14,10 +14,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ContinueStatement extends ASTNode implements IStatement
 {
-	public Label		label;
-	public Name			name;
+	public Label	label;
+	public Name		name;
 	
-	private IStatement	parent;
+	private IStatement parent;
 	
 	public ContinueStatement(ICodePosition position)
 	{
@@ -72,7 +72,7 @@ public class ContinueStatement extends ASTNode implements IStatement
 		
 		this.label = ((ILoop) this.label.value).getContinueLabel();
 	}
-
+	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{

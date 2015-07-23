@@ -7,8 +7,8 @@ public class DoubleVector
 	private static final int	DEFAULT_CAPACITY	= 10;
 	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	private double[]			elementData;
-	private int					size;
+	private double[]	elementData;
+	private int			size;
 	
 	public DoubleVector()
 	{

@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class CharValue extends ASTNode implements INumericValue
 {
-	public char					value;
+	public char value;
 	
 	public CharValue(char value)
 	{

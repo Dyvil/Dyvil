@@ -26,12 +26,12 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	protected static final int	ARROW			= 7;
 	protected static final int	END				= 8;
 	
-	protected IValueConsumer	consumer;
+	protected IValueConsumer consumer;
 	
-	private IParameter[]		params;
-	private int					parameterCount;
+	private IParameter[]	params;
+	private int				parameterCount;
 	
-	private IValue				value;
+	private IValue value;
 	
 	public LambdaOrTupleParser(IValueConsumer consumer)
 	{

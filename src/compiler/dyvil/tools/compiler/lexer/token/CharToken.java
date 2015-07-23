@@ -7,13 +7,13 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public final class CharToken implements IToken
 {
-	private IToken		prev;
-	private IToken		next;
+	private IToken	prev;
+	private IToken	next;
 	
 	private final int	lineNumber;
 	private final int	start;
 	
-	private char		value;
+	private char value;
 	
 	public CharToken(IToken prev, char value, int lineNumber, int start)
 	{

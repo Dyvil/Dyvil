@@ -11,7 +11,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public class SimpleFieldVisitor implements FieldVisitor
 {
-	private IDataMember	field;
+	private IDataMember field;
 	
 	public SimpleFieldVisitor(IDataMember field)
 	{
@@ -29,18 +29,18 @@ public class SimpleFieldVisitor implements FieldVisitor
 		}
 		return null;
 	}
-
+	
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void visitAttribute(Attribute attr)
 	{
 	}
-
+	
 	@Override
 	public void visitEnd()
 	{

@@ -38,18 +38,18 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ExternalClass extends CodeClass
 {
-	public Package		thePackage;
+	public Package thePackage;
 	
-	private List<IType>	innerTypes;
+	private List<IType> innerTypes;
 	
-	private boolean		metadataResolved;
-	private boolean		superTypesResolved;
-	private boolean		genericsResolved;
-	private boolean		parametersResolved;
-	private boolean		annotationsResolved;
-	private boolean		innerTypesResolved;
+	private boolean	metadataResolved;
+	private boolean	superTypesResolved;
+	private boolean	genericsResolved;
+	private boolean	parametersResolved;
+	private boolean	annotationsResolved;
+	private boolean	innerTypesResolved;
 	
-	private String[]	classParameters;
+	private String[] classParameters;
 	
 	public ExternalClass(Name name)
 	{

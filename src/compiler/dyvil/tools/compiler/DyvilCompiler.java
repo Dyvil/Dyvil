@@ -34,8 +34,8 @@ public final class DyvilCompiler
 	public static int		maxConstantDepth	= 10;
 	public static boolean	compilationFailed;
 	
-	private static Logger				logger;
-	public static DateFormat			format		= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static Logger		logger;
+	public static DateFormat	format	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig		config		= new CompilerConfig();
 	public static Set<ICompilerPhase>	phases		= new TreeSet();
@@ -99,9 +99,9 @@ public final class DyvilCompiler
 		System.err.println();
 		
 		// Sets up States from arguments
-		for (int i = 0; i < args.length; i++)
+		for (String arg : args)
 		{
-			processArgument(args[i]);
+			processArgument(arg);
 		}
 		
 		// Sets up the logger

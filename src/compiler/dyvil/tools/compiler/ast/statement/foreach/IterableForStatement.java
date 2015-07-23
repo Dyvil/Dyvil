@@ -14,12 +14,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class IterableForStatement extends ForEachStatement
 {
-	public static final ITypeVariable	ITERABLE_TYPE	= Types.ITERABLE.getTheClass().getTypeVariable(0);
+	public static final ITypeVariable ITERABLE_TYPE = Types.ITERABLE.getTheClass().getTypeVariable(0);
 	
-	public static final Name			$iterator		= Name.getQualified("$iterator");
+	public static final Name $iterator = Name.getQualified("$iterator");
 	
-	protected Variable					iteratorVar;
-	protected IMethod					boxMethod;
+	protected Variable	iteratorVar;
+	protected IMethod	boxMethod;
 	
 	public IterableForStatement(Variable variable, IValue action)
 	{

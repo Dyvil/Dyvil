@@ -13,7 +13,7 @@ import java.util.Locale;
  */
 public class AppendableOutputStream extends PrintStream
 {
-	private Appendable	appendable;
+	private Appendable appendable;
 	
 	public AppendableOutputStream(Appendable appendable)
 	{

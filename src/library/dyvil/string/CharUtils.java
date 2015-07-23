@@ -17,25 +17,23 @@ import dyvil.annotation.infix;
 @Utility(char.class)
 public final class CharUtils
 {
-	private static final char[]		LOWER_ALPHABET		= { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-			'u', 'v', 'w', 'x', 'y', 'z'				};
-	private static final char[]		UPPER_ALPHABET		= { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-			'U', 'V', 'W', 'X', 'Y', 'Z'				};
-	private static final char[]		LOWER_VOWELS		= { 'a', 'e', 'i', 'o', 'u' };
-	private static final char[]		UPPER_VOWELS		= { 'A', 'E', 'I', 'O', 'U' };
+	private static final char[]	LOWER_ALPHABET	= { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+			'v', 'w', 'x', 'y', 'z' };
+	private static final char[]	UPPER_ALPHABET	= { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+			'V', 'W', 'X', 'Y', 'Z' };
+	private static final char[]	LOWER_VOWELS	= { 'a', 'e', 'i', 'o', 'u' };
+	private static final char[]	UPPER_VOWELS	= { 'A', 'E', 'I', 'O', 'U' };
 	
-	private static final char[]		LOWER_CONSONANTS	= { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y',
-			'z'										};
+	private static final char[] LOWER_CONSONANTS = { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
 	
-	private static final char[]		UPPER_CONSONANTS	= { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y',
-			'Z'										};
+	private static final char[] UPPER_CONSONANTS = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
 	
-	private static final String[]	CONSONANTS			= { "bl", "br", "bs", "by", "ch", "ck", "cl", "cr", "ct", "db", "dl", "dn", "dr", "ds", "dt", "dy",
-			"fl", "fr", "ft", "gh", "gl", "gn", "gr", "gs", "hd", "hl", "hr", "ht", "hy", "kl", "kn", "ks", "lc", "ld", "lf", "lk", "ls", "lt", "ly", "mb",
-			"mn", "mp", "ms", "nc", "nd", "ng", "nk", "nl", "ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp",
-			"rs", "rt", "rw", "ry", "sh", "sk", "sl", "sn", "sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl", "wn", "wt", "xc", "xp",
-			"yh", "yn", "ys", "yt"						};
-	
+	private static final String[] CONSONANTS = { "bl", "br", "bs", "by", "ch", "ck", "cl", "cr", "ct", "db", "dl", "dn", "dr", "ds", "dt", "dy", "fl", "fr",
+			"ft", "gh", "gl", "gn", "gr", "gs", "hd", "hl", "hr", "ht", "hy", "kl", "kn", "ks", "lc", "ld", "lf", "lk", "ls", "lt", "ly", "mb", "mn", "mp",
+			"ms", "nc", "nd", "ng", "nk", "nl", "ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp", "rs", "rt",
+			"rw", "ry", "sh", "sk", "sl", "sn", "sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl", "wn", "wt", "xc", "xp", "yh", "yn",
+			"ys", "yt" };
+			
 	private CharUtils()
 	{
 		// no instances

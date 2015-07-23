@@ -8,8 +8,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.*;
+import dyvil.collection.immutable.ArrayList;
 
 public class LinkedList<E> implements MutableList<E>, Deque<E>
 {
@@ -53,8 +53,8 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	{
 		return new Iterator<E>()
 		{
-			Node<E>	lastReturned;
-			Node<E>	next	= LinkedList.this.first;
+			Node<E> lastReturned;
+			Node<E> next = LinkedList.this.first;
 			
 			@Override
 			public boolean hasNext()
@@ -100,8 +100,8 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	{
 		return new Iterator<E>()
 		{
-			Node<E>	lastReturned;
-			Node<E>	prev	= LinkedList.this.last;
+			Node<E> lastReturned;
+			Node<E> prev = LinkedList.this.last;
 			
 			@Override
 			public boolean hasNext()
@@ -229,7 +229,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	{
 		Node<E> node = this.first;
 		for (; index > 0; index--)
+		{
 			node = node.next;
+		}
 		return node;
 	}
 	
@@ -572,9 +574,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	@Override
 	public void reverse()
 	{
-		Node temp = first;
-		first = last;
-		Node p = last = temp;
+		Node temp = this.first;
+		this.first = this.last;
+		Node p = this.last = temp;
 		
 		while (p != null)
 		{

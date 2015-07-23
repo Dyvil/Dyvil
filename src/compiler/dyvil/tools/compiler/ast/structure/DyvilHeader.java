@@ -34,21 +34,21 @@ import dyvil.tools.compiler.sources.FileType;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
-	public final CodeFile			inputFile;
-	public final File				outputDirectory;
-	public final File				outputFile;
+	public final CodeFile	inputFile;
+	public final File		outputDirectory;
+	public final File		outputFile;
 	
-	public final String				name;
-	public Package					pack;
+	public final String	name;
+	public Package		pack;
 	
-	protected TokenIterator			tokens;
-	protected MarkerList			markers		= new MarkerList();
+	protected TokenIterator	tokens;
+	protected MarkerList	markers	= new MarkerList();
 	
-	protected PackageDeclaration	packageDeclaration;
+	protected PackageDeclaration packageDeclaration;
 	
-	protected ImportDeclaration[]	imports		= new ImportDeclaration[5];
+	protected ImportDeclaration[]	imports	= new ImportDeclaration[5];
 	protected int					importCount;
-	protected ImportDeclaration[]	usings		= new ImportDeclaration[1];
+	protected ImportDeclaration[]	usings	= new ImportDeclaration[1];
 	protected int					usingCount;
 	protected IncludeDeclaration[]	includes;
 	protected int					includeCount;
@@ -56,7 +56,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected Map<Name, Operator>	operators	= new IdentityHashMap();
 	protected Map<Name, Operator>	inheritedOperators;
 	
-	protected Map<Name, ITypeAlias>	typeAliases	= new IdentityHashMap();
+	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap();
 	
 	public DyvilHeader(String name)
 	{

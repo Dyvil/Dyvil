@@ -10,6 +10,7 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
+import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
 
 import static dyvil.collection.impl.AbstractHashMap.*;
@@ -134,10 +135,10 @@ public class HashSet<E> implements MutableSet<E>
 	{
 		return new Iterator<E>()
 		{
-			HashElement<E>	next;		// next entry to return
-			HashElement<E>	current;	// current entry
-			int				index;		// current slot
-										
+			HashElement<E> next; // next entry to return
+			HashElement<E> current; // current entry
+			int index; // current slot
+			
 			{
 				HashElement<E>[] t = HashSet.this.elements;
 				this.current = this.next = null;
@@ -351,7 +352,7 @@ public class HashSet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		int len = MathUtils.powerOfTwo(HashMap.grow(this.size));
+		int len = MathUtils.powerOfTwo(AbstractHashMap.grow(this.size));
 		HashElement[] newEntries = new HashElement[len];
 		for (HashElement<E> e : this.elements)
 		{

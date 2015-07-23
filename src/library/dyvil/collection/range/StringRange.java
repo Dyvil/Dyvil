@@ -84,7 +84,7 @@ public class StringRange implements Range<String>
 	{
 		return new Iterator<String>()
 		{
-			private String	current	= StringRange.this.first;
+			private String current = StringRange.this.first;
 			
 			@Override
 			public boolean hasNext()

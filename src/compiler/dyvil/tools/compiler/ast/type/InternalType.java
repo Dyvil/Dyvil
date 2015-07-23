@@ -22,7 +22,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class InternalType implements IType
 {
-	protected String	internalName;
+	protected String internalName;
 	
 	public InternalType(String internalName)
 	{

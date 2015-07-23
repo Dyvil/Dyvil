@@ -3,7 +3,7 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.lang.*;
+import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 
 import dyvil.annotation.Covariant;

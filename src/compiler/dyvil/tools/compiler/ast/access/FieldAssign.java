@@ -147,7 +147,7 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		{
 			Name name = Name.getQualified(this.name.qualified + "_$eq");
 			IArguments arg = new SingleArgument(this.value);
-			IMethod m = ICall.resolveMethod(context, instance, name, arg);
+			IMethod m = ICall.resolveMethod(context, this.instance, name, arg);
 			if (m != null)
 			{
 				MethodCall mc = new MethodCall(this.position, this.instance, name);

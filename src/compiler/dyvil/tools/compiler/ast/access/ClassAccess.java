@@ -23,7 +23,7 @@ public final class ClassAccess extends ASTNode implements IValue
 	private static final byte	OBJECT_ACCESS	= 1;
 	private static final byte	APPLY_CALL		= 2;
 	
-	public IType				type;
+	public IType type;
 	
 	public ClassAccess(IType type)
 	{

@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 public final class JarLibrary extends Library
 {
-	private FileSystem	jarFileSystem;
+	private FileSystem jarFileSystem;
 	
 	public JarLibrary(File file)
 	{

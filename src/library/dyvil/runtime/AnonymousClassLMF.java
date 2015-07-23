@@ -18,16 +18,16 @@ import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Type;
 
-import sun.misc.Unsafe;
-
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
 
+import sun.misc.Unsafe;
+
 public final class AnonymousClassLMF extends AbstractLMF
 {
-	private static final Unsafe					UNSAFE					= ReflectUtils.unsafe;
+	private static final Unsafe UNSAFE = ReflectUtils.unsafe;
 	
-	private static final MethodHandles.Lookup	LOOKUP;
+	private static final MethodHandles.Lookup LOOKUP;
 	
 	static
 	{
@@ -46,75 +46,75 @@ public final class AnonymousClassLMF extends AbstractLMF
 		LOOKUP = lookup;
 	}
 	
-	private static final int					CLASSFILE_VERSION		= 52;
-	private static final String					METHOD_DESCRIPTOR_VOID	= "()V";
-	private static final String					JAVA_LANG_OBJECT		= "java/lang/Object";
-	private static final String					NAME_CTOR				= "<init>";
-	private static final String					NAME_FACTORY			= "get$Lambda";
+	private static final int	CLASSFILE_VERSION		= 52;
+	private static final String	METHOD_DESCRIPTOR_VOID	= "()V";
+	private static final String	JAVA_LANG_OBJECT		= "java/lang/Object";
+	private static final String	NAME_CTOR				= "<init>";
+	private static final String	NAME_FACTORY			= "get$Lambda";
 	
-	private static final String[]				EMPTY_STRING_ARRAY		= new String[0];
+	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
 	/**
 	 * Directory to dump generated class file bytecode.
 	 */
-	private static final File					dumpDirectory			= null;
+	private static final File dumpDirectory = null;
 	
 	/** Used to ensure that each spun class name is unique */
-	private static final AtomicInteger			counter					= new AtomicInteger(0);
+	private static final AtomicInteger counter = new AtomicInteger(0);
 	
 	/* See context values in AbstractValidatingLambdaMetafactory * */
 	
 	/**
 	 * Name of type containing implementation "CC"
 	 */
-	private final String						implMethodClassName;
+	private final String implMethodClassName;
 	
 	/**
 	 * Name of implementation method "impl"
 	 */
-	private final String						implMethodName;
+	private final String implMethodName;
 	
 	/**
 	 * Type descriptor for implementation methods "(I)Ljava/lang/String;"
 	 */
-	private final String						implMethodDesc;
+	private final String implMethodDesc;
 	
 	/**
 	 * Class for implementation method return type "Ljava/lang/String;"
 	 */
-	private final Class<?>						implMethodReturnClass;
+	private final Class<?> implMethodReturnClass;
 	
 	/**
 	 * Generated class constructor type "(CC)void"
 	 */
-	private final MethodType					constructorType;
+	private final MethodType constructorType;
 	
 	/**
 	 * ASM class writer
 	 */
-	private final ClassWriter					cw;
+	private final ClassWriter cw;
 	
 	/**
 	 * Generated names for the constructor arguments
 	 */
-	private final String[]						argNames;
+	private final String[] argNames;
 	
 	/**
 	 * Type descriptors for the constructor arguments
 	 */
-	private final String[]						argDescs;
+	private final String[] argDescs;
 	
 	/**
 	 * Generated name for the generated class "X$Lambda$1"
 	 */
-	private final String						lambdaClassName;
+	private final String lambdaClassName;
 	
 	/**
 	 * Field that represents the return value of the {@code toString()} method
 	 * of this object. Supplied by the compiler or computed from the invoked
 	 * type, i.e. the functional interface this lambda object represents.
 	 */
-	private String								toString;
+	private String toString;
 	
 	public AnonymousClassLMF(MethodHandles.Lookup caller, MethodType invokedType, String samMethodName, MethodType samMethodType, MethodHandle implMethod,
 			MethodType instantiatedMethodType, String toString) throws LambdaConversionException
@@ -196,7 +196,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		
 		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null, JAVA_LANG_OBJECT,
 				new String[] { samIntf });
-		
+				
 		// Generate final fields to be filled in by constructor
 		for (int i = 0; i < this.argDescs.length; i++)
 		{
@@ -283,7 +283,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 	
 	private class ForwardingMethodGenerator
 	{
-		private MethodVisitor	mv;
+		private MethodVisitor mv;
 		
 		ForwardingMethodGenerator(MethodVisitor mv)
 		{
@@ -302,7 +302,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 			for (int i = 0; i < AnonymousClassLMF.this.argNames.length; i++)
 			{
 				this.mv.visitVarInsn(ALOAD, 0);
-				this.mv.visitFieldInsn(GETFIELD, AnonymousClassLMF.this.lambdaClassName, AnonymousClassLMF.this.argNames[i], AnonymousClassLMF.this.argDescs[i]);
+				this.mv.visitFieldInsn(GETFIELD, AnonymousClassLMF.this.lambdaClassName, AnonymousClassLMF.this.argNames[i],
+						AnonymousClassLMF.this.argDescs[i]);
 			}
 			
 			this.convertArgumentTypes(methodType);
@@ -310,7 +311,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 			// Invoke the method we want to forward to
 			this.mv.visitMethodInsn(this.invocationOpcode(), AnonymousClassLMF.this.implMethodClassName, AnonymousClassLMF.this.implMethodName,
 					AnonymousClassLMF.this.implMethodDesc, AnonymousClassLMF.this.implDefiningClass.isInterface());
-			
+					
 			// Convert the return value (if any) and return it
 			// Note: if adapting from non-void to void, the 'return'
 			// instruction will pop the unneeded result

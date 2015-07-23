@@ -9,7 +9,7 @@ import dyvil.tools.compiler.util.Util;
 
 public class ResolveTypesPhase implements ICompilerPhase
 {
-	private int	id;
+	private int id;
 	
 	public ResolveTypesPhase(int id)
 	{

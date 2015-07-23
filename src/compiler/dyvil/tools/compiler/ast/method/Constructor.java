@@ -39,16 +39,16 @@ import dyvil.tools.compiler.util.Util;
 
 public class Constructor extends Member implements IConstructor
 {
-	protected IClass		theClass;
+	protected IClass theClass;
 	
 	protected IParameter[]	parameters	= new MethodParameter[3];
 	protected int			parameterCount;
 	protected IType[]		exceptions;
 	protected int			exceptionCount;
 	
-	public IValue			value;
+	public IValue value;
 	
-	protected IMethod		overrideMethod;
+	protected IMethod overrideMethod;
 	
 	public Constructor(IClass iclass)
 	{
@@ -666,8 +666,9 @@ public class Constructor extends Member implements IConstructor
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				
 		mw.setThisType(this.theClass.getInternalName());
 		
 		for (int i = 0; i < this.annotationCount; i++)

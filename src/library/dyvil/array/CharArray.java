@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface CharArray
 {
-	public static final char[]	EMPTY	= new char[0];
+	public static final char[] EMPTY = new char[0];
 	
 	public static char[] apply()
 	{

@@ -18,7 +18,7 @@ public class Double implements Number
 	public static final double	negative_infinity	= java.lang.Double.NEGATIVE_INFINITY;
 	public static final byte	size				= java.lang.Double.SIZE;
 	
-	protected double			value;
+	protected double value;
 	
 	public static Double apply(double v)
 	{

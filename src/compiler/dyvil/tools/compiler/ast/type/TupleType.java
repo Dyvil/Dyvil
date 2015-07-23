@@ -29,8 +29,8 @@ public final class TupleType implements IType, ITypeList
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
 	
-	protected IType[]				types;
-	protected int					typeCount;
+	protected IType[]	types;
+	protected int		typeCount;
 	
 	public TupleType()
 	{

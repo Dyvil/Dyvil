@@ -20,7 +20,7 @@ import dyvil.collection.iterator.EmptyIterator;
 @NilConvertible
 public @object class EmptySet<E> implements ImmutableSet<E>
 {
-	public static final EmptySet	instance	= new EmptySet();
+	public static final EmptySet instance = new EmptySet();
 	
 	public static <E> EmptySet<E> apply()
 	{

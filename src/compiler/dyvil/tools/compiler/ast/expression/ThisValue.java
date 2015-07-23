@@ -14,7 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ThisValue extends ASTNode implements IValue
 {
-	public IType	type	= Types.UNKNOWN;
+	public IType type = Types.UNKNOWN;
 	
 	public ThisValue(IType type)
 	{

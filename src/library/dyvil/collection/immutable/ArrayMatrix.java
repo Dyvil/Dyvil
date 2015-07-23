@@ -15,10 +15,10 @@ import dyvil.tuple.Tuple2;
 
 public class ArrayMatrix<E> implements ImmutableMatrix<E>
 {
-	private int			rows;
-	private int			columns;
+	private int	rows;
+	private int	columns;
 	
-	private Object[][]	cells;
+	private Object[][] cells;
 	
 	public ArrayMatrix(E[]... cells)
 	{
@@ -124,8 +124,8 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		return new Iterator<E>()
 		{
-			private int	row;
-			private int	column;
+			private int row;
+			private int column;
 			
 			@Override
 			public boolean hasNext()

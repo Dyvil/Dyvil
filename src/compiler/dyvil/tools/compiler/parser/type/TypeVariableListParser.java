@@ -9,7 +9,7 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class TypeVariableListParser extends Parser
 {
-	protected IGeneric	generic;
+	protected IGeneric generic;
 	
 	public TypeVariableListParser(IGeneric generic)
 	{

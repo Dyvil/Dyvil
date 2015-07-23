@@ -22,12 +22,12 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	public static final Name	$doCondition	= Name.getQualified("$doCondition");
 	public static final Name	$doEnd			= Name.getQualified("$doEnd");
 	
-	public IValue				action;
-	public IValue				condition;
+	public IValue	action;
+	public IValue	condition;
 	
-	public Label				startLabel;
-	public Label				conditionLabel;
-	public Label				endLabel;
+	public Label	startLabel;
+	public Label	conditionLabel;
+	public Label	endLabel;
 	
 	public DoStatement(ICodePosition position)
 	{
@@ -43,7 +43,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	{
 		return DO_WHILE;
 	}
-
+	
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
@@ -85,12 +85,12 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (name == $doEnd)
 		{
-			return this.endLabel; 
+			return this.endLabel;
 		}
 		
 		return null;
 	}
-
+	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

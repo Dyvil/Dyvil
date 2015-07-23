@@ -29,25 +29,25 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ClassBodyParser extends Parser implements ITypeConsumer
 {
-	public static final int			TYPE			= 1;
-	public static final int			NAME			= 2;
-	public static final int			GENERICS_END	= 4;
-	public static final int			PARAMETERS		= 8;
-	public static final int			PARAMETERS_END	= 16;
-	public static final int			FIELD_END		= 32;
-	public static final int			PROPERTY_END	= 64;
-	public static final int			METHOD_VALUE	= 128;
-	public static final int			METHOD_END		= 256;
+	public static final int	TYPE			= 1;
+	public static final int	NAME			= 2;
+	public static final int	GENERICS_END	= 4;
+	public static final int	PARAMETERS		= 8;
+	public static final int	PARAMETERS_END	= 16;
+	public static final int	FIELD_END		= 32;
+	public static final int	PROPERTY_END	= 64;
+	public static final int	METHOD_VALUE	= 128;
+	public static final int	METHOD_END		= 256;
 	
 	protected IClass				theClass;
 	protected IClassBodyConsumer	consumer;
 	
-	private IType					type;
-	private int						modifiers;
-	private Annotation[]			annotations		= new Annotation[2];
-	private int						annotationCount;
+	private IType			type;
+	private int				modifiers;
+	private Annotation[]	annotations	= new Annotation[2];
+	private int				annotationCount;
 	
-	private IMember					member;
+	private IMember member;
 	
 	public ClassBodyParser(IClass theClass, IClassBodyConsumer consumer)
 	{

@@ -18,7 +18,7 @@ public abstract class Parameter extends Member implements IParameter
 	protected int		index;
 	protected boolean	varargs;
 	
-	protected IValue	defaultValue;
+	protected IValue defaultValue;
 	
 	public Parameter()
 	{

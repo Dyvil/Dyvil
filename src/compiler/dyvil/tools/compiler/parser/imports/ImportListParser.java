@@ -9,7 +9,7 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public class ImportListParser extends Parser
 {
-	protected IImportList	theImport;
+	protected IImportList theImport;
 	
 	public ImportListParser(IImportList list)
 	{

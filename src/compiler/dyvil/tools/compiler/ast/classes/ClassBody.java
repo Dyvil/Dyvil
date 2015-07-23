@@ -20,10 +20,10 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassBody extends ASTNode implements IClassBody
 {
-	public IClass			theClass;
+	public IClass theClass;
 	
-	public IClass[]			classes;
-	public int				classCount;
+	public IClass[]	classes;
+	public int		classCount;
 	
 	private IField[]		fields			= new IField[3];
 	private int				fieldCount;
@@ -34,7 +34,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	private IProperty[]		properties		= new IProperty[3];
 	private int				propertyCount;
 	
-	protected IMethod		functionalMethod;
+	protected IMethod functionalMethod;
 	
 	public ClassBody(IClass iclass)
 	{

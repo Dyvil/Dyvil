@@ -13,6 +13,7 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.immutable.ArrayMap;
+import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
 
 @NilConvertible
@@ -197,12 +198,12 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		}
 		
 		this.table = new Object[MathUtils.powerOfTwo(size << 1)];
-		this.threshold = (int) Math.min(size * loadFactor, HashMap.MAX_ARRAY_SIZE + 1);
+		this.threshold = (int) Math.min(size * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
 	
 	public IdentityHashMap(Map<K, V> map)
 	{
-		this(HashMap.grow(map.size()), DEFAULT_LOAD_FACTOR);
+		this(AbstractHashMap.grow(map.size()), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
 			this.subscript_$eq(entry.getKey(), entry.getValue());
@@ -302,13 +303,13 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		
 		Object[] oldTable = this.table;
 		int oldLength = oldTable.length;
-		if (newLength - HashMap.MAX_ARRAY_SIZE > 0)
+		if (newLength - AbstractHashMap.MAX_ARRAY_SIZE > 0)
 		{
-			if (oldLength == HashMap.MAX_ARRAY_SIZE)
+			if (oldLength == AbstractHashMap.MAX_ARRAY_SIZE)
 			{
 				return;
 			}
-			newLength = HashMap.MAX_ARRAY_SIZE;
+			newLength = AbstractHashMap.MAX_ARRAY_SIZE;
 		}
 		
 		Object[] newTable = new Object[newLength];
@@ -503,7 +504,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		
 		return false;
 	}
-
+	
 	@Override
 	public V replace(K key, V newValue)
 	{

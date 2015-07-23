@@ -23,7 +23,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public final class ClassGenericType extends GenericType
 {
-	protected IClass	theClass;
+	protected IClass theClass;
 	
 	public ClassGenericType()
 	{

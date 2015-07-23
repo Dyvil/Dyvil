@@ -26,7 +26,7 @@ public class NestedMethod extends Method
 	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
 	
-	public transient IContext	context;
+	public transient IContext context;
 	
 	public NestedMethod(IClass iclass)
 	{
@@ -153,9 +153,9 @@ public class NestedMethod extends Method
 			modifiers |= Modifiers.ABSTRACT;
 		}
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
-				this.getExceptions()));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				
 		if (this.thisClass != null)
 		{
 			mw.setThisType(this.theClass.getInternalName());

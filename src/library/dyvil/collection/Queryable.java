@@ -17,7 +17,8 @@ import java.util.stream.StreamSupport;
  * {@link #reduce(BiFunction)}, {@link #map(Function)},
  * {@link #flatMap(Function)} and {@link #filter(Predicate)}.
  * 
- * @param <E> the element type
+ * @param <E>
+ *            the element type
  */
 public interface Queryable<E> extends Iterable<E>
 {

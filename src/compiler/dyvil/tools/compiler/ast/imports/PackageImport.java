@@ -18,7 +18,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class PackageImport extends Import
 {
-	private IContext	context;
+	private IContext context;
 	
 	public PackageImport(ICodePosition position)
 	{

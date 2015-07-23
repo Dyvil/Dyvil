@@ -1,6 +1,5 @@
 package dyvil.random;
 
-
 @FunctionalInterface
 public interface Random
 {

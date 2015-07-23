@@ -56,6 +56,7 @@ final class Frame
 	static final int			NULL					= BASE | 5;
 	static final int			UNINITIALIZED_THIS		= BASE | 6;
 	static final int[]			SIZE;
+	
 	static
 	{
 		int i;
@@ -68,14 +69,15 @@ final class Frame
 		}
 		SIZE = b;
 	}
-	Label						owner;
-	int[]						inputLocals;
-	int[]						inputStack;
-	private int[]				outputLocals;
-	private int[]				outputStack;
-	private int					outputStackTop;
-	private int					initializationCount;
-	private int[]				initializations;
+	
+	Label			owner;
+	int[]			inputLocals;
+	int[]			inputStack;
+	private int[]	outputLocals;
+	private int[]	outputStack;
+	private int		outputStackTop;
+	private int		initializationCount;
+	private int[]	initializations;
 	
 	private int get(final int local)
 	{
@@ -174,7 +176,7 @@ final class Frame
 			// stores the internal name, not the descriptor!
 			t = desc.substring(index + 1, desc.length() - 1);
 			return OBJECT | cw.addType(t);
-			// case '[':
+		// case '[':
 		default:
 			// extracts the dimensions and the element type
 			int data;

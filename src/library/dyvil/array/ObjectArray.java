@@ -20,7 +20,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface ObjectArray
 {
-	public static final Object[]	EMPTY	= new Object[0];
+	public static final Object[] EMPTY = new Object[0];
 	
 	public static <T> T[] apply()
 	{

@@ -14,10 +14,10 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class BytecodeVisitor implements MethodVisitor
 {
-	private ExternalMethod	method;
+	private ExternalMethod method;
 	
-	private boolean			inline;
-	private Bytecode		bytecode;
+	private boolean		inline;
+	private Bytecode	bytecode;
 	
 	public BytecodeVisitor(ExternalMethod method)
 	{
@@ -159,7 +159,7 @@ public final class BytecodeVisitor implements MethodVisitor
 		}
 	}
 	
-	private Map<Label, dyvil.tools.compiler.ast.statement.Label>	labels	= new IdentityHashMap();
+	private Map<Label, dyvil.tools.compiler.ast.statement.Label> labels = new IdentityHashMap();
 	
 	private dyvil.tools.compiler.ast.statement.Label getLabel(Label target)
 	{

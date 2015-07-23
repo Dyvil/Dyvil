@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ReturnStatement extends ASTNode implements IStatement, IValued
 {
-	public IValue		value;
+	public IValue value;
 	
 	public ReturnStatement(ICodePosition position)
 	{

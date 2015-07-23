@@ -19,9 +19,9 @@ public class DWTParser extends Parser implements IValued
 	public static final int	EQUALS			= 8;
 	public static final int	BODY_END		= 64;
 	
-	protected DWTNode		node;
+	protected DWTNode node;
 	
-	private String			name;
+	private String name;
 	
 	public DWTParser(DWTNode node)
 	{

@@ -15,14 +15,14 @@ public final class MarkerList implements Iterable<Marker>
 	{
 		IGNORE, INFO, WARNING, ERROR;
 		
-		static Map<String, MarkerType>	map	= new HashMap();
+		static Map<String, MarkerType> map = new HashMap();
 	}
 	
 	private Marker[]	markers;
 	private int			markerCount;
 	
-	private int			warnings;
-	private int			errors;
+	private int	warnings;
+	private int	errors;
 	
 	public MarkerList()
 	{

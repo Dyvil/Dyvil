@@ -22,7 +22,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ClassType implements IType
 {
-	public IClass	theClass;
+	public IClass theClass;
 	
 	public ClassType()
 	{

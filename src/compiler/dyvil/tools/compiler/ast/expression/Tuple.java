@@ -26,12 +26,12 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Tuple extends ASTNode implements IValue, IValueList
 {
-	private IValue[]			values;
-	private int					valueCount;
+	private IValue[]	values;
+	private int			valueCount;
 	
-	private IType				tupleType;
-	private IMethod				method;
-	private IArguments			arguments;
+	private IType		tupleType;
+	private IMethod		method;
+	private IArguments	arguments;
 	
 	public Tuple(ICodePosition position)
 	{

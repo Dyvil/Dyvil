@@ -25,7 +25,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class TypeVarType implements IType
 {
-	public ITypeVariable	typeVar;
+	public ITypeVariable typeVar;
 	
 	public TypeVarType()
 	{
@@ -204,7 +204,8 @@ public class TypeVarType implements IType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typeVar.getName().qualified);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;",
+				false);
 	}
 	
 	@Override

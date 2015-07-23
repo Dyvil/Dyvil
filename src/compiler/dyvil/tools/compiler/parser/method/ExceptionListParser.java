@@ -14,7 +14,7 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 	private static final int	TYPE		= 1;
 	private static final int	SEPARATOR	= 2;
 	
-	protected IExceptionList	exceptionList;
+	protected IExceptionList exceptionList;
 	
 	public ExceptionListParser(IExceptionList list)
 	{

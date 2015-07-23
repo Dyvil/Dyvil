@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import dyvil.collection.List;
 import dyvil.tools.compiler.ast.IASTNode;

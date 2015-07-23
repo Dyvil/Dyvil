@@ -31,7 +31,7 @@ public interface IParameter extends IVariable, IClassMember
 	
 	public default void setVarargs(boolean varargs)
 	{
-		
+	
 	}
 	
 	public default boolean isVarargs()

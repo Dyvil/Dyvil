@@ -40,14 +40,14 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
 	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
-	protected IPattern					pattern;
-	protected IValue					condition;
-	protected IValue					action;
+	protected IPattern	pattern;
+	protected IValue	condition;
+	protected IValue	action;
 	
-	protected IType						type;
-	private String						internalClassName;
+	protected IType	type;
+	private String	internalClassName;
 	
-	private transient IContext			context;
+	private transient IContext context;
 	
 	public CaseExpression(ICodePosition position)
 	{

@@ -48,34 +48,34 @@ import dyvil.tools.compiler.util.Util;
 
 public class CodeClass extends ASTNode implements IClass
 {
-	protected IDyvilHeader			unit;
-	protected IClass				outerClass;
+	protected IDyvilHeader	unit;
+	protected IClass		outerClass;
 	
-	protected Annotation[]			annotations;
-	protected int					annotationCount;
-	protected int					modifiers;
+	protected Annotation[]	annotations;
+	protected int			annotationCount;
+	protected int			modifiers;
 	
-	protected Name					name;
-	protected String				fullName;
-	protected String				internalName;
+	protected Name		name;
+	protected String	fullName;
+	protected String	internalName;
 	
-	protected ITypeVariable[]		generics;
-	protected int					genericCount;
+	protected ITypeVariable[]	generics;
+	protected int				genericCount;
 	
-	protected IParameter[]			parameters;
-	protected int					parameterCount;
+	protected IParameter[]	parameters;
+	protected int			parameterCount;
 	
-	protected IType					superType	= Types.OBJECT;
-	protected IType[]				interfaces;
-	protected int					interfaceCount;
+	protected IType		superType	= Types.OBJECT;
+	protected IType[]	interfaces;
+	protected int		interfaceCount;
 	
-	protected IType					type;
+	protected IType type;
 	
 	protected IClassCompilable[]	compilables;
 	protected int					compilableCount;
 	
-	protected IClassBody			body;
-	protected IClassMetadata		metadata;
+	protected IClassBody		body;
+	protected IClassMetadata	metadata;
 	
 	public CodeClass()
 	{
@@ -460,7 +460,7 @@ public class CodeClass extends ASTNode implements IClass
 	public boolean isSubTypeOf(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		if (this == iclass || (this.superType != null && type.isSuperClassOf(this.superType)))
+		if (this == iclass || this.superType != null && type.isSuperClassOf(this.superType))
 		{
 			return true;
 		}

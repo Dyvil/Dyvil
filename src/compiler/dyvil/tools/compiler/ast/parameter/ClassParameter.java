@@ -22,7 +22,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassParameter extends Parameter implements IField
 {
-	public IClass	theClass;
+	public IClass theClass;
 	
 	public ClassParameter()
 	{
@@ -46,7 +46,7 @@ public final class ClassParameter extends Parameter implements IField
 		this.type = type;
 		this.modifiers = access;
 	}
-
+	
 	@Override
 	public boolean isField()
 	{

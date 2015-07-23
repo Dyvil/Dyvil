@@ -7,9 +7,9 @@ import java.util.function.Predicate;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 
-public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements MutableSet<E>
 {
-	protected MutableMap<E, Object>	map;
+	protected MutableMap<E, Object> map;
 	
 	public MapBasedSet(MutableMap<E, ? extends Object> map)
 	{

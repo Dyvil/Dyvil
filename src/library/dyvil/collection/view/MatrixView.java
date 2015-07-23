@@ -15,7 +15,7 @@ import dyvil.tuple.Tuple2;
 
 public class MatrixView<E> implements ImmutableMatrix<E>
 {
-	protected final Matrix<E>	matrix;
+	protected final Matrix<E> matrix;
 	
 	public MatrixView(Matrix<E> matrix)
 	{

@@ -36,19 +36,19 @@ class Context
 	char[]		buffer;
 	int[]		bootstrapMethods;
 	
-	int			access;
-	String		name;
-	String		desc;
+	int		access;
+	String	name;
+	String	desc;
 	
 	Label[]		labels;
 	int			typeRef;
 	TypePath	typePath;
 	
-	int			offset;
-	Label[]		start;
-	Label[]		end;
-	int[]		index;
-	int			mode;
+	int		offset;
+	Label[]	start;
+	Label[]	end;
+	int[]	index;
+	int		mode;
 	
 	int			localCount;
 	int			localDiff;

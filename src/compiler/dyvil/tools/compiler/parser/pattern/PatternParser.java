@@ -14,14 +14,14 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class PatternParser extends Parser
 {
-	public static final int		PATTERN			= 1;
-	public static final int		ARRAY_END		= 2;
-	public static final int		TUPLE_END		= 4;
-	public static final int		CASE_CLASS_END	= 8;
+	public static final int	PATTERN			= 1;
+	public static final int	ARRAY_END		= 2;
+	public static final int	TUPLE_END		= 4;
+	public static final int	CASE_CLASS_END	= 8;
 	
-	protected IPatternConsumer	consumer;
+	protected IPatternConsumer consumer;
 	
-	private IPattern			pattern;
+	private IPattern pattern;
 	
 	public PatternParser(IPatternConsumer consumer)
 	{

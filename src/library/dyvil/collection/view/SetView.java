@@ -13,7 +13,7 @@ import dyvil.collection.iterator.ImmutableIterator;
 
 public class SetView<E> implements ImmutableSet<E>
 {
-	protected final Set<E>	set;
+	protected final Set<E> set;
 	
 	public SetView(Set<E> collection)
 	{

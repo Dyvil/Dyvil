@@ -40,11 +40,11 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private static final int	POST_GENERICS	= PARAMETERS | POST_PARAMETERS;
 	private static final int	POST_NAME		= PARAMETERS | GENERICS | POST_PARAMETERS;
 	
-	protected IClassList		classList;
-	private CodeClass			theClass;
+	protected IClassList	classList;
+	private CodeClass		theClass;
 	
-	private int					modifiers;
-	private Annotation[]		annotations;
+	private int				modifiers;
+	private Annotation[]	annotations;
 	
 	public ClassDeclarationParser(IDyvilHeader header)
 	{

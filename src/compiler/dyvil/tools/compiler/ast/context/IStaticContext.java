@@ -54,7 +54,7 @@ public interface IStaticContext extends IContext
 	@Override
 	public default void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-		
+	
 	}
 	
 	@Override

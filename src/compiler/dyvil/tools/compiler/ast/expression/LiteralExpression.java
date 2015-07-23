@@ -17,11 +17,11 @@ import dyvil.tools.compiler.util.Util;
 
 public final class LiteralExpression implements IValue
 {
-	private IValue literal;
+	private IValue		literal;
 	private IArguments	arguments;
 	private IType		type;
 	
-	private IMethod		method;
+	private IMethod method;
 	
 	public LiteralExpression(IValue literal)
 	{

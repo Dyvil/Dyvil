@@ -5,7 +5,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class PackageDeclaration extends ASTNode
 {
-	public String	thePackage;
+	public String thePackage;
 	
 	public PackageDeclaration(ICodePosition position)
 	{

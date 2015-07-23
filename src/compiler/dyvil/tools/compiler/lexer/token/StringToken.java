@@ -7,15 +7,15 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public final class StringToken implements IToken
 {
-	private IToken		prev;
-	private IToken		next;
+	private IToken	prev;
+	private IToken	next;
 	
 	private final int	type;
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
 	
-	private String		value;
+	private String value;
 	
 	public StringToken(IToken prev, int type, String value, int lineNumber, int start, int end)
 	{

@@ -23,7 +23,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	protected String	className;
+	protected String className;
 	
 	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className)
 	{

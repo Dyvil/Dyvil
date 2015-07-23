@@ -12,9 +12,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class WildcardValue implements IConstantValue
 {
-	public ICodePosition	position;
+	public ICodePosition position;
 	
-	private IType			type	= Types.UNKNOWN;
+	private IType type = Types.UNKNOWN;
 	
 	public WildcardValue(ICodePosition position)
 	{

@@ -8,7 +8,7 @@ import dyvil.annotation.object;
 @NilConvertible
 public @object class NullType implements Type<Object>
 {
-	public static final NullType	instance	= new NullType();
+	public static final NullType instance = new NullType();
 	
 	public static NullType apply()
 	{

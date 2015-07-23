@@ -8,7 +8,7 @@ import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.util.ImmutableException;
 
-public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableMap<K, V>
+public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements ImmutableMap<K, V>
 {
 	public static <K, V> Builder<K, V> builder()
 	{
@@ -47,9 +47,9 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
-		private Object[]			keys;
-		private Object[]			values;
-		private int					size;
+		private Object[]	keys;
+		private Object[]	values;
+		private int			size;
 		
 		public Builder()
 		{

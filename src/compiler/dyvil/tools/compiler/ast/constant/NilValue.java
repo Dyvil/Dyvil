@@ -18,9 +18,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class NilValue implements IValue
 {
-	private ICodePosition		position;
-	private IType				requiredType;
-	private IMethod				method;
+	private ICodePosition	position;
+	private IType			requiredType;
+	private IMethod			method;
 	
 	public NilValue()
 	{

@@ -11,7 +11,7 @@ public class I18n
 		// do not instantiate
 	}
 	
-	private static final String			BUNDLE_NAME		= "dyvil.tools.compiler.lang.lang"; //$NON-NLS-1$
+	private static final String			BUNDLE_NAME		= "dyvil.tools.compiler.lang.lang";	//$NON-NLS-1$
 	private static final ResourceBundle	RESOURCE_BUNDLE	= loadBundle();
 	
 	private static ResourceBundle loadBundle()

@@ -113,10 +113,10 @@ final class Item
 			this.hashCode = 0x7FFFFFFF & type + strVal1.hashCode() * strVal2.hashCode();
 			return;
 		}
-		// ClassWriter.FIELD:
-		// ClassWriter.METH:
-		// ClassWriter.IMETH:
-		// ClassWriter.HANDLE_BASE + 1..9
+			// ClassWriter.FIELD:
+			// ClassWriter.METH:
+			// ClassWriter.IMETH:
+			// ClassWriter.HANDLE_BASE + 1..9
 		default:
 			this.hashCode = 0x7FFFFFFF & type + strVal1.hashCode() * strVal2.hashCode() * strVal3.hashCode();
 		}
@@ -163,10 +163,10 @@ final class Item
 		{
 			return i.longVal == this.longVal && i.strVal1.equals(this.strVal1) && i.strVal2.equals(this.strVal2);
 		}
-		// case ClassWriter.FIELD:
-		// case ClassWriter.METH:
-		// case ClassWriter.IMETH:
-		// case ClassWriter.HANDLE_BASE + 1..9
+			// case ClassWriter.FIELD:
+			// case ClassWriter.METH:
+			// case ClassWriter.IMETH:
+			// case ClassWriter.HANDLE_BASE + 1..9
 		default:
 			return i.strVal1.equals(this.strVal1) && i.strVal2.equals(this.strVal2) && i.strVal3.equals(this.strVal3);
 		}

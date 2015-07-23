@@ -17,8 +17,8 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class RangeForStatement extends ForEachStatement
 {
-	public IValue		value1;
-	public IValue		value2;
+	public IValue	value1;
+	public IValue	value2;
 	
 	private Variable	startVar;
 	private Variable	endVar;

@@ -10,7 +10,7 @@ public final class Console
 	
 	private Console()
 	{
-		
+	
 	}
 	
 	public static void setOut(PrintStream out)

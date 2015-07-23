@@ -18,7 +18,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 	public static final int	THEN			= 4;
 	public static final int	ELSE			= 8;
 	
-	protected IfStatement	statement;
+	protected IfStatement statement;
 	
 	public IfStatementParser(IfStatement statement)
 	{

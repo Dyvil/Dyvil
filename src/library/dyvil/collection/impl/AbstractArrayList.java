@@ -10,10 +10,10 @@ import dyvil.collection.List;
 
 public abstract class AbstractArrayList<E> implements List<E>
 {
-	protected static final int	INITIAL_CAPACITY	= 10;
+	protected static final int INITIAL_CAPACITY = 10;
 	
-	protected Object[]			elements;
-	protected int				size;
+	protected Object[]	elements;
+	protected int		size;
 	
 	public AbstractArrayList(E... elements)
 	{
@@ -84,7 +84,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	{
 		return new Iterator<E>()
 		{
-			int	index;
+			int index;
 			
 			@Override
 			public boolean hasNext()
@@ -121,7 +121,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	{
 		return new Iterator<E>()
 		{
-			int	index	= AbstractArrayList.this.size - 1;
+			int index = AbstractArrayList.this.size - 1;
 			
 			@Override
 			public boolean hasNext()

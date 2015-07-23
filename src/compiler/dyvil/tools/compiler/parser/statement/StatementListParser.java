@@ -22,11 +22,11 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	private static final int	TYPE		= 2;
 	private static final int	SEPARATOR	= 4;
 	
-	protected StatementList		statementList;
+	protected StatementList statementList;
 	
-	private Name				label;
+	private Name label;
 	
-	private IType				type;
+	private IType type;
 	
 	public StatementListParser(StatementList valueList)
 	{

@@ -26,7 +26,7 @@ public class ConstructorCall extends ASTNode implements ICall
 	public IType		type;
 	public IArguments	arguments	= EmptyArguments.INSTANCE;
 	
-	public IConstructor	constructor;
+	public IConstructor constructor;
 	
 	public ConstructorCall(ICodePosition position)
 	{

@@ -28,11 +28,11 @@ public class RangeOperator implements IValue
 	public static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
 	private static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
 	
-	public ICodePosition				position;
-	protected IValue					firstValue;
-	protected IValue					lastValue;
-	private IType						elementType		= Types.UNKNOWN;
-	private IType						type;
+	public ICodePosition	position;
+	protected IValue		firstValue;
+	protected IValue		lastValue;
+	private IType			elementType	= Types.UNKNOWN;
+	private IType			type;
 	
 	public RangeOperator(IValue value1, IValue value2)
 	{

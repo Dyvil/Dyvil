@@ -12,9 +12,9 @@ import dyvil.tools.compiler.lexer.token.IToken;
 
 public class ParserManager implements IParserManager
 {
-	protected Parser		parser;
+	protected Parser parser;
 	
-	protected IOperatorMap	operators;
+	protected IOperatorMap operators;
 	
 	protected TokenIterator	tokens;
 	protected int			skip;

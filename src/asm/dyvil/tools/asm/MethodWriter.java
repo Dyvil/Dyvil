@@ -31,30 +31,30 @@ package dyvil.tools.asm;
 
 class MethodWriter implements MethodVisitor
 {
-	static final int			ACC_CONSTRUCTOR							= 0x80000;
-	static final int			SAME_FRAME								= 0;
-	static final int			SAME_LOCALS_1_STACK_ITEM_FRAME			= 64;
-	static final int			RESERVED								= 128;
-	static final int			SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED	= 247;
-	static final int			CHOP_FRAME								= 248;
-	static final int			SAME_FRAME_EXTENDED						= 251;
-	static final int			APPEND_FRAME							= 252;
-	static final int			FULL_FRAME								= 255;
+	static final int	ACC_CONSTRUCTOR							= 0x80000;
+	static final int	SAME_FRAME								= 0;
+	static final int	SAME_LOCALS_1_STACK_ITEM_FRAME			= 64;
+	static final int	RESERVED								= 128;
+	static final int	SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED	= 247;
+	static final int	CHOP_FRAME								= 248;
+	static final int	SAME_FRAME_EXTENDED						= 251;
+	static final int	APPEND_FRAME							= 252;
+	static final int	FULL_FRAME								= 255;
 	
-	private static final int	FRAMES									= 0;
-	private static final int	MAXS									= 1;
-	private static final int	NOTHING									= 2;
+	private static final int	FRAMES	= 0;
+	private static final int	MAXS	= 1;
+	private static final int	NOTHING	= 2;
 	
-	final ClassWriter			cw;
-	private int					access;
-	private final int			name;
-	private final int			desc;
-	private final String		descriptor;
-	String						signature;
-	int							classReaderOffset;
-	int							classReaderLength;
-	int							exceptionCount;
-	int[]						exceptions;
+	final ClassWriter		cw;
+	private int				access;
+	private final int		name;
+	private final int		desc;
+	private final String	descriptor;
+	String					signature;
+	int						classReaderOffset;
+	int						classReaderLength;
+	int						exceptionCount;
+	int[]					exceptions;
 	
 	private ByteVector			annd;
 	private AnnotationWriter	anns;
@@ -64,54 +64,54 @@ class MethodWriter implements MethodVisitor
 	private AnnotationWriter[]	panns;
 	private AnnotationWriter[]	ipanns;
 	
-	private int					synthetics;
+	private int synthetics;
 	
-	private Attribute			attrs;
-	private ByteVector			code									= new ByteVector();
+	private Attribute	attrs;
+	private ByteVector	code	= new ByteVector();
 	
-	private int					maxStack;
-	private int					maxLocals;
-	private int					currentLocals;
+	private int	maxStack;
+	private int	maxLocals;
+	private int	currentLocals;
 	
-	private int					frameCount;
-	private ByteVector			stackMap;
-	private int					previousFrameOffset;
-	private int[]				previousFrame;
-	private int[]				frame;
+	private int			frameCount;
+	private ByteVector	stackMap;
+	private int			previousFrameOffset;
+	private int[]		previousFrame;
+	private int[]		frame;
 	
-	private int					handlerCount;
-	private Handler				firstHandler;
-	private Handler				lastHandler;
+	private int		handlerCount;
+	private Handler	firstHandler;
+	private Handler	lastHandler;
 	
-	private int					methodParametersCount;
-	private ByteVector			methodParameters;
+	private int			methodParametersCount;
+	private ByteVector	methodParameters;
 	
-	private int					localVarCount;
-	private ByteVector			localVar;
-	private int					localVarTypeCount;
-	private ByteVector			localVarType;
+	private int			localVarCount;
+	private ByteVector	localVar;
+	private int			localVarTypeCount;
+	private ByteVector	localVarType;
 	
-	private int					lineNumberCount;
-	private ByteVector			lineNumber;
+	private int			lineNumberCount;
+	private ByteVector	lineNumber;
 	
-	private int					lastCodeOffset;
+	private int lastCodeOffset;
 	
 	private AnnotationWriter	ctanns;
 	private AnnotationWriter	ictanns;
 	private Attribute			cattrs;
 	
-	private boolean				resize;
-	private int					subroutines;
+	private boolean	resize;
+	private int		subroutines;
 	
-	private final int			compute;
+	private final int compute;
 	
-	private Label				labels;
-	private Label				previousBlock;
-	private Label				currentBlock;
-	private int					stackSize;
-	private int					maxStackSize;
+	private Label	labels;
+	private Label	previousBlock;
+	private Label	currentBlock;
+	private int		stackSize;
+	private int		maxStackSize;
 	
-	MethodWriter				next;
+	MethodWriter next;
 	
 	MethodWriter(final ClassWriter cw, final int access, final String name, final String desc, final String signature, final String[] exceptions,
 			final boolean computeMaxs, final boolean computeFrames)
@@ -2051,8 +2051,8 @@ class MethodWriter implements MethodVisitor
 	final void put(final ByteVector out)
 	{
 		final int FACTOR = ClassWriter.TO_ACC_SYNTHETIC;
-		int mask = ACC_CONSTRUCTOR | Opcodes.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE | (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE)
-				/ FACTOR;
+		int mask = ACC_CONSTRUCTOR | Opcodes.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE
+				| (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) / FACTOR;
 		out.putShort(this.access & ~mask).putShort(this.name).putShort(this.desc);
 		if (this.classReaderOffset != 0)
 		{

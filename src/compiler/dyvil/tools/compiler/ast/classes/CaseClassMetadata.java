@@ -22,7 +22,7 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	protected IMethod	applyMethod;
+	protected IMethod applyMethod;
 	
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -131,8 +131,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(),
-					this.applyMethod.getSignature(), null));
+			mw = new MethodWriterImpl(writer,
+					writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(), this.applyMethod.getSignature(), null));
 			mw.begin();
 			mw.writeTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
 			mw.writeInsn(Opcodes.DUP);

@@ -68,7 +68,7 @@ public final class TestThread extends Thread
 			return;
 		}
 	}
-
+	
 	private static void failTest(String mainType, String[] args, Throwable ex)
 	{
 		StringBuilder builder = new StringBuilder("Test Failed\n\n");
@@ -78,7 +78,8 @@ public final class TestThread extends Thread
 		DyvilCompiler.error(builder.toString(), ex);
 	}
 	
-	private static void testError(Throwable t) {
-		
+	private static void testError(Throwable t)
+	{
+	
 	}
 }

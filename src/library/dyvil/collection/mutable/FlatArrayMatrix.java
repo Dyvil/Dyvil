@@ -13,7 +13,7 @@ import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
 
 @NilConvertible
-public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
+public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements MutableMatrix<E>
 {
 	public static <E> FlatArrayMatrix<E> apply()
 	{

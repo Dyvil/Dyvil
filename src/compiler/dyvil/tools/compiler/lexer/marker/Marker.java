@@ -6,11 +6,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class Marker extends Throwable implements Comparable<Marker>
 {
-	private static final long	serialVersionUID	= 8313691845679541217L;
+	private static final long serialVersionUID = 8313691845679541217L;
 	
-	private List<String>		info;
+	private List<String> info;
 	
-	public ICodePosition		position;
+	public ICodePosition position;
 	
 	protected Marker()
 	{

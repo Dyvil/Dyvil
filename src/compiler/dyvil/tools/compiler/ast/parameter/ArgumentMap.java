@@ -33,7 +33,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	{
 		return new Iterator<KeyValuePair>()
 		{
-			private int	index;
+			private int index;
 			
 			@Override
 			public KeyValuePair next()

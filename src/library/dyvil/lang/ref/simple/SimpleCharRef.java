@@ -6,7 +6,7 @@ import dyvil.lang.ref.CharRef;
 @CharConvertible
 public class SimpleCharRef implements CharRef
 {
-	public char	value;
+	public char value;
 	
 	public static SimpleCharRef apply(char value)
 	{

@@ -20,9 +20,9 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassOperator extends ASTNode implements IValue
 {
-	private IType				type;
-	private IType				genericType;
-	public boolean				dotless;
+	private IType	type;
+	private IType	genericType;
+	public boolean	dotless;
 	
 	public ClassOperator(ICodePosition position)
 	{

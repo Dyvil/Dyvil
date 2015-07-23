@@ -12,7 +12,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class IntPattern extends ASTNode implements IPattern
 {
-	private int	value;
+	private int value;
 	
 	public IntPattern(ICodePosition position, int value)
 	{

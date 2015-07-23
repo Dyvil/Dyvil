@@ -11,7 +11,7 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 
 @ArrayConvertible
-public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
+public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 {
 	public static <E> ArraySet<E> apply(E... elements)
 	{

@@ -7,7 +7,7 @@ import dyvil.util.ImmutableException;
 
 public class ImmutableIterator<E> implements Iterator<E>
 {
-	private final Iterator<E>	iterator;
+	private final Iterator<E> iterator;
 	
 	public ImmutableIterator(Iterator<E> iterator)
 	{

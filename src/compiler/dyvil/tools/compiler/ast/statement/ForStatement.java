@@ -21,16 +21,16 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	public static final Name	$forUpdate	= Name.getQualified("$forCondition");
 	public static final Name	$forEnd		= Name.getQualified("$forEnd");
 	
-	public Variable				variable;
+	public Variable variable;
 	
-	public IValue				condition;
-	public IValue				update;
+	public IValue	condition;
+	public IValue	update;
 	
-	public IValue				action;
+	public IValue action;
 	
-	protected Label				startLabel;
-	protected Label				updateLabel;
-	protected Label				endLabel;
+	protected Label	startLabel;
+	protected Label	updateLabel;
+	protected Label	endLabel;
 	
 	public ForStatement(Variable variable, IValue condition, IValue update, IValue action)
 	{

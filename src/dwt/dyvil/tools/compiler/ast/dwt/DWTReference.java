@@ -14,7 +14,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class DWTReference extends ASTNode implements IValue
 {
-	public Name	name;
+	public Name name;
 	
 	public DWTReference(ICodePosition position, Name name)
 	{
