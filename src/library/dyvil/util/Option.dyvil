@@ -22,7 +22,7 @@ public interface Option[+T]
 	
 	public boolean ?();
 	
-	public void ifPresent(Consumer[_ >: T] consumer);
+	public void forEach(Consumer[_ >: T] consumer);
 	
 	public Option[T] filter(Predicate[_ >: T] predicate);
 	

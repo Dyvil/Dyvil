@@ -14,13 +14,13 @@ public final case class Some[+T](final T value) implements Option[T]
 	
 	public override boolean ?() = true
 	
-	public override void ifPresent(Consumer[_ >: T] consumer) = consumer.accept(this.value);
+	public override void forEach(Consumer[_ >: T] consumer) = consumer accept this.value;
 	
-	public override Option[T] filter(Predicate[_ >: T] predicate) = if (predicate.test(this.value)) this else None;
+	public override Option[T] filter(Predicate[_ >: T] predicate) = if (predicate test this.value) this else None;
 	
-	public override Option[U] map[U](Function[_ >: T, _ <: U] mapper) = new Some(mapper.apply(this.value));
+	public override Option[U] map[U](Function[_ >: T, _ <: U] mapper) = new Some(mapper(this.value));
 	
-	public override Option[U] flatMap[U](Function[_ >: T, Option[U]] mapper) = Objects.requireNonNull(mapper.apply(this.value));
+	public override Option[U] flatMap[U](Function[_ >: T, Option[U]] mapper) = Objects.requireNonNull(mapper(this.value));
 	
 	public override T orElse(T other) = this.value
 	

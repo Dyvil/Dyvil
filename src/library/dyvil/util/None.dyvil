@@ -16,7 +16,7 @@ public final object None implements Option
 	
 	public override boolean ?() = false
 	
-	public override void ifPresent(Consumer consumer) {}
+	public override void forEach(Consumer consumer) {}
 	
 	public override Option filter(Predicate predicate) = this
 	
@@ -27,10 +27,4 @@ public final object None implements Option
 	public override Object orElse(Object other) = other
 	
 	public override Object orElse(Supplier other) = other.get
-	
-	public override String toString() = "None"
-	
-	public override boolean equals(Object obj) = obj == this
-	
-	public override int hashCode() = 0
 }
