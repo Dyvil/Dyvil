@@ -54,21 +54,21 @@ import static dyvil.reflect.Opcodes.INSTANCE;
 
 public class Method extends Member implements IMethod, ILabelContext
 {
-	protected IClass			theClass;
+	protected IClass theClass;
 	
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
-	protected IParameter[]		parameters	= new MethodParameter[3];
-	protected int				parameterCount;
-	protected IType[]			exceptions;
-	protected int				exceptionCount;
+	protected IParameter[]	parameters	= new MethodParameter[3];
+	protected int			parameterCount;
+	protected IType[]		exceptions;
+	protected int			exceptionCount;
 	
-	public IValue				value;
+	public IValue value;
 	
-	public String				descriptor;
-	protected int[]				intrinsicOpcodes;
-	protected IMethod			overrideMethod;
+	public String		descriptor;
+	protected int[]		intrinsicOpcodes;
+	protected IMethod	overrideMethod;
 	
 	public Method(IClass iclass)
 	{
@@ -326,33 +326,6 @@ public class Method extends Member implements IMethod, ILabelContext
 		
 		super.resolveTypes(markers, this);
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			Annotation annotation = this.annotations[i];
-			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
-			{
-				continue;
-			}
-			
-			try
-			{
-				Array array = (Array) annotation.arguments.getValue(0, Annotation.VALUE);
-				
-				int len = array.valueCount();
-				int[] opcodes = new int[len];
-				for (int j = 0; j < len; j++)
-				{
-					IntValue v = (IntValue) array.getValue(j);
-					opcodes[j] = v.value;
-				}
-				this.intrinsicOpcodes = opcodes;
-			}
-			catch (NullPointerException | ClassCastException ex)
-			{
-			}
-			break;
-		}
-		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i] = this.exceptions[i].resolve(markers, this, TypePosition.TYPE);
@@ -574,6 +547,33 @@ public class Method extends Member implements IMethod, ILabelContext
 	{
 		super.cleanup(context, compilableList);
 		
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			Annotation annotation = this.annotations[i];
+			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
+			{
+				continue;
+			}
+			
+			try
+			{
+				Array array = (Array) annotation.arguments.getValue(0, Annotation.VALUE);
+				
+				int len = array.valueCount();
+				int[] opcodes = new int[len];
+				for (int j = 0; j < len; j++)
+				{
+					IntValue v = (IntValue) array.getValue(j);
+					opcodes[j] = v.value;
+				}
+				this.intrinsicOpcodes = opcodes;
+			}
+			catch (NullPointerException | ClassCastException ex)
+			{
+			}
+			break;
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(this, compilableList);
@@ -728,7 +728,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		// infix modifier implementation
 		if (instance != null)
 		{
-			int mod = (this.modifiers & Modifiers.INFIX);
+			int mod = this.modifiers & Modifiers.INFIX;
 			if (mod != 0 && instance.valueTag() == IValue.CLASS_ACCESS)
 			{
 				instance = null;
@@ -838,7 +838,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		
 		if (instance != null)
 		{
-			int mod = (this.modifiers & Modifiers.INFIX);
+			int mod = this.modifiers & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
 			{
 				IParameter par = this.parameters[0];
@@ -1143,9 +1143,9 @@ public class Method extends Member implements IMethod, ILabelContext
 			modifiers |= Modifiers.ABSTRACT;
 		}
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
-				this.getExceptions()));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.setThisType(this.theClass.getInternalName());
@@ -1228,7 +1228,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		// Generate a bridge method
 		mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified,
 				this.overrideMethod.getDescriptor(), this.overrideMethod.getSignature(), this.overrideMethod.getExceptions()));
-		
+				
 		start = new Label();
 		end = new Label();
 		
