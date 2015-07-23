@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -35,6 +36,9 @@ public final class ObjectClassMetadata extends ClassMetadata
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
+		this.constructor.setModifiers(Modifiers.PRIVATE);
+		
+		this.checkMethods();
 		
 		IClassBody body = this.theClass.getBody();
 		if (body != null)
@@ -61,11 +65,6 @@ public final class ObjectClassMetadata extends ClassMetadata
 		call.constructor = this.constructor;
 		
 		f.setValue(call);
-		
-		if (this.theClass.getMethod(Name.toString, null, 0, null) != null)
-		{
-			this.methods |= TOSTRING;
-		}
 	}
 	
 	@Override
@@ -97,16 +96,46 @@ public final class ObjectClassMetadata extends ClassMetadata
 		
 		super.write(writer, instanceFields);
 		
+		String internalName = this.theClass.getInternalName();
 		if ((this.methods & TOSTRING) == 0)
 		{
 			// Generate a toString() method that simply returns the name of this
 			// object type.
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString", "()Ljava/lang/String;", null, null));
 			mw.begin();
-			mw.setThisType(this.theClass.getInternalName());
+			mw.setThisType(internalName);
 			mw.writeLDC(this.theClass.getName().unqualified);
 			mw.writeInsn(Opcodes.ARETURN);
 			mw.end(Types.STRING);
+		}
+		
+		if ((this.methods & EQUALS) == 0)
+		{
+			// Generate an equals(Object) method that compares the objects for
+			// identity
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals", "(Ljava/lang/Object;)Z", null, null));
+			mw.begin();
+			mw.setThisType(internalName);
+			mw.writeVarInsn(Opcodes.ALOAD, 0);
+			mw.writeVarInsn(Opcodes.ALOAD, 1);
+			Label label = new Label();
+			mw.writeJumpInsn(Opcodes.IF_ACMPNE, label);
+			mw.writeLDC(1);
+			mw.writeInsn(Opcodes.IRETURN);
+			mw.writeLabel(label);
+			mw.writeLDC(0);
+			mw.writeInsn(Opcodes.IRETURN);
+			mw.end();
+		}
+		
+		if ((this.methods & HASHCODE) == 0)
+		{
+			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I", null, null));
+			mw.begin();
+			mw.setThisType(internalName);
+			mw.writeLDC(internalName.hashCode());
+			mw.writeInsn(Opcodes.IRETURN);
+			mw.end();
 		}
 	}
 }

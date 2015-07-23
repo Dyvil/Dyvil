@@ -6,14 +6,17 @@ import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -42,6 +45,67 @@ public class ClassMetadata implements IClassMetadata
 	public IConstructor getConstructor()
 	{
 		return this.constructor;
+	}
+	
+	protected void checkMethods()
+	{
+		IClassBody body = this.theClass.getBody();
+		if (body != null)
+		{
+			int count = body.methodCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.checkMethod(body.getMethod(i));
+			}
+		}
+	}
+	
+	private void checkMethod(IMethod m)
+	{
+		Name name = m.getName();
+		if (name == Name.equals)
+		{
+			if (m.parameterCount() == 1 && m.getParameter(0).getType().equals(Types.OBJECT))
+			{
+				this.methods |= EQUALS;
+			}
+			return;
+		}
+		if (name == Name.hashCode)
+		{
+			if (m.parameterCount() == 0)
+			{
+				this.methods |= HASHCODE;
+			}
+			return;
+		}
+		if (name == Name.toString)
+		{
+			if (m.parameterCount() == 0)
+			{
+				this.methods |= TOSTRING;
+			}
+			return;
+		}
+		if (name == Name.apply)
+		{
+			if (m.parameterCount() == this.theClass.parameterCount())
+			{
+				int len = this.theClass.parameterCount();
+				for (int i = 0; i < len; i++)
+				{
+					IType t1 = m.getParameter(i).getType();
+					IType t2 = m.getParameter(i).getType();
+					if (!t1.equals(t2))
+					{
+						return;
+					}
+				}
+				
+				this.methods |= APPLY;
+			}
+			return;
+		}
 	}
 	
 	@Override
