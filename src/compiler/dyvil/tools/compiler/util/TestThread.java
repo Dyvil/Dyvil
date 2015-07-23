@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.util;
 
-import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -34,11 +33,7 @@ public final class TestThread extends Thread
 	{
 		String mainType = DyvilCompiler.config.getMainType();
 		String[] args = DyvilCompiler.config.getMainArgs();
-		PrintStream out = System.out;
-		PrintStream err = System.err;
 		
-		System.setOut(DyvilCompiler.loggerOut);
-		System.setErr(DyvilCompiler.loggerErr);
 		try
 		{
 			long now = System.currentTimeMillis();
@@ -48,18 +43,12 @@ public final class TestThread extends Thread
 			
 			now = System.currentTimeMillis() - now;
 			
-			System.setOut(out);
-			System.setErr(err);
-			
 			DyvilCompiler.log("Test completed (" + Util.toTime(now) + ")");
 			
 			return;
 		}
 		catch (VerifyError ve)
 		{
-			System.setOut(out);
-			System.setErr(err);
-			
 			StringBuilder builder = new StringBuilder("BYTECODE VERIFICATION FAILED\n\n");
 			builder.append("Main Type: ").append(mainType).append('\n');
 			builder.append("Main Args: ").append(Arrays.toString(args));
@@ -70,17 +59,11 @@ public final class TestThread extends Thread
 		}
 		catch (InvocationTargetException ex)
 		{
-			System.setOut(out);
-			System.setErr(err);
-			
 			failTest(mainType, args, ex.getCause());
 			return;
 		}
 		catch (Throwable ex)
 		{
-			System.setOut(out);
-			System.setErr(err);
-			
 			failTest(mainType, args, ex);
 			return;
 		}

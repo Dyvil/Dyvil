@@ -10,7 +10,6 @@ import java.util.logging.*;
 
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
-import dyvil.io.LoggerOutputStream;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
@@ -36,8 +35,6 @@ public final class DyvilCompiler
 	public static boolean	compilationFailed;
 	
 	private static Logger				logger;
-	public static LoggerOutputStream	loggerOut	= new LoggerOutputStream(logger, "TEST-OUT");
-	public static LoggerOutputStream	loggerErr	= new LoggerOutputStream(logger, "TEST-ERR");
 	public static DateFormat			format		= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static CompilerConfig		config		= new CompilerConfig();
