@@ -25,10 +25,10 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class FieldAccess extends ASTNode implements IValue, INamed, IValued
 {
-	public IValue		instance;
-	public Name			name;
+	public IValue	instance;
+	public Name		name;
 	
-	public boolean		dotless;
+	public boolean dotless;
 	
 	public IDataMember	field;
 	protected IType		type;
@@ -127,6 +127,17 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	
 	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
+		if (!ICall.privateAccess(context, this.instance))
+		{
+			IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
+			if (method != null)
+			{
+				AbstractCall mc = this.toMethodCall(method);
+				mc.checkArguments(markers, context);
+				return mc;
+			}
+		}
+		
 		IDataMember field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
@@ -140,14 +151,6 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 			
 			this.field = field;
 			return this;
-		}
-		
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
-		{
-			AbstractCall mc = this.toMethodCall(method);
-			mc.checkArguments(markers, context);
-			return mc;
 		}
 		
 		if (this.instance == null)

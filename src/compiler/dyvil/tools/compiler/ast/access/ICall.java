@@ -48,6 +48,11 @@ public interface ICall extends IValue
 		}
 	}
 	
+	public static boolean privateAccess(IContext context, IValue instance)
+	{
+		return instance == null || context.getThisClass() == instance.getType().getTheClass();
+	}
+	
 	public static IDataMember resolveField(IContext context, ITyped instance, Name name)
 	{
 		IDataMember match;

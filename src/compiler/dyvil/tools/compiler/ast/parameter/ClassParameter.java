@@ -145,8 +145,6 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.modifiers |= Modifiers.PUBLIC;
-		
 		super.resolve(markers, context);
 		
 		if (this.defaultValue != null)

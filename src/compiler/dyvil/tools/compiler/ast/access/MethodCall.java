@@ -114,6 +114,7 @@ public final class MethodCall extends AbstractCall implements INamed
 					call.instance = this.instance;
 					call.arguments = this.arguments;
 					call.name = name;
+					call.checkArguments(markers, context);
 					return call;
 				}
 			}

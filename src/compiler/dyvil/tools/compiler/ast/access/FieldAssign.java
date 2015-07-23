@@ -9,6 +9,9 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -21,12 +24,12 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class FieldAssign extends ASTNode implements IValue, INamed, IValued
 {
-	public Name			name;
+	public Name name;
 	
-	public IValue		instance;
-	public IValue		value;
+	public IValue	instance;
+	public IValue	value;
 	
-	public IDataMember	field;
+	public IDataMember field;
 	
 	public FieldAssign(ICodePosition position)
 	{
@@ -138,6 +141,21 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		if (this.instance != null)
 		{
 			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		if (!ICall.privateAccess(context, this.instance))
+		{
+			Name name = Name.getQualified(this.name.qualified + "_$eq");
+			IArguments arg = new SingleArgument(this.value);
+			IMethod m = ICall.resolveMethod(context, instance, name, arg);
+			if (m != null)
+			{
+				MethodCall mc = new MethodCall(this.position, this.instance, name);
+				mc.arguments = arg;
+				mc.method = m;
+				mc.checkArguments(markers, context);
+				return mc;
+			}
 		}
 		
 		this.field = ICall.resolveField(context, this.instance, this.name);
