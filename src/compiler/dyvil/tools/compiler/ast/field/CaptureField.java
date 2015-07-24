@@ -202,7 +202,7 @@ public final class CaptureField implements IField
 		if (instance == null)
 		{
 			markers.add(position, "field.access.unqualified", this.name);
-			return new ThisValue(position, this.theClass.getType());
+			return new ThisValue(position, context.getThisClass().getType(), context, markers);
 		}
 		
 		return instance;

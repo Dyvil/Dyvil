@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -30,10 +31,18 @@ public final class ThisValue extends ASTNode implements IValue
 		this.position = position;
 	}
 	
-	public ThisValue(ICodePosition position, IType type)
+	public ThisValue(ICodePosition position, IType type, IContext context, MarkerList markers)
 	{
 		this.position = position;
 		this.type = type;
+		this.checkTypes(markers, context);
+	}
+	
+	public ThisValue(ICodePosition position, IType type, IAccessible getter)
+	{
+		this.position = position;
+		this.type = type;
+		this.getter = getter;
 	}
 	
 	@Override
@@ -74,18 +83,14 @@ public final class ThisValue extends ASTNode implements IValue
 			markers.add(this.position, "this.access.static");
 		}
 		
-		IClass iclass;
 		if (this.type == Types.UNKNOWN)
 		{
-			iclass = context.getThisClass();
-			this.type = iclass.getType();
+			this.type = context.getThisClass().getType();
 		}
 		else
 		{
-			return;
+			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
 		}
-		
-		this.getter = context.getAccessibleThis(iclass);
 	}
 	
 	@Override
@@ -97,6 +102,13 @@ public final class ThisValue extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		IClass iclass = this.type.getTheClass();
+		
+		this.getter = context.getAccessibleThis(iclass);
+		if (this.getter == null)
+		{
+			markers.add(this.position, "this.instance", iclass.getFullName());
+		}
 	}
 	
 	@Override

@@ -145,7 +145,7 @@ public class Property extends Member implements IProperty, IContext
 			else
 			{
 				markers.add(position, "property.access.unqualified", this.name.unqualified);
-				instance = new ThisValue(position, this.theClass.getType());
+				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		

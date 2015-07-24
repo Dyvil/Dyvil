@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class NestedClass extends CodeClass
 {
@@ -22,8 +23,11 @@ public class NestedClass extends CodeClass
 	
 	public transient IContext context;
 	
-	public NestedClass()
+	public NestedClass(ICodePosition position)
 	{
+		this.interfaces = new IType[1];
+		this.body = new ClassBody(this);
+		this.position = position;
 	}
 	
 	@Override

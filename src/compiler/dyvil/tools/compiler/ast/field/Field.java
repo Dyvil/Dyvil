@@ -145,7 +145,7 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(position, "field.access.unqualified", this.name.unqualified);
-				instance = new ThisValue(position, this.theClass.getType());
+				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		

@@ -25,6 +25,7 @@ import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
@@ -716,15 +717,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		throw new SyntaxError(token, "Invalid Assignment");
 	}
 	
-	public void end()
-	{
-		if (this.value != null)
-		{
-			this.field.setValue(this.value);
-		}
-	}
-	
-	public boolean parseKeyword(IParserManager pm, IToken token, int type) throws SyntaxError
+	private boolean parseKeyword(IParserManager pm, IToken token, int type) throws SyntaxError
 	{
 		switch (type)
 		{
@@ -789,6 +782,16 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = ACCESS;
 			return true;
 		case Keywords.THIS:
+			// this[type]
+			if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
+			{
+				ThisValue tv = new ThisValue(token.raw());
+				this.mode = ARRAY_END;
+				this.value = tv;
+				pm.skip();
+				pm.pushParser(new TypeParser(tv));
+				return true;
+			}
 			this.value = new ThisValue(token.raw());
 			this.mode = ACCESS;
 			return true;

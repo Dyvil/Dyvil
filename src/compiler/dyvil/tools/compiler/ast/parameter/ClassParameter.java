@@ -113,7 +113,7 @@ public final class ClassParameter extends Parameter implements IField
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			markers.add(position, "classparameter.access.unqualified", this.name.unqualified);
-			return new ThisValue(position, this.theClass.getType());
+			return new ThisValue(position, this.theClass.getType(), context, markers);
 		}
 		
 		return instance;

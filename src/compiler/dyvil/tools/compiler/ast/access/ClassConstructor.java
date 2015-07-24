@@ -22,7 +22,7 @@ public class ClassConstructor extends ConstructorCall
 	public ClassConstructor(ICodePosition position)
 	{
 		super(position);
-		this.nestedClass = new NestedClass();
+		this.nestedClass = new NestedClass(position);
 	}
 	
 	public NestedClass getNestedClass()
@@ -36,7 +36,14 @@ public class ClassConstructor extends ConstructorCall
 		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		this.arguments.resolveTypes(markers, context);
 		
-		this.nestedClass.setSuperType(this.type);
+		if (this.type.getTheClass().isInterface())
+		{
+			this.nestedClass.addInterface(this.type);
+		}
+		else
+		{
+			this.nestedClass.setSuperType(this.type);
+		}
 		
 		this.nestedClass.context = context;
 		this.nestedClass.resolveTypes(markers, context);

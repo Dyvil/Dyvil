@@ -824,15 +824,15 @@ public class CodeClass extends ASTNode implements IClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(this.superType.getPosition(), "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
+					markers.add(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(this.superType.getPosition(), "class.extend.final", superClass.getName());
+					markers.add(this.position, "class.extend.final", superClass.getName());
 				}
 				else if ((modifiers & Modifiers.DEPRECATED) != 0)
 				{
-					markers.add(this.superType.getPosition(), "class.extend.deprecated", superClass.getName());
+					markers.add(this.position, "class.extend.deprecated", superClass.getName());
 				}
 			}
 		}
@@ -1170,11 +1170,7 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		if (type == this)
-		{
-			return new VariableThis();
-		}
-		return this.outerClass != null ? this.outerClass.getAccessibleThis(type) : null;
+		return type == this ? new VariableThis() : null;
 	}
 	
 	@Override

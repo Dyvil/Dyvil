@@ -920,7 +920,7 @@ public class Method extends Member implements IMethod, ILabelContext
 			else
 			{
 				markers.add(position, "method.access.unqualified", this.name.unqualified);
-				instance = new ThisValue(position, context.getThisClass().getType());
+				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
