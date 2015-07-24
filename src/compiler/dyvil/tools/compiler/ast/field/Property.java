@@ -451,6 +451,18 @@ public class Property extends Member implements IProperty, IContext
 		return false;
 	}
 	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		return this.theClass.getAccessibleThis(type);
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		return null;
+	}
+	
 	// Compilation
 	
 	@Override

@@ -3,7 +3,9 @@ package dyvil.tools.compiler.ast.context;
 import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -27,7 +29,7 @@ public class CombiningContext implements IContext
 	@Override
 	public boolean isStatic()
 	{
-		return this.context1.isStatic() || this.context2.isStatic();
+		return this.context1.isStatic() && this.context2.isStatic();
 	}
 	
 	@Override
@@ -97,5 +99,19 @@ public class CombiningContext implements IContext
 	public boolean handleException(IType type)
 	{
 		return this.context1.handleException(type) || this.context2.handleException(type);
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		IAccessible i = this.context1.getAccessibleThis(type);
+		return i == null ? this.context2.getAccessibleThis(type) : i;
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		IVariable var = this.context2.capture(variable);
+		return this.context1.capture(var == null ? variable : var);
 	}
 }

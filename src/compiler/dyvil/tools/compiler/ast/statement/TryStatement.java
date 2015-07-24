@@ -201,9 +201,7 @@ public final class TryStatement extends ASTNode implements IStatement, IDefaultC
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.context = context;
-			block.action = block.action.resolve(markers, block);
-			block.context = null;
+			block.action = block.action.resolve(markers, new CombiningContext(block, context));
 		}
 		
 		if (this.finallyBlock != null)
@@ -224,9 +222,7 @@ public final class TryStatement extends ASTNode implements IStatement, IDefaultC
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.context = context;
-			block.action.checkTypes(markers, block);
-			block.context = null;
+			block.action.checkTypes(markers, new CombiningContext(block, context));
 		}
 		
 		if (this.finallyBlock != null)

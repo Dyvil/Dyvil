@@ -9,7 +9,6 @@ import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
@@ -405,21 +404,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
 	public IDyvilHeader getHeader()
 	{
 		return this;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
 	}
 	
 	@Override
@@ -487,12 +474,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.usingCount; i++)
@@ -532,12 +513,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
 	}
 	
 	@Override

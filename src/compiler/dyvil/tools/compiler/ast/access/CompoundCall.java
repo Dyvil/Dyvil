@@ -135,7 +135,8 @@ public final class CompoundCall extends AbstractCall implements INamed
 				FieldAccess fa = (FieldAccess) this.instance;
 				if (fa.field != null)
 				{
-					fa.field.checkAssign(markers, context, this.instance.getPosition(), this.instance, this);
+					fa.field = fa.field.capture(context);
+					this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.instance, this.arguments.getLastValue()));
 				}
 			}
 		}

@@ -116,6 +116,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals", "(Ljava/lang/Object;)Z", null, null));
 			mw.begin();
 			mw.setThisType(internalName);
+			mw.registerParameter(1, "obj", Types.ANY, 0);
 			mw.writeVarInsn(Opcodes.ALOAD, 0);
 			mw.writeVarInsn(Opcodes.ALOAD, 1);
 			Label label = new Label();

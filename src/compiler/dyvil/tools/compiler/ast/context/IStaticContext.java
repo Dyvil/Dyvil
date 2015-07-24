@@ -3,7 +3,9 @@ package dyvil.tools.compiler.ast.context;
 import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
@@ -61,5 +63,17 @@ public interface IStaticContext extends IContext
 	public default boolean handleException(IType type)
 	{
 		return false;
+	}
+	
+	@Override
+	public default IVariable capture(IVariable variable)
+	{
+		return variable;
+	}
+	
+	@Override
+	public default IAccessible getAccessibleThis(IClass type)
+	{
+		return null;
 	}
 }

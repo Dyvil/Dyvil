@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -29,7 +30,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IType extends IASTNode, IContext, ITypeContext
+public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
 	public static enum TypePosition
 	{
@@ -296,12 +297,6 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	// IContext
 	
 	@Override
-	public default boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
 	public default IDyvilHeader getHeader()
 	{
 		return this.getTheClass().getHeader();
@@ -332,12 +327,6 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	}
 	
 	@Override
-	public default ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name);
 	
 	@Override
@@ -345,12 +334,6 @@ public interface IType extends IASTNode, IContext, ITypeContext
 	
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
-	
-	@Override
-	public default boolean handleException(IType type)
-	{
-		return false;
-	}
 	
 	public IMethod getFunctionalMethod();
 	

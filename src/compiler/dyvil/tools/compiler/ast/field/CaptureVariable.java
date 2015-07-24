@@ -193,6 +193,12 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
+	public IDataMember capture(IContext context)
+	{
+		return this;
+	}
+	
+	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return this.variable.checkAccess(markers, position, instance, context);

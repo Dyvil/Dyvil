@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -9,19 +8,16 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -33,7 +29,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaseExpression extends ASTNode implements IValue, ICase, IClassCompilable, IContext
+public final class CaseExpression extends ASTNode implements IValue, ICase, IClassCompilable, IDefaultContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
 	public static final ClassType		PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
@@ -161,48 +157,6 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	// IContext
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		IDataMember f = this.pattern.resolveField(name);
@@ -214,24 +168,6 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 		return null;
 	}
 	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return this.context.handleException(type);
-	}
-	
 	// Phases
 	
 	@Override
@@ -239,16 +175,16 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	{
 		if (this.condition != null)
 		{
-			this.condition.resolveTypes(markers, context);
+			this.condition.resolveTypes(markers, this);
 		}
 		if (this.action != null)
 		{
-			this.action.resolveTypes(markers, context);
+			this.action.resolveTypes(markers, this);
 		}
 	}
 	
 	@Override
-	public CaseExpression resolve(MarkerList markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.context = context;
 		if (this.pattern != null)
@@ -310,7 +246,7 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	}
 	
 	@Override
-	public CaseExpression foldConstants()
+	public IValue foldConstants()
 	{
 		if (this.condition != null)
 		{

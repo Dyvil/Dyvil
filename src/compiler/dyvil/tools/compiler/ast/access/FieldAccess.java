@@ -198,6 +198,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		
 		if (this.field != null)
 		{
+			this.field = this.field.capture(context);
 			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
 		}
 	}

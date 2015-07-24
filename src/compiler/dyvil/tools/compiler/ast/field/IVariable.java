@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface IVariable extends IDataMember
@@ -37,6 +38,13 @@ public interface IVariable extends IDataMember
 	public default IType getActualType()
 	{
 		return this.getType();
+	}
+	
+	@Override
+	public default IDataMember capture(IContext context)
+	{
+		IVariable capture = context.capture(this);
+		return capture == null ? this : capture;
 	}
 	
 	public default void appendDescription(StringBuilder buf)

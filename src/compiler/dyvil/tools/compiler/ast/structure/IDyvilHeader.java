@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.collection.Map;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
-import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 
-public interface IDyvilHeader extends IContext, IClassList, IOperatorMap, ITypeAliasMap
+public interface IDyvilHeader extends IStaticContext, IClassList, IOperatorMap, ITypeAliasMap
 {
 	public default boolean isHeader()
 	{

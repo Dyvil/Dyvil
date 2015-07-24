@@ -11,7 +11,9 @@ import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
@@ -497,6 +499,18 @@ public class Constructor extends Member implements IConstructor
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		return this.theClass.getAccessibleThis(type);
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		return null;
 	}
 	
 	@Override

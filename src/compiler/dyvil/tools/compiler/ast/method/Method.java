@@ -17,7 +17,9 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -695,6 +697,18 @@ public class Method extends Member implements IMethod, ILabelContext
 			}
 		}
 		return false;
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		return this.theClass.getAccessibleThis(type);
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		return null;
 	}
 	
 	@Override

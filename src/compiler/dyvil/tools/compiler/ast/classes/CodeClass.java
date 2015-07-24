@@ -14,8 +14,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
@@ -1157,15 +1156,31 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public boolean isMember(IClassMember member)
-	{
-		return this == member.getTheClass();
-	}
-	
-	@Override
 	public boolean handleException(IType type)
 	{
 		return false;
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		return null;
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		if (type == this)
+		{
+			return new VariableThis();
+		}
+		return this.outerClass != null ? this.outerClass.getAccessibleThis(type) : null;
+	}
+	
+	@Override
+	public boolean isMember(IClassMember member)
+	{
+		return this == member.getTheClass();
 	}
 	
 	@Override

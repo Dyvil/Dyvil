@@ -4,7 +4,9 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -46,6 +48,10 @@ public interface IContext
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
 	public boolean handleException(IType type);
+	
+	public IVariable capture(IVariable variable);
+	
+	public IAccessible getAccessibleThis(IClass type);
 	
 	public static void addCompilable(IContext context, IClassCompilable compilable)
 	{

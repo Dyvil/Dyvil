@@ -15,7 +15,9 @@ import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -463,6 +465,18 @@ public class REPLMemberClass implements IClass
 	public boolean handleException(IType type)
 	{
 		return true;
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		return null;
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		return null;
 	}
 	
 	@Override

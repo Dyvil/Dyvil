@@ -1,29 +1,21 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.MapTypeContext;
-import dyvil.tools.compiler.ast.field.CaptureVariable;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -38,7 +30,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext, ITypeContext
+public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IDefaultContext
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
 			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodType;"
@@ -57,8 +49,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	 * The abstract method this lambda expression implements
 	 */
 	protected IMethod method;
-	
-	private IContext context;
 	
 	private String				owner;
 	private String				name;
@@ -158,12 +148,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			this.inferTypes(markers);
 			
-			this.context = context;
-			this.value = this.value.resolve(markers, this);
+			IContext context1 = new CombiningContext(this, context);
+			this.value = this.value.resolve(markers, context1);
 			
 			IType valueType = this.value.getType();
 			
-			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, this);
+			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
@@ -175,8 +165,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 				this.value = value1;
 				valueType = this.value.getType();
 			}
-			
-			this.context = null;
 			
 			ITypeContext tempContext = new MapTypeContext();
 			this.method.getType().inferTypes(valueType, tempContext);
@@ -290,48 +278,6 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.thisClass = this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
@@ -343,63 +289,54 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			}
 		}
 		
-		IDataMember match = this.context.resolveField(name);
-		if (match != null && match.isVariable())
+		return null;
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		this.thisClass = type;
+		return new VariableThis();
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			if (this.capturedFields == null)
+			if (this.parameters[i] == variable)
 			{
-				this.capturedFields = new CaptureVariable[2];
-				this.capturedFieldCount = 1;
-				return this.capturedFields[0] = new CaptureVariable((IVariable) match);
+				return variable;
 			}
-			
-			// Check if the variable is already in the array
-			for (int i = 0; i < this.capturedFieldCount; i++)
-			{
-				CaptureVariable var = this.capturedFields[i];
-				if (var.variable == match)
-				{
-					// If yes, return the match and skip adding the variable
-					// again.
-					return var;
-				}
-			}
-			
-			int index = this.capturedFieldCount++;
-			if (this.capturedFieldCount > this.capturedFields.length)
-			{
-				CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
-				System.arraycopy(this.capturedFields, 0, temp, 0, index);
-				this.capturedFields = temp;
-			}
-			return this.capturedFields[index] = new CaptureVariable((IVariable) match);
 		}
 		
-		return match;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar)
-	{
-		return new TypeVarType(typeVar);
+		if (this.capturedFields == null)
+		{
+			this.capturedFields = new CaptureVariable[2];
+			this.capturedFieldCount = 1;
+			return this.capturedFields[0] = new CaptureVariable(variable);
+		}
+		
+		// Check if the variable is already in the array
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			CaptureVariable var = this.capturedFields[i];
+			if (var.variable == variable)
+			{
+				// If yes, return the match and skip adding the variable
+				// again.
+				return var;
+			}
+		}
+		
+		int index = this.capturedFieldCount++;
+		if (this.capturedFieldCount > this.capturedFields.length)
+		{
+			CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
+			System.arraycopy(this.capturedFields, 0, temp, 0, index);
+			this.capturedFields = temp;
+		}
+		return this.capturedFields[index] = new CaptureVariable(variable);
 	}
 	
 	@Override
@@ -411,9 +348,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			param.resolveTypes(markers, context);
 		}
 		
-		this.context = context;
-		this.value.resolveTypes(markers, this);
-		this.context = null;
+		this.value.resolveTypes(markers, new CombiningContext(this, context));
 	}
 	
 	@Override
@@ -426,9 +361,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.context = context;
-		this.value.checkTypes(markers, this);
-		this.context = null;
+		this.value.checkTypes(markers, new CombiningContext(this, context));
 	}
 	
 	@Override
