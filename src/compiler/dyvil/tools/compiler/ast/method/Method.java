@@ -1156,6 +1156,10 @@ public class Method extends Member implements IMethod, ILabelContext
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
+		if (this.theClass.isInterface())
+		{
+			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
+		}
 		
 		MethodWriter mw = new MethodWriterImpl(writer,
 				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
@@ -1519,10 +1523,6 @@ public class Method extends Member implements IMethod, ILabelContext
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
-		else if (this.theClass.isInterface())
-		{
-			opcode = Opcodes.INVOKEINTERFACE;
-		}
 		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
@@ -1530,6 +1530,10 @@ public class Method extends Member implements IMethod, ILabelContext
 		else if (instance != null && instance.valueTag() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
+		}
+		else if (this.theClass.isInterface())
+		{
+			opcode = Opcodes.INVOKEINTERFACE;
 		}
 		else
 		{

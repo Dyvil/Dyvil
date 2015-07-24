@@ -796,6 +796,15 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = ACCESS;
 			return true;
 		case Keywords.SUPER:
+			if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
+			{
+				SuperValue sv = new SuperValue(token.raw());
+				this.mode = ARRAY_END;
+				this.value = sv;
+				pm.skip();
+				pm.pushParser(new TypeParser(sv));
+				return true;
+			}
 			this.value = new SuperValue(token.raw());
 			this.mode = ACCESS;
 			return true;

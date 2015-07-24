@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -74,11 +75,24 @@ public final class SuperValue extends ASTNode implements IValue
 		}
 		
 		IType thisType = context.getThisClass().getType();
-		this.type = thisType.getSuperType();
-		if (this.type == null)
+		if (this.type == Types.UNKNOWN)
 		{
-			Marker marker = markers.create(this.position, "super.access.type");
-			marker.addInfo("Enclosing Type: " + thisType);
+			this.type = thisType.getSuperType();
+			if (this.type == null)
+			{
+				Marker marker = markers.create(this.position, "super.access.type");
+				marker.addInfo("Enclosing Type: " + thisType);
+			}
+		}
+		else
+		{
+			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+			if (this.type.isResolved() && !this.type.isSuperClassOf(thisType))
+			{
+				Marker marker = markers.create(this.position, "super.type.invalid");
+				marker.addInfo("Enclosing Type: " + thisType);
+				marker.addInfo("Requested Super Type: " + this.type);
+			}
 		}
 	}
 	
