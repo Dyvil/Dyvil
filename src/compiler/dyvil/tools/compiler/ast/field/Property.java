@@ -148,7 +148,10 @@ public class Property extends Member implements IProperty, IContext
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(position, "property.access.instance", this.name.unqualified);
+				if (!instance.getType().getTheClass().isObject())
+				{
+					markers.add(position, "property.access.instance", this.name.unqualified);
+				}
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)

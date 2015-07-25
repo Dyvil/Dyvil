@@ -27,6 +27,12 @@ public final class ThisValue implements IValue
 		this.type = type;
 	}
 	
+	public ThisValue(IType type, IAccessible getter)
+	{
+		this.type = type;
+		this.getter = getter;
+	}
+	
 	public ThisValue(ICodePosition position)
 	{
 		this.position = position;

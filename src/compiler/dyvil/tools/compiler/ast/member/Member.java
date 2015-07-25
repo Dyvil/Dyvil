@@ -273,6 +273,14 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		for (int i = 0; i < this.annotationCount; i++)

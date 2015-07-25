@@ -247,6 +247,12 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public boolean isObject()
+	{
+		return (this.modifiers & Modifiers.OBJECT_CLASS) != 0;
+	}
+	
+	@Override
 	public int getAccessLevel()
 	{
 		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
@@ -901,7 +907,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		return type == this ? new VariableThis() : null;
+		return type == this ? VariableThis.DEFAULT : null;
 	}
 	
 	@Override

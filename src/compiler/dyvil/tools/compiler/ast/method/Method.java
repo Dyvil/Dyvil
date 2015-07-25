@@ -917,7 +917,10 @@ public class Method extends Member implements IMethod, ILabelContext
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(position, "method.access.instance", this.name.unqualified);
+				if (!instance.getType().getTheClass().isObject())
+				{
+					markers.add(position, "method.access.instance", this.name.unqualified);
+				}
 			}
 			else if (this.intrinsicOpcodes == null && instance.isPrimitive())
 			{

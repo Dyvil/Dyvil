@@ -275,6 +275,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public boolean isObject()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setFullName(String name)
 	{
 	}

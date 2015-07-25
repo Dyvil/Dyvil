@@ -45,6 +45,8 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	
 	public boolean isInterface();
 	
+	public boolean isObject();
+	
 	// Full Name
 	
 	public void setFullName(String name);

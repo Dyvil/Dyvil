@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
@@ -404,7 +405,7 @@ public class CodeClass extends AbstractClass
 			}
 		}
 		
-		ThisValue thisValue = new ThisValue(this.type);
+		ThisValue thisValue = new ThisValue(this.type, VariableThis.DEFAULT);
 		StatementList instanceFields = new StatementList();
 		
 		IField[] staticFields = new IField[fields + 1];

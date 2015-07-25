@@ -48,6 +48,7 @@ public final class FieldAssign implements IValue, INamed, IValued
 		this.position = position;
 		this.instance = instance;
 		this.field = field;
+		this.name = field.getName();
 		this.value = value;
 	}
 	
