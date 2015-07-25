@@ -83,17 +83,24 @@ public final class SuperValue extends ASTNode implements IValue
 				Marker marker = markers.create(this.position, "super.access.type");
 				marker.addInfo("Enclosing Type: " + thisType);
 			}
+			return;
 		}
-		else
+		
+		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		if (!this.type.isResolved())
 		{
-			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
-			if (this.type.isResolved() && !this.type.isSuperClassOf(thisType))
-			{
-				Marker marker = markers.create(this.position, "super.type.invalid");
-				marker.addInfo("Enclosing Type: " + thisType);
-				marker.addInfo("Requested Super Type: " + this.type);
-			}
+			return;
 		}
+		
+		int distance = this.type.getSubClassDistance(thisType);
+		if (distance == 1)
+		{
+			return;
+		}
+		
+		Marker marker = markers.create(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
+		marker.addInfo("Enclosing Type: " + thisType);
+		marker.addInfo("Requested Super Type: " + this.type);
 	}
 	
 	@Override
