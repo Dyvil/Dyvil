@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IImport extends IASTNode
 {
@@ -33,6 +34,12 @@ public interface IImport extends IASTNode
 		case MULTI:
 			return new MultiImport(null);
 		}
+		return null;
+	}
+	
+	@Override
+	public default ICodePosition getPosition()
+	{
 		return null;
 	}
 	

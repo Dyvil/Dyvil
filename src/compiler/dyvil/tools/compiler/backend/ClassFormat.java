@@ -64,6 +64,11 @@ public final class ClassFormat
 		return internal.replace('/', '.');
 	}
 	
+	public static String internalToExtended(String internal)
+	{
+		return 'L' + internal + ';';
+	}
+	
 	public static String extendedToInternal(String extended)
 	{
 		return extended.substring(1, extended.length() - 1);

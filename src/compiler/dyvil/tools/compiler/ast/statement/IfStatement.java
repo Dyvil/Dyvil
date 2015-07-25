@@ -1,12 +1,11 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,12 +17,13 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class IfStatement extends ASTNode implements IStatement
+public class IfStatement extends Value implements IStatement
 {
-	public IValue	condition;
-	public IValue	then;
-	public IValue	elseThen;
+	protected IValue	condition;
+	protected IValue	then;
+	protected IValue	elseThen;
 	
+	// Metadata
 	private IType commonType;
 	
 	public IfStatement(ICodePosition position)
@@ -251,7 +251,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.condition.valueTag() == BOOLEAN)
 			{
-				if (((BooleanValue) this.condition).value)
+				if (this.condition.booleanValue())
 				{
 					// Condition is true -> Return the action
 					return this.then.foldConstants();
@@ -302,7 +302,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.condition.valueTag() == BOOLEAN)
 		{
-			return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
+			return this.condition.booleanValue() ? this.then : this.elseThen;
 		}
 		return this;
 	}

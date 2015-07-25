@@ -1,11 +1,12 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 import java.util.TreeSet;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;

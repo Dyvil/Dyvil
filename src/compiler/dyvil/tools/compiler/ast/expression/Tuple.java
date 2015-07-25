@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -24,11 +23,14 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class Tuple extends ASTNode implements IValue, IValueList
+public final class Tuple implements IValue, IValueList
 {
-	private IValue[]	values;
-	private int			valueCount;
+	protected ICodePosition position;
 	
+	protected IValue[]	values;
+	protected int		valueCount;
+	
+	// Metadata
 	private IType		tupleType;
 	private IMethod		method;
 	private IArguments	arguments;
@@ -39,23 +41,23 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 		this.values = new IValue[3];
 	}
 	
-	public Tuple(ICodePosition position, IValue[] values)
+	public Tuple(ICodePosition position, IValue[] values, int valueCount)
 	{
 		this.position = position;
 		this.values = values;
-		this.valueCount = values.length;
+		this.valueCount = valueCount;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
 	public int valueTag()
 	{
 		return TUPLE;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
 	}
 	
 	@Override

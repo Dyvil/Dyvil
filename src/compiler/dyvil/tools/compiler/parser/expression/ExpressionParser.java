@@ -271,7 +271,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				ArgumentList list = new ArgumentList();
-				cc.arguments = list;
+				cc.setArguments(list);
 				pm.pushParser(new ExpressionListParser(list));
 				this.mode = CONSTRUCTOR_END;
 				return;
@@ -285,7 +285,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			SingleArgument sa = new SingleArgument();
-			cc.arguments = sa;
+			cc.setArguments(sa);
 			pm.pushParser(pm.newExpressionParser(sa), true);
 			this.mode = 0;
 			return;
@@ -318,7 +318,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (next.type() == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.skip();
-				mc.arguments = this.getArguments(pm, next.next());
+				mc.setArguments(this.getArguments(pm, next.next()));
 			}
 			
 			this.mode = ACCESS;
@@ -407,8 +407,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				int prevType = prev.type();
 				if (ParserUtil.isIdentifier(prevType))
 				{
-					MethodCall mc = new MethodCall(prev, null, prev.nameValue());
-					mc.arguments = args;
+					MethodCall mc = new MethodCall(prev, null, prev.nameValue(), args);
 					this.value = mc;
 				}
 				else if (prevType == Symbols.CLOSE_SQUARE_BRACKET)
@@ -422,14 +421,12 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					{
 						mc = (AbstractCall) this.value;
 					}
-					mc.arguments = args;
+					mc.setArguments(args);
 					this.value = mc;
 				}
 				else
 				{
-					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition());
-					amc.instance = this.value;
-					amc.arguments = args;
+					ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value, args);
 					this.value = amc;
 				}
 				this.mode = PARAMETERS_END;
@@ -501,10 +498,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			if (this.value != null)
 			{
-				ApplyMethodCall call = new ApplyMethodCall(token.raw());
-				call.instance = this.value;
 				SingleArgument sa = new SingleArgument();
-				call.arguments = sa;
+				ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value, sa);
 				this.value = call;
 				this.mode = 0;
 				pm.pushParser(pm.newExpressionParser(sa), true);
@@ -559,7 +554,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		if (nextType == Symbols.OPEN_PARENTHESIS)
 		{
 			MethodCall call = new MethodCall(token.raw(), this.value, name);
-			call.dotless = this.dotless;
+			call.setDotless(this.dotless);
 			this.value = call;
 			this.mode = PARAMETERS_END;
 			pm.skip();
@@ -590,7 +585,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
 			GenericData gd = new GenericData();
 			mc.setGenericData(gd);
-			mc.dotless = this.dotless;
+			mc.setDotless(this.dotless);
 			this.value = mc;
 			this.mode = TYPE_ARGUMENTS_END;
 			pm.skip();
@@ -602,10 +597,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (this.value == null || op.type == Operator.PREFIX)
 			{
-				MethodCall call = new MethodCall(token, null, name);
 				SingleArgument sa = new SingleArgument();
-				call.arguments = sa;
-				call.dotless = this.dotless;
+				MethodCall call = new MethodCall(token, null, name, sa);
+				call.setDotless(this.dotless);
 				this.value = call;
 				this.mode = ACCESS;
 				
@@ -616,13 +610,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			MethodCall call = new MethodCall(token, this.value, name);
+			call.setDotless(this.dotless);
 			this.value = call;
 			this.mode = ACCESS;
-			call.dotless = this.dotless;
 			if (op.type != Operator.POSTFIX && !ParserUtil.isTerminator2(nextType))
 			{
 				SingleArgument sa = new SingleArgument();
-				call.arguments = sa;
+				call.setArguments(sa);
 				
 				ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
 				parser.operator = op;
@@ -635,7 +629,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (ParserUtil.isTerminator2(nextType))
 			{
 				FieldAccess access = new FieldAccess(token, this.value, name);
-				access.dotless = this.dotless;
+				access.setDotless(this.dotless);
 				this.value = access;
 				this.mode = ACCESS;
 				return;
@@ -645,7 +639,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isTerminator2(next.next().type()))
 				{
 					FieldAccess access = new FieldAccess(token, this.value, name);
-					access.dotless = this.dotless;
+					access.setDotless(this.dotless);
 					this.value = access;
 					this.mode = ACCESS;
 					return;
@@ -653,14 +647,12 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 		}
 		
-		MethodCall call = new MethodCall(token, this.value, name);
+		SingleArgument sa = new SingleArgument();
+		MethodCall call = new MethodCall(token, this.value, name, sa);
+		call.setDotless(this.dotless);
+
 		this.value = call;
 		this.mode = ACCESS;
-		call.dotless = this.dotless;
-		
-		SingleArgument sa = new SingleArgument();
-		call.arguments = sa;
-		
 		ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
 		parser.operator = op;
 		pm.pushParser(parser);
@@ -682,7 +674,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.FIELD_ACCESS:
 		{
 			FieldAccess fa = (FieldAccess) this.value;
-			FieldAssign assign = new FieldAssign(position, fa.instance, fa.name);
+			FieldAssign assign = new FieldAssign(position, fa.getInstance(), fa.getName());
 			this.value = assign;
 			pm.pushParser(pm.newExpressionParser(assign));
 			return;
@@ -690,7 +682,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.APPLY_CALL:
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.value;
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.instance, call.arguments);
+			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.getValue(), call.getArguments());
 			this.value = updateCall;
 			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
@@ -698,8 +690,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.METHOD_CALL:
 		{
 			MethodCall call = (MethodCall) this.value;
-			FieldAccess fa = new FieldAccess(position, call.instance, call.name);
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.arguments);
+			FieldAccess fa = new FieldAccess(position, call.getValue(), call.getName());
+			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.getArguments());
 			this.value = updateCall;
 			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
@@ -707,7 +699,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.SUBSCRIPT_GET:
 		{
 			SubscriptGetter getter = (SubscriptGetter) this.value;
-			SubscriptSetter setter = new SubscriptSetter(position, getter.instance, getter.arguments);
+			SubscriptSetter setter = new SubscriptSetter(position, getter.getValue(), getter.getArguments());
 			this.value = setter;
 			pm.pushParser(pm.newExpressionParser(setter));
 			return;
@@ -875,7 +867,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case Keywords.FOR:
 		{
-			pm.pushParser(new ForStatementParser(this.field));
+			pm.pushParser(new ForStatementParser(this.field, token.raw()));
 			this.mode = 0;
 			return true;
 		}
@@ -956,7 +948,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case Keywords.THROW:
 		{
-			ThrowStatement statement = new ThrowStatement();
+			ThrowStatement statement = new ThrowStatement(token.raw());
 			pm.pushParser(pm.newExpressionParser(statement));
 			this.mode = 0;
 			this.value = statement;

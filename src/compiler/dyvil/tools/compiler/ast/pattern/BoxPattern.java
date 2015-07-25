@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class BoxPattern implements IPattern
 {
@@ -18,6 +19,12 @@ public class BoxPattern implements IPattern
 	{
 		this.pattern = pattern;
 		this.boxingMethod = boxingMethod;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.pattern.getPosition();
 	}
 	
 	@Override

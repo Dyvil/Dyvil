@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,13 +14,19 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ReturnStatement extends ASTNode implements IStatement, IValued
+public class ReturnStatement extends Value implements IStatement, IValued
 {
-	public IValue value;
+	protected IValue value;
 	
 	public ReturnStatement(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	public ReturnStatement(ICodePosition position, IValue value)
+	{
+		this.position = position;
+		this.value = value;
 	}
 	
 	@Override

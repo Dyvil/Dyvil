@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -15,8 +16,8 @@ import dyvil.tools.compiler.transform.ConstantFolder;
 
 public final class MethodCall extends AbstractCall implements INamed
 {
-	public boolean	dotless;
-	public Name		name;
+	protected Name		name;
+	protected boolean	dotless;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -27,8 +28,24 @@ public final class MethodCall extends AbstractCall implements INamed
 	{
 		this.position = position;
 		this.instance = instance;
-		
 		this.name = name;
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.name = name;
+		this.arguments = arguments;
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.name = method.getName();
+		this.method = method;
+		this.arguments = arguments;
 	}
 	
 	@Override
@@ -47,6 +64,16 @@ public final class MethodCall extends AbstractCall implements INamed
 	public Name getName()
 	{
 		return this.name;
+	}
+	
+	public boolean isDotless()
+	{
+		return this.dotless;
+	}
+	
+	public void setDotless(boolean dotless)
+	{
+		this.dotless = dotless;
 	}
 	
 	@Override

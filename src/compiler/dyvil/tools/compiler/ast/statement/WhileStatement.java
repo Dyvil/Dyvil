@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
@@ -18,16 +17,17 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class WhileStatement extends ASTNode implements IStatement, ILoop
+public final class WhileStatement extends Value implements IStatement, ILoop
 {
 	public static final Name	$whileStart	= Name.getQualified("$whileStart");
 	public static final Name	$whileEnd	= Name.getQualified("$whileEnd");
 	
-	public IValue	condition;
-	public IValue	action;
+	protected IValue	condition;
+	protected IValue	action;
 	
-	public Label	startLabel;
-	public Label	endLabel;
+	// Metadata
+	private Label	startLabel;
+	private Label	endLabel;
 	
 	public WhileStatement(ICodePosition position)
 	{
@@ -47,12 +47,12 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		return this.condition;
 	}
 	
-	public void setThen(IValue then)
+	public void setAction(IValue action)
 	{
-		this.action = then;
+		this.action = action;
 	}
 	
-	public IValue getThen()
+	public IValue getAction()
 	{
 		return this.action;
 	}
@@ -157,7 +157,7 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		if (this.condition != null)
 		{
 			// while (false)
-			if (this.condition.valueTag() == BOOLEAN && !((BooleanValue) this.condition).value)
+			if (this.condition.valueTag() == BOOLEAN && !this.condition.booleanValue())
 			{
 				return new VoidValue(this.position);
 			}

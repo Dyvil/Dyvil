@@ -104,9 +104,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					throw new SyntaxError(token, "Cannot define a constructor in this context");
 				}
 				
-				Constructor c = new Constructor(this.theClass);
-				c.position = token.raw();
-				c.modifiers = this.modifiers;
+				Constructor c = new Constructor(token.raw(), this.theClass, this.modifiers);
 				c.setAnnotations(this.annotations, this.annotationCount);
 				this.member = c;
 				
@@ -167,9 +165,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			type = next.type();
 			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				Field f = new Field(this.theClass, token.nameValue(), this.type);
-				f.position = token.raw();
-				f.modifiers = this.modifiers;
+				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.consumer.addField(f);
 				
@@ -187,18 +183,14 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			{
 				this.mode = PARAMETERS;
 				
-				Method m = new Method(this.theClass, token.nameValue(), this.type);
-				m.modifiers = this.modifiers;
-				m.position = token.raw();
+				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.member = m;
 				return;
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				Property p = new Property(this.theClass, token.nameValue(), this.type);
-				p.position = token.raw();
-				p.modifiers = this.modifiers;
+				Property p = new Property(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				p.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.member = p;
 				this.mode = FIELD_END;
@@ -209,9 +201,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			if (type == Symbols.EQUALS)
 			{
-				Field f = new Field(this.theClass, token.nameValue(), this.type);
-				f.position = token.raw();
-				f.modifiers = this.modifiers;
+				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				f.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.member = f;
 				this.mode = FIELD_END;
@@ -222,9 +212,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
-				Method m = new Method(this.theClass, token.nameValue(), this.type);
-				m.modifiers = this.modifiers;
-				m.position = token.raw();
+				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.getAnnotations(), this.annotationCount);
 				this.member = m;
 				

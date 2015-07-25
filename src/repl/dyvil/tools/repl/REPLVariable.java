@@ -25,11 +25,11 @@ public class REPLVariable extends Field
 {
 	protected String className;
 	
-	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className)
+	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
 	{
 		super(null, name, type);
 		this.className = className;
-		this.theClass = new REPLMemberClass(Name.getQualified(className), this);
+		this.modifiers = modifiers;
 		this.position = position;
 		this.value = value;
 	}

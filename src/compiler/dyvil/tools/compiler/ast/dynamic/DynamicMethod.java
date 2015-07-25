@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import dyvil.array.ObjectArray;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -29,7 +28,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
+public class DynamicMethod implements IMethod, IDefaultContext
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
 			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
@@ -39,6 +38,12 @@ public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
 	public DynamicMethod(Name name)
 	{
 		this.name = name;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
 	}
 	
 	@Override
@@ -189,7 +194,7 @@ public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
 	{
 		return 0;
 	}
-
+	
 	@Override
 	public int annotationCount()
 	{
@@ -201,7 +206,7 @@ public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
 	{
 		return null;
 	}
-
+	
 	@Override
 	public void setAnnotation(int index, Annotation annotation)
 	{
@@ -221,7 +226,7 @@ public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
 	public void setAnnotations(Annotation[] annotations, int count)
 	{
 	}
-
+	
 	@Override
 	public Annotation[] getAnnotations()
 	{
@@ -298,32 +303,32 @@ public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
-
+	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}
-
+	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 	}
-
+	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-
+	
 	@Override
 	public void foldConstants()
 	{
 	}
-
+	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
-
+	
 	@Override
 	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
@@ -381,7 +386,7 @@ public class DynamicMethod extends ASTNode implements IMethod, IDefaultContext
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 	}
-
+	
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{

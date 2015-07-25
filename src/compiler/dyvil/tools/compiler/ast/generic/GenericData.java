@@ -18,8 +18,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	public int		genericCount;
 	public IType	instanceType;
 	
-	public int computedGenerics = -1;
-	
 	public GenericData()
 	{
 	}
@@ -28,7 +26,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	{
 		this.method = method;
 		this.generics = new IType[count];
-		this.computedGenerics = count;
 	}
 	
 	@Override
@@ -39,8 +36,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	
 	public void setTypeCount(int count)
 	{
-		this.computedGenerics = count - this.genericCount;
-		
 		if (this.generics == null)
 		{
 			this.generics = new IType[count];
@@ -161,11 +156,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int len = this.genericCount;
-		if (this.computedGenerics != -1)
-		{
-			len -= this.computedGenerics;
-		}
-		
 		if (len > 0)
 		{
 			buffer.append('#').append('[');

@@ -8,10 +8,7 @@ public interface IASTNode
 	{
 	}
 	
-	public default ICodePosition getPosition()
-	{
-		return null;
-	}
+	public ICodePosition getPosition();
 	
 	public default int getLineNumber()
 	{

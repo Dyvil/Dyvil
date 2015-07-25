@@ -104,7 +104,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				if (this.type != null)
 				{
 					FieldInitializer fi = new FieldInitializer(token.raw(), token.nameValue(), this.type);
-					pm.pushParser(pm.newExpressionParser(fi));
+					pm.pushParser(pm.newExpressionParser(fi.getVariable()));
 					this.statementList.addValue(fi);
 				}
 				else if (token != this.firstToken)

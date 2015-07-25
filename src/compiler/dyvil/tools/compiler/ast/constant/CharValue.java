@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -14,9 +13,10 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CharValue extends ASTNode implements INumericValue
+public final class CharValue implements IConstantValue
 {
-	public char value;
+	protected ICodePosition	position;
+	protected char			value;
 	
 	public CharValue(char value)
 	{
@@ -27,6 +27,12 @@ public final class CharValue extends ASTNode implements INumericValue
 	{
 		this.position = position;
 		this.value = value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

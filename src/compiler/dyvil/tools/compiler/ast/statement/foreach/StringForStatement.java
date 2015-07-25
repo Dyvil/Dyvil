@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StringForStatement extends ForEachStatement
 {
@@ -17,30 +18,19 @@ public class StringForStatement extends ForEachStatement
 	protected Variable	lengthVar;
 	protected Variable	stringVar;
 	
-	public StringForStatement(Variable var, IValue action)
+	public StringForStatement(ICodePosition position, Variable var, IValue action)
 	{
-		super(var, action);
+		super(position, var, action);
 		
-		Variable var1 = new Variable();
-		var1.type = Types.INT;
-		var1.name = ArrayForStatement.$index;
-		this.indexVar = var1;
-		
-		var1 = new Variable();
-		var1.type = Types.INT;
-		var1.name = ArrayForStatement.$length;
-		this.lengthVar = var1;
-		
-		var1 = new Variable();
-		var1.type = Types.STRING;
-		var1.name = $string;
-		this.stringVar = var1;
+		this.indexVar = new Variable(ArrayForStatement.$length, Types.INT);
+		this.lengthVar = new Variable(ArrayForStatement.$length, Types.INT);
+		this.stringVar = new Variable($string, Types.STRING);
 	}
 	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.variable.name == name)
+		if (this.variable.getName() == name)
 		{
 			return this.variable;
 		}
@@ -76,7 +66,7 @@ public class StringForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Load the String
-		var.value.writeExpression(writer);
+		var.getValue().writeExpression(writer);
 		
 		// Local Variables
 		int locals = writer.localCount();
@@ -110,7 +100,7 @@ public class StringForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increase index
-		writer.writeIINC(indexVar.index, 1);
+		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
 		indexVar.writeGet(writer, null, lineNumber);
 		lengthVar.writeGet(writer, null, lineNumber);

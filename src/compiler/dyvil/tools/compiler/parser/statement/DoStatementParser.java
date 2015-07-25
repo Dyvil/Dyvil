@@ -75,11 +75,11 @@ public class DoStatementParser extends Parser implements IValueConsumer
 	{
 		if (this.mode == WHILE)
 		{
-			this.statement.action = value;
+			this.statement.setAction(value);
 		}
 		else if (this.mode == END)
 		{
-			this.statement.condition = value;
+			this.statement.setCondition(value);
 		}
 	}
 }

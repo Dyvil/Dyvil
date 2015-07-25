@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassParameterSetter implements IValue
 {
@@ -45,6 +46,12 @@ public final class ClassParameterSetter implements IValue
 	public int valueTag()
 	{
 		return 0;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
 	}
 	
 	@Override

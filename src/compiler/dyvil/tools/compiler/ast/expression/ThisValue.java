@@ -1,24 +1,25 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ThisValue extends ASTNode implements IValue
+public final class ThisValue implements IValue
 {
-	protected IType type = Types.UNKNOWN;
+	protected ICodePosition	position;
+	protected IType			type	= Types.UNKNOWN;
 	
+	// Metadata
 	protected IAccessible getter;
 	
 	public ThisValue(IType type)
@@ -43,6 +44,12 @@ public final class ThisValue extends ASTNode implements IValue
 		this.position = position;
 		this.type = type;
 		this.getter = getter;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

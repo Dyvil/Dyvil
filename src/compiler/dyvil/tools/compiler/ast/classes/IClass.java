@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IParameterized, IClassCompilableList
+public interface IClass extends IClassMember, IGeneric, IContext, IParameterized, IClassCompilableList
 {
 	@Override
 	public default void setTheClass(IClass iclass)

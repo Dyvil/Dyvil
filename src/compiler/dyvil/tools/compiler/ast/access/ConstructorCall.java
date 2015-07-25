@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -21,16 +20,44 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ConstructorCall extends ASTNode implements ICall
+public class ConstructorCall implements ICall
 {
-	public IType		type;
-	public IArguments	arguments	= EmptyArguments.INSTANCE;
+	protected ICodePosition	position;
+	protected IType			type;
+	protected IArguments	arguments;
 	
-	public IConstructor constructor;
+	protected IConstructor constructor;
+	
+	protected ConstructorCall()
+	{
+		this.arguments = EmptyArguments.INSTANCE;
+	}
 	
 	public ConstructorCall(ICodePosition position)
 	{
 		this.position = position;
+		this.arguments = EmptyArguments.INSTANCE;
+	}
+	
+	public ConstructorCall(ICodePosition position, IType type, IArguments arguments)
+	{
+		this.position = position;
+		this.type = type;
+		this.arguments = arguments;
+	}
+	
+	public ConstructorCall(ICodePosition position, IConstructor constructor, IArguments arguments)
+	{
+		this.position = position;
+		this.constructor = constructor;
+		this.type = constructor.getType();
+		this.arguments = arguments;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

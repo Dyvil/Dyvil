@@ -31,6 +31,12 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.variable.getPosition();
+	}
+	
+	@Override
 	public int getAccessLevel()
 	{
 		return this.variable.getAccessLevel();

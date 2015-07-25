@@ -29,21 +29,23 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 {
 	protected ICodePosition position;
 	
-	public Variable	variable;
-	public IValue	action;
+	protected Variable	variable;
+	protected IValue	action;
 	
+	// Metadata
 	protected Label	startLabel;
 	protected Label	updateLabel;
 	protected Label	endLabel;
 	
-	public ForEachStatement(Variable var, IValue action)
+	public ForEachStatement(ICodePosition position, Variable var, IValue action)
 	{
+		this.position = position;
+		this.variable = var;
+		this.action = action;
+		
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
 		this.endLabel = new Label($forEnd);
-		
-		this.variable = var;
-		this.action = action;
 	}
 	
 	@Override
@@ -94,7 +96,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.variable.name == name)
+		if (this.variable.getName() == name)
 		{
 			return this.variable;
 		}
@@ -153,9 +155,9 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IType varType = this.variable.type;
-		IValue value = this.variable.value;
-		this.variable.value = value = value.resolve(markers, context);
+		IType varType = this.variable.getType();
+		IValue value = this.variable.getValue().resolve(markers, context);
+		this.variable.setValue(value);
 		
 		if (value.valueTag() == IValue.RANGE_OPERATOR)
 		{
@@ -171,10 +173,10 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 					rangeType = Types.combine(value1.getType(), value2.getType());
 				}
 				
-				this.variable.type = varType = rangeType;
+				this.variable.setType(varType = rangeType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.position, "for.variable.infer", this.variable.name);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.getName());
 				}
 			}
 			else if (rangeType == Types.UNKNOWN)
@@ -188,7 +190,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new RangeForStatement(this.variable, value1, value2, this.resolveAction(markers, context));
+			return new RangeForStatement(this.position, this.variable, value1, value2, this.resolveAction(markers, context));
 		}
 		
 		IType valueType = value.getType();
@@ -196,10 +198,10 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.type = varType = valueType.getElementType();
+				this.variable.setType(varType = valueType.getElementType());
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.getName());
 				}
 			}
 			else if (!varType.classEquals(valueType.getElementType()))
@@ -209,17 +211,17 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new ArrayForStatement(this.variable, this.resolveAction(markers, context), valueType);
+			return new ArrayForStatement(this.position, this.variable, this.resolveAction(markers, context), valueType);
 		}
 		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
 			IType iterableType = valueType.resolveType(IterableForStatement.ITERABLE_TYPE);
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.type = varType = iterableType;
+				this.variable.setType(varType = iterableType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.position, "for.variable.infer", this.variable.name);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.getName());
 				}
 			}
 			else if (!varType.isSuperTypeOf(iterableType))
@@ -229,13 +231,13 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				m.addInfo("Variable Type: " + varType);
 			}
 			
-			return new IterableForStatement(this.variable, this.resolveAction(markers, context), valueType, iterableType);
+			return new IterableForStatement(this.position, this.variable, this.resolveAction(markers, context), valueType, iterableType);
 		}
 		if (Types.STRING.isSuperTypeOf(valueType))
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.type = varType = Types.CHAR;
+				this.variable.setType(varType = Types.CHAR);
 			}
 			else if (!varType.classEquals(Types.CHAR))
 			{
@@ -243,10 +245,10 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new StringForStatement(this.variable, this.resolveAction(markers, context));
+			return new StringForStatement(this.position, this.variable, this.resolveAction(markers, context));
 		}
 		
-		Marker m = markers.create(this.variable.position, "for.invalid");
+		Marker m = markers.create(this.variable.getPosition(), "for.invalid");
 		m.addInfo("Variable Type: " + varType);
 		m.addInfo("Value Type: " + valueType);
 		
@@ -265,7 +267,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	{
 		if (this.variable != null)
 		{
-			this.variable.value.checkTypes(markers, context);
+			this.variable.getValue().checkTypes(markers, context);
 		}
 		if (this.action != null)
 		{
@@ -278,7 +280,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	{
 		if (this.variable != null)
 		{
-			this.variable.value.check(markers, context);
+			this.variable.getValue().check(markers, context);
 		}
 		if (this.action != null)
 		{
@@ -325,9 +327,9 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.forStart);
-		this.variable.type.toString(prefix, buffer);
-		buffer.append(' ').append(this.variable.name).append(Formatting.Statements.forEachSeperator);
-		this.variable.value.toString(prefix, buffer);
+		this.variable.getType().toString(prefix, buffer);
+		buffer.append(' ').append(this.variable.getName()).append(Formatting.Statements.forEachSeperator);
+		this.variable.getValue().toString(prefix, buffer);
 		buffer.append(Formatting.Statements.forEnd);
 		
 		if (this.action != null)

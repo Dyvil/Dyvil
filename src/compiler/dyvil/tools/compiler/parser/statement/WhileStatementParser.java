@@ -78,11 +78,11 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 	{
 		if (this.mode == CONDITION_END)
 		{
-			this.statement.condition = value;
+			this.statement.setCondition(value);
 		}
 		else if (this.mode == -1)
 		{
-			this.statement.action = value;
+			this.statement.setAction(value);
 		}
 	}
 }

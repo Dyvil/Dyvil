@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -12,7 +11,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class BindingPattern extends ASTNode implements IPattern
+public final class BindingPattern extends Pattern
 {
 	private Name		name;
 	private Variable	variable;
@@ -72,9 +71,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 			return this.variable;
 		}
 		
-		this.variable = new Variable(this.position);
-		this.variable.name = this.name;
-		this.variable.type = this.type;
+		this.variable = new Variable(this.position, this.name, this.type);
 		return this.variable;
 	}
 	
@@ -98,7 +95,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	
 	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
-		this.variable.type = this.type;
+		this.variable.setType(this.type);
 		if (varIndex >= 0)
 		{
 			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);

@@ -27,6 +27,7 @@ import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.FileType;
@@ -86,6 +87,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public boolean isHeader()
 	{
 		return true;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return ICodePosition.ORIGIN;
 	}
 	
 	@Override

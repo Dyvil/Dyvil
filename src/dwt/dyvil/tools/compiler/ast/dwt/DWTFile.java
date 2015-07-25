@@ -9,7 +9,6 @@ import java.util.TreeMap;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -27,11 +26,12 @@ import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.dwt.DWTParser;
 
-public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilable
+public class DWTFile implements ICompilationUnit, IClassCompilable
 {
 	public static final Package javaxSwing = Library.javaLibrary.resolvePackage("javax.swing");
 	
@@ -67,6 +67,12 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		this.outputFile = new File(name.substring(0, end) + ".class");
 		
 		this.rootNode = new DWTNode();
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return ICodePosition.ORIGIN;
 	}
 	
 	@Override
@@ -123,7 +129,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		IConstructor match = IContext.resolveConstructor(this.rootNode.theClass, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			this.markers.add(this.position, "dwt.component.constructor");
+			this.markers.add(ICodePosition.ORIGIN, "dwt.component.constructor");
 		}
 		
 		this.rootNode.resolve(this.markers, Package.rootPackage);

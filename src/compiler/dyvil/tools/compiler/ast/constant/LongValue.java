@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -14,11 +13,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class LongValue extends ASTNode implements INumericValue
+public class LongValue implements IConstantValue
 {
 	private static LongValue NULL;
 	
-	public long value;
+	protected ICodePosition	position;
+	protected long			value;
 	
 	public LongValue(long value)
 	{
@@ -41,9 +41,21 @@ public class LongValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return LONG;
+	}
+	
+	@Override
+	public boolean isPrimitive()
+	{
+		return true;
 	}
 	
 	@Override

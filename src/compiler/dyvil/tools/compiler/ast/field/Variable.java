@@ -24,9 +24,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class Variable extends Member implements IVariable
 {
-	public int		index;
-	public IValue	value;
-	private IType	refType;
+	protected int		index;
+	protected IValue	value;
+	
+	// Metadata
+	private IType refType;
 	
 	public Variable()
 	{
@@ -45,9 +47,15 @@ public final class Variable extends Member implements IVariable
 	
 	public Variable(ICodePosition position, Name name, IType type)
 	{
+		this.position = position;
 		this.name = name;
 		this.type = type;
-		this.position = position;
+	}
+	
+	public Variable(Name name, IType type)
+	{
+		this.name = name;
+		this.type = type;
 	}
 	
 	@Override
@@ -252,6 +260,11 @@ public final class Variable extends Member implements IVariable
 	{
 		IType type = this.refType != null ? this.refType : this.type;
 		writer.writeLocal(this.index, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+	}
+	
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		this.writeInit(writer, this.value);
 	}
 	
 	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException

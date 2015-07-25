@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -23,11 +22,14 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class Array extends ASTNode implements IValue, IValueList
+public final class Array implements IValue, IValueList
 {
+	protected ICodePosition position;
+	
 	protected IValue[]	values;
 	protected int		valueCount;
 	
+	// Metadata
 	protected IType	requiredType;
 	protected IType	elementType;
 	
@@ -38,14 +40,27 @@ public final class Array extends ASTNode implements IValue, IValueList
 	
 	public Array(ICodePosition position)
 	{
-		this.values = new IValue[3];
 		this.position = position;
+		this.values = new IValue[3];
 	}
 	
 	public Array(IValue[] values, int valueCount)
 	{
 		this.values = values;
 		this.valueCount = valueCount;
+	}
+	
+	public Array(ICodePosition position, IValue[] values, int valueCount)
+	{
+		this.position = position;
+		this.values = values;
+		this.valueCount = valueCount;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

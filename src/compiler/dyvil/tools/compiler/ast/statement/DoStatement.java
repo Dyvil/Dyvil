@@ -1,11 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
@@ -16,18 +15,19 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class DoStatement extends ASTNode implements IStatement, ILoop
+public final class DoStatement extends Value implements IStatement, ILoop
 {
-	public static final Name	$doStart		= Name.getQualified("$doStart");
-	public static final Name	$doCondition	= Name.getQualified("$doCondition");
-	public static final Name	$doEnd			= Name.getQualified("$doEnd");
+	private static final Name	$doStart		= Name.getQualified("$doStart");
+	private static final Name	$doCondition	= Name.getQualified("$doCondition");
+	private static final Name	$doEnd			= Name.getQualified("$doEnd");
 	
-	public IValue	action;
-	public IValue	condition;
+	protected IValue	action;
+	protected IValue	condition;
 	
-	public Label	startLabel;
-	public Label	conditionLabel;
-	public Label	endLabel;
+	// Metadata
+	private Label	startLabel;
+	private Label	conditionLabel;
+	private Label	endLabel;
 	
 	public DoStatement(ICodePosition position)
 	{
@@ -54,12 +54,12 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		return this.condition;
 	}
 	
-	public void setThen(IValue then)
+	public void setAction(IValue then)
 	{
 		this.action = then;
 	}
 	
-	public IValue getThen()
+	public IValue getAction()
 	{
 		return this.action;
 	}
@@ -164,7 +164,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.condition != null)
 		{
-			if (this.condition.valueTag() == BOOLEAN && !((BooleanValue) this.condition).value)
+			if (this.condition.valueTag() == BOOLEAN && !this.condition.booleanValue())
 			{
 				return new VoidValue(this.position);
 			}

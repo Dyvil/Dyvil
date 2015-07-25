@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.constant.INumericValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -283,7 +282,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 				IValue value1 = this.arguments.getFirstValue();
 				if (IValue.isNumeric(value1.valueTag()))
 				{
-					int count = ((INumericValue) value1).intValue();
+					int count = value1.intValue();
 					writer.writeIINC(((IVariable) f).getIndex(), minus ? -count : count);
 					return true;
 				}

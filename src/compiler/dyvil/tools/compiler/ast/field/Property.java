@@ -59,6 +59,21 @@ public class Property extends Member implements IProperty, IContext
 		this.theClass = iclass;
 	}
 	
+	public Property(IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
+	public Property(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.position = position;
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
 	@Override
 	public void setTheClass(IClass iclass)
 	{

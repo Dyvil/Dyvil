@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class SwapOperator extends ASTNode implements IValue
+public class SwapOperator extends Value
 {
 	public FieldAccess	left;
 	public FieldAccess	right;
@@ -125,10 +125,10 @@ public class SwapOperator extends ASTNode implements IValue
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		int lineNumber = this.getLineNumber();
-		IValue leftInstance = this.left.instance;
-		IDataMember leftField = this.left.field;
-		IValue rightInstance = this.right.instance;
-		IDataMember rightField = this.right.field;
+		IValue leftInstance = this.left.getInstance();
+		IDataMember leftField = this.left.getField();
+		IValue rightInstance = this.right.getInstance();
+		IDataMember rightField = this.right.getField();
 		
 		if (leftInstance != null)
 		{

@@ -39,12 +39,12 @@ public final class ClassParameter extends Parameter implements IField
 		this.type = type;
 	}
 	
-	public ClassParameter(IClass theClass, int access, Name name, IType type)
+	public ClassParameter(IClass theClass, Name name, IType type, int modifiers)
 	{
 		this.theClass = theClass;
 		this.name = name;
 		this.type = type;
-		this.modifiers = access;
+		this.modifiers = modifiers;
 	}
 	
 	@Override

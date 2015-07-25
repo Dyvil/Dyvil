@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -18,12 +17,13 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ClassAccess extends ASTNode implements IValue
+public final class ClassAccess implements IValue
 {
 	private static final byte	OBJECT_ACCESS	= 1;
 	private static final byte	APPLY_CALL		= 2;
 	
-	public IType type;
+	protected ICodePosition	position;
+	protected IType			type;
 	
 	public ClassAccess(IType type)
 	{
@@ -34,6 +34,12 @@ public final class ClassAccess extends ASTNode implements IValue
 	{
 		this.position = position;
 		this.type = type;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

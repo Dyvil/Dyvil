@@ -13,6 +13,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
 public final class LiteralExpression implements IValue
@@ -40,6 +41,12 @@ public final class LiteralExpression implements IValue
 		this.literal = literal;
 		this.arguments = new SingleArgument(literal);
 		this.method = method;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.literal.getPosition();
 	}
 	
 	@Override

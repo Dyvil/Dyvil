@@ -7,13 +7,13 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ForStatement implements IStatement, IDefaultContext, ILoop
 {
@@ -21,18 +21,20 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	public static final Name	$forUpdate	= Name.getQualified("$forCondition");
 	public static final Name	$forEnd		= Name.getQualified("$forEnd");
 	
-	public Variable variable;
+	protected ICodePosition	position;
+	protected Variable		variable;
 	
-	public IValue	condition;
-	public IValue	update;
+	protected IValue	condition;
+	protected IValue	update;
 	
-	public IValue action;
+	protected IValue action;
 	
+	// Metadata
 	protected Label	startLabel;
 	protected Label	updateLabel;
 	protected Label	endLabel;
 	
-	public ForStatement(Variable variable, IValue condition, IValue update, IValue action)
+	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
 	{
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
@@ -45,16 +47,15 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	}
 	
 	@Override
-	public int valueTag()
+	public ICodePosition getPosition()
 	{
-		return FOR;
+		return this.position;
 	}
 	
 	@Override
-	public void setType(IType type)
+	public int valueTag()
 	{
-		this.variable = new Variable(type.getPosition());
-		this.variable.type = type;
+		return FOR;
 	}
 	
 	@Override
@@ -72,7 +73,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.variable != null && this.variable.name == name)
+		if (this.variable != null && this.variable.getName() == name)
 		{
 			return this.variable;
 		}
@@ -278,7 +279,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		// Variable
 		if (var != null)
 		{
-			var.writeInit(writer, var.value);
+			var.writeInit(writer, var.getValue());
 		}
 		writer.writeTargetLabel(startLabel);
 		// Condition

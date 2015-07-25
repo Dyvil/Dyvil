@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -17,11 +16,15 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class InitializerCall extends ASTNode implements IValue
+public class InitializerCall implements IValue
 {
-	private IConstructor	constructor;
-	private IArguments		arguments;
-	private boolean			isSuper;
+	protected ICodePosition position;
+	
+	protected boolean		isSuper;
+	protected IArguments	arguments;
+	
+	// Metadata
+	protected IConstructor constructor;
 	
 	public InitializerCall(ICodePosition position, IConstructor constructor, IArguments arguments, boolean isSuper)
 	{
@@ -36,6 +39,12 @@ public class InitializerCall extends ASTNode implements IValue
 		this.position = position;
 		this.constructor = constructor;
 		this.arguments = arguments;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

@@ -116,12 +116,12 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	{
 		if (this.mode == CATCH)
 		{
-			this.statement.action = value;
+			this.statement.setAction(value);
 			return;
 		}
 		if (this.mode == 0)
 		{
-			this.statement.finallyBlock = value;
+			this.statement.setFinallyBlock(value);
 		}
 	}
 }

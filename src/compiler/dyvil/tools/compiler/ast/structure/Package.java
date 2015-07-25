@@ -146,7 +146,7 @@ public class Package implements INamed, IDefaultContext
 			return;
 		}
 		
-		if (!this.fullName.equals(packageDecl.thePackage))
+		if (!this.fullName.equals(packageDecl.getPackage()))
 		{
 			markers.add(packageDecl.getPosition(), "package.invalid", this.fullName);
 		}

@@ -10,8 +10,6 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.constant.IntValue;
-import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.Array;
@@ -56,8 +54,6 @@ import static dyvil.reflect.Opcodes.INSTANCE;
 
 public class Method extends Member implements IMethod, ILabelContext
 {
-	protected IClass theClass;
-	
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
@@ -66,9 +62,11 @@ public class Method extends Member implements IMethod, ILabelContext
 	protected IType[]		exceptions;
 	protected int			exceptionCount;
 	
-	public IValue value;
+	protected IValue value;
 	
-	public String		descriptor;
+	// Metadata
+	protected IClass	theClass;
+	protected String	descriptor;
 	protected int[]		intrinsicOpcodes;
 	protected IMethod	overrideMethod;
 	
@@ -88,6 +86,23 @@ public class Method extends Member implements IMethod, ILabelContext
 		this.theClass = iclass;
 		this.type = type;
 		this.name = name;
+	}
+	
+	public Method(IClass iclass, Name name, IType type, int modifiers)
+	{
+		this.theClass = iclass;
+		this.type = type;
+		this.name = name;
+		this.modifiers = modifiers;
+	}
+	
+	public Method(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	{
+		this.theClass = iclass;
+		this.position = position;
+		this.type = type;
+		this.name = name;
+		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -544,6 +559,19 @@ public class Method extends Member implements IMethod, ILabelContext
 		}
 	}
 	
+	protected final void readIntrinsicAnnotation(Annotation annotation)
+	{
+		Array array = (Array) annotation.getArguments().getValue(0, Annotation.VALUE);
+		
+		int len = array.valueCount();
+		int[] opcodes = new int[len];
+		for (int i = 0; i < len; i++)
+		{
+			opcodes[i] = array.getValue(i).intValue();
+		}
+		this.intrinsicOpcodes = opcodes;
+	}
+	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -552,27 +580,12 @@ public class Method extends Member implements IMethod, ILabelContext
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation annotation = this.annotations[i];
-			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
+			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
 			}
 			
-			try
-			{
-				Array array = (Array) annotation.arguments.getValue(0, Annotation.VALUE);
-				
-				int len = array.valueCount();
-				int[] opcodes = new int[len];
-				for (int j = 0; j < len; j++)
-				{
-					IntValue v = (IntValue) array.getValue(j);
-					opcodes[j] = v.value;
-				}
-				this.intrinsicOpcodes = opcodes;
-			}
-			catch (NullPointerException | ClassCastException ex)
-			{
-			}
+			this.readIntrinsicAnnotation(annotation);
 			break;
 		}
 		
@@ -1053,8 +1066,8 @@ public class Method extends Member implements IMethod, ILabelContext
 			return;
 		}
 		
-		IValue v = a.arguments.getValue(0, Annotation.VALUE);
-		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;
+		IValue v = a.getArguments().getValue(0, Annotation.VALUE);
+		String s = v != null ? v.stringValue() : mutating.VALUE_DEFAULT;
 		StringBuilder builder = new StringBuilder(s);
 		
 		int index = builder.indexOf("{method}");

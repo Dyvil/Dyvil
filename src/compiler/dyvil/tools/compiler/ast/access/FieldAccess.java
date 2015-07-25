@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -23,15 +22,21 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class FieldAccess extends ASTNode implements IValue, INamed, IValued
+public final class FieldAccess implements IValue, INamed, IValued
 {
-	public IValue	instance;
-	public Name		name;
+	protected ICodePosition	position;
+	protected IValue		instance;
+	protected Name			name;
 	
-	public boolean dotless;
+	protected boolean dotless;
 	
-	public IDataMember	field;
-	protected IType		type;
+	// Metadata
+	protected IDataMember	field;
+	protected IType			type;
+	
+	public FieldAccess()
+	{
+	}
 	
 	public FieldAccess(ICodePosition position)
 	{
@@ -43,6 +48,19 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
+	}
+	
+	public FieldAccess(ICodePosition position, IValue instance, IDataMember field)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.field = field;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	public MethodCall toMethodCall(IMethod method)
@@ -60,6 +78,26 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	public int valueTag()
 	{
 		return FIELD_ACCESS;
+	}
+	
+	public IValue getInstance()
+	{
+		return this.instance;
+	}
+	
+	public IDataMember getField()
+	{
+		return this.field;
+	}
+	
+	public boolean isDotless()
+	{
+		return this.dotless;
+	}
+	
+	public void setDotless(boolean dotless)
+	{
+		this.dotless = dotless;
 	}
 	
 	@Override
@@ -143,9 +181,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		{
 			if (field.isEnumConstant())
 			{
-				EnumValue enumValue = new EnumValue(this.position);
-				enumValue.name = this.name;
-				enumValue.type = field.getType();
+				EnumValue enumValue = new EnumValue(field.getType(), this.name);
 				return enumValue;
 			}
 			

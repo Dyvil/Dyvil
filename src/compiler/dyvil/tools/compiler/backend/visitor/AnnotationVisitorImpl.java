@@ -23,7 +23,7 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 	{
 		this.annotated = annotated;
 		this.annotation = annotation;
-		this.annotation.arguments = this.arguments = new ArgumentMap();
+		this.annotation.setArguments(this.arguments = new ArgumentMap());
 	}
 	
 	@Override

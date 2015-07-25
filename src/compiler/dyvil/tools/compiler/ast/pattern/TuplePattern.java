@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -17,7 +16,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class TuplePattern extends ASTNode implements IPattern, IPatternList
+public final class TuplePattern extends Pattern implements IPatternList
 {
 	private IPattern[]	patterns	= new IPattern[3];
 	private int			patternCount;

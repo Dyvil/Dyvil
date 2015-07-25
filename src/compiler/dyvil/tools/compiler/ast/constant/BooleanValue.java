@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -15,12 +14,13 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class BooleanValue extends ASTNode implements IConstantValue
+public final class BooleanValue implements IConstantValue
 {
 	public static final BooleanValue	TRUE	= new BooleanValue(true);
 	public static final BooleanValue	FALSE	= new BooleanValue(false);
 	
-	public boolean value;
+	protected ICodePosition	position;
+	protected boolean		value;
 	
 	public BooleanValue(boolean value)
 	{
@@ -31,6 +31,12 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	{
 		this.position = position;
 		this.value = value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

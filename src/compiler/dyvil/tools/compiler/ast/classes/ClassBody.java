@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -17,8 +16,9 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ClassBody extends ASTNode implements IClassBody
+public class ClassBody implements IClassBody
 {
 	public IClass theClass;
 	
@@ -39,6 +39,12 @@ public class ClassBody extends ASTNode implements IClassBody
 	public ClassBody(IClass iclass)
 	{
 		this.theClass = iclass;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
 	}
 	
 	@Override

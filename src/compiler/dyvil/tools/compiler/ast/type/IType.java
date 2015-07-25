@@ -29,6 +29,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
@@ -86,6 +87,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int	TYPE_VAR_TYPE		= 32;
 	int	INTERNAL_TYPE_VAR	= 33;
 	int	WILDCARD_TYPE		= 34;
+	
+	@Override
+	public default ICodePosition getPosition()
+	{
+		return null;
+	}
 	
 	public int typeTag();
 	

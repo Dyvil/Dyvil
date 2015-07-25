@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -16,8 +15,10 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 
-public final class FormatStringExpression extends ASTNode implements IValue
+public final class FormatStringExpression implements IValue
 {
+	protected ICodePosition position;
+	
 	private IValue[]	values	= new IValue[1];
 	private String[]	strings	= new String[2];
 	private int			count;
@@ -25,6 +26,12 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	public FormatStringExpression(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

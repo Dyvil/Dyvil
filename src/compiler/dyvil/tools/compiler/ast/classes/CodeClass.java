@@ -156,7 +156,7 @@ public class CodeClass extends AbstractClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			String internalName = a.type.getInternalName();
+			String internalName = a.getType().getInternalName();
 			if (internalName != null && !this.addRawAnnotation(internalName))
 			{
 				this.removeAnnotation(i--);
@@ -426,11 +426,7 @@ public class CodeClass extends AbstractClass
 			}
 			else
 			{
-				FieldAssign assign = new FieldAssign(null);
-				assign.name = f.getName();
-				assign.instance = thisValue;
-				assign.value = f.getValue();
-				assign.field = f;
+				FieldAssign assign = new FieldAssign(null, thisValue, f, f.getValue());
 				instanceFields.addValue(assign);
 			}
 		}

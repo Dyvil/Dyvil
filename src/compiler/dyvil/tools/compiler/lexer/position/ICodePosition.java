@@ -2,6 +2,8 @@ package dyvil.tools.compiler.lexer.position;
 
 public interface ICodePosition
 {
+	public static ICodePosition ORIGIN = new CodePosition(1, 0, 1);
+	
 	public int startIndex();
 	
 	public int endIndex();

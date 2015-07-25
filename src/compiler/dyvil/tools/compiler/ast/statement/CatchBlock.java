@@ -55,9 +55,7 @@ public class CatchBlock implements IValued, ITyped, IDefaultContext
 		{
 			if (this.variable == null)
 			{
-				this.variable = new Variable(this.type.getPosition());
-				this.variable.name = this.varName;
-				this.variable.type = this.type;
+				this.variable = new Variable(this.type.getPosition(), this.varName, this.type);
 			}
 			return this.variable;
 		}

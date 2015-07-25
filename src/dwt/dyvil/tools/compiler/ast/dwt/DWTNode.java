@@ -7,12 +7,12 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Opcodes;
 import dyvil.string.StringUtils;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.expression.IValueMap;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -30,7 +30,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
+public class DWTNode extends Value implements INamed, IValueMap
 {
 	public static final int	NODE		= 256;
 	public static final int	LIST		= 257;

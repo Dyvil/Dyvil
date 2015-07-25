@@ -60,8 +60,8 @@ public class SubscriptGetter extends AbstractCall
 				else
 				{
 					this.arguments.resolve(markers, context);
-					Array array = new Array(((ArgumentList) this.arguments).getValues(), this.arguments.size());
-					array.position = this.arguments.getFirstValue().getPosition().to(this.arguments.getLastValue().getPosition());
+					ICodePosition position = this.arguments.getFirstValue().getPosition().to(this.arguments.getLastValue().getPosition());
+					Array array = new Array(position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
 					IArguments arguments = new SingleArgument(array);
 					
 					IMethod m = ICall.resolveMethod(context, fa.instance, fa.name, arguments);

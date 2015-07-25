@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class NullCheckOperator implements IValue
 {
@@ -21,6 +22,12 @@ public final class NullCheckOperator implements IValue
 	{
 		this.value = value;
 		this.isNull = isNull;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.value.getPosition();
 	}
 	
 	@Override

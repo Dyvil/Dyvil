@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -14,9 +13,10 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SuperValue extends ASTNode implements IValue
+public final class SuperValue implements IValue
 {
-	public IType type = Types.UNKNOWN;
+	protected ICodePosition	position;
+	protected IType			type	= Types.UNKNOWN;
 	
 	public SuperValue(ICodePosition position)
 	{
@@ -30,15 +30,15 @@ public final class SuperValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int valueTag()
+	public ICodePosition getPosition()
 	{
-		return SUPER;
+		return this.position;
 	}
 	
 	@Override
-	public boolean isPrimitive()
+	public int valueTag()
 	{
-		return false;
+		return SUPER;
 	}
 	
 	@Override

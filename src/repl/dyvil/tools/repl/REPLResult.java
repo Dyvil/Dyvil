@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class REPLResult implements IConstantValue
 {
@@ -18,6 +19,12 @@ public class REPLResult implements IConstantValue
 	public REPLResult(Object value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return ICodePosition.ORIGIN;
 	}
 	
 	@Override

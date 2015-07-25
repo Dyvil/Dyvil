@@ -46,6 +46,21 @@ public class Field extends Member implements IField
 		this.theClass = iclass;
 	}
 	
+	public Field(IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
+	public Field(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.position = position;
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
 	@Override
 	public boolean isField()
 	{

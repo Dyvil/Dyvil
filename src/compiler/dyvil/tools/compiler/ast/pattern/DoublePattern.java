@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -10,7 +9,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class DoublePattern extends ASTNode implements IPattern
+public final class DoublePattern extends Pattern
 {
 	private double value;
 	

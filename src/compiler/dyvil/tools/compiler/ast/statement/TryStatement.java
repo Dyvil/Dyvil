@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,13 +19,14 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class TryStatement extends ASTNode implements IStatement, IDefaultContext
+public final class TryStatement extends Value implements IStatement, IDefaultContext
 {
-	public IValue			action;
-	private CatchBlock[]	catchBlocks	= new CatchBlock[1];
-	private int				catchBlockCount;
-	public IValue			finallyBlock;
+	protected IValue		action;
+	protected CatchBlock[]	catchBlocks	= new CatchBlock[1];
+	protected int			catchBlockCount;
+	protected IValue		finallyBlock;
 	
+	// Metadata
 	private IType commonType;
 	
 	public TryStatement(ICodePosition position)
@@ -37,6 +38,26 @@ public final class TryStatement extends ASTNode implements IStatement, IDefaultC
 	public int valueTag()
 	{
 		return TRY;
+	}
+	
+	public void setAction(IValue action)
+	{
+		this.action = action;
+	}
+	
+	public IValue getAction()
+	{
+		return this.action;
+	}
+	
+	public void setFinallyBlock(IValue finallyBlock)
+	{
+		this.finallyBlock = finallyBlock;
+	}
+	
+	public IValue getFinallyBlock()
+	{
+		return this.finallyBlock;
 	}
 	
 	@Override

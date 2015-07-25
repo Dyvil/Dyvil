@@ -5,8 +5,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -29,25 +29,32 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaseExpression extends ASTNode implements IValue, ICase, IClassCompilable, IDefaultContext
+public final class CaseExpression implements IValue, ICase, IClassCompilable, IDefaultContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
 	public static final ClassType		PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
 	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
 	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
+	protected ICodePosition position;
+	
 	protected IPattern	pattern;
 	protected IValue	condition;
 	protected IValue	action;
 	
+	// Metadata
 	protected IType	type;
 	private String	internalClassName;
-	
-	private transient IContext context;
 	
 	public CaseExpression(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -66,11 +73,6 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	public void setInnerIndex(String internalName, int index)
 	{
 		this.internalClassName = internalName + "$" + index;
-	}
-	
-	public void setMatchCase()
-	{
-		this.type = Types.UNKNOWN;
 	}
 	
 	@Override
@@ -175,18 +177,17 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	{
 		if (this.condition != null)
 		{
-			this.condition.resolveTypes(markers, this);
+			this.condition.resolveTypes(markers, context);
 		}
 		if (this.action != null)
 		{
-			this.action.resolveTypes(markers, this);
+			this.action.resolveTypes(markers, context);
 		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.context = context;
 		if (this.pattern != null)
 		{
 			this.pattern.resolve(markers, context);
@@ -200,49 +201,46 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 			this.pattern = this.pattern.withType(type1, markers);
 			// TODO Handle error
 		}
+		
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, this);
+			this.condition = this.condition.resolve(markers, context1);
 		}
 		if (this.action != null)
 		{
-			this.action = this.action.resolve(markers, this);
+			this.action = this.action.resolve(markers, context1);
 		}
 		
-		this.context = null;
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.context = context;
-		
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition.checkTypes(markers, this);
+			this.condition.checkTypes(markers, context1);
 		}
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, this);
+			this.action.checkTypes(markers, context1);
 		}
-		
-		this.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition.check(markers, this);
+			this.condition.check(markers, context1);
 		}
 		if (this.action != null)
 		{
-			this.action.check(markers, this);
+			this.action.check(markers, context1);
 		}
-		this.context = null;
 	}
 	
 	@Override
@@ -264,13 +262,14 @@ public final class CaseExpression extends ASTNode implements IValue, ICase, ICla
 	{
 		context.getHeader().addInnerClass(this);
 		
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.cleanup(context, compilableList);
+			this.condition = this.condition.cleanup(context1, compilableList);
 		}
 		if (this.action != null)
 		{
-			this.action = this.action.cleanup(context, compilableList);
+			this.action = this.action.cleanup(context1, compilableList);
 		}
 		return this;
 	}

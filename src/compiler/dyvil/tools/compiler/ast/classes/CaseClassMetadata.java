@@ -37,11 +37,10 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			Method m = new Method(this.theClass, Name.apply, this.theClass.getType());
+			Method m = new Method(this.theClass, Name.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
 			IParameter[] parameters = this.theClass.getParameters();
 			int parameterCount = this.theClass.parameterCount();
 			
-			m.modifiers = Modifiers.PUBLIC | Modifiers.STATIC;
 			m.setParameters(parameters, parameterCount);
 			m.setTypeVariables(this.theClass.getTypeVariables(), this.theClass.genericCount());
 			

@@ -10,10 +10,17 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
 	public static final float DEFAULT_MATCH = 1000;
+	
+	@Override
+	default ICodePosition getPosition()
+	{
+		return null;
+	}
 	
 	public int size();
 	

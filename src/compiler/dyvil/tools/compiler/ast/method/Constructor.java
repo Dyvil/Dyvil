@@ -48,13 +48,30 @@ public class Constructor extends Member implements IConstructor
 	protected IType[]		exceptions;
 	protected int			exceptionCount;
 	
-	public IValue value;
+	protected IValue value;
 	
+	// Metadata
 	protected IMethod overrideMethod;
 	
 	public Constructor(IClass iclass)
 	{
 		this.theClass = iclass;
+		this.type = iclass.getType();
+	}
+	
+	public Constructor(IClass iclass, int modifiers)
+	{
+		this.theClass = iclass;
+		this.type = iclass.getType();
+		this.modifiers = modifiers;
+	}
+	
+	public Constructor(ICodePosition position, IClass iclass, int modifiers)
+	{
+		this.position = position;
+		this.theClass = iclass;
+		this.type = iclass.getType();
+		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -285,16 +302,17 @@ public class Constructor extends Member implements IConstructor
 			if (first.valueTag() == IValue.APPLY_CALL)
 			{
 				ApplyMethodCall amc = (ApplyMethodCall) first;
-				int valueType = amc.instance.valueTag();
+				IValue instance = amc.getValue();
+				int valueType = instance.valueTag();
 				if (valueType == IValue.SUPER)
 				{
 					IClass iclass = this.theClass.getSuperType().getTheClass();
-					sl.setValue(0, this.initializer(amc.instance.getPosition(), markers, iclass, amc.arguments, true));
+					sl.setValue(0, this.initializer(instance.getPosition(), markers, iclass, amc.getArguments(), true));
 					return;
 				}
 				else if (valueType == IValue.THIS)
 				{
-					sl.setValue(0, this.initializer(amc.instance.getPosition(), markers, this.theClass, amc.arguments, false));
+					sl.setValue(0, this.initializer(instance.getPosition(), markers, this.theClass, amc.getArguments(), false));
 					return;
 				}
 			}

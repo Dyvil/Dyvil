@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -18,11 +18,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ClassOperator extends ASTNode implements IValue
+public final class ClassOperator extends Value
 {
-	private IType	type;
-	private IType	genericType;
-	public boolean	dotless;
+	protected IType type;
+	
+	// Metadata
+	private IType genericType;
 	
 	public ClassOperator(ICodePosition position)
 	{

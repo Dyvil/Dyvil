@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
-import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -25,6 +24,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -38,6 +38,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ExternalClass extends AbstractClass
 {
@@ -57,6 +58,12 @@ public final class ExternalClass extends AbstractClass
 	public ExternalClass(Name name)
 	{
 		this.name = name;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
 	}
 	
 	private void resolveMetadata()
@@ -118,7 +125,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.annotations[i].resolveTypes(null, Package.rootPackage);
 			
-			String internalName = this.annotations[i].type.getInternalName();
+			String internalName = this.annotations[i].getType().getInternalName();
 			if (!this.addRawAnnotation(internalName))
 			{
 				this.removeAnnotation(i--);
@@ -236,19 +243,19 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void addAnnotation(Annotation annotation)
 	{
-		if (!"dyvil/annotation/ClassParameters".equals(annotation.type.getInternalName()))
+		if (!"dyvil/annotation/ClassParameters".equals(annotation.getType().getInternalName()))
 		{
 			super.addAnnotation(annotation);
 			return;
 		}
 		
-		Array array = (Array) annotation.arguments.getFirstValue();
+		Array array = (Array) annotation.getArguments().getFirstValue();
 		int count = array.valueCount();
 		this.classParameters = new String[count];
 		for (int i = 0; i < count; i++)
 		{
 			IValue value = array.getValue(i);
-			this.classParameters[i] = ((StringValue) value).value;
+			this.classParameters[i] = value.stringValue();
 		}
 	}
 	
@@ -587,7 +594,7 @@ public final class ExternalClass extends AbstractClass
 			{
 				if (s.equals(name))
 				{
-					ClassParameter param = new ClassParameter(this, access, Name.get(name), type);
+					ClassParameter param = new ClassParameter(this, Name.get(name), type, access);
 					this.addParameter(param);
 					return new SimpleFieldVisitor(param);
 				}
@@ -620,10 +627,7 @@ public final class ExternalClass extends AbstractClass
 		
 		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
 		{
-			ClassParameter param = new ClassParameter();
-			param.modifiers = access;
-			param.name = name1;
-			param.type = ClassFormat.readReturnType(desc);
+			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc), access);
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
 		}
@@ -645,10 +649,7 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleMethodVisitor(constructor);
 		}
 		
-		ExternalMethod method = new ExternalMethod(this);
-		method.name = name1;
-		method.modifiers = access;
-		method.descriptor = desc;
+		ExternalMethod method = new ExternalMethod(this, name1, desc, access);
 		
 		if (signature != null)
 		{
@@ -680,9 +681,7 @@ public final class ExternalClass extends AbstractClass
 			IMethod targetMethod = this.body.getMethod(methodName);
 			int parIndex = Integer.parseInt(name.substring(i + 1));
 			
-			MethodCall call = new MethodCall(null);
-			call.method = method;
-			call.name = name1;
+			MethodCall call = new MethodCall(null, null, method, EmptyArguments.INSTANCE);
 			targetMethod.getParameter(parIndex).setValue(call);
 			return new BytecodeVisitor(method);
 		}

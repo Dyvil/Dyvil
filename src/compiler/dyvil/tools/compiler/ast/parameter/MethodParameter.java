@@ -30,6 +30,11 @@ public final class MethodParameter extends Parameter
 		this.type = Types.UNKNOWN;
 	}
 	
+	public MethodParameter(Name name)
+	{
+		this.name = name;
+	}
+	
 	public MethodParameter(Name name, IType type)
 	{
 		this.name = name;

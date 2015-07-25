@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -15,8 +14,10 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class Bytecode extends ASTNode implements IValue
+public final class Bytecode implements IValue
 {
+	protected ICodePosition position;
+	
 	private IInstruction[]	instructions	= new IInstruction[3];
 	private int				instructionCount;
 	private Label[]			labels;
@@ -24,6 +25,12 @@ public final class Bytecode extends ASTNode implements IValue
 	public Bytecode(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

@@ -31,13 +31,11 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.CodePosition;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
-	private static final CodePosition CODE_POSITION = new CodePosition(1, 0, 1);
-	
 	private static int		resultIndex;
 	private static int		classIndex;
 	private static String	className;
@@ -153,8 +151,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void setValue(IValue value)
 	{
 		Name name = Name.getQualified("res" + resultIndex);
-		REPLVariable field = new REPLVariable(CODE_POSITION, name, Types.UNKNOWN, value, className);
-		field.modifiers = Modifiers.FINAL;
+		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, name, Types.UNKNOWN, value, className, Modifiers.FINAL);
 		memberClass = getREPLClass(field);
 		
 		MarkerList markers = new MarkerList();
@@ -184,12 +181,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		value = value.cleanup(this, this);
 		field.setValue(value1);
-		field.type = type;
+		field.setType(type);
 		
 		this.compileVariable(field);
 		if (type != Types.VOID)
 		{
-			fields.put(field.name, field);
+			fields.put(field.getName(), field);
 			System.out.println(field.toString());
 			resultIndex++;
 		}
@@ -220,7 +217,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addImport(declaration);
-		System.out.println("Added import declaration for '" + declaration.theImport + "'");
+		System.out.println("Added import declaration for '" + declaration.getImport() + "'");
 	}
 	
 	@Override
@@ -235,7 +232,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addUsing(declaration);
-		System.out.println("Added using declaration for '" + declaration.theImport + "'");
+		System.out.println("Added using declaration for '" + declaration.getImport() + "'");
 	}
 	
 	@Override
@@ -327,15 +324,13 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addField(IField field)
 	{
-		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue(), className);
-		
+		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue(), className, field.getModifiers());
 		var.setAnnotations(field.getAnnotations(), field.annotationCount());
-		var.modifiers = field.getModifiers();
 		memberClass = getREPLClass(var);
 		
 		if (this.computeVariable(var))
 		{
-			fields.put(var.name, var);
+			fields.put(var.getName(), var);
 			System.out.println(var.toString());
 		}
 	}

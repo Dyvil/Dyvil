@@ -4,9 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -31,9 +29,12 @@ public final class ExternalMethod extends Method
 	private boolean	parametersResolved;
 	private boolean	exceptionsResolved;
 	
-	public ExternalMethod(IClass iclass)
+	public ExternalMethod(IClass iclass, Name name, String desc, int modifiers)
 	{
 		super(iclass);
+		this.name = name;
+		this.modifiers = modifiers;
+		this.descriptor = desc;
 	}
 	
 	public void setVarargsParameter()
@@ -54,27 +55,12 @@ public final class ExternalMethod extends Method
 			Annotation annotation = this.annotations[i];
 			annotation.resolveTypes(null, Package.rootPackage);
 			
-			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
+			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
 			}
 			
-			try
-			{
-				Array array = (Array) annotation.arguments.getValue(0, Annotation.VALUE);
-				
-				int len = array.valueCount();
-				int[] opcodes = new int[len];
-				for (int j = 0; j < len; j++)
-				{
-					IntValue v = (IntValue) array.getValue(j);
-					opcodes[j] = v.value;
-				}
-				this.intrinsicOpcodes = opcodes;
-			}
-			catch (NullPointerException | ClassCastException ex)
-			{
-			}
+			this.readIntrinsicAnnotation(annotation);
 		}
 	}
 	

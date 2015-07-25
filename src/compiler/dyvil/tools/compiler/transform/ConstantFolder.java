@@ -37,18 +37,18 @@ public class ConstantFolder
 			{
 			case CHAR:
 			case INT:
-				return applyInt((INumericValue) v1, op, (INumericValue) v2);
+				return applyInt(v1, op, v2);
 			case LONG:
-				return applyLong((INumericValue) v1, op, (INumericValue) v2);
+				return applyLong(v1, op, v2);
 			case FLOAT:
-				return applyFloat((INumericValue) v1, op, (INumericValue) v2);
+				return applyFloat(v1, op, v2);
 			case DOUBLE:
-				return applyDouble((INumericValue) v1, op, (INumericValue) v2);
+				return applyDouble(v1, op, v2);
 			}
 		}
 		if (t1 == STRING && t2 == STRING && Name.plus.equals(op))
 		{
-			return new StringValue(((StringValue) v1).value + ((StringValue) v2).value);
+			return new StringValue(v1.stringValue() + v2.stringValue());
 		}
 		return null;
 	}
@@ -57,7 +57,7 @@ public class ConstantFolder
 	{
 		if (op == Name.bang)
 		{
-			return new BooleanValue(!v.value);
+			return new BooleanValue(!v.booleanValue());
 		}
 		return null;
 	}
@@ -66,11 +66,11 @@ public class ConstantFolder
 	{
 		if (op == Name.tilde)
 		{
-			return new IntValue(~v.value);
+			return new IntValue(~v.intValue());
 		}
 		if (op == Name.minus)
 		{
-			return new IntValue(-v.value);
+			return new IntValue(-v.intValue());
 		}
 		return null;
 	}
@@ -79,11 +79,11 @@ public class ConstantFolder
 	{
 		if (op == Name.tilde)
 		{
-			return new LongValue(~v.value);
+			return new LongValue(~v.longValue());
 		}
 		if (op == Name.minus)
 		{
-			return new LongValue(-v.value);
+			return new LongValue(-v.longValue());
 		}
 		return null;
 	}
@@ -92,7 +92,7 @@ public class ConstantFolder
 	{
 		if (op == Name.minus)
 		{
-			return new FloatValue(-v.value);
+			return new FloatValue(-v.floatValue());
 		}
 		return null;
 	}
@@ -101,12 +101,12 @@ public class ConstantFolder
 	{
 		if (op == Name.minus)
 		{
-			return new DoubleValue(-v.value);
+			return new DoubleValue(-v.doubleValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyInt(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyInt(IValue v1, Name op, IValue v2)
 	{
 		if (op == Name.plus)
 		{
@@ -162,7 +162,7 @@ public class ConstantFolder
 		return null;
 	}
 	
-	private static IValue applyLong(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyLong(IValue v1, Name op, IValue v2)
 	{
 		if (op == Name.plus)
 		{
@@ -218,7 +218,7 @@ public class ConstantFolder
 		return null;
 	}
 	
-	private static IValue applyFloat(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyFloat(IValue v1, Name op, IValue v2)
 	{
 		if (op == Name.plus)
 		{
@@ -243,7 +243,7 @@ public class ConstantFolder
 		return null;
 	}
 	
-	private static IValue applyDouble(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyDouble(IValue v1, Name op, IValue v2)
 	{
 		if (op == Name.plus)
 		{

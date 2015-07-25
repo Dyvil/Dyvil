@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -14,9 +13,10 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StringValue extends ASTNode implements IConstantValue
+public final class StringValue implements IConstantValue
 {
-	public String value;
+	protected ICodePosition	position;
+	protected String		value;
 	
 	public StringValue(String value)
 	{
@@ -30,15 +30,15 @@ public final class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public int valueTag()
+	public ICodePosition getPosition()
 	{
-		return STRING;
+		return this.position;
 	}
 	
 	@Override
-	public boolean isPrimitive()
+	public int valueTag()
 	{
-		return false;
+		return STRING;
 	}
 	
 	@Override
@@ -78,7 +78,13 @@ public final class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public String toObject()
+	public Object toObject()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public String stringValue()
 	{
 		return this.value;
 	}

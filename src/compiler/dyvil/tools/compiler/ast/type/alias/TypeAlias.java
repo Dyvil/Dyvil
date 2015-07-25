@@ -10,11 +10,28 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class TypeAlias implements ITypeAlias
 {
 	protected Name	name;
 	protected IType	type;
+	
+	public TypeAlias()
+	{
+	}
+	
+	public TypeAlias(Name name, IType type)
+	{
+		this.name = name;
+		this.type = type;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
+	}
 	
 	@Override
 	public void setName(Name name)

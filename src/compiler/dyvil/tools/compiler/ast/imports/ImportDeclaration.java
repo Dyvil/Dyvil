@@ -5,7 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -17,13 +17,14 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ImportDeclaration extends ASTNode
+public final class ImportDeclaration implements IASTNode
 {
 	public static final int	IMPORT	= 0;
 	public static final int	USING	= 1;
 	
-	public IImport	theImport;
-	public boolean	isStatic;
+	protected ICodePosition	position;
+	protected IImport		theImport;
+	protected boolean		isStatic;
 	
 	public ImportDeclaration(ICodePosition position)
 	{
@@ -36,9 +37,20 @@ public final class ImportDeclaration extends ASTNode
 		this.isStatic = isStatic;
 	}
 	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
 	public void setImport(IImport iimport)
 	{
 		this.theImport = iimport;
+	}
+	
+	public IImport getImport()
+	{
+		return this.theImport;
 	}
 	
 	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)

@@ -35,9 +35,9 @@ public abstract class AbstractClass implements IClass
 {
 	// Metadata
 	
-	protected IClass outerClass;
+	protected IClass			outerClass;
 	protected IClassMetadata	metadata;
-	protected IType type;
+	protected IType				type;
 	
 	// Modifiers and Annotations
 	
@@ -63,7 +63,7 @@ public abstract class AbstractClass implements IClass
 	
 	// Body
 	
-	protected IClassBody		body;
+	protected IClassBody			body;
 	protected IClassCompilable[]	compilables;
 	protected int					compilableCount;
 	
@@ -194,7 +194,7 @@ public abstract class AbstractClass implements IClass
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (a.type.getTheClass() == type)
+			if (a.getType().getTheClass() == type)
 			{
 				return a;
 			}

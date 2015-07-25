@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -22,14 +21,15 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class FieldAssign extends ASTNode implements IValue, INamed, IValued
+public final class FieldAssign implements IValue, INamed, IValued
 {
-	public Name name;
+	protected ICodePosition position;
 	
-	public IValue	instance;
-	public IValue	value;
+	protected IValue	instance;
+	protected Name		name;
+	protected IValue	value;
 	
-	public IDataMember field;
+	protected IDataMember field;
 	
 	public FieldAssign(ICodePosition position)
 	{
@@ -41,6 +41,20 @@ public final class FieldAssign extends ASTNode implements IValue, INamed, IValue
 		this.position = position;
 		this.instance = instance;
 		this.name = name;
+	}
+	
+	public FieldAssign(ICodePosition position, IValue instance, IDataMember field, IValue value)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.field = field;
+		this.value = value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

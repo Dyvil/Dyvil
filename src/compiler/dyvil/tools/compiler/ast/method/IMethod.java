@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
@@ -17,7 +16,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IMethod extends IASTNode, IClassMember, ICallableMember, IMethodSignature, IContext
+public interface IMethod extends IClassMember, ICallableMember, IMethodSignature, IContext
 {
 	public float getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	

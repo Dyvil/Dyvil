@@ -1,49 +1,33 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.NestedMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class MethodStatement extends ASTNode implements IValue
+public class MethodStatement implements IStatement
 {
 	private NestedMethod method;
+	
+	public MethodStatement(NestedMethod method)
+	{
+		this.method = method;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.method.getPosition();
+	}
 	
 	@Override
 	public int valueTag()
 	{
 		return NESTED_METHOD;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
-	}
-	
-	@Override
-	public float getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override

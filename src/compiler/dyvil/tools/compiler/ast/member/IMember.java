@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.member;
 
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IMember extends INamed, ITyped, IModified, IAnnotationList
+public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotationList
 {
 	public int getAccessLevel();
 	

@@ -45,8 +45,8 @@ public class AnnotationParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.annotation.name = name;
-				this.annotation.type = new NamedType(token.raw(), name);
+				this.annotation.setName(name);
+				this.annotation.setType(new NamedType(token.raw(), name));
 				
 				this.mode = PARAMETERS_START;
 				return;
@@ -61,13 +61,13 @@ public class AnnotationParser extends Parser
 				if (ParserUtil.isIdentifier(next.type()) && next.next().type() == Symbols.COLON)
 				{
 					ArgumentMap map = new ArgumentMap();
-					this.annotation.arguments = map;
+					this.annotation.setArguments(map);
 					pm.pushParser(new ExpressionMapParser(map));
 				}
 				else
 				{
 					ArgumentList list = new ArgumentList();
-					this.annotation.arguments = list;
+					this.annotation.setArguments(list);
 					pm.pushParser(new ExpressionListParser(list));
 				}
 				
@@ -78,7 +78,7 @@ public class AnnotationParser extends Parser
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				SingleArgument arg = new SingleArgument();
-				this.annotation.arguments = arg;
+				this.annotation.setArguments(arg);
 				pm.popParser();
 				pm.pushParser(pm.newExpressionParser(arg), true);
 				return;

@@ -129,13 +129,10 @@ public class ClassMetadata implements IClassMetadata
 			}
 		}
 		
-		Constructor constructor = new Constructor(this.theClass);
-		constructor.type = this.theClass.getType();
-		constructor.modifiers = Modifiers.PUBLIC;
-		
+		Constructor constructor = new Constructor(this.theClass, Modifiers.PUBLIC);
 		int parameterCount = this.theClass.parameterCount();
-		
 		IParameter[] parameters = this.theClass.getParameters();
+		
 		constructor.setParameters(parameters, parameterCount);
 		
 		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())

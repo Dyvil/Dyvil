@@ -12,9 +12,10 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class SyncStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	LOCK		= 1;
-	public static final int	LOCK_END	= 2;
-	public static final int	THEN		= 4;
+	private static final int	END			= 0;
+	private static final int	LOCK		= 1;
+	private static final int	LOCK_END	= 2;
+	private static final int	ACTION		= 4;
 	
 	protected SyncStatement statement;
 	
@@ -33,35 +34,25 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
-		if (this.mode == -1)
+		switch (this.mode)
 		{
-			pm.popParser(true);
-			return;
-		}
-		
-		int type = token.type();
-		if (this.mode == LOCK)
-		{
+		case LOCK:
 			this.mode = LOCK_END;
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (token.type() == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Synchronized Block - '(' expected", true);
-		}
-		if (this.mode == LOCK_END)
-		{
-			this.mode = THEN;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+		case LOCK_END:
+			this.mode = ACTION;
+			if (token.type() == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Synchronized Block - ')' expected", true);
-		}
-		if (this.mode == THEN)
-		{
-			if (ParserUtil.isTerminator(type) && !token.isInferred())
+		case ACTION:
+			if (ParserUtil.isTerminator(token.type()) && !token.isInferred())
 			{
 				pm.popParser(true);
 				return;
@@ -69,6 +60,9 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = -1;
+			return;
+		case END:
+			pm.popParser(true);
 			return;
 		}
 	}
@@ -78,11 +72,11 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	{
 		if (this.mode == LOCK_END)
 		{
-			this.statement.lock = value;
+			this.statement.setLock(value);
 		}
 		else if (this.mode == -1)
 		{
-			this.statement.block = value;
+			this.statement.setAction(value);
 		}
 	}
 }

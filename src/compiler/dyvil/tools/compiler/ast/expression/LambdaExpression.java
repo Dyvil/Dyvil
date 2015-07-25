@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -30,33 +29,38 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IDefaultContext
+public final class LambdaExpression implements IValue, IValued, IClassCompilable, IDefaultContext
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
 			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodType;"
 					+ "Ljava/lang/invoke/MethodHandle;" + "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
 					
-	public IParameter[]	parameters;
-	public int			parameterCount;
-	public IValue		value;
+	protected ICodePosition position;
+	
+	protected IParameter[]	parameters;
+	protected int			parameterCount;
+	protected IValue		value;
+	
+	// Metadata
 	
 	/**
 	 * The instantiated type this lambda expression represents
 	 */
-	protected IType type;
+	protected IType	type;
+	private IType	returnType;
 	
 	/**
 	 * The abstract method this lambda expression implements
 	 */
 	protected IMethod method;
 	
-	private String				owner;
-	private String				name;
-	private String				lambdaDesc;
-	private IType				returnType;
 	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
 	private IClass				thisClass;
+	
+	private String	owner;
+	private String	name;
+	private String	lambdaDesc;
 	
 	public LambdaExpression(ICodePosition position)
 	{
@@ -77,6 +81,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		this.position = position;
 		this.parameters = params;
 		this.parameterCount = paramCount;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -56,14 +57,10 @@ public final class ObjectClassMetadata extends ClassMetadata
 			}
 		}
 		
-		Field f = new Field(this.theClass, Name.instance, this.theClass.getType());
-		f.modifiers = Modifiers.PUBLIC | Modifiers.CONST;
+		Field f = new Field(this.theClass, Name.instance, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.CONST);
 		this.instanceField = f;
 		
-		ConstructorCall call = new ConstructorCall(null);
-		call.type = this.theClass.getType();
-		call.constructor = this.constructor;
-		
+		ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
 		f.setValue(call);
 	}
 	

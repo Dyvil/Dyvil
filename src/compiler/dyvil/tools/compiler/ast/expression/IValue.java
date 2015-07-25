@@ -246,6 +246,36 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 	
+	public default boolean booleanValue()
+	{
+		return false;
+	}
+	
+	public default int intValue()
+	{
+		return 0;
+	}
+	
+	public default long longValue()
+	{
+		return 0L;
+	}
+	
+	public default float floatValue()
+	{
+		return 0F;
+	}
+	
+	public default double doubleValue()
+	{
+		return 0D;
+	}
+	
+	public default String stringValue()
+	{
+		return null;
+	}
+	
 	public static IValue fromObject(Object o)
 	{
 		if (o == null)

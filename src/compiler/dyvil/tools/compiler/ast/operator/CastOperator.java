@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,7 +19,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import static dyvil.reflect.Opcodes.*;
 
-public final class CastOperator extends ASTNode implements IValue
+public final class CastOperator extends Value
 {
 	public IValue	value;
 	public IType	type;

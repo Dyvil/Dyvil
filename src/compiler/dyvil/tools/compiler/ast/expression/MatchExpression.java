@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -16,14 +15,17 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class MatchExpression extends ASTNode implements IValue
+public final class MatchExpression implements IValue
 {
-	private IValue		value;
-	private MatchCase[]	cases	= new MatchCase[3];
-	private int			caseCount;
-	private boolean		exhaustive;
+	protected ICodePosition position;
 	
-	private IType type;
+	protected IValue		value;
+	protected MatchCase[]	cases	= new MatchCase[3];
+	protected int			caseCount;
+	
+	// Metadata
+	private boolean	exhaustive;
+	private IType	type;
 	
 	public MatchExpression(ICodePosition position, IValue value)
 	{
@@ -36,6 +38,12 @@ public final class MatchExpression extends ASTNode implements IValue
 		this.value = value;
 		this.cases = cases;
 		this.caseCount = cases.length;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override

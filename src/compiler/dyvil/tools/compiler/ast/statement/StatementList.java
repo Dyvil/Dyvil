@@ -6,7 +6,6 @@ import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.IdentityHashMap;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -27,12 +26,15 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StatementList extends ASTNode implements IStatement, IValueList, IDefaultContext, ILabelContext
+public final class StatementList implements IStatement, IValueList, IDefaultContext, ILabelContext
 {
-	private IValue[]	values	= new IValue[3];
-	private int			valueCount;
+	protected ICodePosition position;
 	
-	private Label[]				labels;
+	protected IValue[]	values	= new IValue[3];
+	protected int		valueCount;
+	protected Label[]	labels;
+	
+	// Metadata
 	private Map<Name, Variable>	variables;
 	private IType				requiredType;
 	
@@ -43,6 +45,18 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	public StatementList(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void expandPosition(ICodePosition position)
+	{
+		this.position = this.position.to(position);
 	}
 	
 	@Override
@@ -274,7 +288,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 				
 				FieldInitializer fi = (FieldInitializer) v2;
 				Variable var = fi.variable;
-				this.variables.put(var.name, var);
+				this.variables.put(var.getName(), var);
 			}
 		}
 		return this;
@@ -428,7 +442,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		for (Entry<Name, Variable> entry : this.variables)
 		{
 			Variable var = entry.getValue();
-			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
+			var.writeLocal(writer, start, end);
 		}
 	}
 	

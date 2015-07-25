@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
@@ -24,32 +25,21 @@ public class ArrayForStatement extends ForEachStatement
 	
 	protected IMethod boxMethod;
 	
-	public ArrayForStatement(Variable var, IValue action)
+	public ArrayForStatement(ICodePosition position, Variable var, IValue action)
 	{
-		this(var, action, var.value.getType());
+		this(position, var, action, var.getValue().getType());
 	}
 	
-	public ArrayForStatement(Variable var, IValue action, IType arrayType)
+	public ArrayForStatement(ICodePosition position, Variable var, IValue action, IType arrayType)
 	{
-		super(var, action);
+		super(position, var, action);
 		
-		Variable temp = new Variable();
-		temp.type = Types.INT;
-		temp.name = $index;
-		this.indexVar = temp;
-		
-		temp = new Variable();
-		temp.type = Types.INT;
-		temp.name = $length;
-		this.lengthVar = temp;
-		
-		temp = new Variable();
-		temp.type = arrayType;
-		temp.name = $array;
-		this.arrayVar = temp;
+		this.indexVar = new Variable($index, Types.INT);
+		this.lengthVar = new Variable($length, Types.INT);
+		this.arrayVar = new Variable($array, arrayType);
 		
 		IType elementType = arrayType.getElementType();
-		IType varType = var.type;
+		IType varType = var.getType();
 		boolean primitive = varType.isPrimitive();
 		if (primitive != elementType.isPrimitive())
 		{
@@ -67,7 +57,7 @@ public class ArrayForStatement extends ForEachStatement
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (name == this.variable.name)
+		if (name == this.variable.getName())
 		{
 			return this.variable;
 		}
@@ -105,7 +95,7 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Load the array
-		var.value.writeExpression(writer);
+		var.getValue().writeExpression(writer);
 		
 		// Local Variables
 		int locals = writer.localCount();
@@ -128,7 +118,7 @@ public class ArrayForStatement extends ForEachStatement
 		arrayVar.writeGet(writer, null, lineNumber);
 		indexVar.writeGet(writer, null, lineNumber);
 		writer.writeLineNumber(lineNumber);
-		writer.writeInsn(arrayVar.type.getElementType().getArrayLoadOpcode());
+		writer.writeInsn(arrayVar.getType().getElementType().getArrayLoadOpcode());
 		// Auto(un)boxing
 		if (this.boxMethod != null)
 		{
@@ -145,7 +135,7 @@ public class ArrayForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increase index
-		writer.writeIINC(indexVar.index, 1);
+		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
 		indexVar.writeGet(writer, null, lineNumber);
 		lengthVar.writeGet(writer, null, lineNumber);

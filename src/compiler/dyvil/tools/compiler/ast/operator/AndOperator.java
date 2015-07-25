@@ -2,11 +2,11 @@ package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -16,7 +16,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class AndOperator extends ASTNode implements IValue
+public final class AndOperator extends Value
 {
 	public IValue	left;
 	public IValue	right;
@@ -100,7 +100,7 @@ public final class AndOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.left.valueTag() == BOOLEAN && !((BooleanValue) this.left).value)
+		if (this.left.valueTag() == BOOLEAN && !this.left.booleanValue())
 		{
 			return BooleanValue.FALSE;
 		}
@@ -117,7 +117,7 @@ public final class AndOperator extends ASTNode implements IValue
 	
 	private boolean bothTrue()
 	{
-		return this.left.valueTag() == BOOLEAN && ((BooleanValue) this.left).value && this.right.valueTag() == BOOLEAN && ((BooleanValue) this.right).value;
+		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN && this.right.booleanValue();
 	}
 	
 	@Override

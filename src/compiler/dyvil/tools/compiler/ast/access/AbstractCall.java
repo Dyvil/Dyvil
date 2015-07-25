@@ -20,18 +20,15 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public abstract class AbstractCall implements ICall, IValued
 {
-	protected ICodePosition	position;
-	public IValue			instance;
-	public IArguments		arguments	= EmptyArguments.INSTANCE;
+	protected ICodePosition position;
 	
-	public IMethod			method;
-	protected IType			type;
+	protected IValue		instance;
+	protected IArguments	arguments	= EmptyArguments.INSTANCE;
 	protected GenericData	genericData;
 	
-	public void setGenericData(GenericData data)
-	{
-		this.genericData = data;
-	}
+	// Metadata
+	protected IMethod	method;
+	protected IType		type;
 	
 	@Override
 	public ICodePosition getPosition()
@@ -39,15 +36,44 @@ public abstract class AbstractCall implements ICall, IValued
 		return this.position;
 	}
 	
+	@Override
+	public void setValue(IValue value)
+	{
+		this.instance = value;
+	}
+
+	@Override
+	public IValue getValue()
+	{
+		return this.instance;
+	}
+
+	@Override
+	public void setArguments(IArguments arguments)
+	{
+		this.arguments = arguments;
+	}
+
+	@Override
+	public IArguments getArguments()
+	{
+		return this.arguments;
+	}
+
+	public void setGenericData(GenericData data)
+	{
+		this.genericData = data;
+	}
+
 	protected GenericData getGenericData()
 	{
-		if (this.method == null || this.genericData != null && this.genericData.computedGenerics >= 0)
+		if (this.method == null || this.genericData != null && this.genericData.method != null)
 		{
 			return this.genericData;
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
@@ -91,30 +117,6 @@ public abstract class AbstractCall implements ICall, IValued
 			return false;
 		}
 		return type.isSuperTypeOf(this.getType());
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.instance = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.instance;
-	}
-	
-	@Override
-	public void setArguments(IArguments arguments)
-	{
-		this.arguments = arguments;
-	}
-	
-	@Override
-	public IArguments getArguments()
-	{
-		return this.arguments;
 	}
 	
 	@Override

@@ -18,9 +18,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class NilValue implements IValue
 {
-	private ICodePosition	position;
-	private IType			requiredType;
-	private IMethod			method;
+	protected ICodePosition position;
+	
+	// Metadata
+	private IType	requiredType;
+	private IMethod	method;
 	
 	public NilValue()
 	{
@@ -32,15 +34,15 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
-	public int valueTag()
-	{
-		return NIL;
-	}
-	
-	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
+	}
+	
+	@Override
+	public int valueTag()
+	{
+		return NIL;
 	}
 	
 	@Override
