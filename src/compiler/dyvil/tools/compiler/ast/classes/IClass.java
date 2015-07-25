@@ -30,9 +30,10 @@ public interface IClass extends IASTNode, IClassMember, IGeneric, IContext, IPar
 		return this;
 	}
 	
-	public void setUnit(IDyvilHeader unit);
+	public void setHeader(IDyvilHeader unit);
 	
-	public IDyvilHeader getUnit();
+	@Override
+	public IDyvilHeader getHeader();
 	
 	public void setOuterClass(IClass iclass);
 	

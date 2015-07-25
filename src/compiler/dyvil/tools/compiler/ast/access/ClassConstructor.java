@@ -100,7 +100,7 @@ public class ClassConstructor extends ConstructorCall
 		this.nestedClass.cleanup(context, compilableList);
 		
 		IDyvilHeader header = context.getHeader();
-		this.nestedClass.setUnit(header);
+		this.nestedClass.setHeader(header);
 		header.addInnerClass(this.nestedClass);
 		
 		return this;

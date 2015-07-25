@@ -234,14 +234,14 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void setUnit(IDyvilHeader unit)
+	public void setHeader(IDyvilHeader unit)
 	{
 	}
 	
 	@Override
-	public IDyvilHeader getUnit()
+	public IDyvilHeader getHeader()
 	{
-		return null;
+		return DyvilREPL.context;
 	}
 	
 	@Override
@@ -379,12 +379,6 @@ public class REPLMemberClass implements IClass
 	public boolean isStatic()
 	{
 		return true;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return DyvilREPL.context;
 	}
 	
 	@Override

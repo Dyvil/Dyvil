@@ -4,19 +4,14 @@ import java.lang.annotation.ElementType;
 
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.Opcodes;
-import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.*;
+import dyvil.tools.compiler.ast.field.IAccessible;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -27,32 +22,30 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
-public class CodeClass extends ASTNode implements IClass
+public abstract class AbstractClass implements IClass
 {
-	protected IDyvilHeader	unit;
-	protected IClass		outerClass;
+	// Metadata
+	
+	protected IClass outerClass;
+	protected IClassMetadata	metadata;
+	protected IType type;
+	
+	// Modifiers and Annotations
 	
 	protected Annotation[]	annotations;
 	protected int			annotationCount;
 	protected int			modifiers;
+	
+	// Signature
 	
 	protected Name		name;
 	protected String	fullName;
@@ -68,44 +61,11 @@ public class CodeClass extends ASTNode implements IClass
 	protected IType[]	interfaces;
 	protected int		interfaceCount;
 	
-	protected IType type;
-	
-	protected IClassCompilable[]	compilables;
-	protected int					compilableCount;
+	// Body
 	
 	protected IClassBody		body;
-	protected IClassMetadata	metadata;
-	
-	public CodeClass()
-	{
-	}
-	
-	public CodeClass(ICodePosition position, IDyvilHeader unit)
-	{
-		this.position = position;
-		this.unit = unit;
-		this.interfaces = new IType[1];
-	}
-	
-	public CodeClass(ICodePosition position, IDyvilHeader unit, int modifiers)
-	{
-		this.position = position;
-		this.unit = unit;
-		this.modifiers = modifiers;
-		this.interfaces = new IType[1];
-	}
-	
-	@Override
-	public void setUnit(IDyvilHeader unit)
-	{
-		this.unit = unit;
-	}
-	
-	@Override
-	public IDyvilHeader getUnit()
-	{
-		return this.unit;
-	}
+	protected IClassCompilable[]	compilables;
+	protected int					compilableCount;
 	
 	@Override
 	public void setOuterClass(IClass iclass)
@@ -298,11 +258,6 @@ public class CodeClass extends ASTNode implements IClass
 	public void setName(Name name)
 	{
 		this.name = name;
-		if (this.unit != null)
-		{
-			this.internalName = this.unit.getInternalName(name.qualified);
-			this.fullName = this.unit.getFullName(name.qualified);
-		}
 	}
 	
 	@Override
@@ -700,225 +655,9 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		if (this.metadata == null)
-		{
-			this.metadata = IClass.getClassMetadata(this, this.modifiers);
-		}
-		
-		if (this.genericCount > 0)
-		{
-			ClassGenericType type = new ClassGenericType(this);
-			
-			for (int i = 0; i < this.genericCount; i++)
-			{
-				ITypeVariable var = this.generics[i];
-				var.resolveTypes(markers, context);
-				type.addType(new TypeVarType(var));
-			}
-			
-			this.type = type;
-		}
-		else
-		{
-			this.type = new ClassType(this);
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].resolveTypes(markers, context);
-		}
-		
-		int index = 1;
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			IType type = param.getType();
-			param.resolveTypes(markers, this);
-			param.setIndex(index);
-			if (type == Types.LONG || type == Types.DOUBLE)
-			{
-				index += 2;
-			}
-			else
-			{
-				index++;
-			}
-		}
-		
-		if (this.superType != null)
-		{
-			this.superType = this.superType.resolve(markers, this, TypePosition.SUPER_TYPE);
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			this.interfaces[i] = this.interfaces[i].resolve(markers, this, TypePosition.SUPER_TYPE);
-		}
-		
-		if (this.body != null)
-		{
-			this.body.resolveTypes(markers);
-		}
-		
-		this.metadata.resolve(markers, context);
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			Annotation a = this.annotations[i];
-			String internalName = a.type.getInternalName();
-			if (internalName != null && !this.addRawAnnotation(internalName))
-			{
-				this.removeAnnotation(i--);
-				continue;
-			}
-			
-			a.resolve(markers, context);
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolve(markers, this);
-		}
-		
-		if (this.body != null)
-		{
-			this.body.resolve(markers);
-		}
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.metadata.checkTypes(markers, context);
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].checkTypes(markers, context);
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].checkTypes(markers, this);
-		}
-		
-		if (this.body != null)
-		{
-			this.body.checkTypes(markers);
-		}
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.superType != null)
-		{
-			IClass superClass = this.superType.getTheClass();
-			if (superClass != null)
-			{
-				int modifiers = superClass.getModifiers();
-				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
-				{
-					markers.add(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
-				}
-				else if ((modifiers & Modifiers.FINAL) != 0)
-				{
-					markers.add(this.position, "class.extend.final", superClass.getName());
-				}
-				else if ((modifiers & Modifiers.DEPRECATED) != 0)
-				{
-					markers.add(this.position, "class.extend.deprecated", superClass.getName());
-				}
-			}
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].check(markers, this);
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass != null)
-			{
-				int modifiers = iclass.getModifiers();
-				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
-				{
-					markers.add(type.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
-				}
-				else if ((modifiers & Modifiers.DEPRECATED) != 0)
-				{
-					markers.add(type.getPosition(), "class.implement.deprecated", iclass.getName());
-				}
-			}
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].check(markers, context, ElementType.TYPE);
-		}
-		
-		if (this.body != null)
-		{
-			this.body.check(markers);
-		}
-	}
-	
-	@Override
-	public void foldConstants()
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].foldConstants();
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].foldConstants();
-		}
-		
-		if (this.body != null)
-		{
-			this.body.foldConstants();
-		}
-	}
-	
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].cleanup(this, this);
-		}
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].cleanup(this, this);
-		}
-		
-		if (this.body != null)
-		{
-			this.body.cleanup();
-		}
-	}
-	
-	@Override
 	public boolean isStatic()
 	{
 		return false;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.unit;
 	}
 	
 	@Override
@@ -949,7 +688,9 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			return this.outerClass.resolveClass(name);
 		}
-		return this.unit.resolveClass(name);
+		
+		IDyvilHeader header = this.getHeader();
+		return header == null ? null : header.resolveClass(name);
 	}
 	
 	@Override
@@ -957,16 +698,7 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		if (name == this.name)
 		{
-			return new ClassType(this);
-		}
-		
-		if (this.body != null)
-		{
-			IClass iclass = this.body.getClass(name);
-			if (iclass != null)
-			{
-				return new ClassType(iclass);
-			}
+			return this.type;
 		}
 		
 		for (int i = 0; i < this.genericCount; i++)
@@ -978,11 +710,8 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.outerClass != null)
-		{
-			return this.outerClass.resolveType(name);
-		}
-		return this.unit.resolveType(name);
+		IClass iclass = this.resolveClass(name);
+		return iclass != null ? new ClassType(iclass) : null;
 	}
 	
 	@Override
@@ -1045,10 +774,11 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		if (this.unit != null && this.unit.hasMemberImports())
+		// Static Imports
+		IDyvilHeader header = this.getHeader();
+		if (header != null && header.hasMemberImports())
 		{
-			// Static Imports
-			match = this.unit.resolveField(name);
+			match = header.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -1093,9 +823,10 @@ public class CodeClass extends ASTNode implements IClass
 			return;
 		}
 		
-		if (this.unit != null && this.unit.hasMemberImports())
+		IDyvilHeader header = this.getHeader();
+		if (header != null && header.hasMemberImports())
 		{
-			this.unit.getMethodMatches(list, instance, name, arguments);
+			header.getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
@@ -1219,8 +950,8 @@ public class CodeClass extends ASTNode implements IClass
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			IDyvilHeader unit1 = this.unit;
-			IDyvilHeader unit2 = iclass.getUnit();
+			IDyvilHeader unit1 = this.getHeader();
+			IDyvilHeader unit2 = iclass.getHeader();
 			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
 			{
 				return VISIBLE;
@@ -1234,217 +965,6 @@ public class CodeClass extends ASTNode implements IClass
 	public String getFileName()
 	{
 		return this.getName().qualified;
-	}
-	
-	@Override
-	public void write(ClassWriter writer) throws BytecodeException
-	{
-		// Header
-		
-		String internalName = this.getInternalName();
-		String signature = this.getSignature();
-		String superClass = null;
-		String[] interfaces = this.getInterfaceArray();
-		
-		if (this.superType != null)
-		{
-			superClass = this.superType.getInternalName();
-		}
-		
-		int mods = this.modifiers & 0x7631;
-		if ((mods & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
-		{
-			mods |= Opcodes.ACC_SUPER;
-		}
-		writer.visit(DyvilCompiler.classVersion, mods, internalName, signature, superClass, interfaces);
-		
-		// Source
-		
-		writer.visitSource(this.getUnit().getName() + ".dyvil", null);
-		
-		// Outer Class
-		
-		if (this.outerClass != null)
-		{
-			writer.visitOuterClass(this.outerClass.getInternalName(), null, null);
-		}
-		
-		// Annotations
-		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/object;", true);
-		}
-		if ((this.modifiers & Modifiers.SEALED) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/sealed;", false);
-		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			writer.visitAnnotation("Ljava/lang/Deprecated;", true);
-		}
-		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
-		{
-			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(writer);
-		}
-		
-		// Inner Class Info
-		
-		if (this.outerClass != null)
-		{
-			this.writeInnerClassInfo(writer);
-		}
-		
-		if (this.superType != null)
-		{
-			IClass iclass = this.superType.getTheClass();
-			if (iclass != null)
-			{
-				iclass.writeInnerClassInfo(writer);
-			}
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass != null)
-			{
-				iclass.writeInnerClassInfo(writer);
-			}
-		}
-		
-		// Type Parameter Variances
-		
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].write(writer);
-		}
-		
-		// Fields, Methods and Properties
-		
-		int fields = 0;
-		int constructors = 0;
-		int methods = 0;
-		int properties = 0;
-		if (this.body != null)
-		{
-			fields = this.body.fieldCount();
-			methods = this.body.methodCount();
-			constructors = this.body.constructorCount();
-			properties = this.body.propertyCount();
-			
-			int classes = this.body.classCount();
-			for (int i = 0; i < classes; i++)
-			{
-				this.body.getClass(i).writeInnerClassInfo(writer);
-			}
-		}
-		
-		ThisValue thisValue = new ThisValue(this.type);
-		StatementList instanceFields = new StatementList();
-		
-		IField[] staticFields = new IField[fields + 1];
-		int staticFieldCount = 0;
-		
-		for (int i = 0; i < fields; i++)
-		{
-			IField f = this.body.getField(i);
-			f.write(writer);
-			
-			if (f.hasModifier(Modifiers.LAZY))
-			{
-				continue;
-			}
-			
-			if (f.hasModifier(Modifiers.STATIC))
-			{
-				staticFields[staticFieldCount++] = f;
-			}
-			else
-			{
-				FieldAssign assign = new FieldAssign(null);
-				assign.name = f.getName();
-				assign.instance = thisValue;
-				assign.value = f.getValue();
-				assign.field = f;
-				instanceFields.addValue(assign);
-			}
-		}
-		
-		if (this.parameterCount > 0)
-		{
-			AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/ClassParameters;", false);
-			AnnotationVisitor array = av.visitArray("names");
-			
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				IParameter param = this.parameters[i];
-				param.write(writer);
-				array.visit("", param.getName().qualified);
-			}
-			
-			array.visitEnd();
-		}
-		
-		for (int i = 0; i < constructors; i++)
-		{
-			this.body.getConstructor(i).write(writer, instanceFields);
-		}
-		
-		for (int i = 0; i < properties; i++)
-		{
-			this.body.getProperty(i).write(writer);
-		}
-		
-		for (int i = 0; i < methods; i++)
-		{
-			this.body.getMethod(i).write(writer);
-		}
-		
-		for (int i = 0; i < this.compilableCount; i++)
-		{
-			this.compilables[i].write(writer);
-		}
-		
-		this.metadata.write(writer, instanceFields);
-		
-		// Create the static <clinit> method
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
-		mw.begin();
-		this.metadata.writeStaticInit(mw);
-		for (int i = 0; i < staticFieldCount; i++)
-		{
-			staticFields[i].writeStaticInit(mw);
-		}
-		for (int i = 0; i < this.compilableCount; i++)
-		{
-			this.compilables[i].writeStaticInit(mw);
-		}
-		mw.end(Types.VOID);
-	}
-	
-	@Override
-	public void writeInnerClassInfo(ClassWriter writer)
-	{
-		if (this.outerClass != null)
-		{
-			int mods = this.modifiers & 0x761F;
-			if ((mods & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
-			{
-				mods |= Opcodes.ACC_STATIC;
-			}
-			else
-			{
-				mods &= ~Opcodes.ACC_STATIC;
-			}
-			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified, mods);
-		}
 	}
 	
 	@Override

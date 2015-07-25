@@ -136,7 +136,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				
 				Name name = next.nameValue();
 				
-				CodeClass codeClass = new CodeClass(next.raw(), this.theClass.getUnit(), this.modifiers | i);
+				CodeClass codeClass = new CodeClass(next.raw(), this.theClass.getHeader(), this.modifiers | i);
 				codeClass.setName(name);
 				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
 				codeClass.setOuterClass(this.theClass);
