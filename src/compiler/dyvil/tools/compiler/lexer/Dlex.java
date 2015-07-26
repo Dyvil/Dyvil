@@ -185,26 +185,42 @@ public final class Dlex
 				break;
 			case INT:
 			case LONG:
-				if (c == '.')
+				switch (c)
 				{
+				case '.':
+				case 'e':
 					type = FLOAT;
-					buf.append('.');
-				}
-				else if (c == 'l' || c == 'L')
-				{
+					buf.append(c);
+					continue;
+				case 'l':
+				case 'L':
 					type = LONG;
 					addToken = true;
 					reparse = false;
+					break;
+				case '_':
+					continue;
+				case '-':
+					if (buf.length() == 0)
+					{
+						buf.append('-');
+						continue;
+					}
+					
+					addToken = true;
+					reparse = true;
+					break;
 				}
-				else if (c == '-' && buf.length() == 0)
-				{
-					buf.append('-');
-				}
-				else if (subtype == MOD_DEC)
+				if (subtype == MOD_DEC)
 				{
 					if (isDigit(c))
 					{
 						buf.append(c);
+					}
+					else if (c == 'e' || c == 'E')
+					{
+						type = FLOAT;
+						buf.append('e');
 					}
 					else if (c == 'f' || c == 'F')
 					{
