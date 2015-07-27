@@ -7,8 +7,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
@@ -54,7 +52,7 @@ public class DyvilREPL
 		{
 			currentCode = reader.readLine();
 			TokenIterator tokens = Dlex.tokenIterator(currentCode + ";");
-			REPLContext.newClassName();
+			REPLContext.reset();
 			
 			if (parser.parse(null, tokens, new DyvilUnitParser(context)))
 			{
@@ -65,15 +63,7 @@ public class DyvilREPL
 				return;
 			}
 			
-			MarkerList markers = new MarkerList();
-			parser.parse(markers, tokens, new ExpressionParser(context));
-			
-			StringBuilder buf = new StringBuilder();
-			for (Marker m : markers)
-			{
-				m.log(currentCode, buf);
-			}
-			System.out.println(buf.toString());
+			parser.parse(REPLContext.markers, tokens, new ExpressionParser(context));
 		}
 		catch (Throwable t)
 		{

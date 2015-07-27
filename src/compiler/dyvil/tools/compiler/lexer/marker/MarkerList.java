@@ -29,6 +29,15 @@ public final class MarkerList implements Iterable<Marker>
 		this.markers = new Marker[1];
 	}
 	
+	public void clear()
+	{
+		for (int i = 0; i < this.markerCount; i++)
+		{
+			this.markers[i] = null;
+		}
+		this.markerCount = this.warnings = this.errors = 0;
+	}
+	
 	public static MarkerType getMarkerType(String key)
 	{
 		MarkerType m = MarkerType.map.get(key);
@@ -76,7 +85,7 @@ public final class MarkerList implements Iterable<Marker>
 	
 	public void sort()
 	{
-		Arrays.sort(this.markers);
+		Arrays.sort(this.markers, 0, this.markerCount);
 	}
 	
 	public void add(Marker marker)

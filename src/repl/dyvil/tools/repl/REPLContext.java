@@ -36,9 +36,10 @@ import dyvil.tools.compiler.util.Util;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
-	private static int		resultIndex;
-	private static int		classIndex;
-	private static String	className;
+	private static int			resultIndex;
+	private static int			classIndex;
+	private static String		className;
+	protected static MarkerList	markers	= new MarkerList();
 	
 	private static Map<Name, IField>	fields	= new IdentityHashMap();
 	private static List<IMethod>		methods	= new ArrayList();
@@ -53,9 +54,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		super("REPL");
 	}
 	
-	protected static void newClassName()
+	protected static void reset()
 	{
 		className = "REPL" + classIndex++;
+		markers.clear();
 	}
 	
 	private static boolean reportErrors(MarkerList markers)
@@ -99,7 +101,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	private boolean computeVariable(REPLVariable field)
 	{
-		MarkerList markers = new MarkerList();
 		field.resolveTypes(markers, this);
 		field.resolve(markers, this);
 		field.checkTypes(markers, this);
@@ -154,7 +155,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, name, Types.UNKNOWN, value, className, Modifiers.FINAL);
 		memberClass = getREPLClass(field);
 		
-		MarkerList markers = new MarkerList();
 		value.resolveTypes(markers, this);
 		value = value.resolve(markers, this);
 		
@@ -208,7 +208,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addImport(ImportDeclaration declaration)
 	{
-		MarkerList markers = new MarkerList();
 		declaration.resolveTypes(markers, this, false);
 		
 		if (reportErrors(markers))
@@ -223,7 +222,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addUsing(ImportDeclaration declaration)
 	{
-		MarkerList markers = new MarkerList();
 		declaration.resolveTypes(markers, this, true);
 		
 		if (reportErrors(markers))
@@ -238,7 +236,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addInclude(IncludeDeclaration component)
 	{
-		MarkerList markers = new MarkerList();
 		component.resolve(markers);
 		
 		if (reportErrors(markers))
@@ -254,8 +251,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
-		MarkerList markers = new MarkerList();
-		
 		typeAlias.resolve(markers, this);
 		if (reportErrors(markers))
 		{
@@ -269,7 +264,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addClass(IClass iclass)
 	{
-		MarkerList markers = new MarkerList();
 		iclass.resolveTypes(markers, this);
 		iclass.resolve(markers, this);
 		iclass.checkTypes(markers, this);
@@ -338,7 +332,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addProperty(IProperty property)
 	{
-		MarkerList markers = new MarkerList();
 		REPLMemberClass iclass = REPLContext.getREPLClass(property);
 		
 		property.resolveTypes(markers, this);
@@ -369,7 +362,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addMethod(IMethod method)
 	{
-		MarkerList markers = new MarkerList();
 		REPLMemberClass iclass = REPLContext.getREPLClass(method);
 		
 		method.resolveTypes(markers, this);

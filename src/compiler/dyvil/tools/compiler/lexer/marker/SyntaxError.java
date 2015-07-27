@@ -27,7 +27,7 @@ public class SyntaxError extends Marker
 	@Override
 	public String getMarkerType()
 	{
-		return "error";
+		return "syntax";
 	}
 	
 	@Override
