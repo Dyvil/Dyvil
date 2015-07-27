@@ -1,7 +1,7 @@
 .classpath
 .project
+.settings/**
 bin/
-dbin/
 testbin/
 build/
 .gradle/
@@ -9,12 +9,8 @@ build/
 *.log*
 *.log
 
-src/test/dyvil/test/JavaTest.java
-
 src/test/dyvil/test/*
 
-config.txt
-
-src/gen/dyvil/src/PrimitivesGen.java
-
 test.txt
+
+.settings/org.eclipse.jdt.core.prefs
