@@ -252,7 +252,7 @@ public final class Dlex
 				}
 				else if (subtype == MOD_OCT)
 				{
-					if (isOctDigit(c))
+					if (c == 'o' || isOctDigit(c))
 					{
 						buf.append(c);
 					}
@@ -464,7 +464,7 @@ public final class Dlex
 			{
 				return INT | MOD_HEX;
 			}
-			else if (isDigit(n))
+			else if (n == 'o')
 			{
 				return INT | MOD_OCT;
 			}
@@ -599,7 +599,7 @@ public final class Dlex
 		case INT | MOD_BIN:
 			return new IntToken(prev, Integer.parseInt(s.substring(2), 2), line, start, start + len);
 		case INT | MOD_OCT:
-			return new IntToken(prev, Integer.parseInt(s.substring(1), 8), line, start, start + len);
+			return new IntToken(prev, Integer.parseInt(s.substring(2), 8), line, start, start + len);
 		case INT | MOD_HEX:
 			return new IntToken(prev, Integer.parseInt(s.substring(2), 16), line, start, start + len);
 		case LONG:
