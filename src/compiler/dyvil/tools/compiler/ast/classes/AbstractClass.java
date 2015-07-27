@@ -893,6 +893,37 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public IDataMember getSuperField(Name name)
+	{
+		if (this.superType != null)
+		{
+			IClass iclass = this.superType.getTheClass();
+			if (iclass != null)
+			{
+				IDataMember m = iclass.resolveField(name);
+				if (m != null)
+				{
+					return m;
+				}
+			}
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			IClass iclass = type.getTheClass();
+			if (iclass != null)
+			{
+				IDataMember m = iclass.resolveField(name);
+				if (m != null)
+				{
+					return m;
+				}
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public boolean handleException(IType type)
 	{
 		return false;

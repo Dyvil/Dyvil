@@ -10,26 +10,30 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.util.ModifierTypes;
 
 public class PropertyParser extends Parser implements IValued
 {
-	public static final int	GET	= 1;
-	public static final int	SET	= 2;
+	private static final int	GET_OR_SET	= 1;
+	private static final int	GET			= 2;
+	private static final int	SET			= 4;
 	
 	public static final Name	get	= Name.getQualified("get");
 	public static final Name	set	= Name.getQualified("set");
 	
-	protected Property property;
+	protected Property	property;
+	private int			modifiers;
 	
 	public PropertyParser(Property property)
 	{
 		this.property = property;
+		this.mode = GET_OR_SET;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = 0;
+		this.mode = GET_OR_SET;
 	}
 	
 	@Override
@@ -42,10 +46,18 @@ public class PropertyParser extends Parser implements IValued
 			return;
 		}
 		
-		if (this.mode == 0)
+		switch (this.mode)
 		{
+		case GET_OR_SET:
 			if (type == Symbols.SEMICOLON)
 			{
+				return;
+			}
+			
+			int mod;
+			if ((mod = ModifierTypes.METHOD.parse(type)) >= 0)
+			{
+				this.modifiers |= mod;
 				return;
 			}
 			
@@ -57,11 +69,13 @@ public class PropertyParser extends Parser implements IValued
 					Name name = token.nameValue();
 					if (name == get)
 					{
+						this.property.setGetterModifiers(this.modifiers);
 						this.mode = GET;
 						return;
 					}
 					if (name == set)
 					{
+						this.property.setSetterModifiers(this.modifiers);
 						this.mode = SET;
 						return;
 					}
@@ -69,13 +83,12 @@ public class PropertyParser extends Parser implements IValued
 			}
 			
 			// No 'get:' or 'set:' tag -> Read-Only Property
+			this.property.setGetterModifiers(this.modifiers);
 			this.mode = GET;
 			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
-		}
-		if (this.mode > 0) // SET or GET
-		{
-			this.property.setAccess((byte) (this.property.getAccess() | this.mode));
+		case GET:
+		case SET:
 			if (type == Symbols.COLON)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
@@ -83,7 +96,7 @@ public class PropertyParser extends Parser implements IValued
 			}
 			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				this.mode = 0;
+				this.mode = GET_OR_SET;
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Property Declaration - ':' expected");
