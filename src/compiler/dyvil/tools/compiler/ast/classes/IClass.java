@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
@@ -92,6 +93,8 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
 	
 	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount);
+	
+	public IDataMember getSuperField(Name name);
 	
 	public boolean isMember(IClassMember member);
 	

@@ -511,6 +511,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public IDataMember getSuperField(Name name)
+	{
+		return null;
+	}
+	
+	@Override
 	public boolean isMember(IClassMember member)
 	{
 		return false;

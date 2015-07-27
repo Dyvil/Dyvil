@@ -108,6 +108,13 @@ public final class DyvilCompiler
 		initLogger();
 		
 		File sourceDir = config.getSourceDir();
+		if (sourceDir == null)
+		{
+			log("No source path defined in Configuration File. Skipping Compilation.");
+			System.exit(1);
+			return;
+		}
+		
 		if (!sourceDir.exists())
 		{
 			log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
@@ -264,6 +271,11 @@ public final class DyvilCompiler
 		System.out.println("Loading Configuration File from '" + source + "'");
 		CodeFile file = new CodeFile(source);
 		config.setConfigFile(file);
+		if (!file.exists())
+		{
+			System.err.println("Configuration File '" + source + "' does not exist");
+			return;
+		}
 		ConfigParser.parse(file.getCode(), config);
 	}
 	
