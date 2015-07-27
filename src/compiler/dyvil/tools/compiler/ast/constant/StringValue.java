@@ -1,23 +1,22 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StringValue extends ASTNode implements IConstantValue
+public final class StringValue implements IConstantValue
 {
-	public static final IClass	STRING_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("StringConvertible");
-	
-	public String				value;
+	protected ICodePosition	position;
+	protected String		value;
 	
 	public StringValue(String value)
 	{
@@ -31,33 +30,33 @@ public final class StringValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return STRING;
 	}
 	
 	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-	
-	@Override
-	public Type getType()
+	public ClassType getType()
 	{
 		return Types.STRING;
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type.isSuperTypeOf(Types.STRING))
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -65,25 +64,27 @@ public final class StringValue extends ASTNode implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null;
+		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.STRING)
+		if (type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(STRING_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.STRING);
 	}
 	
 	@Override
-	public String toObject()
+	public Object toObject()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public String stringValue()
 	{
 		return this.value;
 	}

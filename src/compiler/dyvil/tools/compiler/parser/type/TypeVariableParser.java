@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -17,10 +18,10 @@ public final class TypeVariableParser extends Parser implements ITyped
 	public static final int	NAME			= 1;
 	public static final int	TYPE_VARIABLE	= 16;
 	
-	public static final int	UPPER			= 1;
-	public static final int	LOWER			= 2;
+	public static final int	UPPER	= 1;
+	public static final int	LOWER	= 2;
 	
-	protected IGeneric		generic;
+	protected IGeneric generic;
 	
 	private byte			boundMode;
 	private ITypeVariable	variable;
@@ -47,7 +48,21 @@ public final class TypeVariableParser extends Parser implements ITyped
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.variable = new TypeVariable(token, this.generic, token.nameValue());
+				Name name = token.nameValue();
+				if (name == Name.plus || name == Name.minus)
+				{
+					IToken next = token.next();
+					if (ParserUtil.isIdentifier(next.type()))
+					{
+						Variance v = name == Name.minus ? Variance.CONTRAVARIANT : Variance.COVARIANT;
+						this.variable = new TypeVariable(next, this.generic, next.nameValue(), v);
+						this.mode = TYPE_VARIABLE;
+						pm.skip();
+						return;
+					}
+				}
+				
+				this.variable = new TypeVariable(token, this.generic, token.nameValue(), Variance.INVARIANT);
 				this.mode = TYPE_VARIABLE;
 				return;
 			}
@@ -78,15 +93,15 @@ public final class TypeVariableParser extends Parser implements ITyped
 			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
-				if (name == Name.lteq)
+				if (name == Name.gtcolon) // >: - Lower Bound
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(pm.newTypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
-				if (name == Name.gteq)
+				if (name == Name.ltcolon) // <: - Upper Bounds
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(pm.newTypeParser(this));
 					this.boundMode = UPPER;
 					return;
 				}
@@ -95,7 +110,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 			{
 				if (name == Name.amp)
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(pm.newTypeParser(this));
 					return;
 				}
 			}

@@ -1,35 +1,33 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.IBaseMethod;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class MethodParameter extends Member implements IParameter
+public final class MethodParameter extends Parameter
 {
-	public IBaseMethod	method;
-	
-	public int			index;
-	public boolean		varargs;
-	
-	public IValue		defaultValue;
+	public ICallableMember method;
 	
 	public MethodParameter()
 	{
+	}
+	
+	public MethodParameter(ICodePosition position, Name name)
+	{
+		this.position = position;
+		this.name = name;
+		this.type = Types.UNKNOWN;
 	}
 	
 	public MethodParameter(Name name)
@@ -44,78 +42,21 @@ public final class MethodParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void setMethod(IBaseMethod method)
+	public boolean isField()
 	{
-		this.method = method;
+		return false;
 	}
 	
 	@Override
-	public void setValue(IValue value)
+	public boolean isVariable()
 	{
-		this.defaultValue = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.defaultValue;
-	}
-	
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
-	}
-	
-	@Override
-	public int getIndex()
-	{
-		return this.index;
-	}
-	
-	@Override
-	public void setVarargs(boolean varargs)
-	{
-		this.varargs = varargs;
-	}
-	
-	@Override
-	public boolean isVarargs()
-	{
-		return this.varargs;
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return this.type.getExtendedName();
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
-	{
-		switch (type)
-		{
-		case "dyvil/annotation/var":
-			this.modifiers |= Modifiers.VAR;
-			return false;
-		case "dyvil/annotation/lazy":
-			this.modifiers |= Modifiers.LAZY;
-			return false;
-		}
 		return true;
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public void setMethod(ICallableMember method)
 	{
-		return ElementType.PARAMETER;
+		this.method = method;
 	}
 	
 	@Override
@@ -125,14 +66,14 @@ public final class MethodParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(position, "parameter.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
@@ -148,38 +89,15 @@ public final class MethodParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		super.resolveTypes(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.resolveTypes(markers, context);
-		}
-	}
-	
-	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
 		
 		if (this.defaultValue != null)
 		{
-			context.getThisClass().getTheClass().addCompilable(this);
-			
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
-			if (this.type == Types.UNKNOWN)
-			{
-				this.type = this.defaultValue.getType();
-				if (this.type == Types.UNKNOWN)
-				{
-					markers.add(this.position, "parameter.type.infer", this.name.unqualified);
-				}
-				return;
-			}
-			
-			IValue value1 = this.defaultValue.withType(this.type);
+			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type", this.name.unqualified);
@@ -191,21 +109,6 @@ public final class MethodParameter extends Member implements IParameter
 				this.defaultValue = value1;
 			}
 			return;
-		}
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(this.position, "parameter.type.nodefault", this.name.unqualified);
-		}
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		super.checkTypes(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.checkTypes(markers, context);
 		}
 	}
 	
@@ -260,46 +163,18 @@ public final class MethodParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index + writer.inlineOffset());
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (value != null)
 		{
 			value.writeExpression(writer);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index + writer.inlineOffset());
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		
-		if (this.varargs)
-		{
-			this.type.getElementType().toString(prefix, buffer);
-			buffer.append("... ");
-		}
-		else
-		{
-			this.type.toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		buffer.append(this.name);
-		
-		if (this.defaultValue != null)
-		{
-			buffer.append(Formatting.Field.keyValueSeperator).append(' ');
-			this.defaultValue.toString(prefix, buffer);
-		}
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}
 }

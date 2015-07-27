@@ -1,22 +1,39 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ThrowStatement implements IValue, IValued
+public final class ThrowStatement extends Value implements IValued
 {
-	private IValue	value;
+	protected IValue value;
 	
-	public ThrowStatement()
+	public ThrowStatement(ICodePosition position)
 	{
+		this.position = position;
+	}
+	
+	public ThrowStatement(ICodePosition position, IValue value)
+	{
+		this.position = position;
+		this.value = value;
+	}
+	
+	@Override
+	public int valueTag()
+	{
+		return THROW;
 	}
 	
 	@Override
@@ -32,19 +49,13 @@ public final class ThrowStatement implements IValue, IValued
 	}
 	
 	@Override
-	public int valueTag()
-	{
-		return THROW;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		return Types.VOID;
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return this;
 	}
@@ -52,13 +63,13 @@ public final class ThrowStatement implements IValue, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.VOID;
+		return true;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return 0;
+		return 1;
 	}
 	
 	@Override
@@ -77,7 +88,7 @@ public final class ThrowStatement implements IValue, IValued
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.value.withType(Types.THROWABLE);
+		IValue value1 = this.value.withType(Types.THROWABLE, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "throw.type");
@@ -111,10 +122,16 @@ public final class ThrowStatement implements IValue, IValued
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.value = this.value.cleanup(context, compilableList);
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
-		writer.writeInsn(Opcodes.ATHROW);
+		this.writeStatement(writer);
 	}
 	
 	@Override

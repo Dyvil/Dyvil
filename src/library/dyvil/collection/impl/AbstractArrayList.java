@@ -1,48 +1,34 @@
 package dyvil.collection.impl;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import dyvil.lang.Collection;
-import dyvil.lang.List;
+import dyvil.collection.Collection;
+import dyvil.collection.List;
 
 public abstract class AbstractArrayList<E> implements List<E>
 {
-	protected static final int	INITIAL_CAPACITY	= 10;
+	protected static final int INITIAL_CAPACITY = 10;
 	
-	protected Object[]			elements;
-	protected int				size;
+	protected Object[]	elements;
+	protected int		size;
 	
-	public AbstractArrayList()
-	{
-		this.elements = new Object[INITIAL_CAPACITY];
-	}
-	
-	public AbstractArrayList(int size)
-	{
-		this.elements = new Object[size];
-	}
-	
-	public AbstractArrayList(Object... elements)
+	public AbstractArrayList(E... elements)
 	{
 		this.elements = elements.clone();
 		this.size = elements.length;
 	}
 	
-	public AbstractArrayList(Object[] elements, int size)
+	public AbstractArrayList(E[] elements, int size)
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
 		this.size = size;
 	}
 	
-	public AbstractArrayList(Object[] elements, boolean trusted)
-	{
-		this.elements = elements;
-		this.size = elements.length;
-	}
-	
-	public AbstractArrayList(Object[] elements, int size, boolean trusted)
+	public AbstractArrayList(E[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;
@@ -91,6 +77,132 @@ public abstract class AbstractArrayList<E> implements List<E>
 		{
 			action.accept((E) this.elements[i]);
 		}
+	}
+	
+	@Override
+	public Iterator<E> iterator()
+	{
+		return new Iterator<E>()
+		{
+			int index;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index < AbstractArrayList.this.size;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArrayList.this.elements[this.index++];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index <= 0)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArrayList.this.removeAt(--this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ListIterator(" + AbstractArrayList.this + ")";
+			}
+		};
+	}
+	
+	@Override
+	public Iterator<E> reverseIterator()
+	{
+		return new Iterator<E>()
+		{
+			int index = AbstractArrayList.this.size - 1;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index >= 0;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArrayList.this.elements[this.index--];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index >= AbstractArrayList.this.size - 1)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArrayList.this.removeAt(++this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ReverseListIterator(" + AbstractArrayList.this + ")";
+			}
+		};
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (int i = this.size - 1; i >= 0; i--)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		E initialValue = (E) this.elements[0];
+		for (int i = 1; i < this.size; i++)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		E initialValue = (E) this.elements[this.size - 1];
+		for (int i = this.size - 2; i >= 0; i--)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
 	}
 	
 	@Override

@@ -4,27 +4,27 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IClassMetadata
 {
-	public default void setInstanceField(IField field)
+	public default void setInstanceField(IDataMember field)
 	{
 	}
 	
-	public default IField getInstanceField()
+	public default IDataMember getInstanceField()
 	{
 		return null;
 	}
@@ -57,7 +57,7 @@ public interface IClassMetadata
 	
 	public void checkTypes(MarkerList markers, IContext context);
 	
-	public default IField resolveField(Name name)
+	public default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
@@ -71,6 +71,10 @@ public interface IClassMetadata
 	}
 	
 	// Compilation
+	
+	public default void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+	}
 	
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

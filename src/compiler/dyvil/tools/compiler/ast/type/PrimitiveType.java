@@ -1,32 +1,38 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class PrimitiveType extends Type
+public final class PrimitiveType implements IType
 {
+	public Name		name;
+	public IClass	theClass;
 	public int		typecode;
 	public IMethod	boxMethod;
 	public IMethod	unboxMethod;
 	
 	public PrimitiveType(Name name, int typecode)
 	{
-		super(name);
+		this.name = name;
 		this.typecode = typecode;
 	}
 	
@@ -104,7 +110,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public int typeTag()
 	{
-		return PRIMITIVE_TYPE;
+		return PRIMITIVE;
 	}
 	
 	@Override
@@ -116,12 +122,7 @@ public final class PrimitiveType extends Type
 	@Override
 	public final IType getReferenceType()
 	{
-		Type type = new Type(this.position, this.theClass);
-		if (this != Types.VOID)
-		{
-			type.name = this.name;
-		}
-		return type;
+		return new ClassType(this.theClass);
 	}
 	
 	@Override
@@ -139,11 +140,23 @@ public final class PrimitiveType extends Type
 	@Override
 	public IClass getArrayClass()
 	{
-		return Types.getPrimitiveArray(this.typecode);
+		return Types.getPrimitiveArray(this);
 	}
 	
 	@Override
-	public boolean isSuperTypeOf2(IType that)
+	public Name getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	public IClass getTheClass()
+	{
+		return this.theClass;
+	}
+	
+	@Override
+	public boolean isSuperClassOf(IType that)
 	{
 		return this.theClass == that.getTheClass();
 	}
@@ -159,7 +172,7 @@ public final class PrimitiveType extends Type
 		{
 			return true;
 		}
-		return super.classEquals(type);
+		return IType.super.classEquals(type);
 	}
 	
 	@Override
@@ -169,21 +182,27 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
-		if (this.theClass == null)
-		{
-			IType t = resolvePrimitive(this.name);
-			if (t != null)
-			{
-				this.theClass = t.getTheClass();
-			}
-		}
+		// TODO Position and report errors related to the position
+		
 		return this;
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public boolean hasTypeVariables()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
@@ -200,6 +219,12 @@ public final class PrimitiveType extends Type
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
+	}
+	
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return null;
 	}
 	
 	@Override
@@ -466,9 +491,26 @@ public final class PrimitiveType extends Type
 	}
 	
 	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		out.writeByte(this.typecode);
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+	}
+	
+	@Override
 	public String toString()
 	{
 		return this.name.qualified;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(this.name);
 	}
 	
 	@Override
@@ -477,5 +519,17 @@ public final class PrimitiveType extends Type
 		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
 		t.theClass = this.theClass;
 		return t;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.typecode;
 	}
 }

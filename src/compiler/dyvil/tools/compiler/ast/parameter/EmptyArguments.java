@@ -3,10 +3,11 @@ package dyvil.tools.compiler.ast.parameter;
 import java.util.Collections;
 import java.util.Iterator;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -18,7 +19,7 @@ public final class EmptyArguments implements IArguments
 	public static final EmptyArguments	VISIBLE		= new EmptyArguments(true);
 	public static final EmptyArguments	INSTANCE	= new EmptyArguments(false);
 	
-	private boolean						visible;
+	private boolean visible;
 	
 	private EmptyArguments()
 	{
@@ -93,12 +94,6 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return null;
-	}
-	
-	@Override
 	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
 	{
 		if (defaultValue != null)
@@ -115,24 +110,34 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public int getTypeMatch(int index, IParameter param)
-	{
-		return param.getValue() != null ? 3 : 0;
-	}
-	
-	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
-	{
-		return 3;
-	}
-	
-	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	{
+	}
+	
+	@Override
+	public float getTypeMatch(int index, IParameter param)
+	{
+		return param.getValue() != null ? DEFAULT_MATCH : 0;
+	}
+	
+	@Override
+	public float getVarargsTypeMatch(int index, IParameter param)
+	{
+		return DEFAULT_MATCH;
+	}
+	
+	@Override
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 	}
 	
@@ -158,6 +163,11 @@ public final class EmptyArguments implements IArguments
 	
 	@Override
 	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
 	

@@ -1,25 +1,17 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.Label;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -27,31 +19,33 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forEnd;
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forStart;
 import static dyvil.tools.compiler.ast.statement.ForStatement.$forUpdate;
 
-public class ForEachStatement implements IStatement, IContext, ILoop
+public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 {
-	protected transient IContext	context;
-	protected IStatement			parent;
+	protected ICodePosition position;
 	
-	public Variable					variable;
-	public IValue					action;
+	protected Variable	variable;
+	protected IValue	action;
 	
-	protected Label					startLabel;
-	protected Label					updateLabel;
-	protected Label					endLabel;
+	// Metadata
+	protected Label	startLabel;
+	protected Label	updateLabel;
+	protected Label	endLabel;
 	
-	public ForEachStatement(Variable var, IValue action)
+	public ForEachStatement(ICodePosition position, Variable var, IValue action)
 	{
+		this.position = position;
+		this.variable = var;
+		this.action = action;
+		
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
 		this.endLabel = new Label($forEnd);
-		
-		this.variable = var;
-		this.action = action;
 	}
 	
 	@Override
@@ -61,10 +55,30 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public void setType(IType type)
+	public ICodePosition getPosition()
 	{
-		this.variable = new Variable(type.getPosition());
-		this.variable.type = type;
+		return this.position;
+	}
+	
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (type != Types.VOID)
+		{
+			return null;
+		}
+		
+		IValue action1 = this.action.withType(Types.VOID, typeContext, markers, context);
+		if (action1 == null)
+		{
+			// TODO Handle error
+		}
+		else
+		{
+			this.action = action1;
+		}
+		
+		return this;
 	}
 	
 	@Override
@@ -80,86 +94,14 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
+	public IDataMember resolveField(Name name)
 	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
-	public IField resolveField(Name name)
-	{
-		if (this.variable.name == name)
+		if (this.variable.getName() == name)
 		{
 			return this.variable;
 		}
 		
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return this.context.handleException(type);
-	}
-	
-	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.context.getVisibility(member);
+		return null;
 	}
 	
 	@Override
@@ -178,7 +120,13 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 			return this.endLabel;
 		}
 		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		return null;
+	}
+	
+	@Override
+	public ILoop getEnclosingLoop()
+	{
+		return this;
 	}
 	
 	@Override
@@ -191,42 +139,44 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 		
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				((IStatement) this.action).setParent(this);
-			}
-			
 			this.action.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null)
+		{
+			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.context = context;
-		
-		IType varType = this.variable.type;
-		IValue value = this.variable.value;
-		this.variable.value = value = value.resolve(markers, context);
+		IType varType = this.variable.getType();
+		IValue value = this.variable.getValue().resolve(markers, context);
+		this.variable.setValue(value);
 		
 		if (value.valueTag() == IValue.RANGE_OPERATOR)
 		{
 			RangeOperator ro = (RangeOperator) value;
-			IValue value1 = ro.value1;
-			IValue value2 = ro.value2;
+			IValue value1 = ro.getFirstValue();
+			IValue value2 = ro.getLastValue();
 			IType rangeType = ro.getElementType();
 			
 			if (varType == Types.UNKNOWN)
 			{
 				if (rangeType == Types.UNKNOWN)
 				{
-					rangeType = Types.findCommonSuperType(value1.getType(), value2.getType());
+					rangeType = Types.combine(value1.getType(), value2.getType());
 				}
 				
-				this.variable.type = varType = rangeType;
+				this.variable.setType(varType = rangeType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.position, "for.variable.infer", this.variable.name);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.getName());
 				}
 			}
 			else if (rangeType == Types.UNKNOWN)
@@ -240,7 +190,7 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new RangeForStatement(this.variable, value1, value2, this.action == null ? null : this.action.resolve(markers, this));
+			return new RangeForStatement(this.position, this.variable, value1, value2, this.resolveAction(markers, context));
 		}
 		
 		IType valueType = value.getType();
@@ -248,10 +198,10 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.type = varType = valueType.getElementType();
+				this.variable.setType(varType = valueType.getElementType());
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.name);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.getName());
 				}
 			}
 			else if (!varType.classEquals(valueType.getElementType()))
@@ -261,17 +211,17 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new ArrayForStatement(this.variable, this.action == null ? null : this.action.resolve(markers, this), valueType);
+			return new ArrayForStatement(this.position, this.variable, this.resolveAction(markers, context), valueType);
 		}
 		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
 			IType iterableType = valueType.resolveType(IterableForStatement.ITERABLE_TYPE);
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.type = varType = iterableType;
+				this.variable.setType(varType = iterableType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(this.variable.position, "for.variable.infer", this.variable.name);
+					markers.add(this.variable.getPosition(), "for.variable.infer", this.variable.getName());
 				}
 			}
 			else if (!varType.isSuperTypeOf(iterableType))
@@ -281,13 +231,13 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				m.addInfo("Variable Type: " + varType);
 			}
 			
-			return new IterableForStatement(this.variable, this.action == null ? null : this.action.resolve(markers, this), valueType, iterableType);
+			return new IterableForStatement(this.position, this.variable, this.resolveAction(markers, context), valueType, iterableType);
 		}
 		if (Types.STRING.isSuperTypeOf(valueType))
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.type = varType = Types.CHAR;
+				this.variable.setType(varType = Types.CHAR);
 			}
 			else if (!varType.classEquals(Types.CHAR))
 			{
@@ -295,20 +245,21 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new StringForStatement(this.variable, this.action == null ? null : this.action.resolve(markers, this));
+			return new StringForStatement(this.position, this.variable, this.resolveAction(markers, context));
 		}
 		
-		Marker m = markers.create(this.variable.position, "for.invalid");
+		Marker m = markers.create(this.variable.getPosition(), "for.invalid");
 		m.addInfo("Variable Type: " + varType);
 		m.addInfo("Value Type: " + valueType);
 		
-		if (this.action != null)
-		{
-			this.action = this.action.resolve(markers, this);
-		}
+		this.action = this.resolveAction(markers, context);
 		
-		this.context = null;
 		return this;
+	}
+	
+	private IValue resolveAction(MarkerList markers, IContext context)
+	{
+		return this.action == null ? this.action.resolve(markers, new CombiningContext(this, context)) : null;
 	}
 	
 	@Override
@@ -316,31 +267,25 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	{
 		if (this.variable != null)
 		{
-			this.variable.value.checkTypes(markers, context);
+			this.variable.getValue().checkTypes(markers, context);
 		}
-		this.context = context;
 		if (this.action != null)
 		{
 			this.action.checkTypes(markers, this);
 		}
-		this.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.context = context;
-		
 		if (this.variable != null)
 		{
-			this.variable.value.check(markers, context);
+			this.variable.getValue().check(markers, context);
 		}
 		if (this.action != null)
 		{
-			this.action.check(markers, this);
+			this.action.check(markers, new CombiningContext(this, context));
 		}
-		
-		this.context = null;
 	}
 	
 	@Override
@@ -350,6 +295,17 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 		if (this.action != null)
 		{
 			this.action = this.action.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.variable.cleanup(this, compilableList);
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(new CombiningContext(this, context), compilableList);
 		}
 		return this;
 	}
@@ -371,9 +327,9 @@ public class ForEachStatement implements IStatement, IContext, ILoop
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(Formatting.Statements.forStart);
-		this.variable.type.toString(prefix, buffer);
-		buffer.append(' ').append(this.variable.name).append(Formatting.Statements.forEachSeperator);
-		this.variable.value.toString(prefix, buffer);
+		this.variable.getType().toString(prefix, buffer);
+		buffer.append(' ').append(this.variable.getName()).append(Formatting.Statements.forEachSeperator);
+		this.variable.getValue().toString(prefix, buffer);
 		buffer.append(Formatting.Statements.forEnd);
 		
 		if (this.action != null)

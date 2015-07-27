@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.Handle;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.Type;
 
 public interface MethodWriter
 {
@@ -45,8 +44,6 @@ public interface MethodWriter
 	
 	public void writeLocal(int index, String name, String desc, String signature, Label start, Label end);
 	
-	public void writeLocal(int index, String name, IType type, Label start, Label end);
-	
 	// Constants
 	
 	public void writeLDC(int value);
@@ -67,9 +64,13 @@ public interface MethodWriter
 	
 	public void writeTargetLabel(Label label);
 	
+	public void writeLineNumber(int lineNumber);
+	
 	// Instructions
 	
 	public void writeInsn(int opcode) throws BytecodeException;
+	
+	public void writeInsn(int opcode, int lineNumber) throws BytecodeException;
 	
 	public void writeIntInsn(int opcode, int operand) throws BytecodeException;
 	
@@ -120,14 +121,6 @@ public interface MethodWriter
 	public void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers) throws BytecodeException;
 	
 	public void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException;
-	
-	// Inlining
-	
-	public int inlineOffset();
-	
-	public void startInline(Label end, int localCount);
-	
-	public void endInline(Label end, int localCount);
 	
 	// Blocks
 	

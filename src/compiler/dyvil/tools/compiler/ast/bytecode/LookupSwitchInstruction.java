@@ -28,7 +28,7 @@ public class LookupSwitchInstruction implements IInstruction
 	public void write(MethodWriter writer) throws BytecodeException
 	{
 		int len = this.handlers.length;
-		org.objectweb.asm.Label[] labels = new org.objectweb.asm.Label[len];
+		dyvil.tools.asm.Label[] labels = new dyvil.tools.asm.Label[len];
 		for (int i = 0; i < len; i++)
 		{
 			labels[i] = this.handlers[i].target;

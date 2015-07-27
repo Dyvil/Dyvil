@@ -11,7 +11,7 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public final class FormatStringParser extends Parser implements IValued
 {
-	protected FormatStringExpression	value;
+	protected FormatStringExpression value;
 	
 	public FormatStringParser(FormatStringExpression value)
 	{
@@ -39,7 +39,7 @@ public final class FormatStringParser extends Parser implements IValued
 				throw new SyntaxError(token.next(), "Invalid Format String - Expression expected");
 			}
 			this.value.addString(token.stringValue());
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(pm.newExpressionParser(this));
 			return;
 		}
 		case Tokens.STRING_END:

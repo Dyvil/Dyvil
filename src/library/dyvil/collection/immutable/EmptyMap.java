@@ -6,19 +6,16 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.object;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 
 @NilConvertible
 public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
-	public static final EmptyMap	instance	= new EmptyMap();
+	public static final EmptyMap instance = new EmptyMap();
 	
 	public static <K, V> EmptyMap<K, V> apply()
 	{
@@ -88,7 +85,7 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		return null;
 	}
@@ -106,7 +103,7 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		return this;
 	}
@@ -124,7 +121,13 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	{
+		return this;
+	}
+	
+	@Override
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
 		return this;
 	}
@@ -136,9 +139,27 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	{
+		return (ImmutableMap<U, R>) this;
+	}
+	
+	@Override
+	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	{
+		return (ImmutableMap<U, R>) this;
+	}
+	
+	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
 		return this;
+	}
+	
+	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		return (ImmutableMap) this;
 	}
 	
 	@Override

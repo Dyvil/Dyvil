@@ -3,14 +3,17 @@ package dyvil.collection;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.lang.*;
+import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.tuple.Tuple2;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
 
 @ArrayConvertible
-public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
+public interface ImmutableMatrix<@Covariant E> extends Matrix<E>, Immutable
 {
 	public static <E> ImmutableMatrix<E> apply(E[]... elements)
 	{
@@ -23,6 +26,12 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	}
 	
 	// Accessors
+	
+	@Override
+	public default boolean isImmutable()
+	{
+		return true;
+	}
 	
 	@Override
 	public int rows();
@@ -184,5 +193,11 @@ public interface ImmutableMatrix<E> extends Matrix<E>, Immutable
 	public default ImmutableMatrix<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableMatrix<E> view()
+	{
+		return this;
 	}
 }

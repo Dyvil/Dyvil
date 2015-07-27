@@ -1,7 +1,10 @@
 package dyvil.tools.compiler.parser.type;
 
-import dyvil.tools.compiler.ast.generic.IBounded;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.NamedGenericType;
+import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -12,7 +15,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class TypeParser extends Parser implements ITyped
+public final class TypeParser extends Parser
 {
 	public static final int	NAME			= 1;
 	public static final int	GENERICS		= 2;
@@ -23,18 +26,13 @@ public final class TypeParser extends Parser implements ITyped
 	public static final int	LAMBDA_TYPE		= 256;
 	public static final int	LAMBDA_END		= 512;
 	
-	public static final int	UPPER			= 1;
-	public static final int	LOWER			= 2;
+	protected ITypeConsumer typed;
 	
-	protected ITyped		typed;
+	private IType type;
 	
-	private byte			boundMode;
-	
-	private IType			type;
-	
-	public TypeParser(ITyped typed)
+	public TypeParser(ITypeConsumer consumer)
 	{
-		this.typed = typed;
+		this.typed = consumer;
 		this.mode = NAME;
 	}
 	
@@ -42,7 +40,6 @@ public final class TypeParser extends Parser implements ITyped
 	public void reset()
 	{
 		this.mode = NAME;
-		this.boundMode = 0;
 		this.type = null;
 	}
 	
@@ -52,6 +49,13 @@ public final class TypeParser extends Parser implements ITyped
 		int type = token.type();
 		switch (this.mode)
 		{
+		case 0:
+			if (this.type != null)
+			{
+				this.typed.setType(this.type);
+			}
+			pm.popParser(true);
+			return;
 		case NAME:
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
@@ -66,14 +70,14 @@ public final class TypeParser extends Parser implements ITyped
 				this.mode = ARRAY_END;
 				ArrayType at = new ArrayType();
 				this.type = at;
-				pm.pushParser(new TypeParser(at));
+				pm.pushParser(pm.newTypeParser(at));
 				return;
 			}
 			if (type == Symbols.ARROW_OPERATOR)
 			{
 				LambdaType lt = new LambdaType();
 				this.type = lt;
-				pm.pushParser(new TypeParser(lt));
+				pm.pushParser(pm.newTypeParser(lt));
 				this.mode = LAMBDA_END;
 				return;
 			}
@@ -94,12 +98,21 @@ public final class TypeParser extends Parser implements ITyped
 				int nextType = token.next().type();
 				if (nextType == Symbols.OPEN_SQUARE_BRACKET || nextType == Symbols.GENERIC_CALL)
 				{
-					this.type = new GenericType(token, token.nameValue());
+					this.type = new NamedGenericType(token.raw(), token.nameValue());
 					this.mode = GENERICS;
 					return;
 				}
+				if (nextType == Symbols.ARROW_OPERATOR)
+				{
+					LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
+					this.type = lt;
+					this.mode = LAMBDA_END;
+					pm.skip();
+					pm.pushParser(pm.newTypeParser(lt));
+					return;
+				}
 				
-				this.type = new Type(token.raw(), token.nameValue());
+				this.type = new NamedType(token.raw(), token.nameValue());
 				this.typed.setType(this.type);
 				pm.popParser();
 				return;
@@ -117,8 +130,6 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			throw new SyntaxError(token, "Invalid Type - Invalid " + token);
 		case TUPLE_END:
-			this.typed.setType(this.type);
-			pm.popParser();
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				if (token.next().type() == Symbols.ARROW_OPERATOR)
@@ -130,11 +141,13 @@ public final class TypeParser extends Parser implements ITyped
 				}
 				
 				this.type.expandPosition(token);
+				this.typed.setType(this.type);
+				pm.popParser();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Tuple Type - ')' expected");
 		case LAMBDA_TYPE:
-			pm.pushParser(new TypeParser((LambdaType) this.type));
+			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
 			return;
 		case LAMBDA_END:
@@ -164,28 +177,20 @@ public final class TypeParser extends Parser implements ITyped
 			return;
 		case WILDCARD_TYPE:
 			Name name = token.nameValue();
-			if (this.boundMode == 0)
+			WildcardType wt = (WildcardType) this.type;
+			if (name == Name.ltcolon) // <: - Upper Bound
 			{
-				if (name == Name.lteq)
-				{
-					pm.pushParser(new TypeParser(this));
-					this.boundMode = LOWER;
-					return;
-				}
-				if (name == Name.gteq)
-				{
-					pm.pushParser(new TypeParser(this));
-					this.boundMode = UPPER;
-					return;
-				}
+				wt.setVariance(Variance.COVARIANT);
+				pm.pushParser(pm.newTypeParser(wt));
+				this.mode = 0;
+				return;
 			}
-			else if (this.boundMode == UPPER)
+			if (name == Name.gtcolon) // >: - Lower Bound
 			{
-				if (name == Name.amp)
-				{
-					pm.pushParser(new TypeParser(this));
-					return;
-				}
+				wt.setVariance(Variance.CONTRAVARIANT);
+				pm.pushParser(pm.newTypeParser(wt));
+				this.mode = 0;
+				return;
 			}
 			this.typed.setType(this.type);
 			pm.popParser(true);
@@ -199,28 +204,5 @@ public final class TypeParser extends Parser implements ITyped
 			}
 			throw new SyntaxError(token, "Invalid Generic Type - ']' expected", true);
 		}
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		if (this.boundMode == UPPER)
-		{
-			((IBounded) this.type).addUpperBound(type);
-		}
-		else if (this.boundMode == LOWER)
-		{
-			((IBounded) this.type).setLowerBound(type);
-		}
-		else
-		{
-			((ITyped) this.type).setType(type);
-		}
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return null;
 	}
 }

@@ -4,29 +4,25 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 
 public class PropertyParser extends Parser implements IValued
 {
-	public static final int		GET	= 1;
-	public static final int		SET	= 2;
+	public static final int	GET	= 1;
+	public static final int	SET	= 2;
 	
 	public static final Name	get	= Name.getQualified("get");
 	public static final Name	set	= Name.getQualified("set");
 	
-	protected IContext			context;
-	protected Property			property;
+	protected Property property;
 	
-	public PropertyParser(IContext context, Property property)
+	public PropertyParser(Property property)
 	{
-		this.context = context;
 		this.property = property;
 	}
 	
@@ -74,7 +70,7 @@ public class PropertyParser extends Parser implements IValued
 			
 			// No 'get:' or 'set:' tag -> Read-Only Property
 			this.mode = GET;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
 		}
 		if (this.mode > 0) // SET or GET
@@ -82,7 +78,7 @@ public class PropertyParser extends Parser implements IValued
 			this.property.setAccess((byte) (this.property.getAccess() | this.mode));
 			if (type == Symbols.COLON)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)

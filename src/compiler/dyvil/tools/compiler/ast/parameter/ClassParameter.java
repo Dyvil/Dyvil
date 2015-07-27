@@ -5,40 +5,46 @@ import java.lang.annotation.ElementType;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.util.ModifierTypes;
 
-public final class ClassParameter extends Member implements IParameter
+public final class ClassParameter extends Parameter implements IField
 {
-	public IClass	theClass;
-	
-	public int		index;
-	public boolean	varargs;
-	
-	public IValue	defaultValue;
+	public IClass theClass;
 	
 	public ClassParameter()
 	{
+	}
+	
+	public ClassParameter(IClass theClass)
+	{
+		this.theClass = theClass;
 	}
 	
 	public ClassParameter(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
+	}
+	
+	public ClassParameter(IClass theClass, Name name, IType type, int modifiers)
+	{
+		this.theClass = theClass;
+		this.name = name;
+		this.type = type;
+		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -63,54 +69,6 @@ public final class ClassParameter extends Member implements IParameter
 	public IClass getTheClass()
 	{
 		return this.theClass;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.defaultValue = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.defaultValue;
-	}
-	
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
-	}
-	
-	@Override
-	public int getIndex()
-	{
-		return this.index;
-	}
-	
-	@Override
-	public void setVarargs(boolean varargs)
-	{
-		this.varargs = varargs;
-	}
-	
-	@Override
-	public boolean isVarargs()
-	{
-		return this.varargs;
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return this.type.getExtendedName();
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
 	}
 	
 	@Override
@@ -155,21 +113,21 @@ public final class ClassParameter extends Member implements IParameter
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			markers.add(position, "classparameter.access.unqualified", this.name.unqualified);
-			return new ThisValue(position, this.theClass.getType());
+			return new ThisValue(position, this.theClass.getType(), context, markers);
 		}
 		
 		return instance;
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(position, "classparameter.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
@@ -185,17 +143,6 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		super.resolveTypes(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.resolveTypes(markers, context);
-		}
-	}
-	
-	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
@@ -204,17 +151,19 @@ public final class ClassParameter extends Member implements IParameter
 		{
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.defaultValue.getType();
 				if (this.type == Types.UNKNOWN)
 				{
 					markers.add(this.position, "classparameter.type.infer", this.name.unqualified);
+					this.type = Types.ANY;
 				}
-				return;
 			}
 			
-			IValue value1 = this.defaultValue.withType(this.type);
+			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.defaultValue.getPosition(), "classparameter.type", this.name.unqualified);
@@ -224,23 +173,17 @@ public final class ClassParameter extends Member implements IParameter
 			else
 			{
 				this.defaultValue = value1;
+				if (inferType)
+				{
+					this.type = value1.getType();
+				}
 			}
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "classparameter.type.nodefault", this.name.unqualified);
-		}
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		super.checkTypes(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.checkTypes(markers, context);
+			this.type = Types.ANY;
 		}
 	}
 	
@@ -297,7 +240,7 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -308,7 +251,7 @@ public final class ClassParameter extends Member implements IParameter
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -321,35 +264,5 @@ public final class ClassParameter extends Member implements IParameter
 		}
 		
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		
-		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
-		
-		if (this.varargs)
-		{
-			this.type.getElementType().toString(prefix, buffer);
-			buffer.append("... ");
-		}
-		else
-		{
-			this.type.toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		buffer.append(this.name);
-		
-		if (this.defaultValue != null)
-		{
-			buffer.append(Formatting.Field.keyValueSeperator);
-			this.defaultValue.toString(prefix, buffer);
-		}
 	}
 }

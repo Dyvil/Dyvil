@@ -7,27 +7,27 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public abstract class Parser
 {
-	public static final Parser	rootParser	= new Parser()
-											{
-												@Override
-												public void reset()
-												{
-												};
-												
-												@Override
-												public void parse(IParserManager pm, IToken token) throws SyntaxError
-												{
-													if (!ParserUtil.isTerminator(token.type()))
-													{
-														throw new SyntaxError(token, "Root Parser");
-													}
-												}
-											};
+	public static final Parser rootParser = new Parser()
+	{
+		@Override
+		public void reset()
+		{
+		};
+		
+		@Override
+		public void parse(IParserManager pm, IToken token) throws SyntaxError
+		{
+			if (!ParserUtil.isTerminator(token.type()))
+			{
+				throw new SyntaxError(token, "Root Parser");
+			}
+		}
+	};
 	
-	protected int				mode;
+	protected int mode;
 	
-	protected Parser			parent;
-	protected String			name;
+	protected Parser	parent;
+	protected String	name;
 	
 	public Parser()
 	{

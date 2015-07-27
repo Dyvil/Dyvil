@@ -1,21 +1,18 @@
 package dyvil.lang;
 
-import dyvil.lang.literal.IntConvertible;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
-@IntConvertible
 public class Byte implements Integer
 {
 	public static final byte	min		= java.lang.Byte.MIN_VALUE;
 	public static final byte	max		= java.lang.Byte.MAX_VALUE;
 	public static final byte	size	= java.lang.Byte.SIZE;
 	
-	protected byte				value;
+	protected byte value;
 	
 	public static Byte apply(byte v)
 	{

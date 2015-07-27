@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -12,14 +12,14 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class ExpressionListParser extends Parser implements IValued
+public final class ExpressionListParser extends Parser implements IValueConsumer
 {
 	private static final int	EXPRESSION	= 1;
 	private static final int	SEPARATOR	= 2;
 	
-	protected IValueList		valueList;
+	protected IValueList valueList;
 	
-	private Name				label;
+	private Name label;
 	
 	public ExpressionListParser(IValueList valueList)
 	{
@@ -54,25 +54,14 @@ public final class ExpressionListParser extends Parser implements IValued
 			}
 			
 			this.mode = SEPARATOR;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
 		}
 		if (this.mode == SEPARATOR)
 		{
-			if (type == Symbols.COMMA)
+			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
 			{
 				this.mode = EXPRESSION;
-				return;
-			}
-			if (type == Symbols.SEMICOLON && token.isInferred())
-			{
-				this.mode = EXPRESSION;
-				return;
-			}
-			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
-			{
-				this.mode = EXPRESSION;
-				pm.reparse();
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Expression List - ',' expected");
@@ -91,11 +80,5 @@ public final class ExpressionListParser extends Parser implements IValued
 		{
 			this.valueList.addValue(value);
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

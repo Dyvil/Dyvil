@@ -3,9 +3,7 @@ package dyvil.collection;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
-import dyvil.lang.Collection;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -26,13 +24,16 @@ public interface MutableCollection<E> extends Collection<E>
 	// Accessors
 	
 	@Override
+	public default boolean isImmutable()
+	{
+		return false;
+	}
+	
+	@Override
 	public int size();
 	
 	@Override
 	public Iterator<E> iterator();
-	
-	@Override
-	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -46,7 +47,7 @@ public interface MutableCollection<E> extends Collection<E>
 	public MutableCollection<E> $minus(Object element);
 	
 	@Override
-	public MutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
+	public MutableCollection<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public MutableCollection<? extends E> $amp(Collection<? extends E> collection);
@@ -69,21 +70,13 @@ public interface MutableCollection<E> extends Collection<E>
 	public boolean add(E element);
 	
 	@Override
-	public boolean remove(E element);
+	public boolean remove(Object element);
 	
 	@Override
-	public void filter(Predicate<? super E> condition);
-	
-	@Override
-	public void map(UnaryOperator<E> mapper);
+	public void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	
@@ -102,6 +95,8 @@ public interface MutableCollection<E> extends Collection<E>
 		return this.copy();
 	}
 	
+	public <R> MutableCollection<R> emptyCopy();
+	
 	@Override
 	public ImmutableCollection<E> immutable();
 	
@@ -110,4 +105,7 @@ public interface MutableCollection<E> extends Collection<E>
 	{
 		return this.immutable();
 	}
+	
+	@Override
+	public ImmutableCollection<E> view();
 }

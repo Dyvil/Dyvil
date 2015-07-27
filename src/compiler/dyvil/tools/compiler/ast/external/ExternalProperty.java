@@ -2,14 +2,15 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ExternalProperty extends Property
+public final class ExternalProperty extends Property
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
@@ -36,7 +37,7 @@ public class ExternalProperty extends Property
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, Package.rootPackage);
+		this.type = this.type.resolve(null, this.theClass, TypePosition.TYPE);
 	}
 	
 	@Override

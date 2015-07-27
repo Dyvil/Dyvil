@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface LongArray
 {
-	public static final long[]	EMPTY	= new long[0];
+	public static final long[] EMPTY = new long[0];
 	
 	public static long[] apply()
 	{

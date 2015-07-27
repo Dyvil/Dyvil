@@ -1,18 +1,18 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -22,14 +22,21 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
+public final class FieldAccess implements IValue, INamed, IValued
 {
-	public IValue	instance;
-	public Name		name;
+	protected ICodePosition	position;
+	protected IValue		instance;
+	protected Name			name;
 	
-	public boolean	dotless;
+	protected boolean dotless;
 	
-	public IField	field;
+	// Metadata
+	protected IDataMember	field;
+	protected IType			type;
+	
+	public FieldAccess()
+	{
+	}
 	
 	public FieldAccess(ICodePosition position)
 	{
@@ -43,42 +50,84 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		this.name = name;
 	}
 	
+	public FieldAccess(ICodePosition position, IValue instance, IDataMember field)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.field = field;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	public MethodCall toMethodCall(IMethod method)
+	{
+		MethodCall call = new MethodCall(this.position);
+		call.instance = this.instance;
+		call.name = this.name;
+		call.method = method;
+		call.dotless = this.dotless;
+		call.arguments = EmptyArguments.INSTANCE;
+		return call;
+	}
+	
 	@Override
 	public int valueTag()
 	{
 		return FIELD_ACCESS;
 	}
 	
+	public IValue getInstance()
+	{
+		return this.instance;
+	}
+	
+	public IDataMember getField()
+	{
+		return this.field;
+	}
+	
+	public boolean isDotless()
+	{
+		return this.dotless;
+	}
+	
+	public void setDotless(boolean dotless)
+	{
+		this.dotless = dotless;
+	}
+	
 	@Override
 	public IType getType()
 	{
-		return this.field == null ? Types.UNKNOWN : this.field.getType();
+		if (this.type == null)
+		{
+			if (this.field == null)
+			{
+				return Types.UNKNOWN;
+			}
+			if (this.instance == null)
+			{
+				return this.type = this.field.getType();
+			}
+			return this.type = this.field.getType().getConcreteType(this.instance.getType()).getReturnType();
+		}
+		return this.type;
+	}
+	
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return IValue.autoBox(this, this.getType(), type);
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field == null ? false : type.isSuperTypeOf(this.field.getType());
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.field == null)
-		{
-			return 0;
-		}
-		
-		IType type1 = this.field.getType();
-		if (type.equals(type1))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(type1))
-		{
-			return 2;
-		}
-		return 0;
+		return this.field == null ? false : type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -106,17 +155,6 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 	}
 	
 	@Override
-	public void setArguments(IArguments arguments)
-	{
-	}
-	
-	@Override
-	public IArguments getArguments()
-	{
-		return EmptyArguments.INSTANCE;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
@@ -125,27 +163,30 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		}
 	}
 	
-	protected IValue resolveFieldAccess(IContext context)
+	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
-		IField field = ICall.resolveField(context, this.instance, this.name);
+		if (!ICall.privateAccess(context, this.instance))
+		{
+			IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
+			if (method != null)
+			{
+				AbstractCall mc = this.toMethodCall(method);
+				mc.checkArguments(markers, context);
+				return mc;
+			}
+		}
+		
+		IDataMember field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
 			if (field.isEnumConstant())
 			{
-				EnumValue enumValue = new EnumValue(this.position);
-				enumValue.name = this.name;
-				enumValue.type = field.getType();
+				EnumValue enumValue = new EnumValue(field.getType(), this.name);
 				return enumValue;
 			}
 			
 			this.field = field;
 			return this;
-		}
-		
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
-		{
-			return this.toMethodCall(method);
 		}
 		
 		if (this.instance == null)
@@ -168,7 +209,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 			this.instance = this.instance.resolve(markers, context);
 		}
 		
-		IValue v = this.resolveFieldAccess(context);
+		IValue v = this.resolveFieldAccess(markers, context);
 		if (v != null)
 		{
 			return v;
@@ -193,6 +234,7 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		
 		if (this.field != null)
 		{
+			this.field = this.field.capture(context);
 			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
 		}
 	}
@@ -203,11 +245,6 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		if (this.instance != null)
 		{
 			this.instance.check(markers, context);
-		}
-		
-		if (this.field != null)
-		{
-			this.field.checkAccess(markers, this.position, instance, context);
 		}
 	}
 	
@@ -226,27 +263,32 @@ public final class FieldAccess extends ASTNode implements ICall, INamed, IValued
 		return this;
 	}
 	
-	public MethodCall toMethodCall(IMethod method)
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		MethodCall call = new MethodCall(this.position);
-		call.instance = this.instance;
-		call.name = this.name;
-		call.method = method;
-		call.dotless = this.dotless;
-		call.arguments = EmptyArguments.INSTANCE;
-		return call;
+		if (this.instance != null)
+		{
+			this.instance = this.instance.cleanup(context, compilableList);
+		}
+		return this;
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.field.writeGet(writer, this.instance);
+		int lineNumber = this.getLineNumber();
+		this.field.writeGet(writer, this.instance, lineNumber);
+		
+		if (this.type != null)
+		{
+			this.field.getType().writeCast(writer, this.type, lineNumber);
+		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.field.writeGet(writer, this.instance);
+		this.writeExpression(writer);
 		writer.writeInsn(this.field.getType().getReturnOpcode());
 	}
 	

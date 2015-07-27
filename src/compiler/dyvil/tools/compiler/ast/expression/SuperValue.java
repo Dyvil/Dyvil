@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -11,9 +13,10 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SuperValue extends ASTNode implements IValue
+public final class SuperValue implements IValue
 {
-	public IType	type	= Types.UNKNOWN;
+	protected ICodePosition	position;
+	protected IType			type	= Types.UNKNOWN;
 	
 	public SuperValue(ICodePosition position)
 	{
@@ -27,15 +30,15 @@ public final class SuperValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int valueTag()
+	public ICodePosition getPosition()
 	{
-		return SUPER;
+		return this.position;
 	}
 	
 	@Override
-	public boolean isPrimitive()
+	public int valueTag()
 	{
-		return false;
+		return SUPER;
 	}
 	
 	@Override
@@ -51,29 +54,9 @@ public final class SuperValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type.isSuperTypeOf(this.type) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (this.type.getTheClass().isSubTypeOf(type))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -92,12 +75,32 @@ public final class SuperValue extends ASTNode implements IValue
 		}
 		
 		IType thisType = context.getThisClass().getType();
-		this.type = thisType.getSuperType();
-		if (this.type == null)
+		if (this.type == Types.UNKNOWN)
 		{
-			Marker marker = markers.create(this.position, "super.access.type");
-			marker.addInfo("Enclosing Type: " + thisType);
+			this.type = thisType.getSuperType();
+			if (this.type == null)
+			{
+				Marker marker = markers.create(this.position, "super.access.type");
+				marker.addInfo("Enclosing Type: " + thisType);
+			}
+			return;
 		}
+		
+		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		if (!this.type.isResolved())
+		{
+			return;
+		}
+		
+		int distance = this.type.getSubClassDistance(thisType);
+		if (distance == 1)
+		{
+			return;
+		}
+		
+		Marker marker = markers.create(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
+		marker.addInfo("Enclosing Type: " + thisType);
+		marker.addInfo("Requested Super Type: " + this.type);
 	}
 	
 	@Override
@@ -118,6 +121,12 @@ public final class SuperValue extends ASTNode implements IValue
 	
 	@Override
 	public IValue foldConstants()
+	{
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}

@@ -1,28 +1,29 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class ArrayType implements IType, ITyped
 {
-	private IType	type;
+	private IType type;
 	
 	public ArrayType()
 	{
@@ -55,7 +56,7 @@ public class ArrayType implements IType, ITyped
 	@Override
 	public int typeTag()
 	{
-		return ARRAY_TYPE;
+		return ARRAY;
 	}
 	
 	@Override
@@ -71,20 +72,9 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-		this.type.setName(name);
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return this.type.getName();
-	}
-	
-	@Override
-	public void setClass(IClass theClass)
-	{
 	}
 	
 	@Override
@@ -138,19 +128,37 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
+	public boolean classEquals(IType type)
+	{
+		return type.isArrayType() && this.getElementType().classEquals(type.getElementType());
+	}
+	
+	@Override
+	public boolean isSuperClassOf(IType type)
+	{
+		return type.isArrayType() && this.getElementType().isSuperClassOf(type.getElementType());
+	}
+	
+	@Override
 	public boolean isResolved()
 	{
 		return this.type.isResolved();
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
+		if (position == TypePosition.SUPER_TYPE)
+		{
+			markers.add(this.type.getPosition(), "type.super.array");
+			return this.type.resolve(markers, context, TypePosition.SUPER_TYPE);
+		}
+		
 		if (this.type == null)
 		{
 			this.type = Types.ANY;
 		}
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		return this;
 	}
 	
@@ -173,43 +181,16 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		return concrete.isArrayType() ? this.type.resolveType(typeVar, concrete.getElementType()) : null;
+		if (concrete.isArrayType())
+		{
+			this.type.inferTypes(concrete.getElementType(), typeContext);
+		}
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.type.getArrayClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
@@ -226,20 +207,9 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.type.getArrayClass().getVisibility(member);
-	}
-	
-	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setInternalName(String name)
-	{
 	}
 	
 	@Override
@@ -281,9 +251,15 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public IType clone()
+	public void write(DataOutput out) throws IOException
 	{
-		return new ArrayType(this.type);
+		IType.writeType(this.type, out);
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.type = IType.readType(in);
 	}
 	
 	@Override
@@ -298,5 +274,23 @@ public class ArrayType implements IType, ITyped
 		buffer.append('[');
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
+	}
+	
+	@Override
+	public IType clone()
+	{
+		return new ArrayType(this.type);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.equals((IType) obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return 127 * this.type.hashCode();
 	}
 }

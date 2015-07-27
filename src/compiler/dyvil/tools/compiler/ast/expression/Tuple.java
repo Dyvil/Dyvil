@@ -4,17 +4,17 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -23,16 +23,17 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class Tuple extends ASTNode implements IValue, IValueList
+public final class Tuple implements IValue, IValueList
 {
-	public static final IClass	TUPLE_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("TupleConvertible");
+	protected ICodePosition position;
 	
-	private IValue[]			values;
-	private int					valueCount;
+	protected IValue[]	values;
+	protected int		valueCount;
 	
-	private IType				tupleType;
-	private IMethod				method;
-	private IArguments			arguments;
+	// Metadata
+	private IType		tupleType;
+	private IMethod		method;
+	private IArguments	arguments;
 	
 	public Tuple(ICodePosition position)
 	{
@@ -40,23 +41,23 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 		this.values = new IValue[3];
 	}
 	
-	public Tuple(ICodePosition position, IValue[] values)
+	public Tuple(ICodePosition position, IValue[] values, int valueCount)
 	{
 		this.position = position;
 		this.values = values;
-		this.valueCount = values.length;
+		this.valueCount = valueCount;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
 	public int valueTag()
 	{
 		return TUPLE;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
 	}
 	
 	@Override
@@ -99,9 +100,11 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void addValue(int index, IValue value)
 	{
-		int i = this.valueCount++;
-		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
-		this.values[index] = value;
+		IValue[] temp = new IValue[++this.valueCount];
+		System.arraycopy(this.values, 0, temp, 0, index);
+		temp[index] = value;
+		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
+		this.values = temp;
 	}
 	
 	@Override
@@ -136,28 +139,40 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.valueCount == 1)
 		{
-			IValue value1 = this.values[0].withType(type);
-			if (value1 != null)
-			{
-				return new EncapsulatedValue(value1);
-			}
+			return this.values[0].withType(type, typeContext, markers, context);
 		}
 		
-		if (TupleType.isSuperType(type, this.values, this.valueCount))
-		{
-			this.getType();
-			return this;
-		}
-		
-		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null)
 		{
 			this.tupleType = type;
 			return this;
 		}
+		if (TupleType.isSuperType(type, this.values, this.valueCount))
+		{
+			ITypeList typeList = (ITypeList) this.getType();
+			for (int i = 0; i < this.valueCount; i++)
+			{
+				IType elementType = typeList.getType(i);
+				IValue value = this.values[i];
+				IValue value1 = value.withType(elementType, typeContext, markers, context);
+				if (value1 == null)
+				{
+					Marker m = markers.create(value.getPosition(), "tuple.type");
+					m.addInfo("Pattern Type: " + value.getType());
+					m.addInfo("Tuple Type: " + elementType);
+				}
+				else
+				{
+					this.values[i] = value = value1;
+				}
+			}
+			return this;
+		}
+		
 		return null;
 	}
 	
@@ -169,32 +184,18 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 		
-		return TupleType.isSuperType(type, this.values, this.valueCount) || type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null;
+		return TupleType.isSuperType(type, this.values, this.valueCount) || type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.valueCount == 1)
 		{
 			return this.values[0].getTypeMatch(type);
 		}
 		
-		if (type.getTheClass().getAnnotation(TUPLE_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		
-		IType type1 = this.getType();
-		if (type.equals(type1))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(type1))
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(this.getType());
 	}
 	
 	@Override
@@ -212,7 +213,7 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	{
 		if (this.valueCount == 1)
 		{
-			return new EncapsulatedValue(this.values[0].resolve(markers, context));
+			return this.values[0].resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.valueCount; i++)
@@ -226,26 +227,11 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.tupleType instanceof TupleType)
+		if (this.tupleType.typeTag() == IType.TUPLE)
 		{
-			ITypeList typeList = (ITypeList) this.tupleType;
 			for (int i = 0; i < this.valueCount; i++)
 			{
-				IType type = typeList.getType(i);
-				IValue value = this.values[i];
-				IValue value1 = value.withType(type);
-				if (value1 == null)
-				{
-					Marker m = markers.create(value.getPosition(), "tuple.type");
-					m.addInfo("Pattern Type: " + value.getType());
-					m.addInfo("Tuple Type: " + type);
-				}
-				else
-				{
-					this.values[i] = value = value1;
-				}
-				
-				value.checkTypes(markers, context);
+				this.values[i].checkTypes(markers, context);
 			}
 			
 			return;
@@ -294,11 +280,21 @@ public final class Tuple extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
+		}
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		if (this.method != null)
 		{
-			this.method.writeCall(writer, null, this.arguments, this.tupleType);
+			this.method.writeCall(writer, null, this.arguments, this.tupleType, this.getLineNumber());
 			return;
 		}
 		

@@ -1,18 +1,20 @@
 package dyvil.tools.compiler.ast.dwt;
 
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class DWTReference extends ASTNode implements IValue
+public class DWTReference extends Value
 {
-	public Name	name;
+	public Name name;
 	
 	public DWTReference(ICodePosition position, Name name)
 	{
@@ -33,13 +35,19 @@ public class DWTReference extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this;
+	}
+	
+	@Override
 	public boolean isType(IType type)
 	{
 		return false;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return 0;
 	}
@@ -67,6 +75,12 @@ public class DWTReference extends ASTNode implements IValue
 	
 	@Override
 	public IValue foldConstants()
+	{
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}

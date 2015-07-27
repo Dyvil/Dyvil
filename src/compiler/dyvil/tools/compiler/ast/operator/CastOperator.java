@@ -1,11 +1,14 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -16,7 +19,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 import static dyvil.reflect.Opcodes.*;
 
-public final class CastOperator extends ASTNode implements IValue
+public final class CastOperator extends Value
 {
 	public IValue	value;
 	public IType	type;
@@ -59,35 +62,15 @@ public final class CastOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(this.type))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		this.value.resolveTypes(markers, context);
 	}
 	
@@ -108,7 +91,7 @@ public final class CastOperator extends ASTNode implements IValue
 			return this;
 		}
 		
-		IValue value1 = this.value.withType(this.type);
+		IValue value1 = this.value.withType(this.type, null, markers, context);
 		if (value1 != null && value1 != this.value)
 		{
 			this.value = value1;
@@ -161,6 +144,19 @@ public final class CastOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
+		this.value = this.value.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.typeHint)
+		{
+			return this.value.cleanup(context, compilableList);
+		}
+		
+		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
 	

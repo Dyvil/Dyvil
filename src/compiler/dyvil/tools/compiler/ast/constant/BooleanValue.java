@@ -1,29 +1,26 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-
-public final class BooleanValue extends ASTNode implements IConstantValue
+public final class BooleanValue implements IConstantValue
 {
-	public static final IClass			BOOLEAN_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
+	public static final BooleanValue	TRUE	= new BooleanValue(true);
+	public static final BooleanValue	FALSE	= new BooleanValue(false);
 	
-	public static final BooleanValue	TRUE				= new BooleanValue(true);
-	public static final BooleanValue	FALSE				= new BooleanValue(false);
-	
-	public boolean						value;
+	protected ICodePosition	position;
+	protected boolean		value;
 	
 	public BooleanValue(boolean value)
 	{
@@ -34,6 +31,12 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	{
 		this.position = position;
 		this.value = value;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -49,13 +52,13 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	}
 	
 	@Override
-	public Type getType()
+	public IType getType()
 	{
 		return Types.BOOLEAN;
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type == Types.BOOLEAN)
 		{
@@ -65,9 +68,9 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 		{
 			return new BoxedValue(this, Types.BOOLEAN.boxMethod);
 		}
-		if (type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -75,21 +78,17 @@ public final class BooleanValue extends ASTNode implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null;
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.BOOLEAN)
+		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(BOOLEAN_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.BOOLEAN);
 	}
 	
 	@Override

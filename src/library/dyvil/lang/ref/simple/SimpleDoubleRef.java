@@ -6,7 +6,7 @@ import dyvil.lang.ref.DoubleRef;
 @DoubleConvertible
 public class SimpleDoubleRef implements DoubleRef
 {
-	public double	value;
+	public double value;
 	
 	public static SimpleDoubleRef apply(double value)
 	{

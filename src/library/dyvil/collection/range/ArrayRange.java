@@ -4,9 +4,9 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
-import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
 
+import dyvil.collection.Range;
 import dyvil.collection.iterator.ArrayIterator;
 
 @TupleConvertible
@@ -102,7 +102,7 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
-	public boolean $qmark(Object o)
+	public boolean contains(Object o)
 	{
 		for (int i = 0; i < this.count; i++)
 		{

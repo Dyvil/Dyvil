@@ -6,23 +6,27 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
-import dyvil.lang.Collection;
-import dyvil.lang.ImmutableException;
-import dyvil.lang.List;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.SingletonList;
+import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible
-public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
+public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {
+	public static interface Builder<E> extends ImmutableCollection.Builder<E>
+	{
+		@Override
+		public ImmutableList<E> build();
+	}
+	
 	public static <E> ImmutableList<E> apply()
 	{
 		return EmptyList.apply();
@@ -48,6 +52,16 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 		return new ArrayList(array);
 	}
 	
+	public static <E> Builder<E> builder()
+	{
+		return new ArrayList.Builder();
+	}
+	
+	public static <E> Builder<E> builder(int capacity)
+	{
+		return new ArrayList.Builder(capacity);
+	}
+	
 	// Accessors
 	
 	@Override
@@ -57,13 +71,13 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public Iterator<E> iterator();
 	
 	@Override
+	public Iterator<E> reverseIterator();
+	
+	@Override
 	public default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED | Spliterator.IMMUTABLE);
 	}
-	
-	@Override
-	public boolean contains(Object element);
 	
 	@Override
 	public E subscript(int index);
@@ -86,7 +100,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public ImmutableList<E> $minus(Object element);
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection);
+	public ImmutableList<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection);
@@ -99,6 +113,9 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	public ImmutableList<E> filtered(Predicate<? super E> condition);
+	
+	@Override
+	public ImmutableList<E> reversed();
 	
 	@Override
 	public ImmutableList<E> sorted();
@@ -130,14 +147,14 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default void $minus$eq(E element)
+	public default void $minus$eq(Object element)
 	{
 		throw new ImmutableException("-= on Immutable List");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable List");
 	}
@@ -154,13 +171,6 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable List");
-	}
-	
-	@Override
-	@mutating
-	public default void resize(int newLength)
-	{
-		throw new ImmutableException("resize() on Immutable List");
 	}
 	
 	@Override
@@ -212,7 +222,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default boolean remove(E element)
+	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
@@ -226,7 +236,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable List");
 	}
@@ -246,7 +256,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	
 	@Override
 	@mutating
-	public default void map(UnaryOperator<E> mapper)
+	public default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable List");
 	}
@@ -256,6 +266,13 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default void reverse()
+	{
+		throw new ImmutableException("reverse() on Immutable List");
 	}
 	
 	@Override
@@ -294,12 +311,7 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	@Override
 	public int lastIndexOf(Object element);
 	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
-	
-	// Copying
+	// Copying and Views
 	
 	@Override
 	public ImmutableList<E> copy();
@@ -323,5 +335,11 @@ public interface ImmutableList<E> extends List<E>, ImmutableCollection<E>
 	public default ImmutableList<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableList<E> view()
+	{
+		return this;
 	}
 }

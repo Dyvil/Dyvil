@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -19,18 +20,18 @@ public class DyvilHeaderParser extends Parser
 	protected static final int	PACKAGE	= 1;
 	protected static final int	IMPORT	= 2;
 	
-	protected IDyvilHeader		unit;
+	protected IDyvilHeader unit;
 	
 	public DyvilHeaderParser(IDyvilHeader unit)
 	{
 		this.unit = unit;
-		this.mode = PACKAGE | IMPORT;
+		this.mode = PACKAGE;
 	}
 	
 	@Override
 	public void reset()
 	{
-		this.mode = PACKAGE | IMPORT;
+		this.mode = PACKAGE;
 	}
 	
 	protected boolean parsePackage(IParserManager pm, IToken token)
@@ -51,15 +52,19 @@ public class DyvilHeaderParser extends Parser
 		if (type == Keywords.IMPORT)
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw());
-			this.unit.addImport(i);
-			pm.pushParser(new ImportParser(i));
+			pm.pushParser(new ImportParser(im -> {
+				i.setImport(im);
+				this.unit.addImport(i);
+			}));
 			return true;
 		}
 		if (type == Keywords.USING)
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
-			this.unit.addUsing(i);
-			pm.pushParser(new ImportParser(i));
+			pm.pushParser(new ImportParser(im -> {
+				i.setImport(im);
+				this.unit.addUsing(i);
+			}));
 			return true;
 		}
 		if (type == Keywords.OPERATOR)
@@ -78,6 +83,12 @@ public class DyvilHeaderParser extends Parser
 			pm.pushParser(new IncludeParser(this.unit, i));
 			return true;
 		}
+		if (type == Keywords.TYPE)
+		{
+			TypeAlias typeAlias = new TypeAlias();
+			pm.pushParser(new TypeAliasParser(this.unit, typeAlias));
+			return true;
+		}
 		return false;
 	}
 	
@@ -88,21 +99,20 @@ public class DyvilHeaderParser extends Parser
 		{
 			return;
 		}
-		if (this.isInMode(PACKAGE))
+		switch (this.mode)
 		{
+		case PACKAGE:
 			if (this.parsePackage(pm, token))
 			{
 				this.mode = IMPORT;
 				return;
 			}
-		}
-		if (this.isInMode(IMPORT))
-		{
+		case IMPORT:
 			if (this.parseImport(pm, token))
 			{
 				return;
 			}
 		}
-		throw new SyntaxError(token, "Invalid Token - Delete this token");
+		throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
 	}
 }

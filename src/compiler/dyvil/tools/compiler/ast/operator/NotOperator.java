@@ -1,22 +1,23 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-import org.objectweb.asm.Label;
-
-public final class NotOperator extends ASTNode implements IValue
+public final class NotOperator extends Value
 {
-	public IValue	value;
+	public IValue value;
 	
 	public NotOperator(IValue right)
 	{
@@ -42,33 +43,13 @@ public final class NotOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type == Types.BOOLEAN)
 		{
 			return this;
 		}
 		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.boxMethod) : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (type == Types.BOOLEAN)
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(Types.BOOLEAN))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -101,11 +82,16 @@ public final class NotOperator extends ASTNode implements IValue
 	{
 		if (this.value.valueTag() == BOOLEAN)
 		{
-			BooleanValue b = (BooleanValue) this.value;
-			b.value = !b.value;
-			return b;
+			return new BooleanValue(!this.value.booleanValue());
 		}
 		this.value = this.value.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
 	

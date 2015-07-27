@@ -1,19 +1,18 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -21,15 +20,13 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-import org.objectweb.asm.Label;
-
 public class NestedMethod extends Method
 {
 	private IClass				thisClass;
 	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
 	
-	public transient IContext	context;
+	public transient IContext context;
 	
 	public NestedMethod(IClass iclass)
 	{
@@ -86,7 +83,7 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -97,7 +94,7 @@ public class NestedMethod extends Method
 			}
 		}
 		
-		IField match = this.context.resolveField(name);
+		IDataMember match = this.context.resolveField(name);
 		if (match == null)
 		{
 			return null;
@@ -148,12 +145,6 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.context.getVisibility(member);
-	}
-	
-	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		int modifiers = this.modifiers & 0xFFFF;
@@ -162,9 +153,9 @@ public class NestedMethod extends Method
 			modifiers |= Modifiers.ABSTRACT;
 		}
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
-				this.getExceptions()));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				
 		if (this.thisClass != null)
 		{
 			mw.setThisType(this.theClass.getInternalName());
@@ -197,7 +188,7 @@ public class NestedMethod extends Method
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getCaptureType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getActualType(), 0);
 		}
 		
 		index = 0;
@@ -222,13 +213,13 @@ public class NestedMethod extends Method
 		
 		if (this.thisClass != null)
 		{
-			mw.writeLocal(0, "this", this.theClass.getType(), start, end);
+			mw.writeLocal(0, "this", this.theClass.getInternalName(), null, start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 	}
 	
@@ -237,28 +228,28 @@ public class NestedMethod extends Method
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
 		}
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		this.writeCaptures(writer);
-		super.writeCall(writer, instance, arguments, type);
+		super.writeCall(writer, instance, arguments, type, lineNumber);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		this.writeCaptures(writer);
-		super.writeJump(writer, dest, instance, arguments);
+		super.writeJump(writer, dest, instance, arguments, lineNumber);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		this.writeCaptures(writer);
-		super.writeInvJump(writer, dest, instance, arguments);
+		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
 	}
 }

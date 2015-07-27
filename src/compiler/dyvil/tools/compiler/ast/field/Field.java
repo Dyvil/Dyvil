@@ -4,12 +4,14 @@ import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -21,8 +23,6 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
-
-import org.objectweb.asm.FieldVisitor;
 
 public class Field extends Member implements IField
 {
@@ -46,10 +46,31 @@ public class Field extends Member implements IField
 		this.theClass = iclass;
 	}
 	
+	public Field(IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
+	public Field(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.position = position;
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
 	@Override
 	public boolean isField()
 	{
 		return true;
+	}
+	
+	@Override
+	public void setTheClass(IClass iclass)
+	{
+		this.theClass = iclass;
 	}
 	
 	@Override
@@ -127,7 +148,10 @@ public class Field extends Member implements IField
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(position, "field.access.instance", this.name.unqualified);
+				if (!instance.getType().getTheClass().isObject())
+				{
+					markers.add(position, "field.access.instance", this.name.unqualified);
+				}
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -139,7 +163,7 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(position, "field.access.unqualified", this.name.unqualified);
-				instance = new ThisValue(position, this.theClass.getType());
+				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
@@ -148,7 +172,7 @@ public class Field extends Member implements IField
 			markers.add(position, "field.access.deprecated", this.name);
 		}
 		
-		switch (context.getVisibility(this))
+		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.SEALED:
 			markers.add(position, "field.access.sealed", this.name);
@@ -162,14 +186,14 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(position, "field.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type);
+		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);
@@ -204,17 +228,19 @@ public class Field extends Member implements IField
 		{
 			this.value = this.value.resolve(markers, context);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
 					markers.add(this.position, "field.type.infer", this.name.unqualified);
+					this.type = Types.ANY;
 				}
-				return;
 			}
 			
-			IValue value1 = this.value.withType(this.type);
+			IValue value1 = this.value.withType(this.type, this.type, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name.unqualified);
@@ -224,12 +250,18 @@ public class Field extends Member implements IField
 			else
 			{
 				this.value = value1;
+				if (inferType)
+				{
+					this.type = value1.getType();
+				}
 			}
+			
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "field.type.novalue", this.name.unqualified);
+			this.type = Types.ANY;
 		}
 	}
 	
@@ -272,19 +304,30 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
+		}
+	}
+	
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
 			String desc = "()" + this.getDescription();
-			String signature = this.type.getSignature();
+			String signature = this.getSignature();
 			if (signature != null)
 			{
 				signature = "()" + signature;
 			}
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc,
-					signature, null));
-			
+			MethodWriter mw = new MethodWriterImpl(writer,
+					writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
+					
 			for (int i = 0; i < this.annotationCount; i++)
 			{
 				this.annotations[i].write(mw);
@@ -316,7 +359,17 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+		if (this.value != null && (this.modifiers & Modifiers.STATIC) != 0)
+		{
+			this.value.writeExpression(writer);
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		}
+	}
+	
+	@Override
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -332,12 +385,13 @@ public class Field extends Member implements IField
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 		}
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
@@ -357,6 +411,7 @@ public class Field extends Member implements IField
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}

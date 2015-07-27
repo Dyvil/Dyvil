@@ -7,8 +7,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IdentifierToken implements IToken
 {
-	public IToken		prev;
-	public IToken		next;
+	public IToken	prev;
+	public IToken	next;
 	
 	public final int	type;
 	public final Name	name;

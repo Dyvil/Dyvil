@@ -1,41 +1,33 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.NestedMethod;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class MethodStatement extends ASTNode implements IValue
+public class MethodStatement implements IStatement
 {
-	private NestedMethod	method;
+	private NestedMethod method;
+	
+	public MethodStatement(NestedMethod method)
+	{
+		this.method = method;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.method.getPosition();
+	}
 	
 	@Override
 	public int valueTag()
 	{
 		return NESTED_METHOD;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override
@@ -75,6 +67,17 @@ public class MethodStatement extends ASTNode implements IValue
 	public IValue foldConstants()
 	{
 		this.method.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		compilableList.addCompilable(this.method);
+		
+		this.method.context = context;
+		this.method.cleanup(context, compilableList);
+		this.method.context = null;
 		return this;
 	}
 	

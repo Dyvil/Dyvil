@@ -5,24 +5,36 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Immutable;
-import dyvil.lang.ImmutableException;
-import dyvil.lang.literal.NilConvertible;
-
+import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
 
-@NilConvertible
-public interface ImmutableCollection<E> extends Collection<E>, Immutable
+public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immutable
 {
-	public static <E> ImmutableCollection<E> apply()
+	public static interface Builder<E>
 	{
-		return ImmutableList.apply();
+		public void add(E element);
+		
+		public default void addAll(Iterable<? extends E> elements)
+		{
+			for (E element : elements)
+			{
+				this.add(element);
+			}
+		}
+		
+		public ImmutableCollection<E> build();
 	}
 	
 	// Accessors
+	
+	@Override
+	public default boolean isImmutable()
+	{
+		return true;
+	}
 	
 	@Override
 	public int size();
@@ -36,9 +48,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
 	}
 	
-	@Override
-	public boolean contains(Object element);
-	
 	// Non-mutating Operations
 	
 	@Override
@@ -51,7 +60,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public ImmutableCollection<E> $minus(Object element);
 	
 	@Override
-	public ImmutableCollection<? extends E> $minus$minus(Collection<? extends E> collection);
+	public ImmutableCollection<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
 	public ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
@@ -92,14 +101,14 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default void $minus$eq(E entry)
+	public default void $minus$eq(Object entry)
 	{
 		throw new ImmutableException("-= on Immutable Collection");
 	}
 	
 	@Override
 	@mutating
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable Collection");
 	}
@@ -128,13 +137,13 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default boolean remove(E element)
+	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable Collection");
 	}
 	
 	@Override
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable Collection");
 	}
@@ -147,7 +156,7 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	
 	@Override
 	@mutating
-	public default void map(UnaryOperator<E> mapper)
+	public default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Collection");
 	}
@@ -165,11 +174,6 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	{
 		throw new ImmutableException("filter() on Immutable Collection");
 	}
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	
@@ -195,5 +199,11 @@ public interface ImmutableCollection<E> extends Collection<E>, Immutable
 	public default ImmutableCollection<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableCollection<E> view()
+	{
+		return this;
 	}
 }

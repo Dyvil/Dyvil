@@ -18,7 +18,7 @@ public class DWTValueParser extends Parser
 	public static final int	VALUE		= 1;
 	public static final int	LIST_END	= 2;
 	
-	protected IValued		valued;
+	protected IValued valued;
 	
 	public DWTValueParser(IValued valued)
 	{

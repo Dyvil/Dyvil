@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.constant.StringValue;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -53,37 +54,13 @@ public class StringBuilderExpression implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type.isSuperTypeOf(Types.STRING))
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
-		{
-			return new LiteralExpression(type, this);
-		}
 		return null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (type == Types.STRING)
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -129,6 +106,17 @@ public class StringBuilderExpression implements IValue
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+		
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 		
 		return this;

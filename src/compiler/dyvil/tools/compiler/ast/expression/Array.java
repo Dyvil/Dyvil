@@ -4,11 +4,16 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -17,15 +22,16 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class Array extends ASTNode implements IValue, IValueList
+public final class Array implements IValue, IValueList
 {
-	public static final IClass	ARRAY_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
+	protected ICodePosition position;
 	
-	protected IValue[]			values;
-	protected int				valueCount;
+	protected IValue[]	values;
+	protected int		valueCount;
 	
-	protected IType				requiredType;
-	protected IType				elementType;
+	// Metadata
+	protected IType	requiredType;
+	protected IType	elementType;
 	
 	public Array()
 	{
@@ -34,14 +40,27 @@ public final class Array extends ASTNode implements IValue, IValueList
 	
 	public Array(ICodePosition position)
 	{
-		this.values = new IValue[3];
 		this.position = position;
+		this.values = new IValue[3];
 	}
 	
 	public Array(IValue[] values, int valueCount)
 	{
 		this.values = values;
 		this.valueCount = valueCount;
+	}
+	
+	public Array(ICodePosition position, IValue[] values, int valueCount)
+	{
+		this.position = position;
+		this.values = values;
+		this.valueCount = valueCount;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -69,31 +88,24 @@ public final class Array extends ASTNode implements IValue, IValueList
 		return false;
 	}
 	
-	@Override
-	public IType getType()
+	public IType getElementType()
 	{
-		if (this.valueCount == 0)
+		if (this.elementType != null)
 		{
-			return Types.VOID;
-		}
-		
-		if (this.requiredType != null)
-		{
-			return this.requiredType;
+			return this.elementType;
 		}
 		
 		int len = this.valueCount;
 		if (len == 0)
 		{
-			this.elementType = Types.UNKNOWN;
-			return this.requiredType = Types.UNKNOWN;
+			return this.elementType = Types.ANY;
 		}
 		
 		IType t = this.values[0].getType();
 		for (int i = 1; i < len; i++)
 		{
 			IType t1 = this.values[i].getType();
-			t = Types.findCommonSuperType(t, t1);
+			t = Types.combine(t, t1);
 			if (t == null)
 			{
 				t = Types.ANY;
@@ -101,64 +113,104 @@ public final class Array extends ASTNode implements IValue, IValueList
 			}
 		}
 		
-		this.elementType = t;
-		
-		if (t.getTheClass() == Types.TUPLE2_CLASS)
-		{
-			GenericType type = new GenericType(Types.MAP_CLASS);
-			type.genericCount = 2;
-			
-			switch (t.typeTag())
-			{
-			case IType.GENERIC_TYPE:
-			case IType.TUPLE_TYPE:
-				ITypeList t1 = (ITypeList) t;
-				type.generics[0] = t1.getType(0);
-				type.generics[1] = t1.getType(1);
-				break;
-			default:
-				type.generics[0] = type.generics[1] = Types.ANY;
-			}
-			
-			return this.requiredType = type;
-		}
-		return this.requiredType = new ArrayType(t);
+		return this.elementType = t;
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IType getType()
 	{
-		if (!type.isArrayType())
+		if (this.requiredType != null)
 		{
-			IClass iclass = type.getTheClass();
-			if (iclass == Types.OBJECT_CLASS || iclass == null)
-			{
-				return this;
-			}
-			if (iclass.getAnnotation(ARRAY_CONVERTIBLE) != null)
-			{
-				return new LiteralExpression(type, this);
-			}
-			
-			return null;
+			return this.requiredType;
 		}
 		
-		// If the type is an array type, get it's element type
-		IType type1 = type.getElementType();
+		return this.requiredType = new ArrayType(this.getElementType());
+	}
+	
+	@Override
+	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		IType elementType;
+		if (!arrayType.isArrayType())
+		{
+			IClass iclass = arrayType.getTheClass();
+			if (iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null)
+			{
+				return new LiteralExpression(this).withType(arrayType, typeContext, markers, context);
+			}
+			if (arrayType.classEquals(Types.ITERABLE))
+			{
+				return new LiteralExpression(this, getArrayToIterable()).withType(arrayType, typeContext, markers, context);
+			}
+			else if (iclass != Types.OBJECT_CLASS)
+			{
+				return null;
+			}
+			else
+			{
+				elementType = this.getElementType();
+			}
+		}
+		else
+		{
+			// If the type is an array type, get it's element type
+			elementType = arrayType.getElementType();
+		}
 		
 		// Check for every value if it is the element type
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			if (!this.values[i].isType(type1))
+			if (!this.values[i].isType(elementType))
 			{
-				// If not, this is not the type
 				return null;
 			}
 		}
 		
-		this.elementType = type1;
-		this.requiredType = type;
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			IValue value = this.values[i];
+			IValue value1 = value.withType(elementType, typeContext, markers, context);
+			
+			if (value1 == null)
+			{
+				Marker marker = markers.create(value.getPosition(), "array.element.type");
+				marker.addInfo("Array Type: " + this.requiredType);
+				marker.addInfo("Array Element Type: " + value.getType());
+			}
+			else
+			{
+				value = value1;
+				this.values[i] = value1;
+			}
+		}
+		
+		if (arrayType.hasTypeVariables())
+		{
+			this.getType();
+			return this;
+		}
+		
+		this.elementType = elementType;
+		this.requiredType = arrayType;
+		
 		return this;
+	}
+	
+	private static IMethod ARRAY_TO_ITERABLE;
+	
+	private static IMethod getArrayToIterable()
+	{
+		if (ARRAY_TO_ITERABLE != null)
+		{
+			return ARRAY_TO_ITERABLE;
+		}
+		return ARRAY_TO_ITERABLE = Package.dyvilLang.resolveClass("Predef").getBody().getMethod(Name.getQualified("toIterable"));
+	}
+	
+	private boolean isConvertibleFrom(IType type)
+	{
+		IClass iclass = type.getTheClass();
+		return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || Types.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override
@@ -166,8 +218,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			IClass iclass = type.getTheClass();
-			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null;
+			return this.isConvertibleFrom(type);
 		}
 		
 		// Skip getting the element type if this is an empty array
@@ -193,18 +244,19 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (!type.isArrayType())
 		{
-			IClass iclass = type.getTheClass();
-			return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(ARRAY_CONVERTIBLE) != null ? 2 : 0;
+			// isConvertibleFrom also returns true for Object, but the
+			// CONVERSION_MATCH return value here is intentional.
+			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
 		}
 		
 		// Skip getting the element type if this is an empty array
 		if (this.valueCount == 0)
 		{
-			return 3;
+			return 1;
 		}
 		
 		// If the type is an array type, get it's element type
@@ -214,7 +266,7 @@ public final class Array extends ASTNode implements IValue, IValueList
 		// Get the type match for every value in the array
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			int m = this.values[i].getTypeMatch(type1);
+			float m = this.values[i].getTypeMatch(type1);
 			if (m == 0)
 			{
 				// If the type match for one value is zero, return 0
@@ -267,9 +319,11 @@ public final class Array extends ASTNode implements IValue, IValueList
 	@Override
 	public void addValue(int index, IValue value)
 	{
-		int i = this.valueCount++;
-		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
-		this.values[index] = value;
+		IValue[] temp = new IValue[++this.valueCount];
+		System.arraycopy(this.values, 0, temp, 0, index);
+		temp[index] = value;
+		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
+		this.values = temp;
 	}
 	
 	@Override
@@ -316,24 +370,9 @@ public final class Array extends ASTNode implements IValue, IValueList
 			}
 		}
 		
-		IType type = this.elementType;
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue value = this.values[i];
-			IValue value1 = value.withType(type);
-			
-			if (value1 == null)
-			{
-				Marker marker = markers.create(value.getPosition(), "array.element.type");
-				marker.addInfo("Array Type: " + this.requiredType);
-				marker.addInfo("Array Element Type: " + value.getType());
-			}
-			else
-			{
-				value = value1;
-				this.values[i] = value1;
-			}
-			value.checkTypes(markers, context);
+			this.values[i].checkTypes(markers, context);
 		}
 	}
 	
@@ -357,6 +396,16 @@ public final class Array extends ASTNode implements IValue, IValueList
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
+		}
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		IType type = this.elementType;
@@ -372,11 +421,6 @@ public final class Array extends ASTNode implements IValue, IValueList
 			writer.writeLDC(i);
 			value.writeExpression(writer);
 			writer.writeInsn(opcode);
-		}
-		
-		if (this.requiredType.getTheClass() == Types.MAP_CLASS)
-		{
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Map", "apply", "([Ldyvil/tuple/Tuple2;)Ldyvil/collection/ImmutableMap;", true);
 		}
 	}
 	

@@ -1,21 +1,18 @@
 package dyvil.lang;
 
-import dyvil.lang.literal.IntConvertible;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
-@IntConvertible
 public class Short implements Integer
 {
 	public static final int		min		= java.lang.Short.MIN_VALUE;
 	public static final int		max		= java.lang.Short.MAX_VALUE;
 	public static final byte	size	= java.lang.Short.SIZE;
 	
-	protected short				value;
+	protected short value;
 	
 	public static Short apply(short v)
 	{

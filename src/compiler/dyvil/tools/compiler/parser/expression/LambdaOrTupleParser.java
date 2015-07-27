@@ -1,39 +1,42 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.LambdaExpression;
 import dyvil.tools.compiler.ast.expression.Tuple;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.ParserUtil;
 
 public class LambdaOrTupleParser extends EmulatorParser implements IParameterList
 {
-	protected static final int START = 0;
-	protected static final int	PARAMETERS	= 1;
-	protected static final int	TUPLE		= 2;
-	protected static final int	TUPLE_END	= 4;
-	protected static final int	ARROW		= 8;
-	protected static final int	END			= 16;
+	protected static final int	START			= 1;
+	protected static final int	PARAMETERS		= 2;
+	protected static final int	PARAMETER_NAME	= 3;
+	protected static final int	SEPARATOR		= 4;
+	protected static final int	TUPLE			= 5;
+	protected static final int	TUPLE_END		= 6;
+	protected static final int	ARROW			= 7;
+	protected static final int	END				= 8;
 	
-	protected IValued			field;
+	protected IValueConsumer consumer;
 	
-	private IParameter[]		params;
-	private int					parameterCount;
+	private IParameter[]	params;
+	private int				parameterCount;
 	
-	private IValue				value;
+	private IValue value;
 	
-	public LambdaOrTupleParser(IValued field)
+	public LambdaOrTupleParser(IValueConsumer consumer)
 	{
 		this.mode = START;
-		this.parser = this.tryParser = new ParameterListParser(this);
-		this.field = field;
+		this.consumer = consumer;
 	}
 	
 	@Override
@@ -45,14 +48,25 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	@Override
 	public void parse(IParserManager pm, IToken token) throws SyntaxError
 	{
-		if (this.mode == START) {
+		switch (this.mode)
+		{
+		case START:
 			this.firstToken = token;
 			this.pm = pm;
 			this.mode = PARAMETERS;
+			
+			IToken next = token.next();
+			int nextNextType = next.next().type();
+			// Special cases: (x) => ... or (x, y, ...) => ...
+			if (nextNextType == Symbols.CLOSE_PARENTHESIS || nextNextType == Symbols.COMMA)
+			{
+				this.mode = PARAMETER_NAME;
+				return;
+			}
+			
+			this.parser = this.tryParser = new ParameterListParser(this);
 			return;
-		}
-		if (this.mode == PARAMETERS)
-		{
+		case PARAMETERS:
 			if (token.type() == Symbols.CLOSE_PARENTHESIS && this.tryParser.isInMode(ParameterListParser.SEPERATOR))
 			{
 				this.mode = ARROW;
@@ -71,9 +85,33 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				this.mode = TUPLE;
 			}
 			return;
-		}
-		if (this.mode == TUPLE)
-		{
+		case PARAMETER_NAME:
+			if (!ParserUtil.isIdentifier(token.type()))
+			{
+				pm.jump(this.firstToken);
+				this.mode = TUPLE;
+				return;
+			}
+			this.mode = SEPARATOR;
+			this.addParameter(new MethodParameter(token.raw(), token.nameValue()));
+			return;
+		case SEPARATOR:
+			int type = token.type();
+			if (type == Symbols.COMMA)
+			{
+				this.mode = PARAMETER_NAME;
+				return;
+			}
+			if (type == Symbols.CLOSE_PARENTHESIS && token.next().type() == Symbols.ARROW_OPERATOR)
+			{
+				this.mode = ARROW;
+				return;
+			}
+			
+			pm.jump(this.firstToken);
+			this.mode = TUPLE;
+			return;
+		case TUPLE:
 			if (token.type() == Symbols.OPEN_PARENTHESIS)
 			{
 				Tuple t = new Tuple(token);
@@ -84,20 +122,16 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			}
 			pm.popParser();
 			return;
-		}
-		if (this.mode == TUPLE_END)
-		{
+		case TUPLE_END:
 			pm.popParser();
 			if (token.type() == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
-				this.field.setValue(this.value);
+				this.consumer.setValue(this.value);
 				return;
 			}
 			throw new SyntaxError(token, "Invalid Tuple - ')' expected", true);
-		}
-		if (this.mode == ARROW)
-		{
+		case ARROW:
 			if (token.type() != Symbols.ARROW_OPERATOR)
 			{
 				pm.jump(this.firstToken);
@@ -105,16 +139,14 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			
-			LambdaExpression le = new LambdaExpression(token.raw(), params, this.parameterCount);
-			pm.pushParser(new ExpressionParser(le));
+			LambdaExpression le = new LambdaExpression(token.raw(), this.params, this.parameterCount);
+			pm.pushParser(pm.newExpressionParser(le));
 			this.value = le;
 			this.mode = END;
 			return;
-		}
-		if (this.mode == END)
-		{
+		case END:
 			pm.popParser(true);
-			this.field.setValue(this.value);
+			this.consumer.setValue(this.value);
 			return;
 		}
 	}
@@ -134,8 +166,8 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 		if (index >= this.params.length)
 		{
 			IParameter[] temp = new IParameter[index + 1];
-			System.arraycopy(params, 0, temp, 0, params.length);
-			params = temp;
+			System.arraycopy(this.params, 0, temp, 0, this.params.length);
+			this.params = temp;
 		}
 		this.params[index] = param;
 	}

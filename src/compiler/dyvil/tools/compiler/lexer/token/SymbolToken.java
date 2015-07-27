@@ -7,10 +7,10 @@ import dyvil.tools.compiler.transform.Symbols;
 
 public final class SymbolToken implements IToken
 {
-	private IToken		prev;
-	private IToken		next;
+	private IToken	prev;
+	private IToken	next;
 	
-	private final int	type;
+	private final int type;
 	
 	private final int	lineNumber;
 	private final int	start;

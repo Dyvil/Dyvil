@@ -14,7 +14,7 @@ public class Boolean
 	protected static final Boolean	TRUE	= new Boolean(true);
 	protected static final Boolean	FALSE	= new Boolean(false);
 	
-	protected boolean				value;
+	protected boolean value;
 	
 	public static Boolean apply(boolean value)
 	{

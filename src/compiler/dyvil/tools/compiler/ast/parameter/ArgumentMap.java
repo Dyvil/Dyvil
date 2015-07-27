@@ -4,11 +4,12 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -32,7 +33,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	{
 		return new Iterator<KeyValuePair>()
 		{
-			private int	index;
+			private int index;
 			
 			@Override
 			public KeyValuePair next()
@@ -170,13 +171,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return this.getValue(param.getName()).getType();
-	}
-	
-	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
@@ -186,45 +181,59 @@ public final class ArgumentMap implements IArguments, IValueMap
 				return this.values[i].getTypeMatch(param.getType());
 			}
 		}
-		return param.getValue() != null ? 3 : 0;
+		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
 		return this.getTypeMatch(index, param);
 	}
 	
 	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.keys[i] == key)
+			if (this.keys[i] != key)
 			{
-				IType type = param.getType().getConcreteType(context);
-				IValue value = this.values[i];
-				IValue value1 = value.withType(type);
-				if (value1 == null)
-				{
-					Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
-					marker.addInfo("Required Type: " + type);
-					marker.addInfo("Value Type: " + value.getType());
-				}
-				else
-				{
-					this.values[i] = value1;
-				}
-				return;
+				continue;
 			}
+			
+			IType type = param.getActualType();
+			IValue value = this.values[i];
+			IValue value1 = type.convertValue(value, typeContext, markers, context);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
+				marker.addInfo("Required Type: " + type);
+				marker.addInfo("Value Type: " + value.getType());
+			}
+			else
+			{
+				this.values[i] = value1;
+			}
+			return;
 		}
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		this.checkValue(index, param, markers, context);
+		this.checkValue(index, param, typeContext, markers, context);
+	}
+	
+	@Override
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
+	{
+		param.getType().inferTypes(this.getValue(param.getName()).getType(), typeContext);
+	}
+	
+	@Override
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	{
+		this.inferType(index, param, typeContext);
 	}
 	
 	@Override
@@ -290,6 +299,15 @@ public final class ArgumentMap implements IArguments, IValueMap
 		for (int i = 0; i < this.size; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 	}
 	

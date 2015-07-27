@@ -15,7 +15,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	private static final int	DOT		= 2;
 	private static final int	COLON	= 8;
 	
-	protected FieldInstruction	fieldInstruction;
+	protected FieldInstruction fieldInstruction;
 	
 	public FieldInstructionParser(FieldInstruction fi)
 	{

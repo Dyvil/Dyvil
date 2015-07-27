@@ -70,46 +70,64 @@ public final class Dlex
 			switch (type)
 			{
 			case IDENTIFIER:
-				if (subtype == MOD_DOTS)
+				switch (subtype)
 				{
+				case MOD_DOTS:
 					if (c == '.')
 					{
 						buf.append(c);
-					}
-					else
-					{
-						addToken = true;
-						reparse = true;
-					}
-				}
-				else if (c == '_' || c == '$')
-				{
-					subtype = MOD_SYMBOL | MOD_LETTER;
-					buf.append(c);
-				}
-				else
-				{
-					boolean letter = (subtype & MOD_LETTER) != 0;
-					boolean symbol = (subtype & MOD_SYMBOL) != 0;
-					if (letter)
-					{
-						if (isIdentifierPart(c))
-						{
-							subtype = MOD_LETTER;
-							buf.append(c);
-							continue;
-						}
-					}
-					if (symbol)
-					{
-						if (isIdentifierSymbol(c))
-						{
-							subtype = MOD_SYMBOL;
-							buf.append(c);
-							continue;
-						}
+						continue;
 					}
 					addToken = true;
+					break typeswitch;
+				case MOD_LETTER:
+					if (c == '_' || c == '$')
+					{
+						buf.append(c);
+						subtype = MOD_LETTER | MOD_SYMBOL;
+						continue;
+					}
+					if (isIdentifierPart(c))
+					{
+						buf.append(c);
+						continue;
+					}
+					addToken = true;
+					break typeswitch;
+				case MOD_SYMBOL:
+					if (c == '_' || c == '$')
+					{
+						buf.append(c);
+						subtype = MOD_LETTER | MOD_SYMBOL;
+						continue;
+					}
+					if (isIdentifierSymbol(c))
+					{
+						buf.append(c);
+						continue;
+					}
+					addToken = true;
+					break typeswitch;
+				case MOD_LETTER | MOD_SYMBOL:
+					if (c == '_' || c == '$')
+					{
+						buf.append(c);
+						continue;
+					}
+					if (isIdentifierPart(c))
+					{
+						buf.append(c);
+						subtype = MOD_LETTER;
+						continue;
+					}
+					if (isIdentifierSymbol(c))
+					{
+						buf.append(c);
+						subtype = MOD_LETTER;
+						continue;
+					}
+					addToken = true;
+					break typeswitch;
 				}
 				break;
 			case SPECIAL_IDENTIFIER:
@@ -167,22 +185,42 @@ public final class Dlex
 				break;
 			case INT:
 			case LONG:
-				if (c == '.')
+				switch (c)
 				{
+				case '.':
+				case 'e':
 					type = FLOAT;
-					buf.append('.');
-				}
-				else if (c == 'l' || c == 'L')
-				{
+					buf.append(c);
+					continue;
+				case 'l':
+				case 'L':
 					type = LONG;
 					addToken = true;
 					reparse = false;
+					break;
+				case '_':
+					continue;
+				case '-':
+					if (buf.length() == 0)
+					{
+						buf.append('-');
+						continue;
+					}
+					
+					addToken = true;
+					reparse = true;
+					break;
 				}
-				else if (subtype == MOD_DEC)
+				if (subtype == MOD_DEC)
 				{
 					if (isDigit(c))
 					{
 						buf.append(c);
+					}
+					else if (c == 'e' || c == 'E')
+					{
+						type = FLOAT;
+						buf.append('e');
 					}
 					else if (c == 'f' || c == 'F')
 					{
@@ -214,7 +252,7 @@ public final class Dlex
 				}
 				else if (subtype == MOD_OCT)
 				{
-					if (isOctDigit(c))
+					if (c == 'o' || isOctDigit(c))
 					{
 						buf.append(c);
 					}
@@ -426,7 +464,7 @@ public final class Dlex
 			{
 				return INT | MOD_HEX;
 			}
-			else if (isDigit(n))
+			else if (n == 'o')
 			{
 				return INT | MOD_OCT;
 			}
@@ -454,6 +492,15 @@ public final class Dlex
 			return Symbols.SEMICOLON;
 		case ',':
 			return Symbols.COMMA;
+		case '_':
+		case '$':
+			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
+		case '-':
+			if (isDigit(code.charAt(i + 1)))
+			{
+				return INT;
+			}
+			return IDENTIFIER | MOD_SYMBOL;
 		}
 		if (isDigit(c))
 		{
@@ -552,7 +599,7 @@ public final class Dlex
 		case INT | MOD_BIN:
 			return new IntToken(prev, Integer.parseInt(s.substring(2), 2), line, start, start + len);
 		case INT | MOD_OCT:
-			return new IntToken(prev, Integer.parseInt(s.substring(1), 8), line, start, start + len);
+			return new IntToken(prev, Integer.parseInt(s.substring(2), 8), line, start, start + len);
 		case INT | MOD_HEX:
 			return new IntToken(prev, Integer.parseInt(s.substring(2), 16), line, start, start + len);
 		case LONG:

@@ -7,20 +7,20 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.object;
 import dyvil.array.ObjectArray;
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.EmptyIterator;
 
 @NilConvertible
 public @object class EmptySet<E> implements ImmutableSet<E>
 {
-	public static final EmptySet	instance	= new EmptySet();
+	public static final EmptySet instance = new EmptySet();
 	
 	public static <E> EmptySet<E> apply()
 	{
@@ -79,7 +79,7 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		return this;
 	}

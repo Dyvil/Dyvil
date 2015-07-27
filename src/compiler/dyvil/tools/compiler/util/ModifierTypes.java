@@ -108,25 +108,24 @@ public enum ModifierTypes
 			sb.append("public ");
 		}
 		
-		if ((mod & Modifiers.DERIVED) == Modifiers.DERIVED)
+		switch (mod & Modifiers.DERIVED)
 		{
-			sb.append("derived ");
-		}
-		else
-		{
-			if ((mod & Modifiers.PROTECTED) == Modifiers.PROTECTED)
-			{
-				sb.append("protected ");
-			}
-			if ((mod & Modifiers.PRIVATE) == Modifiers.PRIVATE)
-			{
-				sb.append("private ");
-			}
+		case Modifiers.PACKAGE:
+			break;
+		case Modifiers.PROTECTED:
+			sb.append("protected ");
+			break;
+		case Modifiers.PRIVATE:
+			sb.append("private ");
+			break;
+		case Modifiers.DERIVED:
+			sb.append("private protected ");
+			break;
 		}
 		
 		if ((mod & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
-			sb.append("deprecated ");
+			sb.append("@Deprecated ");
 		}
 		if ((mod & Modifiers.SEALED) == Modifiers.SEALED)
 		{
@@ -295,12 +294,8 @@ public enum ModifierTypes
 			return Modifiers.PRIVATE;
 		case Keywords.PROTECTED:
 			return Modifiers.PROTECTED;
-		case Keywords.DERIVED:
-			return Modifiers.DERIVED;
 		case Keywords.SEALED:
 			return Modifiers.SEALED;
-		case Keywords.DEPRECATED:
-			return Modifiers.DEPRECATED;
 		}
 		return -1;
 	}

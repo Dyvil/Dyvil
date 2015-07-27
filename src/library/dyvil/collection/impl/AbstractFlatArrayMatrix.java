@@ -4,17 +4,17 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import dyvil.lang.Int;
-import dyvil.lang.Matrix;
 
+import dyvil.collection.Matrix;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tuple.Tuple2;
 
 public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 {
-	protected int		rows;
-	protected int		columns;
+	protected int	rows;
+	protected int	columns;
 	
-	protected Object[]	cells;
+	protected Object[] cells;
 	
 	public AbstractFlatArrayMatrix()
 	{

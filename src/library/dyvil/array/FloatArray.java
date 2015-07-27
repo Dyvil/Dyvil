@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface FloatArray
 {
-	public static final float[]	EMPTY	= new float[0];
+	public static final float[] EMPTY = new float[0];
 	
 	public static float[] apply()
 	{

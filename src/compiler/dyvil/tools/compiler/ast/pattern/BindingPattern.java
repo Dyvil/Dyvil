@@ -1,18 +1,17 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-
-public final class BindingPattern extends ASTNode implements IPattern
+public final class BindingPattern extends Pattern
 {
 	private Name		name;
 	private Variable	variable;
@@ -43,7 +42,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		if (this.type == Types.ANY || this.type == Types.UNKNOWN)
 		{
@@ -60,7 +59,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (name != this.name)
 		{
@@ -72,9 +71,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 			return this.variable;
 		}
 		
-		this.variable = new Variable(this.position);
-		this.variable.name = this.name;
-		this.variable.type = this.type;
+		this.variable = new Variable(this.position, this.name, this.type);
 		return this.variable;
 	}
 	
@@ -98,12 +95,12 @@ public final class BindingPattern extends ASTNode implements IPattern
 	
 	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
 	{
-		this.variable.type = this.type;
+		this.variable.setType(this.type);
 		if (varIndex >= 0)
 		{
 			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
+		this.variable.writeInit(writer, null);
 	}
 	
 	@Override

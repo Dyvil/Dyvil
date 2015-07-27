@@ -1,28 +1,26 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.context.CombiningContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
-import dyvil.tools.compiler.ast.pattern.IPatterned;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.GenericType;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -31,28 +29,32 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-
-public final class CaseExpression extends ASTNode implements IValue, IValued, IPatterned, IClassCompilable, IContext
+public final class CaseExpression implements IValue, ICase, IClassCompilable, IDefaultContext
 {
 	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
-	public static final Type			PARTIALFUNCTION			= new Type(PARTIALFUNCTION_CLASS);
+	public static final ClassType		PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
 	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
 	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
-	protected IPattern					pattern;
-	protected IValue					condition;
-	protected IValue					value;
+	protected ICodePosition position;
 	
-	protected IType						type;
-	private String						internalClassName;
+	protected IPattern	pattern;
+	protected IValue	condition;
+	protected IValue	action;
 	
-	private transient IContext			context;
+	// Metadata
+	protected IType	type;
+	private String	internalClassName;
 	
 	public CaseExpression(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -73,17 +75,12 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		this.internalClassName = internalName + "$" + index;
 	}
 	
-	public void setMatchCase()
-	{
-		this.type = Types.UNKNOWN;
-	}
-	
 	@Override
 	public IType getType()
 	{
 		if (this.type == null)
 		{
-			GenericType gt = new GenericType(PARTIALFUNCTION_CLASS);
+			ClassGenericType gt = new ClassGenericType(PARTIALFUNCTION_CLASS);
 			IType t1 = this.pattern.getType();
 			if (t1.isPrimitive())
 			{
@@ -91,9 +88,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			}
 			gt.addType(t1);
 			
-			if (this.value != null)
+			if (this.action != null)
 			{
-				t1 = this.value.getType();
+				t1 = this.action.getType();
 				if (t1.isPrimitive())
 				{
 					t1 = t1.getReferenceType();
@@ -102,7 +99,7 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			}
 			else
 			{
-				gt.addType(new Type(Types.VOID_CLASS));
+				gt.addType(new ClassType(Types.VOID_CLASS));
 			}
 			return this.type = gt;
 		}
@@ -110,62 +107,41 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.isType(type))
 		{
 			this.type = type;
+			
+			IType type1 = this.type.resolveType(RETURN_TYPE);
+			this.action = this.action.withType(type1, typeContext, markers, context);
 			return this;
 		}
 		return null;
 	}
 	
 	@Override
-	public boolean isType(IType type)
+	public IValue getAction()
 	{
-		return type.isSuperTypeOf(PARTIALFUNCTION);
+		return this.action;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public void setAction(IValue action)
 	{
-		if (type.getTheClass() == PARTIALFUNCTION_CLASS)
-		{
-			return 3;
-		}
-		if (this.isType(type))
-		{
-			return 2;
-		}
-		return 0;
+		this.action = action;
 	}
 	
 	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
-	}
-	
-	public void setCondition(IValue condition)
-	{
-		this.condition = condition;
-	}
-	
 	public IValue getCondition()
 	{
 		return this.condition;
 	}
 	
 	@Override
-	public void setPattern(IPattern pattern)
+	public void setCondition(IValue condition)
 	{
-		this.pattern = pattern;
+		this.condition = condition;
 	}
 	
 	@Override
@@ -174,82 +150,24 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		return this.pattern;
 	}
 	
+	@Override
+	public void setPattern(IPattern pattern)
+	{
+		this.pattern = pattern;
+	}
+	
 	// IContext
 	
 	@Override
-	public boolean isStatic()
+	public IDataMember resolveField(Name name)
 	{
-		return true;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
-	public IField resolveField(Name name)
-	{
-		IField f = this.pattern.resolveField(name);
+		IDataMember f = this.pattern.resolveField(name);
 		if (f != null)
 		{
 			return f;
 		}
 		
-		if (this.type == Types.UNKNOWN)
-		{
-			return this.context.resolveField(name);
-		}
 		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return this.context.handleException(type);
-	}
-	
-	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.context.getVisibility(member);
 	}
 	
 	// Phases
@@ -261,93 +179,97 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		{
 			this.condition.resolveTypes(markers, context);
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value.resolveTypes(markers, context);
+			this.action.resolveTypes(markers, context);
 		}
 	}
 	
 	@Override
-	public CaseExpression resolve(MarkerList markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		if (this.pattern != null)
+		{
+			this.pattern.resolve(markers, context);
+			
+			if (this.type == null)
+			{
+				this.getType();
+			}
+			
+			IType type1 = this.type.resolveType(PAR_TYPE);
+			this.pattern = this.pattern.withType(type1, markers);
+			// TODO Handle error
+		}
+		
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, this);
+			this.condition = this.condition.resolve(markers, context1);
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value = this.value.resolve(markers, this);
+			this.action = this.action.resolve(markers, context1);
 		}
-		this.context = null;
+		
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition.checkTypes(markers, this);
+			this.condition.checkTypes(markers, context1);
 		}
-		
-		if (this.type != Types.UNKNOWN)
+		if (this.action != null)
 		{
-			if (this.type == null)
-			{
-				this.getType();
-			}
-			
-			IContext.addCompilable(context, this);
-			
-			if (this.pattern != null)
-			{
-				this.pattern.resolve(markers, context);
-				IType type1 = this.type.resolveType(PAR_TYPE);
-				this.pattern = this.pattern.withType(type1);
-				this.pattern.checkTypes(markers, context);
-			}
-			if (this.value != null)
-			{
-				IType type1 = this.type.resolveType(RETURN_TYPE);
-				this.value = this.value.withType(type1);
-			}
+			this.action.checkTypes(markers, context1);
 		}
-		
-		if (this.value != null)
-		{
-			this.value.checkTypes(markers, this);
-		}
-		
-		this.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.context = context;
+		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition.check(markers, this);
+			this.condition.check(markers, context1);
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value.check(markers, this);
+			this.action.check(markers, context1);
 		}
-		this.context = null;
 	}
 	
 	@Override
-	public CaseExpression foldConstants()
+	public IValue foldConstants()
 	{
 		if (this.condition != null)
 		{
 			this.condition = this.condition.foldConstants();
 		}
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value = this.value.foldConstants();
+			this.action = this.action.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		context.getHeader().addInnerClass(this);
+		
+		IContext context1 = new CombiningContext(this, context);
+		if (this.condition != null)
+		{
+			this.condition = this.condition.cleanup(context1, compilableList);
+		}
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(context1, compilableList);
 		}
 		return this;
 	}
@@ -432,9 +354,9 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 		mw.writeInsn(Opcodes.ACONST_NULL);
 		mw.writeInsn(Opcodes.ARETURN);
 		mw.writeLabel(elseLabel);
-		if (this.value != null)
+		if (this.action != null)
 		{
-			this.value.writeExpression(mw);
+			this.action.writeExpression(mw);
 		}
 		else
 		{
@@ -499,10 +421,10 @@ public final class CaseExpression extends ASTNode implements IValue, IValued, IP
 			buffer.append(" if ");
 			this.condition.toString(prefix, buffer);
 		}
-		buffer.append(" : ");
-		if (this.value != null)
+		buffer.append(" => ");
+		if (this.action != null)
 		{
-			this.value.toString(prefix, buffer);
+			this.action.toString(prefix, buffer);
 		}
 	}
 }

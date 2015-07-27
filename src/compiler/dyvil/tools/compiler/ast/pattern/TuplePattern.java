@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
@@ -16,9 +16,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-import org.objectweb.asm.Label;
-
-public final class TuplePattern extends ASTNode implements IPattern, IPatternList
+public final class TuplePattern extends Pattern implements IPatternList
 {
 	private IPattern[]	patterns	= new IPattern[3];
 	private int			patternCount;
@@ -52,14 +50,14 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (!TupleType.tupleClasses[this.patternCount].isSubTypeOf(type))
+		if (!TupleType.getTupleClass(this.patternCount).isSubTypeOf(type))
 		{
 			return null;
 		}
 		int typeTag = type.typeTag();
-		if (typeTag != IType.GENERIC_TYPE && typeTag != IType.TUPLE_TYPE)
+		if (typeTag != IType.GENERIC && typeTag != IType.TUPLE)
 		{
 			return null;
 		}
@@ -74,6 +72,23 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			}
 		}
 		this.tupleType = type;
+		
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			IType type1 = typeList.getType(i);
+			IPattern pattern = this.patterns[i];
+			IPattern pattern1 = pattern.withType(type1, markers);
+			if (pattern1 == null)
+			{
+				Marker m = markers.create(pattern.getPosition(), "tuple.pattern.type");
+				m.addInfo("Pattern Type: " + pattern.getType());
+				m.addInfo("Tuple Type: " + type1);
+			}
+			else
+			{
+				this.patterns[i] = pattern1;
+			}
+		}
 		return this;
 	}
 	
@@ -119,11 +134,11 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IField f = this.patterns[i].resolveField(name);
+			IDataMember f = this.patterns[i].resolveField(name);
 			if (f != null)
 			{
 				return f;
@@ -142,31 +157,6 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		ITypeList typeList = (ITypeList) this.tupleType;
-		
-		for (int i = 0; i < this.patternCount; i++)
-		{
-			IType type = typeList.getType(i);
-			IPattern pattern = this.patterns[i];
-			IPattern pattern1 = pattern.withType(type);
-			if (pattern1 == null)
-			{
-				Marker m = markers.create(pattern.getPosition(), "tuple.pattern.type");
-				m.addInfo("Pattern Type: " + pattern.getType());
-				m.addInfo("Tuple Type: " + type);
-			}
-			else
-			{
-				this.patterns[i] = pattern = pattern1;
-			}
-			
-			pattern.checkTypes(markers, context);
-		}
 	}
 	
 	@Override
@@ -197,7 +187,6 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			this.patterns[i].writeInvJump(writer, -1, target);
 		}
 		
-		writer.resetLocals(varIndex);
 		writer.writeJumpInsn(Opcodes.GOTO, elseLabel);
 		writer.writeLabel(target);
 	}
@@ -228,8 +217,6 @@ public final class TuplePattern extends ASTNode implements IPattern, IPatternLis
 			writer.writeTypeInsn(Opcodes.CHECKCAST, typeList.getType(i).getInternalName());
 			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
-		
-		writer.resetLocals(varIndex);
 	}
 	
 	@Override

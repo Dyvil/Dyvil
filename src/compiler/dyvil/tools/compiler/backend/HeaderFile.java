@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.backend;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
+import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
@@ -11,127 +12,143 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
+import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 
 public class HeaderFile
 {
-	private static final int	FILE_VERSION	= 1;
+	private static final int FILE_VERSION = 1;
 	
 	public static void write(File file, IDyvilHeader header)
 	{
-		byte[] bytes;
-		
-		// First try to compile the file to a byte array
-		try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); DataOutputStream dos = new DataOutputStream(bos))
+		if (!FileUtils.createFile(file))
 		{
-			write(dos, header);
-			bytes = bos.toByteArray();
+			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
+			return;
+		}
+		
+		try (ObjectWriter writer = new ObjectWriter(); OutputStream fo = new BufferedOutputStream(new FileOutputStream(file)))
+		{
+			
+			writer.writeShort(FILE_VERSION);
+			write(writer, header);
+			
+			// Directly write the DyO byte code to the file output to save some
+			// unnecessary byte array allocations
+			writer.writeTo(fo);
 		}
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			DyvilCompiler.warn("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
+			DyvilCompiler.error("ClassWriter", "compile", ex);
 			return;
 		}
-		
-		// If the compilation was successful, we can try to write the newly
-		// created byte array to a newly created, empty file.
-		ClassWriter.save(file, bytes);
 	}
 	
 	public static DyvilHeader read(InputStream is)
 	{
-		try (DataInputStream dis = new DataInputStream(is))
+		try (ObjectReader reader = new ObjectReader(new DataInputStream(is)))
 		{
-			return read(dis);
+			int fileVersion = reader.readShort();
+			if (fileVersion > FILE_VERSION)
+			{
+				throw new IllegalStateException("Unknown Dyvil Header File Version: " + fileVersion);
+			}
+			return read(reader);
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.logger.throwing("HeaderFile", "read", ex);
+			DyvilCompiler.error("HeaderFile", "read", ex);
 		}
 		return null;
 	}
 	
-	private static void write(DataOutputStream dos, IDyvilHeader header) throws Throwable
+	private static void write(DataOutput writer, IDyvilHeader header) throws Throwable
 	{
-		dos.writeShort(FILE_VERSION);
-		
 		// Header Name
-		dos.writeUTF(header.getName());
+		writer.writeUTF(header.getName());
 		
 		// Include Declarations
-		/*
-		 * int includes = header.includeCount(); dos.writeShort(includes); for
-		 * (int i = 0; i < includes; i++) { header.getInclude(i).write(dos); }
-		 */
+		writer.writeShort(0);
 		
 		// Import Declarations
 		int imports = header.importCount();
-		dos.writeShort(imports);
+		writer.writeShort(imports);
 		for (int i = 0; i < imports; i++)
 		{
-			header.getImport(i).write(dos);
+			header.getImport(i).write(writer);
 		}
 		
 		// Using Declarations
 		int staticImports = header.usingCount();
-		dos.writeShort(staticImports);
+		writer.writeShort(staticImports);
 		for (int i = 0; i < staticImports; i++)
 		{
-			header.getUsing(i).write(dos);
+			header.getUsing(i).write(writer);
 		}
 		
-		// Operators Declarations
+		// Operators Definitions
 		Map<Name, Operator> operators = header.getOperators();
-		int operatorCount = operators.size();
-		dos.writeShort(operatorCount);
-		for (Entry<Name, Operator> entry : operators.entrySet())
+		writer.writeShort(operators.size());
+		for (Entry<Name, Operator> entry : operators)
 		{
-			entry.getValue().write(dos);
+			entry.getValue().write(writer);
 		}
+		
+		// Type Aliases
+		Map<Name, ITypeAlias> typeAliases = header.getTypeAliases();
+		writer.writeShort(typeAliases.size());
+		for (Entry<Name, ITypeAlias> entry : typeAliases)
+		{
+			entry.getValue().write(writer);
+		}
+		
+		// Classes
+		writer.writeShort(0);
 	}
 	
-	private static DyvilHeader read(DataInputStream dis) throws Throwable
+	private static DyvilHeader read(ObjectReader reader) throws Throwable
 	{
-		int fileVersion = dis.readShort();
-		if (fileVersion > FILE_VERSION)
-		{
-			throw new IllegalStateException("Unknown Dyvil Header File Version: " + fileVersion);
-		}
-		
-		String name = dis.readUTF();
+		String name = reader.readUTF();
 		DyvilHeader header = new ExternalHeader(name);
 		
 		// Include Declarations
-		/*
-		 * int includes = dis.readShort(); for (int i = 0; i < includes; i++) {
-		 * IncludeDeclaration id = new IncludeDeclaration(null); id.read(dis);
-		 * header.addInclude(id); }
-		 */
+		reader.readShort();
 		
 		// Import Declarations
-		int imports = dis.readShort();
+		int imports = reader.readShort();
 		for (int i = 0; i < imports; i++)
 		{
 			ImportDeclaration id = new ImportDeclaration(null);
-			id.read(dis);
+			id.read(reader);
 			header.addImport(id);
 		}
 		
-		int staticImports = dis.readShort();
+		int staticImports = reader.readShort();
 		for (int i = 0; i < staticImports; i++)
 		{
 			ImportDeclaration id = new ImportDeclaration(null, true);
-			id.read(dis);
+			id.read(reader);
 			header.addUsing(id);
 		}
 		
-		int operators = dis.readShort();
+		int operators = reader.readShort();
 		for (int i = 0; i < operators; i++)
 		{
-			Operator op = Operator.read(dis);
+			Operator op = Operator.read(reader);
 			header.addOperator(op);
 		}
+		
+		int typeAliases = reader.readShort();
+		for (int i = 0; i < typeAliases; i++)
+		{
+			TypeAlias ta = new TypeAlias();
+			ta.read(reader);
+			header.addTypeAlias(ta);
+		}
+		
+		// int classes = reader.readShort();
 		
 		return header;
 	}

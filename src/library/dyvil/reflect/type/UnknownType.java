@@ -8,7 +8,7 @@ import dyvil.annotation.object;
 @NilConvertible
 public @object class UnknownType<T> implements Type<T>
 {
-	public static final UnknownType	instance	= new UnknownType();
+	public static final UnknownType instance = new UnknownType();
 	
 	public static <T> UnknownType<T> apply()
 	{

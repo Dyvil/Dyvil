@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface DoubleArray
 {
-	public static final double[]	EMPTY	= new double[0];
+	public static final double[] EMPTY = new double[0];
 	
 	public static double[] apply()
 	{

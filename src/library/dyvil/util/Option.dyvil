@@ -1,0 +1,36 @@
+package dyvil.util
+
+import java.util.function.Consumer
+import java.util.function.Function
+import java.util.function.Predicate
+import java.util.function.Supplier
+
+import dyvil.lang.literal.NilConvertible
+import dyvil.lang.literal.TupleConvertible
+
+@NilConvertible
+@TupleConvertible
+public interface Option[+T]
+{
+	public static Option[T] of[T](T t) = if (t === null) None.instance; else new Some(t);
+	
+	public static Option[T] apply[T](T t) = new Some(t)
+	
+	public static Option apply() = None.instance
+	
+	public T !();
+	
+	public boolean ?();
+	
+	public void forEach(Consumer[_ >: T] consumer);
+	
+	public Option[T] filter(Predicate[_ >: T] predicate);
+	
+	public Option[U] map[U](Function[_ >: T, _ <: U] mapper);
+	
+	public Option[U] flatMap[U](Function[_ >: T, Option[U]] mapper);
+	
+	public T orElse(T other);
+	
+	public T orElse(Supplier[_ <: T] other);
+}

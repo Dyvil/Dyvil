@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
 /**
@@ -72,7 +71,13 @@ public interface FileUtils
 	 *            the text
 	 * @return true, if successful
 	 */
+	
 	public static @infix boolean write(File file, String text)
+	{
+		return write(file, text.getBytes());
+	}
+	
+	public static @infix boolean write(File file, byte[] bytes)
 	{
 		try
 		{
@@ -81,7 +86,6 @@ public interface FileUtils
 				file.createNewFile();
 			}
 			
-			byte[] bytes = text.getBytes();
 			Files.write(file.toPath(), bytes);
 			return true;
 		}

@@ -1,7 +1,10 @@
 package dyvil.tools.compiler.ast.type;
 
-public interface ITyped
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+
+public interface ITyped extends ITypeConsumer
 {
+	@Override
 	public void setType(IType type);
 	
 	public IType getType();

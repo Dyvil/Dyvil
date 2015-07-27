@@ -1,13 +1,14 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -16,9 +17,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-import org.objectweb.asm.Label;
-
-public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
+public class CaseClassPattern extends Pattern implements IPatternList
 {
 	private IType		type;
 	private IPattern[]	patterns	= new IPattern[2];
@@ -48,17 +47,51 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (type.equals(this.type))
+		if (!type.isSuperTypeOf(this.type))
+		{
+			return null;
+		}
+		
+		IClass iclass = this.type.getTheClass();
+		if (iclass == null)
+		{
+			return this; // skip
+		}
+		
+		int paramCount = iclass.parameterCount();
+		if (this.patternCount != paramCount)
+		{
+			Marker m = markers.create(this.position, "pattern.class.count", this.type.toString());
+			m.addInfo("Pattern Count: " + this.patternCount);
+			m.addInfo("Class Parameter Count: " + paramCount);
+			return this;
+		}
+		
+		for (int i = 0; i < paramCount; i++)
+		{
+			IParameter param = iclass.getParameter(i);
+			IType type1 = param.getType().getConcreteType(this.type);
+			IPattern pattern = this.patterns[i];
+			IPattern pattern1 = pattern.withType(type1, markers);
+			if (pattern1 == null)
+			{
+				Marker m = markers.create(this.position, "pattern.class.type", param.getName());
+				m.addInfo("Pattern Type: " + pattern.getType());
+				m.addInfo("Parameter Type: " + type1);
+			}
+			else
+			{
+				this.patterns[i] = pattern1;
+			}
+		}
+		
+		if (type.classEquals(this.type))
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(this.type))
-		{
-			return new TypeCheckPattern(this, this.type);
-		}
-		return null;
+		return new TypeCheckPattern(this, this.type);
 	}
 	
 	@Override
@@ -99,11 +132,11 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IField f = this.patterns[i].resolveField(name);
+			IDataMember f = this.patterns[i].resolveField(name);
 			if (f != null)
 			{
 				return f;
@@ -115,7 +148,7 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context);
+		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		
 		for (int i = 0; i < this.patternCount; i++)
 		{
@@ -123,45 +156,6 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		IClass iclass = this.type.getTheClass();
-		if (iclass == null)
-		{
-			return; // skip
-		}
-		
-		int paramCount = iclass.parameterCount();
-		if (this.patternCount != paramCount)
-		{
-			Marker m = markers.create(this.position, "pattern.class.count", this.type.toString());
-			m.addInfo("Pattern Count: " + this.patternCount);
-			m.addInfo("Class Parameter Count: " + paramCount);
-			return;
-		}
-		
-		for (int i = 0; i < paramCount; i++)
-		{
-			IParameter param = iclass.getParameter(i);
-			IType type = param.getType().getConcreteType(this.type);
-			IPattern pattern = this.patterns[i];
-			IPattern pattern1 = pattern.withType(type);
-			if (pattern1 == null)
-			{
-				Marker m = markers.create(this.position, "pattern.class.type", param.getName());
-				m.addInfo("Pattern Type: " + pattern.getType());
-				m.addInfo("Parameter Type: " + type);
-			}
-			else
-			{
-				this.patterns[i] = pattern = pattern1;
-			}
-			
-			pattern.checkTypes(markers, context);
-		}
 	}
 	
 	@Override
@@ -187,13 +181,11 @@ public class CaseClassPattern extends ASTNode implements IPattern, IPatternList
 				continue;
 			}
 			
-			IField field = iclass.getParameter(i);
+			IDataMember field = iclass.getParameter(i);
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, this.getLineNumber());
 			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
-		
-		writer.resetLocals(varIndex);
 	}
 	
 	@Override

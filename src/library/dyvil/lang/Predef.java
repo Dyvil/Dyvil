@@ -6,6 +6,8 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.array.*;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
 import dyvil.tuple.Tuple2;
 
 import static dyvil.reflect.Opcodes.*;
@@ -40,6 +42,23 @@ public final class Predef
 	public static @infix boolean $bang$eq$eq(Object o1, Object o2)
 	{
 		return o1 != o2;
+	}
+	
+	// Lists
+	
+	public static @infix <E> ImmutableList<? extends E> $colon$colon(E element, List<? extends E> list)
+	{
+		return ImmutableList.apply(element).$plus$plus(list);
+	}
+	
+	public static @infix <E> ImmutableList<? extends E> $colon$colon(E element1, E element2)
+	{
+		return ImmutableList.apply(element1, element2);
+	}
+	
+	public static @infix <E> Iterable<E> toIterable(E... array)
+	{
+		return ImmutableList.apply(array);
 	}
 	
 	// Strings

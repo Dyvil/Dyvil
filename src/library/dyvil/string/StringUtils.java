@@ -3,11 +3,10 @@ package dyvil.string;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.Utility;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.math.MathUtils;
 import dyvil.random.RandomUtils;
@@ -26,7 +25,7 @@ import dyvil.random.RandomUtils;
 @Utility(String.class)
 public interface StringUtils
 {
-	public static final String[]	EMPTY_STRING_ARRAY	= new String[0];
+	public static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
 	public static @infix String $times(String string, int count)
 	{

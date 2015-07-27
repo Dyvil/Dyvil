@@ -26,10 +26,11 @@ public interface ICompilationUnit extends IASTNode
 				marker.log(code, buf);
 			}
 			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.logger.info(buf.toString());
+			DyvilCompiler.log(buf.toString());
 			if (errors > 0)
 			{
-				DyvilCompiler.logger.warning(name + " was not compiled due to errors in the Compilation Unit\n");
+				DyvilCompiler.compilationFailed = true;
+				DyvilCompiler.warn(name + " was not compiled due to errors in the Compilation Unit\n");
 				return true;
 			}
 		}
@@ -58,6 +59,8 @@ public interface ICompilationUnit extends IASTNode
 	public void check();
 	
 	public void foldConstants();
+	
+	public void cleanup();
 	
 	public void compile();
 }

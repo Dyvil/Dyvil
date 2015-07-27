@@ -15,7 +15,7 @@ public class Char implements Integer
 	public static final char	max		= java.lang.Character.MAX_VALUE;
 	public static final byte	size	= java.lang.Character.SIZE;
 	
-	protected char				value;
+	protected char value;
 	
 	public static Char apply(char v)
 	{

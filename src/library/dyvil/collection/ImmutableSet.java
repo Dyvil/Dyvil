@@ -5,28 +5,38 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
-import dyvil.lang.Collection;
-import dyvil.lang.ImmutableException;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.annotation.Covariant;
 import dyvil.collection.immutable.ArraySet;
+import dyvil.collection.immutable.EmptySet;
+import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible
-public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
+public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>
 {
+	public static interface Builder<E> extends ImmutableCollection.Builder<E>
+	{
+		@Override
+		public ImmutableSet<E> build();
+	}
+	
 	public static <E> ImmutableSet<E> apply()
 	{
-		return null; // TODO EmptySet
+		return EmptySet.instance;
 	}
 	
 	public static <E> ImmutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
+	}
+	
+	public static <E> Builder<E> builder()
+	{
+		return new ArraySet.Builder();
 	}
 	
 	// Accessors
@@ -42,9 +52,6 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.DISTINCT | Spliterator.IMMUTABLE);
 	}
-	
-	@Override
-	public boolean contains(Object element);
 	
 	// Non-mutating Operations
 	
@@ -69,7 +76,7 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	 * operation.
 	 */
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection);
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet
@@ -116,13 +123,13 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public default void $minus$eq(E element)
+	public default void $minus$eq(Object element)
 	{
 		throw new ImmutableException("-= on Immutable Set");
 	}
 	
 	@Override
-	public default void $minus$minus$eq(Collection<? extends E> collection)
+	public default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable Set");
 	}
@@ -168,13 +175,13 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public default boolean remove(E element)
+	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean removeAll(Collection<? extends E> collection)
+	public default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable Set");
 	}
@@ -198,7 +205,7 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	}
 	
 	@Override
-	public default void map(UnaryOperator<E> mapper)
+	public default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Set");
 	}
@@ -214,11 +221,6 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	{
 		throw new ImmutableException("filter() on Immutable Set");
 	}
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
 	
 	// Copying
 	
@@ -244,5 +246,11 @@ public interface ImmutableSet<E> extends Set<E>, ImmutableCollection<E>
 	public default ImmutableSet<E> immutableCopy()
 	{
 		return this.copy();
+	}
+	
+	@Override
+	public default ImmutableSet<E> view()
+	{
+		return this;
 	}
 }

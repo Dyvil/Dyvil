@@ -2,23 +2,25 @@ package dyvil.tools.compiler.ast.dwt;
 
 import java.util.Map;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Opcodes;
 import dyvil.string.StringUtils;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.expression.IValueMap;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -28,25 +30,23 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-import org.objectweb.asm.Label;
-
-public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
+public class DWTNode extends Value implements INamed, IValueMap
 {
-	public static final int		NODE		= 256;
-	public static final int		LIST		= 257;
-	public static final int		REFERENCE	= 258;
+	public static final int	NODE		= 256;
+	public static final int	LIST		= 257;
+	public static final int	REFERENCE	= 258;
 	
-	public DWTNode				parent;
+	public DWTNode parent;
 	
 	public Name					name;
 	public String				fullName;
 	public IType				type;
 	public List<DWTProperty>	properties	= new ArrayList();
 	
-	protected IClass			theClass;
-	protected IMethod			getter;
+	protected IClass	theClass;
+	protected IMethod	getter;
 	
-	private int					varIndex;
+	private int varIndex;
 	
 	public DWTNode()
 	{
@@ -89,7 +89,13 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public float getTypeMatch(IType type)
 	{
 		return 0;
 	}
@@ -224,9 +230,15 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 	}
 	
 	@Override
-	public DWTNode foldConstants()
+	public IValue foldConstants()
 	{
-		return null;
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		return this;
 	}
 	
 	@Override
@@ -252,7 +264,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		if (this.getter != null)
 		{
 			// Getter
-			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE, Types.VOID);
+			this.getter.writeCall(writer, this.parent, EmptyArguments.INSTANCE, Types.VOID, 0);
 		}
 		else
 		{
@@ -276,7 +288,7 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 				value.writeExpression(writer);
 				writer.writeInsn(Opcodes.DUP);
 				writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, property.fullName, value.getType().getExtendedName());
-				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Types.VOID);
+				setter.writeCall(writer, null, EmptyArguments.INSTANCE, Types.VOID, 0);
 			}
 			else if (value.valueTag() == NODE)
 			{
@@ -296,18 +308,8 @@ public class DWTNode extends ASTNode implements IValue, INamed, IValueMap
 		String prefix1 = prefix + '\t';
 		for (DWTProperty property : this.properties)
 		{
-			buffer.append('\n').append(prefix1).append(property.key).append(Formatting.Field.keyValueSeperator);
-			IValue value = property.value;
-			if (value.isStatement())
-			{
-				buffer.append('\n').append(prefix1);
-				value.toString(prefix1, buffer);
-			}
-			else
-			{
-				buffer.append(' ');
-				value.toString(prefix1, buffer);
-			}
+			buffer.append('\n').append(prefix1).append(property.key).append(Formatting.Field.keyValueSeperator).append(' ');
+			property.value.toString(prefix1, buffer);
 		}
 		buffer.append('\n').append(prefix).append('}');
 	}

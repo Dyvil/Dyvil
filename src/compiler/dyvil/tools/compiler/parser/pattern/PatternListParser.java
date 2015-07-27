@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.pattern;
 
+import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.IPatternList;
-import dyvil.tools.compiler.ast.pattern.IPatterned;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -10,11 +10,11 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class PatternListParser extends Parser implements IPatterned
+public final class PatternListParser extends Parser implements IPatternConsumer
 {
-	protected IPatternList	patternList;
+	protected IPatternList patternList;
 	
-	private IPattern		pattern;
+	private IPattern pattern;
 	
 	public PatternListParser(IPatternList list)
 	{
@@ -64,11 +64,5 @@ public final class PatternListParser extends Parser implements IPatterned
 	public void setPattern(IPattern Pattern)
 	{
 		this.pattern = Pattern;
-	}
-	
-	@Override
-	public IPattern getPattern()
-	{
-		return this.pattern;
 	}
 }

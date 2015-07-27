@@ -2,25 +2,25 @@ package dyvil.math;
 
 class UnitUtils
 {
-	static final int			METER_MASK			= 0x0000000F;
-	static final int			SECOND_MASK			= 0x000000F0;
-	static final int			KILOGRAM_MASK		= 0x00000F00;
-	static final int			MOL_MASK			= 0x0000F000;
-	static final int			CANDELA_MASK		= 0x000F0000;
-	static final int			AMPERE_MASK			= 0x00F00000;
-	static final int			KELVIN_MASK			= 0x0F000000;
+	static final int	METER_MASK		= 0x0000000F;
+	static final int	SECOND_MASK		= 0x000000F0;
+	static final int	KILOGRAM_MASK	= 0x00000F00;
+	static final int	MOL_MASK		= 0x0000F000;
+	static final int	CANDELA_MASK	= 0x000F0000;
+	static final int	AMPERE_MASK		= 0x00F00000;
+	static final int	KELVIN_MASK		= 0x0F000000;
 	
-	static final int			METER_SHIFT			= 0;
-	static final int			SECOND_SHIFT		= 4;
-	static final int			KILOGRAM_SHIFT		= 8;
-	static final int			MOL_SHIFT			= 12;
-	static final int			CANDELA_SHIFT		= 16;
-	static final int			AMPERE_SHIFT		= 20;
-	static final int			KELVIN_SHIFT		= 24;
+	static final int	METER_SHIFT		= 0;
+	static final int	SECOND_SHIFT	= 4;
+	static final int	KILOGRAM_SHIFT	= 8;
+	static final int	MOL_SHIFT		= 12;
+	static final int	CANDELA_SHIFT	= 16;
+	static final int	AMPERE_SHIFT	= 20;
+	static final int	KELVIN_SHIFT	= 24;
 	
-	private static final char[]	superscriptDigits	= { '\u2070', '\u00b9', '\u00b2', '\u00b3', '\u2074', '\u2075', '\u2076', '\u2077', '\u2078', '\u2079' };
+	private static final char[] superscriptDigits = { '\u2070', '\u00b9', '\u00b2', '\u00b3', '\u2074', '\u2075', '\u2076', '\u2077', '\u2078', '\u2079' };
 	
-	private static final char	superscriptMinus	= '\u207b';
+	private static final char superscriptMinus = '\u207b';
 	
 	static void superscriptToString(StringBuilder buf, int i)
 	{

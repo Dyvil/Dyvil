@@ -3,8 +3,9 @@ package dyvil.collection.range;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.Range;
 
 @TupleConvertible
 public class StringRange implements Range<String>
@@ -83,7 +84,7 @@ public class StringRange implements Range<String>
 	{
 		return new Iterator<String>()
 		{
-			private String	current	= StringRange.this.first;
+			private String current = StringRange.this.first;
 			
 			@Override
 			public boolean hasNext()
@@ -111,7 +112,7 @@ public class StringRange implements Range<String>
 	}
 	
 	@Override
-	public boolean $qmark(Object o)
+	public boolean contains(Object o)
 	{
 		String s = (String) o;
 		return s.compareTo(this.first) >= 0 && s.compareTo(this.last) <= 0;

@@ -1,21 +1,21 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -31,11 +31,6 @@ public class UnknownType implements IType
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return Name.getQualified("var");
@@ -44,14 +39,9 @@ public class UnknownType implements IType
 	// IContext
 	
 	@Override
-	public void setClass(IClass theClass)
-	{
-	}
-	
-	@Override
 	public IClass getTheClass()
 	{
-		return null;
+		return Types.OBJECT_CLASS;
 	}
 	
 	@Override
@@ -79,7 +69,7 @@ public class UnknownType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		return this;
 	}
@@ -87,25 +77,7 @@ public class UnknownType implements IType
 	// IContext
 	
 	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
@@ -121,23 +93,12 @@ public class UnknownType implements IType
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
-	{
-		return 0;
-	}
-	
-	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
 	
 	// Compilation
-	
-	@Override
-	public void setInternalName(String name)
-	{
-	}
 	
 	@Override
 	public String getInternalName()
@@ -189,7 +150,17 @@ public class UnknownType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInvokeInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
 	}
 	
 	@Override
@@ -208,5 +179,17 @@ public class UnknownType implements IType
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("var");
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return UNKNOWN;
 	}
 }

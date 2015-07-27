@@ -18,7 +18,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	private static final int	PARAMETERS_END	= 8;
 	private static final int	COLON			= 16;
 	
-	protected MethodInstruction	methodInstruction;
+	protected MethodInstruction methodInstruction;
 	
 	public MethodInstructionParser(MethodInstruction fi)
 	{

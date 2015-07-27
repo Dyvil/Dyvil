@@ -1,22 +1,16 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -25,17 +19,15 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class TryStatement extends ASTNode implements IStatement, IContext
+public final class TryStatement extends Value implements IStatement, IDefaultContext
 {
-	public IValue			action;
-	private CatchBlock[]	catchBlocks	= new CatchBlock[1];
-	private int				catchBlockCount;
-	public IValue			finallyBlock;
+	protected IValue		action;
+	protected CatchBlock[]	catchBlocks	= new CatchBlock[1];
+	protected int			catchBlockCount;
+	protected IValue		finallyBlock;
 	
-	private IType			commonType;
-	
-	private IStatement		parent;
-	private IContext		context;
+	// Metadata
+	private IType commonType;
 	
 	public TryStatement(ICodePosition position)
 	{
@@ -46,6 +38,26 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	public int valueTag()
 	{
 		return TRY;
+	}
+	
+	public void setAction(IValue action)
+	{
+		this.action = action;
+	}
+	
+	public IValue getAction()
+	{
+		return this.action;
+	}
+	
+	public void setFinallyBlock(IValue finallyBlock)
+	{
+		this.finallyBlock = finallyBlock;
+	}
+	
+	public IValue getFinallyBlock()
+	{
+		return this.finallyBlock;
 	}
 	
 	@Override
@@ -68,7 +80,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			IType t1 = this.catchBlocks[i].action.getType();
-			type = Types.findCommonSuperType(type, t1);
+			type = Types.combine(type, t1);
 			if (type == null)
 			{
 				return this.commonType = Types.ANY;
@@ -78,11 +90,11 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.finallyBlock != null)
 		{
-			IValue value1 = this.finallyBlock.withType(type);
+			IValue value1 = this.finallyBlock.withType(type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				return null;
@@ -94,7 +106,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		
 		if (this.action != null)
 		{
-			IValue value1 = this.action.withType(type);
+			IValue value1 = this.action.withType(type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				return null;
@@ -104,7 +116,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			IValue value1 = block.action.withType(type);
+			IValue value1 = block.action.withType(type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				return null;
@@ -142,9 +154,9 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		return this.isType(type) ? 1 : 0; // TODO Fix this implementation
 	}
 	
 	public void addCatchBlock(CatchBlock block)
@@ -161,24 +173,6 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		return this.parent == null ? this.parent.resolveLabel(name) : null;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
@@ -189,13 +183,31 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.type = block.type.resolve(markers, context);
+			block.type = block.type.resolve(markers, context, TypePosition.CLASS);
 			block.action.resolveTypes(markers, context);
 		}
 		
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null)
+		{
+			this.action.resolveStatement(context, markers);
+		}
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			this.catchBlocks[i].action.resolveStatement(context, markers);
+		}
+		
+		if (this.finallyBlock != null)
+		{
+			this.finallyBlock.resolveStatement(context, markers);
 		}
 	}
 	
@@ -210,9 +222,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.context = context;
-			block.action = block.action.resolve(markers, block);
-			block.context = null;
+			block.action = block.action.resolve(markers, new CombiningContext(block, context));
 		}
 		
 		if (this.finallyBlock != null)
@@ -227,15 +237,13 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	{
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, context);
+			this.action.checkTypes(markers, new CombiningContext(this, context));
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.context = context;
-			block.action.checkTypes(markers, block);
-			block.context = null;
+			block.action.checkTypes(markers, new CombiningContext(block, context));
 		}
 		
 		if (this.finallyBlock != null)
@@ -249,9 +257,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	{
 		if (this.action != null)
 		{
-			this.context = context;
-			this.action.check(markers, this);
-			this.context = null;
+			this.action.check(markers, new CombiningContext(this, context));
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -259,7 +265,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 			CatchBlock block = this.catchBlocks[i];
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
-				Marker marker = markers.create(block.type.getPosition(), "try.catch.type");
+				Marker marker = markers.create(block.position, "try.catch.type");
 				marker.addInfo("Exception Type: " + block.type);
 			}
 			
@@ -294,63 +300,24 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	}
 	
 	@Override
-	public boolean isStatic()
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
-	public IField resolveField(Name name)
-	{
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.context.getVisibility(member);
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(context, compilableList);
+		}
+		
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			CatchBlock block = this.catchBlocks[i];
+			block.action = block.action.cleanup(context, compilableList);
+		}
+		
+		if (this.finallyBlock != null)
+		{
+			this.finallyBlock = this.finallyBlock.cleanup(context, compilableList);
+		}
+		return this;
 	}
 	
 	@Override
@@ -363,7 +330,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 				return true;
 			}
 		}
-		return this.context.handleException(type);
+		return false;
 	}
 	
 	@Override
@@ -376,9 +343,9 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label tryStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label tryEnd = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
 		
 		writer.writeTargetLabel(tryStart);
 		if (this.action != null)
@@ -391,7 +358,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			org.objectweb.asm.Label handlerLabel = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
 			String type = block.type.getInternalName();
 			
 			writer.writeTargetLabel(handlerLabel);
@@ -424,7 +391,7 @@ public final class TryStatement extends ASTNode implements IStatement, IContext
 		
 		if (this.finallyBlock != null)
 		{
-			org.objectweb.asm.Label finallyLabel = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
 			
 			writer.writeLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");

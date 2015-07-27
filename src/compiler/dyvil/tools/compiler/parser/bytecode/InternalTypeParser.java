@@ -13,9 +13,9 @@ public final class InternalTypeParser extends Parser
 	private static final int	NAME	= 1;
 	private static final int	SLASH	= 2;
 	
-	protected IInternalTyped	typed;
+	protected IInternalTyped typed;
 	
-	private StringBuilder		builder;
+	private StringBuilder builder;
 	
 	public InternalTypeParser(IInternalTyped typed)
 	{

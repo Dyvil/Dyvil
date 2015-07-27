@@ -1,100 +1,100 @@
 package dyvil.collection.immutable;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
-import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.impl.AbstractArraySet;
+import dyvil.util.ImmutableException;
 
 @ArrayConvertible
-public class ArraySet<E> implements ImmutableSet<E>
+public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 {
-	protected E[]	array;
-	protected int	size;
-	
 	public static <E> ArraySet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
+	}
+	
+	public static <E> Builder<E> builder()
+	{
+		return new Builder();
 	}
 	
 	public ArraySet(E... elements)
 	{
-		this.array = elements.clone();
-		this.size = Set.distinct(this.array, elements.length);
+		super(elements);
 	}
 	
 	public ArraySet(E[] elements, int size)
 	{
-		this.array = (E[]) new Object[size];
-		System.arraycopy(elements, 0, this.array, 0, size);
-		this.size = size;
+		super(elements, size);
 	}
 	
 	public ArraySet(E[] elements, boolean trusted)
 	{
-		this.array = elements;
-		this.size = Set.distinct(this.array, this.array.length);
+		super(elements, elements.length, trusted);
 	}
 	
 	public ArraySet(E[] elements, int size, boolean trusted)
 	{
-		this.array = elements;
-		this.size = size;
+		super(elements, size, trusted);
 	}
 	
 	public ArraySet(Collection<E> elements)
 	{
-		Object[] array = new Object[elements.size()];
-		int index = 0;
-		outer:
-		for (E element : elements)
+		super(elements);
+	}
+	
+	public static class Builder<E> implements ImmutableSet.Builder<E>
+	{
+		private Object[]	elements;
+		private int			size;
+		
+		@Override
+		public void add(E element)
 		{
-			// Check if the element is already present in the array
-			for (int i = 0; i < index; i++)
+			if (this.size < 0)
 			{
-				if (Objects.equals(array[i], element))
+				throw new IllegalStateException("Already built");
+			}
+			
+			for (int i = 0; i < this.size; i++)
+			{
+				if (Objects.equals(this.elements[i], element))
 				{
-					continue outer;
+					this.elements[i] = element;
+					return;
 				}
 			}
 			
-			array[index++] = element;
+			int index = this.size++;
+			if (index >= this.elements.length)
+			{
+				Object[] temp = new Object[(int) (this.size * 1.1F)];
+				System.arraycopy(this.elements, 0, temp, 0, index);
+				this.elements = temp;
+			}
+			this.elements[index] = element;
 		}
 		
-		this.array = (E[]) array;
-		this.size = index;
-	}
-	
-	@Override
-	public int size()
-	{
-		return this.size;
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new ArrayIterator<E>(this.array, this.size);
-	}
-	
-	@Override
-	public boolean contains(Object element)
-	{
-		for (int i = 0; i < this.size; i++)
+		@Override
+		public ArraySet<E> build()
 		{
-			if (Objects.equals(this.array[i], element))
-			{
-				return true;
-			}
+			ArraySet<E> set = new ArraySet(this.elements, this.size, true);
+			this.size = -1;
+			return set;
 		}
-		return false;
+	}
+	
+	@Override
+	protected void removeAt(int index)
+	{
+		throw new ImmutableException("removeAt() on Immutable Set");
 	}
 	
 	@Override
@@ -106,7 +106,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 		}
 		
 		Object[] newArray = new Object[this.size + 1];
-		System.arraycopy(this.array, 0, newArray, 0, this.size);
+		System.arraycopy(this.elements, 0, newArray, 0, this.size);
 		newArray[this.size] = element;
 		return new ArraySet(newArray, this.size + 1, true);
 	}
@@ -116,11 +116,11 @@ public class ArraySet<E> implements ImmutableSet<E>
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			if (Objects.equals(this.array[i], element))
+			if (Objects.equals(this.elements[i], element))
 			{
 				Object[] newArray = new Object[this.size - 1];
-				System.arraycopy(this.array, 0, newArray, 0, i);
-				System.arraycopy(this.array, i + 1, newArray, i, this.size - i - 1);
+				System.arraycopy(this.elements, 0, newArray, 0, i);
+				System.arraycopy(this.elements, i + 1, newArray, i, this.size - i - 1);
 				return new ArraySet(newArray, this.size - 1, true);
 			}
 		}
@@ -128,13 +128,13 @@ public class ArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			E element = this.array[i];
+			E element = (E) this.elements[i];
 			if (!collection.contains(element))
 			{
 				newArray[index++] = element;
@@ -150,7 +150,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			E element = this.array[i];
+			E element = (E) this.elements[i];
 			if (collection.contains(element))
 			{
 				newArray[index++] = element;
@@ -164,7 +164,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 	{
 		int size = this.size;
 		Object[] newArray = new Object[size + collection.size()];
-		System.arraycopy(this.array, 0, newArray, 0, this.size);
+		System.arraycopy(this.elements, 0, newArray, 0, this.size);
 		for (E element : collection)
 		{
 			if (!this.contains(element))
@@ -182,7 +182,7 @@ public class ArraySet<E> implements ImmutableSet<E>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			E element = this.array[i];
+			Object element = this.elements[i];
 			if (!collection.contains(element))
 			{
 				newArray[index++] = element;
@@ -201,58 +201,17 @@ public class ArraySet<E> implements ImmutableSet<E>
 	@Override
 	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		Object[] newArray = new Object[this.size];
-		int index = 0;
-		outer:
-		for (int i = 0; i < this.size; i++)
-		{
-			R newElement = mapper.apply(this.array[i]);
-			
-			// Search if the mapped element is already present in the array
-			for (int j = 0; j < index; j++)
-			{
-				if (Objects.equals(newArray[i], newElement))
-				{
-					continue outer;
-				}
-			}
-			
-			newArray[index++] = newElement;
-		}
-		return new ArraySet(newArray, index, true);
+		ArraySet<R> copy = (ArraySet<R>) this.copy();
+		copy.mapImpl((Function) mapper);
+		return copy;
 	}
 	
 	@Override
 	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		Object[] newArray = new Object[this.size << 2];
-		int index = 0;
-		for (int i = 0; i < this.size; i++)
-		{
-			results:
-			for (R result : mapper.apply(this.array[i]))
-			{
-				// Search if the mapped element is already present in the array
-				for (int j = 0; j < index; j++)
-				{
-					if (Objects.equals(newArray[j], result))
-					{
-						continue results;
-					}
-				}
-				
-				// Add the element to the array
-				int index1 = index++;
-				if (index1 >= newArray.length)
-				{
-					Object[] temp = new Object[index << 1];
-					System.arraycopy(newArray, 0, temp, 0, newArray.length);
-					newArray = temp;
-				}
-				newArray[index1] = result;
-			}
-		}
-		return new ArraySet(newArray, index, true);
+		ArraySet<R> copy = (ArraySet<R>) this.copy();
+		copy.flatMapImpl((Function) mapper);
+		return copy;
 	}
 	
 	@Override
@@ -262,8 +221,8 @@ public class ArraySet<E> implements ImmutableSet<E>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			E element = this.array[i];
-			if (condition.test(element))
+			Object element = this.elements[i];
+			if (condition.test((E) element))
 			{
 				newArray[index++] = element;
 			}
@@ -272,49 +231,14 @@ public class ArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public void toArray(int index, Object[] store)
-	{
-		System.arraycopy(this.array, 0, store, index, this.size);
-	}
-	
-	@Override
 	public ImmutableSet<E> copy()
 	{
-		return new ArraySet(this.array, this.size, true);
+		return new ArraySet(this.elements, this.size, true);
 	}
 	
 	@Override
 	public MutableSet<E> mutable()
 	{
-		return null; // TODO mutable.ArraySet ?
-	}
-	
-	@Override
-	public String toString()
-	{
-		if (this.size == 0)
-		{
-			return "[]";
-		}
-		
-		StringBuilder builder = new StringBuilder("[");
-		builder.append(this.array[0]);
-		for (int i = 1; i < this.size; i++)
-		{
-			builder.append(", ").append(this.array[i]);
-		}
-		return builder.append("]").toString();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return Set.setEquals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Set.setHashCode(this);
+		return new dyvil.collection.mutable.ArraySet<E>((E[]) this.elements, this.size);
 	}
 }

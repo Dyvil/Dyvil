@@ -1,0 +1,6 @@
+package dyvil.function
+
+public functional interface Function0[+R]
+{
+	public R apply()
+}

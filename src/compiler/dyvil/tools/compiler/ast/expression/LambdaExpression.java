@@ -1,27 +1,20 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.CaptureVariable;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.context.CombiningContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.MapTypeContext;
+import dyvil.tools.compiler.ast.field.*;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -36,37 +29,38 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-import org.objectweb.asm.Handle;
-
-public final class LambdaExpression extends ASTNode implements IValue, IValued, IClassCompilable, IContext
+public final class LambdaExpression implements IValue, IValued, IClassCompilable, IDefaultContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "java/lang/invoke/LambdaMetafactory", "metafactory",
-													"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;"
-															+ "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodHandle;"
-															+ "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
-	public IParameter[]			parameters;
-	public int					parameterCount;
-	public IValue				value;
+	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
+			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodType;"
+					+ "Ljava/lang/invoke/MethodHandle;" + "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
+					
+	protected ICodePosition position;
+	
+	protected IParameter[]	parameters;
+	protected int			parameterCount;
+	protected IValue		value;
+	
+	// Metadata
 	
 	/**
 	 * The instantiated type this lambda expression represents
 	 */
-	protected IType				type;
+	protected IType	type;
+	private IType	returnType;
 	
 	/**
 	 * The abstract method this lambda expression implements
 	 */
-	protected IMethod			method;
+	protected IMethod method;
 	
-	private IContext			context;
-	
-	private String				owner;
-	private String				name;
-	private String				lambdaDesc;
-	private IType				returnType;
 	private CaptureVariable[]	capturedFields;
 	private int					capturedFieldCount;
 	private IClass				thisClass;
+	
+	private String	owner;
+	private String	name;
+	private String	lambdaDesc;
 	
 	public LambdaExpression(ICodePosition position)
 	{
@@ -74,11 +68,11 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		this.parameters = new IParameter[2];
 	}
 	
-	public LambdaExpression(ICodePosition position, Name name)
+	public LambdaExpression(ICodePosition position, IParameter param)
 	{
 		this.position = position;
 		this.parameters = new IParameter[1];
-		this.parameters[0] = new MethodParameter(name);
+		this.parameters[0] = param;
 		this.parameterCount = 1;
 	}
 	
@@ -87,6 +81,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		this.position = position;
 		this.parameters = params;
 		this.parameterCount = paramCount;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -131,13 +131,12 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	{
 		if (this.type == null)
 		{
-			LambdaType lt = new LambdaType();
+			LambdaType lt = new LambdaType(this.parameterCount);
 			for (int i = 0; i < this.parameterCount; i++)
 			{
-				IType t = this.parameters[i].getType();
-				lt.addType(t == null ? Types.UNKNOWN : t);
+				lt.addType(this.parameters[i].getType());
 			}
-			lt.returnType = this.value.getType();
+			lt.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
 			this.type = lt;
 			return lt;
 		}
@@ -145,14 +144,100 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.isType(type))
+		if (!this.isType(type))
 		{
-			this.type = type;
-			return this;
+			return null;
 		}
-		return null;
+		
+		this.type = type;
+		this.method = type.getFunctionalMethod();
+		
+		if (this.method != null)
+		{
+			this.inferTypes(markers);
+			
+			IContext context1 = new CombiningContext(this, context);
+			this.value = this.value.resolve(markers, context1);
+			
+			IType valueType = this.value.getType();
+			
+			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
+			if (value1 == null)
+			{
+				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
+				marker.addInfo("Method Return Type: " + this.returnType);
+				marker.addInfo("Value Type: " + this.value.getType());
+			}
+			else
+			{
+				this.value = value1;
+				valueType = this.value.getType();
+			}
+			
+			ITypeContext tempContext = new MapTypeContext();
+			this.method.getType().inferTypes(valueType, tempContext);
+			IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
+			
+			type.inferTypes(type1, typeContext);
+			
+			this.returnType = valueType;
+		}
+		
+		if (this.type.typeTag() == IType.LAMBDA)
+		{
+			// Trash the old lambda type and generate a new one from scratch
+			this.type = null;
+			this.type = this.getType();
+		}
+		else
+		{
+			this.type = type.getConcreteType(typeContext);
+		}
+		
+		return this;
+	}
+	
+	private void inferTypes(MarkerList markers)
+	{
+		if (!this.method.hasTypeVariables())
+		{
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				IParameter param = this.parameters[i];
+				if (param.getType() == Types.UNKNOWN)
+				{
+					param.setType(this.method.getParameter(i).getType());
+				}
+			}
+			
+			this.returnType = this.method.getType();
+			return;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IParameter param = this.parameters[i];
+			IType parType = param.getType();
+			if (parType != Types.UNKNOWN)
+			{
+				continue;
+			}
+			
+			IType methodParamType = this.method.getParameter(i).getType();
+			IType concreteType = methodParamType.getConcreteType(this.type).getParameterType();
+			
+			// Can't infer parameter type
+			if (concreteType == methodParamType && concreteType.hasTypeVariables())
+			{
+				markers.add(param.getPosition(), "lambda.parameter.type", param.getName());
+			}
+			param.setType(concreteType);
+		}
+		
+		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType();
+		return;
 	}
 	
 	@Override
@@ -182,66 +267,28 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		{
 			IParameter lambdaParam = this.parameters[i];
 			IParameter param = method.getParameter(i);
-			IType paramType = lambdaParam.getType();
-			if (paramType == null)
+			IType lambdaParamType = lambdaParam.getType();
+			if (lambdaParamType == null)
 			{
 				continue;
 			}
-			if (!param.getType().equals(paramType))
+			if (!param.getType().equals(lambdaParamType))
 			{
 				return false;
 			}
 		}
 		
-		this.type = type;
-		this.method = method;
 		return true;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		return this.isType(type) ? 1 : 0;
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.thisClass = this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
-	}
-	
-	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -252,63 +299,54 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			}
 		}
 		
-		IField match = this.context.resolveField(name);
-		if (match != null && match.isVariable())
+		return null;
+	}
+	
+	@Override
+	public IAccessible getAccessibleThis(IClass type)
+	{
+		this.thisClass = type;
+		return new VariableThis();
+	}
+	
+	@Override
+	public IVariable capture(IVariable variable)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			if (this.capturedFields == null)
+			if (this.parameters[i] == variable)
 			{
-				this.capturedFields = new CaptureVariable[2];
-				this.capturedFieldCount = 1;
-				return this.capturedFields[0] = new CaptureVariable((IVariable) match);
+				return variable;
 			}
-			
-			// Check if the variable is already in the array
-			for (int i = 0; i < this.capturedFieldCount; i++)
-			{
-				CaptureVariable var = this.capturedFields[i];
-				if (var.variable == match)
-				{
-					// If yes, return the match and skip adding the variable
-					// again.
-					return var;
-				}
-			}
-			
-			int index = this.capturedFieldCount++;
-			if (this.capturedFieldCount > this.capturedFields.length)
-			{
-				CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
-				System.arraycopy(this.capturedFields, 0, temp, 0, index);
-				this.capturedFields = temp;
-			}
-			return this.capturedFields[index] = new CaptureVariable((IVariable) match);
 		}
 		
-		return match;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.context.getVisibility(member);
+		if (this.capturedFields == null)
+		{
+			this.capturedFields = new CaptureVariable[2];
+			this.capturedFieldCount = 1;
+			return this.capturedFields[0] = new CaptureVariable(variable);
+		}
+		
+		// Check if the variable is already in the array
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			CaptureVariable var = this.capturedFields[i];
+			if (var.variable == variable)
+			{
+				// If yes, return the match and skip adding the variable
+				// again.
+				return var;
+			}
+		}
+		
+		int index = this.capturedFieldCount++;
+		if (this.capturedFieldCount > this.capturedFields.length)
+		{
+			CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
+			System.arraycopy(this.capturedFields, 0, temp, 0, index);
+			this.capturedFields = temp;
+		}
+		return this.capturedFields[index] = new CaptureVariable(variable);
 	}
 	
 	@Override
@@ -320,75 +358,20 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			param.resolveTypes(markers, context);
 		}
 		
-		this.context = context;
-		this.value.resolveTypes(markers, this);
-		this.context = null;
+		this.value.resolveTypes(markers, new CombiningContext(this, context));
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IContext.addCompilable(context, this);
+		// Resolving the value happens in withType
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.context = context;
-		
-		if (this.method != null)
-		{
-			if (this.method.hasTypeVariables())
-			{
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					IParameter param = this.parameters[i];
-					IType type = param.getType();
-					if (type == null)
-					{
-						type = this.method.getParameter(i).getType();
-					}
-					param.setType(type.getConcreteType(this.type));
-				}
-				
-				this.returnType = this.method.getType().getConcreteType(this.type);
-			}
-			else
-			{
-				for (int i = 0; i < this.parameterCount; i++)
-				{
-					IParameter param = this.parameters[i];
-					if (param.getType() == null)
-					{
-						param.setType(this.method.getParameter(i).getType());
-					}
-				}
-				
-				this.returnType = this.method.getType();
-			}
-			
-			this.value = this.value.resolve(markers, this);
-			IValue value1 = this.value.withType(this.returnType);
-			if (value1 == null)
-			{
-				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
-				marker.addInfo("Method Return Type: " + this.returnType);
-				marker.addInfo("Value Type: " + this.value.getType());
-			}
-			else
-			{
-				this.value = value1;
-			}
-		}
-		else
-		{
-			markers.add(this.position, "lambda.method");
-		}
-		
-		this.value.checkTypes(markers, this);
-		
-		this.context = null;
+		this.value.checkTypes(markers, new CombiningContext(this, context));
 	}
 	
 	@Override
@@ -401,6 +384,15 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	public IValue foldConstants()
 	{
 		this.value = this.value.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		compilableList.addCompilable(this);
+		
+		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
 	
@@ -423,16 +415,18 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getCaptureType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
 		}
 		
 		String name = this.name;
 		String desc = this.getLambdaDescriptor();
 		String invokedName = this.method.getName().qualified;
 		String invokedType = this.getInvokeDescriptor();
-		org.objectweb.asm.Type type1 = org.objectweb.asm.Type.getMethodType(this.method.getDescriptor());
-		org.objectweb.asm.Type type2 = org.objectweb.asm.Type.getMethodType(this.getSpecialDescriptor());
+		dyvil.tools.asm.Type type1 = dyvil.tools.asm.Type.getMethodType(this.method.getDescriptor());
+		dyvil.tools.asm.Type type2 = dyvil.tools.asm.Type.getMethodType(this.getSpecialDescriptor());
 		Handle handle = new Handle(handleType, this.owner, name, desc);
+		
+		writer.writeLineNumber(this.getLineNumber());
 		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, type1, handle, type2);
 	}
 	
@@ -451,7 +445,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		}
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getCaptureType().appendExtendedName(buffer);
+			this.capturedFields[i].getActualType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -482,7 +476,7 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		buffer.append('(');
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getCaptureType().appendExtendedName(buffer);
+			this.capturedFields[i].getActualType().appendExtendedName(buffer);
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -500,17 +494,18 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(), null, null));
 		
+		int index = 0;
 		if (instance)
 		{
 			mw.setThisType(this.thisClass.getInternalName());
+			index = 1;
 		}
 		
-		int index = 0;
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable capture = this.capturedFields[i];
 			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getCaptureType(), 0);
+			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getActualType(), 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -530,14 +525,10 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 0)
-		{
-			buffer.append(Formatting.Method.emptyParameters);
-		}
-		else if (this.parameterCount == 1)
+		if (this.parameterCount == 1)
 		{
 			IParameter param = this.parameters[0];
-			if (param.getType() != null)
+			if (param.getType() == Types.UNKNOWN)
 			{
 				buffer.append('(');
 				param.toString(prefix, buffer);
@@ -547,10 +538,25 @@ public final class LambdaExpression extends ASTNode implements IValue, IValued, 
 			{
 				buffer.append(param.getName());
 			}
+			buffer.append(' ');
 		}
-		else
+		else if (this.parameterCount > 1)
 		{
-			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
+			buffer.append('(');
+			IParameter first = this.parameters[0];
+			if (first.getType() == Types.UNKNOWN)
+			{
+				buffer.append(first.getName());
+				for (int i = 1; i < this.parameterCount; i++)
+				{
+					buffer.append(", ").append(this.parameters[i].getName());
+				}
+			}
+			else
+			{
+				Util.astToString(prefix, this.parameters, this.parameterCount, ", ", buffer);
+			}
+			buffer.append(") ");
 		}
 		
 		buffer.append(Formatting.Expression.lambdaSeperator);

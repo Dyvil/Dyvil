@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -14,20 +15,19 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class DoStatement extends ASTNode implements IStatement, ILoop
+public final class DoStatement extends Value implements IStatement, ILoop
 {
-	public static final Name	$doStart		= Name.getQualified("$doStart");
-	public static final Name	$doCondition	= Name.getQualified("$doCondition");
-	public static final Name	$doEnd			= Name.getQualified("$doEnd");
+	private static final Name	$doStart		= Name.getQualified("$doStart");
+	private static final Name	$doCondition	= Name.getQualified("$doCondition");
+	private static final Name	$doEnd			= Name.getQualified("$doEnd");
 	
-	public IValue				action;
-	public IValue				condition;
+	protected IValue	action;
+	protected IValue	condition;
 	
-	private IStatement			parent;
-	
-	public Label				startLabel;
-	public Label				conditionLabel;
-	public Label				endLabel;
+	// Metadata
+	private Label	startLabel;
+	private Label	conditionLabel;
+	private Label	endLabel;
 	
 	public DoStatement(ICodePosition position)
 	{
@@ -36,6 +36,12 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		this.startLabel = new Label($doStart);
 		this.conditionLabel = new Label($doCondition);
 		this.endLabel = new Label($doEnd);
+	}
+	
+	@Override
+	public int valueTag()
+	{
+		return DO_WHILE;
 	}
 	
 	public void setCondition(IValue condition)
@@ -48,50 +54,14 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		return this.condition;
 	}
 	
-	public void setThen(IValue then)
+	public void setAction(IValue then)
 	{
 		this.action = then;
 	}
 	
-	public IValue getThen()
+	public IValue getAction()
 	{
 		return this.action;
-	}
-	
-	@Override
-	public int valueTag()
-	{
-		return DO_WHILE;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.classEquals(Types.VOID);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
 	}
 	
 	@Override
@@ -107,19 +77,26 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 	}
 	
 	@Override
+	public Label resolveLabel(Name name)
+	{
+		if (name == $doCondition)
+		{
+			return this.conditionLabel;
+		}
+		if (name == $doEnd)
+		{
+			return this.endLabel;
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				((IStatement) this.action).setParent(this);
-				this.action.resolveTypes(markers, context);
-			}
-			else
-			{
-				this.action.resolveTypes(markers, context);
-			}
+			this.action.resolveTypes(markers, context);
 		}
 		if (this.condition != null)
 		{
@@ -150,7 +127,7 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "do.condition.type");
@@ -187,24 +164,27 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.condition != null)
 		{
+			if (this.condition.valueTag() == BOOLEAN && !this.condition.booleanValue())
+			{
+				return new VoidValue(this.position);
+			}
 			this.condition = this.condition.foldConstants();
 		}
 		return this;
 	}
 	
 	@Override
-	public Label resolveLabel(Name name)
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (name == $doCondition)
+		if (this.action != null)
 		{
-			return this.conditionLabel;
+			this.action = this.action.cleanup(context, compilableList);
 		}
-		if (name == $doEnd)
+		if (this.condition != null)
 		{
-			return this.endLabel;
+			this.condition = this.condition.cleanup(context, compilableList);
 		}
-		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		return this;
 	}
 	
 	@Override
@@ -222,9 +202,9 @@ public final class DoStatement extends ASTNode implements IStatement, ILoop
 			this.condition.writeStatement(writer);
 		}
 		
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label conditionLabel = this.conditionLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label conditionLabel = this.conditionLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		// Do Block
 		

@@ -4,12 +4,11 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import dyvil.lang.Int;
-import dyvil.lang.List;
-import dyvil.lang.Matrix;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.mutable.FlatArrayMatrix;
+import dyvil.collection.view.MatrixView;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible
@@ -32,6 +31,12 @@ public interface MutableMatrix<E> extends Matrix<E>
 	}
 	
 	// Accessors
+	
+	@Override
+	public default boolean isImmutable()
+	{
+		return false;
+	}
 	
 	@Override
 	public int rows();
@@ -157,5 +162,11 @@ public interface MutableMatrix<E> extends Matrix<E>
 	public default ImmutableMatrix<E> immutableCopy()
 	{
 		return this.immutable();
+	}
+	
+	@Override
+	public default ImmutableMatrix<E> view()
+	{
+		return new MatrixView(this);
 	}
 }

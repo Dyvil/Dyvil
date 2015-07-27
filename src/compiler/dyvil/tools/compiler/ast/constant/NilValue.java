@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -18,11 +18,11 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class NilValue implements IValue
 {
-	public static final IClass	NIL_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("NilConvertible");
+	protected ICodePosition position;
 	
-	private ICodePosition		position;
-	private IType				requiredType;
-	private IMethod				method;
+	// Metadata
+	private IType	requiredType;
+	private IMethod	method;
 	
 	public NilValue()
 	{
@@ -34,15 +34,15 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
-	public int valueTag()
-	{
-		return NIL;
-	}
-	
-	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
+	}
+	
+	@Override
+	public int valueTag()
+	{
+		return NIL;
 	}
 	
 	@Override
@@ -58,7 +58,7 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.isType(type))
 		{
@@ -71,13 +71,13 @@ public final class NilValue implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isArrayType() || type.getTheClass().getAnnotation(NIL_CONVERTIBLE) != null;
+		return type.isArrayType() || type.getTheClass().getAnnotation(Types.NIL_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		return this.isType(type) ? 1 : 0;
 	}
 	
 	@Override
@@ -136,6 +136,12 @@ public final class NilValue implements IValue
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		// Write an array type
@@ -163,7 +169,7 @@ public final class NilValue implements IValue
 			return;
 		}
 		
-		this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType);
+		this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.getLineNumber());
 	}
 	
 	@Override

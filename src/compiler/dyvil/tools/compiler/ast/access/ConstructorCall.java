@@ -2,15 +2,17 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -18,16 +20,44 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ConstructorCall extends ASTNode implements ICall
+public class ConstructorCall implements ICall
 {
-	public IType		type;
-	public IArguments	arguments	= EmptyArguments.INSTANCE;
+	protected ICodePosition	position;
+	protected IType			type;
+	protected IArguments	arguments;
 	
-	public IConstructor	constructor;
+	protected IConstructor constructor;
+	
+	protected ConstructorCall()
+	{
+		this.arguments = EmptyArguments.INSTANCE;
+	}
 	
 	public ConstructorCall(ICodePosition position)
 	{
 		this.position = position;
+		this.arguments = EmptyArguments.INSTANCE;
+	}
+	
+	public ConstructorCall(ICodePosition position, IType type, IArguments arguments)
+	{
+		this.position = position;
+		this.type = type;
+		this.arguments = arguments;
+	}
+	
+	public ConstructorCall(ICodePosition position, IConstructor constructor, IArguments arguments)
+	{
+		this.position = position;
+		this.constructor = constructor;
+		this.type = constructor.getType();
+		this.arguments = arguments;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -55,7 +85,7 @@ public class ConstructorCall extends ASTNode implements ICall
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
@@ -64,20 +94,6 @@ public class ConstructorCall extends ASTNode implements ICall
 	public boolean isType(IType type)
 	{
 		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (type.isSuperTypeOf(this.type))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -106,11 +122,12 @@ public class ConstructorCall extends ASTNode implements ICall
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context);
+			this.type = this.type.resolve(markers, context, TypePosition.TYPE);
 		}
 		else
 		{
 			markers.add(this.position, "constructor.invalid");
+			this.type = Types.UNKNOWN;
 		}
 		
 		if (this.arguments.isEmpty())
@@ -139,7 +156,7 @@ public class ConstructorCall extends ASTNode implements ICall
 			int dims = this.type.getArrayDimensions();
 			if (dims != len)
 			{
-				Marker marker = markers.create(this.position, "constructor.access.array_length");
+				Marker marker = markers.create(this.position, "constructor.access.array.length");
 				marker.addInfo("Type Dimensions: " + dims);
 				marker.addInfo("Number of Length Arguments: " + len);
 				
@@ -157,32 +174,22 @@ public class ConstructorCall extends ASTNode implements ICall
 			for (int i = 0; i < len; i++)
 			{
 				IValue v = paramList.getValue(i);
-				IType t = v.getType();
-				if (t != Types.INT)
+				IValue v1 = v.withType(Types.INT, Types.INT, markers, context);
+				if (v1 == null)
 				{
-					Marker marker = markers.create(v.getPosition(), "constructor.access.arraylength_type");
-					marker.addInfo("Value Type: " + t);
+					Marker marker = markers.create(v.getPosition(), "constructor.access.array.type");
+					marker.addInfo("Value Type: " + v.getType());
+				}
+				else
+				{
+					paramList.setValue(i, v1);
 				}
 			}
 			
 			return this;
 		}
 		
-		IConstructor match = IContext.resolveConstructor(this.type, this.arguments);
-		if (match == null)
-		{
-			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
-			if (!this.arguments.isEmpty())
-			{
-				StringBuilder builder = new StringBuilder("Argument Types: ");
-				this.arguments.typesToString(builder);
-				marker.addInfo(builder.toString());
-			}
-			
-			return this;
-		}
-		
-		this.constructor = match;
+		this.constructor = IContext.resolveConstructor(this.type, this.arguments);
 		return this;
 	}
 	
@@ -213,16 +220,27 @@ public class ConstructorCall extends ASTNode implements ICall
 		}
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			markers.add(this.position, "constructor.interface", iclass.getName());
+			markers.add(this.position, "constructor.interface", this.type);
+			return;
 		}
-		else if (iclass.hasModifier(Modifiers.ABSTRACT))
+		if (iclass.hasModifier(Modifiers.ABSTRACT))
 		{
-			markers.add(this.position, "constructor.abstract", iclass.getName());
+			markers.add(this.position, "constructor.abstract", this.type);
 		}
 		
 		if (this.constructor != null)
 		{
 			this.constructor.checkCall(markers, this.position, context, this.arguments);
+		}
+		else
+		{
+			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
+			if (!this.arguments.isEmpty())
+			{
+				StringBuilder builder = new StringBuilder("Argument Types: ");
+				this.arguments.typesToString(builder);
+				marker.addInfo(builder.toString());
+			}
 		}
 	}
 	
@@ -230,6 +248,13 @@ public class ConstructorCall extends ASTNode implements ICall
 	public IValue foldConstants()
 	{
 		this.arguments.foldConstants();
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.arguments.cleanup(context, compilableList);
 		return this;
 	}
 	
@@ -243,22 +268,24 @@ public class ConstructorCall extends ASTNode implements ICall
 			if (len == 1)
 			{
 				this.arguments.getFirstValue().writeExpression(writer);
-				writer.writeNewArray(this.type, 1);
+				writer.writeNewArray(this.type.getElementType(), 1);
 				return;
 			}
 			
 			ArgumentList paramList = (ArgumentList) this.arguments;
+			IType type = this.type;
 			
 			for (int i = 0; i < len; i++)
 			{
 				paramList.getValue(i).writeExpression(writer);
+				type = type.getElementType();
 			}
 			
-			writer.writeNewArray(this.type, len);
+			writer.writeNewArray(type, len);
 			return;
 		}
 		
-		this.constructor.writeCall(writer, this.arguments, null);
+		this.constructor.writeCall(writer, this.arguments, null, this.getLineNumber());
 	}
 	
 	@Override

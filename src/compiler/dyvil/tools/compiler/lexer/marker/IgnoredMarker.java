@@ -2,9 +2,9 @@ package dyvil.tools.compiler.lexer.marker;
 
 public class IgnoredMarker extends Marker
 {
-	private static final long			serialVersionUID	= 6339084541799017767L;
+	private static final long serialVersionUID = 6339084541799017767L;
 	
-	public static final IgnoredMarker	instance			= new IgnoredMarker();
+	public static final IgnoredMarker instance = new IgnoredMarker();
 	
 	private IgnoredMarker()
 	{

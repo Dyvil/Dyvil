@@ -2,11 +2,6 @@ package dyvil.tools.compiler.ast.generic;
 
 public interface IGeneric
 {
-	public default boolean isMethod()
-	{
-		return false;
-	}
-	
 	public void setGeneric();
 	
 	public boolean isGeneric();

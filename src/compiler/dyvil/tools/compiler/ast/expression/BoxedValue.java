@@ -1,12 +1,15 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class BoxedValue implements IValue
 {
@@ -26,6 +29,12 @@ public final class BoxedValue implements IValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.boxed.getPosition();
+	}
+	
+	@Override
 	public boolean isPrimitive()
 	{
 		return false;
@@ -38,21 +47,9 @@ public final class BoxedValue implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return this;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.method.getType());
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return type.isSuperTypeOf(this.method.getType()) ? 3 : 0;
 	}
 	
 	@Override
@@ -88,9 +85,16 @@ public final class BoxedValue implements IValue
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.boxed = this.boxed.cleanup(context, compilableList);
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.boxed, EmptyArguments.INSTANCE, null);
+		this.method.writeCall(writer, this.boxed, EmptyArguments.INSTANCE, null, this.boxed.getLineNumber());
 	}
 	
 	@Override

@@ -1,9 +1,16 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 
-public interface IVariable extends IField
+public interface IVariable extends IDataMember
 {
+	@Override
+	public default boolean isField()
+	{
+		return false;
+	}
+	
 	@Override
 	public default boolean isVariable()
 	{
@@ -14,13 +21,39 @@ public interface IVariable extends IField
 	
 	public int getIndex();
 	
-	public default boolean isCaptureType()
+	public default boolean isCapturable()
 	{
 		return false;
 	}
 	
-	public default IType getCaptureType(boolean init)
+	public default boolean isReferenceType()
 	{
-		return null;
+		return false;
+	}
+	
+	public default void setReferenceType()
+	{
+	}
+	
+	public default IType getActualType()
+	{
+		return this.getType();
+	}
+	
+	@Override
+	public default IDataMember capture(IContext context)
+	{
+		IVariable capture = context.capture(this);
+		return capture == null ? this : capture;
+	}
+	
+	public default void appendDescription(StringBuilder buf)
+	{
+		buf.append(this.getDescription());
+	}
+	
+	public default void appendSignature(StringBuilder buf)
+	{
+		buf.append(this.getSignature());
 	}
 }

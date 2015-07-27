@@ -1,18 +1,17 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-
-public final class BooleanPattern extends ASTNode implements IPattern
+public final class BooleanPattern extends Pattern
 {
-	private boolean	value;
+	private boolean value;
 	
 	public BooleanPattern(ICodePosition position, boolean value)
 	{
@@ -33,7 +32,7 @@ public final class BooleanPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		return IPattern.primitiveWithType(this, type, Types.BOOLEAN);
 	}

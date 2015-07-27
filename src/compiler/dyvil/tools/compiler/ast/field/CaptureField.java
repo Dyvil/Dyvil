@@ -6,10 +6,11 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -17,25 +18,31 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class CaptureField implements IVariable
+public final class CaptureField implements IField
 {
-	public IClass	theClass;
-	public String	name;
-	public IField	field;
-	private IType	type;
+	public IClass		theClass;
+	public String		name;
+	public IDataMember	field;
+	private IType		type;
 	
 	public CaptureField(IClass iclass)
 	{
 		this.theClass = iclass;
 	}
 	
-	public CaptureField(IClass iclass, IField field)
+	public CaptureField(IClass iclass, IDataMember field)
 	{
 		this.theClass = iclass;
 		this.field = field;
 		this.type = field.getType();
 		
 		this.name = "this$" + field.getName().qualified;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.field.getPosition();
 	}
 	
 	@Override
@@ -48,6 +55,12 @@ public final class CaptureField implements IVariable
 	public boolean isVariable()
 	{
 		return this.field.isVariable();
+	}
+	
+	@Override
+	public void setTheClass(IClass iclass)
+	{
+		this.theClass = iclass;
 	}
 	
 	@Override
@@ -190,32 +203,21 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public void setIndex(int index)
-	{
-	}
-	
-	@Override
-	public int getIndex()
-	{
-		return 0;
-	}
-	
-	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		if (instance == null)
 		{
 			markers.add(position, "field.access.unqualified", this.name);
-			return new ThisValue(position, this.theClass.getType());
+			return new ThisValue(position, context.getThisClass().getType(), context, markers);
 		}
 		
 		return instance;
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		return this.field.checkAssign(markers, position, instance, newValue);
+		return this.field.checkAssign(markers, context, position, instance, newValue);
 	}
 	
 	@Override
@@ -244,6 +246,11 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+	}
+	
+	@Override
 	public String getDescription()
 	{
 		return this.type.getExtendedName();
@@ -262,7 +269,7 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		String owner = this.theClass.getInternalName();
@@ -272,7 +279,7 @@ public final class CaptureField implements IVariable
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		if (value != null)

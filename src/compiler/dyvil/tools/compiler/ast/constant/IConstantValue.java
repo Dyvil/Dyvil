@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.ast.constant;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IConstantValue extends IValue
@@ -35,6 +36,12 @@ public interface IConstantValue extends IValue
 	
 	@Override
 	public default IValue foldConstants()
+	{
+		return this;
+	}
+	
+	@Override
+	public default IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}

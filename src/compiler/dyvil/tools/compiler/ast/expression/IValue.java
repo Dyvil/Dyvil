@@ -1,38 +1,43 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.reference.IReference;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-import org.objectweb.asm.Label;
-
 public interface IValue extends IASTNode, ITyped
 {
-	int	VOID				= 0;
-	int	NULL				= 1;
-	int	NIL					= 2;
-	int	WILDCARD			= 3;
-	int	BOOLEAN				= 4;
-	int	BYTE				= 5;
-	int	SHORT				= 6;
-	int	CHAR				= 7;
-	int	INT					= 8;
-	int	LONG				= 9;
-	int	FLOAT				= 10;
-	int	DOUBLE				= 11;
-	int	STRING				= 12;
-	int	FORMAT_STRING		= 13;
-	int	STRINGBUILDER		= 14;
+	int	VOID			= 0;
+	int	NULL			= 1;
+	int	NIL				= 2;
+	int	WILDCARD		= 3;
+	int	BOOLEAN			= 4;
+	int	BYTE			= 5;
+	int	SHORT			= 6;
+	int	CHAR			= 7;
+	int	INT				= 8;
+	int	LONG			= 9;
+	int	FLOAT			= 10;
+	int	DOUBLE			= 11;
+	int	STRING			= 12;
+	int	FORMAT_STRING	= 13;
+	int	STRINGBUILDER	= 14;
 	
-	int	THIS				= 16;
-	int	SUPER				= 17;
+	int	THIS	= 16;
+	int	SUPER	= 17;
 	
 	int	STATEMENT_LIST		= 24;
 	int	ARRAY				= 25;
@@ -55,37 +60,39 @@ public interface IValue extends IASTNode, ITyped
 	int	CONSTRUCTOR_CALL	= 41;
 	int	INITIALIZER_CALL	= 42;
 	
-	int	VARIABLE			= 43;
-	int	NESTED_METHOD		= 44;
+	int	VARIABLE		= 43;
+	int	NESTED_METHOD	= 44;
 	
-	int	CAST_OPERATOR		= 48;
-	int	ISOF_OPERATOR		= 49;
-	int	SWAP_OPERATOR		= 50;
-	int	BOOLEAN_AND			= 51;
-	int	BOOLEAN_OR			= 52;
-	int	BOOLEAN_NOT			= 53;
-	int	CLASS_OPERATOR		= 54;
-	int	TYPE_OPERATOR		= 55;
-	int	NULLCHECK			= 56;
-	int	RANGE_OPERATOR		= 57;
+	int	CAST_OPERATOR	= 48;
+	int	ISOF_OPERATOR	= 49;
+	int	SWAP_OPERATOR	= 50;
+	int	BOOLEAN_AND		= 51;
+	int	BOOLEAN_OR		= 52;
+	int	BOOLEAN_NOT		= 53;
+	int	CLASS_OPERATOR	= 54;
+	int	TYPE_OPERATOR	= 55;
+	int	NULLCHECK		= 56;
+	int	RANGE_OPERATOR	= 57;
 	
-	int	RETURN				= 70;
-	int	IF					= 71;
-	int	SWITCH				= 72;
-	int	FOR					= 73;
-	int	WHILE				= 74;
-	int	DO_WHILE			= 75;
-	int	TRY					= 76;
-	int	THROW				= 77;
-	int	SYNCHRONIZED		= 78;
+	int	RETURN			= 70;
+	int	IF				= 71;
+	int	SWITCH			= 72;
+	int	FOR				= 73;
+	int	WHILE			= 74;
+	int	DO_WHILE		= 75;
+	int	TRY				= 76;
+	int	THROW			= 77;
+	int	SYNCHRONIZED	= 78;
 	
-	int	BREAK				= 79;
-	int	CONTINUE			= 80;
-	int	GOTO				= 81;
+	int	BREAK		= 79;
+	int	CONTINUE	= 80;
+	int	GOTO		= 81;
 	
 	// Special Types only used by the compiler
-	int	CAPSULATED			= 128;
-	int	BOXED				= 129;
+	int	REFERENCE	= 128;
+	int	BOXED		= 129;
+	
+	float CONVERSION_MATCH = 1000F;
 	
 	public int valueTag();
 	
@@ -99,14 +106,14 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 	
-	public default boolean isStatement()
-	{
-		return false;
-	}
-	
 	public default boolean isPrimitive()
 	{
 		return this.getType().isPrimitive();
+	}
+	
+	public default IReference toReference()
+	{
+		return null;
 	}
 	
 	@Override
@@ -117,38 +124,55 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 	
-	public default IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
+	
+	public static IValue autoBox(IValue value, IType valueType, IType targetType)
 	{
-		IType thisType = this.getType();
-		if (thisType == null)
-		{
-			return null;
-		}
-		if (!type.isSuperTypeOf(thisType))
+		if (!targetType.isSuperTypeOf(valueType))
 		{
 			return null;
 		}
 		
-		boolean primitive = thisType.isPrimitive();
-		if (primitive != type.isPrimitive())
+		boolean primitive = valueType.isPrimitive();
+		if (primitive != targetType.isPrimitive())
 		{
 			// Box Primitive -> Object
 			if (primitive)
 			{
-				return new BoxedValue(this, thisType.getBoxMethod());
+				return new BoxedValue(value, valueType.getBoxMethod());
 			}
 			// Unbox Object -> Primitive
-			return new BoxedValue(this, type.getUnboxMethod());
+			return new BoxedValue(value, targetType.getUnboxMethod());
 		}
-		return this;
+		return value;
 	}
 	
 	@Override
-	public boolean isType(IType type);
+	public default boolean isType(IType type)
+	{
+		return type.isSuperTypeOf(this.getType());
+	}
 	
-	public int getTypeMatch(IType type);
+	/**
+	 * Returns how much the type of this value 'matches' the given type.
+	 * {@code 1} indicates a perfect match, while {@code 0} marks incompatible
+	 * types. A higher value means that the value is less suitable for the type.
+	 * 
+	 * @param type
+	 *            the type to match
+	 * @return the subtyping distance
+	 */
+	public default float getTypeMatch(IType type)
+	{
+		return type.getSubTypeDistance(this.getType());
+	}
 	
 	public void resolveTypes(MarkerList markers, IContext context);
+	
+	public default void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+	
+	}
 	
 	public IValue resolve(MarkerList markers, IContext context);
 	
@@ -157,6 +181,8 @@ public interface IValue extends IASTNode, ITyped
 	public void check(MarkerList markers, IContext context);
 	
 	public IValue foldConstants();
+	
+	public IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// Compilation
 	
@@ -216,6 +242,36 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	public default Object toObject()
+	{
+		return null;
+	}
+	
+	public default boolean booleanValue()
+	{
+		return false;
+	}
+	
+	public default int intValue()
+	{
+		return 0;
+	}
+	
+	public default long longValue()
+	{
+		return 0L;
+	}
+	
+	public default float floatValue()
+	{
+		return 0F;
+	}
+	
+	public default double doubleValue()
+	{
+		return 0D;
+	}
+	
+	public default String stringValue()
 	{
 		return null;
 	}
@@ -295,11 +351,10 @@ public interface IValue extends IASTNode, ITyped
 			}
 			return valueList;
 		}
-		else if (c == org.objectweb.asm.Type.class)
+		else if (c == dyvil.tools.asm.Type.class)
 		{
-			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
-			IType itype = new Type(Name.getQualified(type.getClassName()));
-			return new ClassOperator(itype);
+			dyvil.tools.asm.Type type = (dyvil.tools.asm.Type) o;
+			return new ClassOperator(Types.fromASMType(type));
 		}
 		return null;
 	}

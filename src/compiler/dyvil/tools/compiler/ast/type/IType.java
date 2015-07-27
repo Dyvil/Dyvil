@@ -1,47 +1,98 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
+import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public interface IType extends IASTNode, INamed, IContext, ITypeContext
+public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
-	int	UNKNOWN			= -1;
-	int	NULL			= 0;
-	int	TYPE			= 1;
-	int	PRIMITIVE_TYPE	= 2;
-	int	GENERIC_TYPE	= 3;
+	public static enum TypePosition
+	{
+		/**
+		 * Only allows Class Types.
+		 */
+		CLASS,
+		/**
+		 * Allows Class Types and Parameterized Types, but the latter cannot
+		 * involve any Wildcard Types.
+		 */
+		SUPER_TYPE,
+		/**
+		 * Allows Class Types as well as Parameterized Types.
+		 */
+		TYPE,
+		/**
+		 * The type arguments of Parameterized Types used as SUPER_TYPE. Can be
+		 * Class Types, Parameterized Types and Type Variable Types.
+		 */
+		SUPER_TYPE_ARGUMENT,
+		/**
+		 * Allows Class Types, Parameterized Types and Type Variable Types, but
+		 * the latter cannot be contravariant.
+		 */
+		RETURN_TYPE, /**
+						 * Allows Class Types, Parameterized Types and Type
+						 * Variable Types, but the latter cannot be covariant.
+						 */
+		PARAMETER_TYPE, /**
+						 * Allows all Types.
+						 */
+		GENERIC_ARGUMENT;
+	}
 	
-	int	TYPE_VAR_TYPE	= 4;
-	int	WILDCARD_TYPE	= 5;
+	int	UNKNOWN		= 0;
+	int	NULL		= 1;
+	int	ANY			= 2;
+	int	DYNAMIC		= 3;
+	int	PRIMITIVE	= 4;
 	
-	int	ARRAY_TYPE		= 6;
-	int	MULTI_ARRAY		= 7;
-	int	TUPLE_TYPE		= 8;
-	int	FUNCTION_TYPE	= 9;
+	int	CLASS				= 8;
+	int	NAMED				= 9;
+	int	INTERNAL			= 10;
+	int	GENERIC				= 11;
+	int	GENERIC_NAMED		= 12;
+	int	GENERIC_INTERNAL	= 13;
 	
-	int	DYNAMIC			= 10;
+	int	TUPLE	= 16;
+	int	LAMBDA	= 17;
+	int	ARRAY	= 18;
+	
+	int	TYPE_VAR_TYPE		= 32;
+	int	INTERNAL_TYPE_VAR	= 33;
+	int	WILDCARD_TYPE		= 34;
+	
+	@Override
+	public default ICodePosition getPosition()
+	{
+		return null;
+	}
 	
 	public int typeTag();
 	
@@ -55,34 +106,26 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return false;
 	}
 	
+	public Name getName();
+	
+	// Container Class
+	
+	public IClass getTheClass();
+	
 	public default IType getReferenceType()
 	{
 		return this;
 	}
 	
-	public default IMethod getBoxMethod()
+	public default IType getReturnType()
 	{
-		return null;
+		return this;
 	}
 	
-	public default IMethod getUnboxMethod()
+	public default IType getParameterType()
 	{
-		return null;
+		return this;
 	}
-	
-	// Full Name
-	
-	@Override
-	public void setName(Name name);
-	
-	@Override
-	public Name getName();
-	
-	// Container Class
-	
-	public void setClass(IClass theClass);
-	
-	public IClass getTheClass();
 	
 	// Arrays
 	
@@ -108,7 +151,30 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Super Type
 	
-	public IType getSuperType();
+	public default float getSubTypeDistance(IType subtype)
+	{
+		return subtype.getTheClass().getSuperTypeDistance(this);
+	}
+	
+	public default int getSubClassDistance(IType subtype)
+	{
+		return subtype.getTheClass().getSuperTypeDistance(this);
+	}
+	
+	public default IType getSuperType()
+	{
+		IClass iclass = this.getTheClass();
+		if (iclass != null)
+		{
+			return iclass.getSuperType();
+		}
+		return Types.OBJECT;
+	}
+	
+	public default IType combine(IType type)
+	{
+		return this;
+	}
 	
 	/**
 	 * Returns true if {@code type} is a subtype of this type
@@ -118,12 +184,26 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	 */
 	public default boolean isSuperTypeOf(IType type)
 	{
+		if (this == type)
+		{
+			return true;
+		}
+		
 		IClass thisClass = this.getTheClass();
-		IClass thatClass = type.getTheClass();
+		if (thisClass == Types.OBJECT_CLASS)
+		{
+			return true;
+		}
+		if (type.typeTag() == WILDCARD_TYPE)
+		{
+			return type.equals(this);
+		}
 		if (type.isArrayType())
 		{
-			return thisClass == Types.OBJECT_CLASS;
+			return false;
 		}
+		
+		IClass thatClass = type.getTheClass();
 		if (thatClass != null)
 		{
 			return thatClass == thisClass || thatClass.isSubTypeOf(this);
@@ -131,7 +211,7 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return false;
 	}
 	
-	public default boolean isSuperTypeOf2(IType type)
+	public default boolean isSuperClassOf(IType type)
 	{
 		IClass thisClass = this.getTheClass();
 		IClass thatClass = type.getTheClass();
@@ -154,18 +234,50 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	
 	// Resolve
 	
-	public boolean isResolved();
+	public default IMethod getBoxMethod()
+	{
+		return null;
+	}
 	
-	public IType resolve(MarkerList markers, IContext context);
+	public default IMethod getUnboxMethod()
+	{
+		return null;
+	}
+	
+	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return value.withType(this.getConcreteType(typeContext), typeContext, markers, context);
+	}
 	
 	// Generics
+	
+	/**
+	 * Returns the type argument in this generic type for the given type
+	 * variable.
+	 * <p>
+	 * Example:<br>
+	 * 
+	 * <pre>
+	 * GenericType gt = type[List[String]]
+	 * ITypeVariable tv = type[List].getTypeVariable("E")
+	 * gt.resolveType(tv) // => String
+	 * </pre>
+	 */
+	@Override
+	public default IType resolveType(ITypeVariable typeVar)
+	{
+		return Types.UNKNOWN;
+	}
 	
 	/**
 	 * Returns true if this is or contains any type variables.
 	 * 
 	 * @return
 	 */
-	public boolean hasTypeVariables();
+	public default boolean hasTypeVariables()
+	{
+		return false;
+	}
 	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
@@ -174,26 +286,22 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	 *            the type variables
 	 * @return
 	 */
-	public IType getConcreteType(ITypeContext context);
-	
-	@Override
-	public default IType resolveType(ITypeVariable typeVar)
+	public default IType getConcreteType(ITypeContext context)
 	{
-		return null;
+		return this;
 	}
 	
-	public default IType resolveType(ITypeVariable typeVar, IType concrete)
+	public default void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		return null;
 	}
+	
+	// Resolve Types
+	
+	public boolean isResolved();
+	
+	public IType resolve(MarkerList markers, IContext context, TypePosition position);
 	
 	// IContext
-	
-	@Override
-	public default boolean isStatic()
-	{
-		return true;
-	}
 	
 	@Override
 	public default IDyvilHeader getHeader()
@@ -208,16 +316,25 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	}
 	
 	@Override
-	public Package resolvePackage(Name name);
+	public default Package resolvePackage(Name name)
+	{
+		return null;
+	}
 	
 	@Override
-	public IClass resolveClass(Name name);
+	public default IClass resolveClass(Name name)
+	{
+		return null;
+	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name);
+	public default IType resolveType(Name name)
+	{
+		return null;
+	}
 	
 	@Override
-	public IField resolveField(Name name);
+	public IDataMember resolveField(Name name);
 	
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
@@ -225,20 +342,9 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
 	
-	@Override
-	public byte getVisibility(IMember member);
-	
-	@Override
-	public default boolean handleException(IType type)
-	{
-		return false;
-	}
-	
 	public IMethod getFunctionalMethod();
 	
 	// Compilation
-	
-	public void setInternalName(String name);
 	
 	public String getInternalName();
 	
@@ -290,6 +396,15 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return this.getInternalName();
 	}
 	
+	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
+	{
+		if (target != this && !target.isSuperClassOf(this))
+		{
+			writer.writeLineNumber(lineNumber);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+		}
+	}
+	
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
 	public default void writeDefaultValue(MethodWriter writer) throws BytecodeException
@@ -302,10 +417,76 @@ public interface IType extends IASTNode, INamed, IContext, ITypeContext
 		return NullValue.getNull();
 	}
 	
+	public static void writeType(IType type, DataOutput dos) throws IOException
+	{
+		dos.writeByte(type.typeTag());
+		type.write(dos);
+	}
+	
+	public static IType readType(DataInput dis) throws IOException
+	{
+		byte tag = dis.readByte();
+		IType type;
+		switch (tag)
+		{
+		case UNKNOWN:
+			return Types.UNKNOWN;
+		case NULL:
+			return Types.NULL;
+		case ANY:
+			return Types.ANY;
+		case DYNAMIC:
+			return Types.DYNAMIC;
+		case PRIMITIVE:
+			return PrimitiveType.fromTypecode(dis.readByte());
+		case CLASS:
+			type = new ClassType();
+			break;
+		case GENERIC:
+			type = new ClassGenericType();
+			break;
+		case TUPLE:
+			type = new TupleType();
+			break;
+		case LAMBDA:
+			type = new LambdaType();
+			break;
+		case ARRAY:
+			type = new ArrayType();
+			break;
+		case TYPE_VAR_TYPE:
+			type = new TypeVarType();
+			break;
+		case WILDCARD_TYPE:
+			type = new WildcardType();
+			break;
+		default:
+			return null;
+		}
+		
+		type.read(dis);
+		return type;
+	}
+	
+	public void write(DataOutput out) throws IOException;
+	
+	public void read(DataInput in) throws IOException;
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);
 	
 	// Misc
 	
 	public IType clone();
+	
+	@Override
+	public boolean equals(Object obj);
+	
+	@Override
+	public int hashCode();
+	
+	public static boolean equals(IType type, Object obj)
+	{
+		return type.classEquals((IType) obj);
+	}
 }

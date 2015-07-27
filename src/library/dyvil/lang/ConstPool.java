@@ -5,15 +5,15 @@ import dyvil.annotation.sealed;
 @sealed
 final class ConstPool
 {
-	protected static final int		tableSize	= 128;
+	protected static final int tableSize = 128;
 	
-	protected static final Byte[]	BYTES		= new Byte[tableSize];
-	protected static final Short[]	SHORTS		= new Short[tableSize];
-	protected static final Char[]	CHARS		= new Char[tableSize];
-	protected static final Int[]	INTS		= new Int[tableSize];
-	protected static final Long[]	LONGS		= new Long[tableSize];
-	protected static final Float[]	FLOATS		= new Float[tableSize];
-	protected static final Double[]	DOUBLES		= new Double[tableSize];
+	protected static final Byte[]	BYTES	= new Byte[tableSize];
+	protected static final Short[]	SHORTS	= new Short[tableSize];
+	protected static final Char[]	CHARS	= new Char[tableSize];
+	protected static final Int[]	INTS	= new Int[tableSize];
+	protected static final Long[]	LONGS	= new Long[tableSize];
+	protected static final Float[]	FLOATS	= new Float[tableSize];
+	protected static final Double[]	DOUBLES	= new Double[tableSize];
 	
 	static
 	{

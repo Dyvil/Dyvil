@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.exception.StackUnderflowException;
-
-import org.objectweb.asm.MethodVisitor;
 
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.tools.compiler.backend.ClassFormat.*;
@@ -425,7 +424,9 @@ public class Frame
 		{
 			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
-			this.stack[this.stackCount] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
+			this.stack[this.stackCount - 1] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount - 2] = this.stack[this.stackCount];
 			this.stackCount++;
 			return;
 		}
@@ -433,7 +434,10 @@ public class Frame
 		{
 			this.actualStackCount++;
 			this.ensureStack(this.stackCount + 1);
-			this.stack[this.stackCount] = this.stack[this.stackCount - 3];
+			this.stack[this.stackCount] = this.stack[this.stackCount - 1];
+			this.stack[this.stackCount - 1] = this.stack[this.stackCount - 2];
+			this.stack[this.stackCount - 2] = this.stack[this.stackCount - 3];
+			this.stack[this.stackCount - 3] = this.stack[this.stackCount];
 			this.stackCount++;
 			return;
 		}
@@ -800,7 +804,7 @@ public class Frame
 			stack--;
 		}
 		
-		mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, localIndex, locals, stack, this.stack);
+		mv.visitFrame(dyvil.tools.asm.Opcodes.F_NEW, localIndex, locals, stack, this.stack);
 	}
 	
 	public Frame copy()

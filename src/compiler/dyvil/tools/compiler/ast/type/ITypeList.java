@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.type;
 
-public interface ITypeList
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+
+public interface ITypeList extends ITypeConsumer
 {
 	public int typeCount();
 	
@@ -9,4 +11,10 @@ public interface ITypeList
 	public void addType(IType type);
 	
 	public IType getType(int index);
+	
+	@Override
+	public default void setType(IType type)
+	{
+		this.addType(type);
+	}
 }

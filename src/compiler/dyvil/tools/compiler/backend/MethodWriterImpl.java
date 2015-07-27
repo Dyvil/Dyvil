@@ -1,31 +1,30 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-import org.objectweb.asm.*;
-
 import static dyvil.reflect.Opcodes.*;
 
 public final class MethodWriterImpl implements MethodWriter
 {
-	private static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
+	private static final Long LONG_MINUS_ONE = Long.valueOf(-1);
 	
-	public ClassWriter			cw;
-	protected MethodVisitor		mv;
+	public ClassWriter		cw;
+	protected MethodVisitor	mv;
 	
-	protected Frame				frame			= new Frame();
-	private boolean				visitFrame;
-	private int					maxLocals;
-	private int					maxStack;
+	protected Frame	frame	= new Frame();
+	private boolean	visitFrame;
+	private int		maxLocals;
+	private int		maxStack;
 	
-	private boolean				hasReturn;
+	private boolean hasReturn;
 	
-	private int[]				syncLocals;
-	private int					syncCount;
+	private int[]	syncLocals;
+	private int		syncCount;
 	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
@@ -127,12 +126,6 @@ public final class MethodWriterImpl implements MethodWriter
 	public void writeLocal(int index, String name, String desc, String signature, Label start, Label end)
 	{
 		this.mv.visitLocalVariable(name, desc, signature, start, end, index);
-	}
-	
-	@Override
-	public void writeLocal(int index, String name, IType type, Label start, Label end)
-	{
-		this.mv.visitLocalVariable(name, type.getExtendedName(), type.getSignature(), start, end, index);
 	}
 	
 	// Constants
@@ -261,7 +254,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 		
-		this.frame.push(type.getInternalName());
+		this.frame.push("java/lang/Class");
 		
 		this.mv.visitLdcInsn(type);
 	}
@@ -300,16 +293,54 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitLabel(label);
 	}
 	
+	@Override
+	public void writeLineNumber(int lineNumber)
+	{
+		Label label = new Label();
+		this.mv.visitLabel(label);
+		this.mv.visitLineNumber(lineNumber, label);
+	}
+	
 	// Other Instructions
+	
+	@Override
+	public void writeInsn(int opcode, int lineNumber) throws BytecodeException
+	{
+		switch (opcode)
+		{
+		// NullPointerException, ArrayIndexOutOfBoundsException
+		case ARRAYLENGTH:
+		case IALOAD:
+		case LALOAD:
+		case FALOAD:
+		case DALOAD:
+		case AALOAD:
+		case BALOAD:
+		case CALOAD:
+		case SALOAD:
+		case IASTORE:
+		case LASTORE:
+		case FASTORE:
+		case DASTORE:
+		case BASTORE:
+		case CASTORE:
+		case SASTORE:
+			// ..., ArrayStoreException
+		case AASTORE:
+			// NullPointerException, any unchecked Exception
+		case OBJECT_EQUALS:
+			// ArithmeticException
+		case IDIV:
+		case LDIV:
+			this.writeLineNumber(lineNumber);
+		}
+		
+		this.writeInsn(opcode);
+	}
 	
 	@Override
 	public void writeInsn(int opcode) throws BytecodeException
 	{
-		if (opcode <= 0)
-		{
-			return;
-		}
-		
 		if (opcode > 255)
 		{
 			switch (opcode)
@@ -540,8 +571,10 @@ public final class MethodWriterImpl implements MethodWriter
 		this.visitFrame = true;
 		this.frame.visitJumpInsn(opcode);
 		
-		target.info = this.frame;
-		this.frame = this.frame.copy();
+		if (target.info == null)
+		{
+			target.info = this.frame.copy();
+		}
 		
 		this.mv.visitJumpInsn(opcode, target);
 	}
@@ -577,7 +610,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		if (dims == 1)
 		{
-			if (type.typeTag() == IType.PRIMITIVE_TYPE)
+			if (type.typeTag() == IType.PRIMITIVE)
 			{
 				this.writeIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
 				return;
@@ -672,22 +705,6 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	// Inlining
-	
-	@Override
-	public int inlineOffset()
-	{
-		return 0;
-	}
-	
-	@Override
-	public void startInline(Label end, int localCount)
-	{
-	}
-	
-	@Override
-	public void endInline(Label end, int localCount)
-	{
-	}
 	
 	@Override
 	public int startSync()

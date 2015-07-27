@@ -1,53 +1,56 @@
 package dyvil.tools.compiler.util;
 
-import java.util.Iterator;
-
-import dyvil.lang.Collection;
-
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Util
 {
-	public static void astToString(String prefix, Collection list, String seperator, StringBuilder buffer)
+	public static void propertySignatureToString(IProperty property, StringBuilder buf)
 	{
-		if (!list.isEmpty())
-		{
-			Iterator iterator = list.iterator();
-			while (true)
-			{
-				IASTNode o = (IASTNode) iterator.next();
-				o.toString(prefix, buffer);
-				
-				if (iterator.hasNext())
-				{
-					buffer.append(seperator);
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
+		buf.append(ModifierTypes.FIELD.toString(property.getModifiers()));
+		property.getType().toString("", buf);
+		buf.append(' ').append(property.getName());
 	}
 	
-	public static void astToString(String prefix, IASTNode[] array, int size, String seperator, StringBuilder buffer)
+	public static void methodSignatureToString(IMethod method, StringBuilder buf)
 	{
-		for (int i = 0; i < size; i++)
+		buf.append(ModifierTypes.METHOD.toString(method.getModifiers()));
+		method.getType().toString("", buf);
+		buf.append(' ').append(method.getName()).append('(');
+		
+		int params = method.parameterCount();
+		if (params > 0)
 		{
-			IASTNode o = array[i];
-			o.toString(prefix, buffer);
-			if (i + 1 == size)
+			method.getParameter(0).getType().toString("", buf);
+			for (int i = 1; i < params; i++)
 			{
-				break;
+				buf.append(", ");
+				method.getParameter(i).getType().toString("", buf);
 			}
-			buffer.append(seperator);
+		}
+		
+		buf.append(')');
+	}
+	
+	public static void astToString(String prefix, IASTNode[] array, int size, String separator, StringBuilder buffer)
+	{
+		if (size <= 0)
+		{
+			return;
+		}
+		
+		array[0].toString(prefix, buffer);
+		for (int i = 1; i < size; i++)
+		{
+			buffer.append(separator);
+			array[i].toString(prefix, buffer);
 		}
 	}
 	

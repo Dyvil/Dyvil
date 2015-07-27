@@ -6,7 +6,7 @@ import dyvil.lang.literal.StringConvertible;
 @StringConvertible
 public class TypeArgument implements Type
 {
-	private final String	name;
+	private final String name;
 	
 	public static TypeArgument apply(String name)
 	{

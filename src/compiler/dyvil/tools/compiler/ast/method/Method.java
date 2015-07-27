@@ -2,33 +2,38 @@ package dyvil.tools.compiler.ast.method;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.mutating;
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.constant.IntValue;
-import dyvil.tools.compiler.ast.constant.StringValue;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IAccessible;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.statement.ILoop;
+import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -42,30 +47,28 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
-import org.objectweb.asm.Label;
-
 import static dyvil.reflect.Opcodes.ARGUMENTS;
 import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
 import static dyvil.reflect.Opcodes.INSTANCE;
 
-public class Method extends Member implements IMethod
+public class Method extends Member implements IMethod, ILabelContext
 {
-	protected IClass			theClass;
-	
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
-	protected IParameter[]		parameters	= new MethodParameter[3];
-	protected int				parameterCount;
-	protected IType[]			exceptions;
-	protected int				exceptionCount;
+	protected IParameter[]	parameters	= new MethodParameter[3];
+	protected int			parameterCount;
+	protected IType[]		exceptions;
+	protected int			exceptionCount;
 	
-	public IValue				value;
+	protected IValue value;
 	
-	public String				descriptor;
-	protected int[]				intrinsicOpcodes;
-	protected IMethod			overrideMethod;
+	// Metadata
+	protected IClass	theClass;
+	protected String	descriptor;
+	protected int[]		intrinsicOpcodes;
+	protected IMethod	overrideMethod;
 	
 	public Method(IClass iclass)
 	{
@@ -83,6 +86,29 @@ public class Method extends Member implements IMethod
 		this.theClass = iclass;
 		this.type = type;
 		this.name = name;
+	}
+	
+	public Method(IClass iclass, Name name, IType type, int modifiers)
+	{
+		this.theClass = iclass;
+		this.type = type;
+		this.name = name;
+		this.modifiers = modifiers;
+	}
+	
+	public Method(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	{
+		this.theClass = iclass;
+		this.position = position;
+		this.type = type;
+		this.name = name;
+		this.modifiers = modifiers;
+	}
+	
+	@Override
+	public void setTheClass(IClass iclass)
+	{
+		this.theClass = iclass;
 	}
 	
 	@Override
@@ -317,36 +343,9 @@ public class Method extends Member implements IMethod
 		
 		super.resolveTypes(markers, this);
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			Annotation annotation = this.annotations[i];
-			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
-			{
-				continue;
-			}
-			
-			try
-			{
-				Array array = (Array) annotation.arguments.getValue(0, Annotation.VALUE);
-				
-				int len = array.valueCount();
-				int[] opcodes = new int[len];
-				for (int j = 0; j < len; j++)
-				{
-					IntValue v = (IntValue) array.getValue(j);
-					opcodes[j] = v.value;
-				}
-				this.intrinsicOpcodes = opcodes;
-			}
-			catch (NullPointerException | ClassCastException ex)
-			{
-			}
-			break;
-		}
-		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(markers, this);
+			this.exceptions[i] = this.exceptions[i].resolve(markers, this, TypePosition.TYPE);
 		}
 		
 		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
@@ -371,6 +370,14 @@ public class Method extends Member implements IMethod
 		{
 			this.value.resolveTypes(markers, this);
 		}
+		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			this.modifiers |= Modifiers.ABSTRACT | Modifiers.PUBLIC;
+		}
+		else if (this.theClass.hasModifier(Modifiers.ABSTRACT))
+		{
+			this.modifiers |= Modifiers.ABSTRACT;
+		}
 	}
 	
 	@Override
@@ -387,17 +394,19 @@ public class Method extends Member implements IMethod
 		{
 			this.value = this.value.resolve(markers, this);
 			
+			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
+				inferType = true;
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
 					markers.add(this.position, "method.type.infer", this.name.unqualified);
+					this.type = Types.ANY;
 				}
-				return;
 			}
 			
-			IValue value1 = this.value.withType(this.type);
+			IValue value1 = this.value.withType(this.type, this.type, markers, this);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
@@ -407,12 +416,17 @@ public class Method extends Member implements IMethod
 			else
 			{
 				this.value = value1;
+				if (inferType)
+				{
+					this.type = value1.getType();
+				}
 			}
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(this.position, "method.type.abstract", this.name.unqualified);
+			this.type = Types.ANY;
 		}
 	}
 	
@@ -428,11 +442,8 @@ public class Method extends Member implements IMethod
 		
 		if (this.value != null)
 		{
+			this.value.resolveStatement(this, markers);
 			this.value.checkTypes(markers, this);
-		}
-		else if ((this.modifiers & Modifiers.ABSTRACT) == 0)
-		{
-			this.modifiers |= Modifiers.ABSTRACT;
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -480,15 +491,22 @@ public class Method extends Member implements IMethod
 		
 		String desc = this.getDescriptor();
 		IClassBody body = this.theClass.getBody();
+		if (body == null)
+		{
+			return;
+		}
+		
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
 			IMethod m = body.getMethod(i);
-			if (m != this && m.getName() == this.name)
+			if (m == this || m.getName() != this.name || m.parameterCount() != this.parameterCount)
 			{
-				if (m.getDescriptor().equals(desc))
-				{
-					markers.add(this.position, "method.duplicate", this.name, desc);
-				}
+				continue;
+			}
+			
+			if (m.getDescriptor().equals(desc))
+			{
+				markers.add(this.position, "method.duplicate", this.name, desc);
 			}
 		}
 	}
@@ -513,7 +531,7 @@ public class Method extends Member implements IMethod
 		{
 			markers.add(this.position, "method.override.final", this.name);
 		}
-		else
+		else if (this.type.isResolved())
 		{
 			IType type = this.overrideMethod.getType();
 			if (type != this.type && !type.isSuperTypeOf(this.type))
@@ -538,6 +556,47 @@ public class Method extends Member implements IMethod
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
+		}
+	}
+	
+	protected final void readIntrinsicAnnotation(Annotation annotation)
+	{
+		Array array = (Array) annotation.getArguments().getValue(0, Annotation.VALUE);
+		
+		int len = array.valueCount();
+		int[] opcodes = new int[len];
+		for (int i = 0; i < len; i++)
+		{
+			opcodes[i] = array.getValue(i).intValue();
+		}
+		this.intrinsicOpcodes = opcodes;
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			Annotation annotation = this.annotations[i];
+			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
+			{
+				continue;
+			}
+			
+			this.readIntrinsicAnnotation(annotation);
+			break;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].cleanup(this, compilableList);
+		}
+		
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(this, compilableList);
 		}
 	}
 	
@@ -572,6 +631,21 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
+	public IType resolveType(Name name)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return new TypeVarType(var);
+			}
+		}
+		
+		return this.theClass.resolveType(name);
+	}
+	
+	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -587,7 +661,7 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -599,6 +673,18 @@ public class Method extends Member implements IMethod
 		}
 		
 		return this.theClass.resolveField(name);
+	}
+	
+	@Override
+	public dyvil.tools.compiler.ast.statement.Label resolveLabel(Name name)
+	{
+		return null;
+	}
+	
+	@Override
+	public ILoop getEnclosingLoop()
+	{
+		return null;
 	}
 	
 	@Override
@@ -627,13 +713,19 @@ public class Method extends Member implements IMethod
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
+	public IAccessible getAccessibleThis(IClass type)
 	{
-		return this.theClass.getVisibility(member);
+		return this.theClass.getAccessibleThis(type);
 	}
 	
 	@Override
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public IVariable capture(IVariable variable)
+	{
+		return null;
+	}
+	
+	@Override
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != null && name != this.name)
 		{
@@ -648,7 +740,7 @@ public class Method extends Member implements IMethod
 		
 		if (instance == null && this.modifiers == Modifiers.PREFIX)
 		{
-			int m = arguments.getFirstValue().getTypeMatch(this.theClass.getType());
+			float m = arguments.getFirstValue().getTypeMatch(this.theClass.getType());
 			if (m == 0)
 			{
 				return 0;
@@ -658,33 +750,35 @@ public class Method extends Member implements IMethod
 		
 		int parIndex = 0;
 		int match = 1;
-		int len = arguments.size();
+		int argumentCount = arguments.size();
 		
 		// infix modifier implementation
-		int mods = this.modifiers & Modifiers.INFIX;
-		if (instance != null && mods == Modifiers.INFIX)
+		if (instance != null)
 		{
-			IType t2 = this.parameters[0].getType();
-			int m = instance.getTypeMatch(t2);
-			if (m == 0)
+			int mod = this.modifiers & Modifiers.INFIX;
+			if (mod != 0 && instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				return 0;
+				instance = null;
 			}
-			match += m;
-			
-			parIndex = 1;
+			else if (mod == Modifiers.INFIX)
+			{
+				IType t2 = this.parameters[0].getType();
+				float m = instance.getTypeMatch(t2);
+				if (m == 0)
+				{
+					return 0;
+				}
+				match += m;
+				
+				parIndex = 1;
+			}
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int parCount = this.parameterCount - 1;
-			if (len <= parCount)
-			{
-				return 0;
-			}
+			int len = this.parameterCount - 1 - parIndex;
 			
-			int m;
-			IParameter varParam = this.parameters[parCount];
-			for (int i = parIndex; i < parCount; i++)
+			float m;
+			for (int i = parIndex; i < len; i++)
 			{
 				IParameter par = this.parameters[i + parIndex];
 				m = arguments.getTypeMatch(i, par);
@@ -694,26 +788,24 @@ public class Method extends Member implements IMethod
 				}
 				match += m;
 			}
-			for (int i = parCount + parIndex; i < len; i++)
+			m = arguments.getVarargsTypeMatch(len, this.parameters[len + parIndex]);
+			if (m == 0)
 			{
-				m = arguments.getVarargsTypeMatch(i, varParam);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
+				return 0;
 			}
-			return match;
+			return match + m;
 		}
-		else if (len > this.parameterCount)
+		
+		int len = this.parameterCount - parIndex;
+		if (argumentCount > len)
 		{
 			return 0;
 		}
 		
-		for (int i = 0; parIndex < this.parameterCount; parIndex++, i++)
+		for (int i = 0; i < len; i++)
 		{
-			IParameter par = this.parameters[parIndex];
-			int m = arguments.getTypeMatch(i, par);
+			IParameter par = this.parameters[i + parIndex];
+			float m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
 				return 0;
@@ -734,30 +826,17 @@ public class Method extends Member implements IMethod
 		
 		if (genericData == null)
 		{
-			genericData = new GenericData(this.genericCount);
-			if (instance != null)
-			{
-				genericData.instanceType = instance.getType();
-			}
+			genericData = new GenericData(this, this.genericCount);
 			
-			for (int i = 0; i < this.genericCount; i++)
-			{
-				genericData.generics[i] = this.inferType(this.generics[i], instance, arguments);
-			}
+			this.inferTypes(genericData, instance, arguments);
 			
 			return genericData;
 		}
 		
-		if (instance != null)
-		{
-			genericData.instanceType = instance.getType();
-		}
+		genericData.method = this;
 		
 		genericData.setTypeCount(this.genericCount);
-		for (int i = genericData.typeCount(); i < this.genericCount; i++)
-		{
-			genericData.generics[i] = this.inferType(this.generics[i], instance, arguments);
-		}
+		this.inferTypes(genericData, instance, arguments);
 		
 		return genericData;
 	}
@@ -768,51 +847,62 @@ public class Method extends Member implements IMethod
 		int len = arguments.size();
 		IType parType;
 		
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			IParameter par = this.parameters[0];
-			parType = par.getType().getConcreteType(typeContext);
-			IValue instance1 = instance.withType(parType);
-			if (instance1 == null)
-			{
-				Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
-				marker.addInfo("Required Type: " + parType);
-				marker.addInfo("Value Type: " + instance.getType());
-			}
-			else
-			{
-				instance = instance1;
-			}
-			
-			if ((this.modifiers & Modifiers.VARARGS) != 0)
-			{
-				arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], markers, typeContext);
-				
-				for (int i = 0; i < this.parameterCount - 2; i++)
-				{
-					arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
-				}
-				return instance;
-			}
-			
-			for (int i = 0; i < this.parameterCount - 1; i++)
-			{
-				arguments.checkValue(i, this.parameters[i + 1], markers, typeContext);
-			}
-			return instance;
-		}
-		else if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			parType = this.theClass.getType();
+			parType = this.theClass.getType().getConcreteType(typeContext);
 			instance = arguments.getFirstValue();
-			IValue instance1 = instance.withType(parType);
+			IValue instance1 = instance.withType(parType, typeContext, markers, context);
 			if (instance1 == null)
 			{
 				Marker marker = markers.create(instance.getPosition(), "method.access.prefix_type", this.name);
 				marker.addInfo("Required Type: " + parType);
 				marker.addInfo("Value Type: " + instance.getType());
 			}
+			
+			this.checkTypeVarsInferred(markers, position, typeContext);
 			return null;
+		}
+		
+		if (instance != null)
+		{
+			int mod = this.modifiers & Modifiers.INFIX;
+			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
+			{
+				IParameter par = this.parameters[0];
+				parType = par.getType().getConcreteType(typeContext);
+				IValue instance1 = instance.withType(parType, typeContext, markers, context);
+				if (instance1 == null)
+				{
+					Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
+					marker.addInfo("Required Type: " + parType);
+					marker.addInfo("Value Type: " + instance.getType());
+				}
+				else
+				{
+					instance = instance1;
+				}
+				
+				if ((this.modifiers & Modifiers.VARARGS) != 0)
+				{
+					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], typeContext, markers, context);
+					
+					for (int i = 0; i < this.parameterCount - 2; i++)
+					{
+						arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
+					}
+					
+					this.checkTypeVarsInferred(markers, position, typeContext);
+					return instance;
+				}
+				
+				for (int i = 0; i < this.parameterCount - 1; i++)
+				{
+					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
+				}
+				
+				this.checkTypeVarsInferred(markers, position, typeContext);
+				return instance;
+			}
 		}
 		
 		if (instance != null)
@@ -827,11 +917,14 @@ public class Method extends Member implements IMethod
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(position, "method.access.instance", this.name.unqualified);
+				if (!instance.getType().getTheClass().isObject())
+				{
+					markers.add(position, "method.access.instance", this.name.unqualified);
+				}
 			}
 			else if (this.intrinsicOpcodes == null && instance.isPrimitive())
 			{
-				instance = instance.withType(this.theClass.getType());
+				instance = instance.withType(this.theClass.getType().getConcreteType(typeContext), typeContext, markers, context);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -843,66 +936,85 @@ public class Method extends Member implements IMethod
 			else
 			{
 				markers.add(position, "method.access.unqualified", this.name.unqualified);
-				instance = new ThisValue(position, context.getThisClass().getType());
+				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], markers, typeContext);
+			arguments.checkVarargsValue(len, this.parameters[len], typeContext, markers, null);
 			
 			for (int i = 0; i < len; i++)
 			{
-				arguments.checkValue(i, this.parameters[i], markers, typeContext);
+				arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
 			}
+			
+			this.checkTypeVarsInferred(markers, position, typeContext);
 			return instance;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], markers, typeContext);
+			arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
 		}
+		
+		this.checkTypeVarsInferred(markers, position, typeContext);
 		return instance;
 	}
 	
-	private IType inferType(ITypeVariable typeVar, IValue instance, IArguments arguments)
+	private void inferTypes(GenericData genericData, IValue instance, IArguments arguments)
 	{
-		IType type;
-		int len = arguments.size();
+		if (instance != null)
+		{
+			genericData.instanceType = instance.getType();
+		}
+		else
+		{
+			genericData.instanceType = this.theClass.getType();
+		}
+		
+		int parIndex = 0;
 		IParameter param;
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			type = this.parameters[0].getType().resolveType(typeVar, instance.getType());
-			if (type != null)
-			{
-				return type;
-			}
-			
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + 1];
-				type = param.getType().resolveType(typeVar, arguments.getType(i, param));
-				if (type != null)
-				{
-					return type;
-				}
-			}
-			
-			return Types.ANY;
+			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
+			parIndex = 1;
 		}
 		
-		len = Math.min(this.parameterCount, len);
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int len = this.parameterCount - parIndex - 1;
+			for (int i = 0; i < len; i++)
+			{
+				param = this.parameters[i + parIndex];
+				arguments.inferType(i, param, genericData);
+			}
+			
+			arguments.inferVarargsType(len, this.parameters[len + parIndex], genericData);
+			return;
+		}
+		
+		int len = this.parameterCount - parIndex;
 		for (int i = 0; i < len; i++)
 		{
-			param = this.parameters[i];
-			type = param.getType().resolveType(typeVar, arguments.getType(i, param));
-			if (type != null)
+			param = this.parameters[i + parIndex];
+			arguments.inferType(i, param, genericData);
+		}
+	}
+	
+	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable typeVar = this.generics[i];
+			IType type = typeContext.resolveType(typeVar);
+			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).typeVar == typeVar)
 			{
-				return type;
+				markers.add(position, "method.typevar.infer", this.name, typeVar.getName());
+				typeContext.addMapping(typeVar, Types.ANY);
 			}
 		}
-		return Types.ANY;
 	}
 	
 	@Override
@@ -913,7 +1025,7 @@ public class Method extends Member implements IMethod
 			markers.add(position, "method.access.deprecated", this.name);
 		}
 		
-		switch (context.getVisibility(this))
+		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.SEALED:
 			markers.add(position, "method.access.sealed", this.name);
@@ -957,8 +1069,8 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		IValue v = a.arguments.getValue(0, Annotation.VALUE);
-		String s = v != null ? ((StringValue) v).value : mutating.VALUE_DEFAULT;
+		IValue v = a.getArguments().getValue(0, Annotation.VALUE);
+		String s = v != null ? v.stringValue() : mutating.VALUE_DEFAULT;
 		StringBuilder builder = new StringBuilder(s);
 		
 		int index = builder.indexOf("{method}");
@@ -1000,7 +1112,7 @@ public class Method extends Member implements IMethod
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getType().appendExtendedName(buffer);
+			this.parameters[i].getActualType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
@@ -1029,7 +1141,7 @@ public class Method extends Member implements IMethod
 		buffer.append('(');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getType().appendSignature(buffer);
+			this.parameters[i].getActualType().appendSignature(buffer);
 		}
 		buffer.append(')');
 		this.type.appendSignature(buffer);
@@ -1060,10 +1172,14 @@ public class Method extends Member implements IMethod
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
+		if (this.theClass.isInterface())
+		{
+			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
+		}
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(),
-				this.getExceptions()));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.setThisType(this.theClass.getInternalName());
@@ -1122,7 +1238,7 @@ public class Method extends Member implements IMethod
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getType(), start, end);
+			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) != 0)
@@ -1130,7 +1246,7 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		mw.writeLocal(0, "this", this.theClass.getType(), start, end);
+		mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
 		
 		if (this.overrideMethod == null)
 		{
@@ -1146,13 +1262,15 @@ public class Method extends Member implements IMethod
 		// Generate a bridge method
 		mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified,
 				this.overrideMethod.getDescriptor(), this.overrideMethod.getSignature(), this.overrideMethod.getExceptions()));
-		
+				
 		start = new Label();
 		end = new Label();
 		
 		mw.begin();
 		mw.setThisType(this.theClass.getInternalName());
 		mw.writeVarInsn(Opcodes.ALOAD, 0);
+		
+		int lineNumber = this.getLineNumber();
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -1162,37 +1280,35 @@ public class Method extends Member implements IMethod
 			
 			param.write(mw);
 			mw.writeVarInsn(type1.getLoadOpcode(), param.getIndex());
-			if (!type1.equals(type2))
-			{
-				mw.writeTypeInsn(Opcodes.CHECKCAST, type1.getInternalName());
-			}
+			type2.writeCast(mw, type1, lineNumber);
 		}
 		
+		mw.writeLineNumber(lineNumber);
 		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
 		mw.writeInsn(this.type.getReturnOpcode());
 		mw.end();
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
-				this.writeIntrinsic(writer, instance, arguments);
+				this.writeIntrinsic(writer, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
 		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeIntrinsic(writer, instance, arguments);
+			this.writeIntrinsic(writer, instance, arguments, lineNumber);
 			return;
 		}
 		
-		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		
 		if (type == Types.VOID)
 		{
@@ -1205,98 +1321,77 @@ public class Method extends Member implements IMethod
 		
 		if (type != null)
 		{
-			if (type != this.type && !type.isSuperTypeOf(this.type))
-			{
-				writer.writeTypeInsn(Opcodes.CHECKCAST, type.getInternalName());
-			}
+			this.type.writeCast(writer, type, lineNumber);
 		}
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
-				this.writeIntrinsic(writer, dest, instance, arguments);
+				this.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
 		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeIntrinsic(writer, dest, instance, arguments);
+			this.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
 		}
-		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
 			if (this.intrinsicOpcodes != null)
 			{
-				this.writeInvIntrinsic(writer, dest, instance, arguments);
+				this.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
 		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeInvIntrinsic(writer, dest, instance, arguments);
+			this.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
 		}
 		
-		this.writeArgumentsAndInvoke(writer, instance, arguments);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
 	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			int len = this.parameterCount;
-			if ((this.modifiers & Modifiers.VARARGS) != 0)
-			{
-				len--;
-				IParameter param;
-				for (int i = 1, j = 0; i < len; i++, j++)
-				{
-					param = this.parameters[i];
-					arguments.writeValue(j, param.getName(), param.getValue(), writer);
-				}
-				param = this.parameters[len];
-				arguments.writeVarargsValue(len - 1, param.getName(), param.getType(), writer);
-				return;
-			}
-			
-			for (int i = 1, j = 0; i < this.parameterCount; i++, j++)
-			{
-				IParameter param = this.parameters[i];
-				arguments.writeValue(j, param.getName(), param.getValue(), writer);
-			}
-			return;
-		}
+		int parIndex = 0;
+		
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			arguments.writeValue(0, Name._this, null, writer);
 			return;
 		}
+		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			parIndex = 1;
+		}
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int len = this.parameterCount - 1;
+			int len = this.parameterCount - 1 - parIndex;
 			IParameter param;
 			for (int i = 0; i < len; i++)
 			{
-				param = this.parameters[i];
+				param = this.parameters[i + parIndex];
 				arguments.writeValue(i, param.getName(), param.getValue(), writer);
 			}
 			param = this.parameters[len];
@@ -1304,14 +1399,15 @@ public class Method extends Member implements IMethod
 			return;
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		int len = this.parameterCount - parIndex;
+		for (int i = 0; i < len; i++)
 		{
-			IParameter param = this.parameters[i];
+			IParameter param = this.parameters[i + parIndex];
 			arguments.writeValue(i, param.getName(), param.getValue(), writer);
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
 		{
@@ -1334,7 +1430,7 @@ public class Method extends Member implements IMethod
 					}
 					else
 					{
-						writer.writeInsn(insn);
+						writer.writeInsn(insn, lineNumber);
 					}
 				}
 				return;
@@ -1342,7 +1438,7 @@ public class Method extends Member implements IMethod
 			
 			Label ifEnd = new Label();
 			Label elseEnd = new Label();
-			this.writeIntrinsic(writer, ifEnd, instance, arguments);
+			this.writeIntrinsic(writer, ifEnd, instance, arguments, lineNumber);
 			
 			// If Block
 			writer.writeLDC(0);
@@ -1369,12 +1465,12 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.writeInsn(i);
+				writer.writeInsn(i, lineNumber);
 			}
 		}
 	}
 	
-	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1392,12 +1488,12 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.writeInsn(i);
+				writer.writeInsn(i, lineNumber);
 			}
 		}
 	}
 	
-	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		for (int i : this.intrinsicOpcodes)
 		{
@@ -1415,33 +1511,33 @@ public class Method extends Member implements IMethod
 			}
 			else
 			{
-				writer.writeInsn(i);
+				writer.writeInsn(i, lineNumber);
 			}
 		}
 	}
 	
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
 			instance.writeExpression(writer);
 		}
 		this.writeArguments(writer, instance, arguments);
-		this.writeInvoke(writer, instance, arguments);
+		this.writeInvoke(writer, instance, arguments, lineNumber);
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
+		writer.writeLineNumber(lineNumber);
+		
 		int opcode;
 		int modifiers = this.modifiers;
+		String owner = this.theClass.getInternalName();
+		
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			opcode = Opcodes.INVOKESTATIC;
-		}
-		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS) && this.value == null)
-		{
-			opcode = Opcodes.INVOKEINTERFACE;
 		}
 		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
 		{
@@ -1451,15 +1547,18 @@ public class Method extends Member implements IMethod
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 		}
+		else if (this.theClass.isInterface())
+		{
+			opcode = Opcodes.INVOKEINTERFACE;
+		}
 		else
 		{
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		
-		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.hasModifier(Modifiers.INTERFACE_CLASS));
+		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.isInterface());
 	}
 	
 	@Override
@@ -1492,11 +1591,28 @@ public class Method extends Member implements IMethod
 			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
 		}
 		
-		if (this.value != null)
+		if (this.value == null)
+		{
+			buffer.append(';');
+			return;
+		}
+		
+		if (this.value.valueTag() != IValue.STATEMENT_LIST)
 		{
 			buffer.append(Formatting.Method.signatureBodySeperator);
 			this.value.toString(prefix, buffer);
+			buffer.append(';');
+			return;
 		}
-		buffer.append(';');
+		
+		if (((StatementList) this.value).isEmpty())
+		{
+			buffer.append(Formatting.Method.emptyBody);
+			return;
+		}
+		
+		buffer.append(' ');
+		this.value.toString(prefix, buffer);
+		return;
 	}
 }

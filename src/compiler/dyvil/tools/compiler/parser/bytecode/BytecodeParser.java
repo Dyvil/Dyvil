@@ -16,11 +16,11 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class BytecodeParser extends Parser
 {
-	private static final int	INSTRUCTION	= 1;
+	private static final int INSTRUCTION = 1;
 	
-	protected Bytecode			bytecode;
+	protected Bytecode bytecode;
 	
-	private Name				label;
+	private Name label;
 	
 	public BytecodeParser(Bytecode bytecode)
 	{
@@ -227,7 +227,7 @@ public final class BytecodeParser extends Parser
 			pm.skip(2);
 			return new IIncInstruction(next.intValue(), next2.intValue());
 		}
-		/* IntInstructions */
+			/* IntInstructions */
 		case Opcodes.BIPUSH:
 		case Opcodes.SIPUSH:
 		case Opcodes.NEWARRAY:
@@ -241,7 +241,7 @@ public final class BytecodeParser extends Parser
 			pm.skip();
 			return new IntInstruction(opcode, next.intValue());
 		}
-		/* LDCInstruction */
+			/* LDCInstruction */
 		case Opcodes.LDC:
 		{
 			IToken next = token.next();
@@ -278,7 +278,7 @@ public final class BytecodeParser extends Parser
 			}
 			return null;
 		}
-		/* VarInstructions */
+			/* VarInstructions */
 		case Opcodes.ILOAD:
 		case Opcodes.LLOAD:
 		case Opcodes.FLOAD:
@@ -299,7 +299,7 @@ public final class BytecodeParser extends Parser
 			pm.skip();
 			return new VarInstruction(opcode, next.intValue());
 		}
-		/* Jump Instructions */
+			/* Jump Instructions */
 		case Opcodes.IFEQ:
 		case Opcodes.IFNE:
 		case Opcodes.IFLT:
@@ -327,10 +327,10 @@ public final class BytecodeParser extends Parser
 			pm.skip();
 			return new JumpInstruction(opcode, new Label(next.nameValue()));
 		}
-		/* TODO TableSwitchInstruction */
+			/* TODO TableSwitchInstruction */
 		case Opcodes.TABLESWITCH:
 			return null;
-			/* TODO LookupSwitchInstruction */
+		/* TODO LookupSwitchInstruction */
 		case Opcodes.LOOKUPSWITCH:
 			break;
 		case Opcodes.GETSTATIC:
@@ -351,7 +351,7 @@ public final class BytecodeParser extends Parser
 			pm.pushParser(new MethodInstructionParser(mi));
 			return mi;
 		}
-		/* TODO InvokeDynamicInstruction */
+			/* TODO InvokeDynamicInstruction */
 		case Opcodes.INVOKEDYNAMIC:
 			break;
 		case Opcodes.NEW:
@@ -363,7 +363,7 @@ public final class BytecodeParser extends Parser
 			pm.pushParser(new InternalTypeParser(ti));
 			return ti;
 		}
-		/* TODO MultiArrayInstruction */
+			/* TODO MultiArrayInstruction */
 		case Opcodes.MULTIANEWARRAY:
 			break;
 		}

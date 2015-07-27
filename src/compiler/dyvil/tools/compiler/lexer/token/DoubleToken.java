@@ -7,14 +7,14 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public final class DoubleToken implements IToken
 {
-	private IToken		prev;
-	private IToken		next;
+	private IToken	prev;
+	private IToken	next;
 	
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
 	
-	private double		value;
+	private double value;
 	
 	public DoubleToken(IToken prev, double value, int lineNumber, int start, int end)
 	{

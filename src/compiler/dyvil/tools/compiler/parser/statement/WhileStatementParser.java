@@ -1,23 +1,22 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.WhileStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
-public final class WhileStatementParser extends Parser implements IValued
+public final class WhileStatementParser extends Parser implements IValueConsumer
 {
-	public static final int		CONDITION		= 1;
-	public static final int		CONDITION_END	= 2;
-	public static final int		BLOCK			= 4;
+	public static final int	CONDITION		= 1;
+	public static final int	CONDITION_END	= 2;
+	public static final int	BLOCK			= 4;
 	
-	protected WhileStatement	statement;
+	protected WhileStatement statement;
 	
 	public WhileStatementParser(WhileStatement statement)
 	{
@@ -46,7 +45,7 @@ public final class WhileStatementParser extends Parser implements IValued
 			this.mode = CONDITION_END;
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			throw new SyntaxError(token, "Invalid While Statement - '(' expected", true);
@@ -68,7 +67,7 @@ public final class WhileStatementParser extends Parser implements IValued
 				return;
 			}
 			
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = -1;
 			return;
 		}
@@ -79,17 +78,11 @@ public final class WhileStatementParser extends Parser implements IValued
 	{
 		if (this.mode == CONDITION_END)
 		{
-			this.statement.condition = value;
+			this.statement.setCondition(value);
 		}
 		else if (this.mode == -1)
 		{
-			this.statement.action = value;
+			this.statement.setAction(value);
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -14,7 +16,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class SwapOperator extends ASTNode implements IValue
+public class SwapOperator extends Value
 {
 	public FieldAccess	left;
 	public FieldAccess	right;
@@ -47,25 +49,19 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public IType getType()
 	{
-		return Types.UNKNOWN;
+		return Types.VOID;
+	}
+	
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
 		return type == Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type)
-	{
-		return type == Types.VOID ? this : null;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override
@@ -113,6 +109,12 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.writeStatement(writer);
@@ -122,34 +124,35 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		IValue leftInstance = this.left.instance;
-		IField leftField = this.left.field;
-		IValue rightInstance = this.right.instance;
-		IField rightField = this.right.field;
+		int lineNumber = this.getLineNumber();
+		IValue leftInstance = this.left.getInstance();
+		IDataMember leftField = this.left.getField();
+		IValue rightInstance = this.right.getInstance();
+		IDataMember rightField = this.right.getField();
 		
 		if (leftInstance != null)
 		{
 			leftInstance.writeExpression(writer);
 		}
-		leftField.writeGet(writer, null);
+		leftField.writeGet(writer, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer);
 		}
-		rightField.writeGet(writer, null);
+		rightField.writeGet(writer, null, lineNumber);
 		
 		if (leftInstance != null)
 		{
 			leftInstance.writeExpression(writer);
 		}
-		leftField.writeSet(writer, null, null);
+		leftField.writeSet(writer, null, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer);
 		}
-		rightField.writeSet(writer, null, null);
+		rightField.writeSet(writer, null, null, lineNumber);
 	}
 	
 	@Override

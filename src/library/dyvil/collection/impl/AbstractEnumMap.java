@@ -4,9 +4,10 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.Type;
+
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
 
 import sun.misc.SharedSecrets;
 
@@ -14,7 +15,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
 	protected class EnumEntry implements Entry<K, V>
 	{
-		int	index;
+		int index;
 		
 		EnumEntry(int index)
 		{
@@ -84,6 +85,17 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			this.indexValid = false;
 			return this.index++;
 		}
+		
+		@Override
+		public void remove()
+		{
+			if (this.index == 0)
+			{
+				throw new IllegalStateException();
+			}
+			
+			AbstractEnumMap.this.removeAt(--this.index);
+		}
 	}
 	
 	protected Class<K>	type;
@@ -106,19 +118,24 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	public AbstractEnumMap(Class<K> type)
 	{
-		this.keys = SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type);
+		this.keys = getKeys(type);
 		this.values = new Object[this.keys.length];
 		this.type = type;
 	}
 	
-	protected boolean checkType(Object key)
+	protected static boolean checkType(Class<?> type, Object key)
 	{
-		return key != null && key.getClass() == this.type;
+		return key != null && key.getClass() == type;
 	}
 	
 	protected static int index(Object key)
 	{
 		return ((Enum) key).ordinal();
+	}
+	
+	protected static <K extends Enum<K>> K[] getKeys(Class<K> type)
+	{
+		return SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type);
 	}
 	
 	@Override
@@ -184,10 +201,12 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		};
 	}
 	
+	protected abstract void removeAt(int index);
+	
 	@Override
 	public boolean containsKey(Object key)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return false;
 		}
@@ -198,7 +217,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return false;
 		}
@@ -222,9 +241,9 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
-		if (!this.checkType(key))
+		if (!checkType(this.type, key))
 		{
 			return null;
 		}

@@ -6,14 +6,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.config.CompilerConfig;
 
-public class ClassWriter extends org.objectweb.asm.ClassWriter
+public class ClassWriter extends dyvil.tools.asm.ClassWriter
 {
 	public ClassWriter()
 	{
@@ -35,7 +34,11 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 	
 	public static void save(File file, byte[] bytes)
 	{
-		FileUtils.createFile(file);
+		if (!FileUtils.createFile(file))
+		{
+			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
+		}
+		
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
 			os.write(bytes, 0, bytes.length);
@@ -43,8 +46,8 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		catch (IOException ex)
 		{
 			// If file saving fails, simply report the error.
-			DyvilCompiler.logger.warning("Failed to save file '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			DyvilCompiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
+			DyvilCompiler.error("ClassWriter", "compile", ex);
 		}
 	}
 	
@@ -60,8 +63,8 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.logger.warning("Error during compilation of '" + file + "': " + ex);
-			DyvilCompiler.logger.throwing("ClassWriter", "compile", ex);
+			DyvilCompiler.error("Error during compilation of '" + file + "': " + ex);
+			DyvilCompiler.error("ClassWriter", "compile", ex);
 			return;
 		}
 		
@@ -87,14 +90,14 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();
-		attributes.putValue("Name", config.jarName);
-		attributes.putValue("Version", config.jarVersion);
-		attributes.putValue("Vendor", config.jarVendor);
+		attributes.putValue("Name", config.getJarName());
+		attributes.putValue("Version", config.getJarVersion());
+		attributes.putValue("Vendor", config.getJarVendor());
 		attributes.putValue("Created-By", "Dyvil Compiler");
-		attributes.put(Attributes.Name.MAIN_CLASS, config.mainType);
+		attributes.put(Attributes.Name.MAIN_CLASS, config.getMainType());
 		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		
-		String outputDir = DyvilCompiler.config.outputDir.getAbsolutePath();
+		String outputDir = DyvilCompiler.config.getOutputDir().getAbsolutePath();
 		int len = outputDir.length();
 		if (!outputDir.endsWith("/"))
 		{
@@ -116,7 +119,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		}
 		catch (Exception ex)
 		{
-			DyvilCompiler.logger.throwing("ClassWriter", "jar", ex);
+			DyvilCompiler.error("ClassWriter", "jar", ex);
 		}
 	}
 	
@@ -136,7 +139,7 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter
 		}
 		catch (Exception ex)
 		{
-			DyvilCompiler.logger.throwing("ClassWriter", "createEntry", ex);
+			DyvilCompiler.error("ClassWriter", "createEntry", ex);
 		}
 	}
 }

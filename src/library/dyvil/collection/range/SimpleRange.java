@@ -5,8 +5,9 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
-import dyvil.lang.Range;
 import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.collection.Range;
 
 @TupleConvertible
 public class SimpleRange<T extends Ordered<T>> implements Range<T>
@@ -59,7 +60,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	{
 		return new Iterator<T>()
 		{
-			private T	current	= SimpleRange.this.first;
+			private T current = SimpleRange.this.first;
 			
 			@Override
 			public T next()
@@ -107,7 +108,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
-	public boolean $qmark(Object o)
+	public boolean contains(Object o)
 	{
 		for (Ordered<T> current = this.first; current.$lt$eq(this.last); current = current.next())
 		{

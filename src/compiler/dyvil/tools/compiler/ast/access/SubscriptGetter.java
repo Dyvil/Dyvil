@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
@@ -7,7 +8,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -51,7 +51,7 @@ public class SubscriptGetter extends AbstractCall
 				{
 					fa.instance = fa.instance.resolve(markers, context);
 				}
-				IValue v1 = fa.resolveFieldAccess(context);
+				IValue v1 = fa.resolveFieldAccess(markers, context);
 				if (v1 != null)
 				{
 					this.instance = v1;
@@ -60,7 +60,9 @@ public class SubscriptGetter extends AbstractCall
 				else
 				{
 					this.arguments.resolve(markers, context);
-					IArguments arguments = new SingleArgument(new Array(((ArgumentList) this.arguments).getValues(), this.arguments.size()));
+					ICodePosition position = this.arguments.getFirstValue().getPosition().to(this.arguments.getLastValue().getPosition());
+					Array array = new Array(position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
+					IArguments arguments = new SingleArgument(array);
 					
 					IMethod m = ICall.resolveMethod(context, fa.instance, fa.name, arguments);
 					if (m != null)
@@ -69,6 +71,7 @@ public class SubscriptGetter extends AbstractCall
 						mc.method = m;
 						mc.arguments = arguments;
 						mc.dotless = fa.dotless;
+						mc.checkArguments(markers, context);
 						return mc;
 					}
 					
@@ -99,10 +102,11 @@ public class SubscriptGetter extends AbstractCall
 		{
 			this.arguments = argumentList;
 			this.method = m;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, this.instance, Name.subscript, argumentList);
+		ICall.addResolveMarker(markers, this.position, this.instance, Name.subscript, argumentList);
 		return this;
 	}
 	

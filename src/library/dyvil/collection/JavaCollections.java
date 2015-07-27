@@ -1,6 +1,8 @@
 package dyvil.collection;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -22,7 +24,7 @@ public interface JavaCollections
 	}
 	
 	/**
-	 * @see List#subscript(int)
+	 * @see List#subscript(Object)
 	 */
 	public static @infix @inline <E> E apply(java.util.List<E> list, int index)
 	{
@@ -56,7 +58,7 @@ public interface JavaCollections
 	}
 	
 	/**
-	 * @see Collection#$minus$eq(Object)
+	 * @see Collection#$minus$eq(Entry)
 	 */
 	public static @infix @inline <E> void $minus$eq(java.util.Collection<E> collection, E element)
 	{
@@ -64,7 +66,7 @@ public interface JavaCollections
 	}
 	
 	/**
-	 * @see Collection#$minus$minus$eq(Collection)
+	 * @see Collection#$minus$minus$eq(Map)
 	 */
 	public static @infix @inline <E> void $minus$minus$eq(java.util.Collection<? super E> collection, java.util.Collection<? extends E> remove)
 	{
@@ -80,7 +82,7 @@ public interface JavaCollections
 	}
 	
 	/**
-	 * @see Collection#map(UnaryOperator)
+	 * @see Collection#map(Function)
 	 */
 	public static @infix <E> void map(java.util.Collection<E> collection, UnaryOperator<E> mapper)
 	{

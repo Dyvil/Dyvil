@@ -23,4 +23,7 @@ public interface IMethodSignature extends ITyped, ITypeList, IExceptionList, IGe
 	{
 		return null;
 	}
+	
+	@Override
+	public void setType(IType type);
 }

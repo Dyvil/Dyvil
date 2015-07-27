@@ -1,39 +1,46 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
-import dyvil.tools.compiler.ast.generic.WildcardType;
+import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.generic.type.GenericType;
+import dyvil.tools.compiler.ast.generic.type.InternalGenericType;
+import dyvil.tools.compiler.ast.generic.type.InternalTypeVarType;
+import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
-import dyvil.tools.compiler.ast.type.*;
-
-import org.objectweb.asm.Opcodes;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.Types;
 
 public final class ClassFormat
 {
-	public static final int		H_GETFIELD			= Opcodes.H_GETFIELD;
-	public static final int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
-	public static final int		H_PUTFIELD			= Opcodes.H_PUTFIELD;
-	public static final int		H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
-	public static final int		H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
-	public static final int		H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
-	public static final int		H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
-	public static final int		H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
-	public static final int		H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
+	public static final int	H_GETFIELD			= Opcodes.H_GETFIELD;
+	public static final int	H_GETSTATIC			= Opcodes.H_GETSTATIC;
+	public static final int	H_PUTFIELD			= Opcodes.H_PUTFIELD;
+	public static final int	H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
+	public static final int	H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
+	public static final int	H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
+	public static final int	H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
+	public static final int	H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
+	public static final int	H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
 	
-	public static final int		T_BOOLEAN			= 4;
-	public static final int		T_CHAR				= 5;
-	public static final int		T_FLOAT				= 6;
-	public static final int		T_DOUBLE			= 7;
-	public static final int		T_BYTE				= 8;
-	public static final int		T_SHORT				= 9;
-	public static final int		T_INT				= 10;
-	public static final int		T_LONG				= 11;
+	public static final int	T_BOOLEAN	= 4;
+	public static final int	T_CHAR		= 5;
+	public static final int	T_FLOAT		= 6;
+	public static final int	T_DOUBLE	= 7;
+	public static final int	T_BYTE		= 8;
+	public static final int	T_SHORT		= 9;
+	public static final int	T_INT		= 10;
+	public static final int	T_LONG		= 11;
 	
-	public static final int		ACC_SUPER			= Opcodes.ACC_SUPER;
+	public static final int ACC_SUPER = Opcodes.ACC_SUPER;
 	
 	public static final Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
 	public static final Integer	NULL				= Opcodes.NULL;
@@ -55,6 +62,11 @@ public final class ClassFormat
 	public static String internalToPackage(String internal)
 	{
 		return internal.replace('/', '.');
+	}
+	
+	public static String internalToExtended(String internal)
+	{
+		return 'L' + internal + ';';
 	}
 	
 	public static String extendedToInternal(String extended)
@@ -111,9 +123,7 @@ public final class ClassFormat
 	
 	public static IType internalToType(String internal)
 	{
-		Type type = new Type();
-		setInternalName(type, internal, 0, internal.length());
-		return type;
+		return new InternalType(internal);
 	}
 	
 	public static IType extendedToType(String extended)
@@ -140,10 +150,10 @@ public final class ClassFormat
 		}
 		
 		int len = desc.length();
-		i = readTyped(desc, i, iclass);
+		i = readTyped(desc, i, iclass::setSuperType);
 		while (i < len)
 		{
-			i = readTypeList(desc, i, iclass);
+			i = readTyped(desc, i, iclass::addInterface);
 		}
 	}
 	
@@ -160,7 +170,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTypeList(desc, i, method);
+			i = readTyped(desc, i, method::addType);
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -178,7 +188,7 @@ public final class ClassFormat
 		int i = 1;
 		while (desc.charAt(i) != ')')
 		{
-			i = readTypeList(desc, i, constructor);
+			i = readTyped(desc, i, constructor::addType);
 		}
 		i += 2;
 		
@@ -187,26 +197,6 @@ public final class ClassFormat
 		{
 			i = readException(desc, i + 1, constructor);
 		}
-	}
-	
-	private static void setInternalName(IType type, String desc, int start, int end)
-	{
-		int index = desc.lastIndexOf('$', end);
-		if (index < start)
-		{
-			index = desc.lastIndexOf('/', end);
-			if (index < start)
-			{
-				// No slash in type name, skip internal -> package name
-				// conversion
-				type.setName(Name.getQualified(desc.substring(start, end)));
-				type.setInternalName(desc.substring(start, end));
-				return;
-			}
-		}
-		
-		type.setName(Name.getQualified(desc.substring(index + 1, end)));
-		type.setInternalName(desc.substring(start, end));
 	}
 	
 	private static IType readType(String desc, int start, int end)
@@ -239,10 +229,7 @@ public final class ClassFormat
 		case 'D':
 			return ArrayType.getArrayType(Types.DOUBLE, array);
 		case 'T':
-		{
-			String s = desc.substring(start + 1, end);
-			return new Type(Name.getQualified(s));
-		}
+			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case 'L':
 			return readReferenceType(desc, start + 1, end);
 		}
@@ -252,25 +239,22 @@ public final class ClassFormat
 	private static IType readReferenceType(String desc, int start, int end)
 	{
 		int index = desc.indexOf('<', start);
-		if (index != -1 && index < end)
+		if (index >= 0 && index < end)
 		{
-			GenericType type = new GenericType();
-			setInternalName(type, desc, start, index);
+			GenericType type = new InternalGenericType(desc.substring(start, index));
 			index++;
 			
 			while (desc.charAt(index) != '>')
 			{
-				index = readTypeList(desc, index, type);
+				index = readTyped(desc, index, type);
 			}
 			return type;
 		}
 		
-		IType type = new Type();
-		setInternalName(type, desc, start, end);
-		return type;
+		return new InternalType(desc.substring(start, end));
 	}
 	
-	private static int readTyped(String desc, int start, ITyped typed)
+	private static int readTyped(String desc, int start, ITypeConsumer consumer)
 	{
 		int array = 0;
 		char c;
@@ -283,31 +267,31 @@ public final class ClassFormat
 		switch (c)
 		{
 		case 'V':
-			typed.setType(ArrayType.getArrayType(Types.VOID, array));
+			consumer.setType(ArrayType.getArrayType(Types.VOID, array));
 			return start + 1;
 		case 'Z':
-			typed.setType(ArrayType.getArrayType(Types.BOOLEAN, array));
+			consumer.setType(ArrayType.getArrayType(Types.BOOLEAN, array));
 			return start + 1;
 		case 'B':
-			typed.setType(ArrayType.getArrayType(Types.BYTE, array));
+			consumer.setType(ArrayType.getArrayType(Types.BYTE, array));
 			return start + 1;
 		case 'S':
-			typed.setType(ArrayType.getArrayType(Types.SHORT, array));
+			consumer.setType(ArrayType.getArrayType(Types.SHORT, array));
 			return start + 1;
 		case 'C':
-			typed.setType(ArrayType.getArrayType(Types.CHAR, array));
+			consumer.setType(ArrayType.getArrayType(Types.CHAR, array));
 			return start + 1;
 		case 'I':
-			typed.setType(ArrayType.getArrayType(Types.INT, array));
+			consumer.setType(ArrayType.getArrayType(Types.INT, array));
 			return start + 1;
 		case 'J':
-			typed.setType(ArrayType.getArrayType(Types.LONG, array));
+			consumer.setType(ArrayType.getArrayType(Types.LONG, array));
 			return start + 1;
 		case 'F':
-			typed.setType(ArrayType.getArrayType(Types.FLOAT, array));
+			consumer.setType(ArrayType.getArrayType(Types.FLOAT, array));
 			return start + 1;
 		case 'D':
-			typed.setType(ArrayType.getArrayType(Types.DOUBLE, array));
+			consumer.setType(ArrayType.getArrayType(Types.DOUBLE, array));
 			return start + 1;
 		case 'L':
 		{
@@ -317,121 +301,37 @@ public final class ClassFormat
 			{
 				type = ArrayType.getArrayType(type, array);
 			}
-			typed.setType(type);
+			consumer.setType(type);
 			return end1 + 1;
 		}
 		case 'T':
 		{
 			int end1 = desc.indexOf(';', start);
-			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
 			if (array > 0)
 			{
 				type = ArrayType.getArrayType(type, array);
 			}
-			typed.setType(type);
+			consumer.setType(type);
 			return end1 + 1;
 		}
 		case '*':
-			typed.setType(new WildcardType());
+			consumer.setType(new WildcardType(Variance.INVARIANT));
 			return start + 1;
 		case '+':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.addUpperBound(readType(desc, start + 1, end1));
-			typed.setType(var);
+			WildcardType var = new WildcardType(Variance.COVARIANT);
+			var.setType(readType(desc, start + 1, end1));
+			consumer.setType(var);
 			return end1 + 1;
 		}
 		case '-':
 		{
 			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.setLowerBound(readType(desc, start + 1, end1));
-			typed.setType(var);
-			return end1 + 1;
-		}
-		}
-		return start;
-	}
-	
-	private static int readTypeList(String desc, int start, ITypeList list)
-	{
-		int array = 0;
-		char c;
-		while ((c = desc.charAt(start)) == '[')
-		{
-			array++;
-			start++;
-		}
-		
-		switch (c)
-		{
-		case 'V':
-			list.addType(ArrayType.getArrayType(Types.VOID, array));
-			return start + 1;
-		case 'Z':
-			list.addType(ArrayType.getArrayType(Types.BOOLEAN, array));
-			return start + 1;
-		case 'B':
-			list.addType(ArrayType.getArrayType(Types.BYTE, array));
-			return start + 1;
-		case 'C':
-			list.addType(ArrayType.getArrayType(Types.CHAR, array));
-			return start + 1;
-		case 'S':
-			list.addType(ArrayType.getArrayType(Types.SHORT, array));
-			return start + 1;
-		case 'I':
-			list.addType(ArrayType.getArrayType(Types.INT, array));
-			return start + 1;
-		case 'J':
-			list.addType(ArrayType.getArrayType(Types.LONG, array));
-			return start + 1;
-		case 'F':
-			list.addType(ArrayType.getArrayType(Types.FLOAT, array));
-			return start + 1;
-		case 'D':
-			list.addType(ArrayType.getArrayType(Types.DOUBLE, array));
-			return start + 1;
-		case 'L':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			IType type = readReferenceType(desc, start + 1, end1);
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			list.addType(type);
-			return end1 + 1;
-		}
-		case 'T':
-		{
-			int end1 = desc.indexOf(';', start);
-			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			list.addType(type);
-			return end1 + 1;
-		}
-		case '*':
-			list.addType(new WildcardType());
-			return start + 1;
-		case '+':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.addUpperBound(readType(desc, start + 1, end1));
-			list.addType(var);
-			return end1 + 1;
-		}
-		case '-':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType();
-			var.setLowerBound(readType(desc, start + 1, end1));
-			list.addType(var);
+			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
+			var.setType(readType(desc, start + 1, end1));
+			consumer.setType(var);
 			return end1 + 1;
 		}
 		}
@@ -440,9 +340,9 @@ public final class ClassFormat
 	
 	private static int readGeneric(String desc, int start, IGeneric generic)
 	{
-		TypeVariable typeVar = new TypeVariable(generic);
 		int index = desc.indexOf(':', start);
-		typeVar.name = Name.getQualified(desc.substring(start, index));
+		Name name = Name.getQualified(desc.substring(start, index));
+		TypeVariable typeVar = new TypeVariable(generic, name);
 		if (desc.charAt(index + 1) == ':')
 		{
 			index++;
@@ -450,7 +350,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(index) == ':')
 		{
-			index = readTypeList(desc, index + 1, typeVar);
+			index = readTyped(desc, index + 1, typeVar::addUpperBound);
 		}
 		generic.addTypeVariable(typeVar);
 		return index;
@@ -470,7 +370,7 @@ public final class ClassFormat
 		case 'T':
 		{
 			int end1 = desc.indexOf(';', start);
-			IType type = new Type(Name.getQualified(desc.substring(start + 1, end1)));
+			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
 			list.addException(type);
 			return end1 + 1;
 		}

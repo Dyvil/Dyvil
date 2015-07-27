@@ -1,26 +1,24 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class FloatValue extends ASTNode implements INumericValue
+public class FloatValue implements IConstantValue
 {
-	public static final IClass	FLOAT_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("FloatConvertible");
+	private static FloatValue NULL;
 	
-	private static FloatValue	NULL;
-	
-	public float				value;
+	protected ICodePosition	position;
+	protected float			value;
 	
 	public FloatValue(float value)
 	{
@@ -43,19 +41,31 @@ public class FloatValue extends ASTNode implements INumericValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return FLOAT;
 	}
 	
 	@Override
-	public Type getType()
+	public boolean isPrimitive()
+	{
+		return true;
+	}
+	
+	@Override
+	public IType getType()
 	{
 		return Types.FLOAT;
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type == Types.FLOAT)
 		{
@@ -65,9 +75,9 @@ public class FloatValue extends ASTNode implements INumericValue
 		{
 			return new BoxedValue(this, Types.FLOAT.boxMethod);
 		}
-		if (type.getTheClass().getAnnotation(FLOAT_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -75,21 +85,17 @@ public class FloatValue extends ASTNode implements INumericValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT) || type.getTheClass().getAnnotation(FLOAT_CONVERTIBLE) != null;
+		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT) || type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type == Types.FLOAT)
+		if (type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
 		{
-			return 3;
+			return CONVERSION_MATCH;
 		}
-		if (type.isSuperTypeOf(Types.FLOAT) || type.getTheClass().getAnnotation(FLOAT_CONVERTIBLE) != null)
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(Types.FLOAT);
 	}
 	
 	@Override

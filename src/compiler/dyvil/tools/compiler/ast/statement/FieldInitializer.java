@@ -1,26 +1,34 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class FieldInitializer extends ASTNode implements IValue, IValued
+public final class FieldInitializer implements IStatement
 {
-	public Variable	variable;
+	protected Variable variable;
 	
 	public FieldInitializer(ICodePosition position, Name name, IType type)
 	{
-		this.position = position;
-		this.variable = new Variable(this.position, name, type);
+		this.variable = new Variable(position, name, type);
+	}
+	
+	public Variable getVariable()
+	{
+		return this.variable;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.variable.getPosition();
 	}
 	
 	@Override
@@ -32,49 +40,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.variable.type.isPrimitive();
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		this.variable.type = type;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return this.variable.type;
-	}
-	
-	@Override
-	public IValue withType(IType type)
-	{
-		return type == Types.VOID ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.variable.value = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.variable.value;
+		return this.variable.getType().isPrimitive();
 	}
 	
 	@Override
@@ -110,6 +76,13 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.variable.cleanup(context, compilableList);
+		return this;
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 	}
@@ -117,7 +90,7 @@ public final class FieldInitializer extends ASTNode implements IValue, IValued
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.variable.writeInit(writer, this.variable.value);
+		this.variable.writeInit(writer);
 	}
 	
 	@Override

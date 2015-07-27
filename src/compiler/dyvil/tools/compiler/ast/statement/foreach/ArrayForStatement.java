@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
@@ -18,38 +19,27 @@ public class ArrayForStatement extends ForEachStatement
 	public static final Name	$length	= Name.getQualified("$length");
 	public static final Name	$array	= Name.getQualified("$array");
 	
-	protected Variable			indexVar;
-	protected Variable			lengthVar;
-	protected Variable			arrayVar;
+	protected Variable	indexVar;
+	protected Variable	lengthVar;
+	protected Variable	arrayVar;
 	
-	protected IMethod			boxMethod;
+	protected IMethod boxMethod;
 	
-	public ArrayForStatement(Variable var, IValue action)
+	public ArrayForStatement(ICodePosition position, Variable var, IValue action)
 	{
-		this(var, action, var.value.getType());
+		this(position, var, action, var.getValue().getType());
 	}
 	
-	public ArrayForStatement(Variable var, IValue action, IType arrayType)
+	public ArrayForStatement(ICodePosition position, Variable var, IValue action, IType arrayType)
 	{
-		super(var, action);
+		super(position, var, action);
 		
-		Variable temp = new Variable();
-		temp.type = Types.INT;
-		temp.name = $index;
-		this.indexVar = temp;
-		
-		temp = new Variable();
-		temp.type = Types.INT;
-		temp.name = $length;
-		this.lengthVar = temp;
-		
-		temp = new Variable();
-		temp.type = arrayType;
-		temp.name = $array;
-		this.arrayVar = temp;
+		this.indexVar = new Variable($index, Types.INT);
+		this.lengthVar = new Variable($length, Types.INT);
+		this.arrayVar = new Variable($array, arrayType);
 		
 		IType elementType = arrayType.getElementType();
-		IType varType = var.type;
+		IType varType = var.getType();
 		boolean primitive = varType.isPrimitive();
 		if (primitive != elementType.isPrimitive())
 		{
@@ -65,9 +55,9 @@ public class ArrayForStatement extends ForEachStatement
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
-		if (name == this.variable.name)
+		if (name == this.variable.getName())
 		{
 			return this.variable;
 		}
@@ -85,32 +75,34 @@ public class ArrayForStatement extends ForEachStatement
 			return this.arrayVar;
 		}
 		
-		return this.context.resolveField(name);
+		return null;
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		Variable var = this.variable;
 		Variable arrayVar = this.arrayVar;
 		Variable indexVar = this.indexVar;
 		Variable lengthVar = this.lengthVar;
+		int lineNumber = this.getLineNumber();
 		
-		org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
 		
 		// Load the array
-		var.value.writeExpression(writer);
+		var.getValue().writeExpression(writer);
 		
 		// Local Variables
 		int locals = writer.localCount();
 		writer.writeInsn(Opcodes.DUP);
 		arrayVar.writeInit(writer, null);
 		// Load the length
+		writer.writeLineNumber(lineNumber);
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
@@ -123,13 +115,14 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeTargetLabel(startLabel);
 		
 		// Load the element
-		arrayVar.writeGet(writer, null);
-		indexVar.writeGet(writer, null);
-		writer.writeInsn(arrayVar.type.getElementType().getArrayLoadOpcode());
+		arrayVar.writeGet(writer, null, lineNumber);
+		indexVar.writeGet(writer, null, lineNumber);
+		writer.writeLineNumber(lineNumber);
+		writer.writeInsn(arrayVar.getType().getElementType().getArrayLoadOpcode());
 		// Auto(un)boxing
 		if (this.boxMethod != null)
 		{
-			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null);
+			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
 		}
 		// Store variable
 		var.writeInit(writer, null);
@@ -142,10 +135,10 @@ public class ArrayForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increase index
-		writer.writeIINC(indexVar.index, 1);
+		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
-		indexVar.writeGet(writer, null);
-		lengthVar.writeGet(writer, null);
+		indexVar.writeGet(writer, null, lineNumber);
+		lengthVar.writeGet(writer, null, lineNumber);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables

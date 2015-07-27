@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.BooleanValue;
+import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -15,15 +17,14 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class IfStatement extends ASTNode implements IStatement
+public class IfStatement extends Value implements IStatement
 {
-	public IValue		condition;
-	public IValue		then;
-	public IValue		elseThen;
+	protected IValue	condition;
+	protected IValue	then;
+	protected IValue	elseThen;
 	
-	private IType		commonType;
-	
-	private IStatement	parent;
+	// Metadata
+	private IType commonType;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -67,18 +68,6 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
 	public IType getType()
 	{
 		if (this.commonType != null)
@@ -90,7 +79,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.elseThen != null)
 			{
-				return this.commonType = Types.findCommonSuperType(this.then.getType(), this.elseThen.getType());
+				return this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
 			}
 			return this.commonType = this.then.getType();
 		}
@@ -98,14 +87,14 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.then == null)
 		{
 			return null;
 		}
 		
-		IValue then1 = this.then.withType(type);
+		IValue then1 = this.then.withType(type, typeContext, markers, context);
 		if (then1 == null)
 		{
 			return null;
@@ -114,15 +103,17 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.elseThen != null)
 		{
-			then1 = this.elseThen.withType(type);
+			then1 = this.elseThen.withType(type, typeContext, markers, context);
 			if (then1 == null)
 			{
 				return null;
 			}
 			this.elseThen = then1;
+			this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
+			return this;
 		}
 		
-		this.commonType = type;
+		this.commonType = this.then.getType();
 		return this;
 	}
 	
@@ -145,9 +136,16 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		if (this.elseThen == null)
+		{
+			return this.then.getTypeMatch(type);
+		}
+		
+		float f1 = this.then.getTypeMatch(type);
+		float f2 = this.elseThen.getTypeMatch(type);
+		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
 	}
 	
 	@Override
@@ -160,21 +158,26 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.then != null)
 		{
-			if (this.then.isStatement())
-			{
-				((IStatement) this.then).setParent(this);
-			}
 			this.then.resolveTypes(markers, context);
 		}
 		
 		if (this.elseThen != null)
 		{
-			if (this.elseThen.isStatement())
-			{
-				((IStatement) this.elseThen).setParent(this);
-			}
-			
 			this.elseThen.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.then != null)
+		{
+			this.then.resolveStatement(context, markers);
+		}
+		
+		if (this.elseThen != null)
+		{
+			this.elseThen.resolveStatement(context, markers);
 		}
 	}
 	
@@ -201,7 +204,7 @@ public final class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");
@@ -244,21 +247,31 @@ public final class IfStatement extends ASTNode implements IStatement
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.condition == null)
-		{
-			return this;
-		}
-		
-		if (this.condition.isConstant())
+		if (this.condition != null)
 		{
 			if (this.condition.valueTag() == BOOLEAN)
 			{
-				return ((BooleanValue) this.condition).value ? this.then : this.elseThen;
+				if (this.condition.booleanValue())
+				{
+					// Condition is true -> Return the action
+					return this.then.foldConstants();
+				}
+				else if (this.elseThen != null)
+				{
+					// Condition is false, else clause exists -> Return else
+					// clause
+					return this.elseThen.foldConstants();
+				}
+				else
+				{
+					// Condition is false, no else clause -> Return empty
+					// statement (VoidValue)
+					return new VoidValue(this.position);
+				}
 			}
-			return this;
+			this.condition = this.condition.foldConstants();
 		}
 		
-		this.condition = this.condition.foldConstants();
 		if (this.then != null)
 		{
 			this.then = this.then.foldConstants();
@@ -271,16 +284,34 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public Label resolveLabel(Name name)
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		if (this.condition != null)
+		{
+			this.condition = this.condition.cleanup(context, compilableList);
+		}
+		
+		if (this.then != null)
+		{
+			this.then = this.then.cleanup(context, compilableList);
+		}
+		if (this.elseThen != null)
+		{
+			this.elseThen = this.elseThen.cleanup(context, compilableList);
+		}
+		
+		if (this.condition.valueTag() == BOOLEAN)
+		{
+			return this.condition.booleanValue() ? this.then : this.elseThen;
+		}
+		return this;
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 		Object commonFrameType = this.commonType.getFrameType();
 		
 		// Condition
@@ -313,11 +344,11 @@ public final class IfStatement extends ASTNode implements IStatement
 			return;
 		}
 		
-		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 		
 		if (this.elseThen != null)
 		{
-			org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
@@ -354,15 +385,6 @@ public final class IfStatement extends ASTNode implements IStatement
 			
 			if (this.elseThen != null)
 			{
-				if (this.then.isStatement())
-				{
-					buffer.append('\n').append(prefix);
-				}
-				else
-				{
-					buffer.append(' ');
-				}
-				
 				buffer.append(Formatting.Statements.ifElse);
 				this.elseThen.toString(prefix, buffer);
 			}

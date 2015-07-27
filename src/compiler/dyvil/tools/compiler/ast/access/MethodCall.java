@@ -1,15 +1,14 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MatchExpression;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Type;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -17,8 +16,8 @@ import dyvil.tools.compiler.transform.ConstantFolder;
 
 public final class MethodCall extends AbstractCall implements INamed
 {
-	public boolean	dotless;
-	public Name		name;
+	protected Name		name;
+	protected boolean	dotless;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -29,8 +28,24 @@ public final class MethodCall extends AbstractCall implements INamed
 	{
 		this.position = position;
 		this.instance = instance;
-		
 		this.name = name;
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.name = name;
+		this.arguments = arguments;
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.name = method.getName();
+		this.method = method;
+		this.arguments = arguments;
 	}
 	
 	@Override
@@ -49,6 +64,16 @@ public final class MethodCall extends AbstractCall implements INamed
 	public Name getName()
 	{
 		return this.name;
+	}
+	
+	public boolean isDotless()
+	{
+		return this.dotless;
+	}
+	
+	public void setDotless(boolean dotless)
+	{
+		this.dotless = dotless;
 	}
 	
 	@Override
@@ -70,16 +95,6 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (this.instance != null)
 		{
 			this.instance = this.instance.resolve(markers, context);
-		}
-		
-		if (args == 1 && this.name == Name.match)
-		{
-			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
-			if (me != null)
-			{
-				me.position = this.position;
-				return me.resolve(markers, context);
-			}
 		}
 		
 		this.arguments.resolve(markers, context);
@@ -107,6 +122,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (method != null)
 		{
 			this.method = method;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		
@@ -125,6 +141,7 @@ public final class MethodCall extends AbstractCall implements INamed
 					call.instance = this.instance;
 					call.arguments = this.arguments;
 					call.name = name;
+					call.checkArguments(markers, context);
 					return call;
 				}
 			}
@@ -140,42 +157,42 @@ public final class MethodCall extends AbstractCall implements INamed
 		// Resolve Apply Method
 		if (this.instance == null)
 		{
-			IValue apply = this.resolveApply(markers, context);
+			AbstractCall apply = this.resolveApply(markers, context);
 			if (apply != null)
 			{
+				apply.checkArguments(markers, context);
 				return apply;
 			}
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, name, arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
 		return this;
 	}
 	
-	private IValue resolveApply(MarkerList markers, IContext context)
+	private AbstractCall resolveApply(MarkerList markers, IContext context)
 	{
 		IValue instance;
 		IMethod method;
-		IType type = null;
 		
-		IField field = context.resolveField(this.name);
+		IDataMember field = context.resolveField(this.name);
 		if (field == null)
 		{
 			// Find a type
-			type = new Type(this.position, this.name).resolve(null, context);
-			if (!type.isResolved())
+			IType itype = IContext.resolveType(context, this.name);
+			if (itype == null)
 			{
-				// No type found -> Not an apply method call
 				return null;
 			}
+			
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(type, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(itype, null, Name.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
 				return null;
 			}
 			method = match;
-			instance = new ClassAccess(this.position, type);
+			instance = new ClassAccess(this.position, itype);
 		}
 		else
 		{

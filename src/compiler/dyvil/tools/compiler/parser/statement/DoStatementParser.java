@@ -1,23 +1,22 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.statement.DoStatement;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 
-public class DoStatementParser extends Parser implements IValued
+public class DoStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	DO				= 1;
-	public static final int	WHILE			= 2;
-	public static final int END = 4;
+	public static final int	DO		= 1;
+	public static final int	WHILE	= 2;
+	public static final int	END		= 4;
 	
-	public DoStatement		statement;
+	public DoStatement statement;
 	
 	public DoStatementParser(DoStatement statement)
 	{
@@ -36,7 +35,7 @@ public class DoStatementParser extends Parser implements IValued
 	{
 		if (this.mode == DO)
 		{
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = WHILE;
 			return;
 		}
@@ -46,7 +45,7 @@ public class DoStatementParser extends Parser implements IValued
 			if (type == Keywords.WHILE)
 			{
 				this.mode = END;
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			
@@ -56,7 +55,7 @@ public class DoStatementParser extends Parser implements IValued
 				{
 					this.mode = END;
 					pm.skip(1);
-					pm.pushParser(new ExpressionParser(this));
+					pm.pushParser(pm.newExpressionParser(this));
 					return;
 				}
 			}
@@ -76,17 +75,11 @@ public class DoStatementParser extends Parser implements IValued
 	{
 		if (this.mode == WHILE)
 		{
-			this.statement.action = value;
+			this.statement.setAction(value);
 		}
 		else if (this.mode == END)
 		{
-			this.statement.condition = value;
+			this.statement.setCondition(value);
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

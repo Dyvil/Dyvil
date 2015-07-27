@@ -2,20 +2,23 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ExternalField extends Field
+public final class ExternalField extends Field
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
 	
-	public ExternalField(IClass iclass)
+	public ExternalField(IClass iclass, int access, Name name, IType type)
 	{
-		super(iclass);
+		super(iclass, name, type);
+		this.modifiers = access;
 	}
 	
 	private void resolveAnnotations()
@@ -30,7 +33,7 @@ public class ExternalField extends Field
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, Package.rootPackage);
+		this.type = this.type.resolve(null, this.theClass, TypePosition.RETURN_TYPE);
 	}
 	
 	@Override

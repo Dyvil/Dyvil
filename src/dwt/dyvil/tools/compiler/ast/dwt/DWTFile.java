@@ -9,12 +9,11 @@ import java.util.TreeMap;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -27,27 +26,28 @@ import dyvil.tools.compiler.lexer.Dlex;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.dwt.DWTParser;
 
-public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilable
+public class DWTFile implements ICompilationUnit, IClassCompilable
 {
-	public static final Package		javaxSwing	= Library.javaLibrary.resolvePackage("javax.swing");
+	public static final Package javaxSwing = Library.javaLibrary.resolvePackage("javax.swing");
 	
-	public final CodeFile			inputFile;
-	public final File				outputDirectory;
-	public final File				outputFile;
+	public final CodeFile	inputFile;
+	public final File		outputDirectory;
+	public final File		outputFile;
 	
-	public final String				name;
-	public final String				internalName;
-	public final Package			pack;
-	protected TokenIterator			tokens;
-	protected MarkerList			markers		= new MarkerList();
+	public final String		name;
+	public final String		internalName;
+	public final Package	pack;
+	protected TokenIterator	tokens;
+	protected MarkerList	markers	= new MarkerList();
 	
-	protected DWTNode				rootNode;
+	protected DWTNode rootNode;
 	
-	protected Map<String, IType>	fields		= new TreeMap();
+	protected Map<String, IType> fields = new TreeMap();
 	
 	public DWTFile(Package pack, CodeFile input, File output)
 	{
@@ -58,7 +58,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		int start = name.lastIndexOf('/');
 		int end = name.lastIndexOf('.');
 		this.name = name.substring(start + 1, end);
-		this.internalName = pack.internalName + this.name;
+		this.internalName = pack.getInternalName() + this.name;
 		
 		name = output.getPath();
 		start = name.lastIndexOf('/');
@@ -67,6 +67,12 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		this.outputFile = new File(name.substring(0, end) + ".class");
 		
 		this.rootNode = new DWTNode();
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return ICodePosition.ORIGIN;
 	}
 	
 	@Override
@@ -105,8 +111,8 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 			{
 				marker.log(code, buf);
 			}
-			DyvilCompiler.logger.info(buf.toString());
-			DyvilCompiler.logger.warning(this.name + " contains Syntax Errors. Skipping.");
+			DyvilCompiler.log(buf.toString());
+			DyvilCompiler.warn(this.name + " contains Syntax Errors. Skipping.");
 		}
 	}
 	
@@ -123,7 +129,7 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		IConstructor match = IContext.resolveConstructor(this.rootNode.theClass, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			this.markers.add(this.position, "dwt.component.constructor");
+			this.markers.add(ICodePosition.ORIGIN, "dwt.component.constructor");
 		}
 		
 		this.rootNode.resolve(this.markers, Package.rootPackage);
@@ -141,6 +147,11 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 	
 	@Override
 	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup()
 	{
 	}
 	
@@ -177,17 +188,17 @@ public class DWTFile extends ASTNode implements ICompilationUnit, IClassCompilab
 		
 		// Write init Method
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null,
-				new String[] { "java/lang/Exception" }));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "init", "()V", null, new String[] { "java/lang/Exception" }));
+				
 		mw.begin();
 		this.rootNode.write(this.internalName, mw);
 		mw.end(Types.VOID);
 		
 		// Write public static void main(String[] args)
 		
-		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null,
-				new String[] { "java/lang/Exception" }));
+		mw = new MethodWriterImpl(writer,
+				writer.visitMethod(Modifiers.PUBLIC | Modifier.STATIC, "main", "([Ljava/lang/String;)V", null, new String[] { "java/lang/Exception" }));
 		mw.resetLocals(1);
 		mw.begin();
 		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, this.internalName, "init", "()V", false);

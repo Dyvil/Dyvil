@@ -12,7 +12,7 @@ public final class FieldInstruction implements IInstruction
 	private String	owner;
 	private String	fieldName;
 	
-	private String	desc;
+	private String desc;
 	
 	public FieldInstruction(int opcode)
 	{

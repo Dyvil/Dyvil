@@ -7,11 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tuple.Tuple2;
 
@@ -109,7 +105,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		return Objects.equals(this.key, key) ? this.value : null;
 	}
@@ -134,7 +130,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		return Objects.equals(this.key, key) ? EmptyMap.instance : this;
 	}
@@ -152,9 +148,15 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
 		return map.contains(this.key, this.value) ? EmptyMap.instance : this;
+	}
+	
+	@Override
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	{
+		return keys.contains(this.key) ? EmptyMap.instance : this;
 	}
 	
 	@Override
@@ -164,9 +166,33 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
+	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	{
+		Entry<? extends U, ? extends R> entry = mapper.apply(this.key, this.value);
+		return entry == null ? EmptyMap.instance : new SingletonMap(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
+	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	{
+		dyvil.collection.mutable.ArrayMap<U, R> mutable = new dyvil.collection.mutable.ArrayMap();
+		for (Entry<? extends U, ? extends R> entry : mapper.apply(this.key, this.value))
+		{
+			mutable.put(entry.getKey(), entry.getValue());
+		}
+		return mutable.trustedImmutable();
+	}
+	
+	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
 		return condition.test(this.key, this.value) ? this : EmptyMap.instance;
+	}
+	
+	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		return new SingletonMap<V, K>(this.value, this.key);
 	}
 	
 	@Override

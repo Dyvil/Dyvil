@@ -7,14 +7,14 @@ import dyvil.tools.compiler.transform.Tokens;
 
 public final class IntToken implements IToken
 {
-	private IToken		prev;
-	private IToken		next;
+	private IToken	prev;
+	private IToken	next;
 	
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
 	
-	private int			value;
+	private int value;
 	
 	public IntToken(IToken prev, int value, int lineNumber, int start, int end)
 	{

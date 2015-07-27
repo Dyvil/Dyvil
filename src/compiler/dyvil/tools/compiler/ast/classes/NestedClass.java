@@ -1,29 +1,33 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureField;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class NestedClass extends CodeClass
 {
 	protected CaptureField[]	capturedFields;
 	protected int				capturedFieldCount;
 	
-	public transient IContext	context;
+	public transient IContext context;
 	
-	public NestedClass()
+	public NestedClass(ICodePosition position)
 	{
+		this.interfaces = new IType[1];
+		this.body = new ClassBody(this);
+		this.position = position;
 	}
 	
 	@Override
@@ -77,7 +81,22 @@ public class NestedClass extends CodeClass
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IType resolveType(Name name)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			ITypeVariable var = this.generics[i];
+			if (var.getName() == name)
+			{
+				return new TypeVarType(var);
+			}
+		}
+		
+		return this.context.resolveType(name);
+	}
+	
+	@Override
+	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -88,7 +107,7 @@ public class NestedClass extends CodeClass
 			}
 		}
 		
-		IField match = this.context.resolveField(name);
+		IDataMember match = this.context.resolveField(name);
 		if (match == null)
 		{
 			return null;
@@ -136,11 +155,5 @@ public class NestedClass extends CodeClass
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.context.getVisibility(member);
 	}
 }

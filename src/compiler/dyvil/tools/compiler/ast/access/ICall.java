@@ -1,16 +1,15 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
@@ -49,9 +48,14 @@ public interface ICall extends IValue
 		}
 	}
 	
-	public static IField resolveField(IContext context, ITyped instance, Name name)
+	public static boolean privateAccess(IContext context, IValue instance)
 	{
-		IField match;
+		return instance == null || context.getThisClass() == instance.getType().getTheClass();
+	}
+	
+	public static IDataMember resolveField(IContext context, ITyped instance, Name name)
+	{
+		IDataMember match;
 		if (instance != null)
 		{
 			IType type = instance.getType();
@@ -98,12 +102,6 @@ public interface ICall extends IValue
 			return IContext.getBestMethod(matches);
 		}
 		
-		Types.PREDEF_CLASS.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return IContext.getBestMethod(matches);
-		}
-		
 		if (instance == null && arguments.size() == 1)
 		{
 			IValue v = arguments.getFirstValue();
@@ -117,6 +115,12 @@ public interface ICall extends IValue
 					return IContext.getBestMethod(matches);
 				}
 			}
+		}
+		
+		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return IContext.getBestMethod(matches);
 		}
 		
 		return null;

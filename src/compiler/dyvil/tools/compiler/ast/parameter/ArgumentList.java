@@ -4,12 +4,14 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -20,7 +22,7 @@ public final class ArgumentList implements IArguments, IValueList
 	private IValue[]	values;
 	private int			size;
 	
-	private boolean		varargs;
+	private boolean varargs;
 	
 	public ArgumentList()
 	{
@@ -171,33 +173,31 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return this.values[index].getType();
-	}
-	
-	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
 		if (index >= this.size)
 		{
-			return param.getValue() != null ? 3 : 0;
+			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
 		
 		return this.values[index].getTypeMatch(param.getType());
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		if (index >= this.size)
+		if (index == this.size)
+		{
+			return DEFAULT_MATCH;
+		}
+		if (index > this.size)
 		{
 			return 0;
 		}
 		
 		IValue argument = this.values[index];
 		IType type = param.getType();
-		int m = argument.getTypeMatch(type);
+		float m = argument.getTypeMatch(type);
 		if (m != 0)
 		{
 			return m;
@@ -206,16 +206,16 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (index >= this.size)
 		{
 			return;
 		}
 		
-		IType type = param.getType().getConcreteType(context);
+		IType type = param.getActualType();
 		IValue value = this.values[index];
-		IValue value1 = value.withType(type);
+		IValue value1 = type.convertValue(value, typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
@@ -229,12 +229,12 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void checkVarargsValue(int index, IParameter param, MarkerList markers, ITypeContext context)
+	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IType varParamType = param.getType().getConcreteType(context);
+		IType varParamType = param.getActualType();
 		
 		IValue value = this.values[index];
-		IValue value1 = value.withType(varParamType);
+		IValue value1 = varParamType.convertValue(value, typeContext, markers, context);
 		if (value1 != null)
 		{
 			this.values[index] = value1;
@@ -247,7 +247,7 @@ public final class ArgumentList implements IArguments, IValueList
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			value1 = value.withType(elementType);
+			value1 = elementType.convertValue(value, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
@@ -259,6 +259,39 @@ public final class ArgumentList implements IArguments, IValueList
 				this.values[index] = value1;
 			}
 		}
+	}
+	
+	@Override
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
+	{
+		if (index >= this.size)
+		{
+			return;
+		}
+		param.getType().inferTypes(this.values[index].getType(), typeContext);
+	}
+	
+	@Override
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	{
+		if (index >= this.size)
+		{
+			return;
+		}
+		
+		IType type = this.values[index].getType();
+		if (index + 1 == this.size && type.isArrayType())
+		{
+			param.getType().inferTypes(type, typeContext);
+			return;
+		}
+		
+		for (int i = index + 1; i < this.size; i++)
+		{
+			type = Types.combine(type, this.values[i].getType());
+		}
+		
+		param.getType().getElementType().inferTypes(type, typeContext);
 	}
 	
 	@Override
@@ -347,6 +380,15 @@ public final class ArgumentList implements IArguments, IValueList
 		for (int i = 0; i < this.size; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 	}
 	

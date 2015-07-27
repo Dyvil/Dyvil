@@ -1,7 +1,10 @@
 package dyvil.tools.compiler.ast.expression;
 
-public interface IValued
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+
+public interface IValued extends IValueConsumer
 {
+	@Override
 	public void setValue(IValue value);
 	
 	public IValue getValue();

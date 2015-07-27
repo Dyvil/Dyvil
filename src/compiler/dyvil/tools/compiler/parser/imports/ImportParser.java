@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
+import dyvil.tools.compiler.ast.consumer.IImportConsumer;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
@@ -18,16 +19,16 @@ public final class ImportParser extends Parser
 	public static final Name	annotation	= Name.getQualified("annotation");
 	public static final Name	type		= Name.getQualified("type");
 	
-	public static final int		IMPORT		= 1;
-	public static final int		DOT			= 2;
-	public static final int		ALIAS		= 4;
-	public static final int		MULTIIMPORT	= 8;
+	public static final int	IMPORT		= 1;
+	public static final int	DOT_ALIAS	= 2;
+	public static final int	MULTIIMPORT	= 4;
 	
+	protected IImportConsumer	consumer;
 	protected IImport			theImport;
 	
-	public ImportParser(IImport container)
+	public ImportParser(IImportConsumer consumer)
 	{
-		this.theImport = container;
+		this.consumer = consumer;
 		this.mode = IMPORT;
 	}
 	
@@ -43,21 +44,22 @@ public final class ImportParser extends Parser
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
 		{
+			this.consumer.setImport(this.theImport);
 			pm.popParser();
 			return;
 		}
-		if (type == Symbols.COMMA)
+		if (type == Symbols.COMMA || this.mode == 0)
 		{
+			this.consumer.setImport(this.theImport);
 			pm.popParser(true);
 			return;
 		}
-		
-		if (this.isInMode(IMPORT))
+		if (this.mode == IMPORT)
 		{
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				MultiImport mi = new MultiImport(token);
-				this.theImport.addImport(mi);
+				mi.setParent(this.theImport);
 				this.theImport = mi;
 				
 				if (token.next().type() != Symbols.CLOSE_CURLY_BRACKET)
@@ -73,47 +75,47 @@ public final class ImportParser extends Parser
 			if (type == Symbols.WILDCARD)
 			{
 				PackageImport pi = new PackageImport(token.raw());
-				this.theImport.addImport(pi);
+				pi.setParent(this.theImport);
+				this.theImport = pi;
 				this.mode = 0;
 				return;
 			}
 			if (type == Keywords.ANNOTATION)
 			{
 				SimpleImport si = new SimpleImport(token.raw(), annotation);
-				this.theImport.addImport(si);
+				si.setParent(this.theImport);
 				this.theImport = si;
-				this.mode = DOT | ALIAS;
+				this.mode = DOT_ALIAS;
 				return;
 			}
 			if (type == Keywords.TYPE)
 			{
 				SimpleImport si = new SimpleImport(token.raw(), ImportParser.type);
-				this.theImport.addImport(si);
+				si.setParent(this.theImport);
 				this.theImport = si;
-				this.mode = DOT | ALIAS;
+				this.mode = DOT_ALIAS;
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				SimpleImport si = new SimpleImport(token.raw(), token.nameValue());
-				this.theImport.addImport(si);
+				si.setParent(this.theImport);
 				this.theImport = si;
-				this.mode = DOT | ALIAS;
+				this.mode = DOT_ALIAS;
 				return;
 			}
+			throw new SyntaxError(token, "Invalid Import Declaration - Identifier expected");
 		}
-		if (this.isInMode(DOT))
+		if (this.mode == DOT_ALIAS)
 		{
 			if (type == Symbols.DOT)
 			{
 				this.mode = IMPORT;
 				return;
 			}
-		}
-		if (this.isInMode(ALIAS))
-		{
 			if (type == Symbols.ARROW_OPERATOR || type == Keywords.AS)
 			{
+				this.mode = 0;
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
 				{
@@ -122,21 +124,27 @@ public final class ImportParser extends Parser
 					return;
 				}
 				
-				this.mode = DOT | IMPORT;
 				throw new SyntaxError(next, "Invalid Import Alias");
 			}
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				this.consumer.setImport(this.theImport);
+				pm.popParser(true);
+				return;
+			}
+			
+			throw new SyntaxError(token, "Invalid Import Declaration - '.' expected");
 		}
 		if (this.isInMode(MULTIIMPORT))
 		{
+			this.theImport.expandPosition(token);
+			this.consumer.setImport(this.theImport);
+			pm.popParser();
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
-				this.theImport.expandPosition(token);
-				this.mode = 0;
 				return;
 			}
+			throw new SyntaxError(token, "Invalid Multi-Import - '}' expected");
 		}
-		
-		pm.popParser(true);
-		return;
 	}
 }

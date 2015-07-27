@@ -7,18 +7,18 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.TupleConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.SingletonIterator;
 
 @TupleConvertible
 public class SingletonSet<E> implements ImmutableSet<E>
 {
-	private E	element;
+	private E element;
 	
 	public static <E> SingletonSet<E> apply(E element)
 	{
@@ -77,7 +77,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		if (collection.contains(this.element))
 		{

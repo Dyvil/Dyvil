@@ -1,14 +1,15 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.GenericType;
+import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -17,13 +18,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ClassOperator extends ASTNode implements IValue
+public final class ClassOperator extends Value
 {
-	public static final IClass	CLASS_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("ClassConvertible");
+	protected IType type;
 	
-	private IType				type;
-	private IType				genericType;
-	public boolean				dotless;
+	// Metadata
+	private IType genericType;
 	
 	public ClassOperator(ICodePosition position)
 	{
@@ -52,7 +52,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	{
 		if (this.genericType == null)
 		{
-			GenericType generic = new GenericType(Types.CLASS_CLASS);
+			ClassGenericType generic = new ClassGenericType(Types.CLASS_CLASS);
 			generic.addType(this.type);
 			return this.genericType = generic;
 		}
@@ -60,11 +60,11 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;
@@ -73,7 +73,7 @@ public final class ClassOperator extends ASTNode implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
 		{
 			return true;
 		}
@@ -82,23 +82,14 @@ public final class ClassOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(CLASS_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
 		
-		IType thisType = this.getType();
-		if (type.equals(thisType))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(thisType))
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(this.genericType);
 	}
 	
 	@Override
@@ -111,8 +102,8 @@ public final class ClassOperator extends ASTNode implements IValue
 			return;
 		}
 		
-		this.type = this.type.resolve(markers, context);
-		GenericType generic = new GenericType(Types.CLASS_CLASS);
+		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		ClassGenericType generic = new ClassGenericType(Types.CLASS_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
 	}
@@ -135,6 +126,12 @@ public final class ClassOperator extends ASTNode implements IValue
 	
 	@Override
 	public IValue foldConstants()
+	{
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}
@@ -183,7 +180,7 @@ public final class ClassOperator extends ASTNode implements IValue
 			return;
 		}
 		
-		org.objectweb.asm.Type t = org.objectweb.asm.Type.getType(this.type.getExtendedName());
+		dyvil.tools.asm.Type t = dyvil.tools.asm.Type.getType(this.type.getExtendedName());
 		writer.writeLDC(t);
 	}
 	

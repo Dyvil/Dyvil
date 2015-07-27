@@ -30,5 +30,5 @@ import dyvil.lang.Predef;
 @Retention(RetentionPolicy.CLASS)
 public @interface Intrinsic
 {
-	public int[] value();
+	public int[]value();
 }

@@ -1,47 +1,44 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class SimpleImport extends ASTNode implements IImport
+public final class SimpleImport extends Import
 {
-	public Name				name;
-	public Name				alias;
-	public IImport			child;
+	public Name	name;
+	public Name	alias;
 	
-	private IClass			theClass;
-	private Package			thePackage;
+	private IClass	theClass;
+	private Package	thePackage;
 	
-	private IField			field;
+	private IDataMember		field;
 	private List<IMethod>	methods;
 	
 	public SimpleImport(ICodePosition position)
 	{
-		this.position = position;
+		super(position);
 	}
 	
 	public SimpleImport(ICodePosition position, Name name)
 	{
-		this.position = position;
+		super(position);
 		this.name = name;
 	}
 	
@@ -52,23 +49,12 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void addImport(IImport iimport)
-	{
-		this.child = iimport;
-	}
-	
-	@Override
-	public IImport getChild()
-	{
-		return this.child;
-	}
-	
-	@Override
 	public void setAlias(Name alias)
 	{
 		this.alias = alias;
 	}
 	
+	@Override
 	public Name getAlias()
 	{
 		return this.alias;
@@ -77,7 +63,18 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
-		if (using && this.child == null)
+		if (this.parent != null)
+		{
+			this.parent.resolveTypes(markers, context, false);
+			context = this.parent.getContext();
+			
+			if (context == null)
+			{
+				return;
+			}
+		}
+		
+		if (using)
 		{
 			if (!(context instanceof IClass))
 			{
@@ -87,7 +84,7 @@ public final class SimpleImport extends ASTNode implements IImport
 			
 			IClassBody body = ((IClass) context).getBody();
 			
-			IField field = body.getField(this.name);
+			IDataMember field = body.getField(this.name);
 			if (field != null)
 			{
 				this.field = field;
@@ -117,10 +114,6 @@ public final class SimpleImport extends ASTNode implements IImport
 		if (pack != null)
 		{
 			this.thePackage = pack;
-			if (this.child != null)
-			{
-				this.child.resolveTypes(markers, pack, using);
-			}
 			return;
 		}
 		
@@ -128,10 +121,6 @@ public final class SimpleImport extends ASTNode implements IImport
 		if (iclass != null)
 		{
 			this.theClass = iclass;
-			if (this.child != null)
-			{
-				this.child.resolveTypes(markers, iclass, using);
-			}
 			return;
 		}
 		
@@ -139,12 +128,14 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
+	public IContext getContext()
+	{
+		return this.theClass != null ? this.theClass : this.thePackage;
+	}
+	
+	@Override
 	public Package resolvePackage(Name name)
 	{
-		if (this.child != null)
-		{
-			return this.child.resolvePackage(name);
-		}
 		if (name == this.name || name == this.alias)
 		{
 			return this.thePackage;
@@ -155,10 +146,6 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (this.child != null)
-		{
-			return this.child.resolveClass(name);
-		}
 		if (name == this.name || name == this.alias)
 		{
 			return this.theClass;
@@ -167,12 +154,8 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
-		if (this.child != null)
-		{
-			return this.child.resolveField(name);
-		}
 		if (name == this.name || name == this.alias)
 		{
 			return this.field;
@@ -183,10 +166,6 @@ public final class SimpleImport extends ASTNode implements IImport
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (this.child != null)
-		{
-			this.child.getMethodMatches(list, instance, name, arguments);
-		}
 		if (name != this.name && name != this.alias)
 		{
 			return;
@@ -198,7 +177,7 @@ public final class SimpleImport extends ASTNode implements IImport
 		}
 		for (IMethod m : this.methods)
 		{
-			int match = m.getSignatureMatch(name, instance, arguments);
+			float match = m.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(m, match));
@@ -207,61 +186,44 @@ public final class SimpleImport extends ASTNode implements IImport
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.name.qualified);
+		IImport.writeImport(this.parent, out);
+		
+		out.writeUTF(this.name.qualified);
 		if (this.alias != null)
 		{
-			dos.writeUTF(this.alias.qualified);
+			out.writeUTF(this.alias.qualified);
 		}
 		else
 		{
-			dos.writeUTF("");
-		}
-		
-		if (this.child != null)
-		{
-			dos.writeByte(this.child.importTag());
-			this.child.write(dos);
-		}
-		else
-		{
-			dos.writeByte(0);
+			out.writeUTF("");
 		}
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.getQualified(dis.readUTF());
+		this.parent = IImport.readImport(in);
 		
-		String alias = dis.readUTF();
+		this.name = Name.getQualified(in.readUTF());
+		
+		String alias = in.readUTF();
 		if (!alias.isEmpty())
 		{
 			this.alias = Name.getQualified(alias);
-		}
-		
-		byte childTag = dis.readByte();
-		if (childTag != 0)
-		{
-			this.child = IImport.fromTag(childTag);
-			this.child.read(dis);
 		}
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		this.appendParent(prefix, buffer);
 		buffer.append(this.name);
 		if (this.alias != null)
 		{
 			buffer.append(Formatting.Import.aliasSeperator);
 			buffer.append(this.alias);
-		}
-		if (this.child != null)
-		{
-			buffer.append('.');
-			this.child.toString(prefix, buffer);
 		}
 	}
 }

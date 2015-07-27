@@ -1,27 +1,39 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, IContext, IParameterized, ITypeList
+public interface IClass extends IClassMember, IGeneric, IContext, IParameterized, IClassCompilableList
 {
-	public void setUnit(IDyvilHeader unit);
+	@Override
+	public default void setTheClass(IClass iclass)
+	{
+	}
 	
-	public IDyvilHeader getUnit();
+	@Override
+	public default IClass getTheClass()
+	{
+		return this;
+	}
+	
+	public void setHeader(IDyvilHeader unit);
+	
+	@Override
+	public IDyvilHeader getHeader();
 	
 	public void setOuterClass(IClass iclass);
 	
@@ -30,6 +42,10 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	// Modifiers
 	
 	public boolean isAbstract();
+	
+	public boolean isInterface();
+	
+	public boolean isObject();
 	
 	// Full Name
 	
@@ -44,6 +60,8 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	public IType getSuperType();
 	
 	public boolean isSubTypeOf(IType type);
+	
+	public int getSuperTypeDistance(IType superType);
 	
 	// Interfaces
 	
@@ -71,18 +89,23 @@ public interface IClass extends IASTNode, IClassCompilable, IMember, IGeneric, I
 	
 	public IMethod getFunctionalMethod();
 	
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount);
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
 	
 	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount);
 	
-	public boolean isMember(IMember member);
+	public boolean isMember(IClassMember member);
+	
+	public byte getVisibility(IClassMember member);
 	
 	// Other Compilables (Lambda Expressions, ...)
 	
+	@Override
 	public int compilableCount();
 	
+	@Override
 	public void addCompilable(IClassCompilable compilable);
 	
+	@Override
 	public IClassCompilable getCompilable(int index);
 	
 	// Compilation

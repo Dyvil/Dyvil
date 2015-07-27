@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.StringValue;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -15,17 +15,23 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
 
-public final class FormatStringExpression extends ASTNode implements IValue
+public final class FormatStringExpression implements IValue
 {
-	public static final IClass	FORMAT_STRING_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
+	protected ICodePosition position;
 	
-	private IValue[]			values						= new IValue[1];
-	private String[]			strings						= new String[2];
-	private int					count;
+	private IValue[]	values	= new IValue[1];
+	private String[]	strings	= new String[2];
+	private int			count;
 	
 	public FormatStringExpression(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -41,18 +47,18 @@ public final class FormatStringExpression extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type.isSuperTypeOf(Types.STRING))
 		{
 			return this;
 		}
 		IClass iclass = type.getTheClass();
-		if (iclass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null)
+		if (iclass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
-			return new LiteralExpression(type, this);
+			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
-		if (iclass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null)
+		if (iclass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null)
 		{
 			StringValue string;
 			int len = this.count / 2;
@@ -79,7 +85,7 @@ public final class FormatStringExpression extends ASTNode implements IValue
 				list.addValue(this.values[i]);
 			}
 			
-			return new LiteralExpression(type, list);
+			return new LiteralExpression(this, list).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -92,22 +98,24 @@ public final class FormatStringExpression extends ASTNode implements IValue
 			return true;
 		}
 		
+		return this.isConvertible(type);
+	}
+	
+	private boolean isConvertible(IType type)
+	{
 		IClass theClass = type.getTheClass();
-		return theClass.getAnnotation(StringValue.STRING_CONVERTIBLE) != null || theClass.getAnnotation(FORMAT_STRING_CONVERTIBLE) != null;
+		return theClass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null || theClass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type.equals(Types.STRING))
+		float distance = type.getSubTypeDistance(Types.STRING);
+		if (distance != 0)
 		{
-			return 3;
+			return distance;
 		}
-		if (this.isType(type))
-		{
-			return 2;
-		}
-		return 0;
+		return this.isConvertible(type) ? CONVERSION_MATCH : 0;
 	}
 	
 	public void addString(String s)
@@ -188,6 +196,17 @@ public final class FormatStringExpression extends ASTNode implements IValue
 		for (int i = 0; i < len; i++)
 		{
 			this.values[i] = this.values[i].foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		int len = this.count / 2;
+		for (int i = 0; i < len; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 		return this;
 	}

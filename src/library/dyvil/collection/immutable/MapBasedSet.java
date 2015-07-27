@@ -3,20 +3,13 @@ package dyvil.collection.immutable;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableMap;
-import dyvil.collection.MutableSet;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.collection.mutable.HashMap;
 
-public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements ImmutableSet<E>
 {
-	protected ImmutableMap<E, Object>	map;
+	protected ImmutableMap<E, Object> map;
 	
 	public MapBasedSet(ImmutableMap<E, ? extends Object> map)
 	{
@@ -38,11 +31,11 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	@Override
 	public ImmutableSet<E> $minus(Object element)
 	{
-		return new MapBasedSet(this.map.$minus(element));
+		return new MapBasedSet(this.map.$minus$at(element));
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		MutableMap<E, Object> map = new HashMap();
 		for (Entry<E, Object> entry : this.map)

@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.imports;
 
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class PackageDeclaration extends ASTNode
+public class PackageDeclaration implements IASTNode
 {
-	public String	thePackage;
+	protected ICodePosition	position;
+	protected String		thePackage;
 	
 	public PackageDeclaration(ICodePosition position)
 	{
@@ -16,6 +17,12 @@ public class PackageDeclaration extends ASTNode
 	{
 		this.position = position;
 		this.thePackage = thePackage;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	public void setPackage(String thePackage)

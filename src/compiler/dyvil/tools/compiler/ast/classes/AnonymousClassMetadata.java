@@ -2,12 +2,12 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureField;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -30,7 +30,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		
+	
 	}
 	
 	@Override
@@ -78,7 +78,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 		int len = this.theClass.capturedFieldCount;
 		for (int i = 0; i < len; i++)
 		{
-			capturedFields[i].field.writeGet(writer, null);
+			capturedFields[i].field.writeGet(writer, null, 0);
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, this.getDesc(), false);
@@ -120,7 +120,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 			IParameter param = this.constructor.getParameter(i);
 			mw.writeVarInsn(param.getType().getLoadOpcode(), param.getIndex());
 		}
-		this.constructor.writeInvoke(mw);
+		this.constructor.writeInvoke(mw, 0);
 		
 		if (len > 0)
 		{

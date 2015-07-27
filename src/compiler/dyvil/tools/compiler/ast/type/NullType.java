@@ -1,21 +1,20 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -29,25 +28,15 @@ public class NullType implements IType
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return Name._null;
 	}
 	
 	@Override
-	public void setClass(IClass theClass)
-	{
-	}
-	
-	@Override
 	public IClass getTheClass()
 	{
-		return null;
+		return Types.NULL_CLASS;
 	}
 	
 	@Override
@@ -63,43 +52,13 @@ public class NullType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		return this;
 	}
 	
 	@Override
-	public boolean hasTypeVariables()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		return this;
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
@@ -115,20 +74,9 @@ public class NullType implements IType
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
-	{
-		return 0;
-	}
-	
-	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setInternalName(String name)
-	{
 	}
 	
 	@Override
@@ -152,7 +100,23 @@ public class NullType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInvokeInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/NullType", "instance", "Ldyvil/reflect/type/NullType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/NullType", "instance", "Ldyvil/reflect/type/NullType;");
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "null";
 	}
 	
 	@Override
@@ -165,5 +129,17 @@ public class NullType implements IType
 	public IType clone()
 	{
 		return this;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.equals((IType) obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return NULL;
 	}
 }

@@ -1,16 +1,16 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
 
 public class TypeCheckPattern implements IPattern
 {
@@ -55,7 +55,7 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		if (type.isPrimitive())
 		{
@@ -72,7 +72,7 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		return this.pattern.resolveField(name);
 	}
@@ -87,11 +87,11 @@ public class TypeCheckPattern implements IPattern
 		
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context);
+			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
 			
 			if (this.pattern != null && this.pattern.getPatternType() != WILDCARD)
 			{
-				this.pattern = this.pattern.withType(this.type);
+				this.pattern = this.pattern.withType(this.type, markers);
 			}
 			
 			if (this.type.isPrimitive())
@@ -105,15 +105,6 @@ public class TypeCheckPattern implements IPattern
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.pattern != null)
-		{
-			this.pattern.checkTypes(markers, context);
-		}
 	}
 	
 	@Override

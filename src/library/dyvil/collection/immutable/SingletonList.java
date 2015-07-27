@@ -4,22 +4,23 @@ import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.List;
 import dyvil.lang.literal.TupleConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.SingletonIterator;
 
 @TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>
 {
-	private E	element;
+	private E element;
 	
 	public static <E> SingletonList<E> apply(E element)
 	{
@@ -50,9 +51,39 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public Iterator<E> reverseIterator()
+	{
+		return new SingletonIterator<E>(this.element);
+	}
+	
+	@Override
 	public void forEach(Consumer<? super E> action)
 	{
 		action.accept(this.element);
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		return reducer.apply(initialValue, this.element);
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		return reducer.apply(initialValue, this.element);
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		return this.element;
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		return this.element;
 	}
 	
 	@Override
@@ -120,19 +151,19 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (Objects.equals(this.element, element))
 		{
-			return ImmutableList.apply();
+			return EmptyList.instance;
 		}
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
 		if (collection.contains(this.element))
 		{
-			return ImmutableList.apply();
+			return EmptyList.instance;
 		}
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
@@ -140,7 +171,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (!collection.contains(this.element))
 		{
-			return ImmutableList.apply();
+			return EmptyList.instance;
 		}
 		return this;
 	}
@@ -148,13 +179,13 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return ImmutableList.apply(mapper.apply(this.element));
+		return new SingletonList(mapper.apply(this.element));
 	}
 	
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return (ImmutableList<R>) ImmutableList.apply(mapper.apply(this.element));
+		return new SingletonList(mapper.apply(this.element));
 	}
 	
 	@Override
@@ -162,33 +193,39 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (condition.test(this.element))
 		{
-			return ImmutableList.apply(this.element);
+			return this;
 		}
-		return ImmutableList.apply();
+		return EmptyList.instance;
+	}
+	
+	@Override
+	public ImmutableList<E> reversed()
+	{
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> sorted()
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> sorted(Comparator<? super E> comparator)
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> distinct()
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
 	public ImmutableList<E> distinct(Comparator<? super E> comparator)
 	{
-		return ImmutableList.apply(this.element);
+		return this;
 	}
 	
 	@Override
@@ -214,7 +251,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return ImmutableList.apply(this.element);
+		return new SingletonList(this.element);
 	}
 	
 	@Override

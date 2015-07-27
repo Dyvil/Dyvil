@@ -4,34 +4,34 @@ import static dyvil.math.UnitUtils.*;
 
 public final class Units
 {
-	public static final int		METER		= 0x0000001;
-	public static final int		SECOND		= 0x0000010;
-	public static final int		KILOGRAM	= 0x0000100;
-	public static final int		MOL			= 0x0001000;
-	public static final int		CANDELA		= 0x0010000;
-	public static final int		AMPERE		= 0x0100000;
-	public static final int		KELVIN		= 0x1000000;
+	public static final int	METER		= 0x0000001;
+	public static final int	SECOND		= 0x0000010;
+	public static final int	KILOGRAM	= 0x0000100;
+	public static final int	MOL			= 0x0001000;
+	public static final int	CANDELA		= 0x0010000;
+	public static final int	AMPERE		= 0x0100000;
+	public static final int	KELVIN		= 0x1000000;
 	
-	private static final int	M1			= 0x8;
-	private static final int	M2			= 0x9;
-	private static final int	M3			= 0xA;
+	private static final int	M1	= 0x8;
+	private static final int	M2	= 0x9;
+	private static final int	M3	= 0xA;
 	
-	public static final int		NEWTON		= METER + KILOGRAM + SECOND * M2;
-	public static final int		HERTZ		= SECOND * M1;
-	public static final int		PASCAL		= KILOGRAM + METER * M1 + SECOND * M2;
-	public static final int		JOULE		= KILOGRAM + METER * 2 + SECOND * M2;
-	public static final int		WATT		= KILOGRAM + METER * 2 + SECOND * M3;
-	public static final int		COULOMB		= SECOND + AMPERE;
-	public static final int		VOLT		= KILOGRAM + METER * 2 + SECOND * M3 + AMPERE * M1;
-	public static final int		FARAD		= KILOGRAM * M1 + METER * M1 + SECOND * 4 + AMPERE * 2;
-	public static final int		OHM			= KILOGRAM + METER * 2 + SECOND * M3 + AMPERE * M2;
-	public static final int		SIEMENS		= KILOGRAM * M1 + METER * M2 + SECOND * 3 + AMPERE * 2;
-	public static final int		WEBER		= KILOGRAM + METER * 2 + SECOND * M2 + AMPERE * M1;
-	public static final int		TESLA		= KILOGRAM + SECOND * M2 + AMPERE;
-	public static final int		HENRY		= KILOGRAM + METER * 2 + SECOND * M2 + AMPERE * M2;
-	public static final int		LUX			= METER * M2 + CANDELA;
-	public static final int		SIEVERT		= METER * 2 + SECOND * M2;
-	public static final int		KATAL		= SECOND * M1 + MOL;
+	public static final int	NEWTON	= METER + KILOGRAM + SECOND * M2;
+	public static final int	HERTZ	= SECOND * M1;
+	public static final int	PASCAL	= KILOGRAM + METER * M1 + SECOND * M2;
+	public static final int	JOULE	= KILOGRAM + METER * 2 + SECOND * M2;
+	public static final int	WATT	= KILOGRAM + METER * 2 + SECOND * M3;
+	public static final int	COULOMB	= SECOND + AMPERE;
+	public static final int	VOLT	= KILOGRAM + METER * 2 + SECOND * M3 + AMPERE * M1;
+	public static final int	FARAD	= KILOGRAM * M1 + METER * M1 + SECOND * 4 + AMPERE * 2;
+	public static final int	OHM		= KILOGRAM + METER * 2 + SECOND * M3 + AMPERE * M2;
+	public static final int	SIEMENS	= KILOGRAM * M1 + METER * M2 + SECOND * 3 + AMPERE * 2;
+	public static final int	WEBER	= KILOGRAM + METER * 2 + SECOND * M2 + AMPERE * M1;
+	public static final int	TESLA	= KILOGRAM + SECOND * M2 + AMPERE;
+	public static final int	HENRY	= KILOGRAM + METER * 2 + SECOND * M2 + AMPERE * M2;
+	public static final int	LUX		= METER * M2 + CANDELA;
+	public static final int	SIEVERT	= METER * 2 + SECOND * M2;
+	public static final int	KATAL	= SECOND * M1 + MOL;
 	
 	public static String toString(int unit)
 	{

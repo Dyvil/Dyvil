@@ -2,14 +2,17 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassParameterSetter implements IValue
 {
@@ -46,7 +49,19 @@ public final class ClassParameterSetter implements IValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
+	}
+	
+	@Override
 	public IType getType()
+	{
+		return null;
+	}
+	
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return null;
 	}
@@ -55,12 +70,6 @@ public final class ClassParameterSetter implements IValue
 	public boolean isType(IType type)
 	{
 		return false;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override
@@ -86,6 +95,12 @@ public final class ClassParameterSetter implements IValue
 	
 	@Override
 	public IValue foldConstants()
+	{
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}

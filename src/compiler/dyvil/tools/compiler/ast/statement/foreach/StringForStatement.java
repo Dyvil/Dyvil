@@ -2,45 +2,35 @@ package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class StringForStatement extends ForEachStatement
 {
-	public static final Name	$string	= Name.getQualified("$string");
+	public static final Name $string = Name.getQualified("$string");
 	
-	protected Variable			indexVar;
-	protected Variable			lengthVar;
-	protected Variable			stringVar;
+	protected Variable	indexVar;
+	protected Variable	lengthVar;
+	protected Variable	stringVar;
 	
-	public StringForStatement(Variable var, IValue action)
+	public StringForStatement(ICodePosition position, Variable var, IValue action)
 	{
-		super(var, action);
+		super(position, var, action);
 		
-		Variable var1 = new Variable();
-		var1.type = Types.INT;
-		var1.name = ArrayForStatement.$index;
-		this.indexVar = var1;
-		
-		var1 = new Variable();
-		var1.type = Types.INT;
-		var1.name = ArrayForStatement.$length;
-		this.lengthVar = var1;
-		
-		var1 = new Variable();
-		var1.type = Types.STRING;
-		var1.name = $string;
-		this.stringVar = var1;
+		this.indexVar = new Variable(ArrayForStatement.$length, Types.INT);
+		this.lengthVar = new Variable(ArrayForStatement.$length, Types.INT);
+		this.stringVar = new Variable($string, Types.STRING);
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
-		if (this.variable.name == name)
+		if (this.variable.getName() == name)
 		{
 			return this.variable;
 		}
@@ -56,32 +46,34 @@ public class StringForStatement extends ForEachStatement
 		{
 			return this.stringVar;
 		}
-		return this.context.resolveField(name);
+		return null;
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label updateLabel = this.updateLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		Variable var = this.variable;
 		Variable stringVar = this.stringVar;
 		Variable indexVar = this.indexVar;
 		Variable lengthVar = this.lengthVar;
+		int lineNumber = this.getLineNumber();
 		
-		org.objectweb.asm.Label scopeLabel = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
 		
 		// Load the String
-		var.value.writeExpression(writer);
+		var.getValue().writeExpression(writer);
 		
 		// Local Variables
 		int locals = writer.localCount();
 		writer.writeInsn(Opcodes.DUP);
 		stringVar.writeInit(writer, null);
 		// Get the length
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
@@ -94,8 +86,9 @@ public class StringForStatement extends ForEachStatement
 		writer.writeTargetLabel(startLabel);
 		
 		// Get the char at the index
-		stringVar.writeGet(writer, null);
-		indexVar.writeGet(writer, null);
+		stringVar.writeGet(writer, null, lineNumber);
+		indexVar.writeGet(writer, null, lineNumber);
+		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
 		var.writeInit(writer, null);
 		
@@ -107,10 +100,10 @@ public class StringForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increase index
-		writer.writeIINC(indexVar.index, 1);
+		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
-		indexVar.writeGet(writer, null);
-		lengthVar.writeGet(writer, null);
+		indexVar.writeGet(writer, null, lineNumber);
+		lengthVar.writeGet(writer, null, lineNumber);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables

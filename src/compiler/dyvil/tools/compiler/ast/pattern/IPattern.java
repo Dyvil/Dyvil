@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
@@ -11,26 +12,24 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-import org.objectweb.asm.Label;
-
 public interface IPattern extends IASTNode, ITyped
 {
-	int	NULL		= 0;
-	int	BOOLEAN		= 1;
-	int	BYTE		= 2;
-	int	SHORT		= 3;
-	int	CHAR		= 4;
-	int	INT			= 5;
-	int	LONG		= 6;
-	int	FLOAT		= 7;
-	int	DOUBLE		= 8;
-	int	STRING		= 9;
+	int	NULL	= 0;
+	int	BOOLEAN	= 1;
+	int	BYTE	= 2;
+	int	SHORT	= 3;
+	int	CHAR	= 4;
+	int	INT		= 5;
+	int	LONG	= 6;
+	int	FLOAT	= 7;
+	int	DOUBLE	= 8;
+	int	STRING	= 9;
 	
-	int	ARRAY		= 16;
-	int	TUPLE		= 17;
-	int	LIST		= 18;
+	int	ARRAY	= 16;
+	int	TUPLE	= 17;
+	int	LIST	= 18;
 	
-	int	CASE_CLASS	= 24;
+	int CASE_CLASS = 24;
 	
 	int	BINDING		= 32;
 	int	WILDCARD	= 33;
@@ -52,7 +51,7 @@ public interface IPattern extends IASTNode, ITyped
 	{
 	};
 	
-	public IPattern withType(IType type);
+	public IPattern withType(IType type, MarkerList markers);
 	
 	public static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
 	{
@@ -74,7 +73,7 @@ public interface IPattern extends IASTNode, ITyped
 	@Override
 	public boolean isType(IType type);
 	
-	public default IField resolveField(Name name)
+	public default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
@@ -82,10 +81,6 @@ public interface IPattern extends IASTNode, ITyped
 	public default IPattern resolve(MarkerList markers, IContext context)
 	{
 		return this;
-	}
-	
-	public default void checkTypes(MarkerList markers, IContext context)
-	{
 	}
 	
 	public default int intValue()

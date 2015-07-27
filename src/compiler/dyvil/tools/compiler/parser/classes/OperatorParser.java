@@ -21,9 +21,9 @@ public final class OperatorParser extends Parser
 	private static final int	PRECEDENCE		= 32;
 	private static final int	CLOSE_BRACKET	= 64;
 	
-	protected IOperatorMap		map;
-	private int					type;
-	private Operator			operator;
+	protected IOperatorMap	map;
+	private int				type;
+	private Operator		operator;
 	
 	public OperatorParser(IOperatorMap map, boolean typeParsed)
 	{

@@ -3,22 +3,26 @@ package dyvil.tools.compiler.ast.member;
 import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class Member extends ASTNode implements IMember
+public abstract class Member implements IMember
 {
+	protected ICodePosition position;
+	
 	protected Annotation[]	annotations;
 	protected int			annotationCount;
 	
-	public int				modifiers;
+	protected int modifiers;
 	
-	public IType			type;
-	public Name				name;
+	protected IType	type;
+	protected Name	name;
 	
 	protected Member()
 	{
@@ -45,6 +49,12 @@ public abstract class Member extends ASTNode implements IMember
 		this.name = name;
 		this.type = type;
 		this.modifiers = modifiers;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -124,7 +134,7 @@ public abstract class Member extends ASTNode implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			if (a.type.getTheClass() == type)
+			if (a.getType().getTheClass() == type)
 			{
 				return a;
 			}
@@ -199,7 +209,7 @@ public abstract class Member extends ASTNode implements IMember
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context);
+			this.type = this.type.resolve(markers, context, TypePosition.RETURN_TYPE);
 		}
 		
 		for (int i = 0; i < this.annotationCount; i++)
@@ -214,7 +224,7 @@ public abstract class Member extends ASTNode implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			Annotation a = this.annotations[i];
-			String fullName = a.type.getInternalName();
+			String fullName = a.getType().getInternalName();
 			if (fullName != null && !this.addRawAnnotation(fullName))
 			{
 				this.removeAnnotation(i--);
@@ -251,6 +261,23 @@ public abstract class Member extends ASTNode implements IMember
 		{
 			this.annotations[i].foldConstants();
 		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.annotationCount; i++)
+		{
+			this.annotations[i].cleanup(context, compilableList);
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString("", builder);
+		return builder.toString();
 	}
 	
 	@Override

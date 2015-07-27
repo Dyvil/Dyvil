@@ -5,14 +5,13 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.type.Type;
+import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -22,7 +21,7 @@ public class AnnotationParser extends Parser
 	public static final int	PARAMETERS_START	= 2;
 	public static final int	PARAMETERS_END		= 4;
 	
-	private Annotation		annotation;
+	private Annotation annotation;
 	
 	public AnnotationParser(Annotation annotation)
 	{
@@ -46,8 +45,8 @@ public class AnnotationParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.annotation.name = name;
-				this.annotation.type = new Type(token, name);
+				this.annotation.setName(name);
+				this.annotation.setType(new NamedType(token.raw(), name));
 				
 				this.mode = PARAMETERS_START;
 				return;
@@ -62,13 +61,13 @@ public class AnnotationParser extends Parser
 				if (ParserUtil.isIdentifier(next.type()) && next.next().type() == Symbols.COLON)
 				{
 					ArgumentMap map = new ArgumentMap();
-					this.annotation.arguments = map;
+					this.annotation.setArguments(map);
 					pm.pushParser(new ExpressionMapParser(map));
 				}
 				else
 				{
 					ArgumentList list = new ArgumentList();
-					this.annotation.arguments = list;
+					this.annotation.setArguments(list);
 					pm.pushParser(new ExpressionListParser(list));
 				}
 				
@@ -76,12 +75,12 @@ public class AnnotationParser extends Parser
 				return;
 			}
 			
-			if (!ParserUtil.isIdentifier(type) && !ParserUtil.isTerminator2(type))
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				SingleArgument arg = new SingleArgument();
-				this.annotation.arguments = arg;
+				this.annotation.setArguments(arg);
 				pm.popParser();
-				pm.pushParser(new ExpressionParser(arg), true);
+				pm.pushParser(pm.newExpressionParser(arg), true);
 				return;
 			}
 			

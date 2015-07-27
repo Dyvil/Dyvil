@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.external;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.IntValue;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -12,16 +12,14 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
 
 public final class ExternalMethod extends Method
 {
@@ -31,9 +29,22 @@ public final class ExternalMethod extends Method
 	private boolean	parametersResolved;
 	private boolean	exceptionsResolved;
 	
-	public ExternalMethod(IClass iclass)
+	public ExternalMethod(IClass iclass, Name name, String desc, int modifiers)
 	{
 		super(iclass);
+		this.name = name;
+		this.modifiers = modifiers;
+		this.descriptor = desc;
+	}
+	
+	public void setVarargsParameter()
+	{
+		this.parameters[this.parameterCount - 1].setVarargs(true);
+	}
+	
+	public void setParameterName(int index, Name name)
+	{
+		this.parameters[index].setName(name);
 	}
 	
 	private void resolveAnnotations()
@@ -44,27 +55,12 @@ public final class ExternalMethod extends Method
 			Annotation annotation = this.annotations[i];
 			annotation.resolveTypes(null, Package.rootPackage);
 			
-			if (annotation.type.getTheClass() != Types.INTRINSIC_CLASS)
+			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
 			}
 			
-			try
-			{
-				Array array = (Array) annotation.arguments.getValue(0, Annotation.VALUE);
-				
-				int len = array.valueCount();
-				int[] opcodes = new int[len];
-				for (int j = 0; j < len; j++)
-				{
-					IntValue v = (IntValue) array.getValue(j);
-					opcodes[j] = v.value;
-				}
-				this.intrinsicOpcodes = opcodes;
-			}
-			catch (NullPointerException | ClassCastException ex)
-			{
-			}
+			this.readIntrinsicAnnotation(annotation);
 		}
 	}
 	
@@ -75,7 +71,7 @@ public final class ExternalMethod extends Method
 			this.resolveGenerics();
 		}
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, this);
+		this.type = this.type.resolve(null, this, TypePosition.RETURN_TYPE);
 	}
 	
 	private void resolveGenerics()
@@ -119,7 +115,7 @@ public final class ExternalMethod extends Method
 		this.exceptionsResolved = true;
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(null, this);
+			this.exceptions[i] = this.exceptions[i].resolve(null, this, TypePosition.TYPE);
 		}
 	}
 	
@@ -154,13 +150,17 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		if (name != this.name)
 		{
 			return 0;
 		}
 		
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();
@@ -188,6 +188,10 @@ public final class ExternalMethod extends Method
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
+		}
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
 		}
 		return super.getGenericData(genericData, instance, arguments);
 	}
@@ -264,32 +268,32 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeCall(writer, instance, arguments, type);
+		super.writeCall(writer, instance, arguments, type, lineNumber);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeJump(writer, dest, instance, arguments);
+		super.writeJump(writer, dest, instance, arguments, lineNumber);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeInvJump(writer, dest, instance, arguments);
+		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
 	}
 }

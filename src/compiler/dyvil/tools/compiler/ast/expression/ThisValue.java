@@ -1,22 +1,36 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IAccessible;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ThisValue extends ASTNode implements IValue
+public final class ThisValue implements IValue
 {
-	public IType	type	= Types.UNKNOWN;
+	protected ICodePosition	position;
+	protected IType			type	= Types.UNKNOWN;
+	
+	// Metadata
+	protected IAccessible getter;
 	
 	public ThisValue(IType type)
 	{
 		this.type = type;
+	}
+	
+	public ThisValue(IType type, IAccessible getter)
+	{
+		this.type = type;
+		this.getter = getter;
 	}
 	
 	public ThisValue(ICodePosition position)
@@ -24,10 +38,24 @@ public final class ThisValue extends ASTNode implements IValue
 		this.position = position;
 	}
 	
-	public ThisValue(ICodePosition position, IType type)
+	public ThisValue(ICodePosition position, IType type, IContext context, MarkerList markers)
 	{
 		this.position = position;
 		this.type = type;
+		this.checkTypes(markers, context);
+	}
+	
+	public ThisValue(ICodePosition position, IType type, IAccessible getter)
+	{
+		this.position = position;
+		this.type = type;
+		this.getter = getter;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 	
 	@Override
@@ -49,29 +77,9 @@ public final class ThisValue extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type.isSuperTypeOf(this.type) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (this.type.getTheClass().isSubTypeOf(type))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -86,10 +94,16 @@ public final class ThisValue extends ASTNode implements IValue
 		if (context.isStatic())
 		{
 			markers.add(this.position, "this.access.static");
-			return;
 		}
 		
-		this.type = context.getThisClass().getType();
+		if (this.type == Types.UNKNOWN)
+		{
+			this.type = context.getThisClass().getType();
+		}
+		else
+		{
+			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		}
 	}
 	
 	@Override
@@ -101,6 +115,13 @@ public final class ThisValue extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		IClass iclass = this.type.getTheClass();
+		
+		this.getter = context.getAccessibleThis(iclass);
+		if (this.getter == null)
+		{
+			markers.add(this.position, "this.instance", iclass.getFullName());
+		}
 	}
 	
 	@Override
@@ -115,6 +136,12 @@ public final class ThisValue extends ASTNode implements IValue
 	}
 	
 	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		return this;
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("this");
@@ -123,13 +150,13 @@ public final class ThisValue extends ASTNode implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		this.getter.writeGet(writer);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);
 	}
 }

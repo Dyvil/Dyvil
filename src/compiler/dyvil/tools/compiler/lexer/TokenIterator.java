@@ -73,6 +73,22 @@ public class TokenIterator implements Iterator<IToken>
 		}
 	}
 	
+	public void set(IToken current)
+	{
+		if (this.next != null)
+		{
+			current.setNext(this.next);
+			this.next.setPrev(current);
+		}
+		IToken prev = this.lastReturned.getPrev();
+		if (prev != null)
+		{
+			current.setPrev(prev);
+			prev.setNext(current);
+		}
+		this.lastReturned = current;
+	}
+	
 	public void inferSemicolons()
 	{
 		if (this.first == null)
@@ -97,6 +113,8 @@ public class TokenIterator implements Iterator<IToken>
 			prev = token;
 			token = token.getNext();
 		}
+		
+		prev.setNext(new InferredSemicolon(prev.endLine(), prev.endIndex() + 1));
 	}
 	
 	private void inferSemicolon(IToken token, IToken prev)

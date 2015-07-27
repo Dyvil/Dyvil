@@ -16,7 +16,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface BooleanArray
 {
-	public static final boolean[]	EMPTY	= new boolean[0];
+	public static final boolean[] EMPTY = new boolean[0];
 	
 	public static boolean[] apply()
 	{

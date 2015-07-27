@@ -3,9 +3,9 @@ package dyvil.tools.compiler.ast.method;
 public final class ConstructorMatch implements Comparable<ConstructorMatch>
 {
 	public final IConstructor	constructor;
-	public final int			match;
+	public final float			match;
 	
-	public ConstructorMatch(IConstructor constructor, int match)
+	public ConstructorMatch(IConstructor constructor, float match)
 	{
 		this.constructor = constructor;
 		this.match = match;

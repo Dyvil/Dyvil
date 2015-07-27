@@ -4,32 +4,30 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.bytecode.*;
+import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
-import org.objectweb.asm.*;
-
-public final class BytecodeVisitor extends MethodVisitor
+public final class BytecodeVisitor implements MethodVisitor
 {
-	private IMethod		method;
+	private ExternalMethod method;
 	
 	private boolean		inline;
 	private Bytecode	bytecode;
 	
-	public BytecodeVisitor(IMethod method)
+	public BytecodeVisitor(ExternalMethod method)
 	{
-		super(DyvilCompiler.asmVersion);
 		this.method = method;
 	}
 	
 	@Override
 	public void visitParameter(String name, int index)
 	{
-		this.method.getParameter(index).setName(Name.getQualified(name));
+		this.method.setParameterName(index, Name.getQualified(name));
 	}
 	
 	@Override
@@ -51,7 +49,7 @@ public final class BytecodeVisitor extends MethodVisitor
 		String internal = ClassFormat.extendedToInternal(type);
 		if (this.method.addRawAnnotation(internal))
 		{
-			Annotation annotation = new Annotation(new dyvil.tools.compiler.ast.type.Type(internal));
+			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.method, annotation);
 		}
 		return null;
@@ -161,7 +159,7 @@ public final class BytecodeVisitor extends MethodVisitor
 		}
 	}
 	
-	private Map<Label, dyvil.tools.compiler.ast.statement.Label>	labels	= new IdentityHashMap();
+	private Map<Label, dyvil.tools.compiler.ast.statement.Label> labels = new IdentityHashMap();
 	
 	private dyvil.tools.compiler.ast.statement.Label getLabel(Label target)
 	{

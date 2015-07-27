@@ -1,20 +1,19 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-import org.objectweb.asm.Type;
-
 public final class MethodInstruction implements IInstruction
 {
-	private int			opcode;
-	private String		owner;
-	private String		name;
-	private String		desc;
-	private boolean		isInterface;
+	private int		opcode;
+	private String	owner;
+	private String	name;
+	private String	desc;
+	private boolean	isInterface;
 	
 	private int			argsCount;
 	private String[]	args;

@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -46,13 +46,15 @@ public class SubscriptSetter extends AbstractCall
 		}
 		this.arguments.resolve(markers, context);
 		
-		IMethod m = ICall.resolveMethod(context, instance, Name.subscript_$eq, arguments);
-		if (m != null) {
+		IMethod m = ICall.resolveMethod(context, this.instance, Name.subscript_$eq, this.arguments);
+		if (m != null)
+		{
 			this.method = m;
+			this.checkArguments(markers, context);
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, Name.subscript_$eq, arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, Name.subscript_$eq, this.arguments);
 		return this;
 	}
 	

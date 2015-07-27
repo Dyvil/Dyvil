@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -14,17 +13,17 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ClassBody extends ASTNode implements IClassBody
+public class ClassBody implements IClassBody
 {
-	public IClass			theClass;
+	public IClass theClass;
 	
-	public IClass[]			classes;
-	public int				classCount;
+	public IClass[]	classes;
+	public int		classCount;
 	
 	private IField[]		fields			= new IField[3];
 	private int				fieldCount;
@@ -35,11 +34,17 @@ public class ClassBody extends ASTNode implements IClassBody
 	private IProperty[]		properties		= new IProperty[3];
 	private int				propertyCount;
 	
-	protected IMethod		functionalMethod;
+	protected IMethod functionalMethod;
 	
 	public ClassBody(IClass iclass)
 	{
 		this.theClass = iclass;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
 	}
 	
 	@Override
@@ -213,12 +218,40 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
+	public IConstructor getConstructor(IParameter[] parameters, int parameterCount)
+	{
+		outer:
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			IConstructor c = this.constructors[i];
+			if (c.parameterCount() != parameterCount)
+			{
+				continue;
+			}
+			
+			for (int p = 0; p < parameterCount; p++)
+			{
+				IType classParamType = parameters[p].getType();
+				IType constructorParamType = c.getParameter(p).getType();
+				if (!classParamType.equals(constructorParamType))
+				{
+					continue outer;
+				}
+			}
+			
+			return c;
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			IConstructor c = this.constructors[i];
-			int m = c.getSignatureMatch(arguments);
+			float m = c.getSignatureMatch(arguments);
 			if (m > 0)
 			{
 				list.add(new ConstructorMatch(c, m));
@@ -268,7 +301,7 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount)
+	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
 	{
 		outer:
 		for (int i = 0; i < this.methodCount; i++)
@@ -287,7 +320,7 @@ public class ClassBody extends ASTNode implements IClassBody
 			for (int p = 0; p < parameterCount; p++)
 			{
 				IType t1 = parameters[p].getType();
-				IType t2 = m.getParameter(p).getType();
+				IType t2 = m.getParameter(p).getType().getConcreteType(concrete);
 				if (!t1.equals(t2))
 				{
 					continue outer;
@@ -304,7 +337,7 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			int match = m.getSignatureMatch(name, instance, arguments);
+			float match = m.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
 				list.add(new MethodMatch(m, match));
@@ -333,8 +366,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolveTypes(markers, context);
@@ -358,8 +392,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolve(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolve(markers, context);
@@ -383,8 +418,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].checkTypes(markers, context);
@@ -408,8 +444,9 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void check(MarkerList markers)
 	{
+		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].check(markers, context);
@@ -454,6 +491,32 @@ public class ClassBody extends ASTNode implements IClassBody
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup()
+	{
+		IClass iclass = this.theClass;
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].cleanup(iclass, iclass);
+		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].cleanup(iclass, iclass);
 		}
 	}
 	

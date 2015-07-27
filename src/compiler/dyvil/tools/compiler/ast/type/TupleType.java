@@ -1,20 +1,22 @@
 package dyvil.tools.compiler.ast.type;
 
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
+import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -27,8 +29,8 @@ public final class TupleType implements IType, ITypeList
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
 	
-	protected IType[]				types;
-	protected int					typeCount;
+	protected IType[]	types;
+	protected int		typeCount;
 	
 	public TupleType()
 	{
@@ -40,58 +42,13 @@ public final class TupleType implements IType, ITypeList
 		this.types = new IType[size];
 	}
 	
+	public TupleType(IType[] types, int typeCount)
+	{
+		this.types = types;
+		this.typeCount = typeCount;
+	}
+	
 	// ITypeList Overrides
-	
-	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
-	{
-		if (!tupleClasses[count].isSubTypeOf(type))
-		{
-			return false;
-		}
-		int typeTag = type.typeTag();
-		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
-		{
-			return false;
-		}
-		
-		ITypeList typeList = (ITypeList) type;
-		
-		for (int i = 0; i < count; i++)
-		{
-			if (!typedArray[i].isType(typeList.getType(i)))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	public static String getConstructorDescriptor(int typeCount)
-	{
-		if (typeCount < 22)
-		{
-			String s = descriptors[typeCount];
-			if (s != null)
-			{
-				return s;
-			}
-		}
-		
-		StringBuilder buffer = new StringBuilder();
-		buffer.append('(');
-		for (int i = 0; i < typeCount; i++)
-		{
-			buffer.append("Ljava/lang/Object;");
-		}
-		buffer.append(")V");
-		
-		String s = buffer.toString();
-		if (typeCount < 22)
-		{
-			descriptors[typeCount] = s;
-		}
-		return s;
-	}
 	
 	public static IClass getTupleClass(int count)
 	{
@@ -106,10 +63,49 @@ public final class TupleType implements IType, ITypeList
 		return iclass;
 	}
 	
+	public static String getConstructorDescriptor(int typeCount)
+	{
+		String s = descriptors[typeCount];
+		if (s != null)
+		{
+			return s;
+		}
+		
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+		for (int i = 0; i < typeCount; i++)
+		{
+			buffer.append("Ljava/lang/Object;");
+		}
+		buffer.append(")V");
+		
+		return descriptors[typeCount] = buffer.toString();
+	}
+	
+	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
+	{
+		IClass iclass = getTupleClass(count);
+		if (!iclass.isSubTypeOf(type))
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < count; i++)
+		{
+			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			IType type1 = type.resolveType(typeVar);
+			if (!typedArray[i].isType(type1))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	@Override
 	public int typeTag()
 	{
-		return TUPLE_TYPE;
+		return TUPLE;
 	}
 	
 	@Override
@@ -119,19 +115,9 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-	}
-	
-	@Override
 	public Name getName()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setClass(IClass theClass)
-	{
 	}
 	
 	@Override
@@ -170,21 +156,19 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (!tupleClasses[this.typeCount].isSubTypeOf(type))
+		IClass iclass = getTupleClass(this.typeCount);
+		if (!iclass.isSubTypeOf(type))
 		{
 			return false;
 		}
-		int typeTag = type.typeTag();
-		if (typeTag != GENERIC_TYPE && typeTag != TUPLE_TYPE)
-		{
-			return false;
-		}
-		
-		ITypeList typeList = (ITypeList) type;
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			if (typeList.getType(i).isSuperTypeOf(this.types[i]))
+			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			IType type1 = type.resolveType(typeVar);
+			
+			// Covariance
+			if (!this.types[i].isSuperTypeOf(type1))
 			{
 				return false;
 			}
@@ -199,14 +183,24 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public boolean classEquals(IType type)
+	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.isSuperTypeOf(type);
+		// We don't need supertype checking here because typeVar can only come
+		// from the tuple class or Entry[K, V], in which case it is simply
+		// overridden and Tuple2.K yields exactly the same as Entry.K.
+		return this.types[typeVar.getIndex()];
 	}
 	
 	@Override
 	public boolean hasTypeVariables()
 	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			if (this.types[i].hasTypeVariables())
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -214,6 +208,7 @@ public final class TupleType implements IType, ITypeList
 	public IType getConcreteType(ITypeContext context)
 	{
 		TupleType tt = new TupleType(this.typeCount);
+		tt.typeCount = this.typeCount;
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			tt.types[i] = this.types[i].getConcreteType(context);
@@ -222,19 +217,25 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		return null;
+		IClass iclass = getTupleClass(this.typeCount);
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			IType concreteType = concrete.resolveType(typeVar);
+			this.types[i].inferTypes(concreteType, typeContext);
+		}
 	}
 	
 	@Override
 	public boolean isResolved()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context)
+	public IType resolve(MarkerList markers, IContext context, TypePosition position)
 	{
 		if (this.typeCount == 0)
 		{
@@ -242,58 +243,23 @@ public final class TupleType implements IType, ITypeList
 		}
 		if (this.typeCount == 1)
 		{
-			return this.types[0].resolve(markers, context);
+			return this.types[0].resolve(markers, context, position);
 		}
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			IType t = this.types[i].resolve(markers, context);
-			
-			// Tuple Value Boxing
-			if (t.isPrimitive())
-			{
-				this.types[i] = t.getReferenceType();
-			}
-			else
-			{
-				this.types[i] = t;
-			}
+			this.types[i] = this.types[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+		}
+		
+		if (position == TypePosition.CLASS)
+		{
+			markers.add(this.types[0].getPosition(), "type.class.tuple");
 		}
 		return this;
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.getTheClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		return this.getTheClass().resolveField(name);
 	}
@@ -311,20 +277,9 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public byte getVisibility(IMember member)
-	{
-		return this.getTheClass().getVisibility(member);
-	}
-	
-	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-	
-	@Override
-	public void setInternalName(String name)
-	{
 	}
 	
 	@Override
@@ -376,13 +331,40 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		out.writeByte(this.typeCount);
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			IType.writeType(this.types[i], out);
+		}
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		int len = this.typeCount = in.readByte();
+		if (len > this.types.length)
+		{
+			this.types = new IType[len];
+		}
+		for (int i = 0; i < len; i++)
+		{
+			this.types[i] = IType.readType(in);
+		}
+	}
+	
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder("(");
-		builder.append(this.types[0]);
-		for (int i = 1; i < this.typeCount; i++)
+		if (this.typeCount > 0)
 		{
-			builder.append(", ").append(this.types[i]);
+			builder.append(this.types[0]);
+			for (int i = 1; i < this.typeCount; i++)
+			{
+				builder.append(", ").append(this.types[i]);
+			}
 		}
 		return builder.append(")").toString();
 	}
@@ -399,7 +381,20 @@ public final class TupleType implements IType, ITypeList
 	public IType clone()
 	{
 		TupleType tt = new TupleType(this.typeCount);
+		tt.typeCount = this.typeCount;
 		System.arraycopy(this.types, 0, tt.types, 0, this.typeCount);
 		return tt;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return IType.equals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return System.identityHashCode(getTupleClass(this.typeCount));
 	}
 }

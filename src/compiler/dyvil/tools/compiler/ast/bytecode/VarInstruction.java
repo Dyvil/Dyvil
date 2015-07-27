@@ -24,7 +24,7 @@ public final class VarInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeVarInsn(this.opcode, this.index + writer.inlineOffset());
+		writer.writeVarInsn(this.opcode, this.index);
 	}
 	
 	@Override

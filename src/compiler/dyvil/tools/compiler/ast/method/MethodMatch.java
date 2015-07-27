@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.tools.compiler.util.Util;
+
 public final class MethodMatch implements Comparable<MethodMatch>
 {
 	public final IMethod	method;
-	public final int		match;
+	public final float		match;
 	
-	public MethodMatch(IMethod method, int match)
+	public MethodMatch(IMethod method, float match)
 	{
 		this.method = method;
 		this.match = match;
@@ -21,7 +23,7 @@ public final class MethodMatch implements Comparable<MethodMatch>
 	public String toString()
 	{
 		StringBuilder buf = new StringBuilder();
-		this.method.toString("", buf);
+		Util.methodSignatureToString(this.method, buf);
 		return buf.toString();
 	}
 }

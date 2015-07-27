@@ -10,11 +10,11 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
-public final class ParserManager implements IParserManager
+public class ParserManager implements IParserManager
 {
-	protected Parser		parser;
+	protected Parser parser;
 	
-	protected IOperatorMap	operators;
+	protected IOperatorMap operators;
 	
 	protected TokenIterator	tokens;
 	protected int			skip;
@@ -63,6 +63,7 @@ public final class ParserManager implements IParserManager
 	
 	public final void parse(MarkerList markers, TokenIterator tokens)
 	{
+		tokens.reset();
 		this.tokens = tokens;
 		IToken token = null;
 		while (true)
@@ -118,7 +119,7 @@ public final class ParserManager implements IParserManager
 				// }
 				// else
 				{
-					DyvilCompiler.logger.throwing("ParserManager", "parseToken", ex);
+					DyvilCompiler.error("ParserManager", "parseToken", ex);
 					markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 				}
 			}

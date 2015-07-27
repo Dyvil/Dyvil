@@ -1,59 +1,69 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.TypeVariableType;
+import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.GenericType;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
-import dyvil.tools.compiler.backend.visitor.BytecodeVisitor;
-import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
-import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.MethodVisitor;
-
-public final class ExternalClass extends CodeClass
+public final class ExternalClass extends AbstractClass
 {
-	public Package		thePackage;
+	public Package thePackage;
 	
-	private List<IType>	innerTypes;
+	private List<IType> innerTypes;
 	
-	private boolean		metadataResolved;
-	private boolean		superTypesResolved;
-	private boolean		genericsResolved;
-	private boolean		annotationsResolved;
-	private boolean		innerTypesResolved;
+	private boolean	metadataResolved;
+	private boolean	superTypesResolved;
+	private boolean	genericsResolved;
+	private boolean	parametersResolved;
+	private boolean	annotationsResolved;
+	private boolean	innerTypesResolved;
+	
+	private String[] classParameters;
 	
 	public ExternalClass(Name name)
 	{
 		this.name = name;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
 	}
 	
 	private void resolveMetadata()
@@ -67,16 +77,25 @@ public final class ExternalClass extends CodeClass
 		this.genericsResolved = true;
 		if (this.genericCount > 0)
 		{
-			GenericType type = new GenericType(this);
+			ClassGenericType type = new ClassGenericType(this);
 			
 			for (int i = 0; i < this.genericCount; i++)
 			{
 				ITypeVariable var = this.generics[i];
 				var.resolveTypes(null, Package.rootPackage);
-				type.addType(new TypeVariableType(var));
+				type.addType(new TypeVarType(var));
 			}
 			
 			this.type = type;
+		}
+	}
+	
+	private void resolveParameters()
+	{
+		this.parametersResolved = true;
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].resolveTypes(null, this);
 		}
 	}
 	
@@ -85,19 +104,18 @@ public final class ExternalClass extends CodeClass
 		this.superTypesResolved = true;
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(null, this);
+			this.superType = this.superType.resolve(null, this, TypePosition.SUPER_TYPE);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(null, this);
+			this.interfaces[i] = this.interfaces[i].resolve(null, this, TypePosition.SUPER_TYPE);
 		}
 		
 		if (!this.metadataResolved)
 		{
 			this.resolveMetadata();
 		}
-		this.metadata.resolve(null, Package.rootPackage);
 	}
 	
 	private void resolveAnnotations()
@@ -107,7 +125,7 @@ public final class ExternalClass extends CodeClass
 		{
 			this.annotations[i].resolveTypes(null, Package.rootPackage);
 			
-			String internalName = this.annotations[i].type.getInternalName();
+			String internalName = this.annotations[i].getType().getInternalName();
 			if (!this.addRawAnnotation(internalName))
 			{
 				this.removeAnnotation(i--);
@@ -125,10 +143,21 @@ public final class ExternalClass extends CodeClass
 			for (int i = 0; i < len; i++)
 			{
 				IType t = this.innerTypes.get(i);
-				this.innerTypes.set(i, t.resolve(null, Package.rootPackage));
+				this.innerTypes.set(i, t.resolve(null, Package.rootPackage, TypePosition.CLASS));
 				t.getTheClass().setOuterClass(this);
 			}
 		}
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setHeader(IDyvilHeader unit)
+	{
 	}
 	
 	@Override
@@ -182,6 +211,16 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		return super.getSuperTypeDistance(superType);
+	}
+	
+	@Override
 	public ITypeVariable getTypeVariable(int index)
 	{
 		if (!this.genericsResolved)
@@ -202,13 +241,32 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addAnnotation(Annotation annotation)
 	{
-		if (!this.metadataResolved)
+		if (!"dyvil/annotation/ClassParameters".equals(annotation.getType().getInternalName()))
 		{
-			this.resolveMetadata();
+			super.addAnnotation(annotation);
+			return;
 		}
-		super.addParameter(param);
+		
+		Array array = (Array) annotation.getArguments().getFirstValue();
+		int count = array.valueCount();
+		this.classParameters = new String[count];
+		for (int i = 0; i < count; i++)
+		{
+			IValue value = array.getValue(i);
+			this.classParameters[i] = value.stringValue();
+		}
+	}
+	
+	@Override
+	public IParameter getParameter(int index)
+	{
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		return super.getParameter(index);
 	}
 	
 	@Override
@@ -241,6 +299,11 @@ public final class ExternalClass extends CodeClass
 		if ((this.modifiers & Modifiers.ABSTRACT | Modifiers.INTERFACE_CLASS) == 0)
 		{
 			return null;
+		}
+		
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
 		}
 		
 		IMethod m;
@@ -305,6 +368,11 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+	}
+	
+	@Override
 	public IClass resolveClass(Name name)
 	{
 		if (!this.innerTypesResolved)
@@ -312,11 +380,14 @@ public final class ExternalClass extends CodeClass
 			this.resolveInnerTypes();
 		}
 		
-		for (IType t : this.innerTypes)
+		if (this.innerTypes != null)
 		{
-			if (t.getName() == name)
+			for (IType t : this.innerTypes)
 			{
-				return t.getTheClass();
+				if (t.getName() == name)
+				{
+					return t.getTheClass();
+				}
 			}
 		}
 		
@@ -324,15 +395,28 @@ public final class ExternalClass extends CodeClass
 	}
 	
 	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
 		}
 		
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IParameter param = this.parameters[i];
+			if (param.getName() == name)
+			{
+				return param;
+			}
+		}
+		
 		// Own properties
-		IField field = this.body.getProperty(name);
+		IDataMember field = this.body.getProperty(name);
 		if (field != null)
 		{
 			return field;
@@ -353,7 +437,7 @@ public final class ExternalClass extends CodeClass
 		// Inherited Fields
 		if (this.superType != null)
 		{
-			IField match = this.superType.resolveField(name);
+			IDataMember match = this.superType.resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -407,35 +491,6 @@ public final class ExternalClass extends CodeClass
 		}
 		
 		this.body.getConstructorMatches(list, arguments);
-	}
-	
-	public boolean addSpecialMethod(String specialType, String name, IMethod method)
-	{
-		if ("get".equals(specialType) || "set".equals(specialType))
-		{
-			Name name1 = Name.getQualified(name);
-			IProperty property = this.body.getProperty(name1);
-			if (property == null)
-			{
-				Property prop = new ExternalProperty(this, name1, method.getType());
-				prop.modifiers = method.getModifiers() & ~Modifiers.SYNTHETIC;
-				this.body.addProperty(prop);
-			}
-		}
-		if ("parDefault".equals(specialType))
-		{
-			int i = name.indexOf('$');
-			Name name1 = Name.getQualified(name.substring(0, i));
-			IMethod method1 = this.body.getMethod(name1);
-			int parIndex = Integer.parseInt(name.substring(i + 1));
-			
-			MethodCall call = new MethodCall(null);
-			call.method = method;
-			call.name = name1;
-			method1.getParameter(parIndex).setValue(call);
-			return false;
-		}
-		return true;
 	}
 	
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
@@ -494,30 +549,75 @@ public final class ExternalClass extends CodeClass
 			}
 		}
 		
-		this.type = new dyvil.tools.compiler.ast.type.Type(this);
+		this.type = new ClassType(this);
+	}
+	
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
+	{
+		String internal = ClassFormat.extendedToInternal(type);
+		if (this.addRawAnnotation(internal))
+		{
+			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
+			return new AnnotationVisitorImpl(this, annotation);
+		}
+		return null;
+	}
+	
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	{
+		switch (TypeReference.getSort(typeRef))
+		{
+		// TODO implement other sorts
+		case TypeReference.CLASS_TYPE_PARAMETER:
+			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			switch (desc)
+			{
+			case "Ldyvil/annotation/Covariant;":
+				typeVar.setVariance(Variance.COVARIANT);
+				break;
+			case "Ldyvil/annotation/Contravariant;":
+				typeVar.setVariance(Variance.CONTRAVARIANT);
+				break;
+			}
+			// TODO implement other type parameter annotations
+		}
+		return null;
 	}
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
-		Field field = new ExternalField(this);
-		field.setName(Name.get(name));
-		field.setModifiers(access);
-		field.setType(ClassFormat.extendedToType(desc));
+		IType type = ClassFormat.extendedToType(signature == null ? desc : signature);
+		
+		if (this.classParameters != null)
+		{
+			for (String s : this.classParameters)
+			{
+				if (s.equals(name))
+				{
+					ClassParameter param = new ClassParameter(this, Name.get(name), type, access);
+					this.addParameter(param);
+					return new SimpleFieldVisitor(param);
+				}
+			}
+		}
+		
+		ExternalField field = new ExternalField(this, access, Name.get(name), type);
 		
 		if (value != null)
 		{
 			field.setValue(IValue.fromObject(value));
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("$instance"))
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("instance"))
 		{
-			// This is the instance field of a singleton object class, ignore
-			// annotations as it shouldn't have any
-			this.metadata.setInstanceField(field);
-			return null;
+			// This is the instance field of a singleton object class
+			this.getMetadata().setInstanceField(field);
+		}
+		else
+		{
+			this.body.addField(field);
 		}
 		
-		this.body.addField(field);
 		return new SimpleFieldVisitor(field);
 	}
 	
@@ -527,10 +627,7 @@ public final class ExternalClass extends CodeClass
 		
 		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
 		{
-			ClassParameter param = new ClassParameter();
-			param.modifiers = access;
-			param.name = name1;
-			param.type = ClassFormat.readReturnType(desc);
+			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc), access);
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
 		}
@@ -552,10 +649,7 @@ public final class ExternalClass extends CodeClass
 			return new SimpleMethodVisitor(constructor);
 		}
 		
-		ExternalMethod method = new ExternalMethod(this);
-		method.name = name1;
-		method.modifiers = access;
-		method.descriptor = desc;
+		ExternalMethod method = new ExternalMethod(this, name1, desc, access);
 		
 		if (signature != null)
 		{
@@ -577,24 +671,22 @@ public final class ExternalClass extends CodeClass
 		
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			method.getParameter(method.parameterCount() - 1).setVarargs(true);
+			method.setVarargsParameter();
 		}
 		
-		boolean flag = true;
-		if ((access & Modifiers.SYNTHETIC) != 0)
+		if (name.startsWith("parDefault$"))
 		{
-			int index = name.indexOf('$');
-			if (index != -1)
-			{
-				flag = this.addSpecialMethod(name.substring(0, index), name.substring(index + 1), method);
-			}
+			int i = name.indexOf('$', 12);
+			Name methodName = Name.getQualified(name.substring(12, i));
+			IMethod targetMethod = this.body.getMethod(methodName);
+			int parIndex = Integer.parseInt(name.substring(i + 1));
+			
+			MethodCall call = new MethodCall(null, null, method, EmptyArguments.INSTANCE);
+			targetMethod.getParameter(parIndex).setValue(call);
+			return new BytecodeVisitor(method);
 		}
 		
-		if (flag)
-		{
-			this.body.addMethod(method);
-		}
-		
+		this.body.addMethod(method);
 		return new BytecodeVisitor(method);
 	}
 	
@@ -607,5 +699,19 @@ public final class ExternalClass extends CodeClass
 		
 		IType type = ClassFormat.internalToType(name);
 		this.innerTypes.add(type);
+	}
+	
+	public void visitEnd()
+	{
+	}
+	
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+	}
+	
+	@Override
+	public void writeInnerClassInfo(ClassWriter writer)
+	{
 	}
 }

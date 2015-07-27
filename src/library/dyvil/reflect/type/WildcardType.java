@@ -2,32 +2,22 @@ package dyvil.reflect.type;
 
 import dyvil.lang.Type;
 
+import dyvil.reflect.Variance;
+
 public class WildcardType<T> implements Type<T>
 {
-	protected final Type[]	upperBounds;
-	protected final Type	lowerBound;
+	protected final Variance	variance;
+	protected final Type		bound;
 	
-	public static <T> WildcardType<T> apply(Type lowerBound, Type... upperBounds)
+	public static <T> WildcardType<T> apply(Variance variance, Type upperBounds)
 	{
-		return new WildcardType(lowerBound, upperBounds);
+		return new WildcardType(variance, upperBounds);
 	}
 	
-	public WildcardType(Type lowerBound)
+	public WildcardType(Variance variance, Type bound)
 	{
-		this.lowerBound = lowerBound;
-		this.upperBounds = null;
-	}
-	
-	public WildcardType(Type... upperBounds)
-	{
-		this.upperBounds = upperBounds;
-		this.lowerBound = null;
-	}
-	
-	public WildcardType(Type lowerBound, Type... upperBounds)
-	{
-		this.lowerBound = lowerBound;
-		this.upperBounds = upperBounds;
+		this.variance = variance;
+		this.bound = bound;
 	}
 	
 	@Override
@@ -60,57 +50,47 @@ public class WildcardType<T> implements Type<T>
 	public void toString(StringBuilder builder)
 	{
 		builder.append('_');
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			builder.append(" <= ");
-			this.lowerBound.toString(builder);
-		}
-		if (this.upperBounds == null)
-		{
-			return;
-		}
-		
-		int len = this.upperBounds.length;
-		if (len == 0)
-		{
-			return;
-		}
-		
-		builder.append(" >= ");
-		this.upperBounds[0].toString(builder);
-		for (int i = 1; i < len; i++)
-		{
-			builder.append(" & ");
-			this.upperBounds[i].toString(builder);
+			if (this.variance == Variance.CONTRAVARIANT)
+			{
+				builder.append(" >: ");
+			}
+			else
+			{
+				builder.append(" <: ");
+			}
+			this.bound.toString(builder);
 		}
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		if (this.lowerBound != null)
+		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			builder.append("Ljava/lang/Object;");
+			this.bound.appendSignature(builder);
 			return;
 		}
-		if (this.upperBounds != null && this.upperBounds.length > 0)
-		{
-			this.upperBounds[0].appendSignature(builder);
-		}
+		builder.append("Ljava/lang/Object;");
 	}
 	
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		if (this.lowerBound != null)
+		if (this.bound != null)
 		{
-			builder.append('-');
-			this.lowerBound.appendGenericSignature(builder);
+			if (this.variance == Variance.CONTRAVARIANT)
+			{
+				builder.append('-');
+			}
+			else
+			{
+				builder.append('+');
+			}
+			this.bound.appendSignature(builder);
 			return;
 		}
-		if (this.upperBounds != null && this.upperBounds.length > 0)
-		{
-			this.upperBounds[0].appendSignature(builder);
-		}
+		builder.append('*');
 	}
 }

@@ -23,7 +23,7 @@ public final class IIncInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeIINC(this.index + writer.inlineOffset(), this.value);
+		writer.writeIINC(this.index, this.value);
 	}
 	
 	@Override

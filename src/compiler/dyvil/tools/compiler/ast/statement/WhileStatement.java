@@ -1,11 +1,14 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.context.CombiningLabelContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.IContext;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -14,18 +17,17 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class WhileStatement extends ASTNode implements IStatement, ILoop
+public final class WhileStatement extends Value implements IStatement, ILoop
 {
 	public static final Name	$whileStart	= Name.getQualified("$whileStart");
 	public static final Name	$whileEnd	= Name.getQualified("$whileEnd");
 	
-	public IValue				condition;
-	public IValue				action;
+	protected IValue	condition;
+	protected IValue	action;
 	
-	private IStatement			parent;
-	
-	public Label				startLabel;
-	public Label				endLabel;
+	// Metadata
+	private Label	startLabel;
+	private Label	endLabel;
 	
 	public WhileStatement(ICodePosition position)
 	{
@@ -45,12 +47,12 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		return this.condition;
 	}
 	
-	public void setThen(IValue then)
+	public void setAction(IValue action)
 	{
-		this.action = then;
+		this.action = action;
 	}
 	
-	public IValue getThen()
+	public IValue getAction()
 	{
 		return this.action;
 	}
@@ -59,42 +61,6 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	public int valueTag()
 	{
 		return WHILE;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type)
-	{
-		return type == Types.VOID || type == Types.UNKNOWN ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID || type == Types.UNKNOWN;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
 	}
 	
 	@Override
@@ -118,15 +84,16 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 		}
 		if (this.action != null)
 		{
-			if (this.action.isStatement())
-			{
-				((IStatement) this.action).setParent(this);
-				this.action.resolveTypes(markers, context);
-			}
-			else
-			{
-				this.action.resolveTypes(markers, context);
-			}
+			this.action.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null)
+		{
+			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
 	
@@ -149,7 +116,7 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "while.condition.type");
@@ -189,11 +156,30 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	{
 		if (this.condition != null)
 		{
+			// while (false)
+			if (this.condition.valueTag() == BOOLEAN && !this.condition.booleanValue())
+			{
+				return new VoidValue(this.position);
+			}
 			this.condition = this.condition.foldConstants();
 		}
 		if (this.action != null)
 		{
 			this.action = this.action.foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.condition != null)
+		{
+			this.condition = this.condition.cleanup(context, compilableList);
+		}
+		if (this.action != null)
+		{
+			this.action = this.action.cleanup(context, compilableList);
 		}
 		return this;
 	}
@@ -210,7 +196,7 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 			return this.endLabel;
 		}
 		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		return null;
 	}
 	
 	@Override
@@ -223,8 +209,8 @@ public final class WhileStatement extends ASTNode implements IStatement, ILoop
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label startLabel = this.startLabel.target = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label endLabel = this.endLabel.target = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		// Condition
 		writer.writeTargetLabel(startLabel);

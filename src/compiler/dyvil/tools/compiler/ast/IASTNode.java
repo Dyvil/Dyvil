@@ -8,9 +8,12 @@ public interface IASTNode
 	{
 	}
 	
-	public default ICodePosition getPosition()
+	public ICodePosition getPosition();
+	
+	public default int getLineNumber()
 	{
-		return null;
+		ICodePosition position = this.getPosition();
+		return position == null ? 0 : position.startLine();
 	}
 	
 	public default void expandPosition(ICodePosition position)

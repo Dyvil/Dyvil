@@ -41,7 +41,7 @@ public class LoggerOutputStream extends PrintStream
 		
 		this.level = new Level(name, 1000)
 		{
-			private static final long	serialVersionUID	= -8829261068161314749L;
+			private static final long serialVersionUID = -8829261068161314749L;
 		};
 	}
 	

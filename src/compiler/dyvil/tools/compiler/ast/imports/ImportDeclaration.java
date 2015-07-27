@@ -1,31 +1,30 @@
 package dyvil.tools.compiler.ast.imports;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.lang.List;
-
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.collection.List;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ImportDeclaration extends ASTNode implements IImport
+public final class ImportDeclaration implements IASTNode
 {
 	public static final int	IMPORT	= 0;
 	public static final int	USING	= 1;
 	
-	public IImport			theImport;
-	public IImport			last;
-	public boolean			isStatic;
+	protected ICodePosition	position;
+	protected IImport		theImport;
+	protected boolean		isStatic;
 	
 	public ImportDeclaration(ICodePosition position)
 	{
@@ -39,18 +38,21 @@ public final class ImportDeclaration extends ASTNode implements IImport
 	}
 	
 	@Override
-	public int importTag()
+	public ICodePosition getPosition()
 	{
-		return -1;
+		return this.position;
 	}
 	
-	@Override
-	public void addImport(IImport iimport)
+	public void setImport(IImport iimport)
 	{
 		this.theImport = iimport;
 	}
 	
-	@Override
+	public IImport getImport()
+	{
+		return this.theImport;
+	}
+	
 	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
 	{
 		if (this.theImport == null)
@@ -59,43 +61,26 @@ public final class ImportDeclaration extends ASTNode implements IImport
 		}
 		
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
-		
-		IImport iimport = this.theImport;
-		while (true)
-		{
-			IImport child = iimport.getChild();
-			if (child == null)
-			{
-				break;
-			}
-			iimport = child;
-		}
-		
-		this.last = iimport;
 	}
 	
-	@Override
 	public Package resolvePackage(Name name)
 	{
-		return this.last.resolvePackage(name);
+		return this.theImport.resolvePackage(name);
 	}
 	
-	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.last.resolveClass(name);
+		return this.theImport.resolveClass(name);
 	}
 	
-	@Override
-	public IField resolveField(Name name)
+	public IDataMember resolveField(Name name)
 	{
-		return this.last.resolveField(name);
+		return this.theImport.resolveField(name);
 	}
 	
-	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		this.last.getMethodMatches(list, instance, name, arguments);
+		this.theImport.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -112,15 +97,13 @@ public final class ImportDeclaration extends ASTNode implements IImport
 		this.theImport.toString(prefix, buffer);
 	}
 	
-	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeByte(this.theImport.importTag());
 		this.theImport.write(dos);
 	}
 	
-	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput dis) throws IOException
 	{
 		this.theImport = IImport.fromTag(dis.readByte());
 		this.theImport.read(dis);

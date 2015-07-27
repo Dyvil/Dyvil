@@ -3,25 +3,25 @@ package dyvil.tools.compiler.library;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.LinkOption;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import dyvil.tools.compiler.ast.external.ExternalPackage;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 
 public abstract class Library
 {
-	public static final File					javaLibraryLocation;
-	public static final File					dyvilLibraryLocation;
+	public static final File	javaLibraryLocation;
+	public static final File	dyvilLibraryLocation;
 	
-	public static final Library					dyvilLibrary;
-	public static final Library					dyvilBinLibrary;
-	public static final Library					javaLibrary;
+	public static final Library	dyvilLibrary;
+	public static final Library	dyvilBinLibrary;
+	public static final Library	javaLibrary;
 	
 	static
 	{
-		String s = System.getProperty("sun.boot.class.path");
+		String s = String.class.getResource("/java/lang/String.class").getFile();
 		int index = s.indexOf("rt.jar");
 		if (index != -1)
 		{
@@ -31,7 +31,7 @@ public abstract class Library
 		}
 		else
 		{
-			javaLibraryLocation = null;
+			throw new Error("Could not locate rt.jar - " + s);
 		}
 		
 		File bin = new File("bin");
@@ -49,10 +49,16 @@ public abstract class Library
 			dyvilLibraryLocation = new File(s);
 		}
 		
-		dyvilLibrary = load(dyvilLibraryLocation);
-		javaLibrary = load(javaLibraryLocation);
+		if ((dyvilLibrary = load(dyvilLibraryLocation)) == null)
+		{
+			throw new Error("Could not load Dyvil Runtime Library");
+		}
+		if ((javaLibrary = load(javaLibraryLocation)) == null)
+		{
+			throw new Error("Could not load Java Runtime Library");
+		}
 		
-		bin = new File("dbin");
+		bin = new File("build/dyvilbin");
 		if (bin.exists())
 		{
 			dyvilBinLibrary = load(bin);
@@ -63,18 +69,13 @@ public abstract class Library
 		}
 	}
 	
-	protected static final Map<String, String>	env					= new HashMap<>();
+	protected static final Map<String, String> env = Collections.singletonMap("create", "true");
 	
-	static
-	{
-		env.put("create", "true");
-	}
+	protected static final String[]		emptyStrings		= {};
+	protected static final LinkOption[]	emptyLinkOptions	= {};
 	
-	protected static final String[]				emptyStrings		= {};
-	protected static final LinkOption[]			emptyLinkOptions	= {};
-	
-	public File									file;
-	public Map<String, Package>					packages			= new HashMap();
+	public File					file;
+	public Map<String, Package>	packages	= new HashMap();
 	
 	protected Library(File file)
 	{
@@ -91,6 +92,12 @@ public abstract class Library
 		{
 			return new JarLibrary(file);
 		}
+		String error = "Invalid Library File: " + file.getAbsolutePath();
+		if (!file.exists())
+		{
+			error += " (File does not exist)";
+		}
+		DyvilCompiler.error(error);
 		return null;
 	}
 	
@@ -114,7 +121,7 @@ public abstract class Library
 			if (this.isSubPackage(internal))
 			{
 				String s = internal.substring(0, index);
-				pack = this.resolvePackage2(s);
+				pack = Package.rootPackage.createSubPackage(s);
 				
 				if (pack == null)
 				{
@@ -141,27 +148,7 @@ public abstract class Library
 		}
 		if (this.isSubPackage(internal))
 		{
-			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(internal), this);
-			Package.rootPackage.addSubPackage(pack);
-			this.packages.put(internal, pack);
-			return pack;
-		}
-		return null;
-	}
-	
-	public Package resolvePackage2(String name)
-	{
-		Package pack = this.packages.get(name);
-		if (pack != null)
-		{
-			return pack;
-		}
-		if (this.isSubPackage(name))
-		{
-			pack = new ExternalPackage(Package.rootPackage, Name.getQualified(name), this);
-			Package.rootPackage.addSubPackage(pack);
-			this.packages.put(name, pack);
-			return pack;
+			return Package.rootPackage.createSubPackage(internal);
 		}
 		return null;
 	}

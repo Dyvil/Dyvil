@@ -6,12 +6,14 @@ import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
+import dyvil.collection.immutable.ArrayMap;
+import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
 
 @NilConvertible
@@ -19,7 +21,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 {
 	private final class TableEntry implements Entry<K, V>
 	{
-		int	index;
+		int index;
 		
 		public TableEntry(int index)
 		{
@@ -196,12 +198,12 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		}
 		
 		this.table = new Object[MathUtils.powerOfTwo(size << 1)];
-		this.threshold = (int) Math.min(size * loadFactor, HashMap.MAX_ARRAY_SIZE + 1);
+		this.threshold = (int) Math.min(size * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
 	
 	public IdentityHashMap(Map<K, V> map)
 	{
-		this(map.size(), DEFAULT_LOAD_FACTOR);
+		this(AbstractHashMap.grow(map.size()), DEFAULT_LOAD_FACTOR);
 		for (Entry<K, V> entry : map)
 		{
 			this.subscript_$eq(entry.getKey(), entry.getValue());
@@ -271,19 +273,19 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		};
 	}
 	
-	private static final Object	NULL	= new Object();
+	static final Object NULL = new Object();
 	
-	private static Object maskNull(Object o)
+	static Object maskNull(Object o)
 	{
 		return o == null ? NULL : o;
 	}
 	
-	private static Object unmaskNull(Object o)
+	static Object unmaskNull(Object o)
 	{
 		return o == NULL ? null : o;
 	}
 	
-	private static int hash(Object x, int length)
+	static int hash(Object x, int length)
 	{
 		int h = System.identityHashCode(x);
 		h = (h << 1) - (h << 8); // Multiply by -127
@@ -301,13 +303,13 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		
 		Object[] oldTable = this.table;
 		int oldLength = oldTable.length;
-		if (newLength - HashMap.MAX_ARRAY_SIZE > 0)
+		if (newLength - AbstractHashMap.MAX_ARRAY_SIZE > 0)
 		{
-			if (oldLength == HashMap.MAX_ARRAY_SIZE)
+			if (oldLength == AbstractHashMap.MAX_ARRAY_SIZE)
 			{
 				return;
 			}
-			newLength = HashMap.MAX_ARRAY_SIZE;
+			newLength = AbstractHashMap.MAX_ARRAY_SIZE;
 		}
 		
 		Object[] newTable = new Object[newLength];
@@ -393,7 +395,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
-	public V get(K key)
+	public V get(Object key)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -412,70 +414,6 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 			}
 			i = nextKeyIndex(i, len);
 		}
-	}
-	
-	@Override
-	public MutableMap<K, V> $plus(K key, V value)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.subscript_$eq(key, value);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$plus$plus$eq(map);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus(Object key)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$minus$eq(key);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus(Object key, Object value)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.remove(key, value);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus$colon(Object value)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$minus$colon$eq(value);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.$minus$minus$eq(map);
-		return copy;
-	}
-	
-	@Override
-	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
-	{
-		MutableMap<K, U> copy = (MutableMap<K, U>) this.copy();
-		copy.map((BiFunction<? super K, ? super U, ? extends U>) mapper);
-		return copy;
-	}
-	
-	@Override
-	public MutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
-	{
-		MutableMap<K, V> copy = this.copy();
-		copy.filter(condition);
-		return copy;
 	}
 	
 	@Override
@@ -498,7 +436,6 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		{
 			if (item == k)
 			{
-				@SuppressWarnings("unchecked")
 				V oldValue = (V) tab[i + 1];
 				tab[i + 1] = value;
 				return oldValue;
@@ -512,6 +449,82 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		{
 			this.resize(len);
 		}
+		return null;
+	}
+	
+	@Override
+	public boolean putIfAbsent(K key, V value)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		
+		Object item;
+		while ((item = tab[i]) != null)
+		{
+			if (item == k)
+			{
+				return false;
+			}
+			i = nextKeyIndex(i, len);
+		}
+		
+		tab[i] = k;
+		tab[i + 1] = value;
+		if (++this.size >= this.threshold)
+		{
+			this.resize(len);
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean replace(K key, V oldValue, V newValue)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		
+		Object item;
+		while ((item = tab[i]) != null)
+		{
+			if (item == k)
+			{
+				if (tab[i + 1] != oldValue)
+				{
+					return false;
+				}
+				tab[i + 1] = newValue;
+				return true;
+			}
+			i = nextKeyIndex(i, len);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public V replace(K key, V newValue)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		
+		Object item;
+		while ((item = tab[i]) != null)
+		{
+			if (item == k)
+			{
+				V oldValue = (V) tab[i + 1];
+				tab[i + 1] = newValue;
+				return oldValue;
+			}
+			i = nextKeyIndex(i, len);
+		}
+		
 		return null;
 	}
 	
@@ -642,9 +655,15 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	}
 	
 	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new IdentityHashMap(this.size);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return null;
+		return new ArrayMap(this); // TODO immutable.IdentityHashMap
 	}
 	
 	@Override

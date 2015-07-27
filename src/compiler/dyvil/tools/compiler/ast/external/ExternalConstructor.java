@@ -2,16 +2,17 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class ExternalConstructor extends Constructor
+public final class ExternalConstructor extends Constructor
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
@@ -53,7 +54,7 @@ public class ExternalConstructor extends Constructor
 		this.exceptionsResolved = true;
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(null, Package.rootPackage);
+			this.exceptions[i] = this.exceptions[i].resolve(null, Package.rootPackage, TypePosition.TYPE);
 		}
 	}
 	
@@ -78,7 +79,7 @@ public class ExternalConstructor extends Constructor
 	}
 	
 	@Override
-	public int getSignatureMatch(IArguments arguments)
+	public float getSignatureMatch(IArguments arguments)
 	{
 		if (!this.parametersResolved)
 		{
