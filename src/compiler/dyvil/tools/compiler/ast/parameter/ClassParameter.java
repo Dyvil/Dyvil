@@ -19,6 +19,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public final class ClassParameter extends Parameter implements IField
 {
@@ -151,18 +152,6 @@ public final class ClassParameter extends Parameter implements IField
 		{
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
-			boolean inferType = false;
-			if (this.type == Types.UNKNOWN)
-			{
-				inferType = true;
-				this.type = this.defaultValue.getType();
-				if (this.type == Types.UNKNOWN)
-				{
-					markers.add(this.position, "classparameter.type.infer", this.name.unqualified);
-					this.type = Types.ANY;
-				}
-			}
-			
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
@@ -173,11 +162,9 @@ public final class ClassParameter extends Parameter implements IField
 			else
 			{
 				this.defaultValue = value1;
-				if (inferType)
-				{
-					this.type = value1.getType();
-				}
 			}
+			
+			this.defaultValue = Util.constant(this.defaultValue, markers);
 			return;
 		}
 		if (this.type == Types.UNKNOWN)

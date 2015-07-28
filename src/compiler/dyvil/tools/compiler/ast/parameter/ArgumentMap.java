@@ -227,7 +227,15 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		param.getType().inferTypes(this.getValue(param.getName()).getType(), typeContext);
+		IType type = param.getType();
+		Name name = param.getName();
+		for (int i = 0; i < this.size; i++)
+		{
+			if (this.keys[i] == name)
+			{
+				type.inferTypes(this.values[i].getType(), typeContext);
+			}
+		}
 	}
 	
 	@Override

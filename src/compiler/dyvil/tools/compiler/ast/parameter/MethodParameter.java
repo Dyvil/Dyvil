@@ -14,6 +14,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public final class MethodParameter extends Parameter
 {
@@ -108,6 +109,8 @@ public final class MethodParameter extends Parameter
 			{
 				this.defaultValue = value1;
 			}
+			
+			this.defaultValue = Util.constant(this.defaultValue, markers);
 			return;
 		}
 	}

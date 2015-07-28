@@ -97,7 +97,7 @@ public class Util
 		{
 			if (--depth < 0)
 			{
-				markers.add(value.getPosition(), "value.constant", value.toString(), DyvilCompiler.maxConstantDepth);
+				markers.add(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth);
 				return value.getType().getDefaultValue();
 			}
 			value = value.foldConstants();
