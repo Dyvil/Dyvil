@@ -101,6 +101,12 @@ public final class FieldAccess implements IValue, INamed, IValued
 	}
 	
 	@Override
+	public boolean isConstant()
+	{
+		return this.field != null && this.field.hasModifier(Modifiers.CONST);
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.type == null)

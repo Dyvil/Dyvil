@@ -42,6 +42,12 @@ public final class ClassOperator extends Value
 	}
 	
 	@Override
+	public boolean isConstant()
+	{
+		return true;
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

@@ -144,8 +144,6 @@ public abstract class Parameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			compilableList.addCompilable(this);
-			
 			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
 		}
 	}
