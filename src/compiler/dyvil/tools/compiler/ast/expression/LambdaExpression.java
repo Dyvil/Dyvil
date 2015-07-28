@@ -120,6 +120,26 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		return this.value;
 	}
 	
+	public void setMethod(IMethod method)
+	{
+		this.method = method;
+	}
+	
+	public IMethod getMethod()
+	{
+		return this.method;
+	}
+	
+	public IType getReturnType()
+	{
+		return this.returnType;
+	}
+	
+	public void setReturnType(IType returnType)
+	{
+		this.returnType = returnType;
+	}
+	
 	@Override
 	public void setType(IType type)
 	{

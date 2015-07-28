@@ -9,6 +9,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LambdaExpression;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -141,16 +142,58 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	}
 	
 	@Override
+	public int getSubClassDistance(IType subtype)
+	{
+		if (this.parameterCount == 0)
+		{
+			int i = this.returnType.getSubClassDistance(subtype);
+			if (i != 0)
+			{
+				return i;
+			}
+		}
+		
+		return IType.super.getSubClassDistance(subtype);
+	}
+	
+	@Override
+	public float getSubTypeDistance(IType subtype)
+	{
+		if (this.parameterCount == 0)
+		{
+			float f = this.returnType.getSubTypeDistance(subtype);
+			if (f != 0)
+			{
+				return f;
+			}
+		}
+		
+		return IType.super.getSubTypeDistance(subtype);
+	}
+	
+	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
+		if (this.parameterCount == 0 && this.returnType.isSuperTypeOf(type))
+		{
+			return true;
+		}
+		
 		if (!IType.super.isSuperTypeOf(type))
 		{
 			return false;
 		}
 		
 		IClass iclass = this.getTheClass();
-		ITypeVariable typeVar;
-		IType type1;
+		ITypeVariable typeVar = iclass.getTypeVariable(this.parameterCount);
+		IType type1 = type.resolveType(typeVar);
+		
+		// Return type is Covariant
+		if (!this.returnType.isSuperTypeOf(type1))
+		{
+			return false;
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			typeVar = iclass.getTypeVariable(i);
@@ -163,10 +206,28 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			}
 		}
 		
-		typeVar = iclass.getTypeVariable(this.parameterCount);
-		type1 = type.resolveType(typeVar);
-		// Covariance
-		return this.returnType.isSuperTypeOf(type1);
+		return true;
+	}
+	
+	@Override
+	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (this.parameterCount != 0 || IType.super.isSuperTypeOf(value.getType()))
+		{
+			return value.withType(this, typeContext, markers, context);
+		}
+		
+		IValue value1 = value.withType(this.returnType, typeContext, markers, context);
+		if (value1 != null)
+		{
+			LambdaExpression le = new LambdaExpression(value1.getPosition(), null, 0);
+			le.setMethod(this.getFunctionalMethod());
+			le.setReturnType(this.returnType);
+			le.setValue(value1);
+			le.setType(this);
+			return le;
+		}
+		return null;
 	}
 	
 	@Override
@@ -206,6 +267,12 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
+		if (this.parameterCount == 0 && this.returnType.isSuperTypeOf(concrete))
+		{
+			this.returnType.inferTypes(concrete, typeContext);
+			return;
+		}
+		
 		ITypeVariable typeVar;
 		IType concreteType;
 		IClass iclass = this.getTheClass();
@@ -234,7 +301,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		{
 			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
 		}
-		this.returnType = this.returnType.resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+		this.returnType = this.returnType.resolve(markers, context, TypePosition.GENERIC_ARGUMENT).getReferenceType();
 		
 		if (position == TypePosition.CLASS)
 		{

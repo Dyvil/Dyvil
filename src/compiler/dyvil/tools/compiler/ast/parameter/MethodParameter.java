@@ -97,7 +97,7 @@ public final class MethodParameter extends Parameter
 		{
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
-			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
+			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type", this.name.unqualified);

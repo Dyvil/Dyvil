@@ -116,7 +116,7 @@ public final class WhileStatement extends Value implements IStatement, ILoop
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = markers.create(this.condition.getPosition(), "while.condition.type");

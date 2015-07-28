@@ -127,7 +127,7 @@ public final class Annotation implements IASTNode, INamed
 			IParameter param = theClass.getParameter(i);
 			IType type = param.getType();
 			IValue value = this.arguments.getValue(i, param);
-			IValue value1 = value.withType(type, null, markers, context);
+			IValue value1 = value.withType(type, type, markers, context);
 			
 			if (value1 == null)
 			{

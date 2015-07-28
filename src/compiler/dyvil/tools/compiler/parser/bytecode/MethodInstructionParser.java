@@ -57,14 +57,14 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		{
 			if (type != Symbols.DOT)
 			{
-				throw new SyntaxError(token, "Invalid Field Instruction - '.' expected");
+				throw new SyntaxError(token, "Invalid Method Instruction - '.' expected");
 			}
 			this.mode = PARAMETERS;
 			
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				throw new SyntaxError(next, "Invalid Field Instruction - Field Name expected");
+				throw new SyntaxError(next, "Invalid Method Instruction - Identifier expected");
 			}
 			pm.skip();
 			this.methodInstruction.setMethodName(next.nameValue().qualified);
@@ -98,7 +98,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		{
 			if (type != Symbols.COLON)
 			{
-				throw new SyntaxError(token, "Invalid Field Instruction - ':' expected");
+				throw new SyntaxError(token, "Invalid Method Instruction - ':' expected");
 			}
 			
 			pm.pushParser(new InternalTypeParser(this));

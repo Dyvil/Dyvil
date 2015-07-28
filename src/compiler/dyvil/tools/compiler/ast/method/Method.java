@@ -406,7 +406,7 @@ public class Method extends Member implements IMethod, ILabelContext
 				}
 			}
 			
-			IValue value1 = this.value.withType(this.type, this.type, markers, this);
+			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
@@ -851,7 +851,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		{
 			parType = this.theClass.getType().getConcreteType(typeContext);
 			instance = arguments.getFirstValue();
-			IValue instance1 = instance.withType(parType, typeContext, markers, context);
+			IValue instance1 = parType.convertValue(instance, typeContext, markers, context);
 			if (instance1 == null)
 			{
 				Marker marker = markers.create(instance.getPosition(), "method.access.prefix_type", this.name);

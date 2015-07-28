@@ -193,7 +193,7 @@ public class Field extends Member implements IField
 			markers.add(position, "field.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = newValue.withType(this.type, null, markers, context);
+		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);
