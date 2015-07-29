@@ -1,0 +1,116 @@
+package dyvil.lang
+
+import dyvil.annotation.Intrinsic
+import dyvil.array._
+import dyvil.collection.{ List, ImmutableList }
+import java.lang.{ Float => JFloat, Double => JDouble }
+
+using dyvil.reflect.Opcodes._
+
+public final class Predef
+{
+	private new() {}
+	
+	public static void main([String] args) {}
+	
+	// Object Operators
+	
+	@Intrinsic [ INSTANCE, ARGUMENTS, OBJECT_EQUALS, IFNE ]
+	public infix boolean ==(Object o1, Object o2) = o1 equals o2
+	
+	@Intrinsic [ INSTANCE, ARGUMENTS, IF_ACMPEQ ]
+	public infix boolean ===(Object o1, Object o2) = o1 === o2
+	
+	@Intrinsic [ INSTANCE, ARGUMENTS, OBJECT_EQUALS, IFEQ ]
+	public infix boolean !=(Object o1, Object o2) = !(o1 equals o2)
+	
+	@Intrinsic [ INSTANCE, ARGUMENTS, IF_ACMPNE ]
+	public infix boolean !==(Object o1, Object o2) = o1 !== o2
+	
+	// Lists
+	
+	public infix ImmutableList[_ <: E] ::[E](E element, List[_ <: E] list) = ImmutableList(element) ++ list
+	
+	public infix ImmutableList[_ <: E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	
+	public infix Iterable[E] toIterable[E](E... array) = ImmutableList(array)
+	
+	// Strings
+	
+	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
+	
+	// Hashing
+	
+	public static int hash(Object... args)
+	{
+		if (args == null) return 0
+		
+		var result = 1
+		for (var element : args)
+		{
+			result = 31 * result + if (element == null) 0 else element.hashCode
+		}
+		return result;
+	}
+	
+	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
+	
+	@Intrinsic [ INSTANCE, ARGUMENTS ]
+	public infix int ##(int i) = i
+	
+	public infix int ##(long l) = (l ^ l >>> 32) as int
+	
+	public infix int ##(float f) = JFloat.hashCode(f)
+	
+	public infix int ##(double d) = JDouble.hashCode(d)
+	
+	// Print
+	
+	public static void println() = System.out.println()
+	
+	public static void println(boolean v) = System.out.println(if (v) "true" else "false")
+	
+	public static void println(byte v) = System.out.println(v)
+	
+	public static void println(short v) = System.out.println(v)
+	
+	public static void println(char v) = System.out.println(v)
+	
+	public static void println(int v) = System.out.println(v)
+	
+	public static void println(long v) = System.out.println(v)
+	
+	public static void println(float v) = System.out.println(v)
+	
+	public static void println(double v) = System.out.println(v)
+	
+	public static void println(String s) = System.out.println(s)
+	
+	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
+	
+	public static void println(boolean... v) = System.out.println(BooleanArray.toString(v));
+	
+	public static void println(byte... v) = System.out.println(ByteArray.toString(v));
+	
+	public static void println(short... v) = System.out.println(ShortArray.toString(v));
+	
+	public static void println(char... v) = System.out.println(CharArray.toString(v));
+	
+	public static void println(int... v) = System.out.println(IntArray.toString(v));
+	
+	public static void println(long... v) = System.out.println(LongArray.toString(v));
+	
+	public static void println(float... v) = System.out.println(FloatArray.toString(v));
+	
+	public static void println(double... v) = System.out.println(DoubleArray.toString(v));
+	
+	public static void println(Object... v) = System.out.println(ObjectArray.deepToString(v));
+	
+	// Tuples
+	
+	public infix (A, B) ->[A, B](A a, B b) = (a, b)
+	
+	public infix (A, B) <-[A, B](A a, B b) = (b, a)
+	
+	public static void ???() = throw new UnsupportedOperationException("Not Implemented!")
+}
