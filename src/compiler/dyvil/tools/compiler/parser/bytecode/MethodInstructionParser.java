@@ -27,13 +27,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = OWNER;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
@@ -42,46 +36,40 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 			return;
 		}
 		
-		if (this.mode == OWNER)
+		switch (this.mode)
 		{
+		case OWNER:
 			if (type == Keywords.INTERFACE)
 			{
 				this.methodInstruction.setInterface(true);
 			}
-			
 			pm.pushParser(new InternalTypeParser(this), true);
 			this.mode = DOT;
 			return;
-		}
-		if (this.mode == DOT)
-		{
+		case DOT:
 			if (type != Symbols.DOT)
 			{
-				throw new SyntaxError(token, "Invalid Method Instruction - '.' expected");
+				pm.report(new SyntaxError(token, "Invalid Method Instruction - '.' expected")); return;
 			}
 			this.mode = PARAMETERS;
-			
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				throw new SyntaxError(next, "Invalid Method Instruction - Identifier expected");
+				pm.report(new SyntaxError(next, "Invalid Method Instruction - Identifier expected")); return;
 			}
 			pm.skip();
 			this.methodInstruction.setMethodName(next.nameValue().qualified);
 			return;
-		}
-		if (this.mode == PARAMETERS)
-		{
+		case PARAMETERS:
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new InternalTypeParser(this));
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Method Instruction - '(' expected");
-		}
-		if (this.mode == PARAMETERS_END)
-		{
+			pm.report(new SyntaxError(token, "Invalid Method Instruction - '(' expected"));
+			return;
+		case PARAMETERS_END:
 			if (type == Symbols.COMMA)
 			{
 				pm.pushParser(new InternalTypeParser(this));
@@ -92,15 +80,13 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 				this.mode = COLON;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Method Instruction - ',' or ')' expected");
-		}
-		if (this.mode == COLON)
-		{
+			pm.report(new SyntaxError(token, "Invalid Method Instruction - ',' or ')' expected"));
+			break;
+		case COLON:
 			if (type != Symbols.COLON)
 			{
-				throw new SyntaxError(token, "Invalid Method Instruction - ':' expected");
+				pm.report(new SyntaxError(token, "Invalid Method Instruction - ':' expected")); return;
 			}
-			
 			pm.pushParser(new InternalTypeParser(this));
 			return;
 		}

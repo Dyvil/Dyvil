@@ -17,34 +17,28 @@ public class TypeVariableListParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == 0)
+		switch (this.mode)
 		{
+		case 0:
 			this.mode = 1;
 			pm.pushParser(pm.newTypeVariableParser(this.generic), true);
 			return;
-		}
-		if (this.mode == 1)
-		{
+		case 1:
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
 				return;
 			}
 			this.mode = 0;
-			if (ParserUtil.isSeperator(type))
+			if (!ParserUtil.isSeperator(type))
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Type Variable List - ',' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Type Variable List - ',' expected", true);
+			return;
 		}
 	}
 }

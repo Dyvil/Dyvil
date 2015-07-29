@@ -33,15 +33,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = NAME;
-		this.boundMode = 0;
-		this.variable = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (this.mode == NAME)
@@ -66,7 +58,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 				this.mode = TYPE_VARIABLE;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type Variable - Name expected");
+			pm.report(new SyntaxError(token, "Invalid Type Variable - Name expected")); return;
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
@@ -87,7 +79,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 					this.generic.addTypeVariable(this.variable);
 				}
 				pm.popParser(true);
-				throw new SyntaxError(token, "Invalid Type Variable - '>=', '<=' or '&' expected");
+				pm.report(new SyntaxError(token, "Invalid Type Variable - '>=', '<=' or '&' expected")); return;
 			}
 			
 			Name name = token.nameValue();

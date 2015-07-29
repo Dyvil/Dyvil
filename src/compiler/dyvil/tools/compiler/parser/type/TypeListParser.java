@@ -18,13 +18,7 @@ public final class TypeListParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON && token.isInferred() || type == Symbols.OPEN_CURLY_BRACKET)
@@ -33,14 +27,13 @@ public final class TypeListParser extends Parser
 			return;
 		}
 		
-		if (this.mode == 0)
+		switch (this.mode)
 		{
+		case 0:
 			this.mode = 1;
 			pm.pushParser(pm.newTypeParser(this.consumer), true);
 			return;
-		}
-		if (this.mode == 1)
-		{
+		case 1:
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
@@ -51,7 +44,8 @@ public final class TypeListParser extends Parser
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type List - ',' expected");
+			pm.report(new SyntaxError(token, "Invalid Type List - ',' expected"));
+			return;
 		}
 	}
 }

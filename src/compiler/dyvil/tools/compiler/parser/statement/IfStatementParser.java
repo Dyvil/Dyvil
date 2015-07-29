@@ -27,13 +27,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = IF;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		if (this.mode == -1)
 		{
@@ -46,20 +40,22 @@ public class IfStatementParser extends Parser implements IValueConsumer
 		{
 			this.mode = CONDITION_END;
 			pm.pushParser(pm.newExpressionParser(this));
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type != Symbols.OPEN_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid if statement - '(' expected"));
 			}
-			throw new SyntaxError(token, "Invalid if statement - '(' expected", true);
+			return;
 		}
 		if (this.mode == CONDITION_END)
 		{
 			this.mode = THEN;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid if statement - ')' expected"));
 			}
-			throw new SyntaxError(token, "Invalid if statement - ')' expected", true);
+			return;
 		}
 		if (this.mode == THEN)
 		{
@@ -77,7 +73,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 		{
 			if (ParserUtil.isTerminator(type))
 			{
-				IToken next = token.getNext();
+				IToken next = token.next();
 				if (next != null && next.type() == Keywords.ELSE)
 				{
 					return;
@@ -101,17 +97,17 @@ public class IfStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == CONDITION_END)
+		switch (this.mode)
 		{
+		case CONDITION_END:
 			this.statement.setCondition(value);
-		}
-		else if (this.mode == ELSE)
-		{
+			return;
+		case ELSE:
 			this.statement.setThen(value);
-		}
-		else if (this.mode == -1)
-		{
+			return;
+		case -1:
 			this.statement.setElse(value);
+			return;
 		}
 	}
 }

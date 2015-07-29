@@ -35,14 +35,7 @@ public class TypeAliasParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = TYPE;
-		this.typeAlias = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{
@@ -57,7 +50,9 @@ public class TypeAliasParser extends Parser
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type Alias - 'type' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Type Alias - 'type' expected"));
+			return;
 		case NAME:
 			if (ParserUtil.isIdentifier(token.type()))
 			{
@@ -68,7 +63,8 @@ public class TypeAliasParser extends Parser
 			}
 			pm.skip();
 			pm.popParser();
-			throw new SyntaxError(token, "Invalid Type Alias - Identifier expected");
+			pm.report(new SyntaxError(token, "Invalid Type Alias - Identifier expected"));
+			return;
 		case EQUAL:
 			this.mode = 0;
 			pm.pushParser(pm.newTypeParser(this.typeAlias));
@@ -76,7 +72,9 @@ public class TypeAliasParser extends Parser
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type Alias - '=' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Type Alias - '=' expected"));
+			return;
 		}
 	}
 }

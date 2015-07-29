@@ -28,12 +28,6 @@ public class DyvilHeaderParser extends Parser
 		this.mode = PACKAGE;
 	}
 	
-	@Override
-	public void reset()
-	{
-		this.mode = PACKAGE;
-	}
-	
 	protected boolean parsePackage(IParserManager pm, IToken token)
 	{
 		if (token.type() == Keywords.PACKAGE)
@@ -46,10 +40,11 @@ public class DyvilHeaderParser extends Parser
 		return false;
 	}
 	
-	protected boolean parseImport(IParserManager pm, IToken token) throws SyntaxError
+	protected boolean parseImport(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == Keywords.IMPORT)
+		switch (token.type())
+		{
+		case Keywords.IMPORT:
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw());
 			pm.pushParser(new ImportParser(im -> {
@@ -58,7 +53,7 @@ public class DyvilHeaderParser extends Parser
 			}));
 			return true;
 		}
-		if (type == Keywords.USING)
+		case Keywords.USING:
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
 			pm.pushParser(new ImportParser(im -> {
@@ -67,33 +62,32 @@ public class DyvilHeaderParser extends Parser
 			}));
 			return true;
 		}
-		if (type == Keywords.OPERATOR)
-		{
+		case Keywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, true), true);
 			return true;
-		}
-		if (type == Keywords.PREFIX || type == Keywords.POSTFIX || type == Keywords.INFIX)
-		{
+		case Keywords.PREFIX:
+		case Keywords.POSTFIX:
+		case Keywords.INFIX:
 			pm.pushParser(new OperatorParser(this.unit, false), true);
 			return true;
-		}
-		if (type == Keywords.INCLUDE)
+		case Keywords.INCLUDE:
 		{
 			IncludeDeclaration i = new IncludeDeclaration(token.raw());
 			pm.pushParser(new IncludeParser(this.unit, i));
 			return true;
 		}
-		if (type == Keywords.TYPE)
+		case Keywords.TYPE:
 		{
 			TypeAlias typeAlias = new TypeAlias();
 			pm.pushParser(new TypeAliasParser(this.unit, typeAlias));
 			return true;
 		}
+		}
 		return false;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		if (token.type() == Symbols.SEMICOLON)
 		{
@@ -113,6 +107,7 @@ public class DyvilHeaderParser extends Parser
 				return;
 			}
 		}
-		throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
+		pm.report(new SyntaxError(token, "Invalid " + token + " - Delete this token"));
+		return;
 	}
 }

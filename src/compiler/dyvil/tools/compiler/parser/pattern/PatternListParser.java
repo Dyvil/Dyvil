@@ -22,14 +22,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-		this.pattern = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
@@ -42,21 +35,21 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 			return;
 		}
 		
-		if (this.mode == 0)
+		switch (this.mode)
 		{
+		case 0:
 			this.mode = 1;
 			pm.pushParser(new PatternParser(this), true);
 			return;
-		}
-		if (this.mode == 1)
-		{
+		case 1:
 			this.mode = 0;
 			if (type == Symbols.COMMA)
 			{
 				this.patternList.addPattern(this.pattern);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Pattern List - ',' expected");
+			pm.report(new SyntaxError(token, "Invalid Pattern List - ',' expected"));
+			return;
 		}
 	}
 	

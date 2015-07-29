@@ -62,8 +62,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		this.mode = TYPE;
 	}
 	
-	@Override
-	public void reset()
+	private void reset()
 	{
 		this.mode = TYPE;
 		this.modifiers = 0;
@@ -73,7 +72,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		
@@ -101,7 +100,8 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				if (this.theClass == null)
 				{
 					this.mode = 0;
-					throw new SyntaxError(token, "Cannot define a constructor in this context");
+					pm.report(new SyntaxError(token, "Cannot define a constructor in this context"));
+					return;
 				}
 				
 				Constructor c = new Constructor(token.raw(), this.theClass, this.modifiers);
@@ -123,13 +123,15 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				if (!ParserUtil.isIdentifier(next.type()))
 				{
 					this.reset();
-					throw new SyntaxError(next, "Invalid Class Declaration - Name expected");
+					pm.report(new SyntaxError(next, "Invalid Class Declaration - Name expected"));
+					return;
 				}
 				
 				if (this.theClass == null)
 				{
 					this.reset();
-					throw new SyntaxError(token, "Cannot define a class in this context");
+					pm.report(new SyntaxError(token, "Cannot define a class in this context"));
+					return;
 				}
 				
 				Name name = next.nameValue();
@@ -159,7 +161,8 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
-				throw new SyntaxError(token, "Invalid Member Declaration - Name expected");
+				pm.report(new SyntaxError(token, "Invalid Member Declaration - Name expected"));
+				return;
 			}
 			IToken next = token.next();
 			type = next.type();
@@ -223,14 +226,17 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			throw new SyntaxError(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected");
+			pm.report(new SyntaxError(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected"));
+			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Generic Type Parameter List - ']' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Generic Type Parameter List - ']' expected"));
+			return;
 		case PARAMETERS:
 			this.mode = PARAMETERS_END;
 			if (type == Symbols.OPEN_PARENTHESIS)
@@ -238,14 +244,19 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.pushParser(new ParameterListParser((IParameterList) this.member));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Parameter List - '(' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Parameter List - '(' expected"));
+			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_VALUE;
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Parameter List - ')' expected", true);
+			
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Parameter List - ')' expected"));
+			return;
 		case METHOD_VALUE:
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
@@ -277,7 +288,8 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			throw new SyntaxError(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
+			pm.report(new SyntaxError(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected"));
+			return;
 		case METHOD_END:
 			if (this.member instanceof IMethod)
 			{

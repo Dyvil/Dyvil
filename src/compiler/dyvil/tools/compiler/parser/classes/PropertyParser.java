@@ -31,13 +31,7 @@ public class PropertyParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = GET_OR_SET;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (type == Symbols.CLOSE_CURLY_BRACKET)
@@ -99,7 +93,7 @@ public class PropertyParser extends Parser implements IValued
 				this.mode = GET_OR_SET;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Property Declaration - ':' expected");
+			pm.report(new SyntaxError(token, "Invalid Property Declaration - ':' expected")); return;
 		}
 	}
 	

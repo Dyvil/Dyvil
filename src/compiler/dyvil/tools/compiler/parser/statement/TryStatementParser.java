@@ -30,24 +30,17 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
+	public void parse(IParserManager pm, IToken token) 
 	{
-		this.mode = ACTION;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
-	{
-		if (this.mode == ACTION)
+		int type = token.type();
+		switch (this.mode)
 		{
+		case ACTION:
 			// TODO Try-With-Resource
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = CATCH;
-			return;
-		}
-		int type = token.type();
-		if (this.mode == CATCH)
-		{
+			return;			
+		case CATCH:
 			if (type == Keywords.CATCH)
 			{
 				this.statement.addCatchBlock(this.catchBlock = new CatchBlock(token.raw()));
@@ -56,14 +49,13 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			}
 			if (type == Keywords.FINALLY)
 			{
-				pm.popParser();
 				pm.pushParser(pm.newExpressionParser(this));
-				this.mode = 0;
+				this.mode = END;
 				return;
 			}
 			if (ParserUtil.isTerminator(type))
 			{
-				IToken next = token.getNext();
+				IToken next = token.next();
 				if (next == null)
 				{
 					pm.popParser(true);
@@ -71,57 +63,54 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 				}
 				
 				int nextType = token.next().type();
-				if (nextType != Keywords.CATCH && nextType != Keywords.FINALLY)
+				if (nextType == Keywords.CATCH || nextType == Keywords.FINALLY)
 				{
-					pm.popParser(true);
+					return;
 				}
-				return;
 			}
 			pm.popParser(true);
-		}
-		if (this.mode == CATCH_OPEN)
-		{
+			return;
+		case CATCH_OPEN:
 			this.mode = CATCH_VAR;
 			pm.pushParser(pm.newTypeParser(this.catchBlock));
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type != Symbols.OPEN_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Catch Expression - '(' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Catch Expression - '(' expected", true);
-		}
-		if (this.mode == CATCH_VAR)
-		{
+			return;
+		case CATCH_VAR:
 			this.mode = CATCH_CLOSE;
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.catchBlock.varName = token.nameValue();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Catch Expression - Name expected", true);
-		}
-		if (this.mode == CATCH_CLOSE)
-		{
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Catch Expression - Name expected"));
+			return;
+		case CATCH_CLOSE:
 			this.mode = CATCH;
 			pm.pushParser(pm.newExpressionParser(this.catchBlock));
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.report(new SyntaxError(token, "Invalid Catch Expression - ')' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Catch Expression - ')' expected");
+			return;
 		}
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == CATCH)
+		switch (this.mode)
 		{
+		case CATCH:
 			this.statement.setAction(value);
 			return;
-		}
-		if (this.mode == 0)
-		{
+		case END:
 			this.statement.setFinallyBlock(value);
+			break;
 		}
 	}
 }

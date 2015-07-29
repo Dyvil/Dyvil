@@ -67,17 +67,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		this.field = field;
 	}
 	
-	@Override
-	public void reset()
+	public void reset(IValueConsumer field)
 	{
 		this.mode = VALUE;
+		this.field = field;
 		this.value = null;
 		this.dotless = false;
 		this.operator = null;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (this.mode == 0)
@@ -183,7 +183,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			if (type == Symbols.COLON)
 			{
-				throw new SyntaxError(token, "Invalid Colon - Delete this token");
+				pm.report(new SyntaxError(token, "Invalid Colon - Delete this token"));
+				return;
 			}
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
@@ -215,7 +216,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				}
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Pattern - ':' expected");
+			pm.report(new SyntaxError(token, "Invalid Pattern - ':' expected"));
+			return;
 		case ARRAY_END:
 			this.value.expandPosition(token);
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
@@ -225,7 +227,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			this.field.setValue(this.value);
 			pm.popParser();
-			throw new SyntaxError(token, "Invalid Array - ']' expected");
+			pm.report(new SyntaxError(token, "Invalid Array - ']' expected"));
+			return;
 		case LIST_END:
 			this.field.setValue(this.value);
 			this.value.expandPosition(token);
@@ -242,7 +245,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid Statement List - '}' expected");
+			pm.report(new SyntaxError(token, "Invalid Statement List - '}' expected"));
+			return;
 		case PARAMETERS_END:
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
@@ -250,7 +254,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Argument List - ')' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Argument List - ')' expected"));
+			return;
 		case SUBSCRIPT_END:
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
@@ -258,7 +264,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Subscript Arguments - ']' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Subscript Arguments - ']' expected"));
+			return;
 		case CONSTRUCTOR:
 		{
 			ConstructorCall cc = (ConstructorCall) this.value;
@@ -302,7 +310,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Constructor Argument List - ')' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Constructor Argument List - ')' expected"));
+			return;
 		case BYTECODE_END:
 			this.field.setValue(this.value);
 			pm.popParser();
@@ -311,7 +321,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Bytecode Expression - '}' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Bytecode Expression - '}' expected"));
+			return;
 		case TYPE_ARGUMENTS_END:
 			MethodCall mc = (MethodCall) this.value;
 			IToken next = token.next();
@@ -326,13 +338,15 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Method Type Parameter List - ']' expected");
+			pm.report(new SyntaxError(token, "Invalid Method Type Parameter List - ']' expected"));
+			return;
 		}
 		
 		if (type == Symbols.COLON)
 		{
 			this.mode = ACCESS;
-			throw new SyntaxError(token, "Invalid Colon - Delete this token");
+			pm.report(new SyntaxError(token, "Invalid Colon - Delete this token"));
+			return;
 		}
 		if (ParserUtil.isCloseBracket(type))
 		{
@@ -466,7 +480,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 								pm.popParser(true);
 								return;
 							case Operator.INFIX_NONE:
-								throw new SyntaxError(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
+								pm.report(new SyntaxError(token,
+										"Invalid Operator " + name + " - Operator without associativity is not allowed at this location"));
+								return;
 							case Operator.INFIX_RIGHT:
 							}
 						}
@@ -484,7 +500,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			if (type == Symbols.HASH || type == Symbols.COLON)
 			{
-				throw new SyntaxError(token, "Invalid Access - Invalid " + token);
+				pm.report(new SyntaxError(token, "Invalid Access - Invalid " + token));
+				return;
 			}
 			
 			IToken prev = token.prev();
@@ -505,7 +522,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(pm.newExpressionParser(sa), true);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Access - Invalid " + token);
+			pm.report(new SyntaxError(token, "Invalid Access - Invalid " + token));
+			return;
 		}
 		
 		if (this.value != null)
@@ -515,7 +533,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			pm.popParser(true);
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Expression - Invalid " + token);
+		pm.report(new SyntaxError(token, "Invalid Expression - Invalid " + token));
+		return;
 	}
 	
 	private void createBody(ClassConstructor cc, IParserManager pm)
@@ -528,7 +547,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		return;
 	}
 	
-	private IArguments getArguments(IParserManager pm, IToken next) throws SyntaxError
+	private IArguments getArguments(IParserManager pm, IToken next)
 	{
 		int type = next.type();
 		if (type == Symbols.CLOSE_PARENTHESIS)
@@ -547,7 +566,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		return list;
 	}
 	
-	private void getAccess(IParserManager pm, Name name, IToken token, int type) throws SyntaxError
+	private void getAccess(IParserManager pm, Name name, IToken token, int type)
 	{
 		IToken next = token.next();
 		int nextType = next.type();
@@ -650,7 +669,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		SingleArgument sa = new SingleArgument();
 		MethodCall call = new MethodCall(token, this.value, name, sa);
 		call.setDotless(this.dotless);
-
+		
 		this.value = call;
 		this.mode = ACCESS;
 		ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
@@ -659,12 +678,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		return;
 	}
 	
-	private void getAssign(IParserManager pm, IToken token) throws SyntaxError
+	private void getAssign(IParserManager pm, IToken token)
 	{
 		if (this.value == null)
 		{
 			this.mode = VALUE;
-			throw new SyntaxError(token, "Invalid Assignment - Delete this token");
+			pm.report(new SyntaxError(token, "Invalid Assignment - Delete this token"));
+			return;
 		}
 		
 		ICodePosition position = this.value.getPosition();
@@ -706,10 +726,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		}
 		
-		throw new SyntaxError(token, "Invalid Assignment");
+		pm.report(new SyntaxError(token, "Invalid Assignment"));
+		return;
 	}
 	
-	private boolean parseKeyword(IParserManager pm, IToken token, int type) throws SyntaxError
+	private boolean parseKeyword(IParserManager pm, IToken token, int type)
 	{
 		switch (type)
 		{
@@ -843,7 +864,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
-				throw new SyntaxError(token, "Invalid Expression - 'else' not allowed at this location");
+				pm.report(new SyntaxError(token, "Invalid Expression - 'else' not allowed at this location"));
+				return true;
 			}
 			this.field.setValue(this.value);
 			pm.popParser(true);
@@ -930,7 +952,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				throw new SyntaxError(token, "Invalid Expression - 'catch' not allowed at this location");
+				pm.report(new SyntaxError(token, "Invalid Expression - 'catch' not allowed at this location"));
+				return true;
 			}
 			this.field.setValue(this.value);
 			pm.popParser(true);
@@ -940,7 +963,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				throw new SyntaxError(token, "Invalid Expression - 'finally' not allowed at this location");
+				pm.report(new SyntaxError(token, "Invalid Expression - 'finally' not allowed at this location"));
+				return true;
 			}
 			this.field.setValue(this.value);
 			pm.popParser(true);
@@ -983,13 +1007,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == PATTERN_END)
+		switch (this.mode)
 		{
+		case PATTERN_END:
 			((CaseExpression) this.value).setCondition(value);
-		}
-		else
-		{
+			return;
+		default:
 			this.value = value;
+			return;
 		}
 	}
 }

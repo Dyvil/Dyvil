@@ -17,13 +17,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = PACKAGE;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		switch (this.mode)
@@ -50,6 +44,6 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			pm.pushParser(new ClassDeclarationParser(this.unit), true);
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Token - Delete this token");
+		pm.report(new SyntaxError(token, "Invalid Token - Delete this token")); return;
 	}
 }

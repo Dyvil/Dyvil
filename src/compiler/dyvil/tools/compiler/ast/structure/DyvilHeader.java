@@ -343,9 +343,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DyvilHeaderParser(this));
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers);
 		manager.setOperatorMap(this);
-		manager.parse(this.markers, this.tokens);
+		manager.parse(this.tokens);
 		this.tokens = null;
 	}
 	

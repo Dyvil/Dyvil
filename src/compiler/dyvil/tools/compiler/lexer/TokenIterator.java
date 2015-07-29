@@ -2,7 +2,6 @@ package dyvil.tools.compiler.lexer;
 
 import java.util.Iterator;
 
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.InferredSemicolon;
 import dyvil.tools.compiler.transform.Symbols;
@@ -29,7 +28,7 @@ public class TokenIterator implements Iterator<IToken>
 	
 	public void jump(IToken next)
 	{
-		this.lastReturned = next.getPrev();
+		this.lastReturned = next.prev();
 		this.next = next;
 	}
 	
@@ -50,7 +49,7 @@ public class TokenIterator implements Iterator<IToken>
 		this.lastReturned = this.next;
 		if (this.next != null)
 		{
-			this.next = this.next.getNext();
+			this.next = this.next.next();
 		}
 		return this.lastReturned;
 	}
@@ -58,19 +57,13 @@ public class TokenIterator implements Iterator<IToken>
 	@Override
 	public void remove()
 	{
-		try
-		{
-			IToken prev = this.lastReturned;
-			IToken next = this.next.next();
-			
-			prev.setNext(next);
-			next.setPrev(prev);
-			this.lastReturned = prev;
-			this.next = next;
-		}
-		catch (SyntaxError ex)
-		{
-		}
+		IToken prev = this.lastReturned;
+		IToken next = this.next.next();
+		
+		prev.setNext(next);
+		next.setPrev(prev);
+		this.lastReturned = prev;
+		this.next = next;
 	}
 	
 	public void set(IToken current)
@@ -80,7 +73,7 @@ public class TokenIterator implements Iterator<IToken>
 			current.setNext(this.next);
 			this.next.setPrev(current);
 		}
-		IToken prev = this.lastReturned.getPrev();
+		IToken prev = this.lastReturned.prev();
 		if (prev != null)
 		{
 			current.setPrev(prev);
@@ -96,22 +89,22 @@ public class TokenIterator implements Iterator<IToken>
 			return;
 		}
 		
-		IToken token = this.first.getNext();
+		IToken token = this.first.next();
 		IToken prev = this.first;
 		while (token != null)
 		{
 			this.inferSemicolon(token, prev);
 			prev = token;
-			token = token.getNext();
+			token = token.next();
 		}
 		
-		token = this.first.getNext();
+		token = this.first.next();
 		prev = this.first;
 		while (token != null)
 		{
 			token.setPrev(prev);
 			prev = token;
-			token = token.getNext();
+			token = token.next();
 		}
 		
 		prev.setNext(new InferredSemicolon(prev.endLine(), prev.endIndex() + 1));
@@ -161,7 +154,7 @@ public class TokenIterator implements Iterator<IToken>
 		while (token != null)
 		{
 			buf.append(token).append('\n');
-			token = token.getNext();
+			token = token.next();
 		}
 		return buf.toString();
 	}

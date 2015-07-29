@@ -34,8 +34,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		this.mode = EXPRESSION;
 	}
 	
-	@Override
-	public void reset()
+	private void reset()
 	{
 		this.mode = EXPRESSION;
 		this.label = null;
@@ -47,7 +46,16 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void report(SyntaxError error)
+	{
+		this.pm.jump(this.firstToken);
+		this.reset();
+		this.pm.pushParser(this.pm.newExpressionParser(this));
+		this.mode = SEPARATOR;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		
@@ -128,18 +136,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				return;
 			}
 			
-			try
-			{
-				this.parser.parse(this, token);
-			}
-			catch (Throwable ex)
-			{
-				pm.jump(this.firstToken);
-				this.reset();
-				pm.pushParser(pm.newExpressionParser(this));
-				this.mode = SEPARATOR;
-			}
-			
+			this.parser.parse(this, token);
 			return;
 		}
 		if (this.mode == SEPARATOR)
@@ -155,7 +152,8 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				pm.reparse();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Statement List - ';' expected");
+			pm.report(new SyntaxError(token, "Invalid Statement List - ';' expected"));
+			return;
 		}
 	}
 	

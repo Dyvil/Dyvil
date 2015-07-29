@@ -68,13 +68,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = MODIFIERS;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (this.mode == MODIFIERS)
@@ -102,7 +96,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid " + token + " - Delete this token");
+			pm.report(new SyntaxError(token, "Invalid " + token + " - Delete this token"));
+			return;
 		}
 		if (this.mode == NAME)
 		{
@@ -117,7 +112,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = POST_NAME;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Class Declaration - Name expected");
+			pm.report(new SyntaxError(token, "Invalid Class Declaration - Name expected"));
+			return;
 		}
 		if (this.isInMode(GENERICS))
 		{
@@ -136,7 +132,9 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Generic Type Variable List - ']' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Generic Type Variable List - ']' expected"));
+			return;
 		}
 		if (this.isInMode(PARAMETERS))
 		{
@@ -154,7 +152,9 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Class Parameter List - ')' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Class Parameter List - ')' expected"));
+			return;
 		}
 		if (this.isInMode(EXTENDS))
 		{
@@ -181,7 +181,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				
 				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
-					throw new SyntaxError(token, "Interfaces cannot implement other interfaces - Use 'extends' instead");
+					pm.report(new SyntaxError(token, "Interfaces cannot implement other interfaces - Use 'extends' instead"));
+					return;
 				}
 				return;
 			}
@@ -223,7 +224,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			this.mode = BODY_END;
-			throw new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected");
+			pm.report(new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected"));
+			return;
 		}
 		if (this.mode == BODY_END)
 		{
@@ -233,7 +235,9 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.classList.addClass(this.theClass);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Class Declaration - '}' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Class Declaration - '}' expected"));
+			return;
 		}
 	}
 	

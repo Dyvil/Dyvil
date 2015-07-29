@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.lexer.token;
 
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IToken extends ICodePosition
@@ -48,13 +47,9 @@ public interface IToken extends ICodePosition
 		return false;
 	}
 	
-	public IToken prev() throws SyntaxError;
+	public IToken prev();
 	
-	public IToken next() throws SyntaxError;
-	
-	public IToken getPrev();
-	
-	public IToken getNext();
+	public IToken next();
 	
 	public void setPrev(IToken prev);
 	

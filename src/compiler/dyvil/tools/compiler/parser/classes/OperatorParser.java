@@ -40,17 +40,12 @@ public final class OperatorParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = TYPE;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == TYPE)
+		switch (this.mode)
 		{
+		case TYPE:
 			this.mode = OPERATOR;
 			switch (type)
 			{
@@ -64,11 +59,9 @@ public final class OperatorParser extends Parser
 				this.type = Operator.INFIX_NONE;
 				return;
 			}
-			
-			throw new SyntaxError(token, "Invalid Operator - 'infix', 'prefix' or 'postfix' expected");
-		}
-		if (this.mode == OPERATOR)
-		{
+			pm.report(new SyntaxError(token, "Invalid Operator - 'infix', 'prefix' or 'postfix' expected"));
+			return;
+		case OPERATOR:
 			this.mode = OPEN_BRACKET;
 			if (type == Keywords.OPERATOR)
 			{
@@ -77,18 +70,17 @@ public final class OperatorParser extends Parser
 				pm.skip();
 				if (name == null)
 				{
-					throw new SyntaxError(next, "Invalid Operator - Identifier expected");
+					pm.report(new SyntaxError(next, "Invalid Operator - Identifier expected"));
+					return;
 				}
 				
 				this.operator = new Operator(name);
 				this.operator.type = this.type;
 				return;
 			}
-			
-			throw new SyntaxError(token, "Invalid Operator - 'operator' expected");
-		}
-		if (this.mode == OPEN_BRACKET)
-		{
+			pm.report(new SyntaxError(token, "Invalid Operator - 'operator' expected"));
+			return;
+		case OPEN_BRACKET:
 			switch (this.type)
 			{
 			case Operator.PREFIX:
@@ -96,7 +88,8 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				if (type != Symbols.SEMICOLON)
 				{
-					throw new SyntaxError(token, "Invalid Prefix Operator - ';' expected");
+					pm.report(new SyntaxError(token, "Invalid Prefix Operator - ';' expected"));
+					return;
 				}
 				return;
 			case Operator.POSTFIX:
@@ -104,20 +97,21 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				if (type != Symbols.SEMICOLON)
 				{
-					throw new SyntaxError(token, "Invalid Postfix Operator - ';' expected");
+					pm.report(new SyntaxError(token, "Invalid Postfix Operator - ';' expected"));
+					return;
 				}
 				return;
 			default: // infix
 				this.mode = ASSOCIATIVITY;
 				if (type != Symbols.OPEN_CURLY_BRACKET)
 				{
-					throw new SyntaxError(token, "Invalid Infix Operator - '{' expected", true);
+					pm.reparse();
+					pm.report(new SyntaxError(token, "Invalid Infix Operator - '{' expected"));
+					return;
 				}
 				return;
 			}
-		}
-		if (this.mode == ASSOCIATIVITY)
-		{
+		case ASSOCIATIVITY:
 			if (token.type() == Tokens.LETTER_IDENTIFIER)
 			{
 				switch (token.nameValue().qualified)
@@ -136,35 +130,34 @@ public final class OperatorParser extends Parser
 					return;
 				}
 			}
-			
-			throw new SyntaxError(token, "Invalid Operator Type - Invalid " + token);
-		}
-		if (this.mode == COMMA)
-		{
+			pm.report(new SyntaxError(token, "Invalid Operator Type - Invalid " + token));
+			return;
+		case COMMA:
 			this.mode = PRECEDENCE;
 			if (type != Symbols.COMMA)
 			{
-				throw new SyntaxError(token, "Invalid Infix Operator - ',' expected", true);
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Infix Operator - ',' expected"));
+				return;
 			}
 			return;
-		}
-		if (this.mode == PRECEDENCE)
-		{
+		case PRECEDENCE:
 			this.mode = CLOSE_BRACKET;
 			if ((type & Tokens.INT) == 0)
 			{
-				throw new SyntaxError(token, "Invalid Infix Operator - Integer Precedence expected", true);
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Infix Operator - Integer Precedence expected"));
+				return;
 			}
 			this.operator.precedence = token.intValue();
 			return;
-		}
-		if (this.mode == CLOSE_BRACKET)
-		{
+		case CLOSE_BRACKET:
 			pm.popParser();
 			this.map.addOperator(this.operator);
 			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
-				throw new SyntaxError(token, "Invalid Operator - '}' expected");
+				pm.report(new SyntaxError(token, "Invalid Operator - '}' expected"));
+				return;
 			}
 			return;
 		}

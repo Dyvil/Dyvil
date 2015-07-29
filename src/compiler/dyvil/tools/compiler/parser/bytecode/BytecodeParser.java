@@ -29,13 +29,7 @@ public final class BytecodeParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = INSTRUCTION;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
@@ -57,13 +51,14 @@ public final class BytecodeParser extends Parser
 				IToken next = token.next();
 				if (!ParserUtil.isIdentifier(next.type()))
 				{
-					throw new SyntaxError(token, "Invalid Jump Instruction - Identifier expected");
+					pm.report(new SyntaxError(token, "Invalid Jump Instruction - Identifier expected"));
+					return;
 				}
 				
 				pm.skip();
 				insn = new JumpInstruction(Opcodes.GOTO, new Label(next.nameValue()));
 			}
-			if (ParserUtil.isIdentifier(type))
+			if (type == Tokens.LETTER_IDENTIFIER)
 			{
 				Name name = token.nameValue();
 				if (token.next().type() == Symbols.COLON)
@@ -76,10 +71,16 @@ public final class BytecodeParser extends Parser
 				int opcode = Opcodes.parseOpcode(name.qualified);
 				if (opcode == -1)
 				{
-					throw new SyntaxError(token, "Invalid Instruction - Unknown Instruction Name '" + name + "'");
+					pm.report(new SyntaxError(token, "Invalid Instruction - Unknown Instruction Name '" + name + "'"));
+					return;
 				}
 				
 				insn = handleOpcode(pm, token, opcode);
+			}
+			else
+			{
+				pm.report(new SyntaxError(token, "Invalid Instruction - Identifier expected"));
+				return;
 			}
 			if (insn != null)
 			{
@@ -93,11 +94,11 @@ public final class BytecodeParser extends Parser
 				this.bytecode.addInstruction(insn);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Instruction - Name expected");
+			return;
 		}
 	}
 	
-	private static IInstruction handleOpcode(IParserManager pm, IToken token, int opcode) throws SyntaxError
+	private static IInstruction handleOpcode(IParserManager pm, IToken token, int opcode)
 	{
 		switch (opcode)
 		{
@@ -215,13 +216,15 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
 			{
-				throw new SyntaxError(next, "Invalid IINC Instruction - Integer expected");
+				pm.report(new SyntaxError(next, "Invalid IINC Instruction - Integer expected"));
+				return null;
 			}
 			
 			IToken next2 = next.next();
 			if (next2.type() != Tokens.INT)
 			{
-				throw new SyntaxError(next2, "Invalid IINC Instruction - Integer expected");
+				pm.report(new SyntaxError(next2, "Invalid IINC Instruction - Integer expected"));
+				return null;
 			}
 			
 			pm.skip(2);
@@ -235,7 +238,8 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
 			{
-				throw new SyntaxError(token, "Invalid Int Instruction - Integer expected");
+				pm.report(new SyntaxError(token, "Invalid Int Instruction - Integer expected"));
+				return null;
 			}
 			
 			pm.skip();
@@ -293,7 +297,8 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
 			{
-				throw new SyntaxError(token, "Invalid Var Instruction - Integer expected");
+				pm.report(new SyntaxError(token, "Invalid Var Instruction - Integer expected"));
+				return null;
 			}
 			
 			pm.skip();
@@ -321,7 +326,8 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				throw new SyntaxError(token, "Invalid Jump Instruction - Identifier expected");
+				pm.report(new SyntaxError(token, "Invalid Jump Instruction - Identifier expected"));
+				return null;
 			}
 			
 			pm.skip();

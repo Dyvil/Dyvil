@@ -4,13 +4,14 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public abstract class Marker extends Throwable implements Comparable<Marker>
+public abstract class Marker implements Comparable<Marker>
 {
 	private static final long serialVersionUID = 8313691845679541217L;
 	
-	private List<String> info;
+	protected ICodePosition position;
 	
-	public ICodePosition position;
+	private String message;
+	private List<String> info;
 	
 	protected Marker()
 	{
@@ -18,7 +19,6 @@ public abstract class Marker extends Throwable implements Comparable<Marker>
 	
 	public Marker(ICodePosition position)
 	{
-		super();
 		if (position == null)
 		{
 			throw new IllegalArgumentException("Marker Position cannot be null");
@@ -29,18 +29,12 @@ public abstract class Marker extends Throwable implements Comparable<Marker>
 	
 	public Marker(ICodePosition position, String message)
 	{
-		super(message);
 		if (position == null)
 		{
 			throw new IllegalArgumentException("Marker Position cannot be null");
 		}
 		
-		this.position = position;
-	}
-	
-	public Marker(ICodePosition position, Throwable cause)
-	{
-		super(cause);
+		this.message = message;
 		this.position = position;
 	}
 	
@@ -70,7 +64,7 @@ public abstract class Marker extends Throwable implements Comparable<Marker>
 	public void log(String code, StringBuilder buf)
 	{
 		String type = this.getMarkerType();
-		String message = this.getMessage();
+		String message = this.message;
 		
 		buf.append("line ").append(this.position.startLine()).append(": ").append(type);
 		if (message != null)

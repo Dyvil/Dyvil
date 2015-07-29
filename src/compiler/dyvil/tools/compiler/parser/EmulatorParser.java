@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 
 public abstract class EmulatorParser extends Parser implements IParserManager
@@ -78,7 +77,7 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 	}
 	
 	@Override
-	public void popParser(boolean reparse) throws SyntaxError
+	public void popParser(boolean reparse)
 	{
 		if (reparse)
 		{

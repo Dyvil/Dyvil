@@ -33,28 +33,21 @@ public class IncludeParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-		this.includeDeclaration = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
-		if (this.mode == INCLUDE)
+		switch (this.mode)
 		{
+		case INCLUDE:
 			if (type == Keywords.INCLUDE)
 			{
 				this.mode = NAME;
 				this.includeDeclaration = new IncludeDeclaration(token.raw());
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Include Declaration - 'include' expected");
-		}
-		if (this.mode == NAME)
-		{
+			pm.report(new SyntaxError(token, "Invalid Include Declaration - 'include' expected"));
+			return;
+		case NAME:
 			this.mode = DOT;
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -62,10 +55,9 @@ public class IncludeParser extends Parser
 				this.includeDeclaration.addNamePart(name);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Include Declaration - Identifier expected");
-		}
-		if (this.mode == DOT)
-		{
+			pm.report(new SyntaxError(token, "Invalid Include Declaration - Identifier expected"));
+			return;
+		case DOT:
 			if (type == Symbols.SEMICOLON)
 			{
 				this.header.addInclude(this.includeDeclaration);
@@ -77,7 +69,8 @@ public class IncludeParser extends Parser
 				this.mode = NAME;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Include Declaration - '.' expected");
+			pm.report(new SyntaxError(token, "Invalid Include Declaration - '.' expected"));
+			return;
 		}
 	}
 }

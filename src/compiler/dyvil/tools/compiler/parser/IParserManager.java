@@ -17,6 +17,8 @@ import dyvil.tools.compiler.parser.type.TypeVariableParser;
 
 public interface IParserManager
 {
+	public void report(SyntaxError error);
+	
 	public default void setOperatorMap(IOperatorMap operators)
 	{
 	}
@@ -49,7 +51,7 @@ public interface IParserManager
 	
 	public void popParser();
 	
-	public void popParser(boolean reparse) throws SyntaxError;
+	public void popParser(boolean reparse);
 	
 	// Parser Factory Methods
 	

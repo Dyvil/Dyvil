@@ -40,8 +40,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		this.mode = TYPE;
 	}
 	
-	@Override
-	public void reset()
+	private void reset()
 	{
 		this.mode = TYPE;
 		this.modifiers = 0;
@@ -52,16 +51,16 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
-		if (this.mode == TYPE)
+		switch (this.mode)
 		{
+		case TYPE:
 			if (type == Symbols.SEMICOLON && token.isInferred())
 			{
 				return;
 			}
-			
 			int i = 0;
 			if ((i = ModifierTypes.PARAMETER.parse(type)) != -1)
 			{
@@ -80,13 +79,10 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				pm.popParser(true);
 				return;
 			}
-			
 			this.mode = NAME;
 			pm.pushParser(pm.newTypeParser(this), true);
 			return;
-		}
-		if (this.mode == NAME)
-		{
+		case NAME:
 			if (type == Symbols.ELLIPSIS)
 			{
 				this.varargs = true;
@@ -113,10 +109,9 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Parameter Declaration - Name expected");
-		}
-		if (this.mode == SEPERATOR)
-		{
+			pm.report(new SyntaxError(token, "Invalid Parameter Declaration - Name expected"));
+			return;
+		case SEPERATOR:
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
@@ -132,7 +127,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Parameter Declaration - ',' expected");
+			pm.report(new SyntaxError(token, "Invalid Parameter Declaration - ',' expected"));
+			return;
 		}
 	}
 	

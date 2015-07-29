@@ -49,12 +49,6 @@ public class ForStatementParser extends Parser implements IValueConsumer
 		this.mode = FOR_START;
 	}
 	
-	@Override
-	public void reset()
-	{
-		this.mode = FOR_START;
-	}
-	
 	private IValue makeForStatement()
 	{
 		if (this.forEach)
@@ -65,25 +59,27 @@ public class ForStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (this.mode)
 		{
 		case FOR:
 			this.mode = FOR_START;
-			if (type == Keywords.FOR)
+			if (type != Keywords.FOR)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid For Statement - 'for' expected"));
 			}
-			throw new SyntaxError(token, "Invalid For Statement - 'for' expected", true);
+			return;
 		case FOR_START:
 			this.mode = TYPE;
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type != Symbols.OPEN_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid For Statement - '(' expected"));
 			}
-			throw new SyntaxError(token, "Invalid For Statement - '(' expected", true);
+			return;
 		case TYPE:
 			if (type == Symbols.SEMICOLON)
 			{
@@ -104,7 +100,9 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				this.variable.setPosition(token.raw());
 				return;
 			}
-			throw new SyntaxError(token, "Invalid For statement - Variable Name expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid For statement - Variable Name expected"));
+			return;
 		case SEPERATOR:
 			if (type == Symbols.COLON)
 			{
@@ -119,7 +117,9 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				pm.pushParser(pm.newExpressionParser(this.variable));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid For Statement - ';' or ':' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid For Statement - ';' or ':' expected"));
+			return;
 		case VARIABLE_END:
 			this.mode = CONDITION_END;
 			if (type == Symbols.SEMICOLON)
@@ -132,27 +132,32 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid for statement - ';' expected"));
+			return;
 		case CONDITION_END:
 			this.mode = FOR_END;
-			if (type == Symbols.SEMICOLON)
+			if (type != Symbols.SEMICOLON)
 			{
-				if (token.next().type() == Symbols.SEMICOLON)
-				{
-					return;
-				}
-				
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid for statement - ';' expected"));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
+			
+			if (token.next().type() != Symbols.SEMICOLON)
+			{
+				pm.pushParser(pm.newExpressionParser(this));
+			}
+			
+			return;
 		case FOR_END:
 			this.mode = STATEMENT;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid for statement - ')' expected"));
 			}
-			throw new SyntaxError(token, "Invalid for statement - ')' expected", true);
+			return;
 		case STATEMENT:
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
@@ -173,16 +178,15 @@ public class ForStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == VARIABLE_END)
+		switch (this.mode)
 		{
+		case VARIABLE_END:
 			this.variable.setValue(value);
-		}
-		else if (this.mode == CONDITION_END)
-		{
+			return;
+		case CONDITION_END:
 			this.condition = value;
-		}
-		else if (this.mode == FOR_END)
-		{
+			return;
+		case FOR_END:
 			if (this.forEach)
 			{
 				this.variable.setValue(value);
@@ -191,10 +195,10 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			{
 				this.update = value;
 			}
-		}
-		else if (this.mode == STATEMENT_END)
-		{
+			return;
+		case STATEMENT_END:
 			this.action = value;
+			return;
 		}
 	}
 }

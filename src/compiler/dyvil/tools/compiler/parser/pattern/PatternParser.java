@@ -14,10 +14,10 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class PatternParser extends Parser
 {
-	public static final int	PATTERN			= 1;
-	public static final int	ARRAY_END		= 2;
-	public static final int	TUPLE_END		= 4;
-	public static final int	CASE_CLASS_END	= 8;
+	private static final int	PATTERN			= 1;
+	private static final int	ARRAY_END		= 2;
+	private static final int	TUPLE_END		= 4;
+	private static final int	CASE_CLASS_END	= 8;
 	
 	protected IPatternConsumer consumer;
 	
@@ -30,13 +30,7 @@ public class PatternParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = PATTERN;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (this.mode == 0 || type == Symbols.COLON)
@@ -57,8 +51,9 @@ public class PatternParser extends Parser
 			return;
 		}
 		
-		if (this.mode == PATTERN)
+		switch (this.mode)
 		{
+		case PATTERN:
 			if (ParserUtil.isIdentifier(type))
 			{
 				IToken next = token.next();
@@ -73,7 +68,8 @@ public class PatternParser extends Parser
 					return;
 				}
 				
-				throw new SyntaxError(next, "Invalid Case Class Pattern - '(' expected");
+				pm.report(new SyntaxError(next, "Invalid Case Class Pattern - '(' expected"));
+				return;
 			}
 			if (type == Keywords.VAR)
 			{
@@ -87,7 +83,8 @@ public class PatternParser extends Parser
 					return;
 				}
 				
-				throw new SyntaxError(next, "Invalid Binding Pattern - Identifier expected");
+				pm.report(new SyntaxError(next, "Invalid Binding Pattern - Identifier expected"));
+				return;
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
@@ -102,7 +99,6 @@ public class PatternParser extends Parser
 				pm.pushParser(new PatternListParser(tp));
 				return;
 			}
-			
 			IPattern p = parsePrimitive(token, type);
 			if (p != null)
 			{
@@ -110,11 +106,9 @@ public class PatternParser extends Parser
 				this.mode = 0;
 				return;
 			}
-			
-			throw new SyntaxError(token, "Invalid Pattern");
-		}
-		if (this.mode == ARRAY_END)
-		{
+			pm.report(new SyntaxError(token, "Invalid Pattern"));
+			return;
+		case ARRAY_END:
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				this.pattern.expandPosition(token);
@@ -125,10 +119,9 @@ public class PatternParser extends Parser
 			this.pattern.expandPosition(token.prev());
 			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid Array Pattern - '}' expected");
-		}
-		if (this.mode == TUPLE_END)
-		{
+			pm.report(new SyntaxError(token, "Invalid Array Pattern - '}' expected"));
+			return;
+		case TUPLE_END:
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.pattern.expandPosition(token);
@@ -139,10 +132,9 @@ public class PatternParser extends Parser
 			this.pattern.expandPosition(token.prev());
 			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid Tuple Pattern - ')' expected");
-		}
-		if (this.mode == CASE_CLASS_END)
-		{
+			pm.report(new SyntaxError(token, "Invalid Tuple Pattern - ')' expected"));
+			return;
+		case CASE_CLASS_END:
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				this.consumer.setPattern(this.pattern);
@@ -151,11 +143,12 @@ public class PatternParser extends Parser
 			}
 			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
-			throw new SyntaxError(token, "Invalid Case Class Pattern - ')' expected");
+			pm.report(new SyntaxError(token, "Invalid Case Class Pattern - ')' expected"));
+			return;
 		}
 	}
 	
-	public static IPattern parsePrimitive(IToken token, int type) throws SyntaxError
+	public static IPattern parsePrimitive(IToken token, int type)
 	{
 		switch (type)
 		{

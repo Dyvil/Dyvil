@@ -40,13 +40,15 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	}
 	
 	@Override
-	public void reset()
+	public void report(SyntaxError error)
 	{
-		this.mode = START;
+		this.pm.jump(this.firstToken);
+		this.pm.setParser(this);
+		this.mode = TUPLE;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{
@@ -73,17 +75,8 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			
-			try
-			{
-				this.pm = pm;
-				this.parser.parse(this, token);
-			}
-			catch (SyntaxError error)
-			{
-				pm.jump(this.firstToken);
-				pm.setParser(this);
-				this.mode = TUPLE;
-			}
+			this.pm = pm;
+			this.parser.parse(this, token);
 			return;
 		case PARAMETER_NAME:
 			if (!ParserUtil.isIdentifier(token.type()))
@@ -130,7 +123,9 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				this.consumer.setValue(this.value);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Tuple - ')' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Tuple - ')' expected"));
+			return;
 		case ARROW:
 			if (token.type() != Symbols.ARROW_OPERATOR)
 			{

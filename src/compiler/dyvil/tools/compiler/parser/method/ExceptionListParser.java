@@ -3,11 +3,10 @@ package dyvil.tools.compiler.parser.method;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.transform.Symbols;
 
 public class ExceptionListParser extends Parser implements ITypeConsumer
 {
@@ -23,35 +22,30 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = TYPE;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (ParserUtil.isCloseBracket(type))
+		switch (type)
 		{
+		case Symbols.OPEN_CURLY_BRACKET:
+		case Symbols.EQUALS:
+		case Symbols.SEMICOLON:
 			pm.popParser(true);
 			return;
 		}
 		
-		if (this.mode == TYPE)
+		switch (this.mode)
 		{
+		case TYPE:
 			pm.pushParser(pm.newTypeParser(this), true);
 			this.mode = SEPARATOR;
 			return;
-		}
-		if (this.mode == SEPARATOR)
-		{
-			if (ParserUtil.isSeperator(type))
+		case SEPARATOR:
+			if (type == Symbols.COMMA)
 			{
 				this.mode = TYPE;
 				return;
 			}
-			
 			pm.popParser(true);
 			return;
 		}

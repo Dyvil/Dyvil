@@ -2,7 +2,6 @@ package dyvil.tools.compiler.util;
 
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.Keywords;
@@ -214,7 +213,7 @@ public class ParserUtil
 		return pm.getOperator(token.nameValue()) != null;
 	}
 	
-	public static IValue parsePrimitive(IToken token, int type) throws SyntaxError
+	public static IValue parsePrimitive(IToken token, int type)
 	{
 		switch (type)
 		{

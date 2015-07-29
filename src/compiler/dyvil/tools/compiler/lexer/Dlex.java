@@ -413,7 +413,7 @@ public final class Dlex
 			addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
-		return first.getNext();
+		return first.next();
 	}
 	
 	private static int getMode(char c, String code, int i)

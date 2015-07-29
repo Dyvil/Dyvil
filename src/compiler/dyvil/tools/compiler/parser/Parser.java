@@ -10,19 +10,17 @@ public abstract class Parser
 	public static final Parser rootParser = new Parser()
 	{
 		@Override
-		public void reset()
-		{
-		};
-		
-		@Override
-		public void parse(IParserManager pm, IToken token) throws SyntaxError
+		public void parse(IParserManager pm, IToken token)
 		{
 			if (!ParserUtil.isTerminator(token.type()))
 			{
-				throw new SyntaxError(token, "Root Parser");
+				pm.report(new SyntaxError(token, "Root Parser"));
+				return;
 			}
 		}
 	};
+	
+	protected static final int END = -1;
 	
 	protected int mode;
 	
@@ -93,7 +91,5 @@ public abstract class Parser
 		return this.parent;
 	}
 	
-	public abstract void reset();
-	
-	public abstract void parse(IParserManager pm, IToken token) throws SyntaxError;
+	public abstract void parse(IParserManager pm, IToken token);
 }

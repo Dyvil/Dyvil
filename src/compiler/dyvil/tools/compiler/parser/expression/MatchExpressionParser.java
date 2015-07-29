@@ -32,13 +32,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = OPEN_BRACKET;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		
@@ -52,7 +46,8 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			}
 			if (type != Keywords.CASE)
 			{
-				throw new SyntaxError(token, "Invalid Match Expression - '{' or 'case' expected");
+				pm.report(new SyntaxError(token, "Invalid Match Expression - '{' or 'case' expected"));
+				return;
 			}
 			this.singleCase = true;
 		case CASE:
@@ -68,7 +63,8 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.popParser();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Match Expression - 'case' or '}' expected expected");
+			pm.report(new SyntaxError(token, "Invalid Match Expression - 'case' or '}' expected expected"));
+			return;
 		case CONDITION:
 			if (type == Keywords.IF)
 			{
@@ -83,7 +79,8 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Match Case - ':' or '=>' expected");
+			pm.report(new SyntaxError(token, "Invalid Match Case - ':' or '=>' expected"));
+			return;
 		case SEPARATOR:
 			this.matchExpression.addCase(this.currentCase);
 			if (this.singleCase)
@@ -103,7 +100,9 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Match Case - ';' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Match Case - ';' expected"));
+			return;
 		}
 	}
 	

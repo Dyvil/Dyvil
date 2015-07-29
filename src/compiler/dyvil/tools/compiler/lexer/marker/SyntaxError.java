@@ -6,8 +6,6 @@ public class SyntaxError extends Marker
 {
 	private static final long serialVersionUID = -2234451954260010124L;
 	
-	public boolean reparse;
-	
 	public SyntaxError(ICodePosition position)
 	{
 		super(position);
@@ -16,12 +14,6 @@ public class SyntaxError extends Marker
 	public SyntaxError(ICodePosition position, String message)
 	{
 		super(position, message);
-	}
-	
-	public SyntaxError(ICodePosition position, String message, boolean reparse)
-	{
-		super(position, message);
-		this.reparse = reparse;
 	}
 	
 	@Override

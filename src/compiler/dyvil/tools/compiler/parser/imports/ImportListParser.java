@@ -17,13 +17,7 @@ public class ImportListParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.CLOSE_CURLY_BRACKET || type == Symbols.SEMICOLON)
@@ -41,11 +35,12 @@ public class ImportListParser extends Parser
 		if (this.mode == 1)
 		{
 			this.mode = 0;
-			if (type == Symbols.COMMA)
+			if (type != Symbols.COMMA)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Import List - ',' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Import List - ',' expected", true);
+			return;
 		}
 	}
 }

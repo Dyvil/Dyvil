@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.lexer.token;
 
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Tokens;
@@ -88,33 +87,13 @@ public final class StringToken implements IToken
 	}
 	
 	@Override
-	public IToken prev() throws SyntaxError
-	{
-		if (this.prev == null)
-		{
-			throw new SyntaxError(this, "Unexpected End of Input");
-		}
-		return this.prev;
-	}
-	
-	@Override
-	public IToken next() throws SyntaxError
-	{
-		if (this.next == null)
-		{
-			throw new SyntaxError(this, "Unexpected End of Input");
-		}
-		return this.next;
-	}
-	
-	@Override
-	public IToken getPrev()
+	public IToken prev()
 	{
 		return this.prev;
 	}
 	
 	@Override
-	public IToken getNext()
+	public IToken next()
 	{
 		return this.next;
 	}

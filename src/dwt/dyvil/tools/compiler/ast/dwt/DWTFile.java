@@ -96,8 +96,8 @@ public class DWTFile implements ICompilationUnit, IClassCompilable
 	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DWTParser(this.rootNode));
-		manager.parse(this.markers, this.tokens);
+		ParserManager manager = new ParserManager(new DWTParser(this.rootNode), this.markers);
+		manager.parse(this.tokens);
 		this.tokens = null;
 		
 		int size = this.markers.size();

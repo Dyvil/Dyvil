@@ -30,18 +30,12 @@ public class AnnotationParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = NAME;
-		this.annotation = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == NAME)
+		switch (this.mode)
 		{
+		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
@@ -51,10 +45,9 @@ public class AnnotationParser extends Parser
 				this.mode = PARAMETERS_START;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Annotation - Name expected");
-		}
-		if (this.mode == PARAMETERS_START)
-		{
+			pm.report(new SyntaxError(token, "Invalid Annotation - Name expected"));
+			return;
+		case PARAMETERS_START:
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				IToken next = token.next();
@@ -86,15 +79,14 @@ public class AnnotationParser extends Parser
 			
 			pm.popParser(true);
 			return;
-		}
-		if (this.mode == PARAMETERS_END)
-		{
+		case PARAMETERS_END:
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.popParser();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Annotation - ')' expected");
+			pm.report(new SyntaxError(token, "Invalid Annotation - ')' expected"));
+			return;
 		}
 	}
 }

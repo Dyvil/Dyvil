@@ -37,14 +37,7 @@ public final class TypeParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = NAME;
-		this.type = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (this.mode)
@@ -128,7 +121,8 @@ public final class TypeParser extends Parser
 				pm.popParser(true);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type - Invalid " + token);
+			pm.report(new SyntaxError(token, "Invalid Type - Invalid " + token));
+			return;
 		case TUPLE_END:
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
@@ -145,7 +139,9 @@ public final class TypeParser extends Parser
 				pm.popParser();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Tuple Type - ')' expected");
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Tuple Type - ')' expected"));
+			return;
 		case LAMBDA_TYPE:
 			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
@@ -159,11 +155,12 @@ public final class TypeParser extends Parser
 			this.type.expandPosition(token);
 			this.typed.setType(this.type);
 			pm.popParser();
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Array Type - ']' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Array Type - ']' expected", true);
+			return;
 		case GENERICS:
 			if (type == Symbols.OPEN_SQUARE_BRACKET || type == Symbols.GENERIC_CALL)
 			{
@@ -198,11 +195,12 @@ public final class TypeParser extends Parser
 		case GENERICS_END:
 			this.typed.setType(this.type);
 			pm.popParser();
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Generic Type - ']' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Generic Type - ']' expected", true);
+			return;
 		}
 	}
 }

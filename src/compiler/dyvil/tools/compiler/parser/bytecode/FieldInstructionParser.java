@@ -24,13 +24,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = OWNER;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
@@ -39,36 +33,31 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 			return;
 		}
 		
-		if (this.mode == OWNER)
+		switch (this.mode)
 		{
+		case OWNER:
 			pm.pushParser(new InternalTypeParser(this), true);
 			this.mode = DOT;
 			return;
-		}
-		if (this.mode == DOT)
-		{
+		case DOT:
 			if (type != Symbols.DOT)
 			{
-				throw new SyntaxError(token, "Invalid Field Instruction - '.' expected");
+				pm.report(new SyntaxError(token, "Invalid Field Instruction - '.' expected")); return;
 			}
 			this.mode = COLON;
-			
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				throw new SyntaxError(next, "Invalid Field Instruction - Field Name expected");
+				pm.report(new SyntaxError(next, "Invalid Field Instruction - Field Name expected")); return;
 			}
 			pm.skip();
 			this.fieldInstruction.setFieldName(next.nameValue().qualified);
 			return;
-		}
-		if (this.mode == COLON)
-		{
+		case COLON:
 			if (type != Symbols.COLON)
 			{
-				throw new SyntaxError(token, "Invalid Field Instruction - ':' expected");
+				pm.report(new SyntaxError(token, "Invalid Field Instruction - ':' expected")); return;
 			}
-			
 			pm.pushParser(new InternalTypeParser(this));
 			return;
 		}

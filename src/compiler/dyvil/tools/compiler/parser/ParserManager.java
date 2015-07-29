@@ -14,6 +14,8 @@ public class ParserManager implements IParserManager
 {
 	protected Parser parser;
 	
+	protected MarkerList markers;
+	
 	protected IOperatorMap operators;
 	
 	protected TokenIterator	tokens;
@@ -33,9 +35,16 @@ public class ParserManager implements IParserManager
 	 * @param parser
 	 *            the parser
 	 */
-	public ParserManager(Parser parser)
+	public ParserManager(Parser parser, MarkerList markers)
 	{
 		this.parser = parser;
+		this.markers = markers;
+	}
+	
+	@Override
+	public void report(SyntaxError error)
+	{
+		this.markers.add(error);
 	}
 	
 	@Override
@@ -61,7 +70,7 @@ public class ParserManager implements IParserManager
 		return Operators.map.get(name);
 	}
 	
-	public final void parse(MarkerList markers, TokenIterator tokens)
+	public final void parse(TokenIterator tokens)
 	{
 		tokens.reset();
 		this.tokens = tokens;
@@ -92,36 +101,10 @@ public class ParserManager implements IParserManager
 			{
 				this.parser.parse(this, token);
 			}
-			catch (SyntaxError ex)
-			{
-				// if (this.jumpBackToken != null)
-				// {
-				// tokens.jump(this.jumpBackToken);
-				// this.popParser();
-				// this.jumpBackToken = null;
-				// }
-				// else
-				{
-					if (ex.reparse)
-					{
-						this.reparse = true;
-					}
-					markers.add(ex);
-				}
-			}
 			catch (Exception ex)
 			{
-				// if (this.jumpBackToken != null)
-				// {
-				// tokens.jump(this.jumpBackToken);
-				// this.popParser();
-				// this.jumpBackToken = null;
-				// }
-				// else
-				{
 					DyvilCompiler.error("ParserManager", "parseToken", ex);
 					markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
-				}
 			}
 			
 			if (this.parser == null)

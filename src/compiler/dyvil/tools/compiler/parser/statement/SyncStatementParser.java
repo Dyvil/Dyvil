@@ -26,13 +26,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = LOCK;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		switch (this.mode)
 		{
@@ -43,14 +37,16 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Synchronized Block - '(' expected", true);
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Synchronized Block - '(' expected")); return;
 		case LOCK_END:
 			this.mode = ACTION;
-			if (token.type() == Symbols.CLOSE_PARENTHESIS)
+			if (token.type() != Symbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Synchronized Block - ')' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Synchronized Block - ')' expected", true);
+			return;
 		case ACTION:
 			if (ParserUtil.isTerminator(token.type()) && !token.isInferred())
 			{
@@ -70,13 +66,14 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == LOCK_END)
+		switch (this.mode)
 		{
+		case LOCK_END:
 			this.statement.setLock(value);
-		}
-		else if (this.mode == -1)
-		{
+			break;
+		case -1:
 			this.statement.setAction(value);
+			break;
 		}
 	}
 }

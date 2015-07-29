@@ -7,7 +7,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.transform.Tokens;
 
 public class PackageParser extends Parser
 {
@@ -20,43 +20,31 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.packageDeclaration = null;
-		this.buffer.delete(0, this.buffer.length());
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		switch (type)
 		{
+		case Symbols.SEMICOLON:
 			this.packageDeclaration.setPackage(this.buffer.toString());
-			
 			pm.popParser();
 			return;
-		}
-		if (type == Keywords.TYPE)
-		{
+		case Keywords.TYPE:
 			this.buffer.append("type");
 			return;
-		}
-		if (type == Keywords.ANNOTATION)
-		{
+		case Keywords.ANNOTATION:
 			this.buffer.append("annotation");
 			return;
-		}
-		if (type == Symbols.DOT)
-		{
+		case Symbols.DOT:
 			this.buffer.append('.');
 			return;
-		}
-		if (ParserUtil.isIdentifier(type))
-		{
+		case Tokens.IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
+		case Tokens.SYMBOL_IDENTIFIER:
+		case Tokens.DOT_IDENTIFIER:
 			this.buffer.append(token.nameValue().qualified);
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Package Declaration - Invalid " + token);
+		pm.report(new SyntaxError(token, "Invalid Package Declaration - Invalid " + token)); return;
 	}
 }

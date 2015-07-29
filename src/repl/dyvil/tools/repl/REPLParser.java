@@ -20,6 +20,16 @@ public class REPLParser implements IParserManager
 	private Parser			parser;
 	private int				skip;
 	private boolean			reparse;
+	private MarkerList		markers;
+	
+	@Override
+	public void report(SyntaxError error)
+	{
+		if (this.markers != null)
+		{
+			this.markers.add(error);
+		}
+	}
 	
 	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser)
 	{
@@ -27,6 +37,7 @@ public class REPLParser implements IParserManager
 		this.parser = parser;
 		this.skip = 0;
 		this.reparse = false;
+		this.markers = markers;
 		
 		IToken token = null, prev = null;
 		tokens.reset();
@@ -76,15 +87,6 @@ public class REPLParser implements IParserManager
 			try
 			{
 				this.parser.parse(this, token);
-			}
-			catch (SyntaxError ex)
-			{
-				if (markers == null)
-				{
-					return false;
-				}
-				
-				markers.add(ex);
 			}
 			catch (Exception ex)
 			{

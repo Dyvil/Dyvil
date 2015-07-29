@@ -25,50 +25,40 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
+	public void parse(IParserManager pm, IToken token) 
 	{
-		this.mode = CONDITION;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
-	{
-		if (this.mode == -1)
-		{
-			pm.popParser(true);
-			return;
-		}
-		
 		int type = token.type();
-		if (this.mode == CONDITION)
+		switch (this.mode)
 		{
+		case CONDITION:
 			this.mode = CONDITION_END;
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid While Statement - '(' expected", true);
-		}
-		if (this.mode == CONDITION_END)
-		{
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid While Statement - '(' expected"));
+			return;
+		case CONDITION_END:
 			this.mode = BLOCK;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid While Statement - ')' expected"));
 			}
-			throw new SyntaxError(token, "Invalid While Statement - ')' expected", true);
-		}
-		if (this.mode == BLOCK)
-		{
+			return;
+		case BLOCK:
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				return;
 			}
-			
 			pm.pushParser(pm.newExpressionParser(this), true);
-			this.mode = -1;
+			this.mode = END;
+			return;
+		case END:
+			pm.popParser(true);
 			return;
 		}
 	}
@@ -76,13 +66,14 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == CONDITION_END)
+		switch (this.mode)
 		{
+		case CONDITION_END:
 			this.statement.setCondition(value);
-		}
-		else if (this.mode == -1)
-		{
+			break;
+		case END:
 			this.statement.setAction(value);
+			break;
 		}
 	}
 }

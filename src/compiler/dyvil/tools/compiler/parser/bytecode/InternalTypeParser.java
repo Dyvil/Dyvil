@@ -24,17 +24,12 @@ public final class InternalTypeParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = NAME;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
-		if (this.mode == NAME)
+		switch (this.mode)
 		{
+		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
@@ -56,10 +51,9 @@ public final class InternalTypeParser extends Parser
 				this.mode = SLASH;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type - Identifier expected");
-		}
-		if (this.mode == SLASH)
-		{
+			pm.report(new SyntaxError(token, "Invalid Type - Identifier expected"));
+			return;
+		case SLASH:
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
@@ -70,7 +64,6 @@ public final class InternalTypeParser extends Parser
 					return;
 				}
 			}
-			
 			String s = this.builder.toString();
 			this.typed.setInternalType(s);
 			pm.popParser(true);

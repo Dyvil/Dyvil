@@ -19,13 +19,7 @@ public final class FormatStringParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (type)
@@ -36,7 +30,8 @@ public final class FormatStringParser extends Parser implements IValued
 			int nextType = token.next().type();
 			if (nextType == Tokens.STRING_PART || nextType == Tokens.STRING_END)
 			{
-				throw new SyntaxError(token.next(), "Invalid Format String - Expression expected");
+				pm.report(new SyntaxError(token.next(), "Invalid Format String - Expression expected"));
+				return;
 			}
 			this.value.addString(token.stringValue());
 			pm.pushParser(pm.newExpressionParser(this));
@@ -47,7 +42,9 @@ public final class FormatStringParser extends Parser implements IValued
 			pm.popParser();
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Format String - String part expected");
+		pm.reparse();
+		pm.report(new SyntaxError(token, "Invalid Format String - String part expected"));
+		return;
 	}
 	
 	@Override

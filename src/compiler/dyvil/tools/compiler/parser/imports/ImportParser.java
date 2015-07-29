@@ -12,6 +12,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ImportParser extends Parser
@@ -19,9 +20,9 @@ public final class ImportParser extends Parser
 	public static final Name	annotation	= Name.getQualified("annotation");
 	public static final Name	type		= Name.getQualified("type");
 	
-	public static final int	IMPORT		= 1;
-	public static final int	DOT_ALIAS	= 2;
-	public static final int	MULTIIMPORT	= 4;
+	private static final int	IMPORT		= 1;
+	private static final int	DOT_ALIAS	= 2;
+	private static final int	MULTIIMPORT	= 4;
 	
 	protected IImportConsumer	consumer;
 	protected IImport			theImport;
@@ -33,13 +34,7 @@ public final class ImportParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = IMPORT;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
@@ -54,14 +49,17 @@ public final class ImportParser extends Parser
 			pm.popParser(true);
 			return;
 		}
-		if (this.mode == IMPORT)
+		
+		switch (this.mode)
 		{
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+		case IMPORT:
+			switch (type)
+			{
+			case Symbols.OPEN_CURLY_BRACKET:
 			{
 				MultiImport mi = new MultiImport(token);
 				mi.setParent(this.theImport);
 				this.theImport = mi;
-				
 				if (token.next().type() != Symbols.CLOSE_CURLY_BRACKET)
 				{
 					pm.pushParser(new ImportListParser(mi));
@@ -72,7 +70,7 @@ public final class ImportParser extends Parser
 				pm.skip();
 				return;
 			}
-			if (type == Symbols.WILDCARD)
+			case Symbols.WILDCARD:
 			{
 				PackageImport pi = new PackageImport(token.raw());
 				pi.setParent(this.theImport);
@@ -80,7 +78,7 @@ public final class ImportParser extends Parser
 				this.mode = 0;
 				return;
 			}
-			if (type == Keywords.ANNOTATION)
+			case Keywords.ANNOTATION:
 			{
 				SimpleImport si = new SimpleImport(token.raw(), annotation);
 				si.setParent(this.theImport);
@@ -88,7 +86,7 @@ public final class ImportParser extends Parser
 				this.mode = DOT_ALIAS;
 				return;
 			}
-			if (type == Keywords.TYPE)
+			case Keywords.TYPE:
 			{
 				SimpleImport si = new SimpleImport(token.raw(), ImportParser.type);
 				si.setParent(this.theImport);
@@ -96,7 +94,10 @@ public final class ImportParser extends Parser
 				this.mode = DOT_ALIAS;
 				return;
 			}
-			if (ParserUtil.isIdentifier(type))
+			case Tokens.IDENTIFIER:
+			case Tokens.SYMBOL_IDENTIFIER:
+			case Tokens.LETTER_IDENTIFIER:
+			case Tokens.DOT_IDENTIFIER:
 			{
 				SimpleImport si = new SimpleImport(token.raw(), token.nameValue());
 				si.setParent(this.theImport);
@@ -104,17 +105,17 @@ public final class ImportParser extends Parser
 				this.mode = DOT_ALIAS;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Import Declaration - Identifier expected");
-		}
-		if (this.mode == DOT_ALIAS)
-		{
-			if (type == Symbols.DOT)
+			}
+			pm.report(new SyntaxError(token, "Invalid Import Declaration - Identifier expected"));
+			return;
+		case DOT_ALIAS:
+			switch (type)
 			{
+			case Symbols.DOT:
 				this.mode = IMPORT;
 				return;
-			}
-			if (type == Symbols.ARROW_OPERATOR || type == Keywords.AS)
-			{
+			case Symbols.ARROW_OPERATOR:
+			case Keywords.AS:
 				this.mode = 0;
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
@@ -123,28 +124,24 @@ public final class ImportParser extends Parser
 					pm.skip();
 					return;
 				}
-				
-				throw new SyntaxError(next, "Invalid Import Alias");
-			}
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
-			{
+				pm.report(new SyntaxError(next, "Invalid Import Alias"));
+				return;
+			case Symbols.CLOSE_CURLY_BRACKET:
 				this.consumer.setImport(this.theImport);
 				pm.popParser(true);
 				return;
 			}
-			
-			throw new SyntaxError(token, "Invalid Import Declaration - '.' expected");
-		}
-		if (this.isInMode(MULTIIMPORT))
-		{
+			pm.report(new SyntaxError(token, "Invalid Import Declaration - '.' expected"));
+			return;
+		case MULTIIMPORT:
 			this.theImport.expandPosition(token);
 			this.consumer.setImport(this.theImport);
 			pm.popParser();
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
-				return;
+				pm.report(new SyntaxError(token, "Invalid Multi-Import - '}' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Multi-Import - '}' expected");
+			return;
 		}
 	}
 }

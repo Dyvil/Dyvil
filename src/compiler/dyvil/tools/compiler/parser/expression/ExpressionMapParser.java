@@ -28,14 +28,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = NAME;
-		this.key = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token) 
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
@@ -44,8 +37,9 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 			return;
 		}
 		
-		if (this.mode == NAME)
+		switch (this.mode)
 		{
+		case NAME:
 			this.mode = VALUE;
 			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.COLON)
 			{
@@ -55,21 +49,18 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 			}
 			this.key = Name.update;
 			return;
-		}
-		if (this.mode == VALUE)
-		{
+		case VALUE:
 			this.mode = SEPERATOR;
 			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
-		}
-		if (this.mode == SEPERATOR)
-		{
-			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
+		case SEPERATOR:
+			this.mode = NAME;
+			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
 			{
-				this.mode = NAME;
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Expression Map - ',' expected"));
 			}
-			throw new SyntaxError(token, "Invalid Expression Map - ',' expected");
+			return;
 		}
 	}
 	
