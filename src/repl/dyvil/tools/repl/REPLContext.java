@@ -51,7 +51,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	public REPLContext()
 	{
-		super("REPL");
+		super(Name.getQualified("REPL"));
 	}
 	
 	protected static void reset()
@@ -451,9 +451,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
-		return className;
+		return Name.getQualified(className);
 	}
 	
 	@Override

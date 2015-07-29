@@ -22,9 +22,9 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 		return true;
 	}
 	
-	public void setName(String name);
+	public void setName(Name name);
 	
-	public String getName();
+	public Name getName();
 	
 	// Package
 	

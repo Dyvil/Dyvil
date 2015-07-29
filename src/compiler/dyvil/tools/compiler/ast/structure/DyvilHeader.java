@@ -42,8 +42,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public final File		outputDirectory;
 	public final File		outputFile;
 	
-	public String	name;
-	public Package	pack;
+	protected Name		name;
+	protected Package	pack;
 	
 	protected TokenIterator	tokens;
 	protected MarkerList	markers	= new MarkerList();
@@ -69,7 +69,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.outputFile = null;
 	}
 	
-	public DyvilHeader(String name)
+	public DyvilHeader(Name name)
 	{
 		this.inputFile = null;
 		this.outputDirectory = null;
@@ -85,7 +85,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf('/');
 		int end = name.lastIndexOf('.');
-		this.name = name.substring(start + 1, end);
+		this.name = Name.get(name.substring(start + 1, end));
 		
 		name = output.getPath();
 		start = name.lastIndexOf('/');
@@ -107,13 +107,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public void setName(String name)
+	public void setName(Name name)
 	{
 		this.name = name;
 	}
 	
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
 	}
@@ -550,7 +550,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		if (!name.equals(this.name))
 		{
-			name = this.name + '.' + name;
+			name = this.name.qualified + '.' + name;
 		}
 		return this.pack.fullName + '.' + name;
 	}
@@ -566,7 +566,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		if (!name.equals(this.name))
 		{
-			name = this.name + '$' + name;
+			name = this.name.qualified + '$' + name;
 		}
 		return this.pack.getInternalName() + name;
 	}
@@ -575,7 +575,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public void write(DataOutput out) throws IOException
 	{
 		// Header Name
-		out.writeUTF(this.getName());
+		out.writeUTF(this.name.unqualified);
 		
 		// Include Declarations
 		out.writeShort(0);
@@ -619,7 +619,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = in.readUTF();
+		this.name = Name.get(in.readUTF());
 		
 		// Include Declarations
 		in.readShort();

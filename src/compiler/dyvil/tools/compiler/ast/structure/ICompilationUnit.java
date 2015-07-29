@@ -4,13 +4,14 @@ import java.io.File;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface ICompilationUnit extends IASTNode
 {
-	public static boolean printMarkers(MarkerList markers, String fileType, String name, CodeFile source)
+	public static boolean printMarkers(MarkerList markers, String fileType, Name name, CodeFile source)
 	{
 		int size = markers.size();
 		if (size > 0)

@@ -181,9 +181,14 @@ public class Package implements INamed, IDefaultContext
 	
 	public IDyvilHeader resolveHeader(String name)
 	{
+		return this.resolveHeader(Name.getQualified(name));
+	}
+	
+	public IDyvilHeader resolveHeader(Name name)
+	{
 		for (IDyvilHeader unit : this.headers)
 		{
-			if (unit.getName().equals(name))
+			if (unit.getName() == name)
 			{
 				return unit;
 			}
@@ -201,7 +206,7 @@ public class Package implements INamed, IDefaultContext
 	{
 		for (IDyvilHeader c : this.headers)
 		{
-			if (c.getName().equals(name.qualified))
+			if (c.getName() == name)
 			{
 				return c.getClass(name);
 			}
@@ -214,12 +219,12 @@ public class Package implements INamed, IDefaultContext
 				return c;
 			}
 		}
-		return this.loadClass(name.qualified);
+		return this.loadClass(name);
 	}
 	
-	private IClass loadClass(String name)
+	private IClass loadClass(Name name)
 	{
-		String fileName = this.getInternalName() + name + FileType.CLASS_EXTENSION;
+		String fileName = this.getInternalName() + name.qualified + FileType.CLASS_EXTENSION;
 		
 		for (Library library : DyvilCompiler.config.libraries)
 		{
@@ -233,9 +238,9 @@ public class Package implements INamed, IDefaultContext
 		return null;
 	}
 	
-	private IDyvilHeader loadHeader(String name)
+	private IDyvilHeader loadHeader(Name name)
 	{
-		String fileName = this.getInternalName() + name + FileType.OBJECT_EXTENSION;
+		String fileName = this.getInternalName() + name.qualified + FileType.OBJECT_EXTENSION;
 		for (Library library : DyvilCompiler.config.libraries)
 		{
 			IDyvilHeader header = this.loadHeader(fileName, name, library);
@@ -248,19 +253,19 @@ public class Package implements INamed, IDefaultContext
 		return null;
 	}
 	
-	private IClass loadClass(String fileName, String name, Library library)
+	private IClass loadClass(String fileName, Name name, Library library)
 	{
 		InputStream is = library.getInputStream(fileName);
 		if (is != null)
 		{
-			ExternalClass bclass = new ExternalClass(Name.getQualified(name));
+			ExternalClass bclass = new ExternalClass(name);
 			this.classes.add(bclass);
 			return ClassReader.loadClass(bclass, is, false);
 		}
 		return null;
 	}
 	
-	private IDyvilHeader loadHeader(String fileName, String name, Library library)
+	private IDyvilHeader loadHeader(String fileName, Name name, Library library)
 	{
 		InputStream is = library.getInputStream(fileName);
 		if (is != null)

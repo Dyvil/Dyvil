@@ -18,7 +18,7 @@ public class ExternalHeader extends DyvilHeader
 	{
 	}
 	
-	public ExternalHeader(String name)
+	public ExternalHeader(Name name)
 	{
 		super(name);
 	}
