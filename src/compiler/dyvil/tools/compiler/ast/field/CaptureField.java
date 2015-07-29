@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
@@ -290,6 +293,16 @@ public final class CaptureField implements IField
 		String name = this.name;
 		String desc = this.type.getExtendedName();
 		writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
 	}
 	
 	@Override

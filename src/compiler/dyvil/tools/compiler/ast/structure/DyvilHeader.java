@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.File;
+import java.io.IOException;
 
 import dyvil.collection.Entry;
 import dyvil.collection.List;
@@ -20,6 +23,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
+import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
@@ -38,8 +42,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public final File		outputDirectory;
 	public final File		outputFile;
 	
-	public final String	name;
-	public Package		pack;
+	public String	name;
+	public Package	pack;
 	
 	protected TokenIterator	tokens;
 	protected MarkerList	markers	= new MarkerList();
@@ -57,6 +61,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected Map<Name, Operator>	inheritedOperators;
 	
 	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap();
+	
+	public DyvilHeader()
+	{
+		this.inputFile = null;
+		this.outputDirectory = null;
+		this.outputFile = null;
+	}
 	
 	public DyvilHeader(String name)
 	{
@@ -93,6 +104,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public ICodePosition getPosition()
 	{
 		return ICodePosition.ORIGIN;
+	}
+	
+	@Override
+	public void setName(String name)
+	{
+		this.name = name;
 	}
 	
 	@Override
@@ -552,6 +569,92 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			name = this.name + '$' + name;
 		}
 		return this.pack.getInternalName() + name;
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		// Header Name
+		out.writeUTF(this.getName());
+		
+		// Include Declarations
+		out.writeShort(0);
+		
+		// Import Declarations
+		int imports = this.importCount();
+		out.writeShort(imports);
+		for (int i = 0; i < imports; i++)
+		{
+			this.imports[i].write(out);
+		}
+		
+		// Using Declarations
+		int staticImports = this.usingCount;
+		out.writeShort(staticImports);
+		for (int i = 0; i < staticImports; i++)
+		{
+			this.usings[i].write(out);
+		}
+		
+		// Operators Definitions
+		Map<Name, Operator> operators = this.operators;
+		out.writeShort(operators.size());
+		for (Entry<Name, Operator> entry : operators)
+		{
+			entry.getValue().write(out);
+		}
+		
+		// Type Aliases
+		Map<Name, ITypeAlias> typeAliases = this.typeAliases;
+		out.writeShort(typeAliases.size());
+		for (Entry<Name, ITypeAlias> entry : typeAliases)
+		{
+			entry.getValue().write(out);
+		}
+		
+		// Classes
+		out.writeShort(0);
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.name = in.readUTF();
+		
+		// Include Declarations
+		in.readShort();
+		
+		// Import Declarations
+		int imports = in.readShort();
+		for (int i = 0; i < imports; i++)
+		{
+			ImportDeclaration id = new ImportDeclaration(null);
+			id.read(in);
+			this.addImport(id);
+		}
+		
+		int staticImports = in.readShort();
+		for (int i = 0; i < staticImports; i++)
+		{
+			ImportDeclaration id = new ImportDeclaration(null, true);
+			id.read(in);
+			this.addUsing(id);
+		}
+		
+		int operators = in.readShort();
+		for (int i = 0; i < operators; i++)
+		{
+			Operator op = Operator.read(in);
+			this.addOperator(op);
+		}
+		
+		int typeAliases = in.readShort();
+		for (int i = 0; i < typeAliases; i++)
+		{
+			TypeAlias ta = new TypeAlias();
+			ta.read(in);
+			this.addTypeAlias(ta);
+		}
 	}
 	
 	@Override

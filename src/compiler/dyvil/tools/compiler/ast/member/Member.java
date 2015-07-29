@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.member;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
@@ -269,6 +272,57 @@ public abstract class Member implements IMember
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			this.annotations[i].cleanup(context, compilableList);
+		}
+	}
+	
+	public void write(DataOutput out) throws IOException
+	{
+		this.writeSignature(out);
+		out.writeUTF(this.name.unqualified);
+		this.writeAnnotations(out);
+	}
+
+	public void writeSignature(DataOutput out) throws IOException
+	{
+		IType.writeType(this.type, out);
+	}
+	
+	protected void writeAnnotations(DataOutput out) throws IOException
+	{
+		out.writeInt(this.modifiers);
+		
+		int annotations = this.annotationCount;
+		out.writeShort(annotations);
+		for (int i = 0; i < annotations; i++)
+		{
+			this.annotations[i].write(out);
+		}
+	}
+	
+	public void read(DataInput in) throws IOException
+	{
+		this.readSignature(in);
+		this.name = Name.get(in.readUTF());
+		this.readAnnotations(in);
+	}
+
+	public void readSignature(DataInput in) throws IOException
+	{
+		this.type = IType.readType(in);
+	}
+	
+	protected void readAnnotations(DataInput in) throws IOException
+	{
+		this.modifiers = in.readInt();
+		
+		int annotations = in.readShort();
+		this.annotations = new Annotation[annotations];
+		this.annotationCount = annotations;
+		for (int i = 0; i < annotations; i++)
+		{
+			Annotation a = new Annotation();
+			this.annotations[i] = a;
+			a.read(in);
 		}
 	}
 	

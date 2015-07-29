@@ -419,6 +419,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public static void writeType(IType type, DataOutput dos) throws IOException
 	{
+		if (type == null)
+		{
+			dos.writeByte(-1);
+			return;
+		}
+		
 		dos.writeByte(type.typeTag());
 		type.write(dos);
 	}

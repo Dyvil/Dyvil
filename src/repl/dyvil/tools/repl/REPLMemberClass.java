@@ -1,5 +1,8 @@
 package dyvil.tools.repl;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.security.ProtectionDomain;
 
@@ -597,6 +600,16 @@ public class REPLMemberClass implements IClass
 	
 	@Override
 	public void writeInnerClassInfo(ClassWriter writer)
+	{
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
 	{
 	}
 	

@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.dynamic;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.array.ObjectArray;
@@ -422,6 +425,16 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	{
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
 	{
 	}
 	

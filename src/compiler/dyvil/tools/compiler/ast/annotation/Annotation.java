@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
@@ -24,13 +27,14 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class Annotation implements IASTNode, INamed
+public final class Annotation implements IASTNode, INamed, IObjectCompilable
 {
 	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
 	
@@ -41,6 +45,10 @@ public final class Annotation implements IASTNode, INamed
 	
 	// Metadata
 	protected IType type;
+	
+	public Annotation()
+	{
+	}
 	
 	public Annotation(IType type)
 	{
@@ -261,6 +269,18 @@ public final class Annotation implements IASTNode, INamed
 		{
 			visitor.visit(key, value.toObject());
 		}
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		// TODO
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		// TODO
 	}
 	
 	@Override

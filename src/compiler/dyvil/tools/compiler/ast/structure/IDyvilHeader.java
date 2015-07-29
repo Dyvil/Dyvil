@@ -13,13 +13,16 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.IObjectCompilable;
 
-public interface IDyvilHeader extends IStaticContext, IClassList, IOperatorMap, ITypeAliasMap
+public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassList, IOperatorMap, ITypeAliasMap
 {
 	public default boolean isHeader()
 	{
 		return true;
 	}
+	
+	public void setName(String name);
 	
 	public String getName();
 	

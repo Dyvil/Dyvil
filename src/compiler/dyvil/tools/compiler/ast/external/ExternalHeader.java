@@ -14,6 +14,10 @@ public class ExternalHeader extends DyvilHeader
 	private boolean	importsResolved;
 	private boolean	staticImportsResolved;
 	
+	public ExternalHeader()
+	{
+	}
+	
 	public ExternalHeader(String name)
 	{
 		super(name);

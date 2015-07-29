@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.collection.List;
@@ -713,6 +716,16 @@ public class Property extends Member implements IProperty, IContext
 		String name = this.name.qualified + "_$eq";
 		String desc = "(" + this.type.getExtendedName() + ")V";
 		writer.writeInvokeInsn(opcode, owner, name, desc, false);
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
 	}
 	
 	@Override

@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.method;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.annotation.mutating;
@@ -1559,6 +1562,75 @@ public class Method extends Member implements IMethod, ILabelContext
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.isInterface());
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+		out.writeUTF(this.name.qualified);
+		IType.writeType(this.type, out);
+		
+		out.writeByte(this.parameterCount);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType.writeType(this.parameters[i].getType(), out);
+		}
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		this.writeAnnotations(out);
+		
+		out.writeUTF(this.name.qualified);
+		IType.writeType(this.type, out);
+		
+		out.writeByte(this.parameterCount);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].write(out);
+		}
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
+		this.type = IType.readType(in);
+		
+		int parameterCount = in.readByte();
+		if (this.parameterCount != 0)
+		{
+			for (int i = 0; i < parameterCount; i++)
+			{
+				this.parameters[i].setType(IType.readType(in));
+			}
+			this.parameterCount = parameterCount;
+			return;
+		}
+		
+		this.parameters = new IParameter[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			this.parameters[i] = new MethodParameter(Name.getQualified("par" + i), IType.readType(in));
+		}
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.readAnnotations(in);
+		
+		this.name = Name.get(in.readUTF());
+		this.type = IType.readType(in);
+		
+		int parameterCount = in.readByte();
+		this.parameters = new IParameter[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			MethodParameter param = new MethodParameter();
+			param.read(in);
+			this.parameters[i] = param;
+		}
 	}
 	
 	@Override

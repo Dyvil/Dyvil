@@ -1,5 +1,9 @@
 package dyvil.tools.compiler.ast.external;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
@@ -712,6 +716,16 @@ public final class ExternalClass extends AbstractClass
 	
 	@Override
 	public void writeInnerClassInfo(ClassWriter writer)
+	{
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
 	{
 	}
 }

@@ -10,6 +10,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalClass;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
@@ -264,10 +265,10 @@ public class Package implements INamed, IDefaultContext
 		InputStream is = library.getInputStream(fileName);
 		if (is != null)
 		{
-			DyvilHeader header = ObjectFormat.read(is);
+			DyvilHeader header = new ExternalHeader(name);
 			header.pack = this;
 			this.headers.add(header);
-			return header;
+			return ObjectFormat.read(is, header);
 		}
 		return null;
 	}

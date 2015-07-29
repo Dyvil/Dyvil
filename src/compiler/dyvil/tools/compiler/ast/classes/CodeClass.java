@@ -1,5 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
@@ -16,6 +19,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -499,6 +503,122 @@ public class CodeClass extends AbstractClass
 				mods &= ~Opcodes.ACC_STATIC;
 			}
 			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified, mods);
+		}
+	}
+	
+	private void writeTypes(DataOutput out) throws IOException
+	{
+		IType.writeType(this.superType, out);
+		
+		int itfs = this.interfaceCount;
+		out.writeByte(itfs);
+		for (int i = 0; i < itfs; i++)
+		{
+			IType.writeType(this.interfaces[i], out);
+		}
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+		this.writeTypes(out);
+		
+		int params = this.parameterCount;
+		out.writeByte(params);
+		for (int i = 0; i < params; i++)
+		{
+			IType.writeType(this.parameters[i].getType(), out);
+		}
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		out.writeInt(this.modifiers);
+		
+		int annotations = this.annotationCount;
+		out.writeShort(annotations);
+		for (int i = 0; i < annotations; i++)
+		{
+			this.annotations[i].write(out);
+		}
+		
+		out.writeUTF(this.name.unqualified);
+		
+		this.writeTypes(out);
+		
+		int params = this.parameterCount;
+		out.writeByte(params);
+		for (int i = 0; i < params; i++)
+		{
+			this.parameters[i].write(out);
+		}
+	}
+	
+	private void readTypes(DataInput in) throws IOException
+	{
+		this.superType = IType.readType(in);
+		
+		int itfs = in.readByte();
+		this.interfaceCount = itfs;
+		this.interfaces = new IType[itfs];
+		for (int i = 0; i < itfs; i++)
+		{
+			this.interfaces[i] = IType.readType(in);
+		}
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
+		this.readTypes(in);
+		
+		int params = in.readByte();
+		if (this.parameterCount != 0)
+		{
+			this.parameterCount = params;
+			for (int i = 0; i < params; i++)
+			{
+				this.parameters[i].setType(IType.readType(in));
+			}
+			return;
+		}
+		
+		this.parameterCount = params;
+		this.parameters = new IParameter[params];
+		for (int i = 0; i < params; i++)
+		{
+			this.parameters[i] = new ClassParameter(Name.getQualified("par" + i), IType.readType(in));
+		}
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.modifiers = in.readInt();
+		
+		int annotations = in.readShort();
+		this.annotations = new Annotation[annotations];
+		this.annotationCount = annotations;
+		for (int i = 0; i < annotations; i++)
+		{
+			Annotation a = new Annotation();
+			a.read(in);
+			this.annotations[i] = a;
+		}
+		
+		this.name = Name.get(in.readUTF());
+		
+		this.readTypes(in);
+		
+		int params = in.readByte();
+		this.parameters = new IParameter[params];
+		this.parameterCount = params;
+		for (int i = 0; i < params; i++)
+		{
+			ClassParameter param = new ClassParameter();
+			param.read(in);
+			this.parameters[i] = param;
 		}
 	}
 }
