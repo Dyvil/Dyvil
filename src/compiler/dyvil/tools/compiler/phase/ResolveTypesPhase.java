@@ -47,4 +47,10 @@ public class ResolveTypesPhase implements ICompilerPhase
 			unit.resolveTypes();
 		}
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "RESOLVE_TYPES";
+	}
 }

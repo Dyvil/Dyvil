@@ -548,7 +548,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		if (this.parameterCount == 1)
 		{
 			IParameter param = this.parameters[0];
-			if (param.getType() == Types.UNKNOWN)
+			if (param.getType() != Types.UNKNOWN)
 			{
 				buffer.append('(');
 				param.toString(prefix, buffer);

@@ -148,10 +148,16 @@ public final class TypeOperator extends Value
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "type(" + this.type + ")";
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("type[");
+		buffer.append("type(");
 		this.type.toString(prefix, buffer);
-		buffer.append(']');
+		buffer.append(')');
 	}
 }

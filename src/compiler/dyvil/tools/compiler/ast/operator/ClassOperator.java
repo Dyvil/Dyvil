@@ -198,10 +198,16 @@ public final class ClassOperator extends Value
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "class(" + this.type + ")";
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("class[");
+		buffer.append("class(");
 		this.type.toString(prefix, buffer);
-		buffer.append(']');
+		buffer.append(')');
 	}
 }
