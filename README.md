@@ -6,8 +6,12 @@ The Dyvil programming language
 
 Dyvil (Dynamic Visual / Virtual Language) is a programming language that is based on Java and the JVM, but extends the language with several new features including operator overloading, function types, tuples and many more.
 
-###▶ [Language Features](https://github.com/Clashsoft/Dyvil/wiki/Language-Features)
+###▶ [Language Features](https://github.com/Dyvil/Dyvil/wiki/Language-Features)
 
-###▶ [Tutorials](https://github.com/Clashsoft/Dyvil/wiki#tutorials)
+###▶ [Tutorials](https://github.com/Dyvil/Dyvil/wiki#tutorials)
 
-###▶ [Contribution](https://github.com/Clashsoft/Dyvil/wiki#contribution)
+###▶ [Contribution](https://github.com/Dyvil/Dyvil/wiki#contribution)
+
+###▶ [Dyvil Installer](https://github.com/Dyvil/Dyvil-Installer)
+
+###▶ [Dyvil Window Toolkit](https://github.com/Dyvil/Dyvil-Window-Toolkit)
