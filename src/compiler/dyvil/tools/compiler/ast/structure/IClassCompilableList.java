@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.tools.compiler.ast.member.IClassCompilable;
+import dyvil.tools.compiler.backend.IClassCompilable;
 
 public interface IClassCompilableList
 {

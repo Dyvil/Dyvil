@@ -14,10 +14,11 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ImportDeclaration implements IASTNode
+public final class ImportDeclaration implements IASTNode, IObjectCompilable
 {
 	public static final int	IMPORT	= 0;
 	public static final int	USING	= 1;
@@ -97,12 +98,14 @@ public final class ImportDeclaration implements IASTNode
 		this.theImport.toString(prefix, buffer);
 	}
 	
+	@Override
 	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeByte(this.theImport.importTag());
 		this.theImport.write(dos);
 	}
 	
+	@Override
 	public void read(DataInput dis) throws IOException
 	{
 		this.theImport = IImport.fromTag(dis.readByte());

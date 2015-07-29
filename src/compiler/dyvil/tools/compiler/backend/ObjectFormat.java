@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 
-public class HeaderFile
+public class ObjectFormat
 {
 	private static final int FILE_VERSION = 1;
 	

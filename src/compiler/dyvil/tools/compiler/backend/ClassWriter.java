@@ -9,7 +9,6 @@ import java.util.jar.Manifest;
 import dyvil.collection.List;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.config.CompilerConfig;
 
 public class ClassWriter extends dyvil.tools.asm.ClassWriter

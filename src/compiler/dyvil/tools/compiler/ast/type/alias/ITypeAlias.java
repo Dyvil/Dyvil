@@ -10,9 +10,10 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface ITypeAlias extends IASTNode, INamed, ITyped
+public interface ITypeAlias extends IASTNode, INamed, ITyped, IObjectCompilable
 {
 	@Override
 	public void setName(Name name);
@@ -28,7 +29,9 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped
 	
 	public void resolve(MarkerList markers, IContext context);
 	
+	@Override
 	public void write(DataOutput dos) throws IOException;
 	
+	@Override
 	public void read(DataInput dis) throws IOException;
 }

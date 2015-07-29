@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -21,7 +20,8 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvil.tools.compiler.backend.HeaderFile;
+import dyvil.tools.compiler.backend.ObjectFormat;
+import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
@@ -407,7 +407,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			return;
 		}
 		
-		HeaderFile.write(this.outputFile, this);
+		ObjectFormat.write(this.outputFile, this);
 	}
 	
 	@Override

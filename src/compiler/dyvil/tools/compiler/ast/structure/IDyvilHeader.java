@@ -7,12 +7,12 @@ import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
+import dyvil.tools.compiler.backend.IClassCompilable;
 
 public interface IDyvilHeader extends IStaticContext, IClassList, IOperatorMap, ITypeAliasMap
 {

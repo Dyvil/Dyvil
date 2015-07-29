@@ -1,7 +1,5 @@
-package dyvil.tools.compiler.ast.member;
+package dyvil.tools.compiler.backend;
 
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IClassCompilable

@@ -4,9 +4,9 @@ import java.io.File;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;

@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassReader;
-import dyvil.tools.compiler.backend.HeaderFile;
+import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
@@ -264,7 +264,7 @@ public class Package implements INamed, IDefaultContext
 		InputStream is = library.getInputStream(fileName);
 		if (is != null)
 		{
-			DyvilHeader header = HeaderFile.read(is);
+			DyvilHeader header = ObjectFormat.read(is);
 			header.pack = this;
 			this.headers.add(header);
 			return header;
