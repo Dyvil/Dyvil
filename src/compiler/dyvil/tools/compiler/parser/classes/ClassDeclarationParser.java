@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -44,7 +45,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private CodeClass		theClass;
 	
 	private int				modifiers;
-	private Annotation[]	annotations;
+	private IAnnotation[]	annotations;
 	
 	public ClassDeclarationParser(IDyvilHeader header)
 	{
@@ -256,17 +257,17 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		}
 	}
 	
-	public void addAnnotation(Annotation annotation)
+	public void addAnnotation(IAnnotation annotation)
 	{
 		if (this.annotations == null)
 		{
-			this.annotations = new Annotation[1];
+			this.annotations = new IAnnotation[1];
 			this.annotations[0] = annotation;
 			return;
 		}
 		
 		int len = this.annotations.length;
-		Annotation[] temp = new Annotation[len + 1];
+		IAnnotation[] temp = new IAnnotation[len + 1];
 		System.arraycopy(this.annotations, 0, temp, 0, this.annotations.length);
 		temp[this.annotations.length] = annotation;
 		this.annotations = temp;

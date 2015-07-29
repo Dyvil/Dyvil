@@ -33,7 +33,7 @@ public class NestedClass extends CodeClass
 	@Override
 	public void setInnerIndex(String internalName, int index)
 	{
-		String outerName = this.outerClass == null ? this.unit.getName() : this.outerClass.getFileName();
+		String outerName = this.outerClass == null ? this.unit.getName().qualified : this.outerClass.getFileName();
 		String indexString = Integer.toString(index);
 		
 		this.name = Name.getQualified(outerName + '$' + indexString);

@@ -58,10 +58,10 @@ public final class AnnotationMetadata implements IClassMetadata
 		}
 		if (this.retention == null)
 		{
-			Annotation retention = this.theClass.getAnnotation(Types.RETENTION_CLASS);
+			IAnnotation retention = this.theClass.getAnnotation(Types.RETENTION_CLASS);
 			if (retention != null)
 			{
-				EnumValue value = (EnumValue) retention.arguments.getValue(0, Annotation.VALUE);
+				EnumValue value = (EnumValue) retention.getArguments().getValue(0, Annotation.VALUE);
 				this.retention = RetentionPolicy.valueOf(value.name.qualified);
 			}
 		}
@@ -70,14 +70,14 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 		
-		Annotation target = this.theClass.getAnnotation(Types.TARGET_CLASS);
+		IAnnotation target = this.theClass.getAnnotation(Types.TARGET_CLASS);
 		if (target == null)
 		{
 			return;
 		}
 		
 		this.targets = new TreeSet();
-		IValueList values = (IValueList) target.arguments.getValue(0, Annotation.VALUE);
+		IValueList values = (IValueList) target.getArguments().getValue(0, Annotation.VALUE);
 		if (values == null)
 		{
 			return;

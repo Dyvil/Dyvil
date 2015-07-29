@@ -9,14 +9,12 @@ import java.lang.annotation.RetentionPolicy;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.FieldVisitor;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -27,14 +25,13 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.util.Util;
 
-public final class Annotation implements IASTNode, INamed, IObjectCompilable
+public final class Annotation implements IAnnotation
 {
 	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
 	
@@ -92,26 +89,31 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		return this.name;
 	}
 	
+	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
 	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
 	
+	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
 	}
 	
+	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
 	}
 	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
@@ -119,6 +121,7 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		this.arguments.resolveTypes(markers, context);
 	}
 	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
@@ -153,11 +156,13 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		}
 	}
 	
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.checkTypes(markers, context);
 	}
 	
+	@Override
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
 		if (this.type == null)
@@ -183,11 +188,13 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		}
 	}
 	
+	@Override
 	public void foldConstants()
 	{
 		this.arguments.foldConstants();
 	}
 	
+	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.arguments.cleanup(context, compilableList);
@@ -198,6 +205,7 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		return this.type.getTheClass().getMetadata().getRetention();
 	}
 	
+	@Override
 	public void write(ClassWriter writer)
 	{
 		RetentionPolicy retention = this.getRetention();
@@ -207,6 +215,7 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		}
 	}
 	
+	@Override
 	public void write(MethodWriter writer)
 	{
 		RetentionPolicy retention = this.getRetention();
@@ -216,6 +225,7 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		}
 	}
 	
+	@Override
 	public void write(FieldVisitor writer)
 	{
 		RetentionPolicy retention = this.getRetention();
@@ -225,6 +235,7 @@ public final class Annotation implements IASTNode, INamed, IObjectCompilable
 		}
 	}
 	
+	@Override
 	public void write(MethodWriter writer, int index)
 	{
 		RetentionPolicy retention = this.getRetention();

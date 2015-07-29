@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -106,7 +106,7 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 	}
 	
 	@Override
-	public Parser newAnnotationParser(Annotation annotation)
+	public Parser newAnnotationParser(IAnnotation annotation)
 	{
 		return this.pm.newAnnotationParser(annotation);
 	}

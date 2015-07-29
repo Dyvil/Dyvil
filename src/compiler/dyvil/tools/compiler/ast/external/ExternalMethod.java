@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -52,7 +52,7 @@ public final class ExternalMethod extends Method
 		this.annotationsResolved = true;
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Annotation annotation = this.annotations[i];
+			IAnnotation annotation = this.annotations[i];
 			annotation.resolveTypes(null, Package.rootPackage);
 			
 			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
@@ -207,7 +207,7 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public IAnnotation getAnnotation(int index)
 	{
 		if (this.annotations == null)
 		{
@@ -222,7 +222,7 @@ public final class ExternalMethod extends Method
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{

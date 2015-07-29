@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -41,7 +41,7 @@ public abstract class AbstractClass implements IClass
 	
 	// Modifiers and Annotations
 	
-	protected Annotation[]	annotations;
+	protected IAnnotation[]	annotations;
 	protected int			annotationCount;
 	protected int			modifiers;
 	
@@ -97,24 +97,24 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void setAnnotations(Annotation[] annotations, int count)
+	public void setAnnotations(IAnnotation[] annotations, int count)
 	{
 		this.annotations = annotations;
 		this.annotationCount = count;
 	}
 	
 	@Override
-	public void setAnnotation(int index, Annotation annotation)
+	public void setAnnotation(int index, IAnnotation annotation)
 	{
 		this.annotations[index] = annotation;
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
+	public void addAnnotation(IAnnotation annotation)
 	{
 		if (this.annotations == null)
 		{
-			this.annotations = new Annotation[3];
+			this.annotations = new IAnnotation[3];
 			this.annotations[0] = annotation;
 			this.annotationCount = 1;
 			return;
@@ -123,7 +123,7 @@ public abstract class AbstractClass implements IClass
 		int index = this.annotationCount++;
 		if (this.annotationCount > this.annotations.length)
 		{
-			Annotation[] temp = new Annotation[this.annotationCount];
+			IAnnotation[] temp = new IAnnotation[this.annotationCount];
 			System.arraycopy(this.annotations, 0, temp, 0, index);
 			this.annotations = temp;
 		}
@@ -172,19 +172,19 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public Annotation[] getAnnotations()
+	public IAnnotation[] getAnnotations()
 	{
 		return this.annotations;
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public IAnnotation getAnnotation(int index)
 	{
 		return this.annotations[index];
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -193,7 +193,7 @@ public abstract class AbstractClass implements IClass
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Annotation a = this.annotations[i];
+			IAnnotation a = this.annotations[i];
 			if (a.getType().getTheClass() == type)
 			{
 				return a;

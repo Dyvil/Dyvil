@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.generic.IGeneric;
@@ -65,7 +65,7 @@ public interface IParserManager
 		return new TypeParser(typeConsumer);
 	}
 	
-	public default Parser newAnnotationParser(Annotation annotation)
+	public default Parser newAnnotationParser(IAnnotation annotation)
 	{
 		return new AnnotationParser(annotation);
 	}

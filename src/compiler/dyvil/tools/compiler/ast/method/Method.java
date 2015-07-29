@@ -11,6 +11,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -562,7 +563,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		}
 	}
 	
-	protected final void readIntrinsicAnnotation(Annotation annotation)
+	protected final void readIntrinsicAnnotation(IAnnotation annotation)
 	{
 		Array array = (Array) annotation.getArguments().getValue(0, Annotation.VALUE);
 		
@@ -582,7 +583,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Annotation annotation = this.annotations[i];
+			IAnnotation annotation = this.annotations[i];
 			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
 			{
 				continue;
@@ -1066,7 +1067,7 @@ public class Method extends Member implements IMethod, ILabelContext
 			return;
 		}
 		
-		Annotation a = this.getAnnotation(Types.MUTATING_CLASS);
+		IAnnotation a = this.getAnnotation(Types.MUTATING_CLASS);
 		if (a == null)
 		{
 			return;

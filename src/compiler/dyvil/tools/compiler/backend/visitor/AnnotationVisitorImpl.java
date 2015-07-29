@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -16,10 +16,10 @@ import dyvil.tools.compiler.backend.ClassFormat;
 public class AnnotationVisitorImpl implements AnnotationVisitor
 {
 	private IAnnotationList	annotated;
-	private Annotation		annotation;
+	private IAnnotation		annotation;
 	private ArgumentMap		arguments;
 	
-	public AnnotationVisitorImpl(IAnnotationList annotated, Annotation annotation)
+	public AnnotationVisitorImpl(IAnnotationList annotated, IAnnotation annotation)
 	{
 		this.annotated = annotated;
 		this.annotation = annotation;

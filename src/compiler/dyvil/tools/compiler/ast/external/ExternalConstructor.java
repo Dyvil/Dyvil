@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.Constructor;
@@ -99,7 +99,7 @@ public final class ExternalConstructor extends Constructor
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public IAnnotation getAnnotation(int index)
 	{
 		if (this.annotations == null)
 		{
@@ -114,7 +114,7 @@ public final class ExternalConstructor extends Constructor
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{

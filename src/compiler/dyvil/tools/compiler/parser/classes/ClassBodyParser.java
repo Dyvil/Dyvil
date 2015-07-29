@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
@@ -44,7 +45,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	
 	private IType			type;
 	private int				modifiers;
-	private Annotation[]	annotations	= new Annotation[2];
+	private IAnnotation[]	annotations	= new IAnnotation[2];
 	private int				annotationCount;
 	
 	private IMember member;
@@ -326,19 +327,19 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		return this.annotationCount;
 	}
 	
-	public Annotation[] getAnnotations()
+	public IAnnotation[] getAnnotations()
 	{
-		Annotation[] a = new Annotation[this.annotationCount];
+		IAnnotation[] a = new IAnnotation[this.annotationCount];
 		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
 		return a;
 	}
 	
-	public void addAnnotation(Annotation annotation)
+	public void addAnnotation(IAnnotation annotation)
 	{
 		int index = this.annotationCount++;
 		if (this.annotationCount > this.annotations.length)
 		{
-			Annotation[] temp = new Annotation[this.annotationCount];
+			IAnnotation[] temp = new IAnnotation[this.annotationCount];
 			System.arraycopy(this.annotations, 0, temp, 0, index);
 			this.annotations = temp;
 		}

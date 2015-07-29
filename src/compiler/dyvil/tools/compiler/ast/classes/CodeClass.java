@@ -11,6 +11,7 @@ import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -160,7 +161,7 @@ public class CodeClass extends AbstractClass
 	{
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Annotation a = this.annotations[i];
+			IAnnotation a = this.annotations[i];
 			String internalName = a.getType().getInternalName();
 			if (internalName != null && !this.addRawAnnotation(internalName))
 			{
@@ -598,7 +599,7 @@ public class CodeClass extends AbstractClass
 		this.modifiers = in.readInt();
 		
 		int annotations = in.readShort();
-		this.annotations = new Annotation[annotations];
+		this.annotations = new IAnnotation[annotations];
 		this.annotationCount = annotations;
 		for (int i = 0; i < annotations; i++)
 		{

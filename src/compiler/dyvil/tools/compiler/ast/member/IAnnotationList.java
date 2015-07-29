@@ -2,26 +2,26 @@ package dyvil.tools.compiler.ast.member;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 
 public interface IAnnotationList
 {
 	public int annotationCount();
 	
-	public void setAnnotations(Annotation[] annotations, int annotationCount);
+	public void setAnnotations(IAnnotation[] annotations, int annotationCount);
 	
-	public void setAnnotation(int index, Annotation annotation);
+	public void setAnnotation(int index, IAnnotation annotation);
 	
-	public void addAnnotation(Annotation annotation);
+	public void addAnnotation(IAnnotation annotation);
 	
 	public void removeAnnotation(int index);
 	
-	public Annotation[] getAnnotations();
+	public IAnnotation[] getAnnotations();
 	
-	public Annotation getAnnotation(int index);
+	public IAnnotation getAnnotation(int index);
 	
-	public Annotation getAnnotation(IClass type);
+	public IAnnotation getAnnotation(IClass type);
 	
 	public default boolean addRawAnnotation(String type)
 	{

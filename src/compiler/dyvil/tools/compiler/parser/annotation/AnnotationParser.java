@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.annotation;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
@@ -21,9 +21,9 @@ public class AnnotationParser extends Parser
 	public static final int	PARAMETERS_START	= 2;
 	public static final int	PARAMETERS_END		= 4;
 	
-	private Annotation annotation;
+	private IAnnotation annotation;
 	
-	public AnnotationParser(Annotation annotation)
+	public AnnotationParser(IAnnotation annotation)
 	{
 		this.annotation = annotation;
 		this.mode = NAME;

@@ -7,6 +7,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,7 +20,7 @@ public abstract class Member implements IMember
 {
 	protected ICodePosition position;
 	
-	protected Annotation[]	annotations;
+	protected IAnnotation[]	annotations;
 	protected int			annotationCount;
 	
 	protected int modifiers;
@@ -67,24 +68,24 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
-	public void setAnnotations(Annotation[] annotations, int count)
+	public void setAnnotations(IAnnotation[] annotations, int count)
 	{
 		this.annotations = annotations;
 		this.annotationCount = count;
 	}
 	
 	@Override
-	public void setAnnotation(int index, Annotation annotation)
+	public void setAnnotation(int index, IAnnotation annotation)
 	{
 		this.annotations[index] = annotation;
 	}
 	
 	@Override
-	public final void addAnnotation(Annotation annotation)
+	public final void addAnnotation(IAnnotation annotation)
 	{
 		if (this.annotations == null)
 		{
-			this.annotations = new Annotation[3];
+			this.annotations = new IAnnotation[3];
 			this.annotations[0] = annotation;
 			this.annotationCount = 1;
 			return;
@@ -93,7 +94,7 @@ public abstract class Member implements IMember
 		int index = this.annotationCount++;
 		if (this.annotationCount > this.annotations.length)
 		{
-			Annotation[] temp = new Annotation[this.annotationCount];
+			IAnnotation[] temp = new IAnnotation[this.annotationCount];
 			System.arraycopy(this.annotations, 0, temp, 0, index);
 			this.annotations = temp;
 		}
@@ -112,13 +113,13 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
-	public Annotation[] getAnnotations()
+	public IAnnotation[] getAnnotations()
 	{
 		return this.annotations;
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public IAnnotation getAnnotation(int index)
 	{
 		if (this.annotations == null)
 		{
@@ -128,7 +129,7 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -136,7 +137,7 @@ public abstract class Member implements IMember
 		}
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Annotation a = this.annotations[i];
+			IAnnotation a = this.annotations[i];
 			if (a.getType().getTheClass() == type)
 			{
 				return a;
@@ -226,7 +227,7 @@ public abstract class Member implements IMember
 	{
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			Annotation a = this.annotations[i];
+			IAnnotation a = this.annotations[i];
 			String fullName = a.getType().getInternalName();
 			if (fullName != null && !this.addRawAnnotation(fullName))
 			{
@@ -281,7 +282,7 @@ public abstract class Member implements IMember
 		out.writeUTF(this.name.unqualified);
 		this.writeAnnotations(out);
 	}
-
+	
 	public void writeSignature(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
@@ -305,7 +306,7 @@ public abstract class Member implements IMember
 		this.name = Name.get(in.readUTF());
 		this.readAnnotations(in);
 	}
-
+	
 	public void readSignature(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
@@ -316,7 +317,7 @@ public abstract class Member implements IMember
 		this.modifiers = in.readInt();
 		
 		int annotations = in.readShort();
-		this.annotations = new Annotation[annotations];
+		this.annotations = new IAnnotation[annotations];
 		this.annotationCount = annotations;
 		for (int i = 0; i < annotations; i++)
 		{

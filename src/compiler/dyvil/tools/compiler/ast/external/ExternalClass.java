@@ -10,6 +10,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -235,7 +236,7 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (!this.annotationsResolved)
 		{
@@ -245,7 +246,7 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public void addAnnotation(Annotation annotation)
+	public void addAnnotation(IAnnotation annotation)
 	{
 		if (!"dyvil/annotation/ClassParameters".equals(annotation.getType().getInternalName()))
 		{
