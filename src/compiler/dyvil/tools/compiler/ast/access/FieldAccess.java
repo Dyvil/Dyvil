@@ -101,7 +101,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public boolean isConstant()
+	public boolean isConstantOrField()
 	{
 		return this.field != null && this.field.hasModifier(Modifiers.CONST);
 	}
@@ -260,7 +260,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
 		{
 			IValue v = this.field.getValue();
-			return v != null && v.isConstant() ? v : this;
+			return v != null && v.isConstantOrField() ? v : this;
 		}
 		if (this.instance != null)
 		{

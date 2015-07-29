@@ -600,21 +600,21 @@ public class Long implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, LSHL })
 	public Long $lt$lt(int v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, LSHR })
 	public Long $gt$gt(int v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, LUSHR })
 	public Long $gt$gt$gt(int v)
 	{
 		return Long.apply(this.value >>> v);
@@ -728,21 +728,21 @@ public class Long implements Integer
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LSHL })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, LSHL })
 	public Long $lt$lt(long v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LSHR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, LSHR })
 	public Long $gt$gt(long v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LUSHR })
+	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, LUSHR })
 	public Long $gt$gt$gt(long v)
 	{
 		return Long.apply(this.value >>> v);

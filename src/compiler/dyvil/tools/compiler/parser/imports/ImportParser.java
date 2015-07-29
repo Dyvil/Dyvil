@@ -106,6 +106,7 @@ public final class ImportParser extends Parser
 				return;
 			}
 			}
+			pm.popParser();
 			pm.report(new SyntaxError(token, "Invalid Import Declaration - Identifier expected"));
 			return;
 		case DOT_ALIAS:
@@ -139,6 +140,7 @@ public final class ImportParser extends Parser
 			pm.popParser();
 			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
+				pm.reparse();
 				pm.report(new SyntaxError(token, "Invalid Multi-Import - '}' expected"));
 			}
 			return;

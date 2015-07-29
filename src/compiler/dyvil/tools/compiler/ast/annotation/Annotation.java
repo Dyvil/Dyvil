@@ -11,8 +11,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -235,6 +235,7 @@ public final class Annotation implements IASTNode, INamed
 			IParameter param = iclass.getParameter(i);
 			visitValue(visitor, param.getName().qualified, this.arguments.getValue(i, param));
 		}
+		visitor.visitEnd();
 	}
 	
 	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)
@@ -243,10 +244,13 @@ public final class Annotation implements IASTNode, INamed
 		if (valueType == IValue.ARRAY)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
-			for (IValue v : (IValueList) value)
+			Array array = (Array)value;
+			int count = array.valueCount();
+			for (int i = 0; i < count; i++)
 			{
-				visitValue(arrayVisitor, null, v);
+				visitValue(arrayVisitor, null, array.getValue(i));
 			}
+			arrayVisitor.visitEnd();
 		}
 		else if (valueType == IValue.ENUM)
 		{

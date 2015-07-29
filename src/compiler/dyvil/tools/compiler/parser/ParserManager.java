@@ -26,15 +26,6 @@ public class ParserManager implements IParserManager
 	{
 	}
 	
-	/**
-	 * Creates a new {@link ParserManager} with the given {@link Parser}
-	 * {@code parser} as the current parser, and calls the parser's
-	 * {@link Parser#begin(ParserManager) begin} method.
-	 * 
-	 * @see Parser#begin(ParserManager)
-	 * @param parser
-	 *            the parser
-	 */
 	public ParserManager(Parser parser, MarkerList markers)
 	{
 		this.parser = parser;
@@ -75,6 +66,7 @@ public class ParserManager implements IParserManager
 		tokens.reset();
 		this.tokens = tokens;
 		IToken token = null;
+		
 		while (true)
 		{
 			if (this.reparse)
@@ -103,8 +95,8 @@ public class ParserManager implements IParserManager
 			}
 			catch (Exception ex)
 			{
-					DyvilCompiler.error("ParserManager", "parseToken", ex);
-					markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
+				DyvilCompiler.error("ParserManager", "parseToken", ex);
+				markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 			}
 			
 			if (this.parser == null)
@@ -173,18 +165,12 @@ public class ParserManager implements IParserManager
 	@Override
 	public void popParser()
 	{
-		// Drop the jumpback token since the tryparser has completed
-		// successfully.
-		// this.jumpBackToken = null;
 		this.parser = this.parser.parent;
 	}
 	
 	@Override
 	public void popParser(boolean reparse)
 	{
-		// Drop the jumpback token since the tryparser has completed
-		// successfully.
-		// this.jumpBackToken = null;
 		this.parser = this.parser.parent;
 		this.reparse = reparse;
 	}

@@ -62,9 +62,13 @@ public class ReturnStatement extends Value implements IStatement, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (type == Types.VOID)
+		{
+			return this;
+		}
 		if (this.value == null)
 		{
-			return type == Types.UNKNOWN || type == Types.VOID ? this : null;
+			return null;
 		}
 		IValue value1 = this.value.withType(type, typeContext, markers, context);
 		if (value1 == null)
@@ -78,7 +82,11 @@ public class ReturnStatement extends Value implements IStatement, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.value == null ? type == Types.UNKNOWN || type == Types.VOID : this.value.isType(type);
+		if (type == Types.VOID)
+		{
+			return true;
+		}
+		return this.value != null && this.value.isType(type);
 	}
 	
 	@Override
@@ -166,7 +174,7 @@ public class ReturnStatement extends Value implements IStatement, IValued
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
+		this.writeStatement(writer);
 	}
 	
 	@Override

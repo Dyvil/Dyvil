@@ -68,14 +68,17 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			return null;
 		}
 		
-		IValue action1 = this.action.withType(Types.VOID, typeContext, markers, context);
-		if (action1 == null)
+		if (this.action != null)
 		{
-			// TODO Handle error
-		}
-		else
-		{
-			this.action = action1;
+			IValue action1 = this.action.withType(Types.VOID, typeContext, markers, context);
+			if (action1 == null)
+			{
+				// TODO Handle error
+			}
+			else
+			{
+				this.action = action1;
+			}
 		}
 		
 		return this;

@@ -49,8 +49,8 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	public void report(SyntaxError error)
 	{
 		this.pm.jump(this.firstToken);
-		this.reset();
 		this.pm.pushParser(this.pm.newExpressionParser(this));
+		this.reset();
 		this.mode = SEPARATOR;
 	}
 	
