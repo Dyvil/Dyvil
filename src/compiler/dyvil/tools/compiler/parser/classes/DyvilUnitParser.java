@@ -10,14 +10,17 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 {
 	private static final int CLASS = 4;
 	
-	public DyvilUnitParser(IDyvilHeader unit)
+	public DyvilUnitParser(IDyvilHeader unit, boolean classMode)
 	{
 		super(unit);
-		this.mode = CLASS;
+		if (classMode)
+		{
+			this.mode = CLASS;
+		}
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (this.mode)
@@ -44,6 +47,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			pm.pushParser(new ClassDeclarationParser(this.unit), true);
 			return;
 		}
-		pm.report(new SyntaxError(token, "Invalid Token - Delete this token")); return;
+		pm.report(new SyntaxError(token, "Invalid Token - Delete this token"));
+		return;
 	}
 }

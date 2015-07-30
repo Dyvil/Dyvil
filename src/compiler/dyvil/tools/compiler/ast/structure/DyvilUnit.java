@@ -100,7 +100,7 @@ public class DyvilUnit extends DyvilHeader
 	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DyvilUnitParser(this), this.markers, this);
+		ParserManager manager = new ParserManager(new DyvilUnitParser(this, true), this.markers, this);
 		manager.parse(this.tokens);
 		this.tokens = null;
 	}

@@ -20,11 +20,14 @@ public class REPLParser implements IParserManager
 	private Parser			parser;
 	private int				skip;
 	private boolean			reparse;
+	
 	private MarkerList		markers;
+	private boolean syntaxErrors;
 	
 	@Override
 	public void report(SyntaxError error)
 	{
+		this.syntaxErrors = true;
 		if (this.markers != null)
 		{
 			this.markers.add(error);
@@ -105,7 +108,7 @@ public class REPLParser implements IParserManager
 			}
 		}
 		
-		return true;
+		return !this.syntaxErrors;
 	}
 	
 	@Override
