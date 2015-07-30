@@ -5,14 +5,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
-import dyvil.collection.Map;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -106,16 +104,6 @@ public class IncludeDeclaration implements IASTNode
 		{
 			markers.add(this.position, "include.unit");
 		}
-	}
-	
-	public void addOperators(Map<Name, Operator> operatorMap)
-	{
-		if (this.header == null)
-		{
-			return;
-		}
-		
-		operatorMap.putAll(this.header.getOperators());
 	}
 	
 	public void write(DataOutput out) throws IOException

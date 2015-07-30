@@ -58,8 +58,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected int					includeCount;
 	
 	protected Map<Name, Operator>	operators	= new IdentityHashMap();
-	protected Map<Name, Operator>	inheritedOperators;
-	
 	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap();
 	
 	public DyvilHeader()
@@ -218,23 +216,17 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.includes = new IncludeDeclaration[2];
 			this.includes[0] = component;
 			this.includeCount = 1;
-			
-			if (!this.isHeader())
-			{
-				this.inheritedOperators = new IdentityHashMap();
-			}
+			return;
 		}
-		else
+		
+		int index = this.includeCount++;
+		if (index >= this.includes.length)
 		{
-			int index = this.includeCount++;
-			if (index >= this.includes.length)
-			{
-				IncludeDeclaration[] temp = new IncludeDeclaration[index + 1];
-				System.arraycopy(this.includes, 0, temp, 0, this.includes.length);
-				this.includes = temp;
-			}
-			this.includes[index] = component;
+			IncludeDeclaration[] temp = new IncludeDeclaration[index + 1];
+			System.arraycopy(this.includes, 0, temp, 0, this.includes.length);
+			this.includes = temp;
 		}
+		this.includes[index] = component;
 	}
 	
 	@Override
@@ -264,16 +256,18 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public Operator getOperator(Name name)
 	{
-		Operator op1 = this.operators.get(name);
-		if (op1 != null)
+		Operator op = this.operators.get(name);
+		if (op != null)
 		{
-			return op1;
+			return op;
 		}
-		if (this.inheritedOperators == null)
-		{
-			return null;
+		for (int i = 0; i < this.includeCount; i++) {
+			op = this.includes[i].getHeader().getOperator(name);
+			if (op != null) {
+				return op;
+			}
 		}
-		return this.inheritedOperators.get(name);
+		return null;
 	}
 	
 	@Override
@@ -355,7 +349,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		{
 			IncludeDeclaration include = this.includes[i];
 			include.resolve(this.markers);
-			include.addOperators(this.inheritedOperators);
 		}
 	}
 	

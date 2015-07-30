@@ -244,7 +244,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addInclude(component);
-		component.addOperators(this.operators);
+		this.operators.putAll(component.getHeader().getOperators());
 		System.out.println("Included the header '" + component.getHeader().getFullName() + "'");
 	}
 	
