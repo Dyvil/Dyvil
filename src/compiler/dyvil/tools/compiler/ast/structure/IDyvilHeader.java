@@ -108,9 +108,9 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	
 	public String getInternalName();
 	
-	public String getInternalName(String subClass);
+	public String getInternalName(Name subClass);
 	
 	public String getFullName();
 	
-	public String getFullName(String subClass);
+	public String getFullName(Name subClass);
 }

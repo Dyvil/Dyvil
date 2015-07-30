@@ -210,7 +210,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		return this.includeCount;
 	}
 	
-	protected void addIncludeToArray(IncludeDeclaration component)
+	@Override
+	public void addInclude(IncludeDeclaration component)
 	{
 		if (this.includes == null)
 		{
@@ -234,23 +235,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			}
 			this.includes[index] = component;
 		}
-	}
-	
-	@Override
-	public void addInclude(IncludeDeclaration component)
-	{
-		this.addIncludeToArray(component);
-		
-		if (this.isHeader())
-		{
-			this.markers.add(component.getPosition(), "header.include");
-			return;
-		}
-		
-		// Resolve the header
-		
-		component.resolve(this.markers);
-		component.addOperators(this.inheritedOperators);
 	}
 	
 	@Override
@@ -358,12 +342,26 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public void parseHeader()
+	{
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers, this);
+		manager.parse(this.tokens);
+	}
+	
+	@Override
+	public void resolveHeader()
+	{
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			IncludeDeclaration include = this.includes[i];
+			include.resolve(this.markers);
+			include.addOperators(this.inheritedOperators);
+		}
+	}
+	
+	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers);
-		manager.setOperatorMap(this);
-		manager.parse(this.tokens);
-		this.tokens = null;
 	}
 	
 	@Override
@@ -546,13 +544,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public String getFullName(String name)
+	public String getFullName(Name name)
 	{
-		if (!name.equals(this.name))
+		if (name != this.name)
 		{
-			name = this.name.qualified + '.' + name;
+			return this.pack.fullName + '.' + this.name.qualified + '.' + name.qualified;
 		}
-		return this.pack.fullName + '.' + name;
+		return this.pack.fullName + '.' + name.qualified;
 	}
 	
 	@Override
@@ -562,13 +560,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public String getInternalName(String name)
+	public String getInternalName(Name name)
 	{
-		if (!name.equals(this.name))
+		if (name != this.name)
 		{
-			name = this.name.qualified + '$' + name;
+			return this.pack.getInternalName() + this.name.qualified + '$' + name;
 		}
-		return this.pack.getInternalName() + name;
+		return this.pack.getInternalName() + name.qualified;
 	}
 	
 	@Override
@@ -578,10 +576,15 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		out.writeUTF(this.name.unqualified);
 		
 		// Include Declarations
-		out.writeShort(0);
+		int includes = this.includeCount;
+		out.writeShort(includes);
+		for (int i = 0; i < includes; i++)
+		{
+			this.includes[i].write(out);
+		}
 		
 		// Import Declarations
-		int imports = this.importCount();
+		int imports = this.importCount;
 		out.writeShort(imports);
 		for (int i = 0; i < imports; i++)
 		{
@@ -622,7 +625,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.name = Name.get(in.readUTF());
 		
 		// Include Declarations
-		in.readShort();
+		int includes = in.readShort();
+		for (int i = 0; i < includes; i++)
+		{
+			IncludeDeclaration id = new IncludeDeclaration(null);
+			id.read(in);
+			this.addInclude(id);
+		}
 		
 		// Import Declarations
 		int imports = in.readShort();

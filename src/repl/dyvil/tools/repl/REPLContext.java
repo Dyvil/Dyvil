@@ -243,7 +243,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		this.addIncludeToArray(component);
+		super.addInclude(component);
 		component.addOperators(this.operators);
 		System.out.println("Included the header '" + component.getHeader().getFullName() + "'");
 	}
@@ -463,9 +463,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	}
 	
 	@Override
-	public String getFullName(String name)
+	public String getFullName(Name name)
 	{
-		return name;
+		return name.qualified;
 	}
 	
 	@Override
@@ -475,8 +475,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	}
 	
 	@Override
-	public String getInternalName(String name)
+	public String getInternalName(Name name)
 	{
-		return name;
+		return name.qualified;
 	}
 }

@@ -49,6 +49,10 @@ public interface ICompilationUnit extends IASTNode
 	
 	public void tokenize();
 	
+	public void parseHeader();
+	
+	public void resolveHeader();
+	
 	public void parse();
 	
 	public void resolveTypes();

@@ -26,10 +26,11 @@ public class ParserManager implements IParserManager
 	{
 	}
 	
-	public ParserManager(Parser parser, MarkerList markers)
+	public ParserManager(Parser parser, MarkerList markers, IOperatorMap operators)
 	{
 		this.parser = parser;
 		this.markers = markers;
+		this.operators = operators;
 	}
 	
 	@Override
@@ -63,7 +64,6 @@ public class ParserManager implements IParserManager
 	
 	public final void parse(TokenIterator tokens)
 	{
-		tokens.reset();
 		this.tokens = tokens;
 		IToken token = null;
 		

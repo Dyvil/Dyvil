@@ -100,8 +100,7 @@ public class DyvilUnit extends DyvilHeader
 	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DyvilUnitParser(this), this.markers);
-		manager.setOperatorMap(this);
+		ParserManager manager = new ParserManager(new DyvilUnitParser(this), this.markers, this);
 		manager.parse(this.tokens);
 		this.tokens = null;
 	}
@@ -188,16 +187,18 @@ public class DyvilUnit extends DyvilHeader
 		for (int i = 0; i < this.classCount; i++)
 		{
 			IClass iclass = this.classes[i];
-			String name = iclass.getName().qualified;
-			if (!name.equals(this.name))
+			Name name = iclass.getName();
+			String name1;
+			if (name != this.name)
 			{
-				name = this.name + "$" + name + FileType.CLASS_EXTENSION;
+				name1 = this.name.qualified + "$" + name.qualified + FileType.CLASS_EXTENSION;
 			}
 			else
 			{
-				name += FileType.CLASS_EXTENSION;
+				name1 = name.qualified + FileType.CLASS_EXTENSION;
 			}
-			File file = new File(this.outputDirectory, name);
+			
+			File file = new File(this.outputDirectory, name1);
 			ClassWriter.compile(file, iclass);
 			
 			IClassBody body = iclass.getBody();
@@ -207,8 +208,8 @@ public class DyvilUnit extends DyvilHeader
 				for (int j = 0; j < len; j++)
 				{
 					IClass iclass1 = body.getClass(j);
-					name = this.name + "$" + iclass1.getName().qualified + FileType.CLASS_EXTENSION;
-					file = new File(this.outputDirectory, name);
+					name1 = this.name.qualified + "$" + iclass1.getName().qualified + FileType.CLASS_EXTENSION;
+					file = new File(this.outputDirectory, name1);
 					ClassWriter.compile(file, iclass1);
 				}
 			}

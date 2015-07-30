@@ -285,6 +285,8 @@ public final class DyvilCompiler
 		{
 		case "compile":
 			phases.add(ICompilerPhase.TOKENIZE);
+			phases.add(ICompilerPhase.PARSE_HEADER);
+			phases.add(ICompilerPhase.RESOLVE_HEADER);
 			phases.add(ICompilerPhase.PARSE);
 			phases.add(ICompilerPhase.RESOLVE_TYPES);
 			phases.add(ICompilerPhase.RESOLVE);

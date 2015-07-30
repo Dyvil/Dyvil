@@ -37,8 +37,9 @@ public class NestedClass extends CodeClass
 		String indexString = Integer.toString(index);
 		
 		this.name = Name.getQualified(outerName + '$' + indexString);
-		this.fullName = this.unit.getFullName(indexString);
-		this.internalName = this.unit.getInternalName(indexString);
+		Name qualified = Name.getQualified(indexString);
+		this.fullName = this.unit.getFullName(qualified);
+		this.internalName = this.unit.getInternalName(qualified);
 	}
 	
 	@Override

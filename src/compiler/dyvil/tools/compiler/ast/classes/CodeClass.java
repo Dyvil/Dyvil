@@ -85,8 +85,8 @@ public class CodeClass extends AbstractClass
 		this.name = name;
 		if (this.unit != null)
 		{
-			this.internalName = this.unit.getInternalName(name.qualified);
-			this.fullName = this.unit.getFullName(name.qualified);
+			this.internalName = this.unit.getInternalName(name);
+			this.fullName = this.unit.getFullName(name);
 		}
 	}
 	

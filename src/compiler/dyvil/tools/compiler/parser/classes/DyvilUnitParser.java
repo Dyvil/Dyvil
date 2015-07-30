@@ -13,7 +13,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	public DyvilUnitParser(IDyvilHeader unit)
 	{
 		super(unit);
-		this.mode = PACKAGE;
+		this.mode = CLASS;
 	}
 	
 	@Override

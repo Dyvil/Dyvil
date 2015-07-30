@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -107,7 +106,8 @@ public class DyvilHeaderParser extends Parser
 				return;
 			}
 		}
-		pm.report(new SyntaxError(token, "Invalid " + token + " - Delete this token"));
+		pm.jump(token);
+		pm.popParser();
 		return;
 	}
 }
