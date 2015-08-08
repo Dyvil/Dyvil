@@ -1,5 +1,7 @@
 package dyvil.tools.repl;
 
+import java.lang.reflect.Field;
+
 import dyvil.array.ObjectArray;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -89,11 +91,52 @@ public class REPLResult implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.value.getClass().isArray())
+		Class c = this.value.getClass();
+		if (c.isArray())
 		{
 			ObjectArray.toString(this.value, buffer);
 			return;
 		}
+		
+		String s = this.value.toString();
+		int i = s.indexOf('@');
+		if (i >= 0)
+		{
+			String className = c.getName();
+			if (i == className.length() && s.regionMatches(0, className, 0, i))
+			{
+				prettyPrint(this.value, c, buffer, true);
+				return;
+			}
+		}
+		
 		buffer.append(this.value);
+	}
+	
+	public static <T> void prettyPrint(T value, Class<T> type, StringBuilder builder, boolean fieldNames)
+	{
+		Field[] fields = type.getFields();
+		builder.append(type.getName());
+		
+		builder.append('(');
+		for (Field f : fields)
+		{
+			if (fieldNames)
+			{
+				builder.append(f.getName()).append(": ");
+			}
+			
+			try
+			{
+				f.setAccessible(true);
+				builder.append(f.get(value));
+			}
+			catch (IllegalArgumentException | IllegalAccessException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		
+		builder.append(')');
 	}
 }
