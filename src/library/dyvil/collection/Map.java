@@ -562,4 +562,31 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		}
 		return sum * 31 + product;
 	}
+	
+	public default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString(builder, prefix, entrySeparator, keyValueSeparator, postfix);
+		return builder.toString();
+	}
+	
+	public default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	{
+		builder.append(prefix);
+		if (this.isEmpty())
+		{
+			builder.append(postfix);
+			return;
+		}
+		
+		Iterator<Entry<K, V>> iterator = this.iterator();
+		Entry<K, V> first = iterator.next();
+		builder.append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+		while (iterator.hasNext())
+		{
+			first = iterator.next();
+			builder.append(entrySeparator).append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+		}
+		builder.append(postfix);
+	}
 }

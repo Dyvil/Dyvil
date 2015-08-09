@@ -1,5 +1,6 @@
 package dyvil.string;
 
+import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -649,5 +650,32 @@ public interface StringUtils
 		}
 		
 		return buf.toString();
+	}
+	
+	public static <T> void prettyPrint(T value, Class<T> type, StringBuilder builder, boolean fieldNames)
+	{
+		Field[] fields = type.getFields();
+		builder.append(type.getName());
+		
+		builder.append('(');
+		for (Field f : fields)
+		{
+			if (fieldNames)
+			{
+				builder.append(f.getName()).append(": ");
+			}
+			
+			try
+			{
+				f.setAccessible(true);
+				builder.append(f.get(value));
+			}
+			catch (IllegalArgumentException | IllegalAccessException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		
+		builder.append(')');
 	}
 }

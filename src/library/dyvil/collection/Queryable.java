@@ -196,4 +196,31 @@ public interface Queryable<E> extends Iterable<E>
 	 *            the condition
 	 */
 	public void filter(Predicate<? super E> condition);
+	
+	public default String toString(String prefix, String separator, String postfix)
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString(builder, prefix, separator, postfix);
+		return builder.toString();
+	}
+	
+	public default void toString(StringBuilder builder, String prefix, String separator, String postfix)
+	{
+		builder.append(prefix);
+		if (this.isEmpty())
+		{
+			builder.append(postfix);
+			return;
+		}
+		
+		Iterator<E> iterator = this.iterator();
+		E first = iterator.next();
+		builder.append(first);
+		while (iterator.hasNext())
+		{
+			builder.append(separator);
+			builder.append(iterator.next());
+		}
+		builder.append(postfix);
+	}
 }
