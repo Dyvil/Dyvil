@@ -91,7 +91,7 @@ public final class Types
 	
 	public static void init()
 	{
-		LANG_HEADER = Package.dyvilLang.resolveHeader("lang");
+		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
 		
 		VOID.theClass = VOID_CLASS = Package.dyvilLang.resolveClass("Void");
 		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");

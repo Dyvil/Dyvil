@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 import dyvil.collection.Collection;
@@ -11,11 +12,13 @@ public class SortedArrayList<E> extends ArrayList<E>
 	public SortedArrayList(E[] elements)
 	{
 		super(elements);
+		Arrays.sort(this.elements);
 	}
 	
 	public SortedArrayList(E[] elements, int size)
 	{
 		super(elements, size);
+		Arrays.sort(this.elements, 0, size);
 	}
 	
 	public SortedArrayList(E[] elements, boolean trusted)

@@ -1,4 +1,4 @@
-package dyvil.reflect
+package dyvil
 
 using	dyvil.reflect.Modifiers._
 using	dyvil.reflect.Opcodes._

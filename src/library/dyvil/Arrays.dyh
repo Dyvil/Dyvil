@@ -1,4 +1,4 @@
-package dyvil.array
+package dyvil
 
 using	dyvil.array.BooleanArray._
 using	dyvil.array.ByteArray._

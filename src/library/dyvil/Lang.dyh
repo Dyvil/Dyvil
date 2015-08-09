@@ -1,4 +1,4 @@
-package dyvil.lang
+package dyvil
 
 // Base imports for primitive types
 import	dyvil.lang._

@@ -1,4 +1,4 @@
-package dyvil.string
+package dyvil
 
 using	dyvil.string.CharUtils._
 using	dyvil.string.StringUtils._

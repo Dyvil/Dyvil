@@ -1,4 +1,4 @@
-package dyvil.io
+package dyvil
 
 using	dyvil.io.FileUtils._
 using	dyvil.io.WebUtils._
