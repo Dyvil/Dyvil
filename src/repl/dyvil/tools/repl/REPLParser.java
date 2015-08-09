@@ -21,8 +21,8 @@ public class REPLParser implements IParserManager
 	private int				skip;
 	private boolean			reparse;
 	
-	private MarkerList		markers;
-	private boolean syntaxErrors;
+	private MarkerList	markers;
+	private boolean		syntaxErrors;
 	
 	@Override
 	public void report(SyntaxError error)
@@ -41,6 +41,7 @@ public class REPLParser implements IParserManager
 		this.skip = 0;
 		this.reparse = false;
 		this.markers = markers;
+		this.syntaxErrors = false;
 		
 		IToken token = null, prev = null;
 		tokens.reset();

@@ -167,6 +167,11 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			return null;
 		}
 		
+		if (type.getTheClass() == Types.OBJECT_CLASS)
+		{
+			type = this.getType();
+		}
+		
 		this.type = type;
 		this.method = type.getFunctionalMethod();
 		
@@ -204,7 +209,6 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		if (this.type.typeTag() == IType.LAMBDA)
 		{
 			// Trash the old lambda type and generate a new one from scratch
-			this.type = null;
 			this.type = this.getType();
 		}
 		else
@@ -269,6 +273,11 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		{
 			return false;
 		}
+		if (iclass == Types.OBJECT_CLASS)
+		{
+			return true;
+		}
+		
 		IMethod method = iclass.getFunctionalMethod();
 		if (method == null)
 		{
