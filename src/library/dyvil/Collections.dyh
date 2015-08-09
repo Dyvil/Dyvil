@@ -37,7 +37,7 @@ import	dyvil.collection.immutable.EnumMap => ImmutableEnumMap
 // TODO import	dyvil.collection.immutable.TreeMap => ImmutableTreeMap
 
 import	dyvil.collection.mutable.ArrayMap => MutableArrayMap
-// TODO import	dyvil.collection.mutable.TupleMap => MutableTupleMap
+import	dyvil.collection.mutable.TupleMap => MutableTupleMap
 import	dyvil.collection.mutable.HashMap => MutableHashMap
 import	dyvil.collection.mutable.IdentityHashMap => MutableIdentityHashMap
 import	dyvil.collection.mutable.EnumMap => MutableEnumMap

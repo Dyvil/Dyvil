@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.array.ObjectArray;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
@@ -52,9 +51,11 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 	@Override
 	public void clear()
 	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.keys[i] = this.values[i] = null;
+		}
 		this.size = 0;
-		this.keys = ObjectArray.EMPTY;
-		this.values = ObjectArray.EMPTY;
 	}
 	
 	private void putNew(K key, V value)

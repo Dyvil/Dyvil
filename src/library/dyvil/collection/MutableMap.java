@@ -9,7 +9,9 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.LinkedList;
+import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
+import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
@@ -22,22 +24,22 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	public static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
-		HashMap<K, V> map = new HashMap(1);
-		map.subscript_$eq(key, value);
-		return map;
+		return apply(new Tuple2<K, V>(key, value));
 	}
 	
 	public static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		return apply(entry.getKey(), entry.getValue());
+		TupleMap<K, V> map = new TupleMap<K, V>();
+		map.$plus$eq(entry);
+		return map;
 	}
 	
 	public static <K, V> MutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
-		HashMap<K, V> map = new HashMap(entries.length);
+		TupleMap<K, V> map = new TupleMap<K, V>();
 		for (Entry<? extends K, ? extends V> entry : entries)
 		{
-			map.subscript_$eq(entry.getKey(), entry.getValue());
+			map.$plus$eq(entry);
 		}
 		return map;
 	}
