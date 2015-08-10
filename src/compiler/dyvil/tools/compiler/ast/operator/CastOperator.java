@@ -96,7 +96,21 @@ public final class CastOperator extends Value
 			return this;
 		}
 		
-		if (value1 == null && !prevType.isSuperClassOf(this.type))
+		boolean primitiveType = this.type.isPrimitive();
+		boolean primitiveValue = this.value.isPrimitive();
+		if (primitiveType)
+		{
+			if (!primitiveValue)
+			{
+				markers.add(this.position, "cast.reference");
+			}
+		}
+		else if (primitiveValue)
+		{
+			markers.add(this.position, "cast.primitive");
+		}
+		
+		if (value1 == null && !(primitiveType && primitiveValue) && !prevType.isSuperClassOf(this.type))
 		{
 			markers.add(this.position, "cast.incompatible", prevType, this.type);
 			return this;
@@ -115,25 +129,6 @@ public final class CastOperator extends Value
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.value.checkTypes(markers, context);
-		
-		if (this.typeHint)
-		{
-			return;
-		}
-		
-		boolean primitiveType = this.type.isPrimitive();
-		boolean primitiveValue = this.value.isPrimitive();
-		if (primitiveType)
-		{
-			if (!primitiveValue)
-			{
-				markers.add(this.position, "cast.reference");
-			}
-		}
-		else if (primitiveValue)
-		{
-			markers.add(this.position, "cast.primitive");
-		}
 	}
 	
 	@Override
