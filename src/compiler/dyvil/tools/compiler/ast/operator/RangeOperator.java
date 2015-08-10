@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -250,9 +249,9 @@ public class RangeOperator implements IValue
 			this.firstValue.writeExpression(writer);
 			this.lastValue.writeExpression(writer);
 			
-			if (this.elementType.typeTag() == IType.PRIMITIVE)
+			if (this.elementType.isPrimitive())
 			{
-				switch (((PrimitiveType) this.elementType).typecode)
+				switch (this.elementType.getTypecode())
 				{
 				case ClassFormat.T_BYTE:
 					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "range", "(BB)[B", false);

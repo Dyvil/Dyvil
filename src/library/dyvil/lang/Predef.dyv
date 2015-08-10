@@ -29,9 +29,9 @@ public final class Predef
 	
 	// Lists
 	
-	public infix ImmutableList[_ <: E] ::[E](E element, List[_ <: E] list) = ImmutableList(element) ++ list
+	public infix ImmutableList[E] ::[E](E element, List[_ <: E] list) = ImmutableList(element) ++ list
 	
-	public infix ImmutableList[_ <: E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 	
 	public infix Iterable[E] toIterable[E](E... array) = ImmutableList(array)
 	

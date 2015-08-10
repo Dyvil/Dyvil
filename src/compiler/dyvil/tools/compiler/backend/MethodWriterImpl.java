@@ -4,7 +4,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 import static dyvil.reflect.Opcodes.*;
@@ -612,7 +611,7 @@ public final class MethodWriterImpl implements MethodWriter
 		{
 			if (type.typeTag() == IType.PRIMITIVE)
 			{
-				this.writeIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
+				this.writeIntInsn(Opcodes.NEWARRAY, type.getTypecode());
 				return;
 			}
 			

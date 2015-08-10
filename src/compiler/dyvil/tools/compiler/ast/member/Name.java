@@ -46,7 +46,6 @@ public final class Name
 	public static final Name	amp		= new Name("&", "$amp");
 	public static final Name	bar		= new Name("|", "$bar");
 	public static final Name	up		= new Name("^", "$up");
-	public static final Name	at		= new Name("@", "$at");
 	public static final Name	ltlt	= new Name("<<", "$lt$lt");
 	public static final Name	gtgt	= new Name(">>", "$gt$gt");
 	public static final Name	gtgtgt	= new Name(">>>", "$gt$gt$gt");

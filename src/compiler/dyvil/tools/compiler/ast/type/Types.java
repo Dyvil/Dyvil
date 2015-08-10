@@ -203,13 +203,14 @@ public final class Types
 		return iclass;
 	}
 	
-	private static ReferenceType getPrimitiveRef(PrimitiveType type)
+	private static ReferenceType getPrimitiveRef(IType type)
 	{
-		ReferenceType itype = PRIMITIVE_REF[type.typecode];
+		int typecode = type.getTypecode();
+		ReferenceType itype = PRIMITIVE_REF[typecode];
 		if (itype == null)
 		{
-			String className = type.theClass.getName().qualified + "Ref";
-			return PRIMITIVE_REF[type.typecode] = new ReferenceType(Package.dyvilLangRef.resolveClass(className), type);
+			String className = type.getTheClass().getName().qualified + "Ref";
+			return PRIMITIVE_REF[typecode] = new ReferenceType(Package.dyvilLangRef.resolveClass(className), type);
 		}
 		return itype;
 	}
@@ -218,7 +219,7 @@ public final class Types
 	{
 		if (type.isPrimitive())
 		{
-			return getPrimitiveRef((PrimitiveType) type);
+			return getPrimitiveRef(type);
 		}
 		
 		if (OBJECT_REF_CLASS == null)
@@ -226,15 +227,14 @@ public final class Types
 			OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
 		}
 		
-		ReferenceType gt = new ReferenceType(OBJECT_REF_CLASS, type);
-		return gt;
+		return new ReferenceType(OBJECT_REF_CLASS, type);
 	}
 	
 	public static IType getSimpleRef(IType type)
 	{
 		if (type.isPrimitive())
 		{
-			return getPrimitiveSimpleRef((PrimitiveType) type);
+			return getPrimitiveSimpleRef(type);
 		}
 		
 		if (OBJECT_SIMPLE_REF_CLASS == null)
@@ -247,13 +247,14 @@ public final class Types
 		return gt;
 	}
 	
-	private static IType getPrimitiveSimpleRef(PrimitiveType type)
+	private static IType getPrimitiveSimpleRef(IType type)
 	{
-		IType itype = PRIMITIVE_SIMPLE_REF[type.typecode];
+		int typecode = type.getTypecode();
+		IType itype = PRIMITIVE_SIMPLE_REF[typecode];
 		if (itype == null)
 		{
-			String className = "Simple" + type.theClass.getName().qualified + "Ref";
-			return PRIMITIVE_SIMPLE_REF[type.typecode] = new ClassType(Package.dyvilLangRefSimple.resolveClass(className));
+			String className = "Simple" + type.getTheClass().getName().qualified + "Ref";
+			return PRIMITIVE_SIMPLE_REF[typecode] = new ClassType(Package.dyvilLangRefSimple.resolveClass(className));
 		}
 		return itype;
 	}

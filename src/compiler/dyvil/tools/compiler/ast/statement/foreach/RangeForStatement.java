@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -75,9 +74,9 @@ public class RangeForStatement extends ForEachStatement
 		// Determine the 'type' of the range to fasten up compilation.
 		byte type = 5;
 		IType rangeType = this.variable.getType();
-		if (rangeType.typeTag() == IType.PRIMITIVE)
+		if (rangeType.isPrimitive())
 		{
-			switch (((PrimitiveType) rangeType).typecode)
+			switch (rangeType.getTypecode())
 			{
 			case ClassFormat.T_BYTE:
 			case ClassFormat.T_SHORT:
@@ -96,7 +95,7 @@ public class RangeForStatement extends ForEachStatement
 				break;
 			}
 		}
-		else if (rangeType.classEquals(Types.STRING))
+		else if (rangeType.getTheClass() == Types.STRING_CLASS)
 		{
 			type = 4;
 		}

@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -86,7 +85,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = NAME;
 				return;
 			}
-			if (token.nameValue() == Name.at)
+			if (type == Symbols.AT)
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);

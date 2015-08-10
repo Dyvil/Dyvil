@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -68,7 +67,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.modifiers |= i;
 				return;
 			}
-			if (token.nameValue() == Name.at)
+			if (type == Symbols.AT)
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);

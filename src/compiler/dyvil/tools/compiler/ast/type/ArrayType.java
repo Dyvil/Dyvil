@@ -140,6 +140,26 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
+	public float getSubTypeDistance(IType subtype)
+	{
+		if (!subtype.isArrayType())
+		{
+			return 0F;
+		}
+		return this.type.getSubTypeDistance(subtype.getElementType());
+	}
+	
+	@Override
+	public int getSubClassDistance(IType subtype)
+	{
+		if (!subtype.isArrayType())
+		{
+			return 0;
+		}
+		return this.type.getSubClassDistance(subtype.getElementType());
+	}
+	
+	@Override
 	public boolean isResolved()
 	{
 		return this.type.isResolved();

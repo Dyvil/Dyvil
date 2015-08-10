@@ -22,6 +22,8 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
+import static dyvil.reflect.Opcodes.*;
+
 public final class PrimitiveType implements IType
 {
 	public Name		name;
@@ -117,6 +119,12 @@ public final class PrimitiveType implements IType
 	public boolean isPrimitive()
 	{
 		return true;
+	}
+	
+	@Override
+	public int getTypecode()
+	{
+		return this.typecode;
 	}
 	
 	@Override
@@ -464,6 +472,147 @@ public final class PrimitiveType implements IType
 			break;
 		case ClassFormat.T_DOUBLE:
 			writer.writeLDC(0D);
+			break;
+		}
+	}
+	
+	@Override
+	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
+	{
+		if (!target.isPrimitive())
+		{
+			return;
+		}
+		
+		switch (this.typecode)
+		{
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
+			writeIntCast(target, writer);
+			return;
+		case ClassFormat.T_LONG:
+			writeLongCast(target, writer);
+			return;
+		case ClassFormat.T_FLOAT:
+			writeFloatCast(target, writer);
+			return;
+		case ClassFormat.T_DOUBLE:
+			writeDoubleCast(target, writer);
+			return;
+		}
+	}
+	
+	private static void writeIntCast(IType cast, MethodWriter writer) throws BytecodeException
+	{
+		switch (cast.getTypecode())
+		{
+		case ClassFormat.T_BOOLEAN:
+		case ClassFormat.T_BYTE:
+		case ClassFormat.T_SHORT:
+		case ClassFormat.T_CHAR:
+		case ClassFormat.T_INT:
+			break;
+		case ClassFormat.T_LONG:
+			writer.writeInsn(I2L);
+			break;
+		case ClassFormat.T_FLOAT:
+			writer.writeInsn(I2F);
+			break;
+		case ClassFormat.T_DOUBLE:
+			writer.writeInsn(I2D);
+			break;
+		}
+	}
+	
+	private static void writeLongCast(IType cast, MethodWriter writer) throws BytecodeException
+	{
+		switch (cast.getTypecode())
+		{
+		case ClassFormat.T_BOOLEAN:
+			writer.writeInsn(L2I);
+			break;
+		case ClassFormat.T_BYTE:
+			writer.writeInsn(L2B);
+			break;
+		case ClassFormat.T_SHORT:
+			writer.writeInsn(L2S);
+			break;
+		case ClassFormat.T_CHAR:
+			writer.writeInsn(L2C);
+			break;
+		case ClassFormat.T_INT:
+			writer.writeInsn(L2I);
+			break;
+		case ClassFormat.T_LONG:
+			break;
+		case ClassFormat.T_FLOAT:
+			writer.writeInsn(L2F);
+			break;
+		case ClassFormat.T_DOUBLE:
+			writer.writeInsn(L2D);
+			break;
+		}
+	}
+	
+	private static void writeFloatCast(IType cast, MethodWriter writer) throws BytecodeException
+	{
+		switch (cast.getTypecode())
+		{
+		case ClassFormat.T_BOOLEAN:
+			writer.writeInsn(F2I);
+			break;
+		case ClassFormat.T_BYTE:
+			writer.writeInsn(F2B);
+			break;
+		case ClassFormat.T_SHORT:
+			writer.writeInsn(F2S);
+			break;
+		case ClassFormat.T_CHAR:
+			writer.writeInsn(F2C);
+			break;
+		case ClassFormat.T_INT:
+			writer.writeInsn(F2I);
+			break;
+		case ClassFormat.T_LONG:
+			writer.writeInsn(F2L);
+			break;
+		case ClassFormat.T_FLOAT:
+			break;
+		case ClassFormat.T_DOUBLE:
+			writer.writeInsn(F2D);
+			break;
+		}
+	}
+	
+	private static void writeDoubleCast(IType cast, MethodWriter writer) throws BytecodeException
+	{
+		switch (cast.getTypecode())
+		{
+		case ClassFormat.T_BOOLEAN:
+			writer.writeInsn(D2I);
+			break;
+		case ClassFormat.T_BYTE:
+			writer.writeInsn(D2B);
+			break;
+		case ClassFormat.T_SHORT:
+			writer.writeInsn(D2S);
+			break;
+		case ClassFormat.T_CHAR:
+			writer.writeInsn(D2C);
+			break;
+		case ClassFormat.T_INT:
+			writer.writeInsn(D2I);
+			break;
+		case ClassFormat.T_LONG:
+			writer.writeInsn(D2L);
+			break;
+		case ClassFormat.T_FLOAT:
+			writer.writeInsn(D2F);
+			break;
+		case ClassFormat.T_DOUBLE:
 			break;
 		}
 	}

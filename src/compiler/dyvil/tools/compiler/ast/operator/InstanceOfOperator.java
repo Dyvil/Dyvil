@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -17,8 +18,8 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class InstanceOfOperator extends Value
 {
-	public IValue	value;
-	public IType	type;
+	protected IValue	value;
+	protected IType		type;
 	
 	public InstanceOfOperator(ICodePosition position, IValue value)
 	{
@@ -93,11 +94,29 @@ public final class InstanceOfOperator extends Value
 		
 		if (this.type.isPrimitive())
 		{
-			markers.add(this.position, "instanceof.primitive");
+			markers.add(this.position, "instanceof.type.primitive");
+			return;
 		}
-		else if (this.value.isType(this.type))
+		if (this.value.isPrimitive())
 		{
-			markers.add(this.position, "instanceof.unnecessary");
+			markers.add(this.position, "instanceof.value.primitive");
+			return;
+		}
+		
+		IType valueType = this.value.getType();
+		if (valueType.classEquals(this.type))
+		{
+			markers.add(this.position, "instanceof.type.equal", valueType);
+			return;
+		}
+		if (this.type.isSuperClassOf(valueType))
+		{
+			markers.add(this.position, "instanceof.type.subtype", valueType, this.type);
+			return;
+		}
+		if (!valueType.isSuperClassOf(this.type))
+		{
+			markers.add(this.position, "instanceof.type.incompatible", valueType, this.type);
 		}
 	}
 	
@@ -112,6 +131,11 @@ public final class InstanceOfOperator extends Value
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.value = this.value.cleanup(context, compilableList);
+		
+		if (this.value.isType(this.type))
+		{
+			return BooleanValue.TRUE;
+		}
 		return this;
 	}
 	

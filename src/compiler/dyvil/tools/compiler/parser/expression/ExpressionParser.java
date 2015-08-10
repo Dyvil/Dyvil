@@ -160,7 +160,12 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			if (type == Tokens.SYMBOL_IDENTIFIER)
 			{
-				if (token.nameValue() == Name.at && token.next().type() == Symbols.OPEN_CURLY_BRACKET)
+				this.getAccess(pm, token.nameValue(), token, type);
+				return;
+			}
+			if (type == Symbols.AT)
+			{
+				if (token.next().type() != Symbols.OPEN_CURLY_BRACKET)
 				{
 					Bytecode bc = new Bytecode(token);
 					pm.skip();
@@ -170,7 +175,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					return;
 				}
 				
-				this.getAccess(pm, token.nameValue(), token, type);
+				pm.report(new SyntaxError(token, "Invalid Expression - Invalid Symbol '@'"));
 				return;
 			}
 			if (type == Symbols.ARROW_OPERATOR)
@@ -368,7 +373,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			this.dotless = true;
-			this.mode = ACCESS_2;
 			
 			if (type == Keywords.ELSE)
 			{
@@ -446,6 +450,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.mode = PARAMETERS_END;
 				return;
 			}
+			
+			this.mode = ACCESS_2;
 		}
 		if (this.mode == ACCESS_2)
 		{

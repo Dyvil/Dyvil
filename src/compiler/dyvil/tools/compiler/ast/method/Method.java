@@ -1392,6 +1392,11 @@ public class Method extends Member implements IMethod, ILabelContext
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int len = this.parameterCount - 1 - parIndex;
+			if (len < 0)
+			{
+				return;
+			}
+			
 			IParameter param;
 			for (int i = 0; i < len; i++)
 			{

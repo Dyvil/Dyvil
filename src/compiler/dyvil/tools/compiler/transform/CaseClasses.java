@@ -5,7 +5,6 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -84,7 +83,7 @@ public interface CaseClasses
 			field.writeGet(writer, null, 0);
 			
 			Label label = new Label();
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
 			case ClassFormat.T_BOOLEAN:
 			case ClassFormat.T_BYTE:
@@ -150,7 +149,7 @@ public interface CaseClasses
 		switch (type.typeTag())
 		{
 		case IType.PRIMITIVE:
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
 			case ClassFormat.T_BOOLEAN:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "equals", "([Z[Z)Z", true);
@@ -216,7 +215,7 @@ public interface CaseClasses
 		
 		if (type.isPrimitive())
 		{
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
 			case ClassFormat.T_BOOLEAN:
 			{
@@ -303,7 +302,7 @@ public interface CaseClasses
 		switch (type.typeTag())
 		{
 		case IType.PRIMITIVE:
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
 			case ClassFormat.T_BOOLEAN:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "hashCode", "([Z)Z", true);
@@ -422,7 +421,7 @@ public interface CaseClasses
 		switch (type.typeTag())
 		{
 		case IType.PRIMITIVE:
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
 			case ClassFormat.T_BOOLEAN:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "toString", "([ZLjava/lang/StringBuilder;)V", true);

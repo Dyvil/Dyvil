@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -151,7 +150,7 @@ public final class ClassOperator extends Value
 			
 			// Cannot use PrimitiveType.getInternalName as it returns the Dyvil
 			// class instead of the Java one.
-			switch (((PrimitiveType) this.type).typecode)
+			switch (this.type.getTypecode())
 			{
 			case ClassFormat.T_BOOLEAN:
 				owner = "java/lang/Boolean";

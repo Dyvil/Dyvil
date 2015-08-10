@@ -148,7 +148,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-			if (token.nameValue() == Name.at)
+			if (type == Symbols.AT)
 			{
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);

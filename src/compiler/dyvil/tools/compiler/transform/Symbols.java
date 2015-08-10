@@ -55,6 +55,7 @@ public final class Symbols
 	public static final int	ARROW_OPERATOR	= Tokens.SYMBOL | 0x00080000;
 	public static final int	ELLIPSIS		= Tokens.SYMBOL | 0x00090000;
 	public static final int	GENERIC_CALL	= Tokens.SYMBOL | 0x000A0000;
+	public static final int	AT				= Tokens.SYMBOL | 0x000B0000;
 	
 	private static void addReplacement(char symbol, String replacement)
 	{
@@ -163,6 +164,8 @@ public final class Symbols
 			return Symbols.ARROW_OPERATOR;
 		case "...":
 			return Symbols.ELLIPSIS;
+		case "@":
+			return Symbols.AT;
 		}
 		return 0;
 	}
@@ -185,6 +188,8 @@ public final class Symbols
 			return "=";
 		case Symbols.HASH:
 			return "#";
+		case Symbols.AT:
+			return "@";
 		case Symbols.ARROW_OPERATOR:
 			return "=>";
 		case Symbols.ELLIPSIS:

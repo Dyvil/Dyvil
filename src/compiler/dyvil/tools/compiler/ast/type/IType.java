@@ -101,6 +101,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return false;
 	}
 	
+	public default int getTypecode()
+	{
+		return -1;
+	}
+	
 	public default boolean isGenericType()
 	{
 		return false;
@@ -153,11 +158,29 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public default float getSubTypeDistance(IType subtype)
 	{
+		if (subtype.isArrayType())
+		{
+			IClass iclass = this.getTheClass();
+			if (iclass == Types.OBJECT_CLASS)
+			{
+				return 3F;
+			}
+			return 0F;
+		}
 		return subtype.getTheClass().getSuperTypeDistance(this);
 	}
 	
 	public default int getSubClassDistance(IType subtype)
 	{
+		if (subtype.isArrayType())
+		{
+			IClass iclass = this.getTheClass();
+			if (iclass == Types.OBJECT_CLASS)
+			{
+				return 3;
+			}
+			return 0;
+		}
 		return subtype.getTheClass().getSuperTypeDistance(this);
 	}
 	
