@@ -208,12 +208,12 @@ public interface Modifiers
 	// Member Modifiers
 	
 	/**
-	 * <i>Dyvil</i> {@code sealed} modifier. This is used to mark that a class,
+	 * <i>Dyvil</i> {@code internal} modifier. This is used to mark that a class,
 	 * method or field is only visible from inside the current library /
-	 * project. This modifier will be converted to the {@link sealed}
+	 * project. This modifier will be converted to the {@link internal}
 	 * annotation.
 	 */
-	public static final int SEALED = 0x00100000;
+	public static final int INTERNAL = 0x00100000;
 	
 	/**
 	 * <i>Dyvil</i> {@code deprecated} modifier. This modifier is a shortcut for
@@ -231,7 +231,7 @@ public interface Modifiers
 	/**
 	 * The access modifiers.
 	 */
-	public static final int ACCESS_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | DEPRECATED | SEALED;
+	public static final int ACCESS_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | DEPRECATED | INTERNAL;
 	
 	/**
 	 * The modifiers that can be used on any member.

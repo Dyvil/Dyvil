@@ -127,9 +127,9 @@ public enum ModifierTypes
 		{
 			sb.append("@Deprecated ");
 		}
-		if ((mod & Modifiers.SEALED) == Modifiers.SEALED)
+		if ((mod & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			sb.append("sealed ");
+			sb.append("internal ");
 		}
 	}
 	
@@ -294,8 +294,8 @@ public enum ModifierTypes
 			return Modifiers.PRIVATE;
 		case Keywords.PROTECTED:
 			return Modifiers.PROTECTED;
-		case Keywords.SEALED:
-			return Modifiers.SEALED;
+		case Keywords.INTERNAL:
+			return Modifiers.INTERNAL;
 		}
 		return -1;
 	}

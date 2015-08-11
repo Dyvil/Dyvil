@@ -146,8 +146,8 @@ public abstract class AbstractClass implements IClass
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/sealed":
-			this.modifiers |= Modifiers.SEALED;
+		case "dyvil/annotation/internal":
+			this.modifiers |= Modifiers.INTERNAL;
 			return false;
 		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
@@ -957,7 +957,7 @@ public abstract class AbstractClass implements IClass
 		}
 		
 		int level = member.getAccessLevel();
-		if ((level & Modifiers.SEALED) != 0)
+		if ((level & Modifiers.INTERNAL) != 0)
 		{
 			if (iclass instanceof ExternalClass)
 			{

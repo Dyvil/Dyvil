@@ -612,9 +612,9 @@ public class Property extends Member implements IProperty, IContext
 			{
 				mw.addAnnotation("Ljava/lang/Deprecated;", true);
 			}
-			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+			if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 			{
-				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
+				mw.addAnnotation("Ldyvil/annotation/internal;", false);
 			}
 			
 			if (this.getter != null)
@@ -645,9 +645,9 @@ public class Property extends Member implements IProperty, IContext
 			{
 				mw.addAnnotation("Ljava/lang/Deprecated;", true);
 			}
-			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+			if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 			{
-				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
+				mw.addAnnotation("Ldyvil/annotation/internal;", false);
 			}
 			
 			if (this.setterParameter != null)

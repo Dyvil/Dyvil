@@ -8,7 +8,7 @@ import dyvil.lang.Type;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;
 
-import dyvil.annotation.sealed;
+import dyvil.annotation.internal;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.util.ImmutableException;
@@ -37,7 +37,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		return new EnumMap(type);
 	}
 	
-	public @sealed EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	public @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
 		super(type, keys, values, size);
 	}

@@ -454,7 +454,7 @@ public class REPLMemberClass implements IClass
 		}
 		
 		int level = member.getAccessLevel();
-		if ((level & Modifiers.SEALED) != 0)
+		if ((level & Modifiers.INTERNAL) != 0)
 		{
 			if (iclass instanceof ExternalClass)
 			{

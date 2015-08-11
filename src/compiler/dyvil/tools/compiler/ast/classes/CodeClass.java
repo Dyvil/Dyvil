@@ -339,9 +339,9 @@ public class CodeClass extends AbstractClass
 		{
 			writer.visitAnnotation("Ldyvil/annotation/object;", true);
 		}
-		if ((this.modifiers & Modifiers.SEALED) != 0)
+		if ((this.modifiers & Modifiers.INTERNAL) != 0)
 		{
-			writer.visitAnnotation("Ldyvil/annotation/sealed;", false);
+			writer.visitAnnotation("Ldyvil/annotation/internal;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{

@@ -15,6 +15,7 @@ public interface Keywords
 	int	ELSE			= Tokens.KEYWORD | 0x000D0000;
 	int	ENUM			= Tokens.KEYWORD | 0x000E0000;
 	int	EXTENDS			= Tokens.KEYWORD | 0x000F0000;
+	int	EXTENSION		= Tokens.KEYWORD | 0x003E0000;
 	int	FALSE			= Tokens.KEYWORD | 0x00100000;
 	int	FINAL			= Tokens.KEYWORD | 0x00110000;
 	int	FINALLY			= Tokens.KEYWORD | 0x00120000;
@@ -29,6 +30,7 @@ public interface Keywords
 	int	INLINE			= Tokens.KEYWORD | 0x001B0000;
 	int	INFIX			= Tokens.KEYWORD | 0x001C0000;
 	int	INTERFACE		= Tokens.KEYWORD | 0x001D0000;
+	int	INTERNAL		= Tokens.KEYWORD | 0x003F0000;
 	int	IS				= Tokens.KEYWORD | 0x001E0000;
 	int	LAZY			= Tokens.KEYWORD | 0x001F0000;
 	int	MACRO			= Tokens.KEYWORD | 0x003A0000;
@@ -90,6 +92,8 @@ public interface Keywords
 			return ENUM;
 		case "extends":
 			return EXTENDS;
+		case "extension":
+			return EXTENSION;
 		case "false":
 			return FALSE;
 		case "final":
@@ -118,6 +122,8 @@ public interface Keywords
 			return INFIX;
 		case "interface":
 			return INTERFACE;
+		case "internal":
+			return INTERNAL;
 		case "is":
 			return IS;
 		case "lazy":
@@ -212,6 +218,8 @@ public interface Keywords
 			return "enum";
 		case EXTENDS:
 			return "extends";
+		case EXTENSION:
+			return "extension";
 		case FALSE:
 			return "false";
 		case FINAL:
@@ -240,6 +248,8 @@ public interface Keywords
 			return "infix";
 		case INTERFACE:
 			return "interface";
+		case INTERNAL:
+			return "internal";
 		case IS:
 			return "is";
 		case LAZY:

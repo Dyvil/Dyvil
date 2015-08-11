@@ -111,8 +111,8 @@ public class Field extends Member implements IField
 		case "dyvil/annotation/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
-		case "dyvil/annotation/sealed":
-			this.modifiers |= Modifiers.SEALED;
+		case "dyvil/annotation/internal":
+			this.modifiers |= Modifiers.INTERNAL;
 			return false;
 		case "dyvil/annotation/Transient":
 			this.modifiers |= Modifiers.TRANSIENT;
@@ -343,9 +343,9 @@ public class Field extends Member implements IField
 		}
 		
 		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
-		if ((this.modifiers & Modifiers.SEALED) != 0)
+		if ((this.modifiers & Modifiers.INTERNAL) != 0)
 		{
-			fv.visitAnnotation("Ldyvil/annotation/sealed", false);
+			fv.visitAnnotation("Ldyvil/annotation/internal", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{

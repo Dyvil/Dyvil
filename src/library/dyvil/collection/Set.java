@@ -7,13 +7,13 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.sealed;
+import dyvil.annotation.internal;
 
 @NilConvertible
 @ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
-	@sealed
+	@internal
 	Object VALUE = new Object();
 	
 	public static <E> MutableSet<E> apply()
@@ -232,7 +232,7 @@ public interface Set<E> extends Collection<E>
 		return sum * 31 + product;
 	}
 	
-	public static @sealed int distinct(Object[] array, int size)
+	public static @internal int distinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -252,7 +252,7 @@ public interface Set<E> extends Collection<E>
 		return size;
 	}
 	
-	public static @sealed <T> int distinct(T[] array, int size, Comparator<? super T> comparator)
+	public static @internal <T> int distinct(T[] array, int size, Comparator<? super T> comparator)
 	{
 		if (size < 2)
 		{
@@ -264,7 +264,7 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 	
-	public static @sealed int distinctSorted(Object[] array, int size)
+	public static @internal int distinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{

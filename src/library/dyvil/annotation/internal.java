@@ -8,16 +8,16 @@ import java.lang.annotation.Target;
 import dyvil.reflect.Modifiers;
 
 /**
- * Annotation for <b>sealed</b> classes and members. This is used to mark that a
+ * Annotation for <b>internal</b> classes and members. This is used to mark that a
  * class, method or field is only visible from inside the current library /
  * project.
  * 
- * @see Modifiers#SEALED
+ * @see Modifiers#INTERNAL
  * @author Clashsoft
  * @version 1.0
  */
 @Retention(RetentionPolicy.CLASS)
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.CONSTRUCTOR })
-public @interface sealed
+public @interface internal
 {
 }

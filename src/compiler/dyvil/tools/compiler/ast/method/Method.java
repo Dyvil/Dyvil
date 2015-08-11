@@ -263,8 +263,8 @@ public class Method extends Member implements IMethod, ILabelContext
 		case "dyvil/annotation/prefix":
 			this.modifiers |= Modifiers.PREFIX;
 			return false;
-		case "dyvil/annotation/sealed":
-			this.modifiers |= Modifiers.SEALED;
+		case "dyvil/annotation/internal":
+			this.modifiers |= Modifiers.INTERNAL;
 			return false;
 		case "dyvil/annotation/Native":
 			this.modifiers |= Modifiers.NATIVE;
@@ -1210,9 +1210,9 @@ public class Method extends Member implements IMethod, ILabelContext
 		{
 			mw.addAnnotation("Ljava/lang/Deprecated;", true);
 		}
-		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.addAnnotation("Ldyvil/annotation/sealed;", false);
+			mw.addAnnotation("Ldyvil/annotation/internal;", false);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

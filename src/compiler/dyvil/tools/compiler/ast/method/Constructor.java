@@ -158,8 +158,8 @@ public class Constructor extends Member implements IConstructor
 		case "dyvil/annotation/inline":
 			this.modifiers |= Modifiers.INLINE;
 			return false;
-		case "dyvil/annotation/sealed":
-			this.modifiers |= Modifiers.SEALED;
+		case "dyvil/annotation/internal":
+			this.modifiers |= Modifiers.INTERNAL;
 			return false;
 		case "java/lang/Deprecated":
 			this.modifiers |= Modifiers.DEPRECATED;
@@ -719,9 +719,9 @@ public class Constructor extends Member implements IConstructor
 		{
 			mw.addAnnotation("Ljava/lang/Deprecated;", true);
 		}
-		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.addAnnotation("Ldyvil/annotation/sealed;", false);
+			mw.addAnnotation("Ldyvil/annotation/internal;", false);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
