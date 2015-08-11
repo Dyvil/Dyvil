@@ -169,19 +169,20 @@ public final class FieldAccess implements IValue, INamed, IValued
 		}
 	}
 	
-	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
+	private IValue resolveMethod(MarkerList markers, IContext context)
 	{
-		if (!ICall.privateAccess(context, this.instance))
+		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
+		if (method != null)
 		{
-			IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
-			if (method != null)
-			{
-				AbstractCall mc = this.toMethodCall(method);
-				mc.checkArguments(markers, context);
-				return mc;
-			}
+			AbstractCall mc = this.toMethodCall(method);
+			mc.checkArguments(markers, context);
+			return mc;
 		}
-		
+		return null;
+	}
+	
+	private IValue resolveField(MarkerList markers, IContext context)
+	{
 		IDataMember field = ICall.resolveField(context, this.instance, this.name);
 		if (field != null)
 		{
@@ -193,6 +194,37 @@ public final class FieldAccess implements IValue, INamed, IValued
 			
 			this.field = field;
 			return this;
+		}
+		return null;
+	}
+	
+	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
+	{
+		if (ICall.privateAccess(context, this.instance))
+		{
+			IValue value = this.resolveField(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+			value = this.resolveMethod(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+		}
+		else
+		{
+			IValue value = this.resolveMethod(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+			value = this.resolveField(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
 		}
 		
 		if (this.instance == null)

@@ -80,7 +80,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == 0)
+		if (this.mode == END)
 		{
 			if (this.value != null)
 			{
@@ -124,7 +124,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					
 					this.value = new VoidValue(token.to(token.next()));
 					pm.skip();
-					this.mode = 0;
+					this.mode = END;
 					return;
 				}
 				
@@ -214,7 +214,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case PATTERN_END:
 			if (type == Symbols.COLON)
 			{
-				this.mode = 0;
+				this.mode = END;
 				if (token.next().type() != Keywords.CASE)
 				{
 					pm.pushParser(pm.newExpressionParser((IValued) this.value));
@@ -300,7 +300,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			SingleArgument sa = new SingleArgument();
 			cc.setArguments(sa);
 			pm.pushParser(pm.newExpressionParser(sa), true);
-			this.mode = 0;
+			this.mode = END;
 			return;
 		}
 		case CONSTRUCTOR_END:
@@ -524,7 +524,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				SingleArgument sa = new SingleArgument();
 				ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value, sa);
 				this.value = call;
-				this.mode = 0;
+				this.mode = END;
 				pm.pushParser(pm.newExpressionParser(sa), true);
 				return;
 			}
@@ -599,7 +599,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		if (nextType == Symbols.ARROW_OPERATOR)
 		{
 			LambdaExpression lv = new LambdaExpression(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
-			this.mode = 0;
+			this.mode = END;
 			this.value = lv;
 			pm.pushParser(pm.newExpressionParser(lv));
 			pm.skip();
@@ -863,7 +863,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			IfStatement is = new IfStatement(token.raw());
 			this.value = is;
 			pm.pushParser(new IfStatementParser(is));
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.ELSE:
@@ -882,7 +882,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			WhileStatement statement = new WhileStatement(token);
 			this.value = statement;
 			pm.pushParser(new WhileStatementParser(statement));
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.DO:
@@ -890,13 +890,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			DoStatement statement = new DoStatement(token);
 			this.value = statement;
 			pm.pushParser(new DoStatementParser(statement));
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.FOR:
 		{
 			pm.pushParser(new ForStatementParser(this.field, token.raw()));
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.BREAK:
@@ -909,7 +909,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				statement.setName(next.nameValue());
 				pm.skip();
 			}
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.CONTINUE:
@@ -922,7 +922,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				statement.setName(next.nameValue());
 				pm.skip();
 			}
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.GOTO:
@@ -935,7 +935,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				statement.setName(next.nameValue());
 				pm.skip();
 			}
-			this.mode = 0;
+			this.mode = END;
 			return true;
 		}
 		case Keywords.CASE:
@@ -950,7 +950,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			TryStatement statement = new TryStatement(token.raw());
 			pm.pushParser(new TryStatementParser(statement));
-			this.mode = 0;
+			this.mode = END;
 			this.value = statement;
 			return true;
 		}
@@ -980,7 +980,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			ThrowStatement statement = new ThrowStatement(token.raw());
 			pm.pushParser(pm.newExpressionParser(statement));
-			this.mode = 0;
+			this.mode = END;
 			this.value = statement;
 			return true;
 		}
@@ -988,7 +988,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			SyncStatement statement = new SyncStatement(token.raw());
 			pm.pushParser(new SyncStatementParser(statement));
-			this.mode = 0;
+			this.mode = END;
 			this.value = statement;
 			return true;
 		}

@@ -32,6 +32,10 @@ public interface IToken extends ICodePosition
 		return 0L;
 	}
 	
+	public default void setLong(long value)
+	{
+	}
+	
 	public default float floatValue()
 	{
 		return 0F;

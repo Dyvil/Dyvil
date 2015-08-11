@@ -15,6 +15,16 @@ public final class LongToken implements IToken
 	
 	private long value;
 	
+	public LongToken(IToken prev, int lineNumber, int start, int end)
+	{
+		this.prev = prev;
+		prev.setNext(this);
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+		this.end = end;
+	}
+	
 	public LongToken(IToken prev, long value, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
@@ -105,6 +115,12 @@ public final class LongToken implements IToken
 	public boolean hasPrev()
 	{
 		return this.prev != null;
+	}
+	
+	@Override
+	public void setLong(long value)
+	{
+		this.value = value;
 	}
 	
 	@Override

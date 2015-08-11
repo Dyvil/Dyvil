@@ -42,7 +42,7 @@ public final class TypeParser extends Parser
 		int type = token.type();
 		switch (this.mode)
 		{
-		case 0:
+		case END:
 			if (this.type != null)
 			{
 				this.typed.setType(this.type);
@@ -118,23 +118,22 @@ public final class TypeParser extends Parser
 			pm.report(new SyntaxError(token, "Invalid Type - Invalid " + token));
 			return;
 		case TUPLE_END:
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				if (token.next().type() == Symbols.ARROW_OPERATOR)
-				{
-					TupleType tupleType = (TupleType) this.type;
-					this.type = new LambdaType(tupleType);
-					this.mode = LAMBDA_TYPE;
-					return;
-				}
-				
-				this.type.expandPosition(token);
-				this.typed.setType(this.type);
-				pm.popParser();
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Tuple Type - ')' expected"));
+			}
+			if (token.next().type() == Symbols.ARROW_OPERATOR)
+			{
+				TupleType tupleType = (TupleType) this.type;
+				this.type = new LambdaType(tupleType);
+				this.mode = LAMBDA_TYPE;
 				return;
 			}
-			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Tuple Type - ')' expected"));
+			
+			pm.popParser();
+			this.type.expandPosition(token);
+			this.typed.setType(this.type);
 			return;
 		case LAMBDA_TYPE:
 			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
@@ -173,14 +172,14 @@ public final class TypeParser extends Parser
 			{
 				wt.setVariance(Variance.COVARIANT);
 				pm.pushParser(pm.newTypeParser(wt));
-				this.mode = 0;
+				this.mode = END;
 				return;
 			}
 			if (name == Name.gtcolon) // >: - Lower Bound
 			{
 				wt.setVariance(Variance.CONTRAVARIANT);
 				pm.pushParser(pm.newTypeParser(wt));
-				this.mode = 0;
+				this.mode = END;
 				return;
 			}
 			this.typed.setType(this.type);

@@ -331,7 +331,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void tokenize()
 	{
-		this.tokens = Dlex.tokenIterator(this.inputFile.getCode());
+		this.tokens = new Dlex(this.markers).tokenize(this.inputFile.getCode());
 		this.tokens.inferSemicolons();
 	}
 	

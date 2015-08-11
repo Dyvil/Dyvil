@@ -15,10 +15,21 @@ public final class IntToken implements IToken
 	
 	private int value;
 	
+	public IntToken(IToken prev, int lineNumber, int start, int end)
+	{
+		this.prev = prev;
+		prev.setNext(this);
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+		this.end = end;
+	}
+	
 	public IntToken(IToken prev, int value, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
+		
 		this.value = value;
 		
 		this.lineNumber = lineNumber;
@@ -105,6 +116,12 @@ public final class IntToken implements IToken
 	public boolean hasPrev()
 	{
 		return this.prev != null;
+	}
+	
+	@Override
+	public void setLong(long value)
+	{
+		this.value = (int) value;
 	}
 	
 	@Override

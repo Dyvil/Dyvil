@@ -76,8 +76,8 @@ public class DyvilREPL
 				return;
 			}
 			
-			TokenIterator tokens = Dlex.tokenIterator(currentCode + ";");
 			REPLContext.reset();
+			TokenIterator tokens = new Dlex(REPLContext.markers).tokenize(currentCode + ";");
 			
 			if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))
 			{

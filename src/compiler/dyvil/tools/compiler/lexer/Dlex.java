@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.lexer;
 
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.*;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -10,16 +12,14 @@ import static dyvil.tools.compiler.util.ParserUtil.*;
 
 public final class Dlex
 {
-	private Dlex()
+	private MarkerList	markers;
+	
+	public Dlex(MarkerList markers)
 	{
+		this.markers = markers;
 	}
 	
-	public static TokenIterator tokenIterator(String code)
-	{
-		return new TokenIterator(tokenize(code));
-	}
-	
-	public static IToken tokenize(String code)
+	public TokenIterator tokenize(String code)
 	{
 		int len = code.length();
 		
@@ -413,7 +413,7 @@ public final class Dlex
 			addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
-		return first.next();
+		return new TokenIterator(first.next());
 	}
 	
 	private static int getMode(char c, String code, int i)
@@ -548,7 +548,7 @@ public final class Dlex
 		return false;
 	}
 	
-	private static IToken addToken(IToken prev, String s, int type, int line, int start, int len)
+	private IToken addToken(IToken prev, String s, int type, int line, int start, int len)
 	{
 		switch (type)
 		{
@@ -595,21 +595,21 @@ public final class Dlex
 		case Symbols.CLOSE_CURLY_BRACKET:
 			return new SymbolToken(prev, type, line, start);
 		case INT:
-			return new IntToken(prev, Integer.parseInt(s, 10), line, start, start + len);
+			return intToken(prev, s, line, start, len, 10, false);
 		case INT | MOD_BIN:
-			return new IntToken(prev, Integer.parseInt(s.substring(2), 2), line, start, start + len);
+			return intToken(prev, s, line, start, len, 2, false);
 		case INT | MOD_OCT:
-			return new IntToken(prev, Integer.parseInt(s.substring(2), 8), line, start, start + len);
+			return intToken(prev, s, line, start, len, 8, false);
 		case INT | MOD_HEX:
-			return new IntToken(prev, Integer.parseInt(s.substring(2), 16), line, start, start + len);
+			return intToken(prev, s, line, start, len, 16, false);
 		case LONG:
-			return new LongToken(prev, Long.parseLong(s, 10), line, start, start + len);
+			return intToken(prev, s, line, start, len, 10, true);
 		case LONG | MOD_BIN:
-			return new LongToken(prev, Long.parseLong(s.substring(2), 2), line, start, start + len);
+			return intToken(prev, s, line, start, len, 2, true);
 		case LONG | MOD_OCT:
-			return new LongToken(prev, Long.parseLong(s.substring(1), 8), line, start, start + len);
+			return intToken(prev, s, line, start, len, 8, true);
 		case LONG | MOD_HEX:
-			return new LongToken(prev, Long.parseLong(s.substring(2), 16), line, start, start + len);
+			return intToken(prev, s, line, start, len, 16, true);
 		case FLOAT:
 			return new FloatToken(prev, Float.parseFloat(s), line, start, start + len);
 		case FLOAT | MOD_HEX:
@@ -636,7 +636,51 @@ public final class Dlex
 		return null;
 	}
 	
-	private static IToken addToken(IToken prev, StringBuilder buf, int type, int line, int start)
+	private IToken intToken(IToken prev, String s, int line, int start, int len, int radix, boolean isLong)
+	{
+		IToken token = isLong ? new LongToken(prev, line, start, start + len) : new IntToken(prev, line, start, start + len);
+		this.parseInteger(token, s, radix, isLong);
+		return token;
+	}
+	
+	private void parseInteger(IToken token, String str, int radix, boolean isLong)
+	{
+		long result = 0;
+		boolean negative = false;
+		int from = radix != 10 ? 2 : 0;
+		int to = str.length();
+		long limit = isLong ? -Long.MAX_VALUE : -Integer.MAX_VALUE;
+		long multmin;
+		int digit;
+		
+		char firstChar = str.charAt(from);
+		if (firstChar < '0')
+		{ // Possible leading "+" or "-"
+			if (firstChar == '-')
+			{
+				negative = true;
+				limit = Long.MIN_VALUE;
+			}
+			from++;
+		}
+		
+		multmin = limit / radix;
+		while (from < to)
+		{
+			// Accumulating negatively avoids surprises near MAX_VALUE
+			digit = Character.digit(str.charAt(from++), radix);
+			if (result < multmin || (result *= radix) < limit + digit)
+			{
+				this.markers.add(new SyntaxError(token, "Invalid Integer - Out of Range"));
+				return;
+			}
+			result -= digit;
+		}
+		
+		token.setLong(negative ? result : -result);
+	}
+	
+	private IToken addToken(IToken prev, StringBuilder buf, int type, int line, int start)
 	{
 		String s = buf.toString();
 		int len = buf.length();
