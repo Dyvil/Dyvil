@@ -19,6 +19,8 @@ public interface Operators
 	
 	public static final Map<Name, Operator> map = new IdentityHashMap();
 	
+	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
+	
 	public static final Operator	PREFIX_MINUS	= new Operator(Name.minus, PREFIX);
 	public static final Operator	PREFIX_TILDE	= new Operator(Name.tilde, PREFIX);
 	public static final Operator	PREFIX_BANG		= new Operator(Name.bang, PREFIX);

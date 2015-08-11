@@ -637,6 +637,11 @@ public final class ExternalClass extends AbstractClass
 			return new AnnotationClassVisitor(param);
 		}
 		
+		if ((access & Modifiers.SYNTHETIC) != 0)
+		{
+			return null;
+		}
+		
 		if ("<init>".equals(name))
 		{
 			Constructor constructor = new ExternalConstructor(this);

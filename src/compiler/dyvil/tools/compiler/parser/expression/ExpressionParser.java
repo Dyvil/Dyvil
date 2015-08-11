@@ -299,7 +299,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			SingleArgument sa = new SingleArgument();
 			cc.setArguments(sa);
-			pm.pushParser(pm.newExpressionParser(sa), true);
+			ExpressionParser ep = (ExpressionParser) pm.newExpressionParser(sa);
+			ep.operator = Operators.DEFAULT;
+			pm.pushParser(ep, true);
 			this.mode = END;
 			return;
 		}
@@ -525,7 +527,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value, sa);
 				this.value = call;
 				this.mode = END;
-				pm.pushParser(pm.newExpressionParser(sa), true);
+				ExpressionParser ep = (ExpressionParser) pm.newExpressionParser(sa);
+				ep.operator = Operators.DEFAULT;
+				pm.pushParser(ep, true);
 				return;
 			}
 			pm.report(new SyntaxError(token, "Invalid Access - Invalid " + token));
@@ -679,7 +683,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		this.value = call;
 		this.mode = ACCESS;
 		ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
-		parser.operator = op;
+		parser.operator = Operators.DEFAULT;
 		pm.pushParser(parser);
 		return;
 	}
