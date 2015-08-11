@@ -33,8 +33,6 @@ public final class Predef
 	
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 	
-	public infix Iterable[E] toIterable[E](E... array) = ImmutableList(array)
-	
 	// Strings
 	
 	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)

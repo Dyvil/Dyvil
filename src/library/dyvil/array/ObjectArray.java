@@ -9,11 +9,20 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
+import dyvil.lang.Boolean;
+import dyvil.lang.Byte;
+import dyvil.lang.Char;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Int;
+import dyvil.lang.Long;
 import dyvil.lang.Ordered;
+import dyvil.lang.Short;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.StringRange;
 
 import static dyvil.reflect.Opcodes.*;
@@ -366,6 +375,101 @@ public interface ObjectArray
 	{
 		return java.util.Arrays.<N, T> copyOf(array, newLength, newType);
 	}
+	
+	public static @infix boolean[] unboxed(Boolean[] array)
+	{
+		int len = array.length;
+		boolean[] unboxed = new boolean[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Boolean.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix byte[] unboxed(Byte[] array)
+	{
+		int len = array.length;
+		byte[] unboxed = new byte[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Byte.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix short[] unboxed(Short[] array)
+	{
+		int len = array.length;
+		short[] unboxed = new short[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Short.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix char[] unboxed(Char[] array)
+	{
+		int len = array.length;
+		char[] unboxed = new char[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Char.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix int[] unboxed(Int[] array)
+	{
+		int len = array.length;
+		int[] unboxed = new int[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Int.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix long[] unboxed(Long[] array)
+	{
+		int len = array.length;
+		long[] unboxed = new long[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Long.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix float[] unboxed(Float[] array)
+	{
+		int len = array.length;
+		float[] unboxed = new float[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Float.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix double[] unboxed(Double[] array)
+	{
+		int len = array.length;
+		double[] unboxed = new double[len];
+		for (int i = 0; i < len; i++)
+		{
+			unboxed[i] = Double.unapply(array[i]);
+		}
+		return unboxed;
+	}
+	
+	public static @infix <T> Iterable<T> toIterable(T[] array)
+	{
+		return new ArrayList<T>(array, true);
+	}
+	
+	// toString, equals and hashCode
 	
 	public static @infix @inline <T> boolean equals(T[] array1, T[] array2)
 	{

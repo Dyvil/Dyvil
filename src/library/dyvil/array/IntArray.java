@@ -6,9 +6,12 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+import dyvil.lang.Int;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -300,6 +303,22 @@ public interface IntArray
 	public static @infix @inline int[] copy(int[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Int[] boxed(int[] array)
+	{
+		int len = array.length;
+		Int[] boxed = new Int[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Int.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Int> toIterable(int[] array)
+	{
+		return new ArrayList<Int>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

@@ -6,9 +6,12 @@ import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.IntConsumer;
 
+import dyvil.lang.Float;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -300,6 +303,22 @@ public interface FloatArray
 	public static @infix @inline float[] copy(float[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Float[] boxed(float[] array)
+	{
+		int len = array.length;
+		Float[] boxed = new Float[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Float.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Float> toIterable(float[] array)
+	{
+		return new ArrayList<Float>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

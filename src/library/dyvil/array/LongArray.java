@@ -6,9 +6,12 @@ import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
 
+import dyvil.lang.Long;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -300,6 +303,22 @@ public interface LongArray
 	public static @infix @inline long[] copy(long[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Long[] boxed(long[] array)
+	{
+		int len = array.length;
+		Long[] boxed = new Long[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Long.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Long> toIterable(long[] array)
+	{
+		return new ArrayList<Long>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

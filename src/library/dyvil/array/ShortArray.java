@@ -6,9 +6,12 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+import dyvil.lang.Short;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -293,6 +296,29 @@ public interface ShortArray
 	public static @infix @inline boolean in(short v, short[] array)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
+	}
+	
+	// Copying
+	
+	public static @infix short[] copy(short[] array)
+	{
+		return array.clone();
+	}
+	
+	public static @infix Short[] boxed(short[] array)
+	{
+		int len = array.length;
+		Short[] boxed = new Short[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Short.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Short> toIterable(short[] array)
+	{
+		return new ArrayList<Short>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

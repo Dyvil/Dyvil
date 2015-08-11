@@ -6,9 +6,12 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+import dyvil.lang.Char;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -300,6 +303,22 @@ public interface CharArray
 	public static @infix @inline char[] copy(char[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Char[] boxed(char[] array)
+	{
+		int len = array.length;
+		Char[] boxed = new Char[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Char.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Char> toIterable(char[] array)
+	{
+		return new ArrayList<Char>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

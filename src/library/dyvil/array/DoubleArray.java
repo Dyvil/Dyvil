@@ -6,9 +6,12 @@ import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.IntConsumer;
 
+import dyvil.lang.Double;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -300,6 +303,22 @@ public interface DoubleArray
 	public static @infix @inline double[] copy(double[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Double[] boxed(double[] array)
+	{
+		int len = array.length;
+		Double[] boxed = new Double[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Double.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Double> toIterable(double[] array)
+	{
+		return new ArrayList<Double>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

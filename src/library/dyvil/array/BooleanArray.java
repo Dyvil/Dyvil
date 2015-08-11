@@ -11,6 +11,7 @@ import dyvil.lang.Boolean;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -313,6 +314,22 @@ public interface BooleanArray
 	public static @infix @inline boolean[] copy(boolean[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Boolean[] boxed(boolean[] array)
+	{
+		int len = array.length;
+		Boolean[] boxed = new Boolean[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Boolean.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Boolean> toIterable(boolean[] array)
+	{
+		return new ArrayList<Boolean>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

@@ -6,9 +6,12 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+import dyvil.lang.Byte;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -302,6 +305,22 @@ public interface ByteArray
 	public static @infix @inline byte[] copy(byte[] array)
 	{
 		return array.clone();
+	}
+	
+	public static @infix Byte[] boxed(byte[] array)
+	{
+		int len = array.length;
+		Byte[] boxed = new Byte[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Byte.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	public static @infix Iterable<Byte> toIterable(byte[] array)
+	{
+		return new ArrayList<Byte>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
