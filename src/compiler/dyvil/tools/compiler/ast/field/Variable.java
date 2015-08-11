@@ -146,7 +146,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType == null)
 		{
-			this.refType = Types.getSimpleRef(this.type);
+			this.refType = this.type.getSimpleRefType();
 		}
 	}
 	

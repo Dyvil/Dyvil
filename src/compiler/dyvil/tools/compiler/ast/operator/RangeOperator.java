@@ -102,7 +102,7 @@ public class RangeOperator implements IValue
 			ClassGenericType gt = new ClassGenericType(RANGE_CLASS);
 			if (this.elementType.isPrimitive())
 			{
-				this.elementType = this.elementType.getReferenceType();
+				this.elementType = this.elementType.getObjectType();
 			}
 			gt.addType(this.elementType);
 			this.type = gt;

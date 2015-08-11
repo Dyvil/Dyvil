@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -117,7 +118,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public IClass getTheClass();
 	
-	public default IType getReferenceType()
+	// Type Conversions
+	
+	public default IType getObjectType()
 	{
 		return this;
 	}
@@ -130,6 +133,16 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	public default IType getParameterType()
 	{
 		return this;
+	}
+	
+	public default ReferenceType getRefType()
+	{
+		return Types.getRef(this);
+	}
+	
+	public default IType getSimpleRefType()
+	{
+		return Types.getSimpleRef(this);
 	}
 	
 	// Arrays

@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -204,7 +203,7 @@ public final class Array implements IValue, IValueList
 		{
 			return ARRAY_TO_ITERABLE;
 		}
-		return ARRAY_TO_ITERABLE = Package.dyvilLang.resolveClass("Predef").getBody().getMethod(Name.getQualified("toIterable"));
+		return ARRAY_TO_ITERABLE = Types.getObjectArray().getBody().getMethod(Name.getQualified("toIterable"));
 	}
 	
 	private boolean isConvertibleFrom(IType type)

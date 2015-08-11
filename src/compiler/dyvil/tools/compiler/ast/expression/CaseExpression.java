@@ -84,7 +84,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 			IType t1 = this.pattern.getType();
 			if (t1.isPrimitive())
 			{
-				t1 = t1.getReferenceType();
+				t1 = t1.getObjectType();
 			}
 			gt.addType(t1);
 			
@@ -93,7 +93,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 				t1 = this.action.getType();
 				if (t1.isPrimitive())
 				{
-					t1 = t1.getReferenceType();
+					t1 = t1.getObjectType();
 				}
 				gt.addType(t1);
 			}

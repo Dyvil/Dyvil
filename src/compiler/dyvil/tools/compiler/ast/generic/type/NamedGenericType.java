@@ -124,7 +124,7 @@ public class NamedGenericType extends GenericType
 			
 			if (t2.isPrimitive())
 			{
-				t2 = t2.getReferenceType();
+				t2 = t2.getObjectType();
 			}
 			
 			this.typeArguments[i] = t2;

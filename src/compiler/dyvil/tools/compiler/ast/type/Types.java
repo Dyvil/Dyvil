@@ -81,13 +81,8 @@ public final class Types
 	public static IClass	TYPE_CONVERTIBLE;
 	
 	private static IClass			OBJECT_ARRAY_CLASS;
-	private static final IClass[]	PRIMITIVE_ARRAY_CLASS	= new IClass[16];
-	
 	public static IClass				OBJECT_SIMPLE_REF_CLASS;
-	private static final ClassType[]	PRIMITIVE_SIMPLE_REF	= new ClassType[16];
-	
 	public static IClass					OBJECT_REF_CLASS;
-	private static final ReferenceType[]	PRIMITIVE_REF	= new ReferenceType[16];
 	
 	public static void init()
 	{
@@ -192,36 +187,8 @@ public final class Types
 		return OBJECT_ARRAY_CLASS;
 	}
 	
-	public static IClass getPrimitiveArray(PrimitiveType type)
+	protected static ReferenceType getRef(IType type)
 	{
-		IClass iclass = PRIMITIVE_ARRAY_CLASS[type.typecode];
-		if (iclass == null)
-		{
-			String className = type.theClass.getName().qualified + "Array";
-			return PRIMITIVE_ARRAY_CLASS[type.typecode] = Package.dyvilArray.resolveClass(className);
-		}
-		return iclass;
-	}
-	
-	private static ReferenceType getPrimitiveRef(IType type)
-	{
-		int typecode = type.getTypecode();
-		ReferenceType itype = PRIMITIVE_REF[typecode];
-		if (itype == null)
-		{
-			String className = type.getTheClass().getName().qualified + "Ref";
-			return PRIMITIVE_REF[typecode] = new ReferenceType(Package.dyvilLangRef.resolveClass(className), type);
-		}
-		return itype;
-	}
-	
-	public static ReferenceType getRef(IType type)
-	{
-		if (type.isPrimitive())
-		{
-			return getPrimitiveRef(type);
-		}
-		
 		if (OBJECT_REF_CLASS == null)
 		{
 			OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
@@ -230,13 +197,8 @@ public final class Types
 		return new ReferenceType(OBJECT_REF_CLASS, type);
 	}
 	
-	public static IType getSimpleRef(IType type)
+	protected static IType getSimpleRef(IType type)
 	{
-		if (type.isPrimitive())
-		{
-			return getPrimitiveSimpleRef(type);
-		}
-		
 		if (OBJECT_SIMPLE_REF_CLASS == null)
 		{
 			OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
@@ -247,18 +209,6 @@ public final class Types
 		return gt;
 	}
 	
-	private static IType getPrimitiveSimpleRef(IType type)
-	{
-		int typecode = type.getTypecode();
-		IType itype = PRIMITIVE_SIMPLE_REF[typecode];
-		if (itype == null)
-		{
-			String className = "Simple" + type.getTheClass().getName().qualified + "Ref";
-			return PRIMITIVE_SIMPLE_REF[typecode] = new ClassType(Package.dyvilLangRefSimple.resolveClass(className));
-		}
-		return itype;
-	}
-	
 	public static IType combine(IType type1, IType type2)
 	{
 		if (type1.equals(type2))
@@ -267,11 +217,11 @@ public final class Types
 		}
 		if (type1.typeTag() == IType.NULL)
 		{
-			return type2.getReferenceType();
+			return type2.getObjectType();
 		}
 		if (type2.typeTag() == IType.NULL)
 		{
-			return type1.getReferenceType();
+			return type1.getObjectType();
 		}
 		
 		Set<IType> types1 = superTypes(type1);

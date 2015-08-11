@@ -301,7 +301,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		{
 			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
 		}
-		this.returnType = this.returnType.resolve(markers, context, TypePosition.GENERIC_ARGUMENT).getReferenceType();
+		this.returnType = this.returnType.resolve(markers, context, TypePosition.GENERIC_ARGUMENT).getObjectType();
 		
 		if (position == TypePosition.CLASS)
 		{

@@ -128,7 +128,7 @@ public final class Tuple implements IValue, IValueList
 			// Tuple Value Boxing
 			if (type.isPrimitive())
 			{
-				t.addType(type.getReferenceType());
+				t.addType(type.getObjectType());
 			}
 			else
 			{

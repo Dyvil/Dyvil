@@ -117,7 +117,7 @@ public class TypeVarType implements IType
 		{
 			if (t.isPrimitive())
 			{
-				return t.getReferenceType();
+				return t.getObjectType();
 			}
 			return t;
 		}
