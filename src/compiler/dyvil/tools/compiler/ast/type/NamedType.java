@@ -76,6 +76,10 @@ public class NamedType implements IType
 		{
 			return Types.DYNAMIC;
 		}
+		if (name == Name.auto)
+		{
+			return Types.UNKNOWN;
+		}
 		return null;
 	}
 	

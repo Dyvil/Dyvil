@@ -36,6 +36,7 @@ public final class Name
 	public static final Name	_double		= new Name("double");
 	public static final Name	dynamic		= new Name("dynamic");
 	public static final Name	any			= new Name("any");
+	public static final Name	auto		= new Name("auto");
 	
 	public static final Name	plus	= new Name("+", "$plus");
 	public static final Name	minus	= new Name("-", "$minus");

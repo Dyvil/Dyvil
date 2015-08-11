@@ -24,19 +24,19 @@ public @object class UnknownType<T> implements Type<T>
 	@Override
 	public String getName()
 	{
-		return "var";
+		return "auto";
 	}
 	
 	@Override
 	public String getQualifiedName()
 	{
-		return "var";
+		return "auto";
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "var";
+		return "auto";
 	}
 	
 	@Override

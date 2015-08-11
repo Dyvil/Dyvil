@@ -74,12 +74,6 @@ public final class TypeParser extends Parser
 				this.mode = LAMBDA_END;
 				return;
 			}
-			if (type == Keywords.VAR)
-			{
-				this.typed.setType(Types.UNKNOWN);
-				pm.popParser();
-				return;
-			}
 			if (type == Keywords.NULL)
 			{
 				this.typed.setType(Types.NULL);

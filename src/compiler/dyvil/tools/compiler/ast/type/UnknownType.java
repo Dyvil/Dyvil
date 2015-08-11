@@ -33,7 +33,7 @@ public class UnknownType implements IType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified("var");
+		return Name.auto;
 	}
 	
 	// IContext
@@ -172,13 +172,13 @@ public class UnknownType implements IType
 	@Override
 	public String toString()
 	{
-		return "var";
+		return "auto";
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("var");
+		buffer.append("auto");
 	}
 	
 	@Override

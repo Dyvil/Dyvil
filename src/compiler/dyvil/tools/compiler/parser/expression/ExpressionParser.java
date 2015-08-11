@@ -511,7 +511,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			IToken prev = token.prev();
-			if (ParserUtil.isIdentifier(prev.type()))
+			if (prev != null && ParserUtil.isIdentifier(prev.type()))
 			{
 				this.value = null;
 				pm.reparse();
