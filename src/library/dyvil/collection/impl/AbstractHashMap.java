@@ -9,6 +9,9 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public abstract class AbstractHashMap<K, V> implements Map<K, V>
 {
@@ -356,6 +359,13 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		HashEntry<K, V> entry = this.getEntry(key);
 		return entry == null ? null : entry.value;
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		HashEntry<K, V> entry = this.getEntry(key);
+		return entry == null ? None.instance : new Some(entry.value);
 	}
 	
 	@Override

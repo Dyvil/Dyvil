@@ -11,6 +11,8 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.annotation.object;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
+import dyvil.util.None;
+import dyvil.util.Option;
 
 @NilConvertible
 public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
@@ -88,6 +90,12 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public V get(Object key)
 	{
 		return null;
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		return None.instance;
 	}
 	
 	@Override

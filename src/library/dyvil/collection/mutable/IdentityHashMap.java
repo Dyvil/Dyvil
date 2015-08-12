@@ -15,6 +15,9 @@ import dyvil.collection.MutableMap;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 @NilConvertible
 public class IdentityHashMap<K, V> implements MutableMap<K, V>
@@ -411,6 +414,28 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 			if (item == null)
 			{
 				return null;
+			}
+			i = nextKeyIndex(i, len);
+		}
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		Object k = maskNull(key);
+		Object[] tab = this.table;
+		int len = tab.length;
+		int i = hash(k, len);
+		while (true)
+		{
+			Object item = tab[i];
+			if (item == k)
+			{
+				return new Some(tab[i + 1]);
+			}
+			if (item == null)
+			{
+				return None.instance;
 			}
 			i = nextKeyIndex(i, len);
 		}

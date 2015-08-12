@@ -14,6 +14,9 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 @NilConvertible
 @ArrayConvertible
@@ -284,6 +287,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 * @return the value
 	 */
 	public V get(Object key);
+	
+	/**
+	 * Gets and returns an optional value for the given {@code key}. If no
+	 * mapping for the {@code key} exists, {@link None} is returned, otherwise,
+	 * the mapped value is wrapped in a {@link Some}.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return an option containing the value, or None if not mapping exists for
+	 *         the key
+	 */
+	public Option<V> getOption(Object key);
 	
 	// Non-mutating Operations
 	

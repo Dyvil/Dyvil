@@ -5,6 +5,9 @@ import java.util.function.Consumer;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 {
@@ -584,6 +587,13 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	{
 		TreeEntry<K, V> p = this.getEntry(key);
 		return p == null ? null : p.value;
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		TreeEntry<K, V> p = this.getEntry(key);
+		return p == null ? None.instance : new Some(p.value);
 	}
 	
 	protected final V putUnsafe(K key, V value)

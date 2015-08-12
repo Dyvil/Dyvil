@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import dyvil.collection.*;
 import dyvil.collection.iterator.ImmutableIterator;
+import dyvil.util.Option;
 
 public class MapView<K, V> implements ImmutableMap<K, V>
 {
@@ -82,6 +83,12 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	public V get(Object key)
 	{
 		return this.map.get(key);
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		return this.map.getOption(key);
 	}
 	
 	@Override

@@ -12,6 +12,7 @@ import dyvil.collection.mutable.LinkedList;
 import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
 import dyvil.tuple.Tuple2;
+import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible
@@ -72,6 +73,9 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	@Override
 	public V get(Object key);
+	
+	@Override
+	public Option<V> getOption(Object key);
 	
 	// Non-mutating Operations
 	

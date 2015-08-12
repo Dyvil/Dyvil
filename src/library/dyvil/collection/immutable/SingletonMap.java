@@ -10,6 +10,9 @@ import java.util.function.Consumer;
 import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
@@ -107,7 +110,13 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public V get(Object key)
 	{
-		return Objects.equals(this.key, key) ? this.value : null;
+		return Objects.equals(key, this.key) ? this.value : null;
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		return Objects.equals(key, this.key) ? new Some(this.value) : None.instance;
 	}
 	
 	@Override

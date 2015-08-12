@@ -7,6 +7,9 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 {
@@ -258,6 +261,30 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		if (key == null)
+		{
+			for (int i = 0; i < this.size; i++)
+			{
+				if (this.keys[i] == null)
+				{
+					return new Some(this.values[i]);
+				}
+			}
+			return None.instance;
+		}
+		for (int i = 0; i < this.size; i++)
+		{
+			if (key.equals(this.keys[i]))
+			{
+				return new Some(this.values[i]);
+			}
+		}
+		return None.instance;
 	}
 	
 	protected abstract class ArrayIterator<R> implements Iterator<R>

@@ -18,6 +18,7 @@ import dyvil.collection.immutable.TupleMap;
 import dyvil.tuple.Tuple2;
 import dyvil.util.Immutable;
 import dyvil.util.ImmutableException;
+import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible
@@ -129,6 +130,9 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	public V get(Object key);
+	
+	@Override
+	public Option<V> getOption(Object key);
 	
 	// Non-mutating Operations
 	

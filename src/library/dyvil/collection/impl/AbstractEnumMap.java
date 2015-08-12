@@ -8,6 +8,9 @@ import dyvil.lang.Type;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 import sun.misc.SharedSecrets;
 
@@ -249,6 +252,17 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 		
 		return (V) this.values[index(key)];
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		if (!checkType(this.type, key))
+		{
+			return None.instance;
+		}
+		
+		return new Some(this.values[index(key)]);
 	}
 	
 	@Override

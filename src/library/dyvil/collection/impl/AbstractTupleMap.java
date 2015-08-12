@@ -7,6 +7,9 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 {
@@ -252,6 +255,20 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public Option<V> getOption(Object key)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			Tuple2<K, V> entry = this.entries[i];
+			if (key == entry._1 || key != null && key.equals(entry._1))
+			{
+				return new Some(entry._2);
+			}
+		}
+		return None.instance;
 	}
 	
 	@Override
