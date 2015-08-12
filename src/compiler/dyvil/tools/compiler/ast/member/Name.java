@@ -74,6 +74,8 @@ public final class Name
 	
 	public static final Name dotdot = new Name("..", "$dot$dot");
 	
+	public static final Name pluseq = new Name("+=", "$plus$eq");
+	
 	public final String	qualified;
 	public final String	unqualified;
 	

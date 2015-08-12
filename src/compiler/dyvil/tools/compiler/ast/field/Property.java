@@ -744,7 +744,10 @@ public class Property extends Member implements IProperty, IContext
 			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
 			buffer.append(ModifierTypes.FIELD.toString(this.getterModifiers));
 			buffer.append(Formatting.Field.propertyGet);
-			this.getter.toString(prefix + Formatting.Method.indent, buffer);
+			if (this.getter != null)
+			{
+				this.getter.toString(prefix + Formatting.Method.indent, buffer);
+			}
 			
 			if (this.setter == null && this.setterModifiers == 0)
 			{

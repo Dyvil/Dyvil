@@ -4,6 +4,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringBuilderExpression;
 import dyvil.tools.compiler.ast.member.Name;
@@ -119,6 +120,28 @@ public interface Operators
 				sbe.addValue(arg2);
 				return sbe;
 			}
+		}
+		if (name == pluseq)
+		{
+			if (arg1.valueTag() != IValue.FIELD_ACCESS || !arg1.isType(Types.STRING))
+			{
+				return null;
+			}
+			if (arg2.valueTag() == IValue.STRINGBUILDER)
+			{
+				StringBuilderExpression sbe = (StringBuilderExpression) arg2;
+				sbe.addFirstValue(arg1);
+			}
+			else
+			{
+				StringBuilderExpression sbe = new StringBuilderExpression();
+				sbe.addValue(arg1);
+				sbe.addValue(arg2);
+				arg2 = sbe;
+			}
+			
+			FieldAccess fa = (FieldAccess) arg1;
+			return new FieldAssign(null, fa.getInstance(), fa.getField(), arg2);
 		}
 		if (name == dotdot)
 		{

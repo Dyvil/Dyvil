@@ -114,7 +114,7 @@ public final class Variable extends Member implements IVariable
 			markers.add(position, "variable.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
+		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "variable.assign.type", this.name.unqualified);

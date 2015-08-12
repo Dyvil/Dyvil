@@ -34,6 +34,21 @@ public class StringBuilderExpression implements IValue
 		return this.values[0].getPosition();
 	}
 	
+	public void addFirstValue(IValue value)
+	{
+		int index = this.valueCount++;
+		if (index >= this.values.length)
+		{
+			IValue[] temp = new IValue[index + 1];
+			System.arraycopy(this.values, 0, temp, 1, index);
+			temp[0] = value;
+			return;
+		}
+		
+		System.arraycopy(this.values, 0, this.values, 1, index);
+		this.values[0] = value;
+	}
+	
 	public void addValue(IValue value)
 	{
 		int index = this.valueCount++;
