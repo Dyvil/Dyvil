@@ -25,9 +25,8 @@ public final class BytecodeVisitor implements MethodVisitor
 	}
 	
 	@Override
-	public void visitParameter(String name, int index)
+	public void visitParameter(String name, int access)
 	{
-		this.method.setParameterName(index, Name.getQualified(name));
 	}
 	
 	@Override
@@ -277,12 +276,12 @@ public final class BytecodeVisitor implements MethodVisitor
 		{
 			if (index < this.method.parameterCount())
 			{
-				this.method.getParameter(index).setName(Name.getQualified(name));
+				this.method.setParameterName(index, Name.getQualified(name));
 			}
 		}
 		else if (index != 0 && index <= this.method.parameterCount())
 		{
-			this.method.getParameter(index - 1).setName(Name.getQualified(name));
+			this.method.setParameterName(index, Name.getQualified(name));
 		}
 	}
 	
