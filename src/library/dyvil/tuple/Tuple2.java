@@ -12,6 +12,11 @@ public class Tuple2<@Covariant A, @Covariant B> implements Entry<A, B>
 	public final A	_1;
 	public final B	_2;
 	
+	public static <A, B> Tuple2<A, B> apply(A _1, B _2)
+	{
+		return new Tuple2<A, B>(_1, _2);
+	}
+	
 	public Tuple2(A _1, B _2)
 	{
 		this._1 = _1;

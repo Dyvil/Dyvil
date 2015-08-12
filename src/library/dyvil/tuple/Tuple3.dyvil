@@ -1,9 +1,0 @@
-package dyvil.tuple
-
-public case class Tuple3[+A, +B, +C] (
-		public final A _1
-		public final B _2
-		public final C _3)
-{
-	public override String toString() = @"(\(this._1), \(this._2), \(this._3))"
-}
