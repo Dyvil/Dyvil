@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.collection.*;
-import dyvil.collection.mutable.AbstractTreeMap;
+import dyvil.collection.impl.AbstractTreeMap;
 
 public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<K, V>
 {

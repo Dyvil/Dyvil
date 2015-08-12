@@ -1,4 +1,4 @@
-package dyvil.collection.mutable;
+package dyvil.collection.impl;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -10,8 +10,8 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 {
 	protected static final class TreeEntry<K, V> implements dyvil.collection.Entry<K, V>
 	{
-		K				key;
-		V				value;
+		public K				key;
+		public V				value;
 		TreeEntry<K, V>	left	= null;
 		TreeEntry<K, V>	right	= null;
 		TreeEntry<K, V>	parent;

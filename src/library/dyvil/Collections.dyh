@@ -24,9 +24,13 @@ import	dyvil.collection.mutable.LinkedList => MutableLinkedList
 // Sets
 import	dyvil.collection.immutable.ArraySet => ImmutableArraySet
 import	dyvil.collection.immutable.MapBasedSet => ImmutableMapBasedSet
+// TODO import	dyvil.collection.immutable.HashSet => ImmutableHashSet
+// TODO import	dyvil.collection.immutable.IdentityHashSet => ImmutableIdentityHashSet
 
 import	dyvil.collection.mutable.ArraySet => MutableArraySet
 import	dyvil.collection.mutable.MapBasedSet => MutableMapBasedSet
+import	dyvil.collection.mutable.HashSet => MutableHashSet
+import	dyvil.collection.mutable.IdentityHashSet => MutableIdentityHashSet
 
 // Maps
 import	dyvil.collection.immutable.ArrayMap => ImmutableArrayMap
