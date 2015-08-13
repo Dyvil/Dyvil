@@ -140,11 +140,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		int len = 1 + collection.size();
-		Object[] array = new Object[len];
-		array[0] = this.element;
-		collection.toArray(1, array);
-		return new ArrayList(array, len, true);
+		return new PrependList<E>(this.element, (ImmutableList<E>) ImmutableList.linked(collection));
 	}
 	
 	@Override

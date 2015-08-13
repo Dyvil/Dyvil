@@ -12,6 +12,7 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.SingletonList;
@@ -50,6 +51,26 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public static <E> ImmutableList<E> apply(E... array)
 	{
 		return new ArrayList(array);
+	}
+	
+	public static <E> ImmutableList<E> linked(E... array)
+	{
+		ImmutableList<E> list = EmptyList.instance;
+		for (E element : array)
+		{
+			list = new AppendList(list, element);
+		}
+		return list;
+	}
+	
+	public static <E> ImmutableList<E> linked(Collection<E> collection)
+	{
+		ImmutableList<E> list = EmptyList.instance;
+		for (E element : collection)
+		{
+			list = new AppendList(list, element);
+		}
+		return list;
 	}
 	
 	public static <E> Builder<E> builder()
