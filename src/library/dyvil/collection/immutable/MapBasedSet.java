@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -147,5 +148,11 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements ImmutableSe
 	public MutableSet<E> mutable()
 	{
 		return new dyvil.collection.mutable.MapBasedSet<E>(this.map.mutable());
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		return Collections.unmodifiableSet(super.toJava());
 	}
 }

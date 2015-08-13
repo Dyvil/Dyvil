@@ -272,6 +272,18 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 	
 	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		java.util.LinkedHashMap<K, V> map = new java.util.LinkedHashMap<>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			Tuple2<K, V> entry = this.entries[i];
+			map.put(entry._1, entry._2);
+		}
+		return map;
+	}
+	
+	@Override
 	public String toString()
 	{
 		if (this.size <= 0)

@@ -159,4 +159,22 @@ public class MatrixView<E> implements ImmutableMatrix<E>
 	{
 		return this.matrix.mutable();
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "view " + this.matrix.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.matrix.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.matrix.hashCode();
+	}
 }

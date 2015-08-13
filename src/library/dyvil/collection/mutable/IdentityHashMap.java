@@ -3,8 +3,10 @@ package dyvil.collection.mutable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 import dyvil.lang.literal.NilConvertible;
 
@@ -34,7 +36,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		@Override
 		public K getKey()
 		{
-			return (K) IdentityHashMap.this.table[this.index];
+			return (K) unmaskNull(IdentityHashMap.this.table[this.index]);
 		}
 		
 		@Override
@@ -46,7 +48,7 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		@Override
 		public String toString()
 		{
-			return IdentityHashMap.this.table[this.index] + " -> " + IdentityHashMap.this.table[this.index + 1];
+			return unmaskNull(IdentityHashMap.this.table[this.index]) + " -> " + IdentityHashMap.this.table[this.index + 1];
 		}
 		
 		@Override
@@ -274,6 +276,61 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 				return "ValueIterator(" + IdentityHashMap.this + ")";
 			}
 		};
+	}
+	
+	@Override
+	public void forEach(BiConsumer<? super K, ? super V> action)
+	{
+		Object[] tab = this.table;
+		for (int i = 0; i < tab.length; i += 2)
+		{
+			Object key = tab[i];
+			if (key != null)
+			{
+				action.accept((K) unmaskNull(key), (V) tab[i + 1]);
+			}
+		}
+	}
+	
+	@Override
+	public void forEach(Consumer<? super Entry<K, V>> action)
+	{
+		Object[] tab = this.table;
+		for (int i = 0; i < tab.length; i += 2)
+		{
+			Object key = tab[i];
+			if (key != null)
+			{
+				action.accept(new TableEntry(i));
+			}
+		}
+	}
+	
+	@Override
+	public void forEachKey(Consumer<? super K> action)
+	{
+		Object[] tab = this.table;
+		for (int i = 0; i < tab.length; i += 2)
+		{
+			Object key = tab[i];
+			if (key != null)
+			{
+				action.accept((K) unmaskNull(key));
+			}
+		}
+	}
+	
+	@Override
+	public void forEachValue(Consumer<? super V> action)
+	{
+		Object[] tab = this.table;
+		for (int i = 1; i < tab.length; i += 2)
+		{
+			if (tab[i - 1] != null)
+			{
+				action.accept((V) tab[i]);
+			}
+		}
 	}
 	
 	static final Object NULL = new Object();
@@ -655,7 +712,11 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		Object[] tab = this.table;
 		for (int i = 0; i < tab.length; i += 2)
 		{
-			tab[i + 1] = mapper.apply((K) tab[i], (V) tab[i + 1]);
+			Object key = tab[i];
+			if (key != null)
+			{
+				tab[i + 1] = mapper.apply((K) unmaskNull(key), (V) tab[i + 1]);
+			}
 		}
 	}
 	
@@ -665,7 +726,12 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 		Object[] tab = this.table;
 		for (int i = 0; i < tab.length; i += 2)
 		{
-			if (!condition.test((K) tab[i], (V) tab[i + 1]))
+			Object key = tab[i];
+			if (key == null)
+			{
+				continue;
+			}
+			if (!condition.test((K) unmaskNull(tab[i]), (V) tab[i + 1]))
 			{
 				tab[i] = tab[i + 1] = null;
 				this.closeDeletion(i);
@@ -689,6 +755,22 @@ public class IdentityHashMap<K, V> implements MutableMap<K, V>
 	public ImmutableMap<K, V> immutable()
 	{
 		return new ArrayMap(this); // TODO immutable.IdentityHashMap
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		java.util.IdentityHashMap<K, V> map = new java.util.IdentityHashMap<>(this.size);
+		Object[] tab = this.table;
+		for (int i = 0; i < tab.length; i += 2)
+		{
+			Object key = tab[i];
+			if (key != null)
+			{
+				map.put((K) unmaskNull(key), (V) tab[i + 1]);
+			}
+		}
+		return map;
 	}
 	
 	@Override

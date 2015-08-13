@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -302,5 +303,11 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	public MutableMap<K, V> mutable()
 	{
 		return new dyvil.collection.mutable.HashMap<>(this);
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return Collections.unmodifiableMap(super.toJava());
 	}
 }

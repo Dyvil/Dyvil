@@ -176,6 +176,17 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	}
 	
 	@Override
+	public java.util.Set<E> toJava()
+	{
+		java.util.LinkedHashSet<E> set = new java.util.LinkedHashSet<>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			set.add((E) this.elements[i]);
+		}
+		return set;
+	}
+	
+	@Override
 	public String toString()
 	{
 		if (this.size == 0)

@@ -13,8 +13,8 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 {
 	protected static final class TreeEntry<K, V> implements dyvil.collection.Entry<K, V>
 	{
-		public K				key;
-		public V				value;
+		public K		key;
+		public V		value;
 		TreeEntry<K, V>	left	= null;
 		TreeEntry<K, V>	right	= null;
 		TreeEntry<K, V>	parent;
@@ -1144,6 +1144,17 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			level++;
 		}
 		return level;
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		java.util.TreeMap<K, V> map = new java.util.TreeMap<>(this.comparator);
+		for (TreeEntry<K, V> first = this.getFirstEntry(); first != null; first = successor(first))
+		{
+			map.put(first.key, first.value);
+		}
+		return map;
 	}
 	
 	@Override

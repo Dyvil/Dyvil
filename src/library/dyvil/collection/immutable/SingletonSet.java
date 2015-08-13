@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import java.lang.reflect.Array;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -202,6 +203,12 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	public MutableSet<E> mutable()
 	{
 		return MutableSet.apply(this.element);
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		return Collections.singleton(this.element);
 	}
 	
 	@Override

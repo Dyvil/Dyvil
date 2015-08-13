@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -294,5 +295,11 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 	public MutableList<E> mutable()
 	{
 		return new dyvil.collection.mutable.ArrayList(this.elements, this.size);
+	}
+	
+	@Override
+	public java.util.List<E> toJava()
+	{
+		return Collections.unmodifiableList(super.toJava());
 	}
 }

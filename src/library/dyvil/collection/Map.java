@@ -496,6 +496,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public ImmutableMap<K, V> view();
 	
+	/**
+	 * Returns the Java Collection Framework equivalent of this map. The
+	 * returned map is not a view of this one, but an exact copy. Immutable maps
+	 * should return a map that is locked for mutation, which is usually ensured
+	 * by wrapping the map with
+	 * {@link java.util.Collections#unmodifiableMap(java.util.Map)
+	 * Collections.unmodifiableMap}.
+	 * 
+	 * @return a java collection containing the elements of this collection
+	 */
+	public java.util.Map<K, V> toJava();
+	
 	// toString, equals and hashCode
 	
 	@Override

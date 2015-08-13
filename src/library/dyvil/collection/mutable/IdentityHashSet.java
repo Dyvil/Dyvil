@@ -1,7 +1,9 @@
 package dyvil.collection.mutable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -214,6 +216,18 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	}
 	
 	@Override
+	public void forEach(Consumer<? super E> action)
+	{
+		for (Object element : this.table)
+		{
+			if (element != null)
+			{
+				action.accept((E) unmaskNull(element));
+			}
+		}
+	}
+	
+	@Override
 	public boolean contains(Object element)
 	{
 		if (element == null)
@@ -392,6 +406,20 @@ public class IdentityHashSet<E> implements MutableSet<E>
 	public ImmutableSet<E> immutable()
 	{
 		return new ArraySet<E>(this); // TODO immutable.IdentityHashSet
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		java.util.IdentityHashMap<E, java.lang.Boolean> map = new java.util.IdentityHashMap<>(this.size);
+		for (Object element : this.table)
+		{
+			if (element != null)
+			{
+				map.put((E) element, true);
+			}
+		}
+		return Collections.newSetFromMap(map);
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.collection.view;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -175,4 +176,27 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 		return this.map.mutable();
 	}
 	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return this.map.isImmutable() ? this.map.toJava() : Collections.unmodifiableMap(this.map.toJava());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "view " + this.map.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.map.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.map.hashCode();
+	}
 }

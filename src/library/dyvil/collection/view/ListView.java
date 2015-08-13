@@ -1,5 +1,6 @@
 package dyvil.collection.view;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.BiFunction;
@@ -194,6 +195,12 @@ public class ListView<E> implements ImmutableList<E>
 	public MutableList<E> mutable()
 	{
 		return this.list.mutable();
+	}
+	
+	@Override
+	public java.util.List<E> toJava()
+	{
+		return this.list.isImmutable() ? this.list.toJava() : Collections.unmodifiableList(this.list.toJava());
 	}
 	
 	@Override

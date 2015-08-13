@@ -369,6 +369,17 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 	
 	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		java.util.HashMap<K, V> map = new java.util.HashMap<>(this.size);
+		for (Entry<K, V> entry : this)
+		{
+			map.put(entry.getKey(), entry.getValue());
+		}
+		return map;
+	}
+	
+	@Override
 	public String toString()
 	{
 		if (this.size == 0)

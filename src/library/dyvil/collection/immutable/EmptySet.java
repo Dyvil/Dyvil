@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -147,6 +148,12 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	public MutableSet<E> mutable()
 	{
 		return MutableSet.apply();
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		return Collections.EMPTY_SET;
 	}
 	
 	@Override

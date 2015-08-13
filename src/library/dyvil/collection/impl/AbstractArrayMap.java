@@ -351,6 +351,17 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	protected abstract void removeAt(int index);
 	
 	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		java.util.LinkedHashMap<K, V> map = new java.util.LinkedHashMap<>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			map.put((K) this.keys[i], (V) this.values[i]);
+		}
+		return map;
+	}
+	
+	@Override
 	public String toString()
 	{
 		if (this.size <= 0)

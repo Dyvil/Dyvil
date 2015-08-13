@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import java.lang.reflect.Array;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
@@ -258,6 +259,12 @@ public class SingletonList<E> implements ImmutableList<E>
 	public MutableList<E> mutable()
 	{
 		return MutableList.apply(this.element);
+	}
+	
+	@Override
+	public java.util.List<E> toJava()
+	{
+		return Collections.singletonList(this.element);
 	}
 	
 	@Override

@@ -323,6 +323,17 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 	
 	@Override
+	public java.util.List<E> toJava()
+	{
+		java.util.ArrayList<E> list = new java.util.ArrayList<E>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			list.add((E) this.elements[i]);
+		}
+		return list;
+	}
+	
+	@Override
 	public String toString()
 	{
 		if (this.size == 0)

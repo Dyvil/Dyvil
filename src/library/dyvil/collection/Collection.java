@@ -609,6 +609,18 @@ public interface Collection<E> extends Queryable<E>
 	 */
 	public ImmutableCollection<E> view();
 	
+	/**
+	 * Returns the Java Collection Framework equivalent of this collection. The
+	 * returned collection is not a view of this one, but an exact copy.
+	 * Immutable collections should return a collection that is locked for
+	 * mutation, which is usually ensured by wrapping the collection with
+	 * {@link java.util.Collections#unmodifiableCollection(java.util.Collection)
+	 * Collections.unmodifiableCollection} .
+	 * 
+	 * @return a java collection containing the elements of this collection
+	 */
+	public java.util.Collection<E> toJava();
+	
 	// toString, equals and hashCode
 	
 	@Override

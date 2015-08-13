@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -398,5 +399,11 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 	public MutableMap<K, V> mutable()
 	{
 		return new dyvil.collection.mutable.TupleMap(this.entries, this.size);
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return Collections.unmodifiableMap(super.toJava());
 	}
 }

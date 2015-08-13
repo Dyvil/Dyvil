@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -242,5 +243,11 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<
 	public MutableMap<K, V> mutable()
 	{
 		return new dyvil.collection.mutable.TreeMap(this, this.comparator);
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return Collections.unmodifiableMap(super.toJava());
 	}
 }

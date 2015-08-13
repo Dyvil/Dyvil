@@ -266,6 +266,21 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	}
 	
 	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		java.util.EnumMap<K, V> map = new java.util.EnumMap<>(this.type);
+		for (int i = 0; i < this.keys.length; i++)
+		{
+			V value = (V) this.values[i];
+			if (value != null)
+			{
+				map.put(this.keys[i], value);
+			}
+		}
+		return map;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return Map.mapToString(this);

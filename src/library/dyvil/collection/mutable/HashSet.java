@@ -386,6 +386,17 @@ public class HashSet<E> implements MutableSet<E>
 	}
 	
 	@Override
+	public java.util.Set<E> toJava()
+	{
+		java.util.HashSet<E> set = new java.util.HashSet<>(this.size);
+		for (E element : this)
+		{
+			set.add(element);
+		}
+		return set;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return Collection.collectionToString(this);

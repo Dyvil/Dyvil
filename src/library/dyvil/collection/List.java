@@ -393,6 +393,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	@Override
 	public ImmutableList<E> view();
 	
+	@Override
+	public java.util.List<E> toJava();
+	
 	// Utility Methods
 	
 	public static <E> boolean listEquals(List<E> list, Object o)

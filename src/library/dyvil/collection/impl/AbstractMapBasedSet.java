@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 import dyvil.collection.Entry;
@@ -35,6 +36,13 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 		{
 			store[index++] = e.getKey();
 		}
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		// TODO Ensure type safety
+		return Collections.newSetFromMap((java.util.Map) this.map().toJava());
 	}
 	
 	@Override

@@ -193,6 +193,9 @@ public interface Set<E> extends Collection<E>
 	@Override
 	public ImmutableSet<E> view();
 	
+	@Override
+	public java.util.Set<E> toJava();
+	
 	// Utility Methods
 	
 	public static <E> boolean setEquals(Set<E> set, Object o)

@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -240,5 +241,11 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 	public MutableSet<E> mutable()
 	{
 		return new dyvil.collection.mutable.ArraySet<E>((E[]) this.elements, this.size);
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		return Collections.unmodifiableSet(super.toJava());
 	}
 }

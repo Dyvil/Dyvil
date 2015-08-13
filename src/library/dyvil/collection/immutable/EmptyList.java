@@ -1,9 +1,6 @@
 package dyvil.collection.immutable;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -237,6 +234,12 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	public MutableList<E> mutable()
 	{
 		return MutableList.apply();
+	}
+	
+	@Override
+	public java.util.List<E> toJava()
+	{
+		return Collections.EMPTY_LIST;
 	}
 	
 	@Override

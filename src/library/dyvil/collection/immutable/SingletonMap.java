@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -220,6 +221,12 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public String toString()
 	{
 		return "[ " + this.key + " -> " + this.value + " ]";
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return Collections.singletonMap(this.key, this.value);
 	}
 	
 	@Override

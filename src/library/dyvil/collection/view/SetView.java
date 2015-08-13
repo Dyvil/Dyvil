@@ -1,5 +1,6 @@
 package dyvil.collection.view;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -108,5 +109,29 @@ public class SetView<E> implements ImmutableSet<E>
 	public MutableSet<E> mutable()
 	{
 		return this.set.mutable();
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		return this.set.isImmutable() ? this.set.toJava() : Collections.unmodifiableSet(this.set.toJava());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "view " + this.set.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.set.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.set.hashCode();
 	}
 }

@@ -679,12 +679,22 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	public LinkedList<E> copy()
 	{
 		LinkedList<E> copy = new LinkedList();
-		
 		for (Node<E> node = this.first; node != null; node = node.next)
 		{
-			copy.$plus$eq(node.item);
+			copy.addLast(node.item);
 		}
 		return copy;
+	}
+	
+	@Override
+	public java.util.List<E> toJava()
+	{
+		java.util.LinkedList<E> list = new java.util.LinkedList<>();
+		for (Node<E> node = this.first; node != null; node = node.next)
+		{
+			list.addLast(node.item);
+		}
+		return list;
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -180,6 +181,12 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public MutableMap<K, V> mutable()
 	{
 		return MutableMap.apply();
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return Collections.EMPTY_MAP;
 	}
 	
 	@Override
