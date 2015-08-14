@@ -3,64 +3,64 @@ package dyvil.tools.compiler.transform;
 public interface Keywords
 {
 	int	ABSTRACT		= Tokens.KEYWORD | 0x00010000;
-	int	ANNOTATION		= Tokens.KEYWORD | 0x00020000;
-	int	AS				= Tokens.KEYWORD | 0x00030000;
-	int	BREAK			= Tokens.KEYWORD | 0x00040000;
-	int	CASE			= Tokens.KEYWORD | 0x00050000;
-	int	CATCH			= Tokens.KEYWORD | 0x00060000;
-	int	CLASS			= Tokens.KEYWORD | 0x00070000;
-	int	CONST			= Tokens.KEYWORD | 0x00080000;
-	int	CONTINUE		= Tokens.KEYWORD | 0x00090000;
-	int	DO				= Tokens.KEYWORD | 0x000C0000;
-	int	ELSE			= Tokens.KEYWORD | 0x000D0000;
-	int	ENUM			= Tokens.KEYWORD | 0x000E0000;
-	int	EXTENDS			= Tokens.KEYWORD | 0x000F0000;
-	int	EXTENSION		= Tokens.KEYWORD | 0x003E0000;
-	int	FALSE			= Tokens.KEYWORD | 0x00100000;
-	int	FINAL			= Tokens.KEYWORD | 0x00110000;
-	int	FINALLY			= Tokens.KEYWORD | 0x00120000;
-	int	FOR				= Tokens.KEYWORD | 0x00130000;
-	int	FUNCTIONAL		= Tokens.KEYWORD | 0x00140000;
-	int	GOTO			= Tokens.KEYWORD | 0x00160000;
-	int	IF				= Tokens.KEYWORD | 0x00170000;
-	int	IMPLEMENTS		= Tokens.KEYWORD | 0x00180000;
-	int	IMPLICIT		= Tokens.KEYWORD | 0x003B0000;
-	int	IMPORT			= Tokens.KEYWORD | 0x00190000;
-	int	INCLUDE			= Tokens.KEYWORD | 0x001A0000;
-	int	INLINE			= Tokens.KEYWORD | 0x001B0000;
-	int	INFIX			= Tokens.KEYWORD | 0x001C0000;
-	int	INTERFACE		= Tokens.KEYWORD | 0x001D0000;
-	int	INTERNAL		= Tokens.KEYWORD | 0x003F0000;
+	int	AS				= Tokens.KEYWORD | 0x00020000;
+	int	BREAK			= Tokens.KEYWORD | 0x00030000;
+	int	CASE			= Tokens.KEYWORD | 0x00040000;
+	int	CATCH			= Tokens.KEYWORD | 0x00050000;
+	int	CLASS			= Tokens.KEYWORD | 0x00060000;
+	int	CONST			= Tokens.KEYWORD | 0x00070000;
+	int	CONTINUE		= Tokens.KEYWORD | 0x00080000;
+	int	DO				= Tokens.KEYWORD | 0x00090000;
+	int	ELSE			= Tokens.KEYWORD | 0x000A0000;
+	int	ENUM			= Tokens.KEYWORD | 0x000B0000;
+	int	EXTENDS			= Tokens.KEYWORD | 0x000C0000;
+	int	EXTENSION		= Tokens.KEYWORD | 0x000D0000;
+	int	FALSE			= Tokens.KEYWORD | 0x000E0000;
+	int	FINAL			= Tokens.KEYWORD | 0x000F0000;
+	int	FINALLY			= Tokens.KEYWORD | 0x00100000;
+	int	FOR				= Tokens.KEYWORD | 0x00110000;
+	int	FUNCTIONAL		= Tokens.KEYWORD | 0x00120000;
+	int	GOTO			= Tokens.KEYWORD | 0x00130000;
+	int	HEADER			= Tokens.KEYWORD | 0x00140000;
+	int	IF				= Tokens.KEYWORD | 0x00150000;
+	int	IMPLEMENTS		= Tokens.KEYWORD | 0x00160000;
+	int	IMPLICIT		= Tokens.KEYWORD | 0x00170000;
+	int	IMPORT			= Tokens.KEYWORD | 0x00180000;
+	int	INCLUDE			= Tokens.KEYWORD | 0x00190000;
+	int	INLINE			= Tokens.KEYWORD | 0x001A0000;
+	int	INFIX			= Tokens.KEYWORD | 0x001B0000;
+	int	INTERFACE		= Tokens.KEYWORD | 0x001C0000;
+	int	INTERNAL		= Tokens.KEYWORD | 0x001D0000;
 	int	IS				= Tokens.KEYWORD | 0x001E0000;
 	int	LAZY			= Tokens.KEYWORD | 0x001F0000;
-	int	MACRO			= Tokens.KEYWORD | 0x003A0000;
-	int	MATCH			= Tokens.KEYWORD | 0x003C0000;
-	int	NEW				= Tokens.KEYWORD | 0x00200000;
-	int	NIL				= Tokens.KEYWORD | 0x00210000;
-	int	NULL			= Tokens.KEYWORD | 0x00220000;
-	int	OBJECT			= Tokens.KEYWORD | 0x00230000;
-	int	OVERRIDE		= Tokens.KEYWORD | 0x00240000;
-	int	OPERATOR		= Tokens.KEYWORD | 0x00250000;
-	int	PACKAGE			= Tokens.KEYWORD | 0x00260000;
-	int	POSTFIX			= Tokens.KEYWORD | 0x00270000;
-	int	PREFIX			= Tokens.KEYWORD | 0x00390000;
-	int	PRIVATE			= Tokens.KEYWORD | 0x00280000;
-	int	PROTECTED		= Tokens.KEYWORD | 0x00290000;
-	int	PUBLIC			= Tokens.KEYWORD | 0x002A0000;
-	int	RETURN			= Tokens.KEYWORD | 0x002B0000;
-	int	SEALED			= Tokens.KEYWORD | 0x002C0000;
-	int	STATIC			= Tokens.KEYWORD | 0x002D0000;
-	int	SUPER			= Tokens.KEYWORD | 0x002E0000;
-	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x002F0000;
-	int	THIS			= Tokens.KEYWORD | 0x00300000;
-	int	THROW			= Tokens.KEYWORD | 0x00310000;
-	int	THROWS			= Tokens.KEYWORD | 0x00320000;
-	int	TRUE			= Tokens.KEYWORD | 0x00330000;
-	int	TRY				= Tokens.KEYWORD | 0x00340000;
-	int	TYPE			= Tokens.KEYWORD | 0x00350000;
-	int	USING			= Tokens.KEYWORD | 0x00360000;
-	int	VAR				= Tokens.KEYWORD | 0x00370000;
-	int	WHILE			= Tokens.KEYWORD | 0x00380000;
+	int	MACRO			= Tokens.KEYWORD | 0x00200000;
+	int	MATCH			= Tokens.KEYWORD | 0x00210000;
+	int	NEW				= Tokens.KEYWORD | 0x00220000;
+	int	NIL				= Tokens.KEYWORD | 0x00230000;
+	int	NULL			= Tokens.KEYWORD | 0x00240000;
+	int	OBJECT			= Tokens.KEYWORD | 0x00250000;
+	int	OVERRIDE		= Tokens.KEYWORD | 0x00260000;
+	int	OPERATOR		= Tokens.KEYWORD | 0x00270000;
+	int	PACKAGE			= Tokens.KEYWORD | 0x00280000;
+	int	POSTFIX			= Tokens.KEYWORD | 0x00290000;
+	int	PREFIX			= Tokens.KEYWORD | 0x002A0000;
+	int	PRIVATE			= Tokens.KEYWORD | 0x002B0000;
+	int	PROTECTED		= Tokens.KEYWORD | 0x002C0000;
+	int	PUBLIC			= Tokens.KEYWORD | 0x002D0000;
+	int	RETURN			= Tokens.KEYWORD | 0x002E0000;
+	int	SEALED			= Tokens.KEYWORD | 0x002F0000;
+	int	STATIC			= Tokens.KEYWORD | 0x00300000;
+	int	SUPER			= Tokens.KEYWORD | 0x00310000;
+	int	SYNCHRONIZED	= Tokens.KEYWORD | 0x00320000;
+	int	THIS			= Tokens.KEYWORD | 0x00330000;
+	int	THROW			= Tokens.KEYWORD | 0x00340000;
+	int	THROWS			= Tokens.KEYWORD | 0x00350000;
+	int	TRUE			= Tokens.KEYWORD | 0x00360000;
+	int	TRY				= Tokens.KEYWORD | 0x00370000;
+	int	TYPE			= Tokens.KEYWORD | 0x00380000;
+	int	USING			= Tokens.KEYWORD | 0x00390000;
+	int	VAR				= Tokens.KEYWORD | 0x003A0000;
+	int	WHILE			= Tokens.KEYWORD | 0x003B0000;
 	
 	public static int getKeywordType(String s)
 	{
@@ -68,8 +68,6 @@ public interface Keywords
 		{
 		case "abstract":
 			return ABSTRACT;
-		case "annotation":
-			return ANNOTATION;
 		case "as":
 			return AS;
 		case "break":
@@ -106,6 +104,8 @@ public interface Keywords
 			return FUNCTIONAL;
 		case "goto":
 			return GOTO;
+		case "header":
+			return HEADER;
 		case "if":
 			return IF;
 		case "implements":
@@ -194,8 +194,6 @@ public interface Keywords
 		{
 		case ABSTRACT:
 			return "abstract";
-		case ANNOTATION:
-			return "annotation";
 		case AS:
 			return "as";
 		case BREAK:
@@ -232,6 +230,8 @@ public interface Keywords
 			return "functional";
 		case GOTO:
 			return "goto";
+		case HEADER:
+			return "header";
 		case IF:
 			return "if";
 		case IMPLEMENTS:

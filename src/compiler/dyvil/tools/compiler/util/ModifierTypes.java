@@ -145,7 +145,7 @@ public enum ModifierTypes
 		}
 		else if ((mod & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
-			sb.append("annotation ");
+			sb.append("@interface ");
 		}
 		else if ((mod & Modifiers.ENUM) == Modifiers.ENUM)
 		{
@@ -308,8 +308,6 @@ public enum ModifierTypes
 			return 0;
 		case Keywords.INTERFACE:
 			return Modifiers.INTERFACE_CLASS;
-		case Keywords.ANNOTATION:
-			return Modifiers.ANNOTATION;
 		case Keywords.ENUM:
 			return Modifiers.ENUM;
 		case Keywords.OBJECT:

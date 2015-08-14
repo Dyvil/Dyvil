@@ -78,22 +78,6 @@ public final class ImportParser extends Parser
 				this.mode = 0;
 				return;
 			}
-			case Keywords.ANNOTATION:
-			{
-				SimpleImport si = new SimpleImport(token.raw(), annotation);
-				si.setParent(this.theImport);
-				this.theImport = si;
-				this.mode = DOT_ALIAS;
-				return;
-			}
-			case Keywords.TYPE:
-			{
-				SimpleImport si = new SimpleImport(token.raw(), ImportParser.type);
-				si.setParent(this.theImport);
-				this.theImport = si;
-				this.mode = DOT_ALIAS;
-				return;
-			}
 			case Tokens.IDENTIFIER:
 			case Tokens.SYMBOL_IDENTIFIER:
 			case Tokens.LETTER_IDENTIFIER:

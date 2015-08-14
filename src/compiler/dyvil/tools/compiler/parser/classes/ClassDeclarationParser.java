@@ -87,6 +87,13 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			if (type == Symbols.AT)
 			{
+				if (token.next().type() == Keywords.INTERFACE)
+				{
+					this.modifiers |= Modifiers.ANNOTATION;
+					pm.skip();
+					return;
+				}
+				
 				Annotation annotation = new Annotation(token.raw());
 				this.addAnnotation(annotation);
 				pm.pushParser(pm.newAnnotationParser(annotation));
