@@ -930,7 +930,7 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public IVariable capture(IVariable variable)
+	public IDataMember capture(IVariable variable)
 	{
 		return null;
 	}

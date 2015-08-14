@@ -335,7 +335,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	}
 	
 	@Override
-	public IVariable capture(IVariable variable)
+	public IDataMember capture(IVariable variable)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{

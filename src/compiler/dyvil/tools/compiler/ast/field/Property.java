@@ -567,7 +567,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public IVariable capture(IVariable variable)
+	public IDataMember capture(IVariable variable)
 	{
 		return null;
 	}

@@ -551,6 +551,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	{
 		IClass iclass = cc.getNestedClass();
 		IClassBody body = iclass.getBody();
+		pm.skip();
 		pm.pushParser(new ClassBodyParser(iclass, body));
 		this.mode = LIST_END;
 		this.value = cc;

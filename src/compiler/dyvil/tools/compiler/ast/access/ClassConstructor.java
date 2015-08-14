@@ -3,12 +3,11 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.AnonymousClassMetadata;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.classes.NestedClass;
+import dyvil.tools.compiler.ast.classes.AnonymousClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -18,13 +17,13 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
-	private NestedClass				nestedClass;
+	private AnonymousClass				nestedClass;
 	private AnonymousClassMetadata	metadata;
 	
 	public ClassConstructor(ICodePosition position)
 	{
 		this.position = position;
-		this.nestedClass = new NestedClass(position);
+		this.nestedClass = new AnonymousClass(position);
 	}
 	
 	public ClassConstructor(ICodePosition position, IType type, IArguments arguments)
@@ -32,7 +31,7 @@ public class ClassConstructor extends ConstructorCall
 		super(position, type, arguments);
 	}
 	
-	public NestedClass getNestedClass()
+	public AnonymousClass getNestedClass()
 	{
 		return this.nestedClass;
 	}
@@ -64,6 +63,8 @@ public class ClassConstructor extends ConstructorCall
 		
 		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);
 		this.nestedClass.setMetadata(this.metadata);
+		this.nestedClass.setOuterClass(context.getThisClass());
+		this.nestedClass.setHeader(context.getHeader());
 		
 		this.nestedClass.context = context;
 		this.nestedClass.resolve(markers, context);
@@ -104,11 +105,9 @@ public class ClassConstructor extends ConstructorCall
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.arguments.cleanup(context, compilableList);
-		this.nestedClass.cleanup(context, compilableList);
 		
-		IDyvilHeader header = context.getHeader();
-		this.nestedClass.setHeader(header);
-		header.addInnerClass(this.nestedClass);
+		this.nestedClass.getHeader().addInnerClass(this.nestedClass);
+		this.nestedClass.cleanup(context, compilableList);
 		
 		return this;
 	}

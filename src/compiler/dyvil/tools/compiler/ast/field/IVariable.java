@@ -43,7 +43,7 @@ public interface IVariable extends IDataMember
 	@Override
 	public default IDataMember capture(IContext context)
 	{
-		IVariable capture = context.capture(this);
+		IDataMember capture = context.capture(this);
 		return capture == null ? this : capture;
 	}
 	

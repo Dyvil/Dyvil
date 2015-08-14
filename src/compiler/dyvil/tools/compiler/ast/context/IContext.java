@@ -49,7 +49,7 @@ public interface IContext
 	
 	public boolean handleException(IType type);
 	
-	public IVariable capture(IVariable variable);
+	public IDataMember capture(IVariable variable);
 	
 	public IAccessible getAccessibleThis(IClass type);
 	

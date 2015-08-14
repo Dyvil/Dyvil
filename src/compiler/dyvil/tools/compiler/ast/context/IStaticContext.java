@@ -66,7 +66,7 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	public default IVariable capture(IVariable variable)
+	public default IDataMember capture(IVariable variable)
 	{
 		return variable;
 	}
