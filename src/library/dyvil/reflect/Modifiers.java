@@ -208,8 +208,8 @@ public interface Modifiers
 	// Member Modifiers
 	
 	/**
-	 * <i>Dyvil</i> {@code internal} modifier. This is used to mark that a class,
-	 * method or field is only visible from inside the current library /
+	 * <i>Dyvil</i> {@code internal} modifier. This is used to mark that a
+	 * class, method or field is only visible from inside the current library /
 	 * project. This modifier will be converted to the {@link internal}
 	 * annotation.
 	 */
@@ -220,6 +220,14 @@ public interface Modifiers
 	 * the {@link Deprecated} annotation.
 	 */
 	public static final int DEPRECATED = 0x00200000;
+	
+	/**
+	 * <i>Dyvil</i> {@code sealed} modifier. This modifier is used to mark that
+	 * a class is {@code sealed}, i.e. it can only be extended from classes in
+	 * the same library. This modifier will be converted to the {@link sealed}
+	 * annotation.
+	 */
+	public static final int SEALED = 0x00400000;
 	
 	/**
 	 * The modifiers that can be used to declare the class type (i.e.,
@@ -236,12 +244,12 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on any member.
 	 */
-	public static final int MEMBER_MODIFIERS = ACCESS_MODIFIERS | DEPRECATED | STATIC | FINAL | SYNTHETIC;
+	public static final int MEMBER_MODIFIERS = ACCESS_MODIFIERS | STATIC | FINAL | SYNTHETIC;
 	
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	public static final int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL;
+	public static final int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED;
 	
 	/**
 	 * The modifiers that can be used on fields.
@@ -251,11 +259,11 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on methods.
 	 */
-	public static final int METHOD_MODIFIERS = MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | PREFIX | DEPRECATED | BRIDGE | VARARGS
-			| MANDATED;
+	public static final int METHOD_MODIFIERS = MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | PREFIX | BRIDGE | VARARGS
+			| SEALED;
 			
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	public static final int PARAMETER_MODIFIERS = FINAL | LAZY | VAR;
+	public static final int PARAMETER_MODIFIERS = FINAL | LAZY | VAR | MANDATED;
 }

@@ -175,6 +175,10 @@ public enum ModifierTypes
 		{
 			sb.append("final ");
 		}
+		if ((mod & Modifiers.SEALED) == Modifiers.SEALED)
+		{
+			sb.append("sealed ");
+		}
 		if ((mod & Modifiers.STRICT) == Modifiers.STRICT)
 		{
 			sb.append("@Strict ");
@@ -234,6 +238,10 @@ public enum ModifierTypes
 		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
 		{
 			sb.append("final ");
+		}
+		if ((mod & Modifiers.SEALED) == Modifiers.SEALED)
+		{
+			sb.append("sealed ");
 		}
 		if ((mod & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{

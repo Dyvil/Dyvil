@@ -266,6 +266,9 @@ public class Method extends Member implements IMethod, ILabelContext
 		case "dyvil/annotation/internal":
 			this.modifiers |= Modifiers.INTERNAL;
 			return false;
+		case "dyvil/annotation/sealed":
+			this.modifiers |= Modifiers.SEALED;
+			return false;
 		case "dyvil/annotation/Native":
 			this.modifiers |= Modifiers.NATIVE;
 			return false;

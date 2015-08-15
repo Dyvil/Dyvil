@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -217,13 +218,20 @@ public class CodeClass extends AbstractClass
 				{
 					markers.add(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
 				}
-				else if ((modifiers & Modifiers.FINAL) != 0)
+				else
 				{
-					markers.add(this.position, "class.extend.final", superClass.getName());
-				}
-				else if ((modifiers & Modifiers.DEPRECATED) != 0)
-				{
-					markers.add(this.position, "class.extend.deprecated", superClass.getName());
+					if ((modifiers & Modifiers.FINAL) != 0)
+					{
+						markers.add(this.position, "class.extend.final", superClass.getName());
+					}
+					else if ((modifiers & Modifiers.SEALED) != 0 && superClass instanceof ExternalClass)
+					{
+						markers.add(this.position, "class.extend.sealed", superClass.getName());
+					}
+					if ((modifiers & Modifiers.DEPRECATED) != 0)
+					{
+						markers.add(this.position, "class.extend.deprecated", superClass.getName());
+					}
 				}
 			}
 		}
@@ -237,17 +245,24 @@ public class CodeClass extends AbstractClass
 		{
 			IType type = this.interfaces[i];
 			IClass iclass = type.getTheClass();
-			if (iclass != null)
+			if (iclass == null)
 			{
-				int modifiers = iclass.getModifiers();
-				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
-				{
-					markers.add(type.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
-				}
-				else if ((modifiers & Modifiers.DEPRECATED) != 0)
-				{
-					markers.add(type.getPosition(), "class.implement.deprecated", iclass.getName());
-				}
+				continue;
+			}
+			
+			int modifiers = iclass.getModifiers();
+			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+			{
+				markers.add(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
+				continue;
+			}
+			if ((modifiers & Modifiers.SEALED) != 0 && iclass instanceof ExternalClass)
+			{
+				markers.add(this.position, "class.implement.sealed", iclass.getName());
+			}
+			if ((modifiers & Modifiers.DEPRECATED) != 0)
+			{
+				markers.add(this.position, "class.implement.deprecated", iclass.getName());
 			}
 		}
 		

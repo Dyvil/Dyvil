@@ -1,15 +1,18 @@
 package dyvil.util;
 
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.literal.TupleConvertible;
+
+import dyvil.annotation.sealed;
+
 @NilConvertible
 @TupleConvertible
-public abstract interface Option<T>
+public abstract @sealed interface Option<T>
 {
 	public static <T> Option<T> of(T t)
 	{
