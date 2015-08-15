@@ -29,7 +29,7 @@ public class AnonymousClass extends CodeClass
 	@Override
 	public void setInnerIndex(String internalName, int index)
 	{
-		String outerName = this.outerClass.getFileName();
+		String outerName = this.outerClass.getName().qualified;
 		String indexString = Integer.toString(index);
 		
 		this.name = Name.getQualified(outerName + '$' + indexString);

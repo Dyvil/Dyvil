@@ -320,11 +320,13 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 		mw.begin();
 		mw.setThisType(this.internalClassName);
 		mw.setLocalType(1, parFrameType);
+		
 		this.pattern.writeInvJump(mw, 1, elseLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeInvJump(mw, elseLabel);
 		}
+		
 		mw.writeLDC(1);
 		mw.writeInsn(Opcodes.IRETURN);
 		mw.writeLabel(elseLabel);
@@ -347,10 +349,13 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 		mw.begin();
 		mw.setThisType(this.internalClassName);
 		mw.setLocalType(1, parFrameType);
-		mw.writeVarInsn(Opcodes.ALOAD, 0);
-		mw.writeVarInsn(Opcodes.ALOAD, 1);
-		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.internalClassName, "isDefined", definedDesc, false);
-		mw.writeJumpInsn(Opcodes.IFNE, elseLabel);
+		
+		this.pattern.writeInvJump(mw, 1, elseLabel);
+		if (this.condition != null)
+		{
+			this.condition.writeInvJump(mw, elseLabel);
+		}
+		
 		mw.writeInsn(Opcodes.ACONST_NULL);
 		mw.writeInsn(Opcodes.ARETURN);
 		mw.writeLabel(elseLabel);

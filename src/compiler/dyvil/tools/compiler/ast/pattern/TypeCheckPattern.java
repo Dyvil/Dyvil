@@ -96,7 +96,7 @@ public class TypeCheckPattern implements IPattern
 			
 			if (this.type.isPrimitive())
 			{
-				markers.add(this.type.getPosition(), "pattern.typecheck.primitive");
+				markers.add(this.position, "pattern.typecheck.primitive");
 			}
 		}
 		else

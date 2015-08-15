@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -22,7 +23,6 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
-import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -208,16 +208,16 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = PATTERN_END;
 			if (type == Keywords.IF)
 			{
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(v -> ((ICase) this.value).setCondition(v)));
 				return;
 			}
 		case PATTERN_END:
-			if (type == Symbols.COLON)
+			if (type == Symbols.COLON || type == Symbols.ARROW_OPERATOR)
 			{
 				this.mode = END;
 				if (token.next().type() != Keywords.CASE)
 				{
-					pm.pushParser(pm.newExpressionParser((IValued) this.value));
+					pm.pushParser(pm.newExpressionParser(v -> ((ICase) this.value).setAction(v)));
 				}
 				return;
 			}
@@ -943,14 +943,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = END;
 			return true;
 		}
-		case Keywords.CASE:
+		/* case Keywords.CASE:
 		{
 			CaseExpression pattern = new CaseExpression(token.raw());
 			pm.pushParser(new PatternParser(pattern));
 			this.mode = PATTERN_IF;
 			this.value = pattern;
 			return true;
-		}
+		} */
 		case Keywords.TRY:
 		{
 			TryStatement statement = new TryStatement(token.raw());
@@ -997,9 +997,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.value = statement;
 			return true;
 		}
-		default:
-			return false;
 		}
+		return false;
 	}
 	
 	@Override
@@ -1018,14 +1017,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	@Override
 	public void setValue(IValue value)
 	{
-		switch (this.mode)
-		{
-		case PATTERN_END:
-			((CaseExpression) this.value).setCondition(value);
-			return;
-		default:
-			this.value = value;
-			return;
-		}
+		this.value = value;
 	}
 }
