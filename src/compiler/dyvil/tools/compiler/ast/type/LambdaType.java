@@ -348,8 +348,8 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/FunctionType", "apply",
-				"(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/type/FunctionType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/FunctionType", "apply",
+				"(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/types/FunctionType;", false);
 	}
 	
 	@Override

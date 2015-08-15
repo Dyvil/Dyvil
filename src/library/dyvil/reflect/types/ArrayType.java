@@ -1,4 +1,4 @@
-package dyvil.reflect.type;
+package dyvil.reflect.types;
 
 import dyvil.lang.Type;
 import dyvil.lang.literal.TypeConvertible;

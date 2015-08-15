@@ -4,10 +4,10 @@ import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.StringConvertible;
 
-import dyvil.reflect.type.GenericType;
-import dyvil.reflect.type.NamedType;
-import dyvil.reflect.type.PrimitiveType;
-import dyvil.reflect.type.UnknownType;
+import dyvil.reflect.types.GenericType;
+import dyvil.reflect.types.NamedType;
+import dyvil.reflect.types.PrimitiveType;
+import dyvil.reflect.types.UnknownType;
 
 @NilConvertible
 @StringConvertible

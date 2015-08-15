@@ -204,7 +204,7 @@ public class TypeVarType implements IType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typeVar.getName().qualified);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;",
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/types/TypeArgument;",
 				false);
 	}
 	

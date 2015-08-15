@@ -458,35 +458,35 @@ public final class PrimitiveType implements IType
 		switch (this.typecode)
 		{
 		case ClassFormat.T_BOOLEAN:
-			i = dyvil.reflect.type.PrimitiveType.BOOLEAN;
+			i = dyvil.reflect.types.PrimitiveType.BOOLEAN;
 			break;
 		case ClassFormat.T_BYTE:
-			i = dyvil.reflect.type.PrimitiveType.BYTE;
+			i = dyvil.reflect.types.PrimitiveType.BYTE;
 			break;
 		case ClassFormat.T_SHORT:
-			i = dyvil.reflect.type.PrimitiveType.SHORT;
+			i = dyvil.reflect.types.PrimitiveType.SHORT;
 			break;
 		case ClassFormat.T_CHAR:
-			i = dyvil.reflect.type.PrimitiveType.CHAR;
+			i = dyvil.reflect.types.PrimitiveType.CHAR;
 			break;
 		case ClassFormat.T_INT:
-			i = dyvil.reflect.type.PrimitiveType.INT;
+			i = dyvil.reflect.types.PrimitiveType.INT;
 			break;
 		case ClassFormat.T_LONG:
-			i = dyvil.reflect.type.PrimitiveType.LONG;
+			i = dyvil.reflect.types.PrimitiveType.LONG;
 			break;
 		case ClassFormat.T_FLOAT:
-			i = dyvil.reflect.type.PrimitiveType.FLOAT;
+			i = dyvil.reflect.types.PrimitiveType.FLOAT;
 			break;
 		case ClassFormat.T_DOUBLE:
-			i = dyvil.reflect.type.PrimitiveType.DOUBLE;
+			i = dyvil.reflect.types.PrimitiveType.DOUBLE;
 			break;
 		default:
 			i = 0;
 		}
 		
 		writer.writeLDC(i);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/PrimitiveType", "apply", "(I)Ldyvil/reflect/type/PrimitiveType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/PrimitiveType", "apply", "(I)Ldyvil/reflect/types/PrimitiveType;", false);
 	}
 	
 	@Override

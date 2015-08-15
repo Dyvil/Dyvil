@@ -1,23 +1,21 @@
-package dyvil.reflect.type;
+package dyvil.reflect.types;
 
 import dyvil.lang.Type;
 import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
-public class FunctionType implements Type
+public class TupleType implements Type
 {
 	protected Type[]	types;
-	protected Type		returnType;
 	protected Class		theClass;
 	
-	public static FunctionType apply(Type returnType, Type... types)
+	public static TupleType apply(Type... types)
 	{
-		return new FunctionType(returnType, types);
+		return new TupleType(types);
 	}
 	
-	public FunctionType(Type returnType, Type... types)
+	public TupleType(Type... types)
 	{
-		this.returnType = returnType;
 		this.types = types;
 	}
 	
@@ -41,13 +39,13 @@ public class FunctionType implements Type
 	@Override
 	public String getName()
 	{
-		return "Function" + this.types.length;
+		return "Tuple" + this.types.length;
 	}
 	
 	@Override
 	public String getQualifiedName()
 	{
-		return "dyvil/function/Function" + this.types.length;
+		return "dyvil/tuple/Tuple" + this.types.length;
 	}
 	
 	@Override
@@ -72,8 +70,7 @@ public class FunctionType implements Type
 				this.types[i].toString(builder);
 			}
 		}
-		builder.append(") => ");
-		this.returnType.toString(builder);
+		builder.append(')');
 	}
 	
 	@Override
@@ -96,7 +93,6 @@ public class FunctionType implements Type
 				this.types[i].appendGenericSignature(builder);
 			}
 		}
-		this.returnType.appendGenericSignature(builder);
 		builder.append('>').append(';');
 	}
 }

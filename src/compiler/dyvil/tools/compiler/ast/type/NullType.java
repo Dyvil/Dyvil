@@ -100,7 +100,7 @@ public class NullType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/NullType", "instance", "Ldyvil/reflect/type/NullType;");
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/NullType", "instance", "Ldyvil/reflect/types/NullType;");
 	}
 	
 	@Override

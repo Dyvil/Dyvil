@@ -267,7 +267,7 @@ public class ArrayType implements IType, ITyped
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/type/ArrayType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ArrayType;", false);
 	}
 	
 	@Override

@@ -150,7 +150,7 @@ public class UnknownType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/UnknownType", "instance", "Ldyvil/reflect/types/UnknownType;", false);
 	}
 	
 	@Override

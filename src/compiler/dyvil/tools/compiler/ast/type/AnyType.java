@@ -107,7 +107,7 @@ public class AnyType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/AnyType", "instance", "Ldyvil/reflect/type/AnyType;");
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/AnyType", "instance", "Ldyvil/reflect/types/AnyType;");
 	}
 	
 	@Override

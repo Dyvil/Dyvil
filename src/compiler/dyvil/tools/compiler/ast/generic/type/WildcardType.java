@@ -308,8 +308,8 @@ public final class WildcardType implements IType, ITyped
 			writer.writeInsn(Opcodes.ACONST_NULL);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/WildcardType", "apply",
-				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/type/WildcardType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/WildcardType", "apply",
+				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/types/WildcardType;", false);
 	}
 	
 	@Override
