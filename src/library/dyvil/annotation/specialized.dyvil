@@ -1,6 +1,6 @@
 package dyvil.annotation
 
-public annotation specialized([Class] values = COMMONS)
+public @interface specialized([Class] values = COMMONS)
 {
 	public static final [Class] COMMONS = [ class int, class long, class float, class double ];
 }

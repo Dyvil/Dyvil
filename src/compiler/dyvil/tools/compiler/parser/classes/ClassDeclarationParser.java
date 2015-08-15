@@ -90,6 +90,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				if (token.next().type() == Keywords.INTERFACE)
 				{
 					this.modifiers |= Modifiers.ANNOTATION;
+					this.mode = NAME;
 					pm.skip();
 					return;
 				}
