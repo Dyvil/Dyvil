@@ -149,6 +149,9 @@ public abstract class AbstractClass implements IClass
 		case "dyvil/annotation/internal":
 			this.modifiers |= Modifiers.INTERNAL;
 			return false;
+		case "dyvil/annotation/sealed":
+			this.modifiers |= Modifiers.SEALED;
+			return false;
 		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;

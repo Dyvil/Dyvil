@@ -5,7 +5,6 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -46,8 +45,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	private static Map<Name, IClass>	classes	= new IdentityHashMap();
 	
 	protected static List<IClassCompilable>	compilableList	= new ArrayList();
-	private static List<IClassCompilable>	innerClassList	= new ArrayList();
-	private static IClass					memberClass;
+	protected static List<IClassCompilable>	innerClassList	= new ArrayList();
+	
+	private static IClass memberClass;
 	
 	public REPLContext()
 	{
@@ -56,11 +56,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	protected static void reset()
 	{
-		className = "REPL" + classIndex++;
+		className = "repl$/REPL" + classIndex++;
 		markers.clear();
 	}
 	
-	private static boolean reportErrors(MarkerList markers)
+	protected static boolean reportErrors(MarkerList markers)
 	{
 		if (!markers.isEmpty())
 		{
@@ -90,7 +90,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			{
 				String fileName = icc.getFileName();
 				byte[] bytes = ClassWriter.compile(icc);
-				ReflectUtils.unsafe.defineClass(fileName, bytes, 0, bytes.length, null, null);
+				REPLMemberClass.loadClass(fileName, bytes);
 			}
 			catch (Throwable t)
 			{
@@ -146,6 +146,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		compilableList.clear();
 		innerClassList.clear();
+		markers.clear();
 	}
 	
 	@Override

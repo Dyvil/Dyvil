@@ -309,6 +309,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = ACCESS;
 			if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 			{
+				pm.skip();
 				this.createBody(((ConstructorCall) this.value).toClassConstructor(), pm);
 				return;
 			}
@@ -551,7 +552,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	{
 		IClass iclass = cc.getNestedClass();
 		IClassBody body = iclass.getBody();
-		pm.skip();
 		pm.pushParser(new ClassBodyParser(iclass, body));
 		this.mode = LIST_END;
 		this.value = cc;

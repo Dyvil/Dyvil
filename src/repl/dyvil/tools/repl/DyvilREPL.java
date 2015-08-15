@@ -89,13 +89,17 @@ public class DyvilREPL
 			}
 			
 			parser.parse(REPLContext.markers, tokens, new ExpressionParser(context));
+			if (!REPLContext.markers.isEmpty())
+			{
+				REPLContext.reportErrors(REPLContext.markers);
+			}
 		}
 		catch (Throwable t)
 		{
 			t.printStackTrace();
 		}
 	}
-
+	
 	private static void runCommand(String line)
 	{
 		int index = line.indexOf(' ', 1);
@@ -107,7 +111,7 @@ public class DyvilREPL
 		
 		runCommand(line.substring(1, index), line.substring(index + 1).split(" "));
 	}
-
+	
 	private static void runCommand(String name, String... arguments)
 	{
 		ICommand command = commands.get(name);
@@ -119,7 +123,7 @@ public class DyvilREPL
 		
 		command.execute(arguments);
 	}
-
+	
 	public static void registerCommand(ICommand command)
 	{
 		commands.put(command.getName(), command);
