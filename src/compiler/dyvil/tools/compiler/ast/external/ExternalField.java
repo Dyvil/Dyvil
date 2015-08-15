@@ -24,9 +24,8 @@ public final class ExternalField extends Field
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].resolveTypes(null, Package.rootPackage);
+		if (this.annotations != null) {
+			this.annotations.resolveTypes(null, Package.rootPackage, this);
 		}
 	}
 	
@@ -47,21 +46,6 @@ public final class ExternalField extends Field
 	}
 	
 	@Override
-	public IAnnotation getAnnotation(int index)
-	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		
-		if (!this.annotationsResolved)
-		{
-			this.resolveAnnotations();
-		}
-		return this.annotations[index];
-	}
-	
-	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
@@ -73,7 +57,7 @@ public final class ExternalField extends Field
 		{
 			this.resolveAnnotations();
 		}
-		return super.getAnnotation(type);
+		return this.annotations.getAnnotation(type);
 	}
 	
 	@Override

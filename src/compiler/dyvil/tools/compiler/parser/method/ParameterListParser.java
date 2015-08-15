@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
@@ -27,8 +27,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	protected IParameterList paramList;
 	
 	private int				modifiers;
-	private IAnnotation[]	annotations	= new IAnnotation[2];
-	private int				annotationCount;
+	private AnnotationList	annotations;
 	
 	private IType		type;
 	private IParameter	parameter;
@@ -44,14 +43,14 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	{
 		this.mode = TYPE;
 		this.modifiers = 0;
-		this.annotationCount = 0;
+		this.annotations = null;
 		this.type = null;
 		this.parameter = null;
 		this.varargs = false;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (this.mode)
@@ -69,8 +68,13 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 			if (type == Symbols.AT)
 			{
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+				
 				Annotation annotation = new Annotation(token.raw());
-				this.addAnnotation(annotation);
+				this.annotations.addAnnotation(annotation);
 				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
@@ -101,7 +105,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 						: new MethodParameter(token.nameValue(), this.type);
 				this.parameter.setPosition(token.raw());
 				this.parameter.setModifiers(this.modifiers);
-				this.parameter.setAnnotations(this.getAnnotations(), this.annotationCount);
+				this.parameter.setAnnotations(this.annotations);
+				this.annotations = null;
 				this.parameter.setVarargs(this.varargs);
 				this.paramList.addParameter(this.parameter);
 				
@@ -136,29 +141,5 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-	
-	public int annotationCount()
-	{
-		return this.annotationCount;
-	}
-	
-	public IAnnotation[] getAnnotations()
-	{
-		IAnnotation[] a = new IAnnotation[this.annotationCount];
-		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
-		return a;
-	}
-	
-	public void addAnnotation(IAnnotation annotation)
-	{
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
-		{
-			IAnnotation[] temp = new IAnnotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
-			this.annotations = temp;
-		}
-		this.annotations[index] = annotation;
 	}
 }

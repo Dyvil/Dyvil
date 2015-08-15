@@ -25,7 +25,7 @@ public class AnnotationClassVisitor implements MethodVisitor
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		String internal = ClassFormat.extendedToInternal(type);
-		if (this.parameter.addRawAnnotation(internal))
+		if (this.parameter.addRawAnnotation(internal, null))
 		{
 			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.parameter, annotation);

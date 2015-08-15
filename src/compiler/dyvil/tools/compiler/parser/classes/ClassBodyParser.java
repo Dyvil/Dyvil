@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
@@ -45,8 +45,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	
 	private IType			type;
 	private int				modifiers;
-	private IAnnotation[]	annotations	= new IAnnotation[2];
-	private int				annotationCount;
+	private AnnotationList annotations;
 	
 	private IMember member;
 	
@@ -67,7 +66,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	{
 		this.mode = TYPE;
 		this.modifiers = 0;
-		this.annotationCount = 0;
+		this.annotations = null;
 		this.type = null;
 		this.member = null;
 	}
@@ -106,7 +105,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				}
 				
 				Constructor c = new Constructor(token.raw(), this.theClass, this.modifiers);
-				c.setAnnotations(this.annotations, this.annotationCount);
+				c.setAnnotations(this.annotations);
 				this.member = c;
 				
 				this.mode = PARAMETERS;
@@ -139,7 +138,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				
 				CodeClass codeClass = new CodeClass(next.raw(), this.theClass.getHeader(), this.modifiers | i);
 				codeClass.setName(name);
-				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
+				codeClass.setAnnotations(this.annotations);
 				codeClass.setOuterClass(this.theClass);
 				
 				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass.getBody(), codeClass);
@@ -150,8 +149,12 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			if (type == Symbols.AT)
 			{
+				if (this.annotations == null) {
+					this.annotations = new AnnotationList();
+				}
+				
 				Annotation annotation = new Annotation(token.raw());
-				this.addAnnotation(annotation);
+				this.annotations.addAnnotation(annotation);
 				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
@@ -170,7 +173,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				f.setAnnotations(this.getAnnotations(), this.annotationCount);
+				f.setAnnotations(this.annotations);
 				this.consumer.addField(f);
 				
 				if (type == Symbols.CLOSE_CURLY_BRACKET)
@@ -188,14 +191,14 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.mode = PARAMETERS;
 				
 				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				m.setAnnotations(this.getAnnotations(), this.annotationCount);
+				m.setAnnotations(this.annotations);
 				this.member = m;
 				return;
 			}
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				Property p = new Property(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				p.setAnnotations(this.getAnnotations(), this.annotationCount);
+				p.setAnnotations(this.annotations);
 				this.member = p;
 				this.mode = FIELD_END;
 				
@@ -206,7 +209,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if (type == Symbols.EQUALS)
 			{
 				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				f.setAnnotations(this.getAnnotations(), this.annotationCount);
+				f.setAnnotations(this.annotations);
 				this.member = f;
 				this.mode = FIELD_END;
 				
@@ -217,7 +220,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
 			{
 				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				m.setAnnotations(this.getAnnotations(), this.annotationCount);
+				m.setAnnotations(this.annotations);
 				this.member = m;
 				
 				this.mode = GENERICS_END;
@@ -320,29 +323,5 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-	
-	public int annotationCount()
-	{
-		return this.annotationCount;
-	}
-	
-	public IAnnotation[] getAnnotations()
-	{
-		IAnnotation[] a = new IAnnotation[this.annotationCount];
-		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
-		return a;
-	}
-	
-	public void addAnnotation(IAnnotation annotation)
-	{
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
-		{
-			IAnnotation[] temp = new IAnnotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
-			this.annotations = temp;
-		}
-		this.annotations[index] = annotation;
 	}
 }

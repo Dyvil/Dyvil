@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import java.lang.annotation.ElementType;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -53,6 +55,12 @@ public final class MethodParameter extends Parameter
 	public boolean isVariable()
 	{
 		return true;
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.PARAMETER;
 	}
 	
 	@Override
@@ -171,10 +179,7 @@ public final class MethodParameter extends Parameter
 			writer.addParameterAnnotation(this.index, "Ldyvil/annotation/var;", true);
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(writer, this.index);
-		}
+		this.writeAnnotations(writer);
 	}
 	
 	@Override

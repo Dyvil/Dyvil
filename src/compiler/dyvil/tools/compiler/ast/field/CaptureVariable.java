@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -97,51 +98,14 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public int annotationCount()
-	{
-		return this.annotationCount();
-	}
-	
-	@Override
-	public void setAnnotations(IAnnotation[] annotations, int count)
-	{
-		this.variable.setAnnotations(annotations, count);
-	}
-	
-	@Override
-	public void setAnnotation(int index, IAnnotation annotation)
-	{
-		this.variable.setAnnotation(index, annotation);
-	}
-	
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		this.variable.addAnnotation(annotation);
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
-	{
-		return this.variable.addRawAnnotation(type);
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-		this.variable.removeAnnotation(index);
-	}
-	
-	@Override
-	public IAnnotation[] getAnnotations()
+	public AnnotationList getAnnotations()
 	{
 		return this.variable.getAnnotations();
 	}
 	
 	@Override
-	public IAnnotation getAnnotation(int index)
+	public void setAnnotations(AnnotationList annotations)
 	{
-		return this.variable.getAnnotation(index);
 	}
 	
 	@Override
@@ -151,9 +115,15 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public void addAnnotation(IAnnotation annotation)
 	{
-		return this.variable.getAnnotationType();
+		this.variable.addAnnotation(annotation);
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.LOCAL_VARIABLE;
 	}
 	
 	@Override

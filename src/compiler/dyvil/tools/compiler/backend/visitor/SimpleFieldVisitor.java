@@ -22,7 +22,7 @@ public class SimpleFieldVisitor implements FieldVisitor
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		String internal = ClassFormat.extendedToInternal(type);
-		if (this.field.addRawAnnotation(internal))
+		if (this.field.addRawAnnotation(internal, null))
 		{
 			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.field, annotation);

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotationList
+public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotated
 {
 	public int getAccessLevel();
 	

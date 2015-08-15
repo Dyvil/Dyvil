@@ -11,6 +11,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -122,18 +123,13 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public int annotationCount()
+	public AnnotationList getAnnotations()
 	{
-		return 0;
+		return null;
 	}
 	
 	@Override
-	public void setAnnotations(IAnnotation[] annotations, int count)
-	{
-	}
-	
-	@Override
-	public void setAnnotation(int index, IAnnotation annotation)
+	public void setAnnotations(AnnotationList annotations)
 	{
 	}
 	
@@ -143,32 +139,15 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void removeAnnotation(int index)
-	{
-	}
-	
-	@Override
-	public IAnnotation[] getAnnotations()
-	{
-		return null;
-	}
-	
-	@Override
-	public IAnnotation getAnnotation(int index)
-	{
-		return null;
-	}
-	
-	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return null;
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
-		return ElementType.TYPE;
+		return null;
 	}
 	
 	@Override

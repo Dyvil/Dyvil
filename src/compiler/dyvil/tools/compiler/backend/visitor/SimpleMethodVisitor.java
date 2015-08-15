@@ -51,7 +51,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		String internal = ClassFormat.extendedToInternal(type);
-		if (this.method.addRawAnnotation(internal))
+		if (this.method.addRawAnnotation(internal, null))
 		{
 			Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationVisitorImpl(this.method, annotation);

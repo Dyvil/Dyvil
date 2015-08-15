@@ -203,8 +203,7 @@ public final class Tuple implements IValue, IValueList
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v = this.values[i];
-			v.resolveTypes(markers, context);
+			this.values[i].resolveTypes(markers, context);
 		}
 	}
 	
@@ -227,6 +226,11 @@ public final class Tuple implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.tupleType == null)
+		{
+			this.getType();
+		}
+		
 		if (this.tupleType.typeTag() == IType.TUPLE)
 		{
 			for (int i = 0; i < this.valueCount; i++)

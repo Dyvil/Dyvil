@@ -161,27 +161,7 @@ public class NestedMethod extends Method
 			mw.setThisType(this.theClass.getInternalName());
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(mw);
-		}
-		
-		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
-		{
-			mw.addAnnotation("Ldyvil/annotation/inline;", false);
-		}
-		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			mw.addAnnotation("Ldyvil/annotation/infix;", false);
-		}
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			mw.addAnnotation("Ldyvil/annotation/prefix;", false);
-		}
-		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-		{
-			mw.addAnnotation("Ljava/lang/Deprecated;", true);
-		}
+		this.writeAnnotations(mw);
 		
 		int index = 0;
 		for (int i = 0; i < this.capturedFieldCount; i++)

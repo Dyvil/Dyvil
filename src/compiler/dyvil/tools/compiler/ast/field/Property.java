@@ -100,7 +100,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.FIELD;
 	}
@@ -291,7 +291,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.resolve(markers, context);
 		
-		if (this.setter != null)
+		if (this.setter != null || this.setterModifiers != 0)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.setterParameter.setIndex(1);
@@ -586,6 +586,27 @@ public class Property extends Member implements IProperty, IContext
 		return null;
 	}
 	
+	protected void writeAnnotations(MethodWriter mw, int modifiers)
+	{
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(mw);
+			}
+		}
+		
+		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+		{
+			mw.addAnnotation("Ljava/lang/Deprecated;", true);
+		}
+		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		{
+			mw.addAnnotation("Ldyvil/annotation/internal;", false);
+		}
+	}
+	
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -603,19 +624,7 @@ public class Property extends Member implements IProperty, IContext
 				mw.setThisType(this.theClass.getInternalName());
 			}
 			
-			for (int i = 0; i < this.annotationCount; i++)
-			{
-				this.annotations[i].write(writer);
-			}
-			
-			if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-			{
-				mw.addAnnotation("Ljava/lang/Deprecated;", true);
-			}
-			if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
-			{
-				mw.addAnnotation("Ldyvil/annotation/internal;", false);
-			}
+			this.writeAnnotations(mw, modifiers);
 			
 			if (this.getter != null)
 			{
@@ -636,24 +645,8 @@ public class Property extends Member implements IProperty, IContext
 				mw.setThisType(this.theClass.getInternalName());
 			}
 			
-			for (int i = 0; i < this.annotationCount; i++)
-			{
-				this.annotations[i].write(writer);
-			}
-			
-			if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-			{
-				mw.addAnnotation("Ljava/lang/Deprecated;", true);
-			}
-			if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
-			{
-				mw.addAnnotation("Ldyvil/annotation/internal;", false);
-			}
-			
-			if (this.setterParameter != null)
-			{
-				this.setterParameter.write(mw);
-			}
+			this.writeAnnotations(mw, modifiers);
+			this.setterParameter.write(mw);
 			
 			if (this.setter != null)
 			{

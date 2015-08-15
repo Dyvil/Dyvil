@@ -249,7 +249,7 @@ public class Method extends Member implements IMethod, ILabelContext
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
@@ -281,12 +281,18 @@ public class Method extends Member implements IMethod, ILabelContext
 		case "java/lang/Override":
 			this.modifiers |= Modifiers.OVERRIDE;
 			return false;
+		case "dyvil/annotation/Intrinsic":
+			if (annotation != null)
+			{
+				this.readIntrinsicAnnotation(annotation);
+				return false;
+			}
 		}
 		return true;
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.METHOD;
 	}
@@ -584,16 +590,13 @@ public class Method extends Member implements IMethod, ILabelContext
 	{
 		super.cleanup(context, compilableList);
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			IAnnotation annotation = this.annotations[i];
-			if (annotation.getType().getTheClass() != Types.INTRINSIC_CLASS)
+			IAnnotation intrinsic = this.annotations.getAnnotation(Types.INTRINSIC_CLASS);
+			if (intrinsic != null)
 			{
-				continue;
+				this.readIntrinsicAnnotation(intrinsic);
 			}
-			
-			this.readIntrinsicAnnotation(annotation);
-			break;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -1192,31 +1195,7 @@ public class Method extends Member implements IMethod, ILabelContext
 			mw.setThisType(this.theClass.getInternalName());
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(mw);
-		}
-		
-		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
-		{
-			mw.addAnnotation("Ldyvil/annotation/inline;", false);
-		}
-		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			mw.addAnnotation("Ldyvil/annotation/infix;", false);
-		}
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			mw.addAnnotation("Ldyvil/annotation/prefix;", false);
-		}
-		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-		{
-			mw.addAnnotation("Ljava/lang/Deprecated;", true);
-		}
-		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
-		{
-			mw.addAnnotation("Ldyvil/annotation/internal;", false);
-		}
+		writeAnnotations(mw);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -1294,6 +1273,39 @@ public class Method extends Member implements IMethod, ILabelContext
 		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
 		mw.writeInsn(this.type.getReturnOpcode());
 		mw.end();
+	}
+	
+	protected void writeAnnotations(MethodWriter mw)
+	{
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(mw);
+			}
+		}
+		
+		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
+		{
+			mw.addAnnotation("Ldyvil/annotation/inline;", false);
+		}
+		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		{
+			mw.addAnnotation("Ldyvil/annotation/infix;", false);
+		}
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		{
+			mw.addAnnotation("Ldyvil/annotation/prefix;", false);
+		}
+		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+		{
+			mw.addAnnotation("Ljava/lang/Deprecated;", true);
+		}
+		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		{
+			mw.addAnnotation("Ldyvil/annotation/internal;", false);
+		}
 	}
 	
 	@Override

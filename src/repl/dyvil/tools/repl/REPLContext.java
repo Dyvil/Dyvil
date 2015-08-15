@@ -320,7 +320,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void addField(IField field)
 	{
 		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue(), className, field.getModifiers());
-		var.setAnnotations(field.getAnnotations(), field.annotationCount());
+		var.setAnnotations(field.getAnnotations());
 		memberClass = getREPLClass(var);
 		
 		if (this.computeVariable(var))

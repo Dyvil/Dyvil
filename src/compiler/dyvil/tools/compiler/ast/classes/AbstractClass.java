@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -41,9 +42,8 @@ public abstract class AbstractClass implements IClass
 	
 	// Modifiers and Annotations
 	
-	protected IAnnotation[]	annotations;
-	protected int			annotationCount;
-	protected int			modifiers;
+	protected AnnotationList	annotations;
+	protected int				modifiers;
 	
 	// Signature
 	
@@ -91,22 +91,15 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public int annotationCount()
+	public AnnotationList getAnnotations()
 	{
-		return this.annotationCount;
+		return this.annotations;
 	}
 	
 	@Override
-	public void setAnnotations(IAnnotation[] annotations, int count)
+	public void setAnnotations(AnnotationList annotations)
 	{
 		this.annotations = annotations;
-		this.annotationCount = count;
-	}
-	
-	@Override
-	public void setAnnotation(int index, IAnnotation annotation)
-	{
-		this.annotations[index] = annotation;
 	}
 	
 	@Override
@@ -114,35 +107,13 @@ public abstract class AbstractClass implements IClass
 	{
 		if (this.annotations == null)
 		{
-			this.annotations = new IAnnotation[3];
-			this.annotations[0] = annotation;
-			this.annotationCount = 1;
-			return;
+			this.annotations = new AnnotationList();
 		}
-		
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
-		{
-			IAnnotation[] temp = new IAnnotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
-			this.annotations = temp;
-		}
-		this.annotations[index] = annotation;
+		this.annotations.addAnnotation(annotation);
 	}
 	
 	@Override
-	public final void removeAnnotation(int index)
-	{
-		int numMoved = this.annotationCount - index - 1;
-		if (numMoved > 0)
-		{
-			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
-		}
-		this.annotations[--this.annotationCount] = null;
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
@@ -164,45 +135,30 @@ public abstract class AbstractClass implements IClass
 		case "java/lang/FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;
+		case "dyvil/annotation/ClassParameters":
+			if (annotation != null)
+			{
+				this.readClassParameters(annotation);
+				return false;
+			}
 		}
 		return true;
 	}
 	
-	@Override
-	public ElementType getAnnotationType()
+	protected void readClassParameters(IAnnotation annotation)
 	{
-		return ElementType.TYPE;
-	}
-	
-	@Override
-	public IAnnotation[] getAnnotations()
-	{
-		return this.annotations;
-	}
-	
-	@Override
-	public IAnnotation getAnnotation(int index)
-	{
-		return this.annotations[index];
 	}
 	
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			IAnnotation a = this.annotations[i];
-			if (a.getType().getTheClass() == type)
-			{
-				return a;
-			}
-		}
-		return null;
+		return this.annotations == null ? null : this.annotations.getAnnotation(type);
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.TYPE;
 	}
 	
 	@Override
@@ -1018,11 +974,9 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			buffer.append(prefix);
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append('\n');
+			this.annotations.toString();
 		}
 		
 		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));

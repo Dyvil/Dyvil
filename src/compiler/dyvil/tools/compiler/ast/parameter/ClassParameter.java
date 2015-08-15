@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -73,7 +74,7 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
@@ -88,9 +89,9 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
-		return ElementType.PARAMETER;
+		return ElementType.FIELD;
 	}
 	
 	@Override
@@ -214,16 +215,7 @@ public final class ClassParameter extends Parameter implements IField
 	public void write(MethodWriter writer)
 	{
 		writer.registerParameter(this.index, this.name.qualified, this.type, 0);
-		
-		if ((this.modifiers & Modifiers.VAR) != 0)
-		{
-			writer.addParameterAnnotation(this.index, "Ldyvil/annotation/var;", true);
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(writer, this.index);
-		}
+		this.writeAnnotations(writer);
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -134,51 +135,14 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public int annotationCount()
-	{
-		return this.field.annotationCount();
-	}
-	
-	@Override
-	public void setAnnotations(IAnnotation[] annotations, int count)
-	{
-		this.field.setAnnotations(annotations, count);
-	}
-	
-	@Override
-	public void setAnnotation(int index, IAnnotation annotation)
-	{
-		this.field.setAnnotation(index, annotation);
-	}
-	
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		this.field.addAnnotation(annotation);
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
-	{
-		return this.field.addRawAnnotation(type);
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-		this.field.removeAnnotation(index);
-	}
-	
-	@Override
-	public IAnnotation[] getAnnotations()
+	public AnnotationList getAnnotations()
 	{
 		return this.field.getAnnotations();
 	}
 	
 	@Override
-	public IAnnotation getAnnotation(int index)
+	public void setAnnotations(AnnotationList annotations)
 	{
-		return this.field.getAnnotation(index);
 	}
 	
 	@Override
@@ -188,9 +152,14 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public void addAnnotation(IAnnotation annotation)
 	{
-		return this.field.getAnnotationType();
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.FIELD;
 	}
 	
 	@Override

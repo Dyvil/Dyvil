@@ -10,6 +10,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
@@ -126,15 +127,9 @@ public final class ExternalClass extends AbstractClass
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(null, Package.rootPackage);
-			
-			String internalName = this.annotations[i].getType().getInternalName();
-			if (!this.addRawAnnotation(internalName))
-			{
-				this.removeAnnotation(i--);
-			}
+			this.annotations.resolveTypes(null, this, this);
 		}
 	}
 	
@@ -246,18 +241,12 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public void addAnnotation(IAnnotation annotation)
+	protected void readClassParameters(IAnnotation annotation)
 	{
-		if (!"dyvil/annotation/ClassParameters".equals(annotation.getType().getInternalName()))
-		{
-			super.addAnnotation(annotation);
-			return;
-		}
-		
 		Array array = (Array) annotation.getArguments().getFirstValue();
-		int count = array.valueCount();
-		this.classParameters = new String[count];
-		for (int i = 0; i < count; i++)
+		int params = array.valueCount();
+		this.classParameters = new String[params];
+		for (int i = 0; i < params; i++)
 		{
 			IValue value = array.getValue(i);
 			this.classParameters[i] = value.stringValue();
@@ -560,8 +549,13 @@ public final class ExternalClass extends AbstractClass
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		String internal = ClassFormat.extendedToInternal(type);
-		if (this.addRawAnnotation(internal))
+		if (this.addRawAnnotation(internal, null))
 		{
+			if (this.annotations == null)
+			{
+				this.annotations = new AnnotationList();
+			}
+			
 			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
 			return new AnnotationVisitorImpl(this, annotation);
 		}

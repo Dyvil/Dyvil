@@ -11,6 +11,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.ApplyMethodCall;
 import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -151,7 +152,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
@@ -169,7 +170,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.METHOD;
 	}
@@ -226,9 +227,9 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.annotations.resolveTypes(markers, context, this);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
@@ -706,9 +707,13 @@ public class Constructor extends Member implements IConstructor
 				
 		mw.setThisType(this.theClass.getInternalName());
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].write(mw);
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(mw);
+			}
 		}
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)

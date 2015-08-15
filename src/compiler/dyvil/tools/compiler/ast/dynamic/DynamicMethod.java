@@ -8,6 +8,7 @@ import java.lang.annotation.ElementType;
 import dyvil.array.ObjectArray;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -199,19 +200,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public int annotationCount()
-	{
-		return 0;
-	}
-	
-	@Override
-	public ElementType getAnnotationType()
+	public AnnotationList getAnnotations()
 	{
 		return null;
 	}
 	
 	@Override
-	public void setAnnotation(int index, IAnnotation annotation)
+	public void setAnnotations(AnnotationList annotations)
 	{
 	}
 	
@@ -221,25 +216,9 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void removeAnnotation(int index)
+	public ElementType getElementType()
 	{
-	}
-	
-	@Override
-	public void setAnnotations(IAnnotation[] annotations, int count)
-	{
-	}
-	
-	@Override
-	public IAnnotation[] getAnnotations()
-	{
-		return null;
-	}
-	
-	@Override
-	public IAnnotation getAnnotation(int index)
-	{
-		return null;
+		return ElementType.METHOD;
 	}
 	
 	@Override

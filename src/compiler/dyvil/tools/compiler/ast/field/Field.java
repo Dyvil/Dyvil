@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -104,7 +105,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
@@ -128,7 +129,7 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.FIELD;
 	}
@@ -314,6 +315,18 @@ public class Field extends Member implements IField
 		}
 	}
 	
+	protected void writeAnnotations(FieldVisitor fv)
+	{
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(fv);
+			}
+		}
+	}
+	
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -328,11 +341,6 @@ public class Field extends Member implements IField
 			MethodWriter mw = new MethodWriterImpl(writer,
 					writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
 					
-			for (int i = 0; i < this.annotationCount; i++)
-			{
-				this.annotations[i].write(mw);
-			}
-			
 			mw.addAnnotation("Ldyvil/annotation/lazy;", false);
 			
 			mw.begin();
@@ -343,19 +351,8 @@ public class Field extends Member implements IField
 		}
 		
 		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
-		if ((this.modifiers & Modifiers.INTERNAL) != 0)
-		{
-			fv.visitAnnotation("Ldyvil/annotation/internal", false);
-		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			fv.visitAnnotation("Ljava/lang/Deprecated;", true);
-		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(fv);
-		}
+		this.writeAnnotations(fv);
 	}
 	
 	@Override

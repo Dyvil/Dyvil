@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -83,7 +84,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
@@ -95,7 +96,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.LOCAL_VARIABLE;
 	}

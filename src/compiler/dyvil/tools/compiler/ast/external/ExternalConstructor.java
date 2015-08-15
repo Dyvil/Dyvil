@@ -28,9 +28,9 @@ public final class ExternalConstructor extends Constructor
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(null, Package.rootPackage);
+			this.annotations.resolveTypes(null, Package.rootPackage, this);
 		}
 	}
 	
@@ -99,21 +99,6 @@ public final class ExternalConstructor extends Constructor
 	}
 	
 	@Override
-	public IAnnotation getAnnotation(int index)
-	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		
-		if (!this.annotationsResolved)
-		{
-			this.resolveAnnotations();
-		}
-		return this.annotations[index];
-	}
-	
-	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
@@ -125,7 +110,7 @@ public final class ExternalConstructor extends Constructor
 		{
 			this.resolveAnnotations();
 		}
-		return super.getAnnotation(type);
+		return this.annotations.getAnnotation(type);
 	}
 	
 	@Override

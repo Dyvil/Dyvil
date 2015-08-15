@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -44,7 +44,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private CodeClass		theClass;
 	
 	private int				modifiers;
-	private IAnnotation[]	annotations;
+	private AnnotationList	annotations;
 	
 	public ClassDeclarationParser(IDyvilHeader header)
 	{
@@ -95,8 +95,13 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 					return;
 				}
 				
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+				
 				Annotation annotation = new Annotation(token.raw());
-				this.addAnnotation(annotation);
+				this.annotations.addAnnotation(annotation);
 				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
@@ -112,10 +117,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.theClass = new CodeClass(token.raw(), (IDyvilHeader) this.classList, this.modifiers);
-				if (this.annotations != null)
-				{
-					this.theClass.setAnnotations(this.annotations, this.annotations.length);
-				}
+				this.theClass.setAnnotations(this.annotations);
 				this.theClass.setName(token.nameValue());
 				this.mode = POST_NAME;
 				return;
@@ -262,21 +264,5 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			this.theClass.addInterface(type);
 			return;
 		}
-	}
-	
-	public void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new IAnnotation[1];
-			this.annotations[0] = annotation;
-			return;
-		}
-		
-		int len = this.annotations.length;
-		IAnnotation[] temp = new IAnnotation[len + 1];
-		System.arraycopy(this.annotations, 0, temp, 0, this.annotations.length);
-		temp[this.annotations.length] = annotation;
-		this.annotations = temp;
 	}
 }

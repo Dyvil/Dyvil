@@ -10,8 +10,7 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.access.FieldAssign;
-import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -117,9 +116,9 @@ public class CodeClass extends AbstractClass
 			this.type = new ClassType(this);
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.annotations.resolveTypes(markers, context, this);
 		}
 		
 		int index = 1;
@@ -160,17 +159,9 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			IAnnotation a = this.annotations[i];
-			String internalName = a.getType().getInternalName();
-			if (internalName != null && !this.addRawAnnotation(internalName))
-			{
-				this.removeAnnotation(i--);
-				continue;
-			}
-			
-			a.resolve(markers, context);
+			this.annotations.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -189,9 +180,9 @@ public class CodeClass extends AbstractClass
 	{
 		this.metadata.checkTypes(markers, context);
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].checkTypes(markers, context);
+			this.annotations.checkTypes(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -266,9 +257,9 @@ public class CodeClass extends AbstractClass
 			}
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].check(markers, context, ElementType.TYPE);
+			this.annotations.check(markers, context, ElementType.TYPE);
 		}
 		
 		if (this.body != null)
@@ -280,9 +271,9 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].foldConstants();
+			this.annotations.foldConstants();
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -299,9 +290,9 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].cleanup(this, this);
+			this.annotations.cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -367,9 +358,13 @@ public class CodeClass extends AbstractClass
 			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].write(writer);
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(writer);
+			}
 		}
 		
 		// Inner Class Info
@@ -552,12 +547,7 @@ public class CodeClass extends AbstractClass
 	{
 		out.writeInt(this.modifiers);
 		
-		int annotations = this.annotationCount;
-		out.writeShort(annotations);
-		for (int i = 0; i < annotations; i++)
-		{
-			this.annotations[i].write(out);
-		}
+		AnnotationList.write(this.annotations, out);
 		
 		out.writeUTF(this.name.unqualified);
 		
@@ -613,15 +603,7 @@ public class CodeClass extends AbstractClass
 	{
 		this.modifiers = in.readInt();
 		
-		int annotations = in.readShort();
-		this.annotations = new IAnnotation[annotations];
-		this.annotationCount = annotations;
-		for (int i = 0; i < annotations; i++)
-		{
-			Annotation a = new Annotation();
-			a.read(in);
-			this.annotations[i] = a;
-		}
+		this.annotations = AnnotationList.read(in);
 		
 		this.name = Name.get(in.readUTF());
 		

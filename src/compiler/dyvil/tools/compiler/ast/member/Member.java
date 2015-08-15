@@ -3,10 +3,9 @@ package dyvil.tools.compiler.ast.member;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -20,8 +19,7 @@ public abstract class Member implements IMember
 {
 	protected ICodePosition position;
 	
-	protected IAnnotation[]	annotations;
-	protected int			annotationCount;
+	protected AnnotationList annotations;
 	
 	protected int modifiers;
 	
@@ -62,88 +60,31 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
-	public int annotationCount()
-	{
-		return this.annotationCount;
-	}
-	
-	@Override
-	public void setAnnotations(IAnnotation[] annotations, int count)
-	{
-		this.annotations = annotations;
-		this.annotationCount = count;
-	}
-	
-	@Override
-	public void setAnnotation(int index, IAnnotation annotation)
-	{
-		this.annotations[index] = annotation;
-	}
-	
-	@Override
-	public final void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new IAnnotation[3];
-			this.annotations[0] = annotation;
-			this.annotationCount = 1;
-			return;
-		}
-		
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
-		{
-			IAnnotation[] temp = new IAnnotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
-			this.annotations = temp;
-		}
-		this.annotations[index] = annotation;
-	}
-	
-	@Override
-	public final void removeAnnotation(int index)
-	{
-		int numMoved = this.annotationCount - index - 1;
-		if (numMoved > 0)
-		{
-			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
-		}
-		this.annotations[--this.annotationCount] = null;
-	}
-	
-	@Override
-	public IAnnotation[] getAnnotations()
+	public AnnotationList getAnnotations()
 	{
 		return this.annotations;
 	}
 	
 	@Override
-	public IAnnotation getAnnotation(int index)
+	public IAnnotation getAnnotation(IClass type)
 	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		return this.annotations[index];
+		return this.annotations == null ? null : this.annotations.getAnnotation(type);
 	}
 	
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation)
 	{
 		if (this.annotations == null)
 		{
-			return null;
+			this.annotations = new AnnotationList();
 		}
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			IAnnotation a = this.annotations[i];
-			if (a.getType().getTheClass() == type)
-			{
-				return a;
-			}
-		}
-		return null;
+		this.annotations.addAnnotation(annotation);
 	}
 	
 	@Override
@@ -215,64 +156,54 @@ public abstract class Member implements IMember
 		{
 			this.type = this.type.resolve(markers, context, TypePosition.RETURN_TYPE);
 		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.annotations.resolveTypes(markers, context, this);
 		}
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			IAnnotation a = this.annotations[i];
-			String fullName = a.getType().getInternalName();
-			if (fullName != null && !this.addRawAnnotation(fullName))
-			{
-				this.removeAnnotation(i--);
-				continue;
-			}
-			
-			a.resolve(markers, context);
+			this.annotations.resolve(markers, context);
 		}
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].checkTypes(markers, context);
+			this.annotations.checkTypes(markers, context);
 		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		ElementType target = this.getAnnotationType();
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].check(markers, context, target);
+			this.annotations.check(markers, context, this.getElementType());
 		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].foldConstants();
+			this.annotations.foldConstants();
 		}
 	}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].cleanup(context, compilableList);
+			this.annotations.cleanup(context, compilableList);
 		}
 	}
 	
@@ -292,12 +223,7 @@ public abstract class Member implements IMember
 	{
 		out.writeInt(this.modifiers);
 		
-		int annotations = this.annotationCount;
-		out.writeShort(annotations);
-		for (int i = 0; i < annotations; i++)
-		{
-			this.annotations[i].write(out);
-		}
+		AnnotationList.write(this.annotations, out);
 	}
 	
 	public void read(DataInput in) throws IOException
@@ -315,16 +241,7 @@ public abstract class Member implements IMember
 	protected void readAnnotations(DataInput in) throws IOException
 	{
 		this.modifiers = in.readInt();
-		
-		int annotations = in.readShort();
-		this.annotations = new IAnnotation[annotations];
-		this.annotationCount = annotations;
-		for (int i = 0; i < annotations; i++)
-		{
-			Annotation a = new Annotation();
-			this.annotations[i] = a;
-			a.read(in);
-		}
+		this.annotations = AnnotationList.read(in);
 	}
 	
 	@Override
@@ -338,13 +255,10 @@ public abstract class Member implements IMember
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			buffer.append(prefix);
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append('\n');
+			this.annotations.toString(prefix, buffer);
 		}
-		
 		buffer.append(prefix);
 	}
 }
