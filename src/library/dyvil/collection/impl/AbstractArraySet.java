@@ -22,13 +22,13 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
-		this.size = size;
+		this.size = Set.distinct(this.elements, size);
 	}
 	
 	public AbstractArraySet(Object[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
-		this.size = size;
+		this.size = Set.distinct(elements, size);
 	}
 	
 	public AbstractArraySet(Collection<E> elements)
