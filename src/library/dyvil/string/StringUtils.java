@@ -11,6 +11,7 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.math.MathUtils;
 import dyvil.random.RandomUtils;
+import dyvil.reflect.Modifiers;
 
 /**
  * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for
@@ -658,8 +659,19 @@ public interface StringUtils
 		builder.append(type.getName());
 		
 		builder.append('(');
+		int count = 0;
 		for (Field f : fields)
 		{
+			if ((f.getModifiers() & Modifiers.STATIC) != 0)
+			{
+				continue;
+			}
+			
+			if (count++ > 0)
+			{
+				builder.append(", ");
+			}
+			
 			if (fieldNames)
 			{
 				builder.append(f.getName()).append(": ");
@@ -673,6 +685,7 @@ public interface StringUtils
 			catch (IllegalArgumentException | IllegalAccessException ex)
 			{
 				ex.printStackTrace();
+				builder.append("<error>");
 			}
 		}
 		

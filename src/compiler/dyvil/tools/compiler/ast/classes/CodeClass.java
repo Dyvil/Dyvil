@@ -71,6 +71,12 @@ public class CodeClass extends AbstractClass
 	public void setHeader(IDyvilHeader unit)
 	{
 		this.unit = unit;
+		
+		if (this.name != null)
+		{
+			this.internalName = unit.getInternalName(this.name);
+			this.fullName = unit.getFullName(this.name);
+		}
 	}
 	
 	@Override
@@ -311,7 +317,6 @@ public class CodeClass extends AbstractClass
 	{
 		// Header
 		
-		String internalName = this.getInternalName();
 		String signature = this.getSignature();
 		String superClass = null;
 		String[] interfaces = this.getInterfaceArray();
@@ -326,7 +331,7 @@ public class CodeClass extends AbstractClass
 		{
 			mods |= Opcodes.ACC_SUPER;
 		}
-		writer.visit(DyvilCompiler.classVersion, mods, internalName, signature, superClass, interfaces);
+		writer.visit(DyvilCompiler.classVersion, mods, this.internalName, signature, superClass, interfaces);
 		
 		// Source
 		

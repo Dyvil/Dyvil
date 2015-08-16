@@ -98,7 +98,7 @@ public class REPLParser implements IParserManager
 				return false;
 			}
 			
-			if (this.parser == null)
+			if (this.parser == null || (this.syntaxErrors && this.markers == null))
 			{
 				break;
 			}

@@ -265,6 +265,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addClass(IClass iclass)
 	{
+		iclass.setHeader(this);
+		
 		iclass.resolveTypes(markers, this);
 		iclass.resolve(markers, this);
 		iclass.checkTypes(markers, this);
@@ -466,7 +468,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public String getFullName(Name name)
 	{
-		return name.qualified;
+		return "repl$." + name.qualified;
 	}
 	
 	@Override
@@ -478,6 +480,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public String getInternalName(Name name)
 	{
-		return name.qualified;
+		return "repl$/" + name.qualified;
 	}
 }

@@ -548,7 +548,7 @@ public class REPLMemberClass implements IClass
 			iclass.write(cw);
 			cw.visitEnd();
 			byte[] bytes = cw.toByteArray();
-			return loadClass(iclass.getName().qualified, bytes);
+			return loadClass(iclass.getFullName(), bytes);
 		}
 		catch (Throwable t)
 		{
