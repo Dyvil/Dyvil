@@ -3,9 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -15,9 +13,9 @@ public final class FieldInitializer implements IStatement
 {
 	protected Variable variable;
 	
-	public FieldInitializer(ICodePosition position, Name name, IType type)
+	public FieldInitializer(Variable variable)
 	{
-		this.variable = new Variable(position, name, type);
+		this.variable = variable;
 	}
 	
 	public Variable getVariable()

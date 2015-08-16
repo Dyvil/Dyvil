@@ -29,6 +29,11 @@ public class AnnotationParser extends Parser
 		this.mode = NAME;
 	}
 	
+	public void reset(IAnnotation annotation)
+	{
+		this.annotation = annotation;
+	}
+	
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{

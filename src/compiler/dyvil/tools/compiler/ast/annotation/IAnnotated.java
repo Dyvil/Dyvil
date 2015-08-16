@@ -1,9 +1,7 @@
-package dyvil.tools.compiler.ast.member;
+package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 
 public interface IAnnotated

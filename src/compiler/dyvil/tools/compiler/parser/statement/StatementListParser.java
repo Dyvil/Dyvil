@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.Label;
@@ -14,6 +17,7 @@ import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
@@ -26,7 +30,9 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	
 	private Name label;
 	
-	private IType type;
+	private IType			type;
+	private int				modifiers;
+	private AnnotationList	annotations;
 	
 	public StatementListParser(StatementList valueList)
 	{
@@ -34,15 +40,17 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		this.mode = EXPRESSION;
 	}
 	
-	private void reset()
+	@Override
+	protected void reset()
 	{
+		super.reset();
+		
 		this.mode = EXPRESSION;
 		this.label = null;
-		this.firstToken = null;
-		this.tryParser = null;
-		this.pm = null;
 		this.type = null;
-		this.parser = null;
+		
+		this.modifiers = 0;
+		this.annotations = null;
 	}
 	
 	@Override
@@ -74,8 +82,9 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		}
 		
-		if (this.mode == EXPRESSION)
+		switch (this.mode)
 		{
+		case EXPRESSION:
 			if (type == Symbols.SEMICOLON)
 			{
 				return;
@@ -92,28 +101,47 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				if (nextType == Symbols.EQUALS)
 				{
 					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
-					pm.pushParser(pm.newExpressionParser(fa));
-					this.statementList.addValue(fa);
 					pm.skip();
+					pm.pushParser(pm.newExpressionParser(fa));
+					this.setValue(fa);
 					this.mode = SEPARATOR;
 					return;
 				}
 			}
+			int i;
+			if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
+			{
+				this.modifiers |= i;
+				return;
+			}
+			if (type == Symbols.AT)
+			{
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+				
+				Annotation a = new Annotation(token.raw());
+				pm.pushParser(pm.newAnnotationParser(a));
+				this.annotations.addAnnotation(a);
+				return;
+			}
 			
-			this.firstToken = token;
-			this.parser = this.tryParser = pm.newTypeParser(this);
-			this.pm = pm;
+			this.tryParser(pm, token, pm.newTypeParser(this));
 			this.mode = TYPE;
-		}
-		if (this.mode == TYPE)
-		{
+			//$FALL-THROUGH$
+		case TYPE:
 			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.EQUALS)
 			{
 				if (this.type != null)
 				{
-					FieldInitializer fi = new FieldInitializer(token.raw(), token.nameValue(), this.type);
-					pm.pushParser(pm.newExpressionParser(fi.getVariable()));
-					this.statementList.addValue(fi);
+					Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
+					variable.setModifiers(this.modifiers);
+					variable.setAnnotations(this.annotations);
+					
+					FieldInitializer fi = new FieldInitializer(variable);
+					pm.pushParser(pm.newExpressionParser(variable));
+					this.setValue(fi);
 				}
 				else if (token != this.firstToken)
 				{
@@ -127,7 +155,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				pm.skip();
 				return;
 			}
-			else if (this.tryParser == null)
+			else if (this.parser == null)
 			{
 				pm.jump(this.firstToken);
 				this.reset();
@@ -135,12 +163,9 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				this.mode = SEPARATOR;
 				return;
 			}
-			
 			this.parser.parse(this, token);
 			return;
-		}
-		if (this.mode == SEPARATOR)
-		{
+		case SEPARATOR:
 			if (type == Symbols.SEMICOLON)
 			{
 				this.mode = EXPRESSION;

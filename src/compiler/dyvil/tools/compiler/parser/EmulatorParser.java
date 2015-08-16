@@ -7,11 +7,25 @@ import dyvil.tools.compiler.lexer.token.IToken;
 
 public abstract class EmulatorParser extends Parser implements IParserManager
 {
-	protected IToken	firstToken;
-	protected Parser	tryParser;
+	protected IToken firstToken;
 	
+	protected Parser			tryParser;
 	protected Parser			parser;
 	protected IParserManager	pm;
+	
+	protected void reset()
+	{
+		this.firstToken = null;
+		this.tryParser = this.parser = null;
+		this.pm = null;
+	}
+	
+	protected void tryParser(IParserManager pm, IToken token, Parser parser)
+	{
+		this.pm = pm;
+		this.firstToken = token;
+		this.parser = this.tryParser = parser;
+	}
 	
 	@Override
 	public void skip()

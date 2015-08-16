@@ -7,7 +7,6 @@ import java.lang.annotation.ElementType;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.member.IAnnotated;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
