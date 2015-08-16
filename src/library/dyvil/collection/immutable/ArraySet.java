@@ -13,12 +13,17 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.util.ImmutableException;
 
-@ArrayConvertible
+@ArrayConvertible(methodName = "fromLiteral")
 public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 {
 	public static <E> ArraySet<E> apply(E... elements)
 	{
 		return new ArraySet(elements);
+	}
+	
+	public static <E> ArraySet<E> fromLiteral(E... elements)
+	{
+		return new ArraySet(elements, true);
 	}
 	
 	public static <E> Builder<E> builder()

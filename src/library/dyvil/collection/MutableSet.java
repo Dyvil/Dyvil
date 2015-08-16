@@ -7,13 +7,12 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.mutable.HashMap;
+import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.HashSet;
-import dyvil.collection.mutable.MapBasedSet;
 import dyvil.collection.view.SetView;
 
 @NilConvertible
-@ArrayConvertible
+@ArrayConvertible(methodName = "fromLiteral")
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
 	public static <E> MutableSet<E> apply()
@@ -23,12 +22,12 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	
 	public static <E> MutableSet<E> apply(E... elements)
 	{
-		HashMap<E, Object> hashMap = new HashMap(elements.length);
-		for (E element : elements)
-		{
-			hashMap.put(element, VALUE);
-		}
-		return new MapBasedSet<E>(hashMap);
+		return new ArraySet(elements);
+	}
+	
+	public static <E> MutableSet<E> fromLiteral(E... elements)
+	{
+		return new ArraySet(elements, true);
 	}
 	
 	// Accessors

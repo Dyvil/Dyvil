@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -24,10 +25,23 @@ public final class LiteralExpression implements IValue
 	
 	private IMethod method;
 	
+	private Name methodName = Name.apply;
+	
 	public LiteralExpression(IValue literal)
 	{
 		this.literal = literal;
 		this.arguments = new SingleArgument(literal);
+	}
+	
+	public LiteralExpression(IValue literal, IAnnotation annotation)
+	{
+		this(literal);
+		
+		IValue v = annotation.getArguments().getFirstValue();
+		if (v != null)
+		{
+			this.methodName = Name.get(v.stringValue());
+		}
 	}
 	
 	public LiteralExpression(IValue literal, IArguments arguments)
@@ -73,7 +87,7 @@ public final class LiteralExpression implements IValue
 		IMethod method = this.method;
 		if (method == null)
 		{
-			method = IContext.resolveMethod(type, null, Name.apply, this.arguments);
+			method = IContext.resolveMethod(type, null, this.methodName, this.arguments);
 			if (method == null)
 			{
 				IValue value = this.arguments.getFirstValue();

@@ -22,7 +22,6 @@ public final class Name
 	public static final Name	toString		= new Name("toString");
 	
 	public static final Name	_this	= new Name("this");
-	public static final Name	_class	= new Name("class");
 	public static final Name	_null	= new Name("null");
 	
 	public static final Name	_void		= new Name("void");

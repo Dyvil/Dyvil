@@ -19,7 +19,7 @@ import dyvil.collection.immutable.SingletonList;
 import dyvil.util.ImmutableException;
 
 @NilConvertible
-@ArrayConvertible
+@ArrayConvertible(methodName = "fromLiteral")
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {
 	public static interface Builder<E> extends ImmutableCollection.Builder<E>
@@ -48,15 +48,20 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
-	public static <E> ImmutableList<E> apply(E... array)
+	public static <E> ImmutableList<E> apply(E... elements)
 	{
-		return new ArrayList(array);
+		return new ArrayList(elements);
 	}
 	
-	public static <E> ImmutableList<E> linked(E... array)
+	public static <E> ImmutableList<E> fromLiteral(E... elements)
+	{
+		return new ArrayList(elements, true);
+	}
+	
+	public static <E> ImmutableList<E> linked(E... elements)
 	{
 		ImmutableList<E> list = EmptyList.instance;
-		for (E element : array)
+		for (E element : elements)
 		{
 			list = new AppendList(list, element);
 		}

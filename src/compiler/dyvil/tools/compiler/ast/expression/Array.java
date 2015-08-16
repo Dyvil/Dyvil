@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -133,9 +134,10 @@ public final class Array implements IValue, IValueList
 		if (!arrayType.isArrayType())
 		{
 			IClass iclass = arrayType.getTheClass();
-			if (iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null)
+			IAnnotation annotation;
+			if ((annotation = iclass.getAnnotation(Types.ARRAY_CONVERTIBLE)) != null)
 			{
-				return new LiteralExpression(this).withType(arrayType, typeContext, markers, context);
+				return new LiteralExpression(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
 			if (arrayType.classEquals(Types.ITERABLE))
 			{
