@@ -16,6 +16,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
+import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
@@ -343,6 +344,20 @@ public final class DyvilCompiler
 		{
 			loadConfig(arg.substring(1));
 			return;
+		}
+		if (arg.startsWith("print["))
+		{
+			int index = arg.lastIndexOf(']');
+			String phase = arg.substring(6, index);
+			
+			for (ICompilerPhase compilerPhase : phases)
+			{
+				if (compilerPhase.getName().equalsIgnoreCase(phase))
+				{
+					phases.add(new PrintPhase(compilerPhase));
+					return;
+				}
+			}
 		}
 		
 		if (!ConfigParser.readProperty(config, arg))

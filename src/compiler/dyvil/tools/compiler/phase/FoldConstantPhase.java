@@ -46,6 +46,6 @@ public class FoldConstantPhase implements ICompilerPhase
 	@Override
 	public String toString()
 	{
-		return "FOLD_CONSTANTS (" + DyvilCompiler.constantFolding + "x)";
+		return "FOLD_CONSTANTS (x" + DyvilCompiler.constantFolding + ")";
 	}
 }

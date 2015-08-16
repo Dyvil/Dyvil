@@ -6,11 +6,11 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class PrintPhase implements ICompilerPhase
 {
-	private final int id;
+	private final ICompilerPhase predecessor;
 	
-	public PrintPhase(int id)
+	public PrintPhase(ICompilerPhase predecessor)
 	{
-		this.id = id;
+		this.predecessor = predecessor;
 	}
 	
 	@Override
@@ -22,13 +22,13 @@ public class PrintPhase implements ICompilerPhase
 	@Override
 	public int getID()
 	{
-		return this.id;
+		return this.predecessor.getID() + 1;
 	}
 	
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		DyvilCompiler.log("--- Syntax Trees at the end of PARSER ---");
+		DyvilCompiler.log("--- Syntax Trees at the end of " + this.predecessor.getName() + " ---");
 		for (ICompilationUnit unit : units)
 		{
 			DyvilCompiler.log(unit.getInputFile() + ":\n" + unit.toString());
@@ -38,6 +38,6 @@ public class PrintPhase implements ICompilerPhase
 	@Override
 	public String toString()
 	{
-		return "PRINT";
+		return "PRINT[" + this.predecessor.getName() + "]";
 	}
 }

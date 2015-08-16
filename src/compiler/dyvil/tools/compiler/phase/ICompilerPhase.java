@@ -44,7 +44,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	/**
 	 * Prints the AST.
 	 */
-	ICompilerPhase PRINT = new PrintPhase(30);
+	ICompilerPhase PRINT = new PrintPhase(PARSE);
 	
 	/**
 	 * Saves the formatted AST to the input file
