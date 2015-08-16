@@ -175,8 +175,8 @@ public class Field extends Member implements IField
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
-		case IContext.SEALED:
-			markers.add(position, "field.access.sealed", this.name);
+		case IContext.INTERNAL:
+			markers.add(position, "field.access.internal", this.name);
 			break;
 		case IContext.INVISIBLE:
 			markers.add(position, "field.access.invisible", this.name);

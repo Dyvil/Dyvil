@@ -623,8 +623,8 @@ public class Constructor extends Member implements IConstructor
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
-		case IContext.SEALED:
-			markers.add(position, "constructor.access.sealed", this.theClass.getName());
+		case IContext.INTERNAL:
+			markers.add(position, "constructor.access.internal", this.theClass.getName());
 			break;
 		case IContext.INVISIBLE:
 			markers.add(position, "constructor.access.invisible", this.theClass.getName());

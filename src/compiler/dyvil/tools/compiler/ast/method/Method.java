@@ -1036,8 +1036,8 @@ public class Method extends Member implements IMethod, ILabelContext
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
-		case IContext.SEALED:
-			markers.add(position, "method.access.sealed", this.name);
+		case IContext.INTERNAL:
+			markers.add(position, "method.access.internal", this.name);
 			break;
 		case IContext.INVISIBLE:
 			markers.add(position, "method.access.invisible", this.name);

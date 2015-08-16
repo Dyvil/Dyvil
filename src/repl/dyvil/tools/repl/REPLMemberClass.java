@@ -437,7 +437,7 @@ public class REPLMemberClass implements IClass
 		{
 			if (iclass instanceof ExternalClass)
 			{
-				return SEALED;
+				return INTERNAL;
 			}
 			// Clear the SEALED bit by ANDing with 0b1111
 			level &= 0b1111;

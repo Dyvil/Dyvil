@@ -229,7 +229,7 @@ public class Property extends Member implements IProperty, IContext
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
-		case IContext.SEALED:
+		case IContext.INTERNAL:
 			markers.add(position, "property.access.sealed", this.name);
 			break;
 		case IContext.INVISIBLE:
