@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -328,6 +329,12 @@ public final class FieldAccess implements IValue, INamed, IValued
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(this.field.getType().getReturnOpcode());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

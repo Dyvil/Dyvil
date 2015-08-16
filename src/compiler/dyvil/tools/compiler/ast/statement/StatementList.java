@@ -6,6 +6,7 @@ import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -488,6 +489,12 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 		{
 			entry.getValue().writeLocal(writer, start, end);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

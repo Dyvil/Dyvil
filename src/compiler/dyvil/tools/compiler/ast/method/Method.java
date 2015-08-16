@@ -879,12 +879,11 @@ public class Method extends Member implements IMethod, ILabelContext
 			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
 			{
 				IParameter par = this.parameters[0];
-				parType = par.getType().getConcreteType(typeContext);
-				IValue instance1 = instance.withType(parType, typeContext, markers, context);
+				IValue instance1 = par.getType().convertValue(instance, typeContext, markers, context);
 				if (instance1 == null)
 				{
 					Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
-					marker.addInfo("Required Type: " + parType);
+					marker.addInfo("Required Type: " + par.getType());
 					marker.addInfo("Value Type: " + instance.getType());
 				}
 				else
@@ -934,7 +933,7 @@ public class Method extends Member implements IMethod, ILabelContext
 			}
 			else if (this.intrinsicOpcodes == null && instance.isPrimitive())
 			{
-				instance = instance.withType(this.theClass.getType().getConcreteType(typeContext), typeContext, markers, context);
+				instance = this.theClass.getType().convertValue(instance, typeContext, markers, context);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)

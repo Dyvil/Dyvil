@@ -235,7 +235,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			pm.report(new SyntaxError(token, "Invalid Array - ']' expected"));
 			return;
 		case LIST_END:
-			this.field.setValue(this.value);
 			this.value.expandPosition(token);
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
@@ -246,9 +245,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					pm.skip();
 					return;
 				}
+				
+				this.field.setValue(this.value);
 				pm.popParser();
 				return;
 			}
+			
+			this.field.setValue(this.value);
 			pm.popParser(true);
 			pm.report(new SyntaxError(token, "Invalid Statement List - '}' expected"));
 			return;

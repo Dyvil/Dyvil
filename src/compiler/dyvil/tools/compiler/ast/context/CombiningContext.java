@@ -111,15 +111,6 @@ public class CombiningContext implements IContext
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		IDataMember member = this.context2.capture(variable);
-		if (member == null)
-		{
-			return this.context1.capture(variable);
-		}
-		if (member instanceof IVariable)
-		{
-			return this.context1.capture((IVariable) member);
-		}
-		return member;
+		return this.context1.capture(variable);
 	}
 }

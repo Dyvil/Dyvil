@@ -20,5 +20,12 @@ public interface IASTNode
 	{
 	}
 	
+	public static String toString(IASTNode node)
+	{
+		StringBuilder s = new StringBuilder();
+		node.toString("", s);
+		return s.toString();
+	}
+	
 	public void toString(String prefix, StringBuilder buffer);
 }

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -545,6 +546,12 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		mw.begin();
 		this.value.writeExpression(mw);
 		mw.end(this.returnType);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

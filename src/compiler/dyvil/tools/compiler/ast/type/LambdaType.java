@@ -217,7 +217,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			return value.withType(this, typeContext, markers, context);
 		}
 		
-		IValue value1 = value.withType(this.returnType, typeContext, markers, context);
+		IValue value1 = value.withType(this.returnType.getConcreteType(typeContext), typeContext, markers, context);
 		if (value1 != null)
 		{
 			LambdaExpression le = new LambdaExpression(value1.getPosition(), null, 0);
