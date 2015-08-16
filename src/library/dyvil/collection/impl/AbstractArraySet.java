@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
@@ -58,6 +59,24 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	public int size()
 	{
 		return this.size;
+	}
+	
+	@Override
+	public boolean isEmpty()
+	{
+		return this.size == 0;
+	}
+	
+	@Override
+	public boolean isSorted()
+	{
+		return Collection.isSorted((E[]) this.elements, this.size);
+	}
+	
+	@Override
+	public boolean isSorted(Comparator<? super E> comparator)
+	{
+		return Collection.isSorted((E[]) this.elements, this.size, comparator);
 	}
 	
 	@Override

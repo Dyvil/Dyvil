@@ -1,10 +1,7 @@
 package dyvil.collection;
 
 import java.lang.reflect.Array;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -104,6 +101,38 @@ public interface Collection<E> extends Queryable<E>
 	public default boolean isEmpty()
 	{
 		return this.size() == 0;
+	}
+	
+	public default boolean isDistinct()
+	{
+		int size = this.size();
+		if (size < 2)
+		{
+			return true;
+		}
+		
+		Object[] array = this.toArray();
+		return Set.isDistinct(array, size);
+	}
+	
+	public default boolean isSorted()
+	{
+		if (this.size() < 2)
+		{
+			return true;
+		}
+		
+		return iteratorSorted(this.iterator());
+	}
+	
+	public default boolean isSorted(Comparator<? super E> comparator)
+	{
+		if (this.size() < 2)
+		{
+			return true;
+		}
+		
+		return iteratorSorted(this.iterator(), comparator);
 	}
 	
 	/**
@@ -682,8 +711,13 @@ public interface Collection<E> extends Queryable<E>
 		return builder.append(']').toString();
 	}
 	
-	public static <E> boolean orderedEquals(Iterable<E> c1, Iterable<E> c2)
+	public static <E> boolean orderedEquals(Collection<E> c1, Collection<E> c2)
 	{
+		if (c1.size() != c2.size())
+		{
+			return false;
+		}
+		
 		Iterator<E> iterator1 = c1.iterator();
 		Iterator<E> iterator2 = c2.iterator();
 		while (iterator1.hasNext())
@@ -711,6 +745,70 @@ public interface Collection<E> extends Queryable<E>
 			{
 				return false;
 			}
+		}
+		return true;
+	}
+	
+	public static <E> boolean isSorted(E[] array, int size)
+	{
+		if (size < 2)
+		{
+			return true;
+		}
+		
+		for (int i = 1; i < size; i++)
+		{
+			if (((Comparable) array[i - 1]).compareTo(array[i]) > 0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static <E> boolean isSorted(E[] array, int size, Comparator<? super E> comparator)
+	{
+		if (size < 2)
+		{
+			return true;
+		}
+		
+		for (int i = 1; i < size; i++)
+		{
+			if (comparator.compare(array[i - 1], array[i]) > 0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static <E> boolean iteratorSorted(Iterator<E> iterator)
+	{
+		Comparable<? super E> prev = (Comparable<? super E>) iterator.next();
+		while (iterator.hasNext())
+		{
+			E next = iterator.next();
+			if (prev.compareTo(next) > 0)
+			{
+				return false;
+			}
+			prev = (Comparable<? super E>) next;
+		}
+		return true;
+	}
+	
+	public static <E> boolean iteratorSorted(Iterator<E> iterator, Comparator<? super E> comparator)
+	{		
+		E prev = iterator.next();
+		while (iterator.hasNext())
+		{
+			E next = iterator.next();
+			if (comparator.compare(prev, next) > 0)
+			{
+				return false;
+			}
+			prev = next;
 		}
 		return true;
 	}

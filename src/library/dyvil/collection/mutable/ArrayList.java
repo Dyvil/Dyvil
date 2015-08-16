@@ -388,7 +388,7 @@ public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 	@Override
 	public void distinguish(Comparator<? super E> comparator)
 	{
-		this.size = Set.distinct((E[]) this.elements, this.size, comparator);
+		this.size = Set.sortDistinct((E[]) this.elements, this.size, comparator);
 	}
 	
 	@Override

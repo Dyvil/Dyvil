@@ -260,7 +260,7 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort(array, 0, this.size);
-		return new SortedArrayList(array, this.size, true);
+		return new SortedArrayList(array, this.size, true, null);
 	}
 	
 	@Override
@@ -269,7 +269,7 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort((E[]) array, 0, this.size, comparator);
-		return new SortedArrayList(array, this.size, true);
+		return new SortedArrayList(array, this.size, true, comparator);
 	}
 	
 	@Override
@@ -286,8 +286,8 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = Set.distinct((E[]) array, this.size, comparator);
-		return new SortedArrayList(array, size, true);
+		int size = Set.sortDistinct((E[]) array, this.size, comparator);
+		return new SortedArrayList(array, size, true, comparator);
 	}
 	
 	@Override

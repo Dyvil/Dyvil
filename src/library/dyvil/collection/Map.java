@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -57,6 +58,26 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public default boolean isEmpty()
 	{
 		return this.size() == 0;
+	}
+	
+	public default boolean isSorted()
+	{
+		if (this.size() < 2)
+		{
+			return true;
+		}
+		
+		return Collection.iteratorSorted(this.keyIterator());
+	}
+	
+	public default boolean isSorted(Comparator<? super K> comparator)
+	{
+		if (this.size() < 2)
+		{
+			return true;
+		}
+		
+		return Collection.iteratorSorted(this.keyIterator(), comparator);
 	}
 	
 	/**

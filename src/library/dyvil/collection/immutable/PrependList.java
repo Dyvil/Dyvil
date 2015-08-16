@@ -207,7 +207,7 @@ public class PrependList<E> implements ImmutableList<E>
 	public ImmutableList<E> distinct(Comparator<? super E> comparator)
 	{
 		Object[] array = this.toArray();
-		int size = Set.distinct((E[]) array, this.size, comparator);
+		int size = Set.sortDistinct((E[]) array, this.size, comparator);
 		return fromArray(array, size);
 	}
 	

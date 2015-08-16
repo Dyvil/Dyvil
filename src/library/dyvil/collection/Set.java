@@ -42,6 +42,12 @@ public interface Set<E> extends Collection<E>
 	public int size();
 	
 	@Override
+	public default boolean isDistinct()
+	{
+		return true;
+	}
+	
+	@Override
 	public Iterator<E> iterator();
 	
 	@Override
@@ -265,7 +271,18 @@ public interface Set<E> extends Collection<E>
 		return size;
 	}
 	
-	public static @internal <T> int distinct(T[] array, int size, Comparator<? super T> comparator)
+	public static @internal int sortDistinct(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return size;
+		}
+		
+		Arrays.sort(array);
+		return distinctSorted(array, size);
+	}
+	
+	public static @internal <T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
 	{
 		if (size < 2)
 		{
@@ -300,5 +317,43 @@ public interface Set<E> extends Collection<E>
 		}
 		
 		return len + 1;
+	}
+	
+	public static @internal boolean isDistinct(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return true;
+		}
+		
+		for (int i = 0; i < size; i++)
+		{
+			Object o = array[i];
+			for (int j = 0; j < i; j++)
+			{
+				if (o.equals(array[j]))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	public static @internal boolean isDistinctSorted(Object[] array, int size)
+	{
+		if (size < 2)
+		{
+			return true;
+		}
+		
+		for (int i = 1; i < size; i++)
+		{
+			if (array[i - 1].equals(array[i]))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }

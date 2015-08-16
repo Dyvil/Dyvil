@@ -2,6 +2,7 @@ package dyvil.collection;
 
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
@@ -280,7 +281,18 @@ public interface Matrix<E> extends Iterable<E>
 			return false;
 		}
 		
-		return Collection.orderedEquals(m1, m2);
+		Iterator<E> iterator1 = m1.iterator();
+		Iterator<E> iterator2 = m2.iterator();
+		while (iterator1.hasNext())
+		{
+			E e1 = iterator1.next();
+			E e2 = iterator2.next();
+			if (!Objects.equals(e1, e2))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public static <E> int matrixHashCode(Matrix<E> matrix)

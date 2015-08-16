@@ -1,12 +1,14 @@
 package dyvil.collection.impl;
 
 import java.lang.reflect.Array;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import dyvil.collection.Collection;
 import dyvil.collection.List;
+import dyvil.collection.Set;
 
 public abstract class AbstractArrayList<E> implements List<E>
 {
@@ -68,6 +70,24 @@ public abstract class AbstractArrayList<E> implements List<E>
 	public boolean isEmpty()
 	{
 		return this.size == 0;
+	}
+	
+	@Override
+	public boolean isSorted()
+	{
+		return Collection.isSorted((E[]) this.elements, this.size);
+	}
+	
+	@Override
+	public boolean isSorted(Comparator<? super E> comparator)
+	{
+		return Collection.isSorted((E[]) this.elements, this.size, comparator);
+	}
+	
+	@Override
+	public boolean isDistinct()
+	{
+		return Set.isDistinct(this.elements, this.size);
 	}
 	
 	@Override

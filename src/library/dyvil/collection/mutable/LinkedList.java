@@ -324,7 +324,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	{
 		LinkedList<E> copy = new LinkedList<E>();
 		Object[] array = this.toArray();
-		copy.fromArray(array, Set.distinct((E[]) array, this.size, comparator));
+		copy.fromArray(array, Set.sortDistinct((E[]) array, this.size, comparator));
 		return copy;
 	}
 	

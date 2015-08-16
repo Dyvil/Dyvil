@@ -166,6 +166,26 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	}
 	
 	@Override
+	public boolean isSorted()
+	{
+		if (this.comparator == null)
+		{
+			return true;
+		}
+		return Map.super.isSorted();
+	}
+	
+	@Override
+	public boolean isSorted(Comparator<? super K> comparator)
+	{
+		if (comparator == this.comparator)
+		{
+			return true;
+		}
+		return Map.super.isSorted(comparator);
+	}
+	
+	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
 		return new PrivateEntryIterator(this.getFirstEntry())
