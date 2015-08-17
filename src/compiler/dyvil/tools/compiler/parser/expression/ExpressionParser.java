@@ -286,9 +286,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
-				ArgumentList list = new ArgumentList();
-				cc.setArguments(list);
-				pm.pushParser(new ExpressionListParser(list));
+				IArguments arguments = this.getArguments(pm, token.next());
+				cc.setArguments(arguments);
 				this.mode = CONSTRUCTOR_END;
 				return;
 			}

@@ -165,7 +165,7 @@ public class ConstructorCall implements ICall
 			
 			if (!(this.arguments instanceof ArgumentList))
 			{
-				markers.add(markers.create(this.position, "constructor.access.array"));
+				markers.add(this.position, "constructor.access.array");
 				return this;
 			}
 			
