@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -518,6 +519,7 @@ public final class PrimitiveType implements IType
 	{
 		if (!target.isPrimitive())
 		{
+			this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
 			return;
 		}
 		

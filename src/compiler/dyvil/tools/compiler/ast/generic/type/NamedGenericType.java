@@ -122,11 +122,6 @@ public class NamedGenericType extends GenericType
 			IType t1 = this.typeArguments[i];
 			IType t2 = t1.resolve(markers, context, position);
 			
-			if (t2.isPrimitive())
-			{
-				t2 = t2.getObjectType();
-			}
-			
 			this.typeArguments[i] = t2;
 			
 			ITypeVariable var = iclass.getTypeVariable(i);

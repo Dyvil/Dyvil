@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -434,10 +435,16 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
-		if (target != this && !target.isSuperClassOf(this))
+		if (target == this || target.isSuperClassOf(this))
 		{
-			writer.writeLineNumber(lineNumber);
-			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+			return;
+		}
+		
+		writer.writeLineNumber(lineNumber);
+		writer.writeTypeInsn(Opcodes.CHECKCAST, target.getTheClass().getInternalName());
+		if (target.isPrimitive())
+		{
+			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
 		}
 	}
 	

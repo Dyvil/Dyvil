@@ -1239,13 +1239,16 @@ public class Method extends Member implements IMethod, ILabelContext
 			IType type2 = param.getType();
 			
 			param.write(mw);
-			mw.writeVarInsn(type1.getLoadOpcode(), param.getIndex());
+			mw.writeVarInsn(type2.getLoadOpcode(), param.getIndex());
 			type2.writeCast(mw, type1, lineNumber);
 		}
 		
+		IType overrideReturnType = this.overrideMethod.getType();
+		
 		mw.writeLineNumber(lineNumber);
 		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
-		mw.writeInsn(this.type.getReturnOpcode());
+		this.type.writeCast(mw, overrideReturnType, lineNumber);
+		mw.writeInsn(overrideReturnType.getReturnOpcode());
 		mw.end();
 	}
 	
