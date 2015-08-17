@@ -624,7 +624,7 @@ public final class ExternalClass extends AbstractClass
 	{
 		Name name1 = Name.get(name);
 		
-		if ((this.modifiers & Modifiers.ANNOTATION) != 0)
+		if ((this.modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
 			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc), access);
 			this.addParameter(param);

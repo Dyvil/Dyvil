@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -157,5 +158,16 @@ public interface IContext
 			}
 			return bestConstructor.constructor;
 		}
+	}
+	
+	public static byte getVisibility(IContext context, IClassMember member)
+	{
+		IClass thisClass = context.getThisClass();
+		if (thisClass != null)
+		{
+			return thisClass.getVisibility(member);
+		}
+		
+		return context.getHeader().getVisibility(member);
 	}
 }

@@ -131,7 +131,7 @@ public final class ClassAccess implements IValue
 				markers.add(this.position, "type.access.deprecated", iclass.getName());
 			}
 			
-			if (context.getThisClass().getVisibility(iclass) == IContext.INTERNAL)
+			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
 			{
 				markers.add(this.position, "type.access.internal", iclass.getName());
 			}

@@ -117,7 +117,7 @@ public interface Modifiers
 	 * Modifier used to declare a class to be an annotation ({@code @interface}
 	 * ).
 	 */
-	public static final int ANNOTATION = 0x00002000;
+	public static final int ANNOTATION = 0x00002000 | INTERFACE_CLASS;
 	
 	/**
 	 * Modifier used to declare a class to be an {@code enum} class.

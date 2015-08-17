@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
@@ -103,6 +104,8 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	public void addInnerClass(IClassCompilable iclass);
 	
 	public IClassCompilable getInnerClass(int index);
+	
+	public byte getVisibility(IClassMember member);
 	
 	// Compilation
 	

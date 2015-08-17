@@ -47,6 +47,12 @@ public final class ClassOperator extends Value
 	}
 	
 	@Override
+	public Object toObject()
+	{
+		return dyvil.tools.asm.Type.getType(this.type.getExtendedName());
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

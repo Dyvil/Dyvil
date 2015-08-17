@@ -5,12 +5,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 import java.util.TreeSet;
 
+import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
-import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -61,8 +65,8 @@ public final class AnnotationMetadata implements IClassMetadata
 			IAnnotation retention = this.theClass.getAnnotation(Types.RETENTION_CLASS);
 			if (retention != null)
 			{
-				EnumValue value = (EnumValue) retention.getArguments().getValue(0, Annotation.VALUE);
-				this.retention = RetentionPolicy.valueOf(value.name.qualified);
+				INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
+				this.retention = RetentionPolicy.valueOf(value.getName().qualified);
 			}
 		}
 		if (this.targets != null)
@@ -86,18 +90,38 @@ public final class AnnotationMetadata implements IClassMetadata
 		int count = values.valueCount();
 		for (int i = 0; i < count; i++)
 		{
-			EnumValue value = (EnumValue) values.getValue(i);
-			this.targets.add(ElementType.valueOf(value.name.qualified));
+			INamed value = (INamed) values.getValue(i);
+			this.targets.add(ElementType.valueOf(value.getName().qualified));
 		}
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (!this.theClass.isSubTypeOf(Types.ANNOTATION))
+		{
+			this.theClass.addInterface(Types.ANNOTATION);
+		}
 	}
 	
 	@Override
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
+		int params = this.theClass.parameterCount();
+		for (int i = 0; i < params; i++)
+		{
+			IParameter param = this.theClass.getParameter(i);
+			
+			StringBuilder desc = new StringBuilder("()");
+			param.getType().appendExtendedName(desc);
+			MethodVisitor mw = writer.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, param.getName().qualified, desc.toString(), null, null);
+			
+			IValue value = param.getValue();
+			if (value != null)
+			{
+				AnnotationVisitor av = mw.visitAnnotationDefault();
+				Annotation.visitValue(av, null, value);
+			}
+		}
 	}
 }

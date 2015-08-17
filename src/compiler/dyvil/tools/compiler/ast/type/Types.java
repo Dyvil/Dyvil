@@ -39,6 +39,7 @@ public final class Types
 	public static final ClassType	THROWABLE			= new ClassType();
 	public static final ClassType	RUNTIME_EXCEPTION	= new ClassType();
 	public static final ClassType	IMMUTABLE			= new ClassType();
+	public static final ClassType	ANNOTATION			= new ClassType();
 	
 	public static IClass	VOID_CLASS;
 	public static IClass	BOOLEAN_CLASS;
@@ -62,6 +63,7 @@ public final class Types
 	
 	public static IClass	INTRINSIC_CLASS;
 	public static IClass	OVERRIDE_CLASS;
+	public static IClass	ANNOTATION_CLASS;
 	public static IClass	RETENTION_CLASS;
 	public static IClass	TARGET_CLASS;
 	public static IClass	MUTATING_CLASS;
@@ -80,9 +82,9 @@ public final class Types
 	public static IClass	CLASS_CONVERTIBLE;
 	public static IClass	TYPE_CONVERTIBLE;
 	
-	private static IClass			OBJECT_ARRAY_CLASS;
-	public static IClass				OBJECT_SIMPLE_REF_CLASS;
-	public static IClass					OBJECT_REF_CLASS;
+	private static IClass	OBJECT_ARRAY_CLASS;
+	public static IClass	OBJECT_SIMPLE_REF_CLASS;
+	public static IClass	OBJECT_REF_CLASS;
 	
 	public static void init()
 	{
@@ -107,6 +109,7 @@ public final class Types
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
 		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
+		ANNOTATION.theClass = ANNOTATION_CLASS = Package.javaLangAnnotation.resolveClass("Annotation");
 		
 		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
 		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");

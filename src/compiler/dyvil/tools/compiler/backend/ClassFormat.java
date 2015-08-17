@@ -133,7 +133,7 @@ public final class ClassFormat
 	
 	public static IType readReturnType(String desc)
 	{
-		return readType(desc, desc.lastIndexOf(')') + 1, desc.length());
+		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1);
 	}
 	
 	public static void readClassSignature(String desc, IClass iclass)
@@ -201,33 +201,31 @@ public final class ClassFormat
 	
 	private static IType readType(String desc, int start, int end)
 	{
-		int array = 0;
-		while (desc.charAt(start) == '[')
+		if (desc.charAt(start) == '[')
 		{
-			array++;
-			start++;
+			return new ArrayType(readType(desc, start + 1, end));
 		}
 		
 		switch (desc.charAt(start))
 		{
 		case 'V':
-			return ArrayType.getArrayType(Types.VOID, array);
+			return Types.VOID;
 		case 'Z':
-			return ArrayType.getArrayType(Types.BOOLEAN, array);
+			return Types.BOOLEAN;
 		case 'B':
-			return ArrayType.getArrayType(Types.BYTE, array);
+			return Types.BYTE;
 		case 'S':
-			return ArrayType.getArrayType(Types.SHORT, array);
+			return Types.SHORT;
 		case 'C':
-			return ArrayType.getArrayType(Types.CHAR, array);
+			return Types.CHAR;
 		case 'I':
-			return ArrayType.getArrayType(Types.INT, array);
+			return Types.INT;
 		case 'J':
-			return ArrayType.getArrayType(Types.LONG, array);
+			return Types.LONG;
 		case 'F':
-			return ArrayType.getArrayType(Types.FLOAT, array);
+			return Types.FLOAT;
 		case 'D':
-			return ArrayType.getArrayType(Types.DOUBLE, array);
+			return Types.DOUBLE;
 		case 'T':
 			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case 'L':

@@ -9,12 +9,16 @@ import dyvil.collection.Entry;
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -24,8 +28,8 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.lexer.Dlex;
@@ -58,7 +62,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected int					includeCount;
 	
 	protected Map<Name, Operator>	operators	= new IdentityHashMap();
-	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap();
+	protected Map<Name, ITypeAlias>	typeAliases	= new IdentityHashMap();
 	
 	public DyvilHeader()
 	{
@@ -261,9 +265,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		{
 			return op;
 		}
-		for (int i = 0; i < this.includeCount; i++) {
+		for (int i = 0; i < this.includeCount; i++)
+		{
 			op = this.includes[i].getHeader().getOperator(name);
-			if (op != null) {
+			if (op != null)
+			{
 				return op;
 			}
 		}
@@ -531,6 +537,37 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public byte getVisibility(IClassMember member)
+	{
+		IClass iclass = member.getTheClass();
+		
+		int access = member.getAccessLevel();
+		if ((access & Modifiers.INTERNAL) != 0)
+		{
+			if (iclass instanceof ExternalClass)
+			{
+				return INTERNAL;
+			}
+			// Clear the INTERNAL bit by ANDing with 0b1111
+			access &= 0b1111;
+		}
+		
+		if (access == Modifiers.PUBLIC)
+		{
+			return VISIBLE;
+		}
+		if (access == Modifiers.PROTECTED || access == Modifiers.PACKAGE)
+		{
+			IDyvilHeader header = iclass.getHeader();
+			if (header == this || this.pack == header.getPackage())
+			{
+				return VISIBLE;
+			}
+		}
+		return INVISIBLE;
+	}
+	
+	@Override
 	public String getFullName()
 	{
 		return this.pack.fullName + '.' + this.name;
@@ -662,9 +699,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public String toString()
 	{
-		StringBuilder buf = new StringBuilder();
-		this.toString("", buf);
-		return buf.toString();
+		return IASTNode.toString(this);
 	}
 	
 	@Override

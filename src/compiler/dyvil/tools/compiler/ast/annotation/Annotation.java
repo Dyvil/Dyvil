@@ -9,6 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -257,7 +258,7 @@ public final class Annotation implements IAnnotation
 		visitor.visitEnd();
 	}
 	
-	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)
+	public static void visitValue(AnnotationVisitor visitor, String key, IValue value)
 	{
 		int valueType = value.valueTag();
 		if (valueType == IValue.ARRAY)
@@ -292,6 +293,12 @@ public final class Annotation implements IAnnotation
 	public void read(DataInput in) throws IOException
 	{
 		// TODO
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

@@ -158,6 +158,10 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public ElementType getElementType()
 	{
+		if ((this.modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		{
+			return ElementType.ANNOTATION_TYPE;
+		}
 		return ElementType.TYPE;
 	}
 	

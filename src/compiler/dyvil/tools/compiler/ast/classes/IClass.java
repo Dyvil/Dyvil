@@ -141,7 +141,7 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 		{
 			return new CaseClassMetadata(iclass);
 		}
-		if ((modifiers & Modifiers.ANNOTATION) != 0)
+		if ((modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
 			return new AnnotationMetadata(iclass);
 		}

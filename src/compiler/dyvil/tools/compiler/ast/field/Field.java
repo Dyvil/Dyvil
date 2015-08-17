@@ -173,7 +173,7 @@ public class Field extends Member implements IField
 			markers.add(position, "field.access.deprecated", this.name);
 		}
 		
-		switch (context.getThisClass().getVisibility(this))
+		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
 			markers.add(position, "field.access.internal", this.name);

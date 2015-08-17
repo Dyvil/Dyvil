@@ -139,13 +139,13 @@ public enum ModifierTypes
 		{
 			sb.append("class ");
 		}
-		else if ((mod & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS)
-		{
-			sb.append("interface ");
-		}
 		else if ((mod & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
 			sb.append("@interface ");
+		}
+		else if ((mod & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS)
+		{
+			sb.append("interface ");
 		}
 		else if ((mod & Modifiers.ENUM) == Modifiers.ENUM)
 		{

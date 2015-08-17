@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.classes;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -265,7 +264,7 @@ public class CodeClass extends AbstractClass
 		
 		if (this.annotations != null)
 		{
-			this.annotations.check(markers, context, ElementType.TYPE);
+			this.annotations.check(markers, context, this.getElementType());
 		}
 		
 		if (this.body != null)
@@ -377,6 +376,14 @@ public class CodeClass extends AbstractClass
 		if (this.outerClass != null)
 		{
 			this.writeInnerClassInfo(writer);
+		}
+		
+		// Super Types
+		
+		if ((this.modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		{
+			this.metadata.write(writer, null);
+			return;
 		}
 		
 		if (this.superType != null)
