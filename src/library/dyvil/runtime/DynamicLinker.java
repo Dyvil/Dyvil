@@ -1,19 +1,110 @@
 package dyvil.runtime;
 
 import java.lang.invoke.*;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Method;
 
 public class DynamicLinker
 {
-	public static CallSite linkMethod(MethodHandles.Lookup callerClass, String name, MethodType type) throws Throwable
+	static class InliningCacheCallSite extends MutableCallSite
 	{
-		Class clazz = type.parameterType(0);
-		type = type.dropParameterTypes(0, 1);
-		MethodHandle handle = callerClass.findStatic(clazz, name, type);
-		if (!type.equals(handle.type()))
+		private static final int	MAX_DEPTH	= 3;
+		
+		final Lookup				lookup;
+		final String				name;
+		int							depth;
+		
+		InliningCacheCallSite(Lookup lookup, String name, MethodType type)
 		{
-			handle = handle.asType(type);
+			super(type);
+			this.lookup = lookup;
+			this.name = name;
 		}
-		return new ConstantCallSite(handle);
+	}
+	
+	private static final MethodHandle	CHECK_CLASS;
+	private static final MethodHandle	FALLBACK;
+	
+	static
+	{
+		Lookup lookup = MethodHandles.lookup();
+		try
+		{
+			CHECK_CLASS = lookup.findStatic(DynamicLinker.class, "checkClass", MethodType.methodType(boolean.class, Class.class, Object.class));
+			FALLBACK = lookup.findStatic(DynamicLinker.class, "fallback", MethodType.methodType(Object.class, InliningCacheCallSite.class, Object[].class));
+		}
+		catch (ReflectiveOperationException e)
+		{
+			throw new AssertionError("", e);
+		}
+	}
+	
+	public static CallSite linkMethod(Lookup lookup, String name, MethodType type)
+	{
+		InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type);
+		
+		MethodHandle fallback = FALLBACK.bindTo(callSite);
+		fallback = fallback.asCollector(Object[].class, type.parameterCount());
+		fallback = fallback.asType(type);
+		
+		callSite.setTarget(fallback);
+		return callSite;
+	}
+	
+	public static boolean checkClass(Class<?> clazz, Object receiver)
+	{
+		return receiver.getClass() == clazz;
+	}
+	
+	public static Method findMethod(Class<?> receiver, String name, Class[] parameterTypes) throws Throwable
+	{
+		do
+		{
+			try
+			{
+				return receiver.getDeclaredMethod(name, parameterTypes);
+			}
+			catch (NoSuchMethodException ex)
+			{
+			}
+			
+			receiver = receiver.getSuperclass();
+		}
+		while (receiver != null);
+		return null;
+	}
+	
+	public static Object fallback(InliningCacheCallSite callSite, Object[] args) throws Throwable
+	{
+		MethodType type = callSite.type();
+		if (callSite.depth >= InliningCacheCallSite.MAX_DEPTH)
+		{
+			// revert to a vtable call
+			MethodHandle target = callSite.lookup.findVirtual(type.parameterType(0), callSite.name, type.dropParameterTypes(0, 1));
+			callSite.setTarget(target);
+			return target.invokeWithArguments(args);
+		}
+		
+		Object receiver = args[0];
+		if (receiver == null)
+		{
+			return null;
+		}
+		
+		Class<?> receiverClass = receiver.getClass();
+		Method m = findMethod(receiverClass, callSite.name, type.dropParameterTypes(0, 1).parameterArray());
+		
+		MethodHandle target = callSite.lookup.unreflect(m);
+		target = target.asType(type);
+		
+		MethodHandle test = CHECK_CLASS.bindTo(receiverClass);
+		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
+		
+		MethodHandle guard = MethodHandles.guardWithTest(test, target, callSite.getTarget());
+		callSite.depth++;
+		
+		callSite.setTarget(guard);
+		return target.invokeWithArguments(args);
 	}
 	
 	public static CallSite linkGetter(MethodHandles.Lookup callerClass, String name, Class type) throws Throwable
