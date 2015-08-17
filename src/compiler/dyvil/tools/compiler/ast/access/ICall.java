@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
@@ -102,13 +103,14 @@ public interface ICall extends IValue
 			return IContext.getBestMethod(matches);
 		}
 		
-		if (instance == null && arguments.size() == 1)
+		// Prefix Methods
+		if (arguments.size() == 1)
 		{
 			IValue v = arguments.getFirstValue();
 			IType type = v.getType();
 			if (type != null)
 			{
-				type.getMethodMatches(matches, instance, name, EmptyArguments.INSTANCE);
+				type.getMethodMatches(matches, v, name, instance == null ? EmptyArguments.INSTANCE : new SingleArgument(instance));
 				
 				if (!matches.isEmpty())
 				{

@@ -748,16 +748,6 @@ public class Method extends Member implements IMethod, ILabelContext
 			return 1;
 		}
 		
-		if (instance == null && this.modifiers == Modifiers.PREFIX)
-		{
-			float m = arguments.getFirstValue().getTypeMatch(this.theClass.getType());
-			if (m == 0)
-			{
-				return 0;
-			}
-			return 1 + m;
-		}
-		
 		int parIndex = 0;
 		int match = 1;
 		int argumentCount = arguments.size();
@@ -855,22 +845,12 @@ public class Method extends Member implements IMethod, ILabelContext
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
-		IType parType;
 		
-		if (instance == null && (this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			parType = this.theClass.getType().getConcreteType(typeContext);
-			instance = arguments.getFirstValue();
-			IValue instance1 = parType.convertValue(instance, typeContext, markers, context);
-			if (instance1 == null)
-			{
-				Marker marker = markers.create(instance.getPosition(), "method.access.prefix_type", this.name);
-				marker.addInfo("Required Type: " + parType);
-				marker.addInfo("Value Type: " + instance.getType());
-			}
-			
-			this.checkTypeVarsInferred(markers, position, typeContext);
-			return null;
+			IValue argument = arguments.getFirstValue();
+			arguments.setFirstValue(instance);
+			instance = argument;
 		}
 		
 		if (instance != null)
@@ -1044,12 +1024,7 @@ public class Method extends Member implements IMethod, ILabelContext
 			break;
 		}
 		
-		if ((this.modifiers & Modifiers.PREFIX) != 0)
-		{
-			IValue value = arguments.getFirstValue();
-			this.checkMutating(markers, value != null ? value : instance);
-		}
-		else if (instance != null)
+		if (instance != null)
 		{
 			this.checkMutating(markers, instance);
 		}
@@ -1393,11 +1368,6 @@ public class Method extends Member implements IMethod, ILabelContext
 	{
 		int parIndex = 0;
 		
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			arguments.writeValue(0, Name._this, null, writer);
-			return;
-		}
 		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			parIndex = 1;

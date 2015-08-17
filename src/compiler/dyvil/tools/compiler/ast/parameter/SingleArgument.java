@@ -2,8 +2,10 @@ package dyvil.tools.compiler.ast.parameter;
 
 import java.util.Iterator;
 
+import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -34,7 +36,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public int size()
 	{
-		return 1;
+		return this.value == null ? 0 : 1;
 	}
 	
 	@Override
@@ -54,6 +56,10 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public IArguments addLastValue(IValue value)
 	{
+		if (this.value == null) {
+			return new SingleArgument(value);
+		}
+		
 		ArgumentList list = new ArgumentList();
 		list.addValue(this.value);
 		list.addValue(value);
@@ -118,7 +124,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
-		if (index == 0)
+		if (index == 0 && this.value != null)
 		{
 			return this.value.getTypeMatch(param.getType());
 		}
@@ -132,7 +138,7 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			return DEFAULT_MATCH;
 		}
-		if (index > 1)
+		if (index > 1 || this.value == null)
 		{
 			return 0;
 		}
@@ -148,7 +154,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (index != 0)
+		if (index != 0 || this.value == null)
 		{
 			return;
 		}
@@ -170,7 +176,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (index != 0)
+		if (index != 0 || this.value == null)
 		{
 			return;
 		}
@@ -200,7 +206,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		if (index == 0)
+		if (index == 0 && this.value != null)
 		{
 			param.getType().inferTypes(this.value.getType(), typeContext);
 		}
@@ -209,7 +215,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
 	{
-		if (index != 0)
+		if (index != 0 || this.value == null)
 		{
 			return;
 		}
@@ -227,7 +233,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
 	{
-		if (index == 0)
+		if (index == 0 && this.value != null)
 		{
 			this.value.writeExpression(writer);
 			return;
@@ -239,7 +245,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
 	{
-		if (index != 0)
+		if (index != 0 || this.value == null)
 		{
 			return;
 		}
@@ -263,51 +269,53 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new SingletonIterator<IValue>(this.value);
+		return this.value == null ? EmptyIterator.apply() : new SingletonIterator<IValue>(this.value);
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.value.resolveTypes(markers, context);
+		if (this.value != null) {
+		this.value.resolveTypes(markers, context);}
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.value = this.value.resolve(markers, context);
+		if (this.value != null) {
+		this.value = this.value.resolve(markers, context);}
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
-	{
+	{if (this.value != null) {
 		this.value.checkTypes(markers, context);
-	}
+	}}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
-	{
+	{if (this.value != null) {
 		this.value.check(markers, context);
-	}
+	}}
 	
 	@Override
 	public void foldConstants()
 	{
+		if (this.value != null) {
 		this.value = this.value.foldConstants();
-	}
+	}}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		if (this.value != null) {
 		this.value = this.value.cleanup(context, compilableList);
-	}
+	}}
 	
 	@Override
 	public String toString()
 	{
-		StringBuilder buf = new StringBuilder();
-		this.toString("", buf);
-		return buf.toString();
+		return IASTNode.toString(this);
 	}
 	
 	@Override
