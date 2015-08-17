@@ -8,17 +8,19 @@ public class DynamicLinker
 {
 	static class InliningCacheCallSite extends MutableCallSite
 	{
-		private static final int	MAX_DEPTH	= 3;
+		private static final int MAX_DEPTH = 3;
 		
-		final Lookup				lookup;
-		final String				name;
-		int							depth;
+		final Lookup		lookup;
+		final String		name;
+		final MethodHandle	fallback;
+		int					depth;
 		
-		InliningCacheCallSite(Lookup lookup, String name, MethodType type)
+		InliningCacheCallSite(Lookup lookup, String name, MethodType type, MethodHandle fallback)
 		{
 			super(type);
 			this.lookup = lookup;
 			this.name = name;
+			this.fallback = fallback;
 		}
 	}
 	
@@ -41,14 +43,7 @@ public class DynamicLinker
 	
 	public static CallSite linkMethod(Lookup lookup, String name, MethodType type)
 	{
-		InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type);
-		
-		MethodHandle fallback = FALLBACK.bindTo(callSite);
-		fallback = fallback.asCollector(Object[].class, type.parameterCount());
-		fallback = fallback.asType(type);
-		
-		callSite.setTarget(fallback);
-		return callSite;
+		return linkExtension(lookup, name, type, null);
 	}
 	
 	public static boolean checkClass(Class<?> clazz, Object receiver)
@@ -94,6 +89,16 @@ public class DynamicLinker
 		Class<?> receiverClass = receiver.getClass();
 		Method m = findMethod(receiverClass, callSite.name, type.dropParameterTypes(0, 1).parameterArray());
 		
+		if (m == null)
+		{
+			MethodHandle fallback = callSite.fallback;
+			if (fallback == null)
+			{
+				throw new NoSuchMethodError(callSite.name);
+			}
+			return fallback.invokeWithArguments(args);
+		}
+		
 		MethodHandle target = callSite.lookup.unreflect(m);
 		target = target.asType(type);
 		
@@ -107,15 +112,11 @@ public class DynamicLinker
 		return target.invokeWithArguments(args);
 	}
 	
-	public static CallSite linkGetter(MethodHandles.Lookup callerClass, String name, Class type) throws Throwable
+	public static CallSite linkExtension(Lookup lookup, String name, MethodType type, MethodHandle fallback)
 	{
-		MethodHandle handle = callerClass.findGetter(DynamicLinker.class, name, type);
-		return new ConstantCallSite(handle);
-	}
-	
-	public static CallSite linkSetter(MethodHandles.Lookup callerClass, String name, Class type) throws Throwable
-	{
-		MethodHandle handle = callerClass.findSetter(DynamicLinker.class, name, type);
-		return new ConstantCallSite(handle);
+		InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type, fallback);
+		MethodHandle fb = FALLBACK.bindTo(callSite).asCollector(Object[].class, type.parameterCount()).asType(type);
+		callSite.setTarget(fb);
+		return callSite;
 	}
 }

@@ -227,7 +227,11 @@ public enum ModifierTypes
 	
 	private static void writeMethodModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & Modifiers.INFIX) == Modifiers.INFIX)
+		if ((mod & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		{
+			sb.append("extension ");
+		}
+		else if ((mod & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			sb.append("infix ");
 		}
@@ -235,6 +239,7 @@ public enum ModifierTypes
 		{
 			sb.append("static ");
 		}
+		
 		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
 		{
 			sb.append("final ");
@@ -376,6 +381,8 @@ public enum ModifierTypes
 			return Modifiers.INLINE;
 		case Keywords.INFIX:
 			return Modifiers.INFIX;
+		case Keywords.EXTENSION:
+			return Modifiers.EXTENSION;
 		case Keywords.POSTFIX:
 			return Modifiers.INFIX;
 		case Keywords.PREFIX:

@@ -169,6 +169,8 @@ public interface Modifiers
 	 */
 	public static final int INFIX = 0x00020000 | STATIC;
 	
+	public static final int EXTENSION = 0x00100000 | INFIX;
+	
 	/**
 	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this
 	 * modifier, it is a method that can be called on any Object and virtually
@@ -213,13 +215,13 @@ public interface Modifiers
 	 * project. This modifier will be converted to the {@link internal}
 	 * annotation.
 	 */
-	public static final int INTERNAL = 0x00100000;
+	public static final int INTERNAL = 0x01000000;
 	
 	/**
 	 * <i>Dyvil</i> {@code deprecated} modifier. This modifier is a shortcut for
 	 * the {@link Deprecated} annotation.
 	 */
-	public static final int DEPRECATED = 0x00200000;
+	public static final int DEPRECATED = 0x02000000;
 	
 	/**
 	 * <i>Dyvil</i> {@code sealed} modifier. This modifier is used to mark that
@@ -227,7 +229,7 @@ public interface Modifiers
 	 * the same library. This modifier will be converted to the {@link sealed}
 	 * annotation.
 	 */
-	public static final int SEALED = 0x00400000;
+	public static final int SEALED = 0x04000000;
 	
 	/**
 	 * The modifiers that can be used to declare the class type (i.e.,

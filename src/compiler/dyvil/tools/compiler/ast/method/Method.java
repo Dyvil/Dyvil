@@ -9,6 +9,7 @@ import dyvil.annotation.mutating;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -39,6 +40,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -58,6 +60,9 @@ import static dyvil.reflect.Opcodes.INSTANCE;
 
 public class Method extends Member implements IMethod, ILabelContext
 {
+	private static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker", "linkExtension",
+			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+			
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
@@ -259,6 +264,9 @@ public class Method extends Member implements IMethod, ILabelContext
 		case "dyvil/annotation/infix":
 		case "dyvil/annotation/postfix":
 			this.modifiers |= Modifiers.INFIX;
+			return false;
+		case "dyvil/annotation/extension":
+			this.modifiers |= Modifiers.EXTENSION;
 			return false;
 		case "dyvil/annotation/prefix":
 			this.modifiers |= Modifiers.PREFIX;
@@ -1267,7 +1275,11 @@ public class Method extends Member implements IMethod, ILabelContext
 		{
 			mw.addAnnotation("Ldyvil/annotation/inline;", false);
 		}
-		if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if ((this.modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		{
+			mw.addAnnotation("Ldyvil/annotation/extension;", true);
+		}
+		else if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			mw.addAnnotation("Ldyvil/annotation/infix;", false);
 		}
@@ -1529,7 +1541,14 @@ public class Method extends Member implements IMethod, ILabelContext
 		
 		int opcode;
 		int modifiers = this.modifiers;
+		
 		String owner = this.theClass.getInternalName();
+		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		{
+			writer.writeInvokeDynamic(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
+					new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified, this.getDescriptor()));
+			return;
+		}
 		
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
