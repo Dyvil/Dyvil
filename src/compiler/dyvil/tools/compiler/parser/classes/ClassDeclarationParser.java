@@ -1,12 +1,8 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.classes.CodeClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.classes.IClassList;
+import dyvil.tools.compiler.ast.classes.*;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,12 +15,10 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
 {
-	private static final int	MODIFIERS		= 0;
 	private static final int	NAME			= 1;
 	private static final int	GENERICS		= 2;
 	private static final int	GENERICS_END	= 4;
@@ -35,109 +29,63 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private static final int	BODY			= 128;
 	private static final int	BODY_END		= 256;
 	
-	private static final int	POST_EXTENDS	= IMPLEMENTS | BODY;
-	private static final int	POST_PARAMETERS	= EXTENDS | POST_EXTENDS;
-	private static final int	POST_GENERICS	= PARAMETERS | POST_PARAMETERS;
-	private static final int	POST_NAME		= PARAMETERS | GENERICS | POST_PARAMETERS;
-	
+	protected IDyvilHeader	header;
+	protected IClass		outerClass;
 	protected IClassList	classList;
-	private CodeClass		theClass;
 	
-	private int				modifiers;
-	private AnnotationList	annotations;
+	protected int				modifiers;
+	protected AnnotationList	annotations;
+	
+	private CodeClass theClass;
 	
 	public ClassDeclarationParser(IDyvilHeader header)
 	{
+		this.header = header;
 		this.classList = header;
-		this.mode = MODIFIERS;
+		this.mode = NAME;
 	}
 	
-	public ClassDeclarationParser(IClassList classList, CodeClass theClass)
+	public ClassDeclarationParser(IDyvilHeader header, int modifiers, AnnotationList annotations)
 	{
-		this.classList = classList;
-		this.theClass = theClass;
+		this.header = header;
+		this.classList = header;
 		
-		if (theClass.getName() == null)
-		{
-			this.mode = NAME;
-		}
-		else
-		{
-			this.mode = POST_NAME;
-		}
+		this.modifiers = modifiers;
+		this.annotations = annotations;
+		this.mode = NAME;
+	}
+	
+	public ClassDeclarationParser(IClass outerClass, int modifiers, AnnotationList annotations)
+	{
+		this.outerClass = outerClass;
+		this.header = outerClass.getHeader();
+		this.classList = outerClass.getBody();
+		
+		this.modifiers = modifiers;
+		this.annotations = annotations;
+		this.mode = NAME;
 	}
 	
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == MODIFIERS)
+		switch (this.mode)
 		{
-			int i = 0;
-			if ((i = ModifierTypes.CLASS.parse(type)) != -1)
-			{
-				this.modifiers |= i;
-				return;
-			}
-			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
-			{
-				this.modifiers |= i;
-				this.mode = NAME;
-				return;
-			}
-			if (type == Symbols.AT)
-			{
-				if (token.next().type() == Keywords.INTERFACE)
-				{
-					this.modifiers |= Modifiers.ANNOTATION;
-					this.mode = NAME;
-					pm.skip();
-					return;
-				}
-				
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-				
-				Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
-				pm.pushParser(pm.newAnnotationParser(annotation));
-				return;
-			}
-			if (token.isInferred())
-			{
-				return;
-			}
-			pm.report(new SyntaxError(token, "Invalid " + token + " - Delete this token"));
-			return;
-		}
-		if (this.mode == NAME)
-		{
+		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.theClass = new CodeClass(token.raw(), (IDyvilHeader) this.classList, this.modifiers);
+				this.theClass = new CodeClass(token.raw(), this.header, this.modifiers);
 				this.theClass.setAnnotations(this.annotations);
+				this.theClass.setOuterClass(this.outerClass);
 				this.theClass.setName(token.nameValue());
-				this.mode = POST_NAME;
+				this.mode = GENERICS;
 				return;
 			}
 			pm.report(new SyntaxError(token, "Invalid Class Declaration - Name expected"));
 			return;
-		}
-		if (this.isInMode(GENERICS))
-		{
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.pushParser(new TypeVariableListParser(this.theClass));
-				this.theClass.setGeneric();
-				this.mode = GENERICS_END;
-				return;
-			}
-		}
-		if (this.mode == GENERICS_END)
-		{
-			this.mode = POST_GENERICS;
+		case GENERICS_END:
+			this.mode = PARAMETERS;
 			if (type == Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
@@ -145,19 +93,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			pm.reparse();
 			pm.report(new SyntaxError(token, "Invalid Generic Type Variable List - ']' expected"));
 			return;
-		}
-		if (this.isInMode(PARAMETERS))
-		{
-			if (type == Symbols.OPEN_PARENTHESIS)
-			{
-				pm.pushParser(new ParameterListParser(this.theClass));
-				this.mode = PARAMETERS_END;
-				return;
-			}
-		}
-		if (this.mode == PARAMETERS_END)
-		{
-			this.mode = POST_PARAMETERS;
+		case PARAMETERS_END:
+			this.mode = EXTENDS;
 			if (type == Symbols.CLOSE_PARENTHESIS)
 			{
 				return;
@@ -165,9 +102,22 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			pm.reparse();
 			pm.report(new SyntaxError(token, "Invalid Class Parameter List - ')' expected"));
 			return;
-		}
-		if (this.isInMode(EXTENDS))
-		{
+		case GENERICS:
+			if (type == Symbols.OPEN_SQUARE_BRACKET)
+			{
+				pm.pushParser(new TypeVariableListParser(this.theClass));
+				this.theClass.setGeneric();
+				this.mode = GENERICS_END;
+				return;
+			}
+		case PARAMETERS:
+			if (type == Symbols.OPEN_PARENTHESIS)
+			{
+				pm.pushParser(new ParameterListParser(this.theClass));
+				this.mode = PARAMETERS_END;
+				return;
+			}
+		case EXTENDS:
 			if (type == Keywords.EXTENDS)
 			{
 				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
@@ -178,12 +128,10 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				}
 				
 				pm.pushParser(pm.newTypeParser(this));
-				this.mode = POST_EXTENDS;
+				this.mode = IMPLEMENTS;
 				return;
 			}
-		}
-		if (this.isInMode(IMPLEMENTS))
-		{
+		case IMPLEMENTS:
 			if (type == Keywords.IMPLEMENTS)
 			{
 				pm.pushParser(new TypeListParser(this));
@@ -196,9 +144,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				}
 				return;
 			}
-		}
-		if (this.isInMode(BODY))
-		{
+		case BODY:
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
 				IClassBody body = new ClassBody(this.theClass);
@@ -211,21 +157,25 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				if (token.isInferred())
 				{
-					int nextType = token.next().type();
-					switch (nextType)
+					IToken next = token.next();
+					if (next != null)
 					{
-					case Keywords.EXTENDS:
-						this.mode = EXTENDS;
-						return;
-					case Keywords.IMPLEMENTS:
-						this.mode = IMPLEMENTS;
-						return;
-					case Symbols.OPEN_SQUARE_BRACKET:
-						this.mode = GENERICS;
-						return;
-					case Symbols.OPEN_PARENTHESIS:
-						this.mode = PARAMETERS;
-						return;
+						int nextType = next.type();
+						switch (nextType)
+						{
+						case Keywords.EXTENDS:
+							this.mode = EXTENDS;
+							return;
+						case Keywords.IMPLEMENTS:
+							this.mode = IMPLEMENTS;
+							return;
+						case Symbols.OPEN_SQUARE_BRACKET:
+							this.mode = GENERICS;
+							return;
+						case Symbols.OPEN_PARENTHESIS:
+							this.mode = PARAMETERS;
+							return;
+						}
 					}
 				}
 				
@@ -236,9 +186,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			this.mode = BODY_END;
 			pm.report(new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected"));
 			return;
-		}
-		if (this.mode == BODY_END)
-		{
+		case BODY_END:
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
@@ -257,7 +205,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		switch (this.mode)
 		{
 		case IMPLEMENTS:
-		case POST_EXTENDS: // extends
+		case EXTENDS: // extends
 			this.theClass.setSuperType(type);
 			return;
 		case BODY: // implements

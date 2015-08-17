@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -45,7 +44,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	
 	private IType			type;
 	private int				modifiers;
-	private AnnotationList annotations;
+	private AnnotationList	annotations;
 	
 	private IMember member;
 	
@@ -119,14 +118,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
 			{
-				IToken next = token.next();
-				if (!ParserUtil.isIdentifier(next.type()))
-				{
-					this.reset();
-					pm.report(new SyntaxError(next, "Invalid Class Declaration - Name expected"));
-					return;
-				}
-				
 				if (this.theClass == null)
 				{
 					this.reset();
@@ -134,22 +125,21 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					return;
 				}
 				
-				Name name = next.nameValue();
-				
-				CodeClass codeClass = new CodeClass(next.raw(), this.theClass.getHeader(), this.modifiers | i);
-				codeClass.setName(name);
-				codeClass.setAnnotations(this.annotations);
-				codeClass.setOuterClass(this.theClass);
-				
-				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass.getBody(), codeClass);
-				pm.skip();
+				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass, this.modifiers | i, this.annotations);
 				pm.pushParser(parser);
 				this.reset();
 				return;
 			}
 			if (type == Symbols.AT)
 			{
-				if (this.annotations == null) {
+				if (token.next().type() == Keywords.INTERFACE)
+				{
+					this.modifiers |= Modifiers.ANNOTATION;
+					return;
+				}
+				
+				if (this.annotations == null)
+				{
 					this.annotations = new AnnotationList();
 				}
 				

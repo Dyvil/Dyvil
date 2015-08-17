@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
@@ -28,7 +29,7 @@ public class DyvilUnit extends DyvilHeader
 	@Override
 	public boolean isHeader()
 	{
-		return false;
+		return this.headerDeclaration != null;
 	}
 	
 	@Override
@@ -145,6 +146,10 @@ public class DyvilUnit extends DyvilHeader
 	public void check()
 	{
 		this.pack.check(this.packageDeclaration, this.markers);
+		if (this.headerDeclaration != null)
+		{
+			this.headerDeclaration.check(this.markers);
+		}
 		
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -182,6 +187,11 @@ public class DyvilUnit extends DyvilHeader
 		if (this.printMarkers())
 		{
 			return;
+		}
+		
+		if (this.headerDeclaration != null)
+		{
+			ObjectFormat.write(new File(this.outputDirectory, this.name.qualified + ".dyo"), this);
 		}
 		
 		for (int i = 0; i < this.classCount; i++)

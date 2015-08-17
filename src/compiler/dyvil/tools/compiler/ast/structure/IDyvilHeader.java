@@ -39,6 +39,12 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	
 	public PackageDeclaration getPackageDeclaration();
 	
+	// Header Declaration
+	
+	public void setHeaderDeclaration(HeaderDeclaration declaration);
+	
+	public HeaderDeclaration getHeaderDeclaration();
+	
 	// Import
 	
 	public int importCount();

@@ -64,6 +64,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected Map<Name, Operator>	operators	= new IdentityHashMap();
 	protected Map<Name, ITypeAlias>	typeAliases	= new IdentityHashMap();
 	
+	protected HeaderDeclaration headerDeclaration;
+	
 	public DyvilHeader()
 	{
 		this.inputFile = null;
@@ -154,6 +156,18 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public PackageDeclaration getPackageDeclaration()
 	{
 		return this.packageDeclaration;
+	}
+	
+	@Override
+	public HeaderDeclaration getHeaderDeclaration()
+	{
+		return this.headerDeclaration;
+	}
+	
+	@Override
+	public void setHeaderDeclaration(HeaderDeclaration declaration)
+	{
+		this.headerDeclaration = declaration;
 	}
 	
 	@Override
@@ -356,6 +370,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			IncludeDeclaration include = this.includes[i];
 			include.resolve(this.markers);
 		}
+		
+		if (this.headerDeclaration == null)
+		{
+			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, Modifiers.PUBLIC, null);
+		}
 	}
 	
 	@Override
@@ -396,6 +415,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public void check()
 	{
 		this.pack.check(this.packageDeclaration, this.markers);
+		
+		if (this.headerDeclaration != null)
+		{
+			this.headerDeclaration.check(this.markers);
+		}
 	}
 	
 	@Override
@@ -603,7 +627,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public void write(DataOutput out) throws IOException
 	{
 		// Header Name
-		out.writeUTF(this.name.unqualified);
+		this.headerDeclaration.write(out);
 		
 		// Include Declarations
 		int includes = this.includeCount;
@@ -652,7 +676,10 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.get(in.readUTF());
+		this.headerDeclaration = new HeaderDeclaration(this);
+		this.headerDeclaration.read(in);
+		
+		this.name = this.headerDeclaration.getName();
 		
 		// Include Declarations
 		int includes = in.readShort();
@@ -781,6 +808,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			{
 				buffer.append('\n');
 			}
+		}
+		
+		if (this.headerDeclaration != null)
+		{
+			this.headerDeclaration.toString(prefix, buffer);
+			buffer.append('\n');
+			buffer.append('\n');
 		}
 	}
 }
