@@ -9,7 +9,6 @@ import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.access.ApplyMethodCall;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -294,29 +293,18 @@ public class Constructor extends Member implements IConstructor
 	
 	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
-		if (this.value.valueTag() != IValue.STATEMENT_LIST)
+		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
 		{
-			markers.add(this.position, "constructor.expression");
+			return;
 		}
-		
-		StatementList sl = (StatementList) this.value;
-		if (sl.valueCount() > 0)
+		if (this.value.valueTag() == IValue.STATEMENT_LIST)
 		{
-			IValue first = sl.getValue(0);
-			if (first.valueTag() == IValue.APPLY_CALL)
+			StatementList sl = (StatementList) this.value;
+			int count = sl.valueCount();
+			for (int i = 0; i < count; i++)
 			{
-				ApplyMethodCall amc = (ApplyMethodCall) first;
-				IValue instance = amc.getValue();
-				int valueType = instance.valueTag();
-				if (valueType == IValue.SUPER)
+				if (sl.getValue(i).valueTag() == IValue.INITIALIZER_CALL)
 				{
-					IClass iclass = this.theClass.getSuperType().getTheClass();
-					sl.setValue(0, this.initializer(instance.getPosition(), markers, iclass, amc.getArguments(), true));
-					return;
-				}
-				else if (valueType == IValue.THIS)
-				{
-					sl.setValue(0, this.initializer(instance.getPosition(), markers, this.theClass, amc.getArguments(), false));
 					return;
 				}
 			}
@@ -330,25 +318,7 @@ public class Constructor extends Member implements IConstructor
 			return;
 		}
 		
-		sl.addValue(0, new InitializerCall(this.position, match, EmptyArguments.INSTANCE));
-	}
-	
-	private IValue initializer(ICodePosition position, MarkerList markers, IClass iclass, IArguments arguments, boolean isSuper)
-	{
-		IConstructor match = IContext.resolveConstructor(iclass, arguments);
-		if (match == null)
-		{
-			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
-			if (!arguments.isEmpty())
-			{
-				StringBuilder builder = new StringBuilder("Argument Types: ");
-				arguments.typesToString(builder);
-				marker.addInfo(builder.toString());
-			}
-			return new InitializerCall(position, null, arguments, isSuper);
-		}
-		
-		return new InitializerCall(position, match, arguments, isSuper);
+		this.value = Util.prependValue(new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true), this.value);
 	}
 	
 	@Override

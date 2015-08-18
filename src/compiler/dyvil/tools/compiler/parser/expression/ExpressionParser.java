@@ -44,9 +44,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public static final int	TYPE				= 0x100;
 	public static final int	CONSTRUCTOR			= 0x200;
 	public static final int	CONSTRUCTOR_END		= 0x400;
-	public static final int	PARAMETERS_END		= 0x800;
-	public static final int	SUBSCRIPT_END		= 0x1000;
-	public static final int	TYPE_ARGUMENTS_END	= 0x2000;
+	public static final int	PARAMETERS			= 0x800;
+	public static final int	PARAMETERS_END		= 0x1000;
+	public static final int	SUBSCRIPT_END		= 0x2000;
+	public static final int	TYPE_ARGUMENTS_END	= 0x4000;
 	
 	public static final int BYTECODE_END = 0x10000;
 	
@@ -284,10 +285,18 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
+			this.mode = PARAMETERS;
+			pm.reparse();
+			return;
+		}
+		case PARAMETERS:
+		{
+			ICall icall = (ICall) this.value;
+			
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				IArguments arguments = this.getArguments(pm, token.next());
-				cc.setArguments(arguments);
+				icall.setArguments(arguments);
 				this.mode = CONSTRUCTOR_END;
 				return;
 			}
@@ -300,7 +309,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			SingleArgument sa = new SingleArgument();
-			cc.setArguments(sa);
+			icall.setArguments(sa);
 			ExpressionParser ep = (ExpressionParser) pm.newExpressionParser(sa);
 			ep.operator = Operators.DEFAULT;
 			pm.pushParser(ep, true);
@@ -808,32 +817,62 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = ACCESS;
 			return true;
 		case Keywords.THIS:
-			// this[type]
-			if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
+		{
+			IToken next = token.next();
+			switch (next.type())
 			{
+			// this[type]
+			case Symbols.OPEN_SQUARE_BRACKET:
 				ThisValue tv = new ThisValue(token.raw());
 				this.mode = ARRAY_END;
 				this.value = tv;
 				pm.skip();
 				pm.pushParser(new TypeParser(tv));
 				return true;
+			case Symbols.DOT:
+				// this.new
+				IToken next2 = next.next();
+				if (next2.type() == Keywords.NEW)
+				{
+					this.value = new InitializerCall(next2.raw(), false);
+					pm.skip(2);
+					this.mode = PARAMETERS;
+					return true;
+				}
 			}
 			this.value = new ThisValue(token.raw());
 			this.mode = ACCESS;
 			return true;
+		}
 		case Keywords.SUPER:
-			if (token.next().type() == Symbols.OPEN_SQUARE_BRACKET)
+		
+		{
+			IToken next = token.next();
+			switch (next.type())
 			{
+			// super[type]
+			case Symbols.OPEN_SQUARE_BRACKET:
 				SuperValue sv = new SuperValue(token.raw());
 				this.mode = ARRAY_END;
 				this.value = sv;
 				pm.skip();
 				pm.pushParser(new TypeParser(sv));
 				return true;
+			case Symbols.DOT:
+				// super.new
+				IToken next2 = next.next();
+				if (next2.type() == Keywords.NEW)
+				{
+					this.value = new InitializerCall(next2.raw(), true);
+					pm.skip(2);
+					this.mode = PARAMETERS;
+					return true;
+				}
 			}
 			this.value = new SuperValue(token.raw());
 			this.mode = ACCESS;
 			return true;
+		}
 		case Keywords.CLASS:
 		{
 			ClassOperator co = new ClassOperator(token);
@@ -945,14 +984,12 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = END;
 			return true;
 		}
-		/* case Keywords.CASE:
-		{
-			CaseExpression pattern = new CaseExpression(token.raw());
-			pm.pushParser(new PatternParser(pattern));
-			this.mode = PATTERN_IF;
-			this.value = pattern;
-			return true;
-		} */
+			/*
+			 * case Keywords.CASE: { CaseExpression pattern = new
+			 * CaseExpression(token.raw()); pm.pushParser(new
+			 * PatternParser(pattern)); this.mode = PATTERN_IF; this.value =
+			 * pattern; return true; }
+			 */
 		case Keywords.TRY:
 		{
 			TryStatement statement = new TryStatement(token.raw());
