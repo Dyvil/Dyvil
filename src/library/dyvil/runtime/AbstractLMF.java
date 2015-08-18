@@ -44,6 +44,7 @@ public abstract class AbstractLMF
 	final Class<?>						targetClass;
 	/** The type of the invoked method "(CC)II" */
 	protected final MethodType			invokedType;
+	protected final int parameterCount;
 	/**
 	 * The type of the returned instance "interface JJ"
 	 */
@@ -97,6 +98,7 @@ public abstract class AbstractLMF
 		this.invokedType = invokedType;
 		
 		this.samBase = invokedType.returnType();
+		this.parameterCount = invokedType.parameterCount();
 		
 		this.samMethodName = samMethodName;
 		this.samMethodType = samMethodType;

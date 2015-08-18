@@ -126,8 +126,10 @@ public final class AnonymousClassLMF extends AbstractLMF
 		this.implMethodReturnClass = this.implKind == MethodHandleInfo.REF_newInvokeSpecial ? this.implDefiningClass : this.implMethodType.returnType();
 		this.constructorType = invokedType.changeReturnType(Void.TYPE);
 		this.lambdaClassName = this.targetClass.getName().replace('.', '/') + "$Lambda$" + counter.incrementAndGet();
+		
 		this.cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-		int parameterCount = invokedType.parameterCount();
+		
+		int parameterCount = this.parameterCount;
 		if (parameterCount > 0)
 		{
 			this.argNames = new String[parameterCount];
@@ -150,7 +152,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 	public CallSite buildCallSite() throws LambdaConversionException
 	{
 		final Class<?> innerClass = this.spinInnerClass();
-		if (this.invokedType.parameterCount() == 0)
+		if (this.parameterCount == 0)
 		{
 			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () -> {
 				Constructor<?>[] ctrs1 = innerClass.getDeclaredConstructors();
@@ -207,14 +209,12 @@ public final class AnonymousClassLMF extends AbstractLMF
 		this.generateConstructor();
 		this.generateToString();
 		
-		if (this.invokedType.parameterCount() != 0)
+		if (this.parameterCount != 0)
 		{
 			this.generateFactory();
 		}
 		
-		// Forward the SAM method
-		MethodVisitor mv = this.cw.visitMethod(PUBLIC, this.samMethodName, this.samMethodType.toMethodDescriptorString(), null, null);
-		new ForwardingMethodGenerator(mv).generate(this.samMethodType);
+		this.generateSAM();
 		
 		this.cw.visitEnd();
 		
@@ -237,7 +237,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		m.visitCode();
 		m.visitTypeInsn(NEW, this.lambdaClassName);
 		m.visitInsn(Opcodes.DUP);
-		int parameterCount = this.invokedType.parameterCount();
+		int parameterCount = this.parameterCount;
 		for (int typeIndex = 0, varIndex = 0; typeIndex < parameterCount; typeIndex++)
 		{
 			Class<?> argType = this.invokedType.parameterType(typeIndex);
@@ -257,7 +257,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		ctor.visitCode();
 		ctor.visitVarInsn(ALOAD, 0);
 		ctor.visitMethodInsn(INVOKESPECIAL, JAVA_LANG_OBJECT, NAME_CTOR, METHOD_DESCRIPTOR_VOID, false);
-		int parameterCount = this.invokedType.parameterCount();
+		int parameterCount = this.parameterCount;
 		for (int i = 0, lvIndex = 0; i < parameterCount; i++)
 		{
 			ctor.visitVarInsn(ALOAD, 0);
@@ -281,91 +281,86 @@ public final class AnonymousClassLMF extends AbstractLMF
 		mv.visitEnd();
 	}
 	
-	private class ForwardingMethodGenerator
+	private void generateSAM()
 	{
-		private MethodVisitor mv;
+		MethodVisitor mv = this.cw.visitMethod(PUBLIC, this.samMethodName, this.samMethodType.toMethodDescriptorString(), null, null);
 		
-		ForwardingMethodGenerator(MethodVisitor mv)
+		mv.visitCode();
+		
+		if (this.implKind == MethodHandleInfo.REF_newInvokeSpecial)
 		{
-			this.mv = mv;
+			mv.visitTypeInsn(NEW, this.implMethodClassName);
+			mv.visitInsn(DUP);
+		}
+		for (int i = 0; i < this.argNames.length; i++)
+		{
+			mv.visitVarInsn(ALOAD, 0);
+			mv.visitFieldInsn(GETFIELD, this.lambdaClassName, this.argNames[i], this.argDescs[i]);
 		}
 		
-		void generate(MethodType methodType)
+		this.convertArgumentTypes(mv, this.samMethodType);
+		
+		// Invoke the method we want to forward to
+		mv.visitMethodInsn(invocationOpcode(this.implKind), this.implMethodClassName, this.implMethodName, this.implMethodDesc,
+				this.implDefiningClass.isInterface());
+				
+		// Convert the return value (if any) and return it
+		// Note: if adapting from non-void to void, the 'return'
+		// instruction will pop the unneeded result
+		Class<?> samReturnClass = this.samMethodType.returnType();
+		TypeConverter.convertType(mv, this.implMethodReturnClass, samReturnClass, samReturnClass);
+		mv.visitInsn(getReturnOpcode(samReturnClass));
+		// Maxs computed by ClassWriter.COMPUTE_MAXS,these arguments ignored
+		mv.visitMaxs(-1, -1);
+		mv.visitEnd();
+	}
+	
+	private void convertArgumentTypes(MethodVisitor mv, MethodType samType)
+	{
+		int lvIndex = 0;
+		int samReceiverLength;
+		if (this.implIsInstanceMethod && this.parameterCount == 0)
 		{
-			this.mv.visitCode();
+			samReceiverLength = 1;
 			
-			if (AnonymousClassLMF.this.implKind == MethodHandleInfo.REF_newInvokeSpecial)
-			{
-				this.mv.visitTypeInsn(NEW, AnonymousClassLMF.this.implMethodClassName);
-				this.mv.visitInsn(DUP);
-			}
-			for (int i = 0; i < AnonymousClassLMF.this.argNames.length; i++)
-			{
-				this.mv.visitVarInsn(ALOAD, 0);
-				this.mv.visitFieldInsn(GETFIELD, AnonymousClassLMF.this.lambdaClassName, AnonymousClassLMF.this.argNames[i],
-						AnonymousClassLMF.this.argDescs[i]);
-			}
-			
-			this.convertArgumentTypes(methodType);
-			
-			// Invoke the method we want to forward to
-			this.mv.visitMethodInsn(this.invocationOpcode(), AnonymousClassLMF.this.implMethodClassName, AnonymousClassLMF.this.implMethodName,
-					AnonymousClassLMF.this.implMethodDesc, AnonymousClassLMF.this.implDefiningClass.isInterface());
-					
-			// Convert the return value (if any) and return it
-			// Note: if adapting from non-void to void, the 'return'
-			// instruction will pop the unneeded result
-			Class<?> samReturnClass = methodType.returnType();
-			TypeConverter.convertType(this.mv, AnonymousClassLMF.this.implMethodReturnClass, samReturnClass, samReturnClass);
-			this.mv.visitInsn(getReturnOpcode(samReturnClass));
-			// Maxs computed by ClassWriter.COMPUTE_MAXS,these arguments ignored
-			this.mv.visitMaxs(-1, -1);
-			this.mv.visitEnd();
+			// push receiver
+			Class<?> rcvrType = samType.parameterType(0);
+			mv.visitVarInsn(getLoadOpcode(rcvrType), lvIndex + 1);
+			lvIndex += getParameterSize(rcvrType);
+			TypeConverter.convertType(mv, rcvrType, this.implDefiningClass, this.instantiatedMethodType.parameterType(0));
+		}
+		else
+		{
+			samReceiverLength = 0;
 		}
 		
-		private void convertArgumentTypes(MethodType samType)
+		int samParametersLength = samType.parameterCount();
+		int argOffset = this.implMethodType.parameterCount() - samParametersLength;
+		for (int i = samReceiverLength; i < samParametersLength; i++)
 		{
-			int lvIndex = 0;
-			boolean samIncludesReceiver = AnonymousClassLMF.this.implIsInstanceMethod && AnonymousClassLMF.this.invokedType.parameterCount() == 0;
-			int samReceiverLength = samIncludesReceiver ? 1 : 0;
-			if (samIncludesReceiver)
-			{
-				// push receiver
-				Class<?> rcvrType = samType.parameterType(0);
-				this.mv.visitVarInsn(getLoadOpcode(rcvrType), lvIndex + 1);
-				lvIndex += getParameterSize(rcvrType);
-				TypeConverter.convertType(this.mv, rcvrType, AnonymousClassLMF.this.implDefiningClass,
-						AnonymousClassLMF.this.instantiatedMethodType.parameterType(0));
-			}
-			int samParametersLength = samType.parameterCount();
-			int argOffset = AnonymousClassLMF.this.implMethodType.parameterCount() - samParametersLength;
-			for (int i = samReceiverLength; i < samParametersLength; i++)
-			{
-				Class<?> argType = samType.parameterType(i);
-				this.mv.visitVarInsn(getLoadOpcode(argType), lvIndex + 1);
-				lvIndex += getParameterSize(argType);
-				TypeConverter.convertType(this.mv, argType, AnonymousClassLMF.this.implMethodType.parameterType(argOffset + i),
-						AnonymousClassLMF.this.instantiatedMethodType.parameterType(i));
-			}
+			Class<?> argType = samType.parameterType(i);
+			mv.visitVarInsn(getLoadOpcode(argType), lvIndex + 1);
+			lvIndex += getParameterSize(argType);
+			TypeConverter.convertType(mv, argType, this.implMethodType.parameterType(argOffset + i), this.instantiatedMethodType.parameterType(i));
 		}
-		
-		private int invocationOpcode() throws InternalError
+	}
+	
+	private static int invocationOpcode(int kind) throws InternalError
+	{
+		switch (kind)
 		{
-			switch (AnonymousClassLMF.this.implKind)
-			{
-			case MethodHandleInfo.REF_invokeStatic:
-				return INVOKESTATIC;
-			case MethodHandleInfo.REF_newInvokeSpecial:
-				return INVOKESPECIAL;
-			case MethodHandleInfo.REF_invokeVirtual:
-				return INVOKEVIRTUAL;
-			case MethodHandleInfo.REF_invokeInterface:
-				return INVOKEINTERFACE;
-			case MethodHandleInfo.REF_invokeSpecial:
-				return INVOKESPECIAL;
-			default:
-				throw new InternalError("Unexpected invocation kind: " + AnonymousClassLMF.this.implKind);
-			}
+		case MethodHandleInfo.REF_invokeStatic:
+			return INVOKESTATIC;
+		case MethodHandleInfo.REF_newInvokeSpecial:
+			return INVOKESPECIAL;
+		case MethodHandleInfo.REF_invokeVirtual:
+			return INVOKEVIRTUAL;
+		case MethodHandleInfo.REF_invokeInterface:
+			return INVOKEINTERFACE;
+		case MethodHandleInfo.REF_invokeSpecial:
+			return INVOKESPECIAL;
+		default:
+			throw new InternalError("Unexpected invocation kind: " + kind);
 		}
 	}
 	
