@@ -79,6 +79,12 @@ public interface FileUtils
 	
 	public static @infix boolean write(File file, byte[] bytes)
 	{
+		File parent = file.getParentFile();
+		if (!parent.exists())
+		{
+			parent.mkdirs();
+		}
+		
 		try
 		{
 			if (!file.exists())

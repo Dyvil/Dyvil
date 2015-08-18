@@ -8,8 +8,6 @@ import static dyvil.runtime.Wrapper.*;
 
 public class TypeConverter
 {
-	private static final String DYVIL_LANG_NUMBER = "dyvil/lang/Number";
-	
 	private static final int NUM_WRAPPERS = Wrapper.values().length;
 	
 	private static final String	NAME_OBJECT		= "java/lang/Object";
@@ -17,6 +15,7 @@ public class TypeConverter
 	
 	// Same for all primitives; name of the boxing method
 	private static final String NAME_BOX_METHOD = "apply";
+	private static final String NAME_UNBOX_METHOD = "unapply";
 	
 	// Table of opcodes for widening primitive conversions
 	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];
@@ -97,19 +96,14 @@ public class TypeConverter
 		return "dyvil/lang/" + w.wrapperSimpleName();
 	}
 	
-	private static String unboxMethod(Wrapper w)
-	{
-		return w.primitiveSimpleName() + "Value";
-	}
-	
 	private static String boxingDescriptor(Wrapper w)
 	{
-		return String.format("(%s)L%s;", w.basicTypeChar(), wrapperName(w));
+		return "(" + w.basicTypeChar() + ")Ldyvil/lang/" + w.wrapperSimpleName() + ";";
 	}
 	
 	private static String unboxingDescriptor(Wrapper w)
 	{
-		return "()" + w.basicTypeChar();
+		return "(Ldyvil/lang/" + w.wrapperSimpleName() + ";)" + w.basicTypeChar();
 	}
 	
 	static void boxIfTypePrimitive(MethodVisitor mv, Type t)
@@ -140,12 +134,7 @@ public class TypeConverter
 	
 	static void unbox(MethodVisitor mv, String sname, Wrapper wt)
 	{
-		if (sname == DYVIL_LANG_NUMBER)
-		{
-			mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, sname, unboxMethod(wt), unboxingDescriptor(wt), true);
-			return;
-		}
-		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, sname, unboxMethod(wt), unboxingDescriptor(wt), false);
+		mv.visitMethodInsn(Opcodes.INVOKESTATIC, sname, NAME_UNBOX_METHOD, unboxingDescriptor(wt), false);
 	}
 	
 	private static String descriptorToName(String desc)
@@ -262,17 +251,7 @@ public class TypeConverter
 				{
 					// Source type is reference type, but not boxed type,
 					// assume it is super type of target type
-					String intermediate;
-					if (wTarget.isSigned() || wTarget.isFloating())
-					{
-						// Boxed number to primitive
-						intermediate = DYVIL_LANG_NUMBER;
-					}
-					else
-					{
-						// Character or Boolean
-						intermediate = wrapperName(wTarget);
-					}
+					String intermediate = wrapperName(wTarget);
 					cast(mv, dSrc, intermediate);
 					unbox(mv, intermediate, wTarget);
 				}

@@ -210,6 +210,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		if (this.type.typeTag() == IType.LAMBDA)
 		{
 			// Trash the old lambda type and generate a new one from scratch
+			this.type = null;
 			this.type = this.getType();
 		}
 		else
