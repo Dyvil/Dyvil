@@ -40,6 +40,12 @@ public final class BooleanValue implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return BOOLEAN;

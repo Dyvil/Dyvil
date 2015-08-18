@@ -14,6 +14,11 @@ public interface IInstruction extends IASTNode
 		return null;
 	}
 	
+	@Override
+	public default void setPosition(ICodePosition position)
+	{
+	}
+	
 	public void resolve(MarkerList markers, Bytecode bytecode);
 	
 	// Compilation

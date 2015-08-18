@@ -59,6 +59,12 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public AnnotationList getAnnotations()
 	{
 		return this.annotations;

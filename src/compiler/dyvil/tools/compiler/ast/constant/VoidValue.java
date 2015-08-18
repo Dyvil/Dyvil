@@ -32,6 +32,12 @@ public class VoidValue implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.VOID;

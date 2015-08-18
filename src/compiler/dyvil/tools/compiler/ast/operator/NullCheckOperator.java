@@ -31,6 +31,11 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return NULLCHECK;

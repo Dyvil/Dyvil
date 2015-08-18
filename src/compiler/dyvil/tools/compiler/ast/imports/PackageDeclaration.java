@@ -25,6 +25,12 @@ public class PackageDeclaration implements IASTNode
 		return this.position;
 	}
 	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public void setPackage(String thePackage)
 	{
 		this.thePackage = thePackage;

@@ -11,4 +11,10 @@ public abstract class Pattern implements IPattern
 	{
 		return this.position;
 	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
 }

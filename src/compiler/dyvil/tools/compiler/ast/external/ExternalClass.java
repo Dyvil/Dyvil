@@ -72,6 +72,11 @@ public final class ExternalClass extends AbstractClass
 		return null;
 	}
 	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
 	private void resolveMetadata()
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers);

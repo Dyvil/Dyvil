@@ -60,6 +60,12 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public AnnotationList getAnnotations()
 	{
 		return this.annotations;

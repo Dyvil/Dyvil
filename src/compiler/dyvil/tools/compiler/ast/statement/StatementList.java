@@ -55,6 +55,12 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public void expandPosition(ICodePosition position)
 	{
 		this.position = this.position.to(position);

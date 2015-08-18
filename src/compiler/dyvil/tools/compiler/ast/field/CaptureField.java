@@ -50,6 +50,11 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public boolean isField()
 	{
 		return this.field.isField();

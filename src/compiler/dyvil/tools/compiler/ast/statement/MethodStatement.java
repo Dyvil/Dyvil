@@ -25,6 +25,12 @@ public class MethodStatement implements IStatement
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.method.setPosition(position);
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return NESTED_METHOD;

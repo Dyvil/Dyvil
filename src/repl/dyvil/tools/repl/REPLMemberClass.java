@@ -67,6 +67,11 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int getAccessLevel()
 	{
 		return 0;

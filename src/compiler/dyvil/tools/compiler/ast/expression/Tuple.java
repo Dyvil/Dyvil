@@ -55,6 +55,12 @@ public final class Tuple implements IValue, IValueList
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return TUPLE;

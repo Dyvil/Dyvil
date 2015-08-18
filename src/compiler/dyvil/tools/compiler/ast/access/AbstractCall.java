@@ -37,6 +37,12 @@ public abstract class AbstractCall implements ICall, IValued
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public void setValue(IValue value)
 	{
 		this.instance = value;

@@ -44,6 +44,12 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		return this.position;
 	}
 	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public void setImport(IImport iimport)
 	{
 		this.theImport = iimport;

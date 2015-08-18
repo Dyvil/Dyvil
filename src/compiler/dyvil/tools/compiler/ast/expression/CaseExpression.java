@@ -58,6 +58,12 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return CASE_STATEMENT;

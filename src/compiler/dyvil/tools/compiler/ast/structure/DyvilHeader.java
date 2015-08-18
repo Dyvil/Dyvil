@@ -111,6 +111,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;

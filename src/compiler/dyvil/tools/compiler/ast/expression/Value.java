@@ -11,4 +11,10 @@ public abstract class Value implements IValue
 	{
 		return this.position;
 	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
 }

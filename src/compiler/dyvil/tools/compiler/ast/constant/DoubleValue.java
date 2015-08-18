@@ -47,6 +47,12 @@ public class DoubleValue implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return DOUBLE;

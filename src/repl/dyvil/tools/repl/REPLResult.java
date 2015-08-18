@@ -29,6 +29,11 @@ public class REPLResult implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return -1;

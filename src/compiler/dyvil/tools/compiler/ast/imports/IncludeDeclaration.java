@@ -38,6 +38,12 @@ public class IncludeDeclaration implements IASTNode
 		return this.position;
 	}
 	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public void addNamePart(Name name)
 	{
 		int index = this.namePartCount++;

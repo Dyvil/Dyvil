@@ -87,6 +87,12 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return LAMBDA;

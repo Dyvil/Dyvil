@@ -13,6 +13,18 @@ public abstract class Import implements IImport
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public void setParent(IImport parent)
 	{
 		this.parent = parent;

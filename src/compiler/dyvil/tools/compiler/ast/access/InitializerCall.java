@@ -48,6 +48,12 @@ public class InitializerCall implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return INITIALIZER_CALL;

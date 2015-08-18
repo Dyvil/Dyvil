@@ -96,6 +96,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return null;
 	}
 	
+	@Override
+	public default void setPosition(ICodePosition position)
+	{
+	}
+	
 	public int typeTag();
 	
 	public default boolean isPrimitive()

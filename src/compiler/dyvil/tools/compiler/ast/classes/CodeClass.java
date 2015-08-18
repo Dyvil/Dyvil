@@ -67,6 +67,12 @@ public class CodeClass extends AbstractClass
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public void setHeader(IDyvilHeader unit)
 	{
 		this.unit = unit;

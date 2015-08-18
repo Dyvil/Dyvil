@@ -43,6 +43,12 @@ public final class ClassAccess implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public boolean isConstant()
 	{
 		return true;

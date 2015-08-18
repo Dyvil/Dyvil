@@ -53,6 +53,12 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return FOR;

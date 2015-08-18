@@ -4,9 +4,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public interface IASTNode
 {
-	public default void setPosition(ICodePosition position)
-	{
-	}
+	public void setPosition(ICodePosition position);
 	
 	public ICodePosition getPosition();
 	
@@ -18,6 +16,13 @@ public interface IASTNode
 	
 	public default void expandPosition(ICodePosition position)
 	{
+		ICodePosition pos = this.getPosition();
+		if (pos == null)
+		{
+			this.setPosition(position);
+			return;
+		}
+		this.setPosition(pos.to(position));
 	}
 	
 	public static String toString(IASTNode node)

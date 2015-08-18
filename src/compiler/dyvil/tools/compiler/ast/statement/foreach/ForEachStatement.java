@@ -61,6 +61,12 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type != Types.VOID)

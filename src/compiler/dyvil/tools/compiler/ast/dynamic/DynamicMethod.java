@@ -51,6 +51,11 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public void setTheClass(IClass iclass)
 	{
 	}

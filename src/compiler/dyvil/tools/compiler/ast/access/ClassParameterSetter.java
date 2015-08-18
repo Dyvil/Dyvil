@@ -55,6 +55,11 @@ public final class ClassParameterSetter implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return null;

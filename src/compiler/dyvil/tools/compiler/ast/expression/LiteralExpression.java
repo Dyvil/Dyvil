@@ -64,6 +64,11 @@ public final class LiteralExpression implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return BOXED;

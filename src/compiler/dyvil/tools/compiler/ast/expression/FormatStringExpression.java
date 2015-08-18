@@ -35,6 +35,12 @@ public final class FormatStringExpression implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return FORMAT_STRING;

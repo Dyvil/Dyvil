@@ -61,6 +61,12 @@ public class ConstructorCall implements ICall
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return CONSTRUCTOR_CALL;

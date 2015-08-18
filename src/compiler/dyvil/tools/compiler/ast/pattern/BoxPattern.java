@@ -28,6 +28,12 @@ public class BoxPattern implements IPattern
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.pattern.setPosition(position);
+	}
+	
+	@Override
 	public int getPatternType()
 	{
 		return BOXED;

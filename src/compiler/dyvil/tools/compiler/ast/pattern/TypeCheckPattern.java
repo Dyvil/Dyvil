@@ -37,6 +37,12 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int getPatternType()
 	{
 		return TYPECHECK;

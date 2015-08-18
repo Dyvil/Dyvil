@@ -22,6 +22,11 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 		return null;
 	}
 	
+	@Override
+	default void setPosition(ICodePosition position)
+	{
+	}
+	
 	public int size();
 	
 	public boolean isEmpty();

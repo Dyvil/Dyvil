@@ -36,6 +36,12 @@ public final class CharValue implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return CHAR;

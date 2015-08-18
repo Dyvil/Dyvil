@@ -34,6 +34,11 @@ public class StringBuilderExpression implements IValue
 		return this.values[0].getPosition();
 	}
 	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
 	public void addFirstValue(IValue value)
 	{
 		int index = this.valueCount++;

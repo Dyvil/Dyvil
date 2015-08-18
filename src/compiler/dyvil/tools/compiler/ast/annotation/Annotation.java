@@ -79,6 +79,12 @@ public final class Annotation implements IAnnotation
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;

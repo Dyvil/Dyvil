@@ -59,6 +59,12 @@ public final class ThisValue implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return THIS;

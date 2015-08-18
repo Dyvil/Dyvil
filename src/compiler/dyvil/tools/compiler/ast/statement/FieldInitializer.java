@@ -30,6 +30,12 @@ public final class FieldInitializer implements IStatement
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.variable.setPosition(position);
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return VARIABLE;

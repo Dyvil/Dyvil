@@ -35,6 +35,12 @@ public final class BoxedValue implements IValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.boxed.setPosition(position);
+	}
+	
+	@Override
 	public boolean isPrimitive()
 	{
 		return false;

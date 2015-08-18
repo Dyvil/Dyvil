@@ -34,6 +34,11 @@ public class TypeAlias implements ITypeAlias
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;

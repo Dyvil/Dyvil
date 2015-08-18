@@ -48,6 +48,12 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public boolean isPrimitive()
 	{
 		return false;

@@ -64,6 +64,12 @@ public final class FieldAccess implements IValue, INamed, IValued
 		return this.position;
 	}
 	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
 	public MethodCall toMethodCall(IMethod method)
 	{
 		MethodCall call = new MethodCall(this.position);

@@ -34,6 +34,11 @@ public class EnumValue implements IConstantValue, INamed
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return ENUM;

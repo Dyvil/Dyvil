@@ -105,24 +105,22 @@ public class Util
 		return value;
 	}
 	
-	public static void prependValue(IMethod method, IValue value)
+	public static IValue prependValue(IValue prepend, IValue value)
 	{
-		IValue value1 = method.getValue();
-		if (value1 instanceof IValueList)
+		if (value instanceof IValueList)
 		{
-			((IValueList) value1).addValue(0, value);
+			((IValueList) value).addValue(0, prepend);
+			return value;
 		}
-		else if (value1 != null)
+		else if (value != null)
 		{
 			StatementList list = new StatementList(null);
-			list.addValue(value1);
+			list.addValue(prepend);
 			list.addValue(value);
-			method.setValue(list);
+			return list;
 		}
-		else
-		{
-			method.setValue(value);
-		}
+		
+		return prepend;
 	}
 	
 	public static String toTime(long nanos)

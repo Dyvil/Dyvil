@@ -48,6 +48,11 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public void setTheClass(IClass theClass)
 	{
 		this.theClass = theClass;

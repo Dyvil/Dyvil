@@ -29,6 +29,11 @@ public class ReferenceValue implements IValue, IValued
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return REFERENCE;

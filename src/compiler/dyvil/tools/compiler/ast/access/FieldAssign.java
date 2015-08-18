@@ -59,6 +59,12 @@ public final class FieldAssign implements IValue, INamed, IValued
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return FIELD_ASSIGN;
