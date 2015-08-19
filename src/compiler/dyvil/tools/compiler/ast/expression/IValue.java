@@ -62,6 +62,7 @@ public interface IValue extends IASTNode, ITyped
 	
 	int	VARIABLE		= 43;
 	int	NESTED_METHOD	= 44;
+	int	ANNOTATION		= 45;
 	
 	int	CAST_OPERATOR	= 48;
 	int	ISOF_OPERATOR	= 49;

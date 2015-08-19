@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.backend.visitor;
 
+
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.annotation.IAnnotated;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
@@ -15,13 +18,13 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public class AnnotationVisitorImpl implements AnnotationVisitor
 {
-	private IAnnotated	annotated;
+	private IAnnotationConsumer consumer;
 	private IAnnotation		annotation;
 	private ArgumentMap		arguments;
 	
-	public AnnotationVisitorImpl(IAnnotated annotated, IAnnotation annotation)
+	public AnnotationVisitorImpl(IAnnotationConsumer consumer, IAnnotation annotation)
 	{
-		this.annotated = annotated;
+		this.consumer = consumer;
 		this.annotation = annotation;
 		this.annotation.setArguments(this.arguments = new ArgumentMap());
 	}
@@ -50,10 +53,12 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 	}
 	
 	@Override
-	public AnnotationVisitor visitAnnotation(String name, String desc)
+	public AnnotationVisitor visitAnnotation(String key, String desc)
 	{
-		// FIXME
-		return null;
+		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		AnnotationValue value = new AnnotationValue(annotation);
+		this.arguments.addValue(Name.getQualified(key), value);
+		return new AnnotationVisitorImpl(value, annotation);
 	}
 	
 	@Override
@@ -67,6 +72,6 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 	@Override
 	public void visitEnd()
 	{
-		this.annotated.addAnnotation(this.annotation);
+		this.consumer.setAnnotation(this.annotation);
 	}
 }

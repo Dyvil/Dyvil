@@ -3,8 +3,9 @@ package dyvil.tools.compiler.ast.annotation;
 import java.lang.annotation.ElementType;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 
-public interface IAnnotated
+public interface IAnnotated extends IAnnotationConsumer
 {
 	public AnnotationList getAnnotations();
 	
@@ -20,4 +21,10 @@ public interface IAnnotated
 	public IAnnotation getAnnotation(IClass type);
 	
 	public ElementType getElementType();
+	
+	@Override
+	public default void setAnnotation(IAnnotation annotation)
+	{
+		this.addAnnotation(annotation);
+	}
 }

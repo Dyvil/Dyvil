@@ -44,7 +44,6 @@ public class AnnotationParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.annotation.setName(name);
 				this.annotation.setType(new NamedType(token.raw(), name));
 				
 				this.mode = PARAMETERS_START;

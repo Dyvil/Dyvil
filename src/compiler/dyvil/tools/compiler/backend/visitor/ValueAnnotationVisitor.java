@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -46,8 +48,10 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String name, String desc)
 	{
-		// FIXME
-		return null;
+		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		AnnotationValue value = new AnnotationValue(annotation);
+		this.valued.setValue(value);
+		return new AnnotationVisitorImpl(value, annotation);
 	}
 	
 	@Override

@@ -36,9 +36,7 @@ public final class Annotation implements IAnnotation
 {
 	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
 	
-	protected ICodePosition position;
-	
-	protected Name			name;
+	protected ICodePosition	position;
 	protected IArguments	arguments	= EmptyArguments.INSTANCE;
 	
 	// Metadata
@@ -51,7 +49,6 @@ public final class Annotation implements IAnnotation
 	public Annotation(IType type)
 	{
 		this.type = type;
-		this.name = type.getName();
 	}
 	
 	public Annotation(ICodePosition position)
@@ -62,14 +59,7 @@ public final class Annotation implements IAnnotation
 	public Annotation(ICodePosition position, IType type)
 	{
 		this.position = position;
-		this.name = type.getName();
 		this.type = type;
-	}
-	
-	public Annotation(ICodePosition position, Name name)
-	{
-		this.position = position;
-		this.name = name;
 	}
 	
 	@Override
@@ -82,18 +72,6 @@ public final class Annotation implements IAnnotation
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
-	}
-	
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public Name getName()
-	{
-		return this.name;
 	}
 	
 	@Override
@@ -181,14 +159,19 @@ public final class Annotation implements IAnnotation
 		
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(this.position, "annotation.type", this.name);
+			markers.add(this.position, "annotation.type", this.type.getName());
+			return;
+		}
+		
+		if (target == null)
+		{
 			return;
 		}
 		
 		IClassMetadata metadata = theClass.getMetadata();
 		if (!metadata.isTarget(target))
 		{
-			Marker error = markers.create(this.position, "annotation.target", this.name);
+			Marker error = markers.create(this.position, "annotation.target", this.type.getName());
 			error.addInfo("Element Target: " + target);
 			error.addInfo("Allowed Targets: " + metadata.getTargets());
 			markers.add(error);
@@ -252,7 +235,8 @@ public final class Annotation implements IAnnotation
 		}
 	}
 	
-	private void write(AnnotationVisitor visitor)
+	@Override
+	public void write(AnnotationVisitor visitor)
 	{
 		IClass iclass = this.type.getTheClass();
 		int count = iclass.parameterCount();
@@ -270,7 +254,7 @@ public final class Annotation implements IAnnotation
 		if (valueType == IValue.ARRAY)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
-			Array array = (Array)value;
+			Array array = (Array) value;
 			int count = array.valueCount();
 			for (int i = 0; i < count; i++)
 			{
@@ -282,6 +266,12 @@ public final class Annotation implements IAnnotation
 		{
 			EnumValue enumValue = (EnumValue) value;
 			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name.qualified);
+		}
+		else if (valueType == IValue.ANNOTATION)
+		{
+			IAnnotation annotation = ((AnnotationValue) value).annotation;
+			AnnotationVisitor av = visitor.visitAnnotation(key, annotation.getType().getExtendedName());
+			annotation.write(av);
 		}
 		else if (value.isConstant())
 		{
@@ -310,7 +300,8 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('@').append(this.name);
+		buffer.append('@');
+		this.type.toString(prefix, buffer);
 		this.arguments.toString(prefix, buffer);
 	}
 }

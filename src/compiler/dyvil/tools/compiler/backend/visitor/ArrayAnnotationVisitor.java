@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class ArrayAnnotationVisitor implements AnnotationVisitor
 {
@@ -31,10 +34,12 @@ public final class ArrayAnnotationVisitor implements AnnotationVisitor
 	}
 	
 	@Override
-	public AnnotationVisitor visitAnnotation(String name, String desc)
+	public AnnotationVisitor visitAnnotation(String key, String desc)
 	{
-		// FIXME
-		return null;
+		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		AnnotationValue value = new AnnotationValue(annotation);
+		this.array.addValue(value);
+		return new AnnotationVisitorImpl(value, annotation);
 	}
 	
 	@Override

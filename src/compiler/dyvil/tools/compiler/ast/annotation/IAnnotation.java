@@ -2,10 +2,10 @@ package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public interface IAnnotation extends IASTNode, INamed, ITyped, IObjectCompilable
+public interface IAnnotation extends IASTNode, ITyped, IObjectCompilable
 {
 	void setArguments(IArguments arguments);
 	
@@ -40,4 +40,5 @@ public interface IAnnotation extends IASTNode, INamed, ITyped, IObjectCompilable
 	
 	void write(FieldVisitor writer);
 	
+	void write(AnnotationVisitor writer);
 }

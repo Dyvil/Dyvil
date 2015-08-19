@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.access.*;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -21,6 +23,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.statement.*;
@@ -166,7 +169,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			if (type == Symbols.AT)
 			{
-				if (token.next().type() != Symbols.OPEN_CURLY_BRACKET)
+				if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
 					Bytecode bc = new Bytecode(token);
 					pm.skip();
@@ -176,7 +179,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					return;
 				}
 				
-				pm.report(new SyntaxError(token, "Invalid Expression - Invalid Symbol '@'"));
+				Annotation a = new Annotation();
+				pm.pushParser(new AnnotationParser(a));
+				this.value = new AnnotationValue(a);
+				this.mode = 0;
 				return;
 			}
 			if (type == Symbols.ARROW_OPERATOR)
