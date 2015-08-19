@@ -44,13 +44,31 @@ public final class CharPattern extends Pattern
 	}
 	
 	@Override
+	public boolean isSwitchable()
+	{
+		return true;
+	}
+	
+	@Override
 	public int switchCases()
 	{
 		return 1;
 	}
 	
 	@Override
-	public int intValue(int index)
+	public int switchValue(int index)
+	{
+		return this.value;
+	}
+	
+	@Override
+	public int minValue()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public int maxValue()
 	{
 		return this.value;
 	}

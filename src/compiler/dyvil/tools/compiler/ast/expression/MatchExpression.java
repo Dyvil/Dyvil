@@ -298,26 +298,46 @@ public final class MatchExpression implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.write(writer, true);
+		if (this.canGenerateSwitch())
+		{
+			this.generateSwitch(writer, true, this.type.getFrameType());
+		}
+		else
+		{
+			this.generateBranched(writer, true, this.type.getFrameType());
+		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.write(writer, false);
+		if (this.canGenerateSwitch())
+		{
+			this.generateSwitch(writer, false, null);
+		}
+		else
+		{
+			this.generateBranched(writer, false, null);
+		}
 	}
 	
-	private void write(MethodWriter writer, boolean expr) throws BytecodeException
+	private boolean canGenerateSwitch()
 	{
-		int varIndex = writer.localCount();
-		Object frameType = expr ? this.type.getFrameType() : null;
-		
-		if (this.generateSwitch(writer, expr, frameType, varIndex))
+		// First run: Determine if a switch instruction can be generated
+		for (int i = 0; i < this.caseCount; i++)
 		{
-			writer.resetLocals(varIndex);
-			return;
+			if (!this.cases[i].pattern.isSwitchable())
+			{
+				return false;
+			}
 		}
 		
+		return true;
+	}
+
+	private void generateBranched(MethodWriter writer, boolean expr, Object frameType) throws BytecodeException
+	{
+		int varIndex = writer.localCount();
 		IType type = this.value.getType();
 		this.value.writeExpression(writer);
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
@@ -394,60 +414,29 @@ public final class MatchExpression implements IValue
 		}
 	}
 	
-	private static class IntAndLabel implements Comparable<IntAndLabel>
+	private void generateSwitch(MethodWriter writer, boolean expr, Object frameType) throws BytecodeException
 	{
-		int		integer;
-		Label	label;
-		
-		public IntAndLabel(int integer, Label label)
-		{
-			this.integer = integer;
-			this.label = label;
-		}
-		
-		@Override
-		public int compareTo(IntAndLabel o)
-		{
-			return Integer.compare(this.integer, o.integer);
-		}
-	}
-	
-	private boolean generateSwitch(MethodWriter writer, boolean expr, Object frameType, int varIndex) throws BytecodeException
-	{
-		int cases = 0;
-		// Determine if a switch instruction can be generated, and count the
-		// number of cases in total
-		for (int i = 0; i < this.caseCount; i++)
-		{
-			MatchCase matchCase = this.cases[i];
-			if (matchCase.pattern.isExhaustive())
-			{
-				continue;
-			}
-			
-			int count = matchCase.pattern.switchCases();
-			if (count <= 0)
-			{
-				return false;
-			}
-			
-			cases += count;
-		}
-		
 		Label defaultLabel = null;
-		IntAndLabel[] intLabels = new IntAndLabel[cases];
+		int cases = 0;
 		int low = Integer.MAX_VALUE; // the minimum int
 		int high = Integer.MIN_VALUE; // the maximum int
-		int arrayIndex = 0; // counter for the intLabels array
 		boolean switchVar = false; // Do we need to store the value in a
 									// variable (for string equality checks
 									// later)
 		
+		// Second run: count the number of total cases, the minimum and maximum
+		// int value, find the default case, and find out if a variable needs to
+		// generated.
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			MatchCase matchCase = this.cases[i];
 			IPattern pattern = matchCase.pattern;
 			Label label = matchCase.switchLabel = new Label();
+			
+			if (switchVar || pattern.switchCheck())
+			{
+				switchVar = true;
+			}
 			
 			if (pattern.isExhaustive())
 			{
@@ -455,53 +444,55 @@ public final class MatchExpression implements IValue
 				continue;
 			}
 			
-			if (switchVar || pattern.switchCheck())
+			int min = pattern.minValue();
+			if (min < low)
 			{
-				switchVar = true;
+				low = min;
 			}
 			
-			int count = pattern.switchCases();
-			
-			for (int j = 0; j < count; j++)
+			int max = pattern.maxValue();
+			if (max > high)
 			{
-				int caseValue = pattern.intValue(j);
-				
-				if (caseValue < low)
-				{
-					low = caseValue;
-				}
-				if (caseValue > high)
-				{
-					high = caseValue;
-				}
-				
-				intLabels[arrayIndex++] = new IntAndLabel(caseValue, label);
+				high = max;
 			}
+			
+			cases += pattern.switchCases();
 		}
 		
+		// Check if a match error should be generated - Non-exhaustive pattern
+		// and no default label
 		Label endLabel = new Label();
-		boolean autoDefault = false;
+		boolean matchError = false;
 		if (defaultLabel == null)
 		{
 			if (!this.exhaustive)
 			{
 				// Need a variable for MatchError
 				switchVar = true;
+				defaultLabel = new Label();
+				matchError = true;
 			}
-			
-			defaultLabel = new Label();
-			autoDefault = true;
+			else
+			{
+				// Exhaustive pattern - default label is end label
+				defaultLabel = endLabel;
+			}
 		}
 		
+		// Write the value
 		IType type = this.value.getType();
 		this.value.writeExpression(writer);
 		
+		int varIndex = -1;
 		if (switchVar)
 		{
+			varIndex = writer.localCount();
+			// Need a variable - store and load the value
 			writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
 		}
 		
+		// Not a primitive type (String) - we need the hashCode
 		if (!type.isPrimitive())
 		{
 			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
@@ -509,37 +500,18 @@ public final class MatchExpression implements IValue
 		
 		int localCount = writer.localCount();
 		
+		// Choose and generate the appropriate instruction
+		// Third run
 		if (useTableSwitch(low, high, cases))
 		{
-			// Generate a TABLESWITCH instruction
-			Label[] handlers = new Label[high - low + 1];
-			Arrays.fill(handlers, defaultLabel);
-			for (int i = 0; i < cases; i++)
-			{
-				IntAndLabel intAndLabel = intLabels[i];
-				handlers[intAndLabel.integer - low] = intAndLabel.label;
-			}
-			
-			writer.writeTableSwitch(defaultLabel, low, high, handlers);
+			this.writeTableSwitch(writer, defaultLabel, low, high);
 		}
 		else
 		{
-			// Generate a LOOKUPSWITCH instruction
-			// Sort the Int-Label associations
-			Arrays.sort(intLabels);
-			
-			Label[] handlers = new Label[cases];
-			int[] keys = new int[cases];
-			for (int i = 0; i < cases; i++)
-			{
-				IntAndLabel intAndLabel = intLabels[i];
-				keys[i] = intAndLabel.integer;
-				handlers[i] = intAndLabel.label;
-			}
-			
-			writer.writeLookupSwitch(defaultLabel, keys, handlers);
+			this.writeLookupSwitch(writer, defaultLabel, cases);
 		}
 		
+		// Fourth run: generate the target labels
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			MatchCase matchCase = this.cases[i];
@@ -561,14 +533,19 @@ public final class MatchExpression implements IValue
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
-		if (autoDefault && !this.exhaustive)
+		// Generate
+		if (matchError)
 		{
 			writer.writeLabel(defaultLabel);
 			this.writeMatchError(writer, varIndex, type);
 		}
 		
 		writer.writeLabel(endLabel);
-		return true;
+		
+		if (switchVar)
+		{
+			writer.resetLocals(varIndex);
+		}
 	}
 	
 	/**
@@ -589,9 +566,84 @@ public final class MatchExpression implements IValue
 		int tableSpace = 4 + (high - low + 1);
 		int tableTime = 3; // constant time
 		int lookupSpace = 3 + 2 * count;
-		int lookupTime = MathUtils.logBaseTwo(count); // binary search - O(log
-														// n)
+		int lookupTime = MathUtils.logBaseTwo(count); // binary search O(log n)
 		return count > 0 && tableSpace + 3 * tableTime <= lookupSpace + 3 * lookupTime;
+	}
+
+	/**
+	 * Generates a {@code lookupswitch} instruction
+	 */
+	private void writeLookupSwitch(MethodWriter writer, Label defaultLabel, int cases) throws BytecodeException
+	{
+		// Generate a LOOKUPSWITCH instruction
+		int[] keys = new int[cases];
+		Label[] handlers = new Label[cases];
+		int length = 0;
+		
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			MatchCase matchCase = this.cases[i];
+			IPattern pattern = matchCase.pattern;
+			Label switchLabel = matchCase.switchLabel;
+			int count = pattern.switchCases();
+			
+			for (int j = 0; j < count; j++)
+			{
+				int switchCase = pattern.switchValue(j);
+				insertToArray(length++, keys, handlers, switchCase, switchLabel);
+			}
+		}
+		
+		writer.writeLookupSwitch(defaultLabel, keys, handlers);
+	}
+	
+	private static void insertToArray(int length, int[] keys, Label[] handlers, int key, Label handler)
+	{
+		if (length == 0)
+		{
+			keys[0] = key;
+			handlers[0] = handler;
+			return;
+		}
+		
+		int index = length;
+		while (index > 0 && keys[index - 1] > key)
+		{
+			--index;
+		}
+		
+		int moved = length - index;
+		if (moved > 0)
+		{
+			System.arraycopy(keys, index, keys, index + 1, moved);
+			System.arraycopy(handlers, index, handlers, index + 1, moved);
+		}
+		keys[index] = key;
+		handlers[index] = handler;
+	}
+	
+	/**
+	 * Generates a {@code tableswitch} instruction
+	 */
+	private void writeTableSwitch(MethodWriter writer, Label defaultLabel, int low, int high) throws BytecodeException
+	{
+		Label[] handlers = new Label[high - low + 1];
+		Arrays.fill(handlers, defaultLabel);
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			MatchCase matchCase = this.cases[i];
+			IPattern pattern = matchCase.pattern;
+			int count = pattern.switchCases();
+			
+			for (int j = 0; j < count; j++)
+			{
+				int switchCase = pattern.switchValue(j);
+				
+				handlers[switchCase - low] = matchCase.switchLabel;
+			}
+		}
+		
+		writer.writeTableSwitch(defaultLabel, low, high, handlers);
 	}
 	
 	@Override

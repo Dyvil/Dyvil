@@ -32,7 +32,7 @@ public final class BindingPattern extends Pattern
 	@Override
 	public boolean isExhaustive()
 	{
-		return this.type == Types.ANY || this.type == Types.UNKNOWN;
+		return true;
 	}
 	
 	@Override
@@ -73,6 +73,18 @@ public final class BindingPattern extends Pattern
 		
 		this.variable = new Variable(this.position, this.name, this.type);
 		return this.variable;
+	}
+	
+	@Override
+	public boolean isSwitchable()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean switchCheck()
+	{
+		return true;
 	}
 	
 	@Override

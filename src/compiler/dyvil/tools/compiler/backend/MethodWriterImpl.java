@@ -288,8 +288,8 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeTargetLabel(Label label)
 	{
+		this.writeLabel(label);
 		this.visitFrame = true;
-		this.mv.visitLabel(label);
 	}
 	
 	@Override
@@ -690,6 +690,12 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		this.frame.visitInsn(Opcodes.TABLESWITCH);
 		
+		defaultHandler.info = this.frame.copy();
+		for (Label l : handlers)
+		{
+			l.info = this.frame.copy();
+		}
+		
 		this.mv.visitTableSwitchInsn(start, end, defaultHandler, handlers);
 	}
 	
@@ -699,6 +705,12 @@ public final class MethodWriterImpl implements MethodWriter
 		this.insnCallback();
 		
 		this.frame.visitInsn(Opcodes.LOOKUPSWITCH);
+		
+		defaultHandler.info = this.frame.copy();
+		for (Label l : handlers)
+		{
+			l.info = this.frame.copy();
+		}
 		
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
 	}

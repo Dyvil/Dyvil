@@ -47,6 +47,12 @@ public final class WildcardPattern extends Pattern
 	}
 	
 	@Override
+	public boolean isSwitchable()
+	{
+		return true;
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex < 0)

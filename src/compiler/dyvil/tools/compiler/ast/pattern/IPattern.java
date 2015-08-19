@@ -83,9 +83,14 @@ public interface IPattern extends IASTNode, ITyped
 		return this;
 	}
 	
+	public default boolean isSwitchable()
+	{
+		return false;
+	}
+	
 	public default int switchCases()
 	{
-		return -1;
+		return 0;
 	}
 	
 	public default boolean switchCheck()
@@ -93,9 +98,19 @@ public interface IPattern extends IASTNode, ITyped
 		return false;
 	}
 	
-	public default int intValue(int index)
+	public default int switchValue(int index)
 	{
-		return 0;
+		return -1;
+	}
+	
+	public default int minValue()
+	{
+		return -1;
+	}
+	
+	public default int maxValue()
+	{
+		return -1;
 	}
 	
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;

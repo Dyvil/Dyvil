@@ -52,6 +52,12 @@ public final class StringPattern extends Pattern
 	}
 	
 	@Override
+	public boolean isSwitchable()
+	{
+		return true;
+	}
+	
+	@Override
 	public boolean switchCheck()
 	{
 		return true;
@@ -64,7 +70,19 @@ public final class StringPattern extends Pattern
 	}
 	
 	@Override
-	public int intValue(int index)
+	public int switchValue(int index)
+	{
+		return this.value.hashCode();
+	}
+	
+	@Override
+	public int minValue()
+	{
+		return this.value.hashCode();
+	}
+	
+	@Override
+	public int maxValue()
 	{
 		return this.value.hashCode();
 	}
