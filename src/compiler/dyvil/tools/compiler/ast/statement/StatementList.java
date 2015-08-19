@@ -106,13 +106,17 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 			}
 		}
 		
-		return null;
+		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.valueCount > 0 && this.values[this.valueCount - 1].isType(type);
+		if (this.valueCount > 0)
+		{
+			return this.values[this.valueCount - 1].isType(type);
+		}
+		return type == Types.VOID;
 	}
 	
 	@Override
