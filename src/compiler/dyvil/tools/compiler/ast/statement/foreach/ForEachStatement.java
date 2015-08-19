@@ -79,7 +79,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			IValue action1 = this.action.withType(Types.VOID, typeContext, markers, context);
 			if (action1 == null)
 			{
-				// TODO Handle error
+				Marker m = markers.create(this.action.getPosition(), "for.action.type");
+				m.addInfo("Action Type: " + this.action.getType());
 			}
 			else
 			{

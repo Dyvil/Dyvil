@@ -218,6 +218,10 @@ public final class Types
 		{
 			return type1;
 		}
+		if (type1 == Types.VOID || type2 == Types.VOID)
+		{
+			return Types.VOID;
+		}
 		if (type1.typeTag() == IType.NULL)
 		{
 			return type2.getObjectType();

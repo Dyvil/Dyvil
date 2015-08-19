@@ -106,7 +106,7 @@ public class REPLVariable extends Field
 	
 	private boolean isConstant()
 	{
-		return (this.modifiers & Modifiers.FINAL) != 0 && isConstant(this.value);
+		return (this.modifiers & Modifiers.FINAL) != 0 && this.value != null && isConstant(this.value);
 	}
 	
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable

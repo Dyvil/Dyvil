@@ -16,16 +16,20 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class RangeOperator implements IValue
 {
-	public static final IClass			RANGE_CLASS		= Package.dyvilLang.resolveClass("Range");
-	public static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
-	public static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-	public static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
-	private static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
+	public static final class LazyFields
+	{
+		static final IClass			RANGE_CLASS		= Package.dyvilCollection.resolveClass("Range");
+		static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
+		static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
+		static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
+		static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
+	}
 	
 	public ICodePosition	position;
 	protected IValue		firstValue;
@@ -99,7 +103,7 @@ public class RangeOperator implements IValue
 				this.elementType = Types.combine(this.firstValue.getType(), this.lastValue.getType());
 			}
 			
-			ClassGenericType gt = new ClassGenericType(RANGE_CLASS);
+			ClassGenericType gt = new ClassGenericType(LazyFields.RANGE_CLASS);
 			if (this.elementType.isPrimitive())
 			{
 				this.elementType = this.elementType.getObjectType();
@@ -126,7 +130,7 @@ public class RangeOperator implements IValue
 		{
 			return type.getElementType();
 		}
-		if (type.isSuperClassOf(RANGE))
+		if (type.isSuperClassOf(LazyFields.RANGE))
 		{
 			return type.resolveType(IterableForStatement.ITERABLE_TYPE);
 		}
@@ -142,11 +146,30 @@ public class RangeOperator implements IValue
 			return null;
 		}
 		
-		if (this.isElementType(elementType))
+		this.elementType = elementType;
+		
+		IValue value1 = this.firstValue.withType(elementType, elementType, markers, context);
+		if (value1 == null)
 		{
-			this.elementType = elementType;
-			this.type = type;
-			return this;
+			Marker m = markers.create(this.firstValue.getPosition(), "range.start.type");
+			m.addInfo("Required Type: " + elementType);
+			m.addInfo("Value Type: " + this.firstValue.getType());
+		}
+		else
+		{
+			this.firstValue = value1;
+		}
+		
+		IValue value2 = this.lastValue.withType(elementType, elementType, markers, context);
+		if (value2 == null)
+		{
+			Marker m = markers.create(this.lastValue.getPosition(), "range.end.type");
+			m.addInfo("Required Type: " + elementType);
+			m.addInfo("Value Type: " + this.lastValue.getType());
+		}
+		else
+		{
+			this.lastValue = value2;
 		}
 		return null;
 	}
@@ -194,26 +217,6 @@ public class RangeOperator implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.firstValue.withType(this.elementType, this.elementType, markers, context);
-		if (value1 == null)
-		{
-			// TODO Handle error
-		}
-		else
-		{
-			this.firstValue = value1;
-		}
-		
-		IValue value2 = this.lastValue.withType(this.elementType, this.elementType, markers, context);
-		if (value2 == null)
-		{
-			// TODO Handle error
-		}
-		else
-		{
-			this.lastValue = value2;
-		}
-		
 		this.firstValue.checkTypes(markers, context);
 		this.lastValue.checkTypes(markers, context);
 	}

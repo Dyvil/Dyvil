@@ -95,12 +95,6 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.VOID)
-		{
-			this.requiredType = Types.VOID;
-			return this;
-		}
-		
 		if (this.valueCount > 0)
 		{
 			IValue v = this.values[this.valueCount - 1].withType(type, typeContext, markers, context);
@@ -118,11 +112,6 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID || type == Types.UNKNOWN)
-		{
-			return true;
-		}
-		
 		return this.valueCount > 0 && this.values[this.valueCount - 1].isType(type);
 	}
 	

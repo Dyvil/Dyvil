@@ -145,7 +145,7 @@ public interface Operators
 		}
 		if (name == dotdot)
 		{
-			if (arg1.isType(RangeOperator.ORDERED) && arg2.isType(RangeOperator.ORDERED))
+			if (arg1.isType(RangeOperator.LazyFields.ORDERED) && arg2.isType(RangeOperator.LazyFields.ORDERED))
 			{
 				return new RangeOperator(arg1, arg2);
 			}

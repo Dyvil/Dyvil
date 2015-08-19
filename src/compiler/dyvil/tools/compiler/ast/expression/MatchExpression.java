@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -119,10 +120,6 @@ public final class MatchExpression implements IValue
 			}
 			
 			t = Types.combine(t, t1);
-			if (t == null)
-			{
-				return this.type = Types.VOID;
-			}
 		}
 		
 		if (t == null)
@@ -135,6 +132,24 @@ public final class MatchExpression implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			MatchCase matchCase = this.cases[i];
+			IValue action = matchCase.action;
+			
+			IValue value = type.convertValue(action, typeContext, markers, context);
+			if (value == null)
+			{
+				Marker m = markers.create(action.getPosition(), "match.value.type");
+				m.addInfo("Return Type: " + type);
+				m.addInfo("Value Type: " + action.getType());
+			}
+			else
+			{
+				matchCase.action = value;
+			}
+		}
+		
 		return type == Types.VOID ? this : IValue.autoBox(this, this.getType(), type);
 	}
 	
@@ -334,7 +349,7 @@ public final class MatchExpression implements IValue
 		
 		return true;
 	}
-
+	
 	private void generateBranched(MethodWriter writer, boolean expr, Object frameType) throws BytecodeException
 	{
 		int varIndex = writer.localCount();
@@ -569,7 +584,7 @@ public final class MatchExpression implements IValue
 		int lookupTime = MathUtils.logBaseTwo(count); // binary search O(log n)
 		return count > 0 && tableSpace + 3 * tableTime <= lookupSpace + 3 * lookupTime;
 	}
-
+	
 	/**
 	 * Generates a {@code lookupswitch} instruction
 	 */

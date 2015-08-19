@@ -89,31 +89,40 @@ public class IfStatement extends Value implements IStatement
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		this.commonType = type;
+		
 		if (this.then == null)
 		{
 			return null;
 		}
 		
-		IValue then1 = this.then.withType(type, typeContext, markers, context);
+		IValue then1 = type.convertValue(this.then, typeContext, markers, context);
 		if (then1 == null)
 		{
-			return null;
+			Marker m = markers.create(this.then.getPosition(), "if.then.type");
+			m.addInfo("Required Type: " + type);
+			m.addInfo("Expression Type: " + this.then.getType());
 		}
-		this.then = then1;
+		else
+		{
+			this.then = then1;
+		}
 		
 		if (this.elseThen != null)
 		{
-			then1 = this.elseThen.withType(type, typeContext, markers, context);
+			then1 = type.convertValue(this.elseThen, typeContext, markers, context);
 			if (then1 == null)
 			{
-				return null;
+				Marker m = markers.create(this.elseThen.getPosition(), "if.else.type");
+				m.addInfo("Required Type: " + type);
+				m.addInfo("Expression Type: " + this.elseThen.getType());
 			}
-			this.elseThen = then1;
-			this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
-			return this;
+			else
+			{
+				this.elseThen = then1;
+			}
 		}
 		
-		this.commonType = this.then.getType();
 		return this;
 	}
 	

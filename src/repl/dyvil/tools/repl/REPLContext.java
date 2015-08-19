@@ -160,16 +160,13 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		value = value.resolve(markers, this);
 		
 		IType type = value.getType();
-		IValue value1 = value.withType(type, type, markers, this);
-		if (value1 == null)
+		value = value.withType(type, type, markers, this);
+		if (value == null)
 		{
-			// TODO Report error?
+			throw new Error("Invalid Value - Invalid Type " + type);
 		}
-		else
-		{
-			value = value1;
-			type = value1.getType();
-		}
+		
+		type = value.getType();
 		
 		value.checkTypes(markers, this);
 		value.check(markers, this);
@@ -181,7 +178,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		value = value.cleanup(this, this);
-		field.setValue(value1);
+		field.setValue(value);
 		field.setType(type);
 		
 		this.compileVariable(field);
