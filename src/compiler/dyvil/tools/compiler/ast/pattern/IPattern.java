@@ -49,7 +49,7 @@ public interface IPattern extends IASTNode, ITyped
 	@Override
 	public default void setType(IType type)
 	{
-	};
+	}
 	
 	public IPattern withType(IType type, MarkerList markers);
 	
@@ -83,7 +83,17 @@ public interface IPattern extends IASTNode, ITyped
 		return this;
 	}
 	
-	public default int intValue()
+	public default int switchCases()
+	{
+		return -1;
+	}
+	
+	public default boolean switchCheck()
+	{
+		return false;
+	}
+	
+	public default int intValue(int index)
 	{
 		return 0;
 	}

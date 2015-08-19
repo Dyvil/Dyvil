@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -17,6 +18,8 @@ public class MatchCase implements ICase, IDefaultContext
 	protected IPattern	pattern;
 	protected IValue	condition;
 	protected IValue	action;
+	
+	protected Label switchLabel;
 	
 	@Override
 	public IPattern getPattern()

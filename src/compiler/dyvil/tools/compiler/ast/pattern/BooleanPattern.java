@@ -44,7 +44,13 @@ public final class BooleanPattern extends Pattern
 	}
 	
 	@Override
-	public int intValue()
+	public int switchCases()
+	{
+		return 1;
+	}
+	
+	@Override
+	public int intValue(int index)
 	{
 		return this.value ? 1 : 0;
 	}

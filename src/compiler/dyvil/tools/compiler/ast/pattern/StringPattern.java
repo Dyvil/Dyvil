@@ -52,6 +52,24 @@ public final class StringPattern extends Pattern
 	}
 	
 	@Override
+	public boolean switchCheck()
+	{
+		return true;
+	}
+	
+	@Override
+	public int switchCases()
+	{
+		return 1;
+	}
+	
+	@Override
+	public int intValue(int index)
+	{
+		return this.value.hashCode();
+	}
+	
+	@Override
 	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
@@ -63,8 +81,8 @@ public final class StringPattern extends Pattern
 		{
 			writer.writeInsn(Opcodes.SWAP);
 		}
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "compareTo", "(Ljava/lang/String;)I", false);
-		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+		writer.writeJumpInsn(Opcodes.IFNE, elseLabel);
 	}
 	
 	@Override
@@ -79,8 +97,8 @@ public final class StringPattern extends Pattern
 		{
 			writer.writeInsn(Opcodes.SWAP);
 		}
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "compareTo", "(Ljava/lang/String;)I", false);
-		writer.writeJumpInsn(Opcodes.IFNE, elseLabel);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
 	
 	@Override

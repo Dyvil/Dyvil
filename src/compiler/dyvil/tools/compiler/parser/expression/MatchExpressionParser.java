@@ -51,6 +51,10 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			}
 			this.singleCase = true;
 		case CASE:
+			if (type == Symbols.SEMICOLON && token.isInferred())
+			{
+				return;
+			}
 			if (type == Keywords.CASE)
 			{
 				this.currentCase = new MatchCase();

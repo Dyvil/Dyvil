@@ -1,7 +1,11 @@
 package dyvil.tools.compiler.ast.expression;
 
+import java.util.Arrays;
+
+import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -306,45 +310,33 @@ public final class MatchExpression implements IValue
 	private void write(MethodWriter writer, boolean expr) throws BytecodeException
 	{
 		int varIndex = writer.localCount();
+		Object frameType = expr ? this.type.getFrameType() : null;
+		
+		if (this.generateSwitch(writer, expr, frameType, varIndex))
+		{
+			writer.resetLocals(varIndex);
+			return;
+		}
 		
 		IType type = this.value.getType();
 		this.value.writeExpression(writer);
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
-		
 		int localCount = writer.localCount();
-		Object frameType = expr ? this.type.getFrameType() : null;
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		for (int i = 0; i < this.caseCount;)
+		for (int i = 0;;)
 		{
 			MatchCase c = this.cases[i];
-			IPattern pattern = c.pattern;
 			IValue condition = c.condition;
-			IValue value = c.action;
 			
-			pattern.writeInvJump(writer, varIndex, elseLabel);
+			c.pattern.writeInvJump(writer, varIndex, elseLabel);
 			if (condition != null)
 			{
 				condition.writeInvJump(writer, elseLabel);
 			}
 			
-			if (value != null)
-			{
-				if (expr)
-				{
-					value.writeExpression(writer);
-					writer.getFrame().set(frameType);
-				}
-				else
-				{
-					value.writeStatement(writer);
-				}
-			}
-			else if (expr)
-			{
-				this.type.writeDefaultValue(writer);
-			}
+			this.writeAction(writer, expr, frameType, c.action);
 			
 			writer.resetLocals(localCount);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
@@ -353,23 +345,259 @@ public final class MatchExpression implements IValue
 			{
 				elseLabel = new Label();
 			}
+			else
+			{
+				break;
+			}
 		}
 		
 		// MatchError
 		writer.writeLabel(elseLabel);
 		if (!this.exhaustive)
 		{
-			writer.writeTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
-			String desc = "(" + (type.isPrimitive() ? type.getExtendedName() + ")V" : "Ljava/lang/Object;)V");
-			writer.writeLineNumber(this.getLineNumber());
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", desc, false);
-			writer.writeInsn(Opcodes.ATHROW);
-			writer.setHasReturn(false);
+			this.writeMatchError(writer, varIndex, type);
 		}
 		writer.writeLabel(endLabel);
 		writer.resetLocals(varIndex);
+	}
+	
+	private void writeMatchError(MethodWriter writer, int varIndex, IType type) throws BytecodeException
+	{
+		String desc = type.isPrimitive() ? "(" + type.getExtendedName() + ")V" : "(Ljava/lang/Object;)V";
+		
+		writer.writeTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
+		writer.writeInsn(Opcodes.DUP);
+		writer.writeVarInsn(type.getLoadOpcode(), varIndex);
+		writer.writeLineNumber(this.getLineNumber());
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", desc, false);
+		writer.writeInsn(Opcodes.ATHROW);
+		writer.setHasReturn(false);
+	}
+	
+	private void writeAction(MethodWriter writer, boolean expr, Object frameType, IValue value) throws BytecodeException
+	{
+		if (value != null)
+		{
+			if (expr)
+			{
+				value.writeExpression(writer);
+				writer.getFrame().set(frameType);
+			}
+			else
+			{
+				value.writeStatement(writer);
+			}
+		}
+		else if (expr)
+		{
+			this.type.writeDefaultValue(writer);
+		}
+	}
+	
+	private static class IntAndLabel implements Comparable<IntAndLabel>
+	{
+		int		integer;
+		Label	label;
+		
+		public IntAndLabel(int integer, Label label)
+		{
+			this.integer = integer;
+			this.label = label;
+		}
+		
+		@Override
+		public int compareTo(IntAndLabel o)
+		{
+			return Integer.compare(this.integer, o.integer);
+		}
+	}
+	
+	private boolean generateSwitch(MethodWriter writer, boolean expr, Object frameType, int varIndex) throws BytecodeException
+	{
+		int cases = 0;
+		// Determine if a switch instruction can be generated, and count the
+		// number of cases in total
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			MatchCase matchCase = this.cases[i];
+			if (matchCase.pattern.isExhaustive())
+			{
+				continue;
+			}
+			
+			int count = matchCase.pattern.switchCases();
+			if (count <= 0)
+			{
+				return false;
+			}
+			
+			cases += count;
+		}
+		
+		Label defaultLabel = null;
+		IntAndLabel[] intLabels = new IntAndLabel[cases];
+		int low = Integer.MAX_VALUE; // the minimum int
+		int high = Integer.MIN_VALUE; // the maximum int
+		int arrayIndex = 0; // counter for the intLabels array
+		boolean switchVar = false; // Do we need to store the value in a
+									// variable (for string equality checks
+									// later)
+		
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			MatchCase matchCase = this.cases[i];
+			IPattern pattern = matchCase.pattern;
+			Label label = matchCase.switchLabel = new Label();
+			
+			if (pattern.isExhaustive())
+			{
+				defaultLabel = label;
+				continue;
+			}
+			
+			if (switchVar || pattern.switchCheck())
+			{
+				switchVar = true;
+			}
+			
+			int count = pattern.switchCases();
+			
+			for (int j = 0; j < count; j++)
+			{
+				int caseValue = pattern.intValue(j);
+				
+				if (caseValue < low)
+				{
+					low = caseValue;
+				}
+				if (caseValue > high)
+				{
+					high = caseValue;
+				}
+				
+				intLabels[arrayIndex++] = new IntAndLabel(caseValue, label);
+			}
+		}
+		
+		Label endLabel = new Label();
+		boolean autoDefault = false;
+		if (defaultLabel == null)
+		{
+			if (!this.exhaustive)
+			{
+				// Need a variable for MatchError
+				switchVar = true;
+			}
+			
+			defaultLabel = new Label();
+			autoDefault = true;
+		}
+		
+		IType type = this.value.getType();
+		this.value.writeExpression(writer);
+		
+		if (switchVar)
+		{
+			writer.writeVarInsn(type.getStoreOpcode(), varIndex);
+			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
+		}
+		
+		if (!type.isPrimitive())
+		{
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+		}
+		
+		int localCount = writer.localCount();
+		
+		if (useTableSwitch(low, high, cases))
+		{
+			// Generate a TABLESWITCH instruction
+			Label[] handlers = new Label[high - low + 1];
+			Arrays.fill(handlers, defaultLabel);
+			for (int i = 0; i < cases; i++)
+			{
+				IntAndLabel intAndLabel = intLabels[i];
+				handlers[intAndLabel.integer - low] = intAndLabel.label;
+			}
+			
+			writer.writeTableSwitch(defaultLabel, low, high, handlers);
+		}
+		else
+		{
+			// Generate a LOOKUPSWITCH instruction
+			// Sort the Int-Label associations
+			Arrays.sort(intLabels);
+			
+			Label[] handlers = new Label[cases];
+			int[] keys = new int[cases];
+			for (int i = 0; i < cases; i++)
+			{
+				IntAndLabel intAndLabel = intLabels[i];
+				keys[i] = intAndLabel.integer;
+				handlers[i] = intAndLabel.label;
+			}
+			
+			writer.writeLookupSwitch(defaultLabel, keys, handlers);
+		}
+		
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			MatchCase matchCase = this.cases[i];
+			
+			writer.writeTargetLabel(matchCase.switchLabel);
+			if (matchCase.condition != null)
+			{
+				matchCase.condition.writeInvJump(writer, defaultLabel);
+			}
+			
+			if (matchCase.pattern.switchCheck())
+			{
+				matchCase.pattern.writeInvJump(writer, varIndex, defaultLabel);
+			}
+			
+			this.writeAction(writer, expr, frameType, matchCase.action);
+			
+			writer.resetLocals(localCount);
+			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+		}
+		
+		if (autoDefault && !this.exhaustive)
+		{
+			writer.writeLabel(defaultLabel);
+			this.writeMatchError(writer, varIndex, type);
+		}
+		
+		writer.writeLabel(endLabel);
+		return true;
+	}
+	
+	/**
+	 * Determines whether to generate a {@code tableswitch} or a
+	 * {@code lookupswitch} instruction, and returns {@code true} when a
+	 * {@code tableswitch} should be generated.
+	 * 
+	 * @param low
+	 *            the lowest value
+	 * @param high
+	 *            the highest value
+	 * @param count
+	 *            the number of cases
+	 * @return true, if a tableswitch instruction should be used
+	 */
+	private static boolean useTableSwitch(int low, int high, int count)
+	{
+		int tableSpace = 4 + (high - low + 1);
+		int tableTime = 3; // constant time
+		int lookupSpace = 3 + 2 * count;
+		int lookupTime = MathUtils.logBaseTwo(count); // binary search - O(log
+														// n)
+		return count > 0 && tableSpace + 3 * tableTime <= lookupSpace + 3 * lookupTime;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override
