@@ -1,6 +1,7 @@
 package dyvil.tools.repl;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import dyvil.collection.Map;
@@ -25,7 +26,8 @@ public class DyvilREPL
 	private static BufferedReader	reader;
 	protected static REPLContext	context	= new REPLContext();
 	protected static REPLParser		parser	= new REPLParser();
-	protected static String			currentCode;
+	
+	protected static String currentCode;
 	
 	public static final Map<String, ICommand> commands = new HashMap();
 	
@@ -63,13 +65,113 @@ public class DyvilREPL
 		while (currentCode != null);
 	}
 	
+	private static String readLine()
+	{
+		StringBuilder buffer = new StringBuilder();
+		int depth1 = 0;
+		int depth2 = 0;
+		int depth3 = 0;
+		byte mode = 0;
+		
+		mainLoop:
+		while (true)
+		{
+			char c;
+			try
+			{
+				c = (char) reader.read();
+			}
+			catch (IOException ignore)
+			{
+				continue;
+			}
+			
+			buffer.append(c);
+			
+			switch (c)
+			{
+			case '\n':
+				if (mode == 0 && depth1 + depth2 + depth3 <= 0)
+				{
+					break mainLoop;
+				}
+				
+				System.out.print('\t');
+				for (int i = 1; i < depth1; i++)
+				{
+					System.out.print('\t');
+				}
+				break;
+			case '"':
+				if (mode == 0 || mode == 2)
+				{
+					mode ^= 2;
+				}
+				break;
+			case '\'':
+				if (mode == 0 || mode == 4)
+				{
+					mode ^= 4;
+				}
+				break;
+			case '\\':
+				if (mode >= 2)
+				{
+					mode |= 1;
+				}
+				continue mainLoop;
+			case '{':
+				if (mode == 0)
+				{
+					depth1++;
+				}
+				break;
+			case '}':
+				if (mode == 0)
+				{
+					depth1--;
+				}
+				break;
+			case '(':
+				if (mode == 0)
+				{
+					depth2++;
+				}
+				break;
+			case ')':
+				if (mode == 0)
+				{
+					depth2--;
+				}
+				break;
+			case '[':
+				if (mode == 0)
+				{
+					depth3++;
+				}
+				break;
+			case ']':
+				if (mode == 0)
+				{
+					depth3--;
+				}
+				break;
+			}
+			
+			mode &= ~1;
+		}
+		
+		return buffer.toString();
+	}
+	
 	public static synchronized void loop()
 	{
-		System.out.print("> ");
+		System.out.print(">\t");
+		currentCode = readLine();
 		
 		try
 		{
-			currentCode = reader.readLine();
+			
 			if (currentCode.startsWith(":"))
 			{
 				runCommand(currentCode);
@@ -78,6 +180,7 @@ public class DyvilREPL
 			
 			REPLContext.reset();
 			TokenIterator tokens = new Dlex(REPLContext.markers).tokenize(currentCode);
+			tokens.inferSemicolons();
 			
 			if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))
 			{
