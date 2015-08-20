@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -14,11 +15,28 @@ public class Byte implements Integer
 	
 	protected byte value;
 	
+	private static final class ConstantPool
+	{
+		protected static final int	TABLE_MIN	= -128;
+		protected static final int	TABLE_SIZE	= 256;
+		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		
+		protected static final Byte[] TABLE = new Byte[TABLE_SIZE];
+		
+		static
+		{
+			for (int i = 0; i < TABLE_SIZE; i++)
+			{
+				TABLE[i] = new Byte((byte) (i + TABLE_MIN));
+			}
+		}
+	}
+	
 	public static Byte apply(byte v)
 	{
-		if (v >= 0 && v < ConstPool.tableSize)
+		if (v >= ConstantPool.TABLE_MIN && v < ConstantPool.TABLE_MAX)
 		{
-			return ConstPool.BYTES[v];
+			return ConstantPool.TABLE[v - ConstantPool.TABLE_MIN];
 		}
 		return new Byte(v);
 	}
@@ -1015,8 +1033,44 @@ public class Byte implements Integer
 	
 	// Object methods
 	
+	public static @infix @inline String toString(byte value)
+	{
+		return java.lang.Integer.toString(value);
+	}
+	
+	public static @infix @inline String toBinaryString(byte value)
+	{
+		return java.lang.Integer.toBinaryString(value);
+	}
+	
+	public static @infix @inline String toHexString(byte value)
+	{
+		return java.lang.Integer.toHexString(value);
+	}
+	
+	public static @infix @inline String toOctalString(byte value)
+	{
+		return java.lang.Integer.toOctalString(value);
+	}
+	
+	public static @infix String toString(byte value, int radix)
+	{
+		switch (radix)
+		{
+		case 2:
+			return java.lang.Integer.toBinaryString(value);
+		case 8:
+			return java.lang.Integer.toOctalString(value);
+		case 10:
+			return java.lang.Integer.toString(value);
+		case 16:
+			return java.lang.Integer.toHexString(value);
+		}
+		return java.lang.Integer.toString(value, radix);
+	}
+	
 	@Override
-	public java.lang.String toString()
+	public String toString()
 	{
 		return java.lang.Byte.toString(this.value);
 	}

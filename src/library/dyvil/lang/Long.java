@@ -4,6 +4,7 @@ import dyvil.lang.literal.LongConvertible;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -17,13 +18,30 @@ public class Long implements Integer
 	
 	protected long value;
 	
-	public static Long apply(long value)
+	private static final class ConstantPool
 	{
-		if (value >= 0 && value < ConstPool.tableSize)
+		protected static final int	TABLE_MIN	= -128;
+		protected static final int	TABLE_SIZE	= 256;
+		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		
+		protected static final Long[] TABLE = new Long[TABLE_SIZE];
+		
+		static
 		{
-			return ConstPool.LONGS[(int) value];
+			for (int i = 0; i < TABLE_SIZE; i++)
+			{
+				TABLE[i] = new Long(i + TABLE_MIN);
+			}
 		}
-		return new Long(value);
+	}
+	
+	public static Long apply(long v)
+	{
+		if (v >= ConstantPool.TABLE_MIN && v < ConstantPool.TABLE_MAX)
+		{
+			return ConstantPool.TABLE[(int) (v - ConstantPool.TABLE_MIN)];
+		}
+		return new Long(v);
 	}
 	
 	public static @infix long unapply(Long v)
@@ -1018,8 +1036,44 @@ public class Long implements Integer
 	
 	// Object methods
 	
+	public static @infix @inline String toString(long value)
+	{
+		return java.lang.Long.toString(value);
+	}
+	
+	public static @infix @inline String toBinaryString(long value)
+	{
+		return java.lang.Long.toBinaryString(value);
+	}
+	
+	public static @infix @inline String toHexString(long value)
+	{
+		return java.lang.Long.toHexString(value);
+	}
+	
+	public static @infix @inline String toOctalString(long value)
+	{
+		return java.lang.Long.toOctalString(value);
+	}
+	
+	public static @infix String toString(long value, int radix)
+	{
+		switch (radix)
+		{
+		case 2:
+			return java.lang.Long.toBinaryString(value);
+		case 8:
+			return java.lang.Long.toOctalString(value);
+		case 10:
+			return java.lang.Long.toString(value);
+		case 16:
+			return java.lang.Long.toHexString(value);
+		}
+		return java.lang.Long.toString(value, radix);
+	}
+	
 	@Override
-	public java.lang.String toString()
+	public String toString()
 	{
 		return java.lang.Long.toString(this.value);
 	}

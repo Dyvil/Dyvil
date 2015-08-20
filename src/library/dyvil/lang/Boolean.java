@@ -4,6 +4,7 @@ import dyvil.lang.literal.BooleanConvertible;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -86,6 +87,11 @@ public class Boolean
 	}
 	
 	// Object methods
+	
+	public static @infix @inline String toString(boolean value)
+	{
+		return value ? "true" : "false";
+	}
 	
 	@Override
 	public String toString()

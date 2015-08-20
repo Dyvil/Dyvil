@@ -2,6 +2,7 @@ package dyvil.lang;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -14,11 +15,28 @@ public class Short implements Integer
 	
 	protected short value;
 	
+	private static final class ConstantPool
+	{
+		protected static final int	TABLE_MIN	= -128;
+		protected static final int	TABLE_SIZE	= 256;
+		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		
+		protected static final Short[] TABLE = new Short[TABLE_SIZE];
+		
+		static
+		{
+			for (int i = 0; i < TABLE_SIZE; i++)
+			{
+				TABLE[i] = new Short((short) (i + TABLE_MIN));
+			}
+		}
+	}
+	
 	public static Short apply(short v)
 	{
-		if (v >= 0 && v < ConstPool.tableSize)
+		if (v >= ConstantPool.TABLE_MIN && v < ConstantPool.TABLE_MAX)
 		{
-			return ConstPool.SHORTS[v];
+			return ConstantPool.TABLE[v - ConstantPool.TABLE_MIN];
 		}
 		return new Short(v);
 	}
@@ -1015,8 +1033,44 @@ public class Short implements Integer
 	
 	// Object methods
 	
+	public static @infix @inline String toString(short value)
+	{
+		return java.lang.Integer.toString(value);
+	}
+	
+	public static @infix @inline String toBinaryString(short value)
+	{
+		return java.lang.Integer.toBinaryString(value);
+	}
+	
+	public static @infix @inline String toHexString(short value)
+	{
+		return java.lang.Integer.toHexString(value);
+	}
+	
+	public static @infix @inline String toOctalString(short value)
+	{
+		return java.lang.Integer.toOctalString(value);
+	}
+	
+	public static @infix String toString(short value, int radix)
+	{
+		switch (radix)
+		{
+		case 2:
+			return java.lang.Integer.toBinaryString(value);
+		case 8:
+			return java.lang.Integer.toOctalString(value);
+		case 10:
+			return java.lang.Integer.toString(value);
+		case 16:
+			return java.lang.Integer.toHexString(value);
+		}
+		return java.lang.Integer.toString(value, radix);
+	}
+	
 	@Override
-	public java.lang.String toString()
+	public String toString()
 	{
 		return java.lang.Short.toString(this.value);
 	}

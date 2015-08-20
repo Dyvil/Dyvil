@@ -4,6 +4,7 @@ import dyvil.lang.literal.IntConvertible;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -17,11 +18,28 @@ public class Int implements Integer
 	
 	protected int value;
 	
+	private static final class ConstantPool
+	{
+		protected static final int	TABLE_MIN	= -128;
+		protected static final int	TABLE_SIZE	= 256;
+		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		
+		protected static final Int[] TABLE = new Int[TABLE_SIZE];
+		
+		static
+		{
+			for (int i = 0; i < TABLE_SIZE; i++)
+			{
+				TABLE[i] = new Int(i + TABLE_MIN);
+			}
+		}
+	}
+	
 	public static Int apply(int v)
 	{
-		if (v >= 0 && v < ConstPool.tableSize)
+		if (v >= ConstantPool.TABLE_MIN && v < ConstantPool.TABLE_MAX)
 		{
-			return ConstPool.INTS[v];
+			return ConstantPool.TABLE[v - ConstantPool.TABLE_MIN];
 		}
 		return new Int(v);
 	}
@@ -1017,6 +1035,42 @@ public class Int implements Integer
 	}
 	
 	// Object methods
+	
+	public static @infix @inline String toString(int value)
+	{
+		return java.lang.Integer.toString(value);
+	}
+	
+	public static @infix @inline String toBinaryString(int value)
+	{
+		return java.lang.Integer.toBinaryString(value);
+	}
+	
+	public static @infix @inline String toHexString(int value)
+	{
+		return java.lang.Integer.toHexString(value);
+	}
+	
+	public static @infix @inline String toOctalString(int value)
+	{
+		return java.lang.Integer.toOctalString(value);
+	}
+	
+	public static @infix String toString(int value, int radix)
+	{
+		switch (radix)
+		{
+		case 2:
+			return java.lang.Integer.toBinaryString(value);
+		case 8:
+			return java.lang.Integer.toOctalString(value);
+		case 10:
+			return java.lang.Integer.toString(value);
+		case 16:
+			return java.lang.Integer.toHexString(value);
+		}
+		return java.lang.Integer.toString(value, radix);
+	}
 	
 	@Override
 	public java.lang.String toString()

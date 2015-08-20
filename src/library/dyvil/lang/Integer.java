@@ -3,8 +3,6 @@ package dyvil.lang;
 import dyvil.lang.literal.IntConvertible;
 import dyvil.lang.literal.LongConvertible;
 
-import dyvil.annotation.infix;
-
 @IntConvertible
 @LongConvertible
 public interface Integer extends Number
@@ -118,40 +116,4 @@ public interface Integer extends Number
 	public Integer $gt$gt(Integer v);
 	
 	public Integer $gt$gt$gt(Integer v);
-	
-	// String representations
-	
-	public static @infix String toString(int v, int radix)
-	{
-		if (radix == 2)
-		{
-			return java.lang.Integer.toBinaryString(v);
-		}
-		if (radix == 8)
-		{
-			return java.lang.Integer.toOctalString(v);
-		}
-		if (radix == 16)
-		{
-			return java.lang.Integer.toHexString(v);
-		}
-		return java.lang.Integer.toString(v, radix);
-	}
-	
-	public static @infix String toString(long v, int radix)
-	{
-		if (radix == 2)
-		{
-			return java.lang.Long.toBinaryString(v);
-		}
-		if (radix == 8)
-		{
-			return java.lang.Long.toOctalString(v);
-		}
-		if (radix == 16)
-		{
-			return java.lang.Long.toHexString(v);
-		}
-		return java.lang.Long.toString(v, radix);
-	}
 }

@@ -4,9 +4,12 @@ import dyvil.lang.literal.FloatConvertible;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
+
+import sun.misc.FloatingDecimal;
 
 @FloatConvertible
 public class Float implements Number
@@ -22,11 +25,6 @@ public class Float implements Number
 	
 	public static Float apply(float v)
 	{
-		int i = (int) v;
-		if (i >= 0 && v == i && i < ConstPool.tableSize)
-		{
-			return ConstPool.FLOATS[i];
-		}
 		return new Float(v);
 	}
 	
@@ -728,10 +726,20 @@ public class Float implements Number
 	
 	// Object methods
 	
-	@Override
-	public java.lang.String toString()
+	public static @infix @inline String toString(float value)
 	{
-		return java.lang.Float.toString(this.value);
+		return FloatingDecimal.toJavaFormatString(value);
+	}
+	
+	public static @infix @inline String toHexString(float value)
+	{
+		return java.lang.Double.toHexString(value);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return FloatingDecimal.toJavaFormatString(this.value);
 	}
 	
 	@Override

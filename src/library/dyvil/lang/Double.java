@@ -4,9 +4,12 @@ import dyvil.lang.literal.DoubleConvertible;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
+
+import sun.misc.FloatingDecimal;
 
 @DoubleConvertible
 public class Double implements Number
@@ -22,11 +25,6 @@ public class Double implements Number
 	
 	public static Double apply(double v)
 	{
-		int i = (int) v;
-		if (i >= 0 && v == i && i < ConstPool.tableSize)
-		{
-			return ConstPool.DOUBLES[i];
-		}
 		return new Double(v);
 	}
 	
@@ -728,10 +726,20 @@ public class Double implements Number
 	
 	// Object methods
 	
-	@Override
-	public java.lang.String toString()
+	public static @infix @inline String toString(double value)
 	{
-		return java.lang.Double.toString(this.value);
+		return FloatingDecimal.toJavaFormatString(value);
+	}
+	
+	public static @infix @inline String toHexString(double value)
+	{
+		return java.lang.Double.toHexString(value);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return FloatingDecimal.toJavaFormatString(this.value);
 	}
 	
 	@Override

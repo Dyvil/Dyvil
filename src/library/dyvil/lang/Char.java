@@ -4,6 +4,7 @@ import dyvil.lang.literal.CharConvertible;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
+import dyvil.annotation.inline;
 import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
@@ -17,11 +18,28 @@ public class Char implements Integer
 	
 	protected char value;
 	
+	private static final class ConstantPool
+	{
+		protected static final int	TABLE_MIN	= -128;
+		protected static final int	TABLE_SIZE	= 256;
+		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		
+		protected static final Char[] TABLE = new Char[TABLE_SIZE];
+		
+		static
+		{
+			for (int i = 0; i < TABLE_SIZE; i++)
+			{
+				TABLE[i] = new Char((char) (i + TABLE_MIN));
+			}
+		}
+	}
+	
 	public static Char apply(char v)
 	{
-		if (v >= 0 && v < ConstPool.tableSize)
+		if (v >= ConstantPool.TABLE_MIN && v < ConstantPool.TABLE_MAX)
 		{
-			return ConstPool.CHARS[v];
+			return ConstantPool.TABLE[v - ConstantPool.TABLE_MIN];
 		}
 		return new Char(v);
 	}
@@ -1018,10 +1036,51 @@ public class Char implements Integer
 	
 	// Object methods
 	
-	@Override
-	public java.lang.String toString()
+	public static @infix @inline String toString(char value)
 	{
-		return java.lang.Character.toString(this.value);
+		return String.valueOf(value);
+	}
+	
+	public static @infix @inline String toDecimalString(char value)
+	{
+		return java.lang.Integer.toString(value);
+	}
+	
+	public static @infix @inline String toBinaryString(char value)
+	{
+		return java.lang.Integer.toBinaryString(value);
+	}
+	
+	public static @infix @inline String toHexString(char value)
+	{
+		return java.lang.Integer.toHexString(value);
+	}
+	
+	public static @infix @inline String toOctalString(char value)
+	{
+		return java.lang.Integer.toOctalString(value);
+	}
+	
+	public static @infix String toString(char value, int radix)
+	{
+		switch (radix)
+		{
+		case 2:
+			return java.lang.Integer.toBinaryString(value);
+		case 8:
+			return java.lang.Integer.toOctalString(value);
+		case 10:
+			return java.lang.Integer.toString(value);
+		case 16:
+			return java.lang.Integer.toHexString(value);
+		}
+		return java.lang.Integer.toString(value, radix);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return String.valueOf(this.value);
 	}
 	
 	@Override
