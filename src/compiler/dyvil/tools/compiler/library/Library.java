@@ -2,6 +2,7 @@ package dyvil.tools.compiler.library;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.LinkOption;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,19 +20,27 @@ public abstract class Library
 	public static final Library	dyvilBinLibrary;
 	public static final Library	javaLibrary;
 	
-	static
+	private static File urlToFile(URL url)
 	{
-		String s = String.class.getResource("/java/lang/String.class").getFile();
-		int index = s.indexOf("rt.jar");
+		String s = url.getPath();
+		int index = s.indexOf(".jar!");
 		if (index != -1)
 		{
 			int index1 = s.lastIndexOf(':', index);
-			String s1 = s.substring(index1 + 1, index + 6);
-			javaLibraryLocation = new File(s1);
+			String s1 = s.substring(index1 + 1, index + 4);
+			return new File(s1);
 		}
-		else
+		return null;
+	}
+	
+	static
+	{
+		URL url = String.class.getResource("/java/lang/String.class");
+		
+		javaLibraryLocation = urlToFile(url);
+		if (javaLibraryLocation == null)
 		{
-			throw new Error("Could not locate rt.jar - " + s);
+			throw new Error("Could not locate rt.jar from '" + url + "'");
 		}
 		
 		File bin = new File("bin");
@@ -41,12 +50,12 @@ public abstract class Library
 		}
 		else
 		{
-			s = System.getenv("DYVIL_HOME");
-			if (s == null || s.isEmpty())
+			url = dyvil.lang.Void.class.getResource("/dyvil/lang/Void.class");
+			dyvilLibraryLocation = urlToFile(url);
+			if (dyvilLibraryLocation == null)
 			{
-				throw new Error("No installed Dyvil Runtime Library found!");
+				throw new Error("Could not locate dyvil-library.jar from '" + url + "'");
 			}
-			dyvilLibraryLocation = new File(s);
 		}
 		
 		if ((dyvilLibrary = load(dyvilLibraryLocation)) == null)

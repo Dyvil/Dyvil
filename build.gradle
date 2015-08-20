@@ -68,7 +68,7 @@ task clean(overwrite: true) << {
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
-	println 'Compliling Dyvil Runtime Library...'
+	println 'Compiling Dyvil Runtime Library...'
 	
 	// Required to make UP-TO-DATE work
 	outputs.upToDateSpec = new org.gradle.api.specs.AndSpec()
@@ -100,6 +100,8 @@ task buildCompiler(type: Jar, dependsOn: 'classes') {
 	from sourceSets.compiler.output
 	
 	archiveName = "dyvil-compiler-${version}.jar"
+	
+	manifest.attributes.put("Main-Class", "dyvil.tools.compiler.DyvilCompiler")
 }
 
 /**
@@ -109,6 +111,8 @@ task buildREPL(type: Jar, dependsOn: 'classes') {
 	from sourceSets.repl.output
 	
 	archiveName = "dyvil-repl-${version}.jar"
+	
+	manifest.attributes.put("Main-Class", "dyvil.tools.repl.DyvilREPL")
 }
 
 /**
