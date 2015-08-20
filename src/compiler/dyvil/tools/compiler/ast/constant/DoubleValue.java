@@ -97,6 +97,10 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (type == Types.DOUBLE)
+		{
+			return 1;
+		}
 		if (type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;

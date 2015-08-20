@@ -97,6 +97,10 @@ public class LongValue implements IConstantValue
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (type == Types.LONG)
+		{
+			return 1;
+		}
 		if (type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;

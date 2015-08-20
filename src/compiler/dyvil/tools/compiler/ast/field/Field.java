@@ -145,6 +145,10 @@ public class Field extends Member implements IField
 				{
 					markers.add(position, "field.access.static", this.name.unqualified);
 				}
+				else if (instance.getType().getTheClass() != this.theClass)
+				{
+					markers.add(position, "field.access.static.type", this.name.unqualified, this.theClass.getFullName());
+				}
 				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)

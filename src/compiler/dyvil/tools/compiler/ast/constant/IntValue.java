@@ -97,6 +97,10 @@ public final class IntValue implements IConstantValue
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (type == Types.INT)
+		{
+			return 1;
+		}
 		if (type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;

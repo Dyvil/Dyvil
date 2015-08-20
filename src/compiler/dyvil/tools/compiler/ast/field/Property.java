@@ -199,6 +199,10 @@ public class Property extends Member implements IProperty, IContext
 				{
 					markers.add(position, "property.access.static", this.name.unqualified);
 				}
+				else if (instance.getType().getTheClass() != this.theClass)
+				{
+					markers.add(position, "property.access.static.type", this.name.unqualified, this.theClass.getFullName());
+				}
 				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)

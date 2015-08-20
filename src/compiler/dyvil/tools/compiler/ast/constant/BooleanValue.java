@@ -90,6 +90,10 @@ public final class BooleanValue implements IConstantValue
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (type == Types.BOOLEAN)
+		{
+			return 1;
+		}
 		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;

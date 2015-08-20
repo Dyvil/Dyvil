@@ -780,6 +780,10 @@ public class Method extends Member implements IMethod, ILabelContext
 				
 				parIndex = 1;
 			}
+			else
+			{
+				match += instance.getTypeMatch(this.theClass.getType());
+			}
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
@@ -909,6 +913,10 @@ public class Method extends Member implements IMethod, ILabelContext
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(position, "method.access.static", this.name.unqualified);
+				}
+				else if (instance.getType().getTheClass() != this.theClass)
+				{
+					markers.add(position, "method.access.static.type", this.name.unqualified, this.theClass.getFullName());
 				}
 				instance = null;
 			}
