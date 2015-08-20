@@ -4,9 +4,9 @@ import java.util.Iterator;
 
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.lexer.token.InferredSemicolon;
+import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
-import dyvil.tools.compiler.util.ParserUtil;
 
 public class TokenIterator implements Iterator<IToken>
 {
@@ -89,22 +89,22 @@ public class TokenIterator implements Iterator<IToken>
 			return;
 		}
 		
-		IToken token = this.first.next();
+		IToken next = this.first.next();
 		IToken prev = this.first;
-		while (token != null)
+		while (next != null)
 		{
-			this.inferSemicolon(token, prev);
-			prev = token;
-			token = token.next();
+			this.inferSemicolon(prev, next);
+			prev = next;
+			next = next.next();
 		}
 		
-		token = this.first.next();
+		next = this.first.next();
 		prev = this.first;
-		while (token != null)
+		while (next != null)
 		{
-			token.setPrev(prev);
-			prev = token;
-			token = token.next();
+			next.setPrev(prev);
+			prev = next;
+			next = next.next();
 		}
 		
 		prev.setNext(new InferredSemicolon(prev.endLine(), prev.endIndex() + 1));
@@ -112,7 +112,7 @@ public class TokenIterator implements Iterator<IToken>
 		this.reset();
 	}
 	
-	private void inferSemicolon(IToken token, IToken prev)
+	private void inferSemicolon(IToken prev, IToken next)
 	{
 		if (prev == null)
 		{
@@ -120,31 +120,37 @@ public class TokenIterator implements Iterator<IToken>
 		}
 		
 		int prevLN = prev.endLine();
-		if (prevLN == token.startLine())
+		if (prevLN == next.startLine())
 		{
 			return;
 		}
 		
-		int type = token.type();
-		if ((type & (Tokens.SYMBOL | Tokens.KEYWORD | Tokens.IDENTIFIER | Tokens.BRACKET)) == 0)
+		int prevType = prev.type();
+		switch (prevType)
 		{
+		case Symbols.DOT:
+		case Symbols.COMMA:
+		case Symbols.COLON:
+		case Symbols.SEMICOLON:
+		case Symbols.OPEN_CURLY_BRACKET:
+		case Symbols.OPEN_PARENTHESIS:
+		case Symbols.OPEN_SQUARE_BRACKET:
+		case Keywords.IS:
+		case Keywords.AS:
+		case Tokens.STRING_PART:
+		case Tokens.STRING_START:
 			return;
 		}
 		
-		if (type == Symbols.OPEN_CURLY_BRACKET)
-		{
-			return;
-		}
-		
-		int type1 = prev.type();
-		if (ParserUtil.isSeperator(type1))
+		int nextType = next.type();
+		if (nextType == Symbols.OPEN_CURLY_BRACKET)
 		{
 			return;
 		}
 		
 		int prevEnd = prev.endIndex();
 		IToken semicolon = new InferredSemicolon(prevLN, prevEnd);
-		semicolon.setNext(token);
+		semicolon.setNext(next);
 		prev.setNext(semicolon);
 	}
 	

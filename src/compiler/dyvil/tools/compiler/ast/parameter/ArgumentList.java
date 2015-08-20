@@ -407,7 +407,7 @@ public final class ArgumentList implements IArguments, IValueList
 		int len = this.size;
 		for (int i = 0; i < len; i++)
 		{
-			this.values[i].toString("", buffer);
+			this.values[i].toString(prefix, buffer);
 			if (i + 1 == len)
 			{
 				break;

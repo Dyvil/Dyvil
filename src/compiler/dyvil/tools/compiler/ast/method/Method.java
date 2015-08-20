@@ -582,7 +582,13 @@ public class Method extends Member implements IMethod, ILabelContext
 	
 	protected final void readIntrinsicAnnotation(IAnnotation annotation)
 	{
-		Array array = (Array) annotation.getArguments().getValue(0, Annotation.VALUE);
+		IValue value = annotation.getArguments().getValue(0, Annotation.VALUE);
+		if (value.valueTag() != IValue.ARRAY)
+		{
+			return;
+		}
+		
+		Array array = (Array) value;
 		
 		int len = array.valueCount();
 		int[] opcodes = new int[len];

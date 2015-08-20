@@ -137,6 +137,11 @@ public final class MatchExpression implements IValue
 			MatchCase matchCase = this.cases[i];
 			IValue action = matchCase.action;
 			
+			if (action == null)
+			{
+				continue;
+			}
+			
 			IValue value = type.convertValue(action, typeContext, markers, context);
 			if (value == null)
 			{
