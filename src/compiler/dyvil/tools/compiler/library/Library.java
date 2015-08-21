@@ -2,6 +2,8 @@ package dyvil.tools.compiler.library;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.LinkOption;
 import java.util.Collections;
@@ -20,64 +22,56 @@ public abstract class Library
 	public static final Library	dyvilBinLibrary;
 	public static final Library	javaLibrary;
 	
-	private static File urlToFile(URL url)
+	private static File getFileLocation(Class<?> klass)
 	{
-		String s = url.getPath();
-		int index = s.indexOf(".jar!");
-		if (index != -1)
+		String classLocation = '/' + klass.getName().replace('.', '/') + ".class";
+		URL url = klass.getResource(classLocation);
+		String path = url.toString();
+		int index = path.lastIndexOf(classLocation);
+		
+		if (index < 0)
 		{
-			int index1 = s.lastIndexOf(':', index);
-			String s1 = s.substring(index1 + 1, index + 4);
-			return new File(s1);
+			return null;
+		}
+		
+		int startIndex = 0;
+		if (path.charAt(index - 1) == '!')
+		{
+			index--;
+			startIndex = 4; // strip leading 'jar:'
+		}
+		else
+		{
+			index++;
+		}
+		
+		String newPath = path.substring(startIndex, index);
+		try
+		{
+			return new File(new URL(newPath).toURI());
+		}
+		catch (URISyntaxException | MalformedURLException ex)
+		{
+			ex.printStackTrace();
 		}
 		return null;
 	}
 	
 	static
 	{
-		URL url = String.class.getResource("/java/lang/String.class");
-		
-		javaLibraryLocation = urlToFile(url);
-		if (javaLibraryLocation == null)
-		{
-			throw new Error("Could not locate Java Library from '" + url + "'");
-		}
-		
-		if (DyvilCompiler.debug)
-		{
-			DyvilCompiler.log("Java Library URL: " + url);
-		}
-		
-		File bin = new File("bin");
-		if (bin.exists())
-		{
-			dyvilLibraryLocation = bin;
-		}
-		else
-		{
-			url = dyvil.lang.Void.class.getResource("/dyvil/lang/Void.class");
-			dyvilLibraryLocation = urlToFile(url);
-			if (dyvilLibraryLocation == null)
-			{
-				throw new Error("Could not locate Dyvil Library from '" + url + "'");
-			}
-			
-			if (DyvilCompiler.debug)
-			{
-				DyvilCompiler.log("Dyvil Library URL: " + url);
-			}
-		}
+		javaLibraryLocation = getFileLocation(java.lang.String.class);
+		dyvilLibraryLocation = getFileLocation(dyvil.lang.Void.class);
 		
 		if ((dyvilLibrary = load(dyvilLibraryLocation)) == null)
 		{
-			throw new Error("Could not load Dyvil Runtime Library");
+			DyvilCompiler.error("Could not load Dyvil Runtime Library");
 		}
 		if ((javaLibrary = load(javaLibraryLocation)) == null)
 		{
-			throw new Error("Could not load Java Runtime Library");
+			DyvilCompiler.error("Could not load Java Runtime Library");
 		}
 		
-		bin = new File("build/dyvilbin");
+		File bin = new File("build/dyvilbin");
 		if (bin.exists())
 		{
 			dyvilBinLibrary = load(bin);
@@ -103,6 +97,11 @@ public abstract class Library
 	
 	public static Library load(File file)
 	{
+		if (file == null)
+		{
+			return null;
+		}
+		
 		if (file.isDirectory())
 		{
 			return new FileLibrary(file);
@@ -135,40 +134,41 @@ public abstract class Library
 		}
 		
 		int index = internal.indexOf('/');
-		if (index >= 0)
+		if (index < 0)
 		{
 			if (this.isSubPackage(internal))
 			{
-				String s = internal.substring(0, index);
-				pack = Package.rootPackage.createSubPackage(s);
-				
+				return Package.rootPackage.createSubPackage(internal);
+			}
+			return null;
+		}
+		
+		if (this.isSubPackage(internal))
+		{
+			String s = internal.substring(0, index);
+			pack = Package.rootPackage.createSubPackage(s);
+			
+			if (pack == null)
+			{
+				return null;
+			}
+			
+			do
+			{
+				int index1 = internal.indexOf('/', index + 1);
+				int index2 = index1 >= 0 ? index1 : internal.length();
+				s = internal.substring(index + 1, index2);
+				pack = pack.createSubPackage(s);
 				if (pack == null)
 				{
 					return null;
 				}
-				
-				do
-				{
-					int index1 = internal.indexOf('/', index + 1);
-					int index2 = index1 >= 0 ? index1 : internal.length();
-					s = internal.substring(index + 1, index2);
-					pack = pack.createSubPackage(s);
-					if (pack == null)
-					{
-						return null;
-					}
-					index = index1;
-				}
-				while (index >= 0);
-				return pack;
+				index = index1;
 			}
-			
-			return null;
+			while (index >= 0);
+			return pack;
 		}
-		if (this.isSubPackage(internal))
-		{
-			return Package.rootPackage.createSubPackage(internal);
-		}
+		
 		return null;
 	}
 	
@@ -178,5 +178,11 @@ public abstract class Library
 	public String toString()
 	{
 		return this.file.getAbsolutePath();
+	}
+	
+	@Override
+	protected void finalize() throws Throwable
+	{
+		this.unloadLibrary();
 	}
 }
