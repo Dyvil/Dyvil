@@ -40,7 +40,12 @@ public abstract class Library
 		javaLibraryLocation = urlToFile(url);
 		if (javaLibraryLocation == null)
 		{
-			throw new Error("Could not locate rt.jar from '" + url + "'");
+			throw new Error("Could not locate Java Library from '" + url + "'");
+		}
+		
+		if (DyvilCompiler.debug)
+		{
+			DyvilCompiler.log("Java Library URL: " + url);
 		}
 		
 		File bin = new File("bin");
@@ -54,7 +59,12 @@ public abstract class Library
 			dyvilLibraryLocation = urlToFile(url);
 			if (dyvilLibraryLocation == null)
 			{
-				throw new Error("Could not locate dyvil-library.jar from '" + url + "'");
+				throw new Error("Could not locate Dyvil Library from '" + url + "'");
+			}
+			
+			if (DyvilCompiler.debug)
+			{
+				DyvilCompiler.log("Dyvil Library URL: " + url);
 			}
 		}
 		

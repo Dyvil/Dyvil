@@ -280,7 +280,7 @@ public final class DyvilCompiler
 		ConfigParser.parse(file.getCode(), config);
 	}
 	
-	private static void processArgument(String arg)
+	public static void processArgument(String arg)
 	{
 		switch (arg)
 		{

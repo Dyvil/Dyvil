@@ -30,12 +30,12 @@ public class CompilerConfig
 	
 	public CompilerConfig()
 	{
-		this.addLibrary(Library.dyvilLibrary);
-		this.addLibrary(Library.javaLibrary);
+		this.libraries.add(Library.dyvilLibrary);
+		this.libraries.add(Library.javaLibrary);
 		
 		if (Library.dyvilBinLibrary != null)
 		{
-			this.addLibrary(Library.dyvilBinLibrary);
+			this.libraries.add(Library.dyvilBinLibrary);
 		}
 	}
 	

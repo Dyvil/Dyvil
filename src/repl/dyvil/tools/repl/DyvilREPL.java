@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.Dlex;
@@ -46,11 +47,14 @@ public class DyvilREPL
 	{
 		System.err.println("Dyvil REPL " + VERSION);
 		
-		Library.javaLibrary.loadLibrary();
-		Library.dyvilLibrary.loadLibrary();
-		if (Library.dyvilBinLibrary != null)
+		for (String arg : args)
 		{
-			Library.dyvilBinLibrary.loadLibrary();
+			DyvilCompiler.processArgument(arg);
+		}
+		
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			library.loadLibrary();
 		}
 		
 		Package.init();
