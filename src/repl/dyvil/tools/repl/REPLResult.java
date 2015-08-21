@@ -95,6 +95,12 @@ public class REPLResult implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.value == null)
+		{
+			buffer.append("null");
+			return;
+		}
+		
 		Class c = this.value.getClass();
 		if (c.isArray())
 		{

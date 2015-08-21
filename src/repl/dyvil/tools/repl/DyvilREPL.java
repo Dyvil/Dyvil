@@ -69,7 +69,7 @@ public class DyvilREPL
 		while (currentCode != null);
 	}
 	
-	private static String readLine()
+	private static String readLine() throws IOException
 	{
 		StringBuilder buffer = new StringBuilder();
 		int depth1 = 0;
@@ -80,89 +80,86 @@ public class DyvilREPL
 		mainLoop:
 		while (true)
 		{
-			char c;
-			try
-			{
-				c = (char) reader.read();
-			}
-			catch (IOException ignore)
-			{
-				continue;
-			}
+			String s = reader.readLine();
 			
-			buffer.append(c);
-			
-			switch (c)
+			for (int i = 0, len = s.length(); i < len; i++)
 			{
-			case '\n':
-				if (mode == 0 && depth1 + depth2 + depth3 <= 0)
+				char c = s.charAt(i);
+				
+				buffer.append(c);
+				
+				switch (c)
 				{
-					break mainLoop;
+				case '"':
+					if (mode == 0 || mode == 2)
+					{
+						mode ^= 2;
+					}
+					break;
+				case '\'':
+					if (mode == 0 || mode == 4)
+					{
+						mode ^= 4;
+					}
+					break;
+				case '\\':
+					if (mode >= 2)
+					{
+						mode |= 1;
+					}
+					continue mainLoop;
+				case '{':
+					if (mode == 0)
+					{
+						depth1++;
+					}
+					break;
+				case '}':
+					if (mode == 0)
+					{
+						depth1--;
+					}
+					break;
+				case '(':
+					if (mode == 0)
+					{
+						depth2++;
+					}
+					break;
+				case ')':
+					if (mode == 0)
+					{
+						depth2--;
+					}
+					break;
+				case '[':
+					if (mode == 0)
+					{
+						depth3++;
+					}
+					break;
+				case ']':
+					if (mode == 0)
+					{
+						depth3--;
+					}
+					break;
 				}
 				
-				System.out.print('\t');
-				for (int i = 1; i < depth1; i++)
-				{
-					System.out.print('\t');
-				}
-				break;
-			case '"':
-				if (mode == 0 || mode == 2)
-				{
-					mode ^= 2;
-				}
-				break;
-			case '\'':
-				if (mode == 0 || mode == 4)
-				{
-					mode ^= 4;
-				}
-				break;
-			case '\\':
-				if (mode >= 2)
-				{
-					mode |= 1;
-				}
-				continue mainLoop;
-			case '{':
-				if (mode == 0)
-				{
-					depth1++;
-				}
-				break;
-			case '}':
-				if (mode == 0)
-				{
-					depth1--;
-				}
-				break;
-			case '(':
-				if (mode == 0)
-				{
-					depth2++;
-				}
-				break;
-			case ')':
-				if (mode == 0)
-				{
-					depth2--;
-				}
-				break;
-			case '[':
-				if (mode == 0)
-				{
-					depth3++;
-				}
-				break;
-			case ']':
-				if (mode == 0)
-				{
-					depth3--;
-				}
-				break;
+				mode &= ~1;
 			}
 			
-			mode &= ~1;
+			buffer.append('\n');
+			if (mode == 0 && depth1 + depth2 + depth3 <= 0)
+			{
+				break mainLoop;
+			}
+			
+			System.out.print("  ");
+			for (int j = 0; j < depth1; j++)
+			{
+				System.out.print("    ");
+			}
 		}
 		
 		return buffer.toString();
@@ -170,15 +167,15 @@ public class DyvilREPL
 	
 	public static synchronized void loop()
 	{
-		System.out.print(">\t");
-		currentCode = readLine();
+		System.out.print("> ");
 		
 		try
 		{
-			
-			if (currentCode.startsWith(":"))
+			currentCode = readLine();
+			String trim = currentCode.trim();
+			if (trim.startsWith(":"))
 			{
-				runCommand(currentCode);
+				runCommand(trim);
 				return;
 			}
 			
