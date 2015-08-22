@@ -53,9 +53,6 @@ public class Constructor extends Member implements IConstructor
 	
 	protected IValue value;
 	
-	// Metadata
-	protected IMethod overrideMethod;
-	
 	public Constructor(IClass iclass)
 	{
 		this.theClass = iclass;
@@ -175,13 +172,15 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void exceptionCount()
+	public int exceptionCount()
 	{
+		return this.exceptionCount;
 	}
 	
 	@Override
 	public void setException(int index, IType exception)
 	{
+		this.exceptions[index] = exception;
 	}
 	
 	@Override

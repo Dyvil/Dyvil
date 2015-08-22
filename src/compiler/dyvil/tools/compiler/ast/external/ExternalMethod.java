@@ -9,18 +9,19 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ExternalMethod extends Method
+public final class ExternalMethod extends AbstractMethod
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
@@ -30,7 +31,7 @@ public final class ExternalMethod extends Method
 	
 	public ExternalMethod(IClass iclass, Name name, String desc, int modifiers)
 	{
-		super(iclass);
+		super(iclass, name);
 		this.name = name;
 		this.modifiers = modifiers;
 		this.descriptor = desc;
@@ -240,6 +241,11 @@ public final class ExternalMethod extends Method
 	
 	@Override
 	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 	}
 	

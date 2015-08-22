@@ -180,7 +180,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			{
 				this.mode = PARAMETERS;
 				
-				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				AbstractMethod m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.annotations);
 				this.member = m;
 				return;

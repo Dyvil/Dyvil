@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface IExceptionList
 {
-	public void exceptionCount();
+	public int exceptionCount();
 	
 	public void setException(int index, IType exception);
 	

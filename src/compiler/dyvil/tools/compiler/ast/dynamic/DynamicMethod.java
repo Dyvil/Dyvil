@@ -266,8 +266,9 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void exceptionCount()
+	public int exceptionCount()
 	{
+		return 0;
 	}
 	
 	@Override
