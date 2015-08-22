@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -16,7 +17,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
-	private AnonymousClass				nestedClass;
+	private AnonymousClass			nestedClass;
 	private AnonymousClassMetadata	metadata;
 	
 	public ClassConstructor(ICodePosition position)
@@ -57,7 +58,21 @@ public class ClassConstructor extends ConstructorCall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		this.type.resolve(markers, context);
+		this.arguments.resolve(markers, context);
+		
+		if (this.type.getTheClass().isInterface())
+		{
+			this.constructor = IContext.resolveConstructor(Types.OBJECT_CLASS, this.arguments);
+		}
+		else
+		{
+			this.constructor = IContext.resolveConstructor(this.type, this.arguments);
+		}
+		if (this.constructor == null)
+		{
+			this.reportResolve(markers);
+		}
 		
 		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);
 		this.nestedClass.setMetadata(this.metadata);

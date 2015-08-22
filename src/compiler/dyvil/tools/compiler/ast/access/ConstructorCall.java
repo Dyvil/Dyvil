@@ -149,9 +149,10 @@ public class ConstructorCall implements ICall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.type.resolve(markers, context);
 		this.arguments.resolve(markers, context);
 		
-		if (this.type == null || !this.type.isResolved())
+		if (!this.type.isResolved())
 		{
 			return this;
 		}
@@ -196,7 +197,27 @@ public class ConstructorCall implements ICall
 		}
 		
 		this.constructor = IContext.resolveConstructor(this.type, this.arguments);
+		if (this.constructor == null)
+		{
+			this.reportResolve(markers);
+		}
 		return this;
+	}
+	
+	protected void reportResolve(MarkerList markers)
+	{
+		if (!this.type.isResolved())
+		{
+			return;
+		}
+		
+		Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
 	}
 	
 	@Override
@@ -214,9 +235,10 @@ public class ConstructorCall implements ICall
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.type.check(markers, context);
 		this.arguments.check(markers, context);
 		
-		if (this.type == null || this.type.isArrayType())
+		if (this.type.isArrayType())
 		{
 			return;
 		}
@@ -239,16 +261,6 @@ public class ConstructorCall implements ICall
 		if (this.constructor != null)
 		{
 			this.constructor.checkCall(markers, this.position, context, this.arguments);
-		}
-		else
-		{
-			Marker marker = markers.create(this.position, "resolve.constructor", this.type.toString());
-			if (!this.arguments.isEmpty())
-			{
-				StringBuilder builder = new StringBuilder("Argument Types: ");
-				this.arguments.typesToString(builder);
-				marker.addInfo(builder.toString());
-			}
 		}
 	}
 	

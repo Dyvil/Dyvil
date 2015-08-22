@@ -82,7 +82,7 @@ public class DyvilREPL
 		{
 			String s = reader.readLine();
 			
-			for (int i = 0, len = s.length(); i < len; i++)
+			outer: for (int i = 0, len = s.length(); i < len; i++)
 			{
 				char c = s.charAt(i);
 				
@@ -107,7 +107,7 @@ public class DyvilREPL
 					{
 						mode |= 1;
 					}
-					continue mainLoop;
+					continue outer;
 				case '{':
 					if (mode == 0)
 					{
