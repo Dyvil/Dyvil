@@ -1289,7 +1289,7 @@ public class Method extends Member implements IMethod, ILabelContext
 		}
 		
 		// Generate a bridge method
-		mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified,
+		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified,
 				this.overrideMethod.getDescriptor(), this.overrideMethod.getSignature(), this.overrideMethod.getExceptions()));
 				
 		start = new Label();
@@ -1315,7 +1315,8 @@ public class Method extends Member implements IMethod, ILabelContext
 		IType overrideReturnType = this.overrideMethod.getType();
 		
 		mw.writeLineNumber(lineNumber);
-		mw.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), false);
+		boolean itf = this.theClass.isInterface();
+		mw.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), itf);
 		this.type.writeCast(mw, overrideReturnType, lineNumber);
 		mw.writeInsn(overrideReturnType.getReturnOpcode());
 		mw.end();

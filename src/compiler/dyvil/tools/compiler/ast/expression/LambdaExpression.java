@@ -301,7 +301,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			IParameter lambdaParam = this.parameters[i];
 			IParameter param = method.getParameter(i);
 			IType lambdaParamType = lambdaParam.getType();
-			if (lambdaParamType == null)
+			if (lambdaParamType == Types.UNKNOWN)
 			{
 				continue;
 			}
