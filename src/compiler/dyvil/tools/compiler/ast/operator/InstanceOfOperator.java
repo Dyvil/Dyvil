@@ -70,13 +70,14 @@ public final class InstanceOfOperator extends Value
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		this.type = this.type.resolveType(markers, context);
 		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.type.resolve(markers, context);
 		this.value = this.value.resolve(markers, context);
 		return this;
 	}
@@ -84,12 +85,14 @@ public final class InstanceOfOperator extends Value
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.CLASS);
 		this.value.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.type.check(markers, context);
 		this.value.check(markers, context);
 		
 		if (this.type.isPrimitive())
@@ -123,6 +126,7 @@ public final class InstanceOfOperator extends Value
 	@Override
 	public IValue foldConstants()
 	{
+		this.type.foldConstants();
 		this.value = this.value.foldConstants();
 		return this;
 	}
@@ -130,6 +134,7 @@ public final class InstanceOfOperator extends Value
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		this.type.cleanup(context, compilableList);
 		this.value = this.value.cleanup(context, compilableList);
 		
 		if (this.value.isType(this.type))

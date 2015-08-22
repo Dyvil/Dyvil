@@ -101,7 +101,7 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		this.type = this.type.resolveType(markers, context);
 		
 		this.arguments.resolveTypes(markers, context);
 	}
@@ -144,6 +144,8 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.CLASS);
+		
 		this.arguments.checkTypes(markers, context);
 	}
 	

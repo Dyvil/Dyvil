@@ -151,12 +151,12 @@ public class CodeClass extends AbstractClass
 		
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(markers, this, TypePosition.SUPER_TYPE);
+			this.superType = this.superType.resolveType(markers, this);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(markers, this, TypePosition.SUPER_TYPE);
+			this.interfaces[i] = this.interfaces[i].resolveType(markers, this);
 		}
 		
 		if (this.body != null)
@@ -175,9 +175,24 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolve(markers, context);
 		}
 		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].resolve(markers, this);
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolve(markers, this);
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.resolve(markers, this);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].resolve(markers, this);
 		}
 		
 		if (this.body != null)
@@ -196,9 +211,24 @@ public class CodeClass extends AbstractClass
 			this.annotations.checkTypes(markers, context);
 		}
 		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].checkTypes(markers, this);
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].checkTypes(markers, this);
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.checkType(markers, this, TypePosition.SUPER_TYPE);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].checkType(markers, this, TypePosition.SUPER_TYPE);
 		}
 		
 		if (this.body != null)
@@ -210,8 +240,52 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, this.getElementType());
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].check(markers, this);
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].check(markers, this);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			type.check(markers, context);
+			
+			IClass iclass = type.getTheClass();
+			if (iclass == null)
+			{
+				continue;
+			}
+			
+			int modifiers = iclass.getModifiers();
+			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+			{
+				markers.add(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
+				continue;
+			}
+			if ((modifiers & Modifiers.SEALED) != 0 && iclass instanceof ExternalClass)
+			{
+				markers.add(this.position, "class.implement.sealed", iclass.getName());
+			}
+			if ((modifiers & Modifiers.DEPRECATED) != 0)
+			{
+				markers.add(this.position, "class.implement.deprecated", iclass.getName());
+			}
+		}
+		
 		if (this.superType != null)
 		{
+			this.superType.check(markers, context);
+			
 			IClass superClass = this.superType.getTheClass();
 			if (superClass != null)
 			{
@@ -238,41 +312,6 @@ public class CodeClass extends AbstractClass
 			}
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].check(markers, this);
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass == null)
-			{
-				continue;
-			}
-			
-			int modifiers = iclass.getModifiers();
-			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
-			{
-				markers.add(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
-				continue;
-			}
-			if ((modifiers & Modifiers.SEALED) != 0 && iclass instanceof ExternalClass)
-			{
-				markers.add(this.position, "class.implement.sealed", iclass.getName());
-			}
-			if ((modifiers & Modifiers.DEPRECATED) != 0)
-			{
-				markers.add(this.position, "class.implement.deprecated", iclass.getName());
-			}
-		}
-		
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, this.getElementType());
-		}
-		
 		if (this.body != null)
 		{
 			this.body.check(markers);
@@ -287,9 +326,24 @@ public class CodeClass extends AbstractClass
 			this.annotations.foldConstants();
 		}
 		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].foldConstants();
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.foldConstants();
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].foldConstants();
 		}
 		
 		if (this.body != null)
@@ -303,12 +357,27 @@ public class CodeClass extends AbstractClass
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.cleanup(context, compilableList);
+			this.annotations.cleanup(context, this);
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].cleanup(this, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(this, this);
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.cleanup(this, this);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].cleanup(this, this);
 		}
 		
 		if (this.body != null)

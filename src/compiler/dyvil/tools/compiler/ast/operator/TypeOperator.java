@@ -100,7 +100,7 @@ public final class TypeOperator extends Value
 			return;
 		}
 		
-		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+		this.type = this.type.resolveType(markers, context);
 		ClassGenericType generic = new ClassGenericType(Types.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
@@ -109,28 +109,33 @@ public final class TypeOperator extends Value
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.type.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.TYPE);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.type.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
+		this.type.foldConstants();
 		return this;
 	}
 	
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		this.type.cleanup(context, compilableList);
 		return this;
 	}
 	

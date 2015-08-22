@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -46,9 +47,19 @@ public interface ITypeVariable extends IASTNode, INamed
 	
 	public boolean isSuperTypeOf(IType type);
 	
-	// Resolve Types
+	// Phases
 	
 	public void resolveTypes(MarkerList markers, IContext context);
+	
+	public void resolve(MarkerList markers, IContext context);
+	
+	public void checkTypes(MarkerList markers, IContext context);
+	
+	public void check(MarkerList markers, IContext context);
+	
+	public void foldConstants();
+	
+	public void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// Compilation
 	

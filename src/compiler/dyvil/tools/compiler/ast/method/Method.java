@@ -357,16 +357,11 @@ public class Method extends Member implements IMethod, ILabelContext
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].resolveTypes(markers, context);
-		}
-		
 		super.resolveTypes(markers, this);
 		
-		for (int i = 0; i < this.exceptionCount; i++)
+		for (int i = 0; i < this.genericCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(markers, this, TypePosition.TYPE);
+			this.generics[i].resolveTypes(markers, this);
 		}
 		
 		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
@@ -387,6 +382,11 @@ public class Method extends Member implements IMethod, ILabelContext
 			}
 		}
 		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i] = this.exceptions[i].resolveType(markers, this);
+		}
+		
 		if (this.value != null)
 		{
 			this.value.resolveTypes(markers, this);
@@ -404,11 +404,21 @@ public class Method extends Member implements IMethod, ILabelContext
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		super.resolve(markers, this);
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].resolve(markers, this);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolve(markers, context);
+			this.parameters[i].resolve(markers, this);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].resolve(markers, this);
 		}
 		
 		if (this.value != null)
@@ -454,11 +464,21 @@ public class Method extends Member implements IMethod, ILabelContext
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.checkTypes(markers, context);
+		super.checkTypes(markers, this);
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].checkTypes(markers, this);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].checkTypes(markers, context);
+			this.parameters[i].checkTypes(markers, this);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].checkType(markers, this, TypePosition.RETURN_TYPE);
 		}
 		
 		if (this.value != null)
@@ -476,16 +496,23 @@ public class Method extends Member implements IMethod, ILabelContext
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		super.check(markers, context);
+		super.check(markers, this);
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].check(markers, this);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].check(markers, context);
+			this.parameters[i].check(markers, this);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			IType t = this.exceptions[i];
+			t.check(markers, this);
+			
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
 				Marker m = markers.create(t.getPosition(), "method.exception.type");
@@ -569,9 +596,19 @@ public class Method extends Member implements IMethod, ILabelContext
 	{
 		super.foldConstants();
 		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].foldConstants();
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].foldConstants();
 		}
 		
 		if (this.value != null)
@@ -602,7 +639,7 @@ public class Method extends Member implements IMethod, ILabelContext
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		super.cleanup(context, compilableList);
+		super.cleanup(this, compilableList);
 		
 		if (this.annotations != null)
 		{
@@ -613,9 +650,19 @@ public class Method extends Member implements IMethod, ILabelContext
 			}
 		}
 		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].cleanup(this, compilableList);
+		}
+		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(this, compilableList);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].cleanup(this, compilableList);
 		}
 		
 		if (this.value != null)

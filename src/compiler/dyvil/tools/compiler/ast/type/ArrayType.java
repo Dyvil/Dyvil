@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -166,20 +167,49 @@ public class ArrayType implements IType, ITyped
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
-		if (position == TypePosition.SUPER_TYPE)
-		{
-			markers.add(this.type.getPosition(), "type.super.array");
-			return this.type.resolve(markers, context, TypePosition.SUPER_TYPE);
-		}
-		
 		if (this.type == null)
 		{
 			this.type = Types.ANY;
 		}
-		this.type = this.type.resolve(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		this.type = this.type.resolveType(markers, context);
 		return this;
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		this.type.resolve(markers, context);
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+		if (position == TypePosition.SUPER_TYPE)
+		{
+			markers.add(this.type.getPosition(), "type.super.array");
+		}
+		
+		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		this.type.check(markers, context);
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		this.type.foldConstants();
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.type.cleanup(context, compilableList);
 	}
 	
 	@Override

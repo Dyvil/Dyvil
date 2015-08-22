@@ -55,12 +55,11 @@ public class InternalGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
-		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			this.typeArguments[i] = this.typeArguments[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
 		}
 		
 		if (this.internalName.startsWith("dyvil/tuple/Tuple"))
@@ -77,6 +76,11 @@ public class InternalGenericType extends GenericType
 		
 		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	@Override

@@ -26,6 +26,7 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -337,11 +338,29 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	{
 	}
 	
-	// Resolve Types
+	// Phases
 	
 	public boolean isResolved();
 	
-	public IType resolve(MarkerList markers, IContext context, TypePosition position);
+	public IType resolveType(MarkerList markers, IContext context);
+	
+	public default void resolve(MarkerList markers, IContext context)
+	{
+	}
+	
+	public void checkType(MarkerList markers, IContext context, TypePosition position);
+	
+	public default void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	public default void foldConstants()
+	{
+	}
+	
+	public default void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+	}
 	
 	// IContext
 	

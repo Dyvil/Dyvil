@@ -108,7 +108,7 @@ public class NamedType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		// Try to resolve the name of this Type as a primitive type
 		IType t = resolvePrimitive(this.name);
@@ -124,23 +124,12 @@ public class NamedType implements IType
 			return this;
 		}
 		
-		if (type.typeTag() == TYPE_VAR_TYPE)
-		{
-			switch (position)
-			{
-			case CLASS:
-			case TYPE:
-				markers.add(this.position, "type.class.typevar");
-				break;
-			case SUPER_TYPE:
-				markers.add(this.position, "type.super.typevar");
-				break;
-			default:
-				break;
-			}
-		}
-		
 		return type;
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	@Override

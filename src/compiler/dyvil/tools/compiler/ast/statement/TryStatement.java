@@ -183,7 +183,7 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.type = block.type.resolve(markers, context, TypePosition.CLASS);
+			block.type = block.type.resolveType(markers, context);
 			block.action.resolveTypes(markers, context);
 		}
 		
@@ -222,6 +222,7 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
+			block.type.resolve(markers, context);
 			block.action = block.action.resolve(markers, new CombiningContext(block, context));
 		}
 		
@@ -243,6 +244,7 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
+			block.type.checkType(markers, context, TypePosition.RETURN_TYPE);
 			block.action.checkTypes(markers, new CombiningContext(block, context));
 		}
 		
@@ -263,6 +265,8 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
+			block.type.check(markers, context);
+			
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
 				Marker marker = markers.create(block.position, "try.catch.type");
@@ -289,6 +293,7 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
+			block.type.foldConstants();
 			block.action = block.action.foldConstants();
 		}
 		
@@ -310,7 +315,8 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			block.action = block.action.cleanup(context, compilableList);
+			block.type.cleanup(context, compilableList);
+			block.action = block.action.cleanup(new CombiningContext(block, context), compilableList);
 		}
 		
 		if (this.finallyBlock != null)

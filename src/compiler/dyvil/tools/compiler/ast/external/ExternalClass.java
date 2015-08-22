@@ -38,7 +38,6 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -115,12 +114,12 @@ public final class ExternalClass extends AbstractClass
 		this.superTypesResolved = true;
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(null, this, TypePosition.SUPER_TYPE);
+			this.superType = this.superType.resolveType(null, this);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(null, this, TypePosition.SUPER_TYPE);
+			this.interfaces[i] = this.interfaces[i].resolveType(null, this);
 		}
 		
 		if (!this.metadataResolved)
@@ -148,7 +147,7 @@ public final class ExternalClass extends AbstractClass
 			for (int i = 0; i < len; i++)
 			{
 				IType t = this.innerTypes.get(i);
-				this.innerTypes.set(i, t.resolve(null, Package.rootPackage, TypePosition.CLASS));
+				this.innerTypes.set(i, t.resolveType(null, Package.rootPackage));
 				t.getTheClass().setOuterClass(this);
 			}
 		}

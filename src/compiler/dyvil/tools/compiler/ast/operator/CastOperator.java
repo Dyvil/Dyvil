@@ -66,13 +66,15 @@ public final class CastOperator extends Value
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+		this.type = this.type.resolveType(markers, context);
 		this.value.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.type.resolve(markers, context);
+		
 		this.value = this.value.resolve(markers, context);
 		if (this.type == Types.VOID)
 		{
@@ -128,19 +130,21 @@ public final class CastOperator extends Value
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.TYPE);
 		this.value.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.type.check(markers, context);
 		this.value.check(markers, context);
-		
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
+		this.type.foldConstants();
 		this.value = this.value.foldConstants();
 		return this;
 	}
@@ -153,6 +157,7 @@ public final class CastOperator extends Value
 			return this.value.cleanup(context, compilableList);
 		}
 		
+		this.type.cleanup(context, compilableList);
 		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}

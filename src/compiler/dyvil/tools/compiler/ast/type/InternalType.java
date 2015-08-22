@@ -54,7 +54,7 @@ public class InternalType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		switch (this.internalName)
 		{
@@ -64,6 +64,11 @@ public class InternalType implements IType
 		
 		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassType(iclass);
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	@Override

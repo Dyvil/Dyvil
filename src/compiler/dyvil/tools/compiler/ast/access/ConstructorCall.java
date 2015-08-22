@@ -128,7 +128,7 @@ public class ConstructorCall implements ICall
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+			this.type = this.type.resolveType(markers, context);
 		}
 		else
 		{
@@ -202,6 +202,8 @@ public class ConstructorCall implements ICall
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.TYPE);
+		
 		if (this.constructor != null)
 		{
 			this.constructor.checkArguments(markers, this.position, context, this.arguments);

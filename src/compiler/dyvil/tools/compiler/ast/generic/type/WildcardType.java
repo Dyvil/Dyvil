@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
@@ -149,20 +150,58 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		if (this.bound != null)
 		{
-			this.bound = this.bound.resolve(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+			this.bound = this.bound.resolveType(markers, context);
+		}
+		
+		return this;
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		if (this.bound != null)
+		{
+			this.bound.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+		if (this.bound != null)
+		{
+			this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 		
 		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
 			markers.add(this.position, "type.invalid.wildcard");
-			return this.bound == null ? Types.ANY : this.bound;
 		}
-		
-		return this;
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.bound != null)
+			this.bound.check(markers, context);
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		if (this.bound != null)
+			this.bound.foldConstants();
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.bound != null)
+			this.bound.cleanup(context, compilableList);
 	}
 	
 	@Override

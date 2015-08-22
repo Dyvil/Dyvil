@@ -6,6 +6,7 @@ import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
@@ -192,13 +193,13 @@ public final class TypeVariable implements ITypeVariable
 	{
 		if (this.lowerBound != null)
 		{
-			this.lowerBound = this.lowerBound.resolve(markers, context, TypePosition.TYPE);
+			this.lowerBound = this.lowerBound.resolveType(markers, context);
 		}
 		
 		if (this.upperBoundCount > 0)
 		{
 			// The first upper bound is meant to be a class bound.
-			IType type = this.upperBounds[0] = this.upperBounds[0].resolve(markers, context, TypePosition.TYPE);
+			IType type = this.upperBounds[0] = this.upperBounds[0].resolveType(markers, context);
 			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
@@ -226,7 +227,7 @@ public final class TypeVariable implements ITypeVariable
 			// not.
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
-				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context, TypePosition.TYPE);
+				type = this.upperBounds[i] = this.upperBounds[i].resolveType(markers, context);
 				iclass = type.getTheClass();
 				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
@@ -235,6 +236,76 @@ public final class TypeVariable implements ITypeVariable
 					i--;
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.resolve(markers, context);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.check(markers, context);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].check(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.foldConstants();
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.cleanup(context, compilableList);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].cleanup(context, compilableList);
 		}
 	}
 	

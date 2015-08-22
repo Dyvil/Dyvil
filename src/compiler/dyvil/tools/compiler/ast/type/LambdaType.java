@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -295,19 +296,70 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context);
 		}
-		this.returnType = this.returnType.resolve(markers, context, TypePosition.GENERIC_ARGUMENT).getObjectType();
+		this.returnType = this.returnType.resolveType(markers, context).getObjectType();
 		
+		return this;
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].resolve(markers, context);
+		}
+		this.returnType.resolve(markers, context);
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 		if (position == TypePosition.CLASS)
 		{
 			markers.add(this.returnType.getPosition(), "type.class.lambda");
 		}
-		return this;
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].checkType(markers, context, TypePosition.PARAMETER_TYPE);
+		}
+		this.returnType.checkType(markers, context, TypePosition.RETURN_TYPE);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].check(markers, context);
+		}
+		this.returnType.check(markers, context);
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].foldConstants();
+		}
+		this.returnType.foldConstants();
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].cleanup(context, compilableList);
+		}
+		this.returnType.cleanup(context, compilableList);
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.config.Formatting;
@@ -63,9 +64,39 @@ public class TypeAlias implements ITypeAlias
 	}
 	
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		this.type = this.type.resolveType(markers, context);
+	}
+	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+		this.type.resolve(markers, context);
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.type.checkType(markers, context, TypePosition.TYPE);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		this.type.check(markers, context);
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		this.type.foldConstants();
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.type.cleanup(context, compilableList);
 	}
 	
 	@Override

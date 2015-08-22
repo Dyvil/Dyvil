@@ -228,11 +228,14 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
-		// TODO Position and report errors related to the position
-		
 		return this;
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	@Override

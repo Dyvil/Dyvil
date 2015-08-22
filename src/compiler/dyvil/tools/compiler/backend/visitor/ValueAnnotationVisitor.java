@@ -8,9 +8,7 @@ import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class ValueAnnotationVisitor implements AnnotationVisitor
@@ -31,7 +29,6 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	static IValue getEnumValue(String enumClass, String name)
 	{
 		IType t = ClassFormat.internalToType(enumClass);
-		t.resolve(null, Package.rootPackage, TypePosition.CLASS);
 		return new EnumValue(t, Name.getQualified(name));
 	}
 	

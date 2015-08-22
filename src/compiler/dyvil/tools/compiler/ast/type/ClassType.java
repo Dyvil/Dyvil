@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
+import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -77,9 +78,27 @@ public class ClassType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+		IClass iclass = this.theClass;
+		if (iclass != null)
+		{
+			if (iclass.hasModifier(Modifiers.DEPRECATED))
+			{
+				markers.add(this.getPosition(), "type.access.deprecated", iclass.getName());
+			}
+			
+			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
+			{
+				markers.add(this.getPosition(), "type.access.internal", iclass.getName());
+			}
+		}
 	}
 	
 	// IContext

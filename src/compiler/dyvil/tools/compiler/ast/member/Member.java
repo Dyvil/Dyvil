@@ -160,7 +160,7 @@ public abstract class Member implements IMember
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context, TypePosition.RETURN_TYPE);
+			this.type = this.type.resolveType(markers, context);
 		}
 		if (this.annotations != null)
 		{
@@ -171,6 +171,8 @@ public abstract class Member implements IMember
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		if (this.type != null)
+			this.type.resolve(markers, context);
 		if (this.annotations != null)
 		{
 			this.annotations.resolve(markers, context);
@@ -180,6 +182,8 @@ public abstract class Member implements IMember
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.type != null)
+			this.type.checkType(markers, context, TypePosition.RETURN_TYPE);
 		if (this.annotations != null)
 		{
 			this.annotations.checkTypes(markers, context);
@@ -189,6 +193,8 @@ public abstract class Member implements IMember
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.type != null)
+			this.type.check(markers, context);
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
@@ -198,6 +204,8 @@ public abstract class Member implements IMember
 	@Override
 	public void foldConstants()
 	{
+		if (this.type != null)
+			this.type.foldConstants();
 		if (this.annotations != null)
 		{
 			this.annotations.foldConstants();
@@ -210,6 +218,10 @@ public abstract class Member implements IMember
 		if (this.annotations != null)
 		{
 			this.annotations.cleanup(context, compilableList);
+		}
+		if (this.type != null)
+		{
+			this.type.cleanup(context, compilableList);
 		}
 	}
 	

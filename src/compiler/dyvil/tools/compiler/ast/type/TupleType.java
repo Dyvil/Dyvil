@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -235,7 +236,7 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		if (this.typeCount == 0)
 		{
@@ -243,19 +244,65 @@ public final class TupleType implements IType, ITypeList
 		}
 		if (this.typeCount == 1)
 		{
-			return this.types[0].resolve(markers, context, position);
+			return this.types[0].resolveType(markers, context);
 		}
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i] = this.types[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+			this.types[i] = this.types[i].resolveType(markers, context);
 		}
 		
+		return this;
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 		if (position == TypePosition.CLASS)
 		{
 			markers.add(this.types[0].getPosition(), "type.class.tuple");
 		}
-		return this;
+		
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].checkType(markers, context, TypePosition.GENERIC_ARGUMENT);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].check(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].cleanup(context, compilableList);
+		}
 	}
 	
 	@Override

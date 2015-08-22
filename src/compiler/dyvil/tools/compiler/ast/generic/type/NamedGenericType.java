@@ -58,7 +58,7 @@ public class NamedGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		// Package.rootPackage.resolveInternalClass(this.internalName);
 		
@@ -91,7 +91,8 @@ public class NamedGenericType extends GenericType
 			}
 		}
 		
-		if (position == TypePosition.CLASS)
+		/* TODO Position handling
+		 * if (position == TypePosition.CLASS)
 		{
 			markers.add(this.position, "type.class.generic");
 		}
@@ -106,13 +107,13 @@ public class NamedGenericType extends GenericType
 			// Otherwise, resolve the type arguments with a GENERIC_ARGUMENT
 			// position
 			position = TypePosition.GENERIC_ARGUMENT;
-		}
+		} */
 		
 		if (iclass == null)
 		{
 			for (int i = 0; i < this.typeArgumentCount; i++)
 			{
-				this.typeArguments[i] = this.typeArguments[i].resolve(markers, context, position);
+				this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
 			}
 			return this;
 		}
@@ -120,7 +121,7 @@ public class NamedGenericType extends GenericType
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			IType t1 = this.typeArguments[i];
-			IType t2 = t1.resolve(markers, context, position);
+			IType t2 = t1.resolveType(markers, context);
 			
 			this.typeArguments[i] = t2;
 			
@@ -133,6 +134,11 @@ public class NamedGenericType extends GenericType
 			}
 		}
 		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	@Override

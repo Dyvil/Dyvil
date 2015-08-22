@@ -108,19 +108,22 @@ public final class ThisValue implements IValue
 		}
 		else
 		{
-			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+			this.type = this.type.resolveType(markers, context);
 		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.type.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.CLASS);
+		
 		IClass iclass = this.type.getTheClass();
 		
 		this.getter = context.getAccessibleThis(iclass);

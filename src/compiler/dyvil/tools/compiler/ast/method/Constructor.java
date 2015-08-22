@@ -233,7 +233,7 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(markers, this, TypePosition.TYPE);
+			this.exceptions[i] = this.exceptions[i].resolveType(markers, this);
 		}
 		
 		int index = 1;
@@ -265,11 +265,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		if (this.annotations != null)
+		{
+			this.annotations.resolve(markers, context);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolve(markers, context);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].resolve(markers, this);
 		}
 		
 		this.resolveSuperConstructors(markers, context);
@@ -324,11 +332,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.checkTypes(markers, context);
+		if (this.annotations != null)
+		{
+			this.annotations.checkTypes(markers, context);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].checkTypes(markers, context);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].checkType(markers, this, TypePosition.RETURN_TYPE);
 		}
 		
 		if (this.value == null)
@@ -347,11 +363,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		super.check(markers, context);
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, ElementType.CONSTRUCTOR);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, context);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].check(markers, this);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
@@ -382,11 +406,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void foldConstants()
 	{
-		super.foldConstants();
+		if (this.annotations != null)
+		{
+			this.annotations.foldConstants();
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].foldConstants();
 		}
 		
 		if (this.value != null)
@@ -398,11 +430,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		super.cleanup(context, compilableList);
+		if (this.annotations != null)
+		{
+			this.annotations.cleanup(context, compilableList);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(this, compilableList);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].cleanup(this, compilableList);
 		}
 		
 		if (this.value != null)

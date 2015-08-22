@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.IObjectCompilable;
@@ -27,7 +28,19 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped, IObjectCompilable
 	@Override
 	public IType getType();
 	
+	// Phases
+	
+	public void resolveTypes(MarkerList markers, IContext context);
+	
 	public void resolve(MarkerList markers, IContext context);
+	
+	public void checkTypes(MarkerList markers, IContext context);
+	
+	public void check(MarkerList markers, IContext context);
+	
+	public void foldConstants();
+	
+	public void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	@Override
 	public void write(DataOutput dos) throws IOException;
