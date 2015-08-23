@@ -62,7 +62,7 @@ public final class CharValue implements IConstantValue
 		}
 		if (type.isSuperTypeOf(Types.CHAR))
 		{
-			return new BoxedValue(this, Types.CHAR.boxMethod);
+			return new BoxedValue(this, Types.CHAR.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
 		{

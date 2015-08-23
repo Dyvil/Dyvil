@@ -61,11 +61,11 @@ public interface IPattern extends IASTNode, ITyped
 		}
 		if (type.classEquals(primitiveType))
 		{
-			return new BoxPattern(pattern, primitiveType.unboxMethod);
+			return new BoxPattern(pattern, primitiveType.getUnboxMethod());
 		}
 		if (type.isSuperTypeOf(primitiveType))
 		{
-			return new TypeCheckPattern(new BoxPattern(pattern, primitiveType.unboxMethod), primitiveType.getObjectType());
+			return new TypeCheckPattern(new BoxPattern(pattern, primitiveType.getUnboxMethod()), primitiveType.getObjectType());
 		}
 		return null;
 	}

@@ -49,7 +49,7 @@ public final class NotOperator extends Value
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.boxMethod) : null;
+		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.getBoxMethod()) : null;
 	}
 	
 	@Override

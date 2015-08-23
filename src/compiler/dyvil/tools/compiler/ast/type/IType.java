@@ -5,11 +5,9 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -23,7 +21,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -91,6 +88,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int	INTERNAL_TYPE_VAR	= 33;
 	int	WILDCARD_TYPE		= 34;
 	
+	int ANNOTATED = 64;
+	
 	@Override
 	public default ICodePosition getPosition()
 	{
@@ -127,10 +126,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Type Conversions
 	
-	public default IType getObjectType()
-	{
-		return this;
-	}
+	public IType getObjectType();
 	
 	public default IType getReturnType()
 	{
@@ -142,37 +138,19 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return this;
 	}
 	
-	public default ReferenceType getRefType()
-	{
-		return Types.getRef(this);
-	}
+	public ReferenceType getRefType();
 	
-	public default IType getSimpleRefType()
-	{
-		return Types.getSimpleRef(this);
-	}
+	public IType getSimpleRefType();
 	
 	// Arrays
 	
-	public default boolean isArrayType()
-	{
-		return false;
-	}
+	public boolean isArrayType();
 	
-	public default int getArrayDimensions()
-	{
-		return 0;
-	}
+	public int getArrayDimensions();
 	
-	public default IType getElementType()
-	{
-		return this;
-	}
+	public IType getElementType();
 	
-	public default IClass getArrayClass()
-	{
-		return Types.getObjectArray();
-	}
+	public IClass getArrayClass();
 	
 	// Super Type
 	
@@ -277,15 +255,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Resolve
 	
-	public default IMethod getBoxMethod()
-	{
-		return null;
-	}
+	public IMethod getBoxMethod();
 	
-	public default IMethod getUnboxMethod()
-	{
-		return null;
-	}
+	public IMethod getUnboxMethod();
 	
 	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -311,10 +283,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * </pre>
 	 */
 	@Override
-	public default IType resolveType(ITypeVariable typeVar)
-	{
-		return Types.ANY;
-	}
+	public IType resolveType(ITypeVariable typeVar);
 	
 	public default IType resolveTypeSafely(ITypeVariable typeVar)
 	{
@@ -327,10 +296,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * 
 	 * @return
 	 */
-	public default boolean hasTypeVariables()
-	{
-		return false;
-	}
+	public boolean hasTypeVariables();
 	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
@@ -339,14 +305,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 *            the type variables
 	 * @return
 	 */
-	public default IType getConcreteType(ITypeContext context)
-	{
-		return this;
-	}
+	public IType getConcreteType(ITypeContext context);
 	
-	public default void inferTypes(IType concrete, ITypeContext typeContext)
-	{
-	}
+	public void inferTypes(IType concrete, ITypeContext typeContext);
 	
 	// Phases
 	
@@ -428,71 +389,31 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public void appendExtendedName(StringBuilder buffer);
 	
-	public default String getSignature()
-	{
-		return null;
-	}
+	public String getSignature();
 	
 	public void appendSignature(StringBuilder buffer);
 	
 	// Compilation
 	
-	public default int getLoadOpcode()
-	{
-		return Opcodes.ALOAD;
-	}
+	public int getLoadOpcode();
 	
-	public default int getArrayLoadOpcode()
-	{
-		return Opcodes.AALOAD;
-	}
+	public int getArrayLoadOpcode();
 	
-	public default int getStoreOpcode()
-	{
-		return Opcodes.ASTORE;
-	}
+	public int getStoreOpcode();
 	
-	public default int getArrayStoreOpcode()
-	{
-		return Opcodes.AASTORE;
-	}
+	public int getArrayStoreOpcode();
 	
-	public default int getReturnOpcode()
-	{
-		return Opcodes.ARETURN;
-	}
+	public int getReturnOpcode();
 	
-	public default Object getFrameType()
-	{
-		return this.getInternalName();
-	}
+	public Object getFrameType();
 	
-	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
-	{
-		if (target == this || target.isSuperClassOf(this))
-		{
-			return;
-		}
-		
-		writer.writeLineNumber(lineNumber);
-		writer.writeTypeInsn(Opcodes.CHECKCAST, target.getTheClass().getInternalName());
-		if (target.isPrimitive())
-		{
-			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
-		}
-	}
+	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
 	
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
-	public default void writeDefaultValue(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeInsn(Opcodes.ACONST_NULL);
-	}
+	public void writeDefaultValue(MethodWriter writer) throws BytecodeException;
 	
-	public default IConstantValue getDefaultValue()
-	{
-		return NullValue.getNull();
-	}
+	public IConstantValue getDefaultValue();
 	
 	public static void writeType(IType type, DataOutput dos) throws IOException
 	{

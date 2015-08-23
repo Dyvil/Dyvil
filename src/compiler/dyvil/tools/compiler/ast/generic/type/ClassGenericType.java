@@ -146,30 +146,6 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public boolean hasTypeVariables()
-	{
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			if (this.typeArguments[i].hasTypeVariables())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		ClassGenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
-		}
-		return copy;
-	}
-	
-	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)

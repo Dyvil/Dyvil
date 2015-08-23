@@ -21,7 +21,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ClassType implements IType
+public class ClassType implements IRawType
 {
 	public IClass theClass;
 	

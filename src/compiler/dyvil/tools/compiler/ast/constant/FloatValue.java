@@ -79,7 +79,7 @@ public class FloatValue implements IConstantValue
 		}
 		if (type.isSuperTypeOf(Types.FLOAT))
 		{
-			return new BoxedValue(this, Types.FLOAT.boxMethod);
+			return new BoxedValue(this, Types.FLOAT.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
 		{

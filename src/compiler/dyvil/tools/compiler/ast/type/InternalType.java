@@ -20,7 +20,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class InternalType implements IType
+public class InternalType implements IRawType
 {
 	protected String internalName;
 	

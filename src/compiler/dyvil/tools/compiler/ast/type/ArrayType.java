@@ -22,7 +22,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public class ArrayType implements IType, ITyped
+public class ArrayType implements IObjectType, ITyped
 {
 	private IType type;
 	
@@ -100,6 +100,18 @@ public class ArrayType implements IType, ITyped
 	public IType getElementType()
 	{
 		return this.type;
+	}
+	
+	@Override
+	public IMethod getBoxMethod()
+	{
+		return null;
+	}
+	
+	@Override
+	public IMethod getUnboxMethod()
+	{
+		return null;
 	}
 	
 	@Override

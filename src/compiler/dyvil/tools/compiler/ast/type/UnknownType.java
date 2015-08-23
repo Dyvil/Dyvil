@@ -22,7 +22,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 import static dyvil.reflect.Opcodes.*;
 
-public class UnknownType implements IType
+public class UnknownType implements IRawType
 {
 	@Override
 	public int typeTag()
@@ -36,12 +36,16 @@ public class UnknownType implements IType
 		return Name.auto;
 	}
 	
-	// IContext
-	
 	@Override
 	public IClass getTheClass()
 	{
 		return Types.OBJECT_CLASS;
+	}
+	
+	@Override
+	public IType getSuperType()
+	{
+		return null;
 	}
 	
 	@Override
@@ -54,12 +58,6 @@ public class UnknownType implements IType
 	public IType getConcreteType(ITypeContext context)
 	{
 		return Types.ANY;
-	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return null;
 	}
 	
 	@Override

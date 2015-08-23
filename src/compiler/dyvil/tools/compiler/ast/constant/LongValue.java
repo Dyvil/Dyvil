@@ -79,7 +79,7 @@ public class LongValue implements IConstantValue
 		}
 		if (type.isSuperTypeOf(Types.LONG))
 		{
-			return new BoxedValue(this, Types.LONG.boxMethod);
+			return new BoxedValue(this, Types.LONG.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
 		{

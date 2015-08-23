@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -29,21 +30,30 @@ import static dyvil.reflect.Opcodes.*;
 
 public final class PrimitiveType implements IType
 {
-	public Name		name;
-	public IClass	theClass;
-	public int		typecode;
+	protected final Name	name;
+	protected IClass		theClass;
 	
-	public IMethod	boxMethod;
-	public IMethod	unboxMethod;
+	private final int		typecode;
+	private final String	internalName;
+	private final int		opcodeOffset1;
+	private final int		opcodeOffset2;
+	private final Object	frameType;
 	
-	public IClass			arrayClass;
-	public ReferenceType	refType;
-	public IType			simpleRefType;
+	protected IMethod	boxMethod;
+	protected IMethod	unboxMethod;
 	
-	public PrimitiveType(Name name, int typecode)
+	private IClass			arrayClass;
+	private ReferenceType	refType;
+	private IType			simpleRefType;
+	
+	public PrimitiveType(Name name, int typecode, String internalName, int loadOpcode, int aloadOpcode, Object frameType)
 	{
 		this.name = name;
 		this.typecode = typecode;
+		this.internalName = internalName;
+		this.opcodeOffset1 = loadOpcode - Opcodes.ILOAD;
+		this.opcodeOffset2 = aloadOpcode - Opcodes.IALOAD;
+		this.frameType = frameType;
 	}
 	
 	public static IType getPrimitiveType(IType type)
@@ -178,6 +188,24 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
+	public boolean isArrayType()
+	{
+		return false;
+	}
+	
+	@Override
+	public int getArrayDimensions()
+	{
+		return 0;
+	}
+	
+	@Override
+	public IType getElementType()
+	{
+		return null;
+	}
+	
+	@Override
 	public IClass getArrayClass()
 	{
 		IClass iclass = this.arrayClass;
@@ -219,6 +247,17 @@ public final class PrimitiveType implements IType
 			return true;
 		}
 		return IType.super.classEquals(type);
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return Types.ANY;
+	}
+	
+	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
 	}
 	
 	@Override
@@ -279,180 +318,61 @@ public final class PrimitiveType implements IType
 	@Override
 	public String getInternalName()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-			return "Z";
-		case ClassFormat.T_BYTE:
-			return "B";
-		case ClassFormat.T_SHORT:
-			return "S";
-		case ClassFormat.T_CHAR:
-			return "C";
-		case ClassFormat.T_INT:
-			return "I";
-		case ClassFormat.T_LONG:
-			return "J";
-		case ClassFormat.T_FLOAT:
-			return "F";
-		case ClassFormat.T_DOUBLE:
-			return "D";
-		default:
-			return "V";
-		}
+		return this.internalName;
 	}
 	
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
-		buf.append(this.getInternalName());
+		buf.append(this.internalName);
+	}
+	
+	@Override
+	public String getSignature()
+	{
+		return null;
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
-		buf.append(this.getInternalName());
+		buf.append(this.internalName);
 	}
 	
 	@Override
 	public int getLoadOpcode()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
-			return Opcodes.ILOAD;
-		case ClassFormat.T_LONG:
-			return Opcodes.LLOAD;
-		case ClassFormat.T_FLOAT:
-			return Opcodes.FLOAD;
-		case ClassFormat.T_DOUBLE:
-			return Opcodes.DLOAD;
-		default:
-			return 0;
-		}
+		return Opcodes.ILOAD + this.opcodeOffset1;
 	}
 	
 	@Override
 	public int getArrayLoadOpcode()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-			return Opcodes.BALOAD;
-		case ClassFormat.T_SHORT:
-			return Opcodes.SALOAD;
-		case ClassFormat.T_CHAR:
-			return Opcodes.CALOAD;
-		case ClassFormat.T_INT:
-			return Opcodes.IALOAD;
-		case ClassFormat.T_LONG:
-			return Opcodes.LALOAD;
-		case ClassFormat.T_FLOAT:
-			return Opcodes.FALOAD;
-		case ClassFormat.T_DOUBLE:
-			return Opcodes.DALOAD;
-		default:
-			return 0;
-		}
+		return Opcodes.IALOAD + this.opcodeOffset2;
 	}
 	
 	@Override
 	public int getStoreOpcode()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
-			return Opcodes.ISTORE;
-		case ClassFormat.T_LONG:
-			return Opcodes.LSTORE;
-		case ClassFormat.T_FLOAT:
-			return Opcodes.FSTORE;
-		case ClassFormat.T_DOUBLE:
-			return Opcodes.DSTORE;
-		default:
-			return 0;
-		}
+		return Opcodes.ISTORE + this.opcodeOffset1;
 	}
 	
 	@Override
 	public int getArrayStoreOpcode()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-			return Opcodes.BASTORE;
-		case ClassFormat.T_SHORT:
-			return Opcodes.SASTORE;
-		case ClassFormat.T_CHAR:
-			return Opcodes.CASTORE;
-		case ClassFormat.T_INT:
-			return Opcodes.IASTORE;
-		case ClassFormat.T_LONG:
-			return Opcodes.LASTORE;
-		case ClassFormat.T_FLOAT:
-			return Opcodes.FASTORE;
-		case ClassFormat.T_DOUBLE:
-			return Opcodes.DASTORE;
-		default:
-			return 0;
-		}
+		return Opcodes.IASTORE + this.opcodeOffset2;
 	}
 	
 	@Override
 	public int getReturnOpcode()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
-			return Opcodes.IRETURN;
-		case ClassFormat.T_LONG:
-			return Opcodes.LRETURN;
-		case ClassFormat.T_FLOAT:
-			return Opcodes.FRETURN;
-		case ClassFormat.T_DOUBLE:
-			return Opcodes.DRETURN;
-		default:
-			return Opcodes.RETURN;
-		}
+		return Opcodes.IRETURN + this.opcodeOffset1;
 	}
 	
 	@Override
 	public Object getFrameType()
 	{
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-			return ClassFormat.BOOLEAN;
-		case ClassFormat.T_BYTE:
-			return ClassFormat.BYTE;
-		case ClassFormat.T_SHORT:
-			return ClassFormat.SHORT;
-		case ClassFormat.T_CHAR:
-			return ClassFormat.CHAR;
-		case ClassFormat.T_INT:
-			return ClassFormat.INT;
-		case ClassFormat.T_LONG:
-			return ClassFormat.LONG;
-		case ClassFormat.T_FLOAT:
-			return ClassFormat.FLOAT;
-		case ClassFormat.T_DOUBLE:
-			return ClassFormat.DOUBLE;
-		}
-		return null;
+		return this.frameType;
 	}
 	
 	@Override
@@ -707,9 +627,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public PrimitiveType clone()
 	{
-		PrimitiveType t = new PrimitiveType(this.name, this.typecode);
-		t.theClass = this.theClass;
-		return t;
+		return this; // no clones
 	}
 	
 	@Override

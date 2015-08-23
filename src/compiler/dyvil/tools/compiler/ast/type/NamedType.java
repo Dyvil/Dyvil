@@ -19,7 +19,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class NamedType implements IType
+public class NamedType implements IRawType
 {
 	protected ICodePosition	position;
 	protected Name			name;

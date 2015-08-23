@@ -79,7 +79,7 @@ public final class IntValue implements IConstantValue
 		}
 		if (type.isSuperTypeOf(Types.INT))
 		{
-			return new BoxedValue(this, Types.INT.boxMethod);
+			return new BoxedValue(this, Types.INT.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
 		{

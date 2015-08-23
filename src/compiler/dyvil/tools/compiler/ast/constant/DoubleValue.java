@@ -79,7 +79,7 @@ public class DoubleValue implements IConstantValue
 		}
 		if (type.isSuperTypeOf(Types.DOUBLE))
 		{
-			return new BoxedValue(this, Types.DOUBLE.boxMethod);
+			return new BoxedValue(this, Types.DOUBLE.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null)
 		{

@@ -72,7 +72,7 @@ public final class BooleanValue implements IConstantValue
 		}
 		if (type.isSuperTypeOf(Types.BOOLEAN))
 		{
-			return new BoxedValue(this, Types.BOOLEAN.boxMethod);
+			return new BoxedValue(this, Types.BOOLEAN.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{

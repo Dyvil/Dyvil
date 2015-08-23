@@ -9,6 +9,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -46,6 +48,17 @@ public class InternalGenericType extends GenericType
 	public IClass getTheClass()
 	{
 		return Types.OBJECT_CLASS;
+	}
+	
+	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+	}
+	
+	@Override
+	public IType resolveType(ITypeVariable typeVar)
+	{
+		return null;
 	}
 	
 	@Override
@@ -124,7 +137,7 @@ public class InternalGenericType extends GenericType
 	}
 	
 	@Override
-	public IType clone()
+	public GenericType clone()
 	{
 		InternalGenericType copy = new InternalGenericType(this.internalName);
 		this.copyTypeArguments(copy);

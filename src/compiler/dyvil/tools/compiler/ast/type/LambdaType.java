@@ -26,7 +26,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
 
-public final class LambdaType implements IType, ITyped, ITypeList
+public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
 	public static final IClass[] functionClasses = new IClass[22];
 	
@@ -154,7 +154,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			}
 		}
 		
-		return IType.super.getSubClassDistance(subtype);
+		return IObjectType.super.getSubClassDistance(subtype);
 	}
 	
 	@Override
@@ -169,7 +169,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			}
 		}
 		
-		return IType.super.getSubTypeDistance(subtype);
+		return IObjectType.super.getSubTypeDistance(subtype);
 	}
 	
 	@Override
@@ -180,7 +180,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 			return true;
 		}
 		
-		if (!IType.super.isSuperTypeOf(type))
+		if (!IObjectType.super.isSuperTypeOf(type))
 		{
 			return false;
 		}
@@ -213,7 +213,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.parameterCount != 0 || IType.super.isSuperTypeOf(value.getType()))
+		if (this.parameterCount != 0 || IObjectType.super.isSuperTypeOf(value.getType()))
 		{
 			return value.withType(this, typeContext, markers, context);
 		}
@@ -422,6 +422,14 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append(';');
+	}
+	
+	@Override
+	public String getSignature()
+	{
+		StringBuilder sb = new StringBuilder();
+		this.appendSignature(sb);
+		return sb.toString();
 	}
 	
 	@Override

@@ -25,7 +25,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
 
-public final class TupleType implements IType, ITypeList
+public final class TupleType implements IObjectType, ITypeList
 {
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
