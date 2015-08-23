@@ -72,14 +72,6 @@ public final class Dlex
 			case IDENTIFIER:
 				switch (subtype)
 				{
-				case MOD_DOTS:
-					if (c == '.')
-					{
-						buf.append(c);
-						continue;
-					}
-					addToken = true;
-					break typeswitch;
 				case MOD_LETTER:
 					if (c == '_' || c == '$')
 					{
@@ -483,9 +475,9 @@ public final class Dlex
 			return Symbols.CLOSE_CURLY_BRACKET;
 		case '.':
 			n = code.charAt(i + 1);
-			if (n == '.')
+			if (isIdentifierSymbol(n))
 			{
-				return IDENTIFIER | MOD_DOTS;
+				return IDENTIFIER | MOD_SYMBOL;
 			}
 			return Symbols.DOT;
 		case ';':
@@ -562,7 +554,6 @@ public final class Dlex
 			}
 			return new KeywordToken(prev, i, line, start, start + len);
 		}
-		case DOT_IDENTIFIER:
 		case SYMBOL_IDENTIFIER:
 		case SYMBOL_IDENTIFIER | LETTER_IDENTIFIER:
 		{

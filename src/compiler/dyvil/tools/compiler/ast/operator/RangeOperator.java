@@ -171,7 +171,7 @@ public class RangeOperator implements IValue
 		{
 			this.lastValue = value2;
 		}
-		return null;
+		return this;
 	}
 	
 	@Override

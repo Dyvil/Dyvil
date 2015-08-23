@@ -143,6 +143,7 @@ public class ParserUtil
 	{
 		switch (c)
 		{
+		case '.':
 		case '=':
 		case '>':
 		case '<':
@@ -206,7 +207,7 @@ public class ParserUtil
 	
 	public static boolean isOperator(IParserManager pm, IToken token, int type)
 	{
-		if (type == Tokens.SYMBOL_IDENTIFIER || type == Tokens.DOT_IDENTIFIER)
+		if (type == Tokens.SYMBOL_IDENTIFIER)
 		{
 			return true;
 		}

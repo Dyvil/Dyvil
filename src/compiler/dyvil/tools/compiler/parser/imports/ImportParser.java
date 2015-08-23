@@ -81,7 +81,6 @@ public final class ImportParser extends Parser
 			case Tokens.IDENTIFIER:
 			case Tokens.SYMBOL_IDENTIFIER:
 			case Tokens.LETTER_IDENTIFIER:
-			case Tokens.DOT_IDENTIFIER:
 			{
 				SimpleImport si = new SimpleImport(token.raw(), token.nameValue());
 				si.setParent(this.theImport);

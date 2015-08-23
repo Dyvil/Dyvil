@@ -34,7 +34,6 @@ public class PackageParser extends Parser
 		case Tokens.IDENTIFIER:
 		case Tokens.LETTER_IDENTIFIER:
 		case Tokens.SYMBOL_IDENTIFIER:
-		case Tokens.DOT_IDENTIFIER:
 		case Tokens.SPECIAL_IDENTIFIER:
 			this.buffer.append(token.nameValue().qualified);
 			return;

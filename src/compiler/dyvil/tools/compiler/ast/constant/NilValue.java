@@ -66,6 +66,11 @@ public final class NilValue implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (type == Types.UNKNOWN)
+		{
+			return this;
+		}
+		
 		if (this.isType(type))
 		{
 			this.requiredType = type;
