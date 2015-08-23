@@ -236,7 +236,16 @@ public class CodeClass extends AbstractClass
 			this.body.checkTypes(markers);
 		}
 		
-		this.checkSuperMethods(markers, this);
+		// Check Methods
+		if (this.superType != null)
+		{
+			this.superType.getTheClass().checkMethods(markers, this, this.superType);
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			type.getTheClass().checkMethods(markers, this, type);
+		}
 	}
 	
 	@Override

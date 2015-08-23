@@ -102,8 +102,6 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	
 	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
 	
-	public void checkSuperMethods(MarkerList markers, IClass iclass);
-	
 	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
 	
 	// Other Compilables (Lambda Expressions, ...)

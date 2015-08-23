@@ -357,6 +357,20 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		return super.checkImplements(markers, iclass, candidate, typeContext);
+	}
+	
+	@Override
 	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
 	{
 		if (!this.genericsResolved)
@@ -368,16 +382,6 @@ public final class ExternalClass extends AbstractClass
 			this.resolveSuperTypes();
 		}
 		super.checkMethods(markers, iclass, typeContext);
-	}
-	
-	@Override
-	public void checkSuperMethods(MarkerList markers, IClass iclass)
-	{
-		if (!this.superTypesResolved)
-		{
-			this.resolveSuperTypes();
-		}
-		super.checkSuperMethods(markers, iclass);
 	}
 	
 	@Override

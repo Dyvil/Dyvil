@@ -554,20 +554,6 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void checkSuperMethods(MarkerList markers, IClass iclass)
-	{
-		if (this.superType != null)
-		{
-			this.superType.getTheClass().checkMethods(markers, iclass, this.superType);
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			type.getTheClass().checkMethods(markers, iclass, type);
-		}
-	}
-	
-	@Override
 	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
 	{
 		if (this.body != null)

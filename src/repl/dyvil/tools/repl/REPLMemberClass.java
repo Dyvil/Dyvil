@@ -378,11 +378,6 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void checkSuperMethods(MarkerList markers, IClass iclass)
-	{
-	}
-	
-	@Override
 	public void foldConstants()
 	{
 	}
