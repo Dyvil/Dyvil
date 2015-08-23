@@ -29,7 +29,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class Method extends AbstractMethod
 {
-	protected IMethod	overrideMethod;
+	protected IMethod[] overrideMethods;
 	
 	public Method(IClass iclass)
 	{
@@ -40,7 +40,7 @@ public class Method extends AbstractMethod
 	{
 		super(iclass, name);
 	}
-
+	
 	public Method(IClass iclass, Name name, IType type)
 	{
 		super(iclass, name, type);
@@ -50,12 +50,12 @@ public class Method extends AbstractMethod
 	{
 		super(iclass, name, type, modifiers);
 	}
-
+	
 	public Method(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
 	{
 		super(position, iclass, name, type, modifiers);
 	}
-
+	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -188,11 +188,6 @@ public class Method extends AbstractMethod
 			this.value.resolveStatement(this, markers);
 			this.value.checkTypes(markers, this);
 		}
-		
-		if ((this.modifiers & Modifiers.STATIC) == 0)
-		{
-			this.checkOverride(markers, context);
-		}
 	}
 	
 	@Override
@@ -237,6 +232,11 @@ public class Method extends AbstractMethod
 			markers.add(this.position, "method.unimplemented", this.name);
 		}
 		
+		if ((this.modifiers & Modifiers.STATIC) == 0)
+		{
+			this.checkOverride(markers, context);
+		}
+		
 		// Check for duplicate methods
 		
 		String desc = this.getDescriptor();
@@ -261,10 +261,24 @@ public class Method extends AbstractMethod
 		}
 	}
 	
+	@Override
+	protected void addOverride(IMethod override)
+	{
+		if (this.overrideMethods == null)
+		{
+			this.overrideMethods = new IMethod[] { override };
+			return;
+		}
+		
+		IMethod[] overrideMethods = new IMethod[this.overrideMethods.length + 1];
+		System.arraycopy(this.overrideMethods, 0, overrideMethods, 0, this.overrideMethods.length);
+		overrideMethods[this.overrideMethods.length] = override;
+		this.overrideMethods = overrideMethods;
+	}
+	
 	private void checkOverride(MarkerList markers, IContext context)
 	{
-		this.overrideMethod = this.theClass.getSuperMethod(this.name, this.parameters, this.parameterCount);
-		if (this.overrideMethod == null)
+		if (this.overrideMethods == null)
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 			{
@@ -277,13 +291,15 @@ public class Method extends AbstractMethod
 		{
 			markers.add(this.position, "method.overrides", this.name);
 		}
-		else if (this.overrideMethod.hasModifier(Modifiers.FINAL))
+		
+		for (IMethod m : this.overrideMethods)
 		{
-			markers.add(this.position, "method.override.final", this.name);
-		}
-		else if (this.type.isResolved())
-		{
-			IType type = this.overrideMethod.getType();
+			if (m.hasModifier(Modifiers.FINAL))
+			{
+				markers.add(this.position, "method.override.final", this.name);
+			}
+			
+			IType type = m.getType();
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
 				Marker marker = markers.create(this.position, "method.override.type", this.name);
@@ -367,8 +383,9 @@ public class Method extends AbstractMethod
 			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
 		}
 		
+		String[] exceptions2 = this.getExceptions();
 		MethodWriter mw = new MethodWriterImpl(writer,
-				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), exceptions2));
 				
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -414,49 +431,60 @@ public class Method extends AbstractMethod
 		
 		mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
 		
-		if (this.overrideMethod == null)
+		if (this.overrideMethods == null)
 		{
 			return;
 		}
 		
-		// Check if a bridge method has to be generated
-		if (this.descriptor.equals(this.overrideMethod.getDescriptor()))
+		String[] descriptors = new String[1 + this.overrideMethods.length];
+		descriptors[0] = this.descriptor;
+		methodLoop:
+		for (IMethod m : this.overrideMethods)
 		{
-			return;
-		}
-		
-		// Generate a bridge method
-		mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified,
-				this.overrideMethod.getDescriptor(), this.overrideMethod.getSignature(), this.overrideMethod.getExceptions()));
-				
-		start = new Label();
-		end = new Label();
-		
-		mw.begin();
-		mw.setThisType(this.theClass.getInternalName());
-		mw.writeVarInsn(Opcodes.ALOAD, 0);
-		
-		int lineNumber = this.getLineNumber();
-		
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.overrideMethod.getParameter(i);
-			IType type1 = this.parameters[i].getType();
-			IType type2 = param.getType();
+			// Check if a bridge method for the descriptor has not yet been generated
+			String desc = m.getDescriptor();
+			for (String preDesc : descriptors)
+			{
+				if (desc.equals(preDesc))
+				{
+					continue methodLoop;
+				}
+			}
 			
-			param.write(mw);
-			mw.writeVarInsn(type2.getLoadOpcode(), param.getIndex());
-			type2.writeCast(mw, type1, lineNumber);
+			// Generate a bridge method
+			mw = new MethodWriterImpl(writer,
+					writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified, desc, null, exceptions2));
+					
+			start = new Label();
+			end = new Label();
+			
+			mw.begin();
+			mw.setThisType(this.theClass.getInternalName());
+			mw.writeVarInsn(Opcodes.ALOAD, 0);
+			
+			int lineNumber = this.getLineNumber();
+			
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				IParameter param = m.getParameter(i);
+				IType type1 = this.parameters[i].getType();
+				IType type2 = param.getType();
+				
+				param.write(mw);
+				mw.writeVarInsn(type2.getLoadOpcode(), param.getIndex());
+				type2.writeCast(mw, type1, lineNumber);
+			}
+			
+			IType overrideReturnType = m.getType();
+			
+			mw.writeLineNumber(lineNumber);
+			boolean itf = this.theClass.isInterface();
+			mw.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(),
+					this.name.qualified, this.getDescriptor(), itf);
+			this.type.writeCast(mw, overrideReturnType, lineNumber);
+			mw.writeInsn(overrideReturnType.getReturnOpcode());
+			mw.end();
 		}
-		
-		IType overrideReturnType = this.overrideMethod.getType();
-		
-		mw.writeLineNumber(lineNumber);
-		boolean itf = this.theClass.isInterface();
-		mw.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), itf);
-		this.type.writeCast(mw, overrideReturnType, lineNumber);
-		mw.writeInsn(overrideReturnType.getReturnOpcode());
-		mw.end();
 	}
 	
 	protected void writeAnnotations(MethodWriter mw)

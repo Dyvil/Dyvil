@@ -6,11 +6,9 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IConstructor;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
@@ -442,9 +440,41 @@ public class ClassBody implements IClassBody
 		{
 			this.constructors[i].checkTypes(markers, context);
 		}
+		
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			if (this.methods[i].checkOverride(markers, iclass, candidate, typeContext))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IMethod candidate = this.methods[i];
+			if (iclass.checkImplements(markers, iclass, candidate, typeContext))
+			{
+				continue;
+			}
+			
+			if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
+			{
+				markers.add(iclass.getPosition(), "class.method.abstract", iclass.getName(), candidate.getName(), this.theClass.getName());
+			}
 		}
 	}
 	

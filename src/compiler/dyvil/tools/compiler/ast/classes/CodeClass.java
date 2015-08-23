@@ -235,6 +235,8 @@ public class CodeClass extends AbstractClass
 		{
 			this.body.checkTypes(markers);
 		}
+		
+		this.checkSuperMethods(markers, this);
 	}
 	
 	@Override

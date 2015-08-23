@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.VariableThis;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -29,6 +30,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 
@@ -519,6 +521,72 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		if (candidate.getTheClass() == this)
+		{
+			return !candidate.hasModifier(Modifiers.ABSTRACT);
+		}
+		
+		if (this.body != null && this.body.checkImplements(markers, iclass, candidate, typeContext))
+		{
+			return true;
+		}
+		
+		if (this.superType != null)
+		{
+			if (this.superType.getTheClass().checkImplements(markers, iclass, candidate, this.superType.getConcreteType(typeContext)))
+			{
+				return true;
+			}
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			if (type.getTheClass().checkImplements(markers, iclass, candidate, type.getConcreteType(typeContext)))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public void checkSuperMethods(MarkerList markers, IClass iclass)
+	{
+		if (this.superType != null)
+		{
+			this.superType.getTheClass().checkMethods(markers, iclass, this.superType);
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			type.getTheClass().checkMethods(markers, iclass, type);
+		}
+	}
+	
+	@Override
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	{
+		if (this.body != null)
+		{
+			this.body.checkMethods(markers, iclass, typeContext);
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.getTheClass().checkMethods(markers, iclass, this.superType.getConcreteType(typeContext));
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			type.getTheClass().checkMethods(markers, iclass, type.getConcreteType(typeContext));
+		}
+	}
+	
+	@Override
 	public IMethod getFunctionalMethod()
 	{
 		// Copy in ExternalClass
@@ -819,37 +887,6 @@ public abstract class AbstractClass implements IClass
 			if (m != null)
 			{
 				return m;
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount)
-	{
-		if (this.superType != null)
-		{
-			IClass iclass = this.superType.getTheClass();
-			if (iclass != null)
-			{
-				IMethod m = iclass.getMethod(name, parameters, parameterCount, this.superType);
-				if (m != null)
-				{
-					return m;
-				}
-			}
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass != null)
-			{
-				IMethod m = iclass.getMethod(name, parameters, parameterCount, type);
-				if (m != null)
-				{
-					return m;
-				}
 			}
 		}
 		return null;

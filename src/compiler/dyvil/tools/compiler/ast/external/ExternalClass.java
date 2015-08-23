@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
@@ -351,12 +352,36 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public void check(MarkerList markers, IContext context)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		super.checkMethods(markers, iclass, typeContext);
+	}
+	
+	@Override
+	public void checkSuperMethods(MarkerList markers, IClass iclass)
+	{
+		if (!this.superTypesResolved)
+		{
+			this.resolveSuperTypes();
+		}
+		super.checkSuperMethods(markers, iclass);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
 	{
 	}
 	

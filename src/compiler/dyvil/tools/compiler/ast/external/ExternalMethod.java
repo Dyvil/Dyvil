@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -236,6 +237,11 @@ public final class ExternalMethod extends AbstractMethod
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	protected void addOverride(IMethod override)
 	{
 	}
 	

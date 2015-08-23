@@ -22,6 +22,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -366,6 +367,22 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		return false;
+	}
+	
+	@Override
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	{
+	}
+	
+	@Override
+	public void checkSuperMethods(MarkerList markers, IClass iclass)
+	{
+	}
+	
+	@Override
 	public void foldConstants()
 	{
 	}
@@ -487,12 +504,6 @@ public class REPLMemberClass implements IClass
 	
 	@Override
 	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
-	{
-		return null;
-	}
-	
-	@Override
-	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount)
 	{
 		return null;
 	}

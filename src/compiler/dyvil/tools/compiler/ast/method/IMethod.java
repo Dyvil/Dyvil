@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
@@ -34,6 +35,8 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
+	
+	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
 	
 	// Generics
 	

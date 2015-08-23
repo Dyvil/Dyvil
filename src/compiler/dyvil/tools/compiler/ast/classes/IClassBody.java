@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -83,6 +84,10 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	{
 		return null;
 	}
+	
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
 	
 	// Phases
 	

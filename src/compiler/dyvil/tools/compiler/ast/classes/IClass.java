@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -17,6 +18,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IClass extends IClassMember, IGeneric, IContext, IParameterized, IClassCompilableList
 {
@@ -92,13 +94,17 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	
 	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
 	
-	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount);
-	
 	public IDataMember getSuperField(Name name);
 	
 	public boolean isMember(IClassMember member);
 	
 	public byte getVisibility(IClassMember member);
+	
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	
+	public void checkSuperMethods(MarkerList markers, IClass iclass);
+	
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
 	
 	// Other Compilables (Lambda Expressions, ...)
 	
