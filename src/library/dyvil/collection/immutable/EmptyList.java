@@ -45,13 +45,13 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
 	public Iterator<E> reverseIterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override

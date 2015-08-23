@@ -44,19 +44,19 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override

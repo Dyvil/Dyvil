@@ -661,7 +661,7 @@ public abstract class AbstractClass implements IClass
 		if (this.superType != null)
 		{
 			IType type = this.superType.resolveType(typeVar);
-			if (type != null)
+			if (type != null && type != Types.ANY)
 			{
 				return type.getConcreteType(concrete);
 			}
@@ -669,7 +669,7 @@ public abstract class AbstractClass implements IClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			IType type = this.interfaces[i].resolveType(typeVar);
-			if (type != null)
+			if (type != null && type != Types.ANY)
 			{
 				return type.getConcreteType(concrete);
 			}

@@ -130,7 +130,7 @@ public class RangeOperator implements IValue
 		{
 			return type.getElementType();
 		}
-		if (type.isSuperClassOf(LazyFields.RANGE))
+		if (Types.ITERABLE.isSuperClassOf(type))
 		{
 			return type.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE);
 		}

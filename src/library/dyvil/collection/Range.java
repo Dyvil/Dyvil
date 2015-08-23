@@ -7,15 +7,23 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.annotation.Covariant;
+import dyvil.collection.range.EmptyRange;
 import dyvil.collection.range.SimpleRange;
 import dyvil.collection.range.StringRange;
 
+@NilConvertible
 @TupleConvertible
 public interface Range<@Covariant T> extends Iterable<T>
 {
+	public static <T extends Ordered<T>> Range<T> apply()
+	{
+		return EmptyRange.instance;
+	}
+	
 	public static <T extends Ordered<T>> Range<T> apply(T first, T last)
 	{
 		return new SimpleRange(first, last);

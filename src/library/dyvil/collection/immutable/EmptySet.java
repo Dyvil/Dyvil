@@ -47,7 +47,7 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override

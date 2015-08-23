@@ -269,7 +269,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return this.value == null ? EmptyIterator.apply() : new SingletonIterator<IValue>(this.value);
+		return this.value == null ? EmptyIterator.instance : new SingletonIterator<IValue>(this.value);
 	}
 	
 	@Override
