@@ -94,7 +94,7 @@ public final class TupleType implements IType, ITypeList
 		for (int i = 0; i < count; i++)
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
-			IType type1 = type.resolveType(typeVar);
+			IType type1 = type.resolveTypeSafely(typeVar);
 			if (!typedArray[i].isType(type1))
 			{
 				return false;
@@ -166,7 +166,7 @@ public final class TupleType implements IType, ITypeList
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
-			IType type1 = type.resolveType(typeVar);
+			IType type1 = type.resolveTypeSafely(typeVar);
 			
 			// Covariance
 			if (!this.types[i].isSuperTypeOf(type1))
@@ -189,7 +189,12 @@ public final class TupleType implements IType, ITypeList
 		// We don't need supertype checking here because typeVar can only come
 		// from the tuple class or Entry[K, V], in which case it is simply
 		// overridden and Tuple2.K yields exactly the same as Entry.K.
-		return this.types[typeVar.getIndex()];
+		int index = typeVar.getIndex();
+		if (index >= this.typeCount)
+		{
+			return null;
+		}
+		return this.types[index];
 	}
 	
 	@Override
@@ -225,7 +230,10 @@ public final class TupleType implements IType, ITypeList
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
 			IType concreteType = concrete.resolveType(typeVar);
-			this.types[i].inferTypes(concreteType, typeContext);
+			if (concreteType != null)
+			{
+				this.types[i].inferTypes(concreteType, typeContext);
+			}
 		}
 	}
 	

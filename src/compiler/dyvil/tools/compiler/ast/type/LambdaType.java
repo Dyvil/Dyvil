@@ -187,7 +187,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		
 		IClass iclass = this.getTheClass();
 		ITypeVariable typeVar = iclass.getTypeVariable(this.parameterCount);
-		IType type1 = type.resolveType(typeVar);
+		IType type1 = type.resolveTypeSafely(typeVar);
 		
 		// Return type is Covariant
 		if (!this.returnType.isSuperTypeOf(type1))
@@ -234,6 +234,8 @@ public final class LambdaType implements IType, ITyped, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
+		// See TupleType.resolveType(ITypeVariable) for a note about supertype
+		// checking
 		int index = typeVar.getIndex();
 		if (index == this.parameterCount)
 		{
@@ -241,7 +243,7 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		}
 		if (index > this.parameterCount)
 		{
-			return Types.UNKNOWN;
+			return null;
 		}
 		return this.parameterTypes[index];
 	}
@@ -280,13 +282,19 @@ public final class LambdaType implements IType, ITyped, ITypeList
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			typeVar = iclass.getTypeVariable(i);
-			concreteType = concrete.getConcreteType(typeContext);
-			this.parameterTypes[i].inferTypes(concreteType, typeContext);
+			concreteType = concrete.resolveType(typeVar);
+			if (concreteType != null)
+			{
+				this.parameterTypes[i].inferTypes(concreteType, typeContext);
+			}
 		}
 		
 		typeVar = iclass.getTypeVariable(this.parameterCount);
 		concreteType = concrete.resolveType(typeVar);
-		this.returnType.inferTypes(concreteType, typeContext);
+		if (concreteType != null)
+		{
+			this.returnType.inferTypes(concreteType, typeContext);
+		}
 	}
 	
 	@Override

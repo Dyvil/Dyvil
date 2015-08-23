@@ -47,13 +47,13 @@ public class UnknownType implements IType
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		return this;
+		return Types.ANY;
 	}
 	
 	@Override

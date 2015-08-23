@@ -211,7 +211,7 @@ public final class WildcardType implements IType, ITyped
 		{
 			return this.bound.resolveType(typeVar);
 		}
-		return Types.UNKNOWN;
+		return null;
 	}
 	
 	@Override

@@ -108,7 +108,7 @@ public final class ClassGenericType extends GenericType
 		{
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
 			
-			IType otherType = type.resolveType(typeVar);
+			IType otherType = type.resolveTypeSafely(typeVar);
 			if (!typeVar.getVariance().checkCompatible(this.typeArguments[i], otherType))
 			{
 				return false;
@@ -133,9 +133,14 @@ public final class ClassGenericType extends GenericType
 	public IType resolveType(ITypeVariable typeVar)
 	{
 		int index = typeVar.getIndex();
+		
 		if (this.theClass.getTypeVariable(index) != typeVar)
 		{
 			return this.theClass.resolveType(typeVar, this);
+		}
+		if (index > this.typeArgumentCount)
+		{
+			return null;
 		}
 		return this.typeArguments[index];
 	}
@@ -171,7 +176,10 @@ public final class ClassGenericType extends GenericType
 		{
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
 			IType concreteType = concrete.resolveType(typeVar);
-			this.typeArguments[i].inferTypes(concreteType, typeContext);
+			if (concreteType != null)
+			{
+				this.typeArguments[i].inferTypes(concreteType, typeContext);
+			}
 		}
 	}
 	

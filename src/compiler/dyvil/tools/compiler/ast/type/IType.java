@@ -289,7 +289,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return value.withType(this.getConcreteType(typeContext), typeContext, markers, context);
+		if (this.hasTypeVariables())
+		{
+			return value.withType(this.getConcreteType(typeContext), typeContext, markers, context);
+		}
+		return value.withType(this, typeContext, markers, context);
 	}
 	
 	// Generics
@@ -309,7 +313,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	@Override
 	public default IType resolveType(ITypeVariable typeVar)
 	{
-		return Types.UNKNOWN;
+		return Types.ANY;
+	}
+	
+	public default IType resolveTypeSafely(ITypeVariable typeVar)
+	{
+		IType t = this.resolveType(typeVar);
+		return t == null ? Types.ANY : t;
 	}
 	
 	/**

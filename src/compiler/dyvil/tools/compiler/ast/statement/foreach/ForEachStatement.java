@@ -225,7 +225,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		}
 		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
-			IType iterableType = valueType.resolveType(IterableForStatement.ITERABLE_TYPE);
+			IType iterableType = valueType.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE);
 			if (varType == Types.UNKNOWN)
 			{
 				this.variable.setType(varType = iterableType);

@@ -29,7 +29,7 @@ public class IterableForStatement extends ForEachStatement
 	
 	public IterableForStatement(ICodePosition position, Variable variable, IValue action, IType valueType)
 	{
-		this(position, variable, action, valueType, valueType.resolveType(ITERABLE_TYPE));
+		this(position, variable, action, valueType, valueType.resolveTypeSafely(ITERABLE_TYPE));
 	}
 	
 	public IterableForStatement(ICodePosition position, Variable variable, IValue action, IType valueType, IType elementType)
