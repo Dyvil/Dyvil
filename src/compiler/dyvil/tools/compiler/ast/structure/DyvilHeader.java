@@ -375,11 +375,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			IncludeDeclaration include = this.includes[i];
 			include.resolve(this.markers);
 		}
-		
-		if (this.headerDeclaration == null)
-		{
-			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, Modifiers.PUBLIC, null);
-		}
 	}
 	
 	@Override
@@ -409,6 +404,10 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void resolve()
 	{
+		if (this.headerDeclaration == null)
+		{
+			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, Modifiers.PUBLIC, null);
+		}
 	}
 	
 	@Override
