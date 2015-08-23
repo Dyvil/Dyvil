@@ -247,8 +247,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			IType parType = param.getType();
-			if (parType != Types.UNKNOWN)
+			if (param.getType() != Types.UNKNOWN)
 			{
 				continue;
 			}
@@ -257,7 +256,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			IType concreteType = methodParamType.getConcreteType(this.type).getParameterType();
 			
 			// Can't infer parameter type
-			if (concreteType == methodParamType && concreteType.hasTypeVariables())
+			if (concreteType == Types.UNKNOWN)
 			{
 				markers.add(param.getPosition(), "lambda.parameter.type", param.getName());
 			}
