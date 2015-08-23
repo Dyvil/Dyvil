@@ -54,14 +54,7 @@ public class TypeReference
 	public final static int	CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT		= 0x4A;
 	public final static int	METHOD_REFERENCE_TYPE_ARGUMENT			= 0x4B;
 	
-	private int value;
-	
-	public TypeReference(int typeRef)
-	{
-		this.value = typeRef;
-	}
-	
-	public static int newint(int sort)
+	public static int newTypeReference(int sort)
 	{
 		return sort << 24;
 	}
@@ -76,7 +69,7 @@ public class TypeReference
 		return sort << 24 | paramIndex << 16 | boundIndex << 8;
 	}
 	
-	public static int newSuperint(int itfIndex)
+	public static int newSuperTypeReference(int itfIndex)
 	{
 		itfIndex &= 0xFFFF;
 		return CLASS_EXTENDS << 24 | itfIndex << 8;
@@ -140,10 +133,5 @@ public class TypeReference
 	public static int getTypeArgumentIndex(int value)
 	{
 		return value & 0xFF;
-	}
-	
-	public static int getValue(int value)
-	{
-		return value;
 	}
 }
