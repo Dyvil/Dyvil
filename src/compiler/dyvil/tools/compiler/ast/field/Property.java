@@ -603,11 +603,11 @@ public class Property extends Member implements IProperty, IContext
 		
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
-			mw.addAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.addAnnotation("Ldyvil/annotation/internal;", false);
+			mw.visitAnnotation("Ldyvil/annotation/internal;", false);
 		}
 	}
 	

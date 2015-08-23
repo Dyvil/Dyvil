@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -442,6 +443,16 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.appendSignature(buffer);
 		buffer.append(">;");
+	}
+	
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameterTypes[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+		}
+		this.returnType.writeAnnotations(visitor, typeRef, typePath + this.parameterCount + ';');
 	}
 	
 	@Override

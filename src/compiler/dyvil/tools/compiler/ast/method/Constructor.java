@@ -727,15 +727,15 @@ public class Constructor extends Member implements IConstructor
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.addAnnotation("Ldyvil/annotation/inline;", false);
+			mw.visitAnnotation("Ldyvil/annotation/inline;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
-			mw.addAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.addAnnotation("Ldyvil/annotation/internal;", false);
+			mw.visitAnnotation("Ldyvil/annotation/internal;", false);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

@@ -500,27 +500,27 @@ public class Method extends AbstractMethod
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.addAnnotation("Ldyvil/annotation/inline;", false);
+			mw.visitAnnotation("Ldyvil/annotation/inline;", false);
 		}
 		if ((this.modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			mw.addAnnotation("Ldyvil/annotation/extension;", true);
+			mw.visitAnnotation("Ldyvil/annotation/extension;", true);
 		}
 		else if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			mw.addAnnotation("Ldyvil/annotation/infix;", false);
+			mw.visitAnnotation("Ldyvil/annotation/infix;", false);
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			mw.addAnnotation("Ldyvil/annotation/prefix;", false);
+			mw.visitAnnotation("Ldyvil/annotation/prefix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
 		{
-			mw.addAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.addAnnotation("Ldyvil/annotation/internal;", false);
+			mw.visitAnnotation("Ldyvil/annotation/internal;", false);
 		}
 	}
 	

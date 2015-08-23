@@ -1,14 +1,11 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.Handle;
-import dyvil.tools.asm.Label;
-import dyvil.tools.asm.Type;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-public interface MethodWriter
+public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
 	public ClassWriter getClassWriter();
 	
@@ -22,9 +19,13 @@ public interface MethodWriter
 	
 	// Annotations
 	
-	public AnnotationVisitor addAnnotation(String type, boolean visible);
+	@Override
+	public AnnotationVisitor visitAnnotation(String type, boolean visible);
 	
-	public AnnotationVisitor addParameterAnnotation(int index, String type, boolean visible);
+	public AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible);
+	
+	@Override
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
 	// Code
 	

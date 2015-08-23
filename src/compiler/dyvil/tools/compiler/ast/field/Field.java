@@ -345,7 +345,7 @@ public class Field extends Member implements IField
 			MethodWriter mw = new MethodWriterImpl(writer,
 					writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
 					
-			mw.addAnnotation("Ldyvil/annotation/lazy;", false);
+			mw.visitAnnotation("Ldyvil/annotation/lazy;", false);
 			
 			mw.begin();
 			this.value.writeExpression(mw);

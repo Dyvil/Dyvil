@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -383,6 +384,15 @@ public final class TupleType implements IObjectType, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/types/TupleType;", false);
+	}
+	
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+		}
 	}
 	
 	@Override

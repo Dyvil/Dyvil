@@ -7,8 +7,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
@@ -25,8 +27,6 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -198,7 +198,7 @@ public final class Annotation implements IAnnotation
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(AnnotatableVisitor writer)
 	{
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
@@ -208,32 +208,12 @@ public final class Annotation implements IAnnotation
 	}
 	
 	@Override
-	public void write(MethodWriter writer)
+	public void write(TypeAnnotatableVisitor writer, int typeRef, TypePath typePath)
 	{
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.addAnnotation(ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
-		}
-	}
-	
-	@Override
-	public void write(FieldVisitor writer)
-	{
-		RetentionPolicy retention = this.getRetention();
-		if (retention != RetentionPolicy.SOURCE)
-		{
-			this.write(writer.visitAnnotation(ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
-		}
-	}
-	
-	@Override
-	public void write(MethodWriter writer, int index)
-	{
-		RetentionPolicy retention = this.getRetention();
-		if (retention != RetentionPolicy.SOURCE)
-		{
-			this.write(writer.addParameterAnnotation(index, ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitTypeAnnotation(typeRef, typePath, ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	

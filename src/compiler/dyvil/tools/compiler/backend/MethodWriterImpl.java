@@ -68,13 +68,19 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public AnnotationVisitor addAnnotation(String type, boolean visible)
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		return this.mv.visitAnnotation(type, visible);
 	}
 	
 	@Override
-	public AnnotationVisitor addParameterAnnotation(int index, String type, boolean visible)
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	{
+		return this.mv.visitTypeAnnotation(typeRef, typePath, desc, visible);
+	}
+	
+	@Override
+	public AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible)
 	{
 		return this.mv.visitParameterAnnotation(index, type, visible);
 	}

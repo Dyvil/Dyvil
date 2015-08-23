@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.collection.List;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -365,6 +367,26 @@ public class AnnotatedType implements IType, ITyped
 	public IConstantValue getDefaultValue()
 	{
 		return this.type.getDefaultValue();
+	}
+	
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		TypePath path = TypePath.fromString(typePath);
+		IType type = this.type;
+		
+		this.annotation.write(visitor, typeRef, path);
+		
+		// Ensure that we don't create the TypePath object multiple times by
+		// checking for multiple annotations on the same type
+		while (type.typeTag() == ANNOTATED)
+		{
+			AnnotatedType t = (AnnotatedType) type;
+			t.annotation.write(visitor, typeRef, path);
+			type = t.type;
+		}
+		
+		type.writeAnnotations(visitor, typeRef, typePath);
 	}
 	
 	@Override

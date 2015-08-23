@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.collection.List;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -412,6 +413,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
 	public void writeDefaultValue(MethodWriter writer) throws BytecodeException;
+	
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 	
 	public IConstantValue getDefaultValue();
 	

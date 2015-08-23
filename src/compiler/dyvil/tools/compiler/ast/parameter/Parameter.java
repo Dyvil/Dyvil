@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -144,13 +145,17 @@ public abstract class Parameter extends Member implements IParameter
 	
 	protected void writeAnnotations(MethodWriter writer)
 	{
-		if (this.annotations != null)
+		if (this.annotations == null)
 		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(writer, this.index);
-			}
+			return;
+		}
+		
+		AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(Parameter.this.index, desc, visible);
+		
+		int count = this.annotations.annotationCount();
+		for (int i = 0; i < count; i++)
+		{
+			this.annotations.getAnnotation(i).write(visitor);
 		}
 	}
 	

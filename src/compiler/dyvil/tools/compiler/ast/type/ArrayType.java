@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -310,6 +311,12 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ArrayType;", false);
+	}
+	
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
 	}
 	
 	@Override

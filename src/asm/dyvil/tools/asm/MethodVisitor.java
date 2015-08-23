@@ -29,14 +29,16 @@
  */
 package dyvil.tools.asm;
 
-public interface MethodVisitor
+public interface MethodVisitor extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
 	public void visitParameter(String name, int access);
 	
 	public AnnotationVisitor visitAnnotationDefault();
 	
+	@Override
 	public AnnotationVisitor visitAnnotation(String desc, boolean visible);
 	
+	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible);

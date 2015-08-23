@@ -176,7 +176,7 @@ public final class MethodParameter extends Parameter
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
-			writer.addParameterAnnotation(this.index, "Ldyvil/annotation/var;", true);
+			writer.visitParameterAnnotation(this.index, "Ldyvil/annotation/var;", true);
 		}
 		
 		this.writeAnnotations(writer);

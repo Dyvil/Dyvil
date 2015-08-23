@@ -63,10 +63,11 @@ public class TypePath
 	
 	public static TypePath fromString(final String typePath)
 	{
-		if (typePath == null || typePath.length() == 0)
+		if (typePath == null || typePath.isEmpty())
 		{
 			return null;
 		}
+		
 		int n = typePath.length();
 		ByteVector out = new ByteVector(n);
 		out.putByte(0);
