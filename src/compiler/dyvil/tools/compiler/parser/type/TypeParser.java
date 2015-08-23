@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
@@ -25,6 +26,7 @@ public final class TypeParser extends Parser
 	public static final int	TUPLE_END		= 128;
 	public static final int	LAMBDA_TYPE		= 256;
 	public static final int	LAMBDA_END		= 512;
+	public static final int	ANNOTATION_END	= 1024;
 	
 	protected ITypeConsumer typed;
 	
@@ -50,6 +52,14 @@ public final class TypeParser extends Parser
 			pm.popParser(true);
 			return;
 		case NAME:
+			if (type == Symbols.AT)
+			{
+				Annotation a = new Annotation();
+				pm.pushParser(pm.newAnnotationParser(a));
+				this.type = new AnnotatedType(a);
+				this.mode = ANNOTATION_END;
+				return;
+			}
 			if (type == Symbols.OPEN_PARENTHESIS)
 			{
 				TupleType tupleType = new TupleType();
@@ -193,6 +203,10 @@ public final class TypeParser extends Parser
 				pm.reparse();
 				pm.report(new SyntaxError(token, "Invalid Generic Type - ']' expected"));
 			}
+			return;
+		case ANNOTATION_END:
+			this.mode = END;
+			pm.pushParser(pm.newTypeParser((ITyped) this.type), true);
 			return;
 		}
 	}
