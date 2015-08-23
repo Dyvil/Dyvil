@@ -58,7 +58,8 @@ public class DyvilREPL
 		}
 		
 		Package.init();
-		Types.init();
+		Types.initHeaders();
+		Types.initTypes();
 		
 		reader = new BufferedReader(new InputStreamReader(System.in));
 		

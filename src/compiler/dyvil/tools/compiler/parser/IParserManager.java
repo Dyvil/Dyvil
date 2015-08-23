@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -30,7 +29,7 @@ public interface IParserManager
 	
 	public default Operator getOperator(Name name)
 	{
-		return Operators.map.get(name);
+		return null;
 	}
 	
 	public void skip();

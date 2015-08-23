@@ -3,7 +3,6 @@ package dyvil.tools.compiler.phase;
 import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.util.Util;
 
@@ -33,9 +32,8 @@ public class ResolveTypesPhase implements ICompilerPhase
 	{
 		long now = System.nanoTime();
 		
-		Package.init();
 		// Loads primitive data types
-		Types.init();
+		Types.initTypes();
 		
 		if (DyvilCompiler.debug)
 		{

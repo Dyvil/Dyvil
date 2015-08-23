@@ -19,3 +19,55 @@ import	dyvil.tuple.Tuple3 => Triple
 
 // Import the methods from Predef
 using	dyvil.lang.Predef._
+
+// Prefix Operators
+prefix operator +
+prefix operator -
+prefix operator ~
+prefix operator !
+
+// Boolean and Bitwise Operators
+infix operator || { left, 10 }
+infix operator && { left, 20 }
+infix operator | { left, 30 }
+infix operator ^ { left, 40 }
+infix operator & { left, 50 }
+
+// Equality and Identity Operators
+infix operator == { left, 60 }
+infix operator != { left, 60 }
+infix operator === { left, 60 }
+infix operator !== { left, 60 }
+
+// Numeric Comparison Operators
+infix operator < { left, 70 }
+infix operator <= { left, 70 }
+infix operator > { left, 70 }
+infix operator >= { left, 70 }
+
+// Additive Operators
+infix operator + { left, 80 }
+infix operator - { left, 80 }
+
+// Multiplicative Operators
+infix operator * { left, 90 }
+infix operator / { left, 90 }
+infix operator \ { left, 90 }
+infix operator % { left, 90 }
+
+// Shift Operators
+infix operator <<  { none, 100 }
+infix operator >>  { none, 100 }
+infix operator >>> { none, 100 }
+
+// Arrow Operators
+infix operator -> { left, 200 }
+infix operator <- { right, 200 }
+
+// Range Operator
+infix operator ..  { none, 300 }
+// infix operator ..< { none, 300 }
+// infix operator >.. { none, 300 }
+// infix operator >.< { none, 300 }
+
+infix operator :=: { none, 1000 }

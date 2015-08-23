@@ -86,10 +86,13 @@ public final class Types
 	public static IClass	OBJECT_SIMPLE_REF_CLASS;
 	public static IClass	OBJECT_REF_CLASS;
 	
-	public static void init()
+	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
-		
+	}
+	
+	public static void initTypes()
+	{
 		VOID.theClass = VOID_CLASS = Package.dyvilLang.resolveClass("Void");
 		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");
 		BYTE.theClass = BYTE_CLASS = Package.dyvilLang.resolveClass("Byte");

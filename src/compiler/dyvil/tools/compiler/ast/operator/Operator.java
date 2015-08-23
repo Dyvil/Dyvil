@@ -27,7 +27,6 @@ public final class Operator
 	{
 		this.name = name;
 		this.type = type;
-		Operators.map.put(name, this);
 	}
 	
 	Operator(Name name, int precedence, int type)
@@ -35,7 +34,6 @@ public final class Operator
 		this.name = name;
 		this.type = type;
 		this.precedence = precedence;
-		Operators.map.put(name, this);
 	}
 	
 	public void setPrecedence(int precedence)

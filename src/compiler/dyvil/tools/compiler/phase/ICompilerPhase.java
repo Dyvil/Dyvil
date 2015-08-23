@@ -32,7 +32,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 */
 	ICompilerPhase TOKENIZE = new SequentialCompilerPhase(10, "TOKENIZE", ICompilationUnit::tokenize);
 	
-	ICompilerPhase PARSE_HEADER = new SequentialCompilerPhase(15, "PARSE_HEADER", ICompilationUnit::parseHeader);
+	ICompilerPhase PARSE_HEADER = new ParseHeaderPhase(15);
 	
 	ICompilerPhase RESOLVE_HEADER = new SequentialCompilerPhase(16, "RESOLVE_HEADER", ICompilationUnit::resolveHeader);
 	

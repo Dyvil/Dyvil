@@ -4,7 +4,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.operator.Operators;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
@@ -59,7 +59,7 @@ public class ParserManager implements IParserManager
 		{
 			return op;
 		}
-		return Operators.map.get(name);
+		return Types.LANG_HEADER.getOperator(name);
 	}
 	
 	public final void parse(TokenIterator tokens)
