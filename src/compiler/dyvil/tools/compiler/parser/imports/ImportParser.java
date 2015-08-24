@@ -79,6 +79,7 @@ public final class ImportParser extends Parser
 				return;
 			}
 			case Tokens.IDENTIFIER:
+			case Tokens.SPECIAL_IDENTIFIER:
 			case Tokens.SYMBOL_IDENTIFIER:
 			case Tokens.LETTER_IDENTIFIER:
 			{

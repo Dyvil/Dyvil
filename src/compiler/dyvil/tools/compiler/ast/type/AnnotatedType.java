@@ -370,6 +370,12 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		this.type = IType.withAnnotation(this.type, annotation, typePath, step, steps);
+	}
+	
+	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
 		TypePath path = TypePath.fromString(typePath);

@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IObjectType;
@@ -140,6 +142,18 @@ public abstract class GenericType implements IObjectType, ITypeList
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/GenericType", "apply",
 				"(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/types/GenericType;", false);
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
+		{
+			return;
+		}
+		
+		int index = typePath.getStepArgument(step);
+		this.typeArguments[index] = IType.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1, steps);
 	}
 	
 	@Override

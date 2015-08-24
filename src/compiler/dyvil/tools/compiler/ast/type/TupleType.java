@@ -7,6 +7,8 @@ import java.io.IOException;
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -384,6 +386,18 @@ public final class TupleType implements IObjectType, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/types/TupleType;", false);
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
+		{
+			return;
+		}
+		
+		int index = typePath.getStepArgument(step);
+		this.types[index] = IType.withAnnotation(this.types[index], annotation, typePath, step + 1, steps);
 	}
 	
 	@Override

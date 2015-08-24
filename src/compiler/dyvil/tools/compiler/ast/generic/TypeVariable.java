@@ -1,8 +1,13 @@
 package dyvil.tools.compiler.ast.generic;
 
+import java.lang.annotation.ElementType;
+
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -27,6 +32,8 @@ public final class TypeVariable implements ITypeVariable
 	
 	private int			index;
 	private IGeneric	generic;
+	
+	private AnnotationList annotations;
 	
 	public TypeVariable(IGeneric generic)
 	{
@@ -105,6 +112,62 @@ public final class TypeVariable implements ITypeVariable
 	public ICodePosition getPosition()
 	{
 		return this.position;
+	}
+	
+	@Override
+	public AnnotationList getAnnotations()
+	{
+		return this.annotations;
+	}
+	
+	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation)
+	{
+		if (this.annotations == null)
+		{
+			this.annotations = new AnnotationList();
+		}
+		
+		this.annotations.addAnnotation(annotation);
+	}
+	
+	@Override
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	{
+		switch (type)
+		{
+		case "Ldyvil/annotation/Covariant;":
+			this.variance = Variance.COVARIANT;
+			return false;
+		case "Ldyvil/annotation/Contravariant;":
+			this.variance = Variance.CONTRAVARIANT;
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public IAnnotation getAnnotation(IClass type)
+	{
+		return this.annotations == null ? null : this.annotations.getAnnotation(type);
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.TYPE_PARAMETER;
+	}
+	
+	@Override
+	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
+	{
+		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0, typePath.getLength());
 	}
 	
 	@Override
@@ -364,6 +427,16 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).toString(prefix, buffer);
+				buffer.append(' ');
+			}
+		}
+		
 		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
 		

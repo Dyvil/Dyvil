@@ -6,7 +6,9 @@ import java.io.IOException;
 
 import dyvil.collection.List;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -413,6 +415,19 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
 	public void writeDefaultValue(MethodWriter writer) throws BytecodeException;
+	
+	public static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath == null || step > steps)
+		{
+			return new AnnotatedType(type, annotation);
+		}
+		
+		type.addAnnotation(annotation, typePath, step, steps);
+		return type;
+	}
+	
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
 	
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 	

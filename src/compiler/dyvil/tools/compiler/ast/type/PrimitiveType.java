@@ -7,6 +7,8 @@ import java.io.IOException;
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -600,6 +602,11 @@ public final class PrimitiveType implements IType
 			return DoubleValue.getNull();
 		}
 		return null;
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
 	}
 	
 	@Override

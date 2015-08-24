@@ -22,11 +22,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -42,7 +40,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.backend.visitor.*;
+import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
+import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
+import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
+import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
@@ -597,23 +598,42 @@ public final class ExternalClass extends AbstractClass
 	
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
+		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		switch (TypeReference.getSort(typeRef))
 		{
-		// TODO implement other sorts
-		case TypeReference.CLASS_TYPE_PARAMETER:
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
-			switch (desc)
+		case TypeReference.CLASS_EXTENDS:
+		{
+			int steps = typePath.getLength();
+			int index = TypeReference.getSuperTypeIndex(typeRef);
+			if (index == -1)
 			{
-			case "Ldyvil/annotation/Covariant;":
-				typeVar.setVariance(Variance.COVARIANT);
-				break;
-			case "Ldyvil/annotation/Contravariant;":
-				typeVar.setVariance(Variance.CONTRAVARIANT);
-				break;
+				this.superType = IType.withAnnotation(this.superType, annotation, typePath, 0, steps);
 			}
-			// TODO implement other type parameter annotations
+			else
+			{
+				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath, 0, steps);
+			}
+			break;
 		}
-		return null;
+		case TypeReference.CLASS_TYPE_PARAMETER:
+		{
+			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			if (typeVar.addRawAnnotation(desc, annotation))
+			{
+				return null;
+			}
+			
+			typeVar.addAnnotation(annotation);
+			break;
+		}
+		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
+		{
+			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
+			break;
+		}
+		}
+		return new AnnotationVisitorImpl(null, annotation);
 	}
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
@@ -671,7 +691,7 @@ public final class ExternalClass extends AbstractClass
 		
 		if ("<init>".equals(name))
 		{
-			Constructor constructor = new ExternalConstructor(this);
+			ExternalConstructor constructor = new ExternalConstructor(this);
 			constructor.setModifiers(access);
 			
 			ClassFormat.readConstructorType(desc, constructor);
@@ -720,11 +740,11 @@ public final class ExternalClass extends AbstractClass
 			
 			MethodCall call = new MethodCall(null, null, method, EmptyArguments.INSTANCE);
 			targetMethod.getParameter(parIndex).setValue(call);
-			return new BytecodeVisitor(method);
+			return new SimpleMethodVisitor(method);
 		}
 		
 		this.body.addMethod(method);
-		return new BytecodeVisitor(method);
+		return new SimpleMethodVisitor(method);
 	}
 	
 	public void visitInnerClass(String name, String outerName, String innerName, int access)

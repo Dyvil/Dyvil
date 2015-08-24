@@ -7,6 +7,8 @@ import java.io.IOException;
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -443,6 +445,23 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.appendSignature(buffer);
 		buffer.append(">;");
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
+		{
+			return;
+		}
+		
+		int index = typePath.getStepArgument(step);
+		if (index < this.parameterCount)
+		{
+			this.parameterTypes[index] = IType.withAnnotation(this.parameterTypes[index], annotation, typePath, step + 1, steps);
+			return;
+		}
+		this.returnType = IType.withAnnotation(this.returnType, annotation, typePath, step + 1, steps);
 	}
 	
 	@Override

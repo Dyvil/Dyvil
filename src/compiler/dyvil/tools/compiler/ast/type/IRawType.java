@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 
@@ -33,6 +35,11 @@ public interface IRawType extends IObjectType
 	public default String getSignature()
 	{
 		return null;
+	}
+	
+	@Override
+	public default void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
 	}
 	
 	@Override

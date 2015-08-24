@@ -7,6 +7,8 @@ import java.io.IOException;
 import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -311,6 +313,17 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ArrayType;", false);
+	}
+	
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
+		{
+			return;
+		}
+		
+		this.type = IType.withAnnotation(this.type, annotation, typePath, step + 1, steps);
 	}
 	
 	@Override

@@ -129,7 +129,7 @@ public final class Name
 			return name;
 		}
 		
-		return new Name('`' + value + '`', '`' + Symbols.qualify(value) + '`');
+		return new Name(value, Symbols.qualify(value));
 	}
 	
 	public static Name getQualified(String value)

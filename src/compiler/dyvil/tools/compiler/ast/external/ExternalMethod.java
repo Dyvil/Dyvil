@@ -1,28 +1,36 @@
 package dyvil.tools.compiler.ast.external;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
+import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class ExternalMethod extends AbstractMethod
+public final class ExternalMethod extends AbstractMethod implements IExternalMethod
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
@@ -43,9 +51,10 @@ public final class ExternalMethod extends AbstractMethod
 		this.parameters[this.parameterCount - 1].setVarargs(true);
 	}
 	
-	public void setParameterName(int index, Name name)
+	@Override
+	public IParameter getParameter_(int index)
 	{
-		this.parameters[index].setName(name);
+		return this.parameters[index];
 	}
 	
 	private void resolveAnnotations()
@@ -283,5 +292,47 @@ public final class ExternalMethod extends AbstractMethod
 			this.resolveAnnotations();
 		}
 		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
+	}
+	
+	@Override
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	{
+		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		int length = typePath.getLength();
+		switch (TypeReference.getSort(typeRef))
+		{
+		case TypeReference.METHOD_RETURN:
+			this.type = IType.withAnnotation(this.type, annotation, typePath, 0, length);
+		case TypeReference.METHOD_TYPE_PARAMETER:
+		{
+			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			if (typeVar.addRawAnnotation(desc, annotation))
+			{
+				return null;
+			}
+			
+			typeVar.addAnnotation(annotation);
+			break;
+		}
+		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
+		{
+			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
+			break;
+		}
+		case TypeReference.EXCEPTION_PARAMETER:
+		{
+			int index = TypeReference.getExceptionIndex(typeRef);
+			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0, length);
+			break;
+		}
+		case TypeReference.METHOD_FORMAL_PARAMETER:
+		{
+			int index = TypeReference.getFormalParameterIndex(typeRef);
+			IParameter param = this.parameters[index];
+			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, length));
+		}
+		}
+		return new AnnotationVisitorImpl(null, annotation);
 	}
 }

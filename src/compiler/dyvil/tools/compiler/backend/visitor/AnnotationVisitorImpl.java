@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.backend.visitor;
 
-
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
@@ -16,9 +15,9 @@ import dyvil.tools.compiler.backend.ClassFormat;
 
 public class AnnotationVisitorImpl implements AnnotationVisitor
 {
-	private IAnnotationConsumer consumer;
-	private IAnnotation		annotation;
-	private ArgumentMap		arguments;
+	private IAnnotationConsumer	consumer;
+	private IAnnotation			annotation;
+	private ArgumentMap			arguments;
 	
 	public AnnotationVisitorImpl(IAnnotationConsumer consumer, IAnnotation annotation)
 	{
@@ -69,6 +68,9 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 	@Override
 	public void visitEnd()
 	{
-		this.consumer.setAnnotation(this.annotation);
+		if (this.consumer != null)
+		{
+			this.consumer.setAnnotation(this.annotation);
+		}
 	}
 }

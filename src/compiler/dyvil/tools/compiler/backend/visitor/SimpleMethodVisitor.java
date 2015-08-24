@@ -1,18 +1,18 @@
 package dyvil.tools.compiler.backend.visitor;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ICallableMember;
+import dyvil.tools.compiler.ast.method.IExternalMethod;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public final class SimpleMethodVisitor implements MethodVisitor
 {
-	private final ICallableMember method;
+	private final IExternalMethod method;
 	
-	public SimpleMethodVisitor(ICallableMember method)
+	public SimpleMethodVisitor(IExternalMethod method)
 	{
 		this.method = method;
 	}
@@ -20,31 +20,20 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitParameter(String name, int index)
 	{
-		this.method.getParameter(index).setName(Name.getQualified(name));
+		this.method.getParameter_(index).setName(Name.getQualified(name));
 	}
 	
 	@Override
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible)
 	{
+		String internal = ClassFormat.extendedToInternal(desc);
+		IParameter param = this.method.getParameter_(parameter);
+		if (param.addRawAnnotation(internal, null))
+		{
+			Annotation annotation = new Annotation(new InternalType(internal));
+			return new AnnotationVisitorImpl(this.method, annotation);
+		}
 		return null;
-	}
-	
-	@Override
-	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
-	{
-		if (this.method.hasModifier(Modifiers.STATIC))
-		{
-			if (index != 0 && index <= this.method.parameterCount())
-			{
-				this.method.getParameter(index - 1).setName(Name.getQualified(name));
-			}
-			return;
-		}
-		
-		if (index < this.method.parameterCount())
-		{
-			this.method.getParameter(index).setName(Name.getQualified(name));
-		}
 	}
 	
 	@Override
@@ -68,7 +57,12 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		return null;
+		return this.method.visitTypeAnnotation(typeRef, typePath, desc, visible);
+	}
+	
+	@Override
+	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
+	{
 	}
 	
 	@Override
