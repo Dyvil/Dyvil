@@ -7,6 +7,7 @@ import java.io.IOException;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -431,31 +432,7 @@ public class CodeClass extends AbstractClass
 		
 		// Annotations
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/object;", true);
-		}
-		if ((this.modifiers & Modifiers.INTERNAL) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/internal;", false);
-		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			writer.visitAnnotation("Ljava/lang/Deprecated;", true);
-		}
-		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
-		{
-			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
-		}
-		
-		if (this.annotations != null)
-		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(writer);
-			}
-		}
+		this.writeAnnotations(writer);
 		
 		// Inner Class Info
 		
@@ -489,13 +466,6 @@ public class CodeClass extends AbstractClass
 			{
 				iclass.writeInnerClassInfo(writer);
 			}
-		}
-		
-		// Type Parameter Variances
-		
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].write(writer);
 		}
 		
 		// Fields, Methods and Properties
@@ -595,6 +565,51 @@ public class CodeClass extends AbstractClass
 			this.compilables[i].writeStaticInit(mw);
 		}
 		mw.end(Types.VOID);
+	}
+	
+	private void writeAnnotations(ClassWriter writer)
+	{
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/annotation/object;", true);
+		}
+		if ((this.modifiers & Modifiers.INTERNAL) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/annotation/internal;", false);
+		}
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
+		{
+			writer.visitAnnotation("Ljava/lang/Deprecated;", true);
+		}
+		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
+		{
+			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
+		}
+		
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(writer);
+			}
+		}
+		
+		// Type Variable Annotations
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].write(writer);
+		}
+		
+		// Super Type Variable Annotations
+		if (this.superType != null)
+		{
+			this.superType.writeAnnotations(writer, TypeReference.newSuperTypeReference(-1), "");
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].writeAnnotations(writer, TypeReference.newSuperTypeReference(i), "");
+		}
 	}
 	
 	@Override

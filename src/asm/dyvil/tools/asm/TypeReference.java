@@ -36,14 +36,18 @@ public class TypeReference
 	public final static int	CLASS_EXTENDS							= 0x10;
 	public final static int	CLASS_TYPE_PARAMETER_BOUND				= 0x11;
 	public final static int	METHOD_TYPE_PARAMETER_BOUND				= 0x12;
+	
 	public final static int	FIELD									= 0x13;
+	
 	public final static int	METHOD_RETURN							= 0x14;
 	public final static int	METHOD_RECEIVER							= 0x15;
 	public final static int	METHOD_FORMAL_PARAMETER					= 0x16;
 	public final static int	THROWS									= 0x17;
+	
 	public final static int	LOCAL_VARIABLE							= 0x40;
 	public final static int	RESOURCE_VARIABLE						= 0x41;
 	public final static int	EXCEPTION_PARAMETER						= 0x42;
+	
 	public final static int	INSTANCEOF								= 0x43;
 	public final static int	NEW										= 0x44;
 	public final static int	CONSTRUCTOR_REFERENCE					= 0x45;

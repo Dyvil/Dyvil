@@ -7,6 +7,7 @@ import java.io.IOException;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -392,7 +393,7 @@ public class Method extends AbstractMethod
 			mw.setThisType(this.theClass.getInternalName());
 		}
 		
-		writeAnnotations(mw);
+		this.writeAnnotations(mw);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -441,7 +442,8 @@ public class Method extends AbstractMethod
 		methodLoop:
 		for (IMethod m : this.overrideMethods)
 		{
-			// Check if a bridge method for the descriptor has not yet been generated
+			// Check if a bridge method for the descriptor has not yet been
+			// generated
 			String desc = m.getDescriptor();
 			for (String preDesc : descriptors)
 			{
@@ -521,6 +523,12 @@ public class Method extends AbstractMethod
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/internal;", false);
+		}
+		
+		this.type.writeAnnotations(mw, TypeReference.METHOD_RETURN, "");
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].writeAnnotations(mw, TypeReference.newExceptionReference(i), "");
 		}
 	}
 	

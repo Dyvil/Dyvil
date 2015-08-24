@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
-import dyvil.tools.asm.ClassWriter;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -65,5 +65,5 @@ public interface ITypeVariable extends IASTNode, INamed
 	
 	public void appendSignature(StringBuilder buffer);
 	
-	public void write(ClassWriter writer);
+	public void write(TypeAnnotatableVisitor visitor);
 }

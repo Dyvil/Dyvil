@@ -123,6 +123,12 @@ public final class Annotation implements IAnnotation
 			IParameter param = theClass.getParameter(i);
 			IType type = param.getType();
 			IValue value = this.arguments.getValue(i, param);
+			if (value == null)
+			{
+				// TODO Error on non-default parameter
+				continue;
+			}
+			
 			IValue value1 = value.withType(type, type, markers, context);
 			
 			if (value1 == null)
@@ -213,7 +219,8 @@ public final class Annotation implements IAnnotation
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitTypeAnnotation(typeRef, typePath, ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitTypeAnnotation(typeRef, typePath, ClassFormat.internalToExtended(this.type.getInternalName()),
+					retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	

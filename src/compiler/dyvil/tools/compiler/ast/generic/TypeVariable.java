@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.ClassWriter;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -333,13 +334,22 @@ public final class TypeVariable implements ITypeVariable
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(TypeAnnotatableVisitor visitor)
 	{
+		boolean method = this.generic instanceof IMethod;
+		int typeRef = TypeReference.newTypeParameterReference(method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
+		
 		if (this.variance != Variance.INVARIANT)
 		{
-			int typeRef = TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, this.index);
 			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/Contravariant;" : "Ldyvil/annotation/Covariant;";
-			writer.visitTypeAnnotation(typeRef, null, type, true);
+			visitor.visitTypeAnnotation(typeRef, null, type, true);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			typeRef = TypeReference.newTypeParameterBoundReference(
+					method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND, this.index, i);
+			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
 		}
 	}
 	

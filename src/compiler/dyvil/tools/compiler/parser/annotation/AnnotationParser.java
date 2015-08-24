@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
@@ -69,15 +68,6 @@ public class AnnotationParser extends Parser
 				}
 				
 				this.mode = PARAMETERS_END;
-				return;
-			}
-			
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				SingleArgument arg = new SingleArgument();
-				this.annotation.setArguments(arg);
-				pm.popParser();
-				pm.pushParser(pm.newExpressionParser(arg), true);
 				return;
 			}
 			

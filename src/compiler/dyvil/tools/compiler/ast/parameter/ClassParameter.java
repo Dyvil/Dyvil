@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -195,7 +196,9 @@ public final class ClassParameter extends Parameter implements IField
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String desc = this.getDescription();
-		writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
+		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
+		
+		IField.writeAnnotations(fv, this.annotations, this.type);
 		
 		if (this.defaultValue == null)
 		{

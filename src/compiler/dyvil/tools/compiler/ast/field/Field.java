@@ -319,18 +319,6 @@ public class Field extends Member implements IField
 		}
 	}
 	
-	protected void writeAnnotations(FieldVisitor fv)
-	{
-		if (this.annotations != null)
-		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(fv);
-			}
-		}
-	}
-	
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -356,7 +344,7 @@ public class Field extends Member implements IField
 		
 		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
 		
-		this.writeAnnotations(fv);
+		IField.writeAnnotations(fv, this.annotations, this.type);
 	}
 	
 	@Override
