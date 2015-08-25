@@ -58,7 +58,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.addLastValue(Name.update, value);
+		this.arguments = this.arguments.withLastValue(Name.update, value);
 	}
 	
 	@Override
@@ -100,7 +100,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			if (valueTag == APPLY_CALL)
 			{
 				ApplyMethodCall call = (ApplyMethodCall) this.instance;
-				IArguments arguments1 = call.arguments.addLastValue(call);
+				IArguments arguments1 = call.arguments.withLastValue(call);
 				
 				IMethod match = ICall.resolveMethod(context, call.instance, Name.update, arguments1);
 				if (match != null)
@@ -116,7 +116,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			else if (valueTag == SUBSCRIPT_GET)
 			{
 				SubscriptGetter setter = (SubscriptGetter) this.instance;
-				IArguments arguments1 = setter.arguments.addLastValue(setter);
+				IArguments arguments1 = setter.arguments.withLastValue(setter);
 				
 				IMethod match = ICall.resolveMethod(context, setter.instance, Name.subscript_$eq, arguments1);
 				if (match != null)

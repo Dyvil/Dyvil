@@ -103,13 +103,13 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public IArguments addLastValue(IValue value)
+	public IArguments withLastValue(IValue value)
 	{
 		return this;
 	}
 	
 	@Override
-	public IArguments addLastValue(Name name, IValue value)
+	public IArguments withLastValue(Name name, IValue value)
 	{
 		int size = this.size;
 		int index = size++;

@@ -79,7 +79,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public IArguments addLastValue(IValue value)
+	public IArguments withLastValue(IValue value)
 	{
 		IValue[] values = new IValue[this.size + 1];
 		System.arraycopy(this.values, 0, values, 0, this.size);
