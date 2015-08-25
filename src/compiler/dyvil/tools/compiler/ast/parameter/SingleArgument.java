@@ -54,7 +54,7 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public IArguments addLastValue(IValue value)
+	public IArguments withLastValue(IValue value)
 	{
 		if (this.value == null) {
 			return new SingleArgument(value);

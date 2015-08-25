@@ -28,7 +28,7 @@ public class SubscriptSetter extends AbstractCall
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.addLastValue(Name.update, value);
+		this.arguments = this.arguments.withLastValue(Name.update, value);
 	}
 	
 	@Override

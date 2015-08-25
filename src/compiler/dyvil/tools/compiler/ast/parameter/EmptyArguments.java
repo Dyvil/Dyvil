@@ -55,7 +55,7 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public IArguments addLastValue(IValue value)
+	public IArguments withLastValue(IValue value)
 	{
 		return new SingleArgument(value);
 	}
