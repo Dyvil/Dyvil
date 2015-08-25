@@ -840,13 +840,19 @@ public interface Opcodes
 	 * Pushes the instance of the current {@link Intrinsic} method call onto the
 	 * stack.
 	 */
-	public static final int INSTANCE = -1;
+	public static final int LOAD_0 = -1;
 	
 	/**
-	 * Pushes all arguments of the current {@link Intrinsic} method call onto
-	 * the stack.
+	 * Pushes the first argument of the current {@link Intrinsic} method call
+	 * onto the stack.
 	 */
-	public static final int ARGUMENTS = -2;
+	public static final int LOAD_1 = -2;
+	
+	/**
+	 * Pushes the second argument of the current {@link Intrinsic} method call
+	 * onto the stack.
+	 */
+	public static final int LOAD_2 = -3;
 	
 	/**
 	 * Pushes the long {@code -1} onto the stack.
@@ -935,29 +941,90 @@ public interface Opcodes
 		return -1;
 	}
 	
-	public static boolean isReturnOpcode(int op)
+	public static boolean isReturnOpcode(int opcode)
 	{
-		return op == RETURN || op == ARETURN || op == IRETURN || op == LRETURN || op == FRETURN || op == DRETURN;
-	}
-	
-	public static boolean isInvokeOpcode(int op)
-	{
-		return op == INVOKEVIRTUAL || op == INVOKEINTERFACE || op == INVOKESPECIAL || op == INVOKESTATIC;
+		switch (opcode)
+		{
+		case RETURN:
+		case ARETURN:
+		case IRETURN:
+		case LRETURN:
+		case FRETURN:
+		case DRETURN:
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isLoadOpcode(int opcode)
 	{
-		return opcode == ALOAD || opcode == ILOAD || opcode == LLOAD || opcode == FLOAD || opcode == DLOAD;
+		switch (opcode)
+		{
+		case ALOAD:
+		case ILOAD:
+		case LLOAD:
+		case FLOAD:
+		case DLOAD:
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isStoreOpcode(int opcode)
 	{
-		return opcode == ASTORE || opcode == ISTORE || opcode == LSTORE || opcode == FSTORE || opcode == DSTORE || opcode == RET;
+		switch (opcode)
+		{
+		case ASTORE:
+		case ISTORE:
+		case LSTORE:
+		case FSTORE:
+		case DSTORE:
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isFieldOpcode(int opcode)
 	{
-		return opcode == PUTFIELD || opcode == GETFIELD || opcode == PUTSTATIC || opcode == GETSTATIC;
+		switch (opcode)
+		{
+		case PUTFIELD:
+		case GETFIELD:
+		case PUTSTATIC:
+		case GETSTATIC:
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isMethodOpcode(int opcode)
+	{
+		switch (opcode)
+		{
+		case INVOKEVIRTUAL:
+		case INVOKEINTERFACE:
+		case INVOKESPECIAL:
+		case INVOKESTATIC:
+			return true;
+		}
+		return false;
+	}
+	
+	public static boolean isFieldOrMethodOpcode(int opcode)
+	{
+		switch (opcode)
+		{
+		case PUTFIELD:
+		case GETFIELD:
+		case PUTSTATIC:
+		case GETSTATIC:
+		case INVOKEVIRTUAL:
+		case INVOKEINTERFACE:
+		case INVOKESPECIAL:
+		case INVOKESTATIC:
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isJumpOpcode(int opcode)

@@ -62,25 +62,25 @@ public interface IntArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix int length(int[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, IALOAD })
 	public static @infix int subscript(int[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, IASTORE })
 	public static @infix void subscript_$eq(int[] array, int i, int v)
 	{
 		array[i] = v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;

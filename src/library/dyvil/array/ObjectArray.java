@@ -83,25 +83,25 @@ public interface ObjectArray
 		return array;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix <T> int length(T[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, AALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, AALOAD })
 	public static @infix <T> T subscript(T[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, AASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, AASTORE })
 	public static @infix <T> void subscript_$eq(T[] array, int i, T v)
 	{
 		array[i] = v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;

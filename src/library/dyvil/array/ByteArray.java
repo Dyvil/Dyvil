@@ -62,19 +62,19 @@ public interface ByteArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix int length(byte[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, BALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, BALOAD })
 	public static @infix byte subscript(byte[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, BASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, BASTORE })
 	public static @infix void subscript_$eq(byte[] array, int i, byte v)
 	{
 		array[i] = v;
@@ -82,7 +82,7 @@ public interface ByteArray
 	
 	// Operators
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(byte[] array)
 	{
 		return array.length == 0;

@@ -29,4 +29,6 @@ import java.lang.annotation.Target;
 public @interface Intrinsic
 {
 	public int[]value();
+	
+	public String[] strings() default {};
 }
