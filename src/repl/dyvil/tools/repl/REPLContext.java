@@ -112,6 +112,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return false;
 		}
 		
+		field.foldConstants();
 		field.cleanup(this, this);
 		this.compileVariable(field);
 		return true;
@@ -119,8 +120,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	private void compileVariable(REPLVariable field)
 	{
-		field.foldConstants();
-		
 		compileInnerClasses();
 		field.compute();
 		

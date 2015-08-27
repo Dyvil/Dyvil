@@ -497,31 +497,34 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	
 	private boolean checkCall(IValue instance, IArguments arguments, IParameterized p)
 	{
+		this.value = null;
+		
 		if (instance != null)
 		{
-			if (this.parameterCount > 0)
+			if (this.parameterCount <= 0)
 			{
 				return false;
 			}
 			
-			if (!isFieldAccess(instance, this.parameters[0]))
+			if (isFieldAccess(instance, this.parameters[0]))
 			{
-				return false;
-			}
-			
-			if (arguments.size() != this.parameterCount - 1)
-			{
-				return false;
-			}
-			
-			for (int i = 1; i < this.parameterCount; i++)
-			{
-				IValue v = arguments.getValue(i - 1, p.getParameter(i - 1));
-				if (!isFieldAccess(v, this.parameters[i]))
+				if (arguments.size() != this.parameterCount - 1)
 				{
 					return false;
 				}
+				
+				for (int i = 1; i < this.parameterCount; i++)
+				{
+					IValue v = arguments.getValue(i - 1, p.getParameter(i - 1));
+					if (!isFieldAccess(v, this.parameters[i]))
+					{
+						return false;
+					}
+				}
 			}
+			
+			this.value = instance;
+			this.thisClass = instance.getType().getTheClass();
 		}
 		
 		if (arguments.size() != this.parameterCount)
@@ -571,6 +574,11 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		}
 		else
 		{
+			if (this.value != null)
+			{
+				this.value.writeExpression(writer);
+			}
+			
 			handleType = this.directInvokeOpcode;
 		}
 		
