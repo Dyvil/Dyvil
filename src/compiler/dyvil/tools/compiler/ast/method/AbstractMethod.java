@@ -1223,7 +1223,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return Opcodes.INVOKESPECIAL;
 		}
-		if (this.theClass.isInterface() && (this.modifiers & Modifiers.ABSTRACT) != 0)
+		if (this.theClass.isInterface())
 		{
 			return Opcodes.INVOKEINTERFACE;
 		}

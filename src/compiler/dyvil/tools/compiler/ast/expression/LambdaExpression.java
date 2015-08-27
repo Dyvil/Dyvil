@@ -497,10 +497,15 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	
 	private boolean checkCall(IValue instance, IArguments arguments, IParameterized p)
 	{
-		this.value = null;
+		boolean receiver = false;
 		
 		if (instance != null)
 		{
+			if (instance.isPrimitive())
+			{
+				return false;
+			}
+			
 			if (this.parameterCount <= 0)
 			{
 				return false;
@@ -521,10 +526,12 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 						return false;
 					}
 				}
+				
+				this.value = null;
+				return true;
 			}
 			
-			this.value = instance;
-			this.thisClass = instance.getType().getTheClass();
+			receiver = true;
 		}
 		
 		if (arguments.size() != this.parameterCount)
@@ -539,6 +546,21 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			{
 				return false;
 			}
+		}
+		
+		if (receiver)
+		{
+			if (instance.isPrimitive())
+			{
+				return false;
+			}
+			
+			this.value = instance;
+			this.thisClass = instance.getType().getTheClass();
+		}
+		else
+		{
+			this.value = null;
 		}
 		
 		return true;
@@ -658,7 +680,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		{
 			this.capturedFields[i].getActualType().appendExtendedName(buffer);
 		}
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = this.directInvokeOpcode != 0 && this.directInvokeOpcode != Opcodes.INVOKESTATIC ? 1 : 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].getType().appendExtendedName(buffer);
 		}

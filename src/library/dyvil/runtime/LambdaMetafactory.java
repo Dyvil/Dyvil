@@ -10,7 +10,7 @@ public class LambdaMetafactory
 	public static CallSite metafactory(MethodHandles.Lookup caller, String invokedName, MethodType invokedType, MethodType samMethodType,
 			MethodHandle implMethod, MethodType instantiatedMethodType) throws LambdaConversionException
 	{
-		String type = '<' + invokedType.returnType().getName() + '>';
+		String type = '<' + invokedType.returnType().getName() + "::" + invokedName + '>';
 		return metafactory(caller, invokedName, invokedType, samMethodType, implMethod, instantiatedMethodType, type);
 	}
 	
