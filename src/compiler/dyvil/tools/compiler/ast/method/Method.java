@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -346,7 +347,7 @@ public class Method extends AbstractMethod
 			IAnnotation intrinsic = this.annotations.getAnnotation(Types.INTRINSIC_CLASS);
 			if (intrinsic != null)
 			{
-				this.readIntrinsicAnnotation(intrinsic);
+				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
 			}
 		}
 		
