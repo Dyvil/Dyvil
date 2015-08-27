@@ -78,6 +78,11 @@ public class ConstructorCall implements ICall
 		return false;
 	}
 	
+	public IConstructor getConstructor()
+	{
+		return this.constructor;
+	}
+	
 	@Override
 	public void setType(IType type)
 	{

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.array.ObjectArray;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -356,6 +357,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	public boolean isIntrinsic()
 	{
 		return false;
+	}
+	
+	@Override
+	public int getInvokeOpcode()
+	{
+		return Opcodes.INVOKEDYNAMIC;
 	}
 	
 	@Override

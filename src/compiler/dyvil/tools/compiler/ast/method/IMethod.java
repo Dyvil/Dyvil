@@ -48,6 +48,8 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	
 	public boolean isIntrinsic();
 	
+	public int getInvokeOpcode();
+	
 	public String getDescriptor();
 	
 	public String getSignature();

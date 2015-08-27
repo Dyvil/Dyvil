@@ -4,6 +4,9 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.access.AbstractCall;
+import dyvil.tools.compiler.ast.access.ConstructorCall;
+import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,8 +15,11 @@ import dyvil.tools.compiler.ast.context.MapTypeContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
@@ -58,6 +64,8 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	private String	owner;
 	private String	name;
 	private String	lambdaDesc;
+	
+	private int directInvokeOpcode;
 	
 	public LambdaExpression(ICodePosition position)
 	{
@@ -190,6 +198,18 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			this.value = this.value.resolve(markers, context1);
 			
 			IType valueType = this.value.getType();
+			
+			if (this.returnType == Types.UNKNOWN)
+			{
+				if (valueType == Types.VOID)
+				{
+					this.returnType = Types.VOID.getObjectType();
+				}
+				else
+				{
+					this.returnType = valueType;
+				}
+			}
 			
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
 			if (value1 == null)
@@ -422,32 +442,136 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		this.value = this.value.cleanup(context, compilableList);
+		
+		if (this.capturedFieldCount == 0)
+		{
+			if (this.value instanceof AbstractCall)
+			{
+				AbstractCall c = (AbstractCall) this.value;
+				
+				IMethod method = c.getMethod();
+				if (this.checkCall(c.getValue(), c.getArguments(), method))
+				{
+					switch (method.getInvokeOpcode())
+					{
+					case Opcodes.INVOKEVIRTUAL:
+						this.directInvokeOpcode = ClassFormat.H_INVOKEVIRTUAL;
+						break;
+					case Opcodes.INVOKESTATIC:
+						this.directInvokeOpcode = ClassFormat.H_INVOKESTATIC;
+						break;
+					case Opcodes.INVOKEINTERFACE:
+						this.directInvokeOpcode = ClassFormat.H_INVOKEINTERFACE;
+						break;
+					case Opcodes.INVOKESPECIAL:
+						this.directInvokeOpcode = ClassFormat.H_INVOKESPECIAL;
+						break;
+					}
+					
+					this.name = method.getName().qualified;
+					this.owner = method.getTheClass().getInternalName();
+					return this;
+				}
+			}
+			// To avoid trouble with anonymous classes
+			else if (this.value.getClass() == ConstructorCall.class)
+			{
+				ConstructorCall c = (ConstructorCall) this.value;
+				IConstructor ctor = c.getConstructor();
+				if (this.checkCall(null, c.getArguments(), ctor))
+				{
+					this.directInvokeOpcode = ClassFormat.H_NEWINVOKESPECIAL;
+					this.name = "<init>";
+					this.owner = ctor.getTheClass().getInternalName();
+					
+					return this;
+				}
+			}
+		}
+		
 		compilableList.addCompilable(this);
 		
-		this.value = this.value.cleanup(context, compilableList);
 		return this;
+	}
+	
+	private boolean checkCall(IValue instance, IArguments arguments, IParameterized p)
+	{
+		if (instance != null)
+		{
+			if (this.parameterCount > 0)
+			{
+				return false;
+			}
+			
+			if (!isFieldAccess(instance, this.parameters[0]))
+			{
+				return false;
+			}
+			
+			if (arguments.size() != this.parameterCount - 1)
+			{
+				return false;
+			}
+			
+			for (int i = 1; i < this.parameterCount; i++)
+			{
+				IValue v = arguments.getValue(i - 1, p.getParameter(i - 1));
+				if (!isFieldAccess(v, this.parameters[i]))
+				{
+					return false;
+				}
+			}
+		}
+		
+		if (arguments.size() != this.parameterCount)
+		{
+			return false;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IValue v = arguments.getValue(i, p.getParameter(i));
+			if (!isFieldAccess(v, this.parameters[i]))
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private static boolean isFieldAccess(IValue value, IDataMember member)
+	{
+		return value.valueTag() == IValue.FIELD_ACCESS && ((FieldAccess) value).getField() == member;
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.lambdaDesc = this.getLambdaDescriptor();
-		
 		int handleType;
-		if (this.thisClass != null)
+		
+		if (this.directInvokeOpcode == 0)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, 0);
-			handleType = ClassFormat.H_INVOKESPECIAL;
+			if (this.thisClass != null)
+			{
+				writer.writeVarInsn(Opcodes.ALOAD, 0);
+				handleType = ClassFormat.H_INVOKESPECIAL;
+			}
+			else
+			{
+				handleType = ClassFormat.H_INVOKESTATIC;
+			}
+			
+			for (int i = 0; i < this.capturedFieldCount; i++)
+			{
+				CaptureVariable var = this.capturedFields[i];
+				writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
+			}
 		}
 		else
 		{
-			handleType = ClassFormat.H_INVOKESTATIC;
-		}
-		
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
+			handleType = this.directInvokeOpcode;
 		}
 		
 		String name = this.name;
@@ -465,8 +589,15 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		this.writeExpression(writer);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
+	/**
+	 * @return the descriptor that contains the captured instance and captured
+	 *         variables (if present) as the argument types and the instantiated
+	 *         method type as the return type.
+	 */
 	private String getInvokeDescriptor()
 	{
 		StringBuilder buffer = new StringBuilder();
@@ -484,6 +615,10 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		return buffer.toString();
 	}
 	
+	/**
+	 * @return the specialized method type of the SAM method, as opposed to
+	 *         {@link IMethod#getDescriptor()}.
+	 */
 	private String getSpecialDescriptor()
 	{
 		StringBuilder buffer = new StringBuilder();
@@ -497,6 +632,11 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		return buffer.toString();
 	}
 	
+	/**
+	 * @return the descriptor of the (synthetic) lambda callback method,
+	 *         including captured variables, parameter types and the return
+	 *         type.
+	 */
 	private String getLambdaDescriptor()
 	{
 		if (this.lambdaDesc != null)
@@ -515,13 +655,25 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			this.parameters[i].getType().appendExtendedName(buffer);
 		}
 		buffer.append(')');
-		this.returnType.appendExtendedName(buffer);
+		if (this.directInvokeOpcode == ClassFormat.H_NEWINVOKESPECIAL)
+		{
+			buffer.append('V');
+		}
+		else
+		{
+			this.returnType.appendExtendedName(buffer);
+		}
 		return this.lambdaDesc = buffer.toString();
 	}
 	
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
+		if (this.directInvokeOpcode != 0)
+		{
+			return;
+		}
+		
 		boolean instance = this.thisClass != null;
 		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(), null, null));

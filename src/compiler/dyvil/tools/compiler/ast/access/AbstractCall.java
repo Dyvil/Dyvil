@@ -79,6 +79,11 @@ public abstract class AbstractCall implements ICall, IValued
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
+	
+	public IMethod getMethod()
+	{
+		return this.method;
+	}
 
 	@Override
 	public boolean isPrimitive()

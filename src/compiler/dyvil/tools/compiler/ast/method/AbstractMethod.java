@@ -1198,30 +1198,36 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 		
-		if ((modifiers & Modifiers.STATIC) != 0)
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		if (instance != null && instance.valueTag() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
-		}
-		else if (instance != null && instance.valueTag() == IValue.SUPER)
-		{
-			opcode = Opcodes.INVOKESPECIAL;
-		}
-		else if (this.theClass.isInterface())
-		{
-			opcode = Opcodes.INVOKEINTERFACE;
 		}
 		else
 		{
-			opcode = Opcodes.INVOKEVIRTUAL;
+			opcode = this.getInvokeOpcode();
 		}
 		
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.isInterface());
+	}
+	
+	@Override
+	public int getInvokeOpcode()
+	{
+		if ((modifiers & Modifiers.STATIC) != 0)
+		{
+			return Opcodes.INVOKESTATIC;
+		}
+		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		{
+			return Opcodes.INVOKESPECIAL;
+		}
+		if (this.theClass.isInterface() && (this.modifiers & Modifiers.ABSTRACT) != 0)
+		{
+			return Opcodes.INVOKEINTERFACE;
+		}
+		return Opcodes.INVOKEVIRTUAL;
 	}
 	
 	@Override
