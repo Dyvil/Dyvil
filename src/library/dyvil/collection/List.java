@@ -306,14 +306,35 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element
 	 * multiple times, implementations should behave so that <i>all</i>
 	 * occurrences of the element are removed, not only the first one. This
-	 * behavior can be achieved using this code snippet:
-	 * 
-	 * <pre>
-	 * list.removeAt(list.indexOf(element))
-	 * </pre>
+	 * behavior can be achieved using the {@link #removeFirst(Object)
+	 * removeFirst} method.
 	 */
 	@Override
 	public boolean remove(Object element);
+	
+	public default boolean removeFirst(Object element)
+	{
+		int index = this.indexOf(element);
+		if (index < 0)
+		{
+			return false;
+		}
+		
+		this.removeAt(index);
+		return true;
+	}
+	
+	public default boolean removeLast(Object element)
+	{
+		int index = this.lastIndexOf(element);
+		if (index < 0)
+		{
+			return false;
+		}
+		
+		this.removeAt(index);
+		return true;
+	}
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This

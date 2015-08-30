@@ -255,6 +255,20 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@mutating
+	public default boolean removeFirst(Object element)
+	{
+		throw new ImmutableException("removeFirst() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default boolean removeLast(Object element)
+	{
+		throw new ImmutableException("removeLast() on Immutable List");
+	}
+	
+	@Override
+	@mutating
 	public default void removeAt(int index)
 	{
 		throw new ImmutableException("removeAt() on Immutable List");
