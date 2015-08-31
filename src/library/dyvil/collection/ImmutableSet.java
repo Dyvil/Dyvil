@@ -16,7 +16,7 @@ import dyvil.collection.immutable.SingletonSet;
 import dyvil.util.ImmutableException;
 
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>
 {
 	public static interface Builder<E> extends ImmutableCollection.Builder<E>
@@ -37,12 +37,12 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	
 	public static <E> ImmutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet(elements, true);
 	}
 	
-	public static <E> ImmutableSet<E> fromLiteral(E... elements)
+	public static <E> ImmutableSet<E> fromArray(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
 	}
 	
 	public static <E> Builder<E> builder()

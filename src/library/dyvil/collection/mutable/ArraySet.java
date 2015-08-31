@@ -10,17 +10,17 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 {
 	public static <E> ArraySet<E> apply(E... elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet(elements, true);
 	}
 	
-	public static <E> ArraySet<E> fromLiteral(E... elements)
+	public static <E> ArraySet<E> fromArray(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
 	}
 	
 	public ArraySet(E... elements)

@@ -5,17 +5,32 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.*;
+import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<K, V>
 {
 	protected static final int DEFAULT_CAPACITY = 10;
 	
+	public static <K, V> TupleMap<K, V> apply()
+	{
+		return new TupleMap(DEFAULT_CAPACITY);
+	}
+	
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new TupleMap(entries, true);
+	}
+	
+	public static <K, V> TupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
 	{
 		return new TupleMap(entries);
 	}

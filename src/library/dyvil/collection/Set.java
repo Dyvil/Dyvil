@@ -10,7 +10,7 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.annotation.internal;
 
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
 	@internal
@@ -31,9 +31,9 @@ public interface Set<E> extends Collection<E>
 		return ImmutableSet.apply(elements);
 	}
 	
-	public static <E> ImmutableSet<E> fromLiteral(E... elements)
+	public static <E> ImmutableSet<E> fromArray(E... elements)
 	{
-		return ImmutableSet.fromLiteral(elements);
+		return ImmutableSet.fromArray(elements);
 	}
 	
 	// Accessors

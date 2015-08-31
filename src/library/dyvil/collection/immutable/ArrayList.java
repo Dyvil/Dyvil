@@ -14,17 +14,17 @@ import dyvil.collection.MutableList;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
 
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E>
 {
 	public static <E> ArrayList<E> apply(E... elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList(elements, true);
 	}
 	
-	public static <E> ArrayList<E> fromLiteral(E... elements)
+	public static <E> ArrayList<E> fromArray(E... elements)
 	{
-		return new ArrayList(elements, true);
+		return new ArrayList(elements);
 	}
 	
 	public static <E> Builder<E> builder()

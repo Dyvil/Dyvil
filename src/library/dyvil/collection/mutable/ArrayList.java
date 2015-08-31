@@ -16,7 +16,7 @@ import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
 
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 {
 	public static <E> ArrayList<E> apply()
@@ -26,12 +26,12 @@ public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 	
 	public static <E> ArrayList<E> apply(E... elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList(elements, true);
 	}
 	
-	public static <E> ArrayList<E> fromLiteral(E... elements)
+	public static <E> ArrayList<E> fromArray(E... elements)
 	{
-		return new ArrayList(elements, true);
+		return new ArrayList(elements);
 	}
 	
 	public ArrayList()

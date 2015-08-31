@@ -44,7 +44,7 @@ import dyvil.collection.mutable.ArrayList;
  *            the element type
  */
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {
 	/**
@@ -80,9 +80,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return ImmutableList.apply(elements);
 	}
 	
-	public static <E> ImmutableList<E> fromLiteral(E... elements)
+	public static <E> ImmutableList<E> fromArray(E... elements)
 	{
-		return ImmutableList.fromLiteral(elements);
+		return ImmutableList.fromArray(elements);
 	}
 	
 	// Simple getters

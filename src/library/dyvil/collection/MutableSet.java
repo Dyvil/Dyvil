@@ -12,7 +12,7 @@ import dyvil.collection.mutable.HashSet;
 import dyvil.collection.view.SetView;
 
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
 	public static <E> MutableSet<E> apply()
@@ -22,12 +22,12 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	
 	public static <E> MutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet(elements, true);
 	}
 	
-	public static <E> MutableSet<E> fromLiteral(E... elements)
+	public static <E> MutableSet<E> fromArray(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet(elements);
 	}
 	
 	// Accessors

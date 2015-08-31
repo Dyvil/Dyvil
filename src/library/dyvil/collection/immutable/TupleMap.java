@@ -25,6 +25,11 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 		return new TupleMap(entries);
 	}
 	
+	public static <K, V> TupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
+	{
+		return new TupleMap(entries, true);
+	}
+	
 	public TupleMap(Tuple2<K, V>[] entries)
 	{
 		super(entries);
