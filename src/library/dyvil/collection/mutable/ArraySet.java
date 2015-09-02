@@ -4,15 +4,24 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 
+@NilConvertible
 @ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 {
+	protected static final int INITIAL_CAPACITY = 10;
+	
+	public static <E> ArraySet<E> apply()
+	{
+		return new ArraySet();
+	}
+	
 	public static <E> ArraySet<E> apply(E... elements)
 	{
 		return new ArraySet(elements, true);
@@ -23,14 +32,19 @@ public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 		return new ArraySet(elements);
 	}
 	
-	public ArraySet(E... elements)
+	public ArraySet()
 	{
-		super(elements);
+		super(new Object[INITIAL_CAPACITY], 0, true);
 	}
 	
 	public ArraySet(int size)
 	{
 		super(new Object[size], 0, true);
+	}
+	
+	public ArraySet(E... elements)
+	{
+		super(elements);
 	}
 	
 	public ArraySet(E[] elements, int size)

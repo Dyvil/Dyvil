@@ -8,6 +8,7 @@ import dyvil.lang.Type;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -124,6 +125,42 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.keys = getKeys(type);
 		this.values = new Object[this.keys.length];
 		this.type = type;
+	}
+	
+	protected static Class<?> getKeyType(Tuple2<Enum<?>, ?>[] tuples)
+	{
+		for (Tuple2<Enum<?>, ?> entry : tuples)
+		{
+			if (entry._1 != null)
+			{
+				return entry._1.getDeclaringClass();
+			}
+		}
+		
+		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
+	}
+	
+	protected static int fillEntries(Object[] values, Tuple2<Enum<?>, ?>[] tuples, int len)
+	{
+		int size = 0;
+		for (int i = 0; i < len; i++)
+		{
+			Tuple2<Enum<?>, ?> entry = tuples[i];
+			Enum key = entry._1;
+			if (key == null)
+			{
+				continue;
+			}
+			
+			int index = key.ordinal();
+			if (values[index] == null)
+			{
+				size++;
+			}
+			values[index] = entry._2;
+		}
+		
+		return size;
 	}
 	
 	protected static boolean checkType(Class<?> type, Object key)

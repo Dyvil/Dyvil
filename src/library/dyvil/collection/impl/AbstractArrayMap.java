@@ -1,6 +1,7 @@
 package dyvil.collection.impl;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -117,6 +118,32 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 			this.values[index] = entry.getValue();
 			index++;
 		}
+	}
+	
+	protected static int fillEntries(Object[] keys, Object[] values, Tuple2<?, ?>[] tuples, int len)
+	{
+		int size = 0;
+		
+		outer:
+		for (int i = 0; i < len; i++)
+		{
+			Tuple2 entry = tuples[i];
+			Object key = entry._1;
+			for (int j = 0; j < size; j++)
+			{
+				if (Objects.equals(key, keys[j]))
+				{
+					values[j] = entry._2;
+					continue outer;
+				}
+			}
+			
+			keys[size] = key;
+			values[size] = entry._2;
+			size++;
+		}
+		
+		return size;
 	}
 	
 	@Override

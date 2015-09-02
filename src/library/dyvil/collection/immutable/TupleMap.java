@@ -15,11 +15,6 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMap<K, V>
 {
-	public static <K, V> Builder<K, V> builder()
-	{
-		return new Builder();
-	}
-	
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		return new TupleMap(entries);
@@ -28,6 +23,11 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 	public static <K, V> TupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
 	{
 		return new TupleMap(entries, true);
+	}
+	
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder();
 	}
 	
 	public TupleMap(Tuple2<K, V>[] entries)

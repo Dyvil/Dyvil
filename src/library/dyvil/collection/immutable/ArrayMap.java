@@ -5,12 +5,25 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayMap;
+import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 
+@ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements ImmutableMap<K, V>
 {
+	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		int len = entries.length;
+		Object[] keys = new Object[len];
+		Object[] values = new Object[len];
+		int size = AbstractArrayMap.fillEntries(keys, values, entries, len);
+		return new ArrayMap<K, V>(keys, values, size, true);
+	}
+	
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<K, V>();

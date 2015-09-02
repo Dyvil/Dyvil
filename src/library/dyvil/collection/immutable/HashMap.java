@@ -5,12 +5,24 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 
+@ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<K, V>
 {
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] entries)
+	{
+		int len = entries.length;
+		HashEntry[] hashEntries = new HashEntry[MathUtils.powerOfTwo(AbstractHashMap.grow(len))];
+		int size = AbstractHashMap.fillEntries(hashEntries, entries, len);
+		return new HashMap(size, hashEntries);
+	}
+	
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<K, V>();

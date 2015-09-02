@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -145,7 +146,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	public static final float	GROWTH_FACTOR		= 1.0625F;
+	public static final float	GROWTH_FACTOR		= 1.125F;
 	public static final int		DEFAULT_CAPACITY	= 16;
 	public static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
 	public static final int		MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
@@ -164,26 +165,42 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		this.entries = new HashEntry[length];
 		this.size = size;
 		
-		outer:
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
 			K key = entry.getKey();
-			V value = entry.getValue();
+			int hash = hash(key);
+			int i = index(hash, length);
+			this.entries[i] = new HashEntry(key, entry.getValue(), hash, this.entries[i]);
+		}
+	}
+	
+	protected static int fillEntries(HashEntry<?, ?>[] entries, Tuple2<?, ?>[] tuples, int length)
+	{
+		int size = 0;
+		
+		outer:
+		for (Tuple2 entry : tuples)
+		{
+			Object key = entry.getKey();
+			Object value = entry.getValue();
 			
 			int hash = hash(key);
 			int i = index(hash, length);
-			for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+			for (HashEntry e = entries[i]; e != null; e = e.next)
 			{
 				Object k;
-				if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
+				if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k))))
 				{
 					e.value = value;
 					continue outer;
 				}
 			}
 			
-			this.entries[i] = new HashEntry(key, value, hash);
+			entries[i] = new HashEntry(key, value, hash, entries[i]);
+			size++;
 		}
+		
+		return size;
 	}
 	
 	public static int hash(Object key)

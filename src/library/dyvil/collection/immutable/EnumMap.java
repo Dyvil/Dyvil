@@ -6,18 +6,26 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.Type;
-import dyvil.lang.literal.ClassConvertible;
-import dyvil.lang.literal.TypeConvertible;
+import dyvil.lang.literal.ArrayConvertible;
 
 import dyvil.annotation.internal;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
+import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 
-@ClassConvertible
-@TypeConvertible
+@ArrayConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements ImmutableMap<K, V>
 {
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		int len = entries.length;
+		Class<K> keyType = (Class<K>) getKeyType((Tuple2<Enum<?>, ?>[]) entries);
+		Object[] values = new Object[len];
+		int size = AbstractEnumMap.fillEntries(values, (Tuple2<Enum<?>, ?>[]) entries, len);
+		return new EnumMap<K, V>(keyType, AbstractEnumMap.getKeys(keyType), (V[]) values, size);
+	}
+	
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
 	{
 		return new Builder(type.getTheClass());
@@ -26,16 +34,6 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
 	{
 		return new Builder(type);
-	}
-	
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Type<K> type)
-	{
-		return new EnumMap(type);
-	}
-	
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Class<K> type)
-	{
-		return new EnumMap(type);
 	}
 	
 	public @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)

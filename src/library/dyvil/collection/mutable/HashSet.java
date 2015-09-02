@@ -5,6 +5,9 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Function;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
@@ -15,6 +18,8 @@ import dyvil.math.MathUtils;
 
 import static dyvil.collection.impl.AbstractHashMap.*;
 
+@NilConvertible
+@ArrayConvertible
 public class HashSet<E> implements MutableSet<E>
 {
 	private static final class HashElement<E>
@@ -41,6 +46,21 @@ public class HashSet<E> implements MutableSet<E>
 	private float			loadFactor;
 	private int				threshold;
 	protected HashElement[]	elements;
+	
+	public static <E> HashSet<E> apply()
+	{
+		return new HashSet();
+	}
+	
+	public static <E> HashSet<E> apply(E... elements)
+	{
+		HashSet<E> set = new HashSet();
+		for (E element : elements)
+		{
+			set.add(element);
+		}
+		return set;
+	}
 	
 	HashSet(int size, float loadFactor, HashElement[] elements)
 	{

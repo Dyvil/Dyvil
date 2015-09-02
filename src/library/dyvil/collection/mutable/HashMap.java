@@ -12,6 +12,7 @@ import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
@@ -23,6 +24,14 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	public static <K, V> HashMap<K, V> apply()
 	{
 		return new HashMap();
+	}
+	
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] entries)
+	{
+		int len = entries.length;
+		HashEntry[] hashEntries = new HashEntry[MathUtils.powerOfTwo(AbstractHashMap.grow(len))];
+		int size = AbstractHashMap.fillEntries(hashEntries, entries, len);
+		return new HashMap(size, DEFAULT_LOAD_FACTOR, hashEntries);
 	}
 	
 	HashMap(int size, float loadFactor, HashEntry[] entries)
@@ -381,7 +390,25 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	@Override
 	public HashMap<K, V> copy()
 	{
-		return new HashMap(this);
+		int len = MathUtils.powerOfTwo(AbstractHashMap.grow(this.size));
+		HashEntry[] newEntries = new HashEntry[len];
+		for (HashEntry<K, V> e : this.entries)
+		{
+			while (e != null)
+			{
+				int index = index(e.hash, len);
+				HashEntry<K, V> newEntry = new HashEntry<K, V>(e.key, e.value, e.hash);
+				if (newEntries[index] != null)
+				{
+					newEntry.next = newEntries[index];
+				}
+				
+				newEntries[index] = newEntry;
+				e = e.next;
+			}
+		}
+		
+		return new HashMap<K, V>(this.size, this.loadFactor, newEntries);
 	}
 	
 	@Override

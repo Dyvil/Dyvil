@@ -4,18 +4,38 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractArrayMap;
+import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<K, V>
 {
-	protected static final int DEFAULT_CAPACITY = 10;
+	protected static final int INITIAL_CAPACITY = 10;
+	
+	public static <K, V> ArrayMap<K, V> apply()
+	{
+		return new ArrayMap<K, V>(INITIAL_CAPACITY);
+	}
+	
+	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		int len = entries.length;
+		Object[] keys = new Object[len];
+		Object[] values = new Object[len];
+		int size = AbstractArrayMap.fillEntries(keys, values, entries, len);
+		return new ArrayMap<K, V>(keys, values, size, true);
+	}
 	
 	public ArrayMap()
 	{
-		super(new Object[DEFAULT_CAPACITY], new Object[DEFAULT_CAPACITY], 0, true);
+		super(new Object[INITIAL_CAPACITY], new Object[INITIAL_CAPACITY], 0, true);
 	}
 	
 	public ArrayMap(int capacity)

@@ -6,11 +6,25 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTreeMap;
+import dyvil.tuple.Tuple2;
 
+@ArrayConvertible
 public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<K, V>
 {
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		TreeMap<K, V> map = new TreeMap();
+		for (Tuple2<K, V> entry : entries)
+		{
+			map.putUnsafe(entry._1, entry._2);
+		}
+		return map;
+	}
+	
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<K, V>();

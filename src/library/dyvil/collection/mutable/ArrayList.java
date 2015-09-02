@@ -19,6 +19,8 @@ import dyvil.collection.impl.AbstractArrayList;
 @ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 {
+	protected static final int INITIAL_CAPACITY = 10;
+	
 	public static <E> ArrayList<E> apply()
 	{
 		return new ArrayList();

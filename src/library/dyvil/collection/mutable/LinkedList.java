@@ -8,9 +8,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.*;
 import dyvil.collection.immutable.ArrayList;
 
+@NilConvertible
+@ArrayConvertible
 public class LinkedList<E> implements MutableList<E>, Deque<E>
 {
 	protected static class Node<E>
@@ -30,6 +35,21 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	protected int		size;
 	protected Node<E>	first;
 	protected Node<E>	last;
+	
+	public static <E> LinkedList<E> apply()
+	{
+		return new LinkedList();
+	}
+	
+	public static <E> LinkedList<E> apply(E... elements)
+	{
+		LinkedList<E> list = new LinkedList();
+		for (E element : elements)
+		{
+			list.addLast(element);
+		}
+		return list;
+	}
 	
 	public LinkedList()
 	{

@@ -6,13 +6,34 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTreeMap;
+import dyvil.tuple.Tuple2;
 
-public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K, V>
+@NilConvertible
+@ArrayConvertible
+public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K, V>
 {
+	public static <K, V> TreeMap<K, V> apply()
+	{
+		return new TreeMap();
+	}
+	
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		TreeMap<K, V> map = new TreeMap();
+		for (Tuple2<K, V> entry : entries)
+		{
+			map.put(entry._1, entry._2);
+		}
+		return map;
+	}
+	
 	public TreeMap()
 	{
 		super();
