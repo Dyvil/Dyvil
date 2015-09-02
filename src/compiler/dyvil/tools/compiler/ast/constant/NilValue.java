@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -22,6 +24,7 @@ public final class NilValue implements IValue
 	
 	// Metadata
 	private IType	requiredType;
+	private Name	methodName;
 	private IMethod	method;
 	
 	public NilValue()
@@ -71,8 +74,15 @@ public final class NilValue implements IValue
 			return this;
 		}
 		
-		if (this.isType(type))
+		if (type.isArrayType())
 		{
+			return this;
+		}
+		
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.NIL_CONVERTIBLE_CLASS);
+		if (annotation != null)
+		{
+			this.methodName = LiteralExpression.getMethodName(annotation);
 			this.requiredType = type;
 			return this;
 		}
@@ -122,10 +132,10 @@ public final class NilValue implements IValue
 			return;
 		}
 		
-		IMethod match = IContext.resolveMethod(this.requiredType, null, Name.apply, EmptyArguments.INSTANCE);
+		IMethod match = IContext.resolveMethod(this.requiredType, null, this.methodName, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(this.position, "nil.method", this.requiredType.toString());
+			markers.add(this.position, "nil.method", this.requiredType.toString(), this.methodName);
 		}
 		else
 		{

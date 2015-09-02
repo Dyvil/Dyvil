@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
 
 /**
@@ -43,14 +44,25 @@ import dyvil.collection.mutable.ArrayList;
  * @param <E>
  *            the element type
  */
-@NilConvertible
+@NilConvertible(methodName = "fromNil")
 @ArrayConvertible
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {
 	/**
-	 * Returns an empty, mutable list. This method is primarily for use with the
-	 * {@code nil} literal in <i>Dyvil</i> and internally creates an empty
-	 * {@link dyvil.collection.mutable.ArrayList ArrayList}.
+	 * Returns an empty, immutabl list. This method is primarily for use with
+	 * the {@code nil} literal in <i>Dyvil</i> and returns an instance of
+	 * {@link EmptyList}.
+	 * 
+	 * @return an empty, immutable list
+	 */
+	public static <E> ImmutableList<E> fromNil()
+	{
+		return ImmutableList.apply();
+	}
+	
+	/**
+	 * Returns an empty, mutable list. The exact type of the returned object is
+	 * given by {@link MutableList#apply()}.
 	 * 
 	 * @return an empty, mutable list
 	 */

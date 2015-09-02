@@ -36,12 +36,7 @@ public final class LiteralExpression implements IValue
 	public LiteralExpression(IValue literal, IAnnotation annotation)
 	{
 		this(literal);
-		
-		IValue v = annotation.getArguments().getFirstValue();
-		if (v != null)
-		{
-			this.methodName = Name.get(v.stringValue());
-		}
+		this.methodName = getMethodName(annotation);
 	}
 	
 	public LiteralExpression(IValue literal, IArguments arguments)
@@ -55,6 +50,16 @@ public final class LiteralExpression implements IValue
 		this.literal = literal;
 		this.arguments = new SingleArgument(literal);
 		this.method = method;
+	}
+	
+	public static Name getMethodName(IAnnotation annotation)
+	{
+		IValue v = annotation.getArguments().getFirstValue();
+		if (v != null)
+		{
+			return Name.get(v.stringValue());
+		}
+		return Name.apply;
 	}
 	
 	@Override

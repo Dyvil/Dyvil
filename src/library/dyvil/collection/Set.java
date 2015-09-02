@@ -9,12 +9,17 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.internal;
 
-@NilConvertible
+@NilConvertible(methodName = "fromNil")
 @ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
 	@internal
 	Object VALUE = new Object();
+	
+	public static <E> ImmutableSet<E> fromNil()
+	{
+		return ImmutableSet.apply();
+	}
 	
 	public static <E> MutableSet<E> apply()
 	{

@@ -39,17 +39,27 @@ import dyvil.util.ImmutableException;
  * @param <E>
  *            the element type
  */
-@NilConvertible
+@NilConvertible(methodName = "fromNil")
 @ArrayConvertible
 public interface Collection<E> extends Queryable<E>
 {
 	/**
-	 * Returns an empty, mutable collection. This method is primarily for use
-	 * with the {@code nil} literal in <i>Dyvil</i> and is defined by
-	 * {@link MutableList#apply()}.
+	 * Returns an empty, immutable collection. This method is primarily for use
+	 * with the {@code nil} literal in <i>Dyvil</i>, and the exact type of the
+	 * returned object is given by {@link ImmutableSet#apply()}.
 	 * 
-	 * @see MutableList#apply()
-	 * @return an empty, mutable collection
+	 * @return an empty, immutable collection
+	 */
+	public static <E> ImmutableCollection<E> fromNil()
+	{
+		return ImmutableSet.apply();
+	}
+	
+	/**
+	 * Returns an empty, mutable collection. The exact type of the returned
+	 * object is given by {@link MutableList#apply()}.
+	 * 
+	 * @return an empty, mutable list
 	 */
 	public static <E> MutableCollection<E> apply()
 	{
@@ -799,7 +809,7 @@ public interface Collection<E> extends Queryable<E>
 	}
 	
 	public static <E> boolean iteratorSorted(Iterator<E> iterator, Comparator<? super E> comparator)
-	{		
+	{
 		E prev = iterator.next();
 		while (iterator.hasNext())
 		{

@@ -19,10 +19,15 @@ import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
-@NilConvertible
+@NilConvertible(methodName = "fromNil")
 @ArrayConvertible
 public interface Map<K, V> extends Iterable<Entry<K, V>>
 {
+	public static <K, V> ImmutableMap<K, V> fromNil()
+	{
+		return ImmutableMap.apply();
+	}
+	
 	public static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
