@@ -193,7 +193,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the key
 	 * @return true, if this map contains a mapping for the key
 	 */
-	public default boolean $qmark(Object key)
+	public default boolean $qmark$at(Object key)
 	{
 		return this.containsKey(key);
 	}

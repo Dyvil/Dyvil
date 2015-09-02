@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
@@ -18,7 +17,7 @@ public interface JavaCollections
 	/**
 	 * @see Collection#contains(Object)
 	 */
-	public static @infix @inline boolean $qmark(java.util.Collection collection, Object o)
+	public static @infix @inline boolean $qmark(java.util.Collection<?> collection, Object o)
 	{
 		return collection.contains(o);
 	}
@@ -26,7 +25,7 @@ public interface JavaCollections
 	/**
 	 * @see List#subscript(Object)
 	 */
-	public static @infix @inline <E> E apply(java.util.List<E> list, int index)
+	public static @infix @inline <E> E subscript(java.util.List<E> list, int index)
 	{
 		return list.get(index);
 	}
@@ -36,7 +35,7 @@ public interface JavaCollections
 	/**
 	 * @see List#subscript_$eq(int, Object)
 	 */
-	public static @infix @inline <E> void update(java.util.List<E> list, int index, E element)
+	public static @infix @inline <E> void subscript_$eq(java.util.List<E> list, int index, E element)
 	{
 		list.set(index, element);
 	}
@@ -60,7 +59,7 @@ public interface JavaCollections
 	/**
 	 * @see Collection#$minus$eq(Entry)
 	 */
-	public static @infix @inline <E> void $minus$eq(java.util.Collection<E> collection, E element)
+	public static @infix @inline void $minus$eq(java.util.Collection<?> collection, Object element)
 	{
 		collection.remove(element);
 	}
@@ -68,7 +67,7 @@ public interface JavaCollections
 	/**
 	 * @see Collection#$minus$minus$eq(Map)
 	 */
-	public static @infix @inline <E> void $minus$minus$eq(java.util.Collection<? super E> collection, java.util.Collection<? extends E> remove)
+	public static @infix @inline void $minus$minus$eq(java.util.Collection<?> collection, java.util.Collection<?> remove)
 	{
 		collection.removeAll(remove);
 	}
@@ -76,7 +75,7 @@ public interface JavaCollections
 	/**
 	 * @see Collection#$amp$eq(Collection)
 	 */
-	public static @infix @inline <E> void $amp$eq(java.util.Collection<? super E> collection, java.util.Collection<? extends E> retain)
+	public static @infix @inline void $amp$eq(java.util.Collection<?> collection, java.util.Collection<?> retain)
 	{
 		collection.retainAll(retain);
 	}
@@ -84,7 +83,7 @@ public interface JavaCollections
 	/**
 	 * @see Collection#map(Function)
 	 */
-	public static @infix <E> void map(java.util.Collection<E> collection, UnaryOperator<E> mapper)
+	public static @infix <E> void map(java.util.Collection<E> collection, Function<? super E, ? extends E> mapper)
 	{
 		int size = collection.size();
 		java.util.Collection<E> list = new java.util.ArrayList(size);
@@ -101,8 +100,7 @@ public interface JavaCollections
 	 */
 	public static @infix <E> void flatMap(java.util.Collection<E> collection, Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
-		int size = collection.size();
-		java.util.Collection<E> list = new java.util.ArrayList(size);
+		java.util.Collection<E> list = new java.util.LinkedList<>();
 		for (E element : collection)
 		{
 			for (E e : mapper.apply(element))
