@@ -1,2 +1,28 @@
-0.1.0-ALPHA
-- Alpha test release
+Dyvil v0.2.0
+ Dyvil Library v0.1.1
+- Updated the dyvil.collection.JavaCollections and dyvil.collection.JavaMaps classes
+- Added the List.removeFirst and .removeLast methods
+- Added the EmptyRange class
+- Moved Basic Operators to the Lang Header
+
+ Dyvil Compiler v0.2.0
+- Improved Windows Compatibility
+- The NilConvertible annotation can now be used with a custom method name
+- Fixed 'this' reference capture in nested lambda expressions causing JVM errors
+- Improved Lambda compilation for direct method references
+- Addressed various Lambda-related bugs
+- Added support for Type (Use) Annotations
+- Miscellaneous improvements to the Type System, including raw types
+- Improved the way Symbol / Dot Identifiers work
+- Fixed Header Files being generated for all compilation units
+- Updated the abstract / override method resolution system
+- Fixed invalid bridge methods being generated in interfaces
+- Anonymous Classes can now directly extend interfaces
+- Miscellaneous improvements, bugfixes and changes
+
+ Dyvil REPL v0.1.1
+- The REPL now supports multi-line input
+- Fixed commands being handled incorrectly
+
+Dyvil v0.1.0-ALPHA
+- Alpha Test Release
