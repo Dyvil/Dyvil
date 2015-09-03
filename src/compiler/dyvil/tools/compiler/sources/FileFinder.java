@@ -51,11 +51,6 @@ public class FileFinder
 			return;
 		}
 		
-		if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
-		{
-			return;
-		}
-		
 		this.files.add(output);
 		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		

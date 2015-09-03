@@ -98,7 +98,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		
 		String outputDir = DyvilCompiler.config.getOutputDir().getAbsolutePath();
 		int len = outputDir.length();
-		if (!outputDir.endsWith("/"))
+		if (outputDir.charAt(len - 1) != File.separatorChar)
 		{
 			len++;
 		}

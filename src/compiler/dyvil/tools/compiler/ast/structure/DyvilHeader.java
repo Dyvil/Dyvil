@@ -87,12 +87,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.inputFile = input;
 		
 		String name = input.getAbsolutePath();
-		int start = name.lastIndexOf('/');
+		int start = name.lastIndexOf(File.separatorChar);
 		int end = name.lastIndexOf('.');
 		this.name = Name.get(name.substring(start + 1, end));
 		
 		name = output.getPath();
-		start = name.lastIndexOf('/');
+		start = name.lastIndexOf(File.separatorChar);
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + FileType.OBJECT_EXTENSION);
