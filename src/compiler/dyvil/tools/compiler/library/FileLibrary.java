@@ -47,7 +47,8 @@ public final class FileLibrary extends Library
 	@Override
 	public InputStream getInputStream(String fileName)
 	{
-		File file = new File(this.file, fileName);
+		String path = fileName.replace('/', File.separatorChar);
+		File file = new File(this.file, path);
 		if (!file.exists())
 		{
 			return null;
@@ -55,7 +56,7 @@ public final class FileLibrary extends Library
 		
 		try
 		{
-			if (file.getCanonicalPath().endsWith(fileName))
+			if (file.getCanonicalPath().endsWith(path))
 			{
 				return new FileInputStream(file);
 			}

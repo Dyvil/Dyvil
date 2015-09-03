@@ -26,7 +26,7 @@ public abstract class Library
 	{
 		String classLocation = '/' + klass.getName().replace('.', '/') + ".class";
 		URL url = klass.getResource(classLocation);
-		String path = url.toString();
+		String path = url.toString().replace(File.separatorChar, '/');
 		int index = path.lastIndexOf(classLocation);
 		
 		if (index < 0)

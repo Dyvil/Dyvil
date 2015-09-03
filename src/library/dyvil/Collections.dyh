@@ -10,7 +10,10 @@ infix operator ++= { right, 120 }
 infix operator --= { right, 120 }
 
 //Map Operators
+infix operator ?@ { none, 120 }
 infix operator ?: { none, 120 }
+infix operator -@ { none, 120 }
+infix operator -@= { right, 120 }
 infix operator -: { none, 120 }
 infix operator -:= { right, 120 }
 
