@@ -704,6 +704,12 @@ public class Complex implements Number
 	}
 	
 	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Double.compare(this.real, o.doubleValue());
+	}
+	
+	@Override
 	public java.lang.String toString()
 	{
 		return new StringBuilder(20).append(this.real).append('+').append(this.imag).append('i').toString();

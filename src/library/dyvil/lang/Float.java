@@ -724,6 +724,12 @@ public class Float implements Number
 		return Float.apply(this.value % v.floatValue());
 	}
 	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Double.compare(this.value, o.doubleValue());
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(float value)

@@ -1034,6 +1034,12 @@ public class Long implements Integer
 		return Long.apply(this.value >>> v.longValue());
 	}
 	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Long.compare(this.value, o.longValue());
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(long value)

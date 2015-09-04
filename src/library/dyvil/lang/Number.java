@@ -264,6 +264,9 @@ public interface Number extends Ordered<Number>
 	}
 	
 	@Override
+	public int compareTo(Number o);
+	
+	@Override
 	public default int distanceTo(Number o)
 	{
 		return o.intValue() - this.intValue();

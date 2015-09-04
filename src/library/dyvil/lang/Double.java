@@ -724,6 +724,12 @@ public class Double implements Number
 		return Double.apply(this.value % v.doubleValue());
 	}
 	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Double.compare(this.value, o.doubleValue());
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(double value)
