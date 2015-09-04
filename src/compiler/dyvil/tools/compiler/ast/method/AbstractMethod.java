@@ -674,7 +674,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(position, "method.access.instance", this.name.unqualified);
 				}
 			}
-			else if (this.intrinsicOpcodes == null && instance.isPrimitive())
+			else
 			{
 				instance = this.theClass.getType().convertValue(instance, typeContext, markers, context);
 			}

@@ -158,6 +158,11 @@ public class Field extends Member implements IField
 					markers.add(position, "field.access.instance", this.name.unqualified);
 				}
 			}
+			else
+			{
+				IType type = this.theClass.getType();
+				instance = type.convertValue(instance, type, markers, context);
+			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{

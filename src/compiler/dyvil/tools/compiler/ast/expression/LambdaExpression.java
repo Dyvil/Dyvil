@@ -471,6 +471,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 					
 					this.name = method.getName().qualified;
 					this.owner = method.getTheClass().getInternalName();
+					this.lambdaDesc = method.getDescriptor();
 					return this;
 				}
 			}
@@ -484,6 +485,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 					this.directInvokeOpcode = ClassFormat.H_NEWINVOKESPECIAL;
 					this.name = "<init>";
 					this.owner = ctor.getTheClass().getInternalName();
+					this.lambdaDesc = ctor.getDescriptor();
 					
 					return this;
 				}

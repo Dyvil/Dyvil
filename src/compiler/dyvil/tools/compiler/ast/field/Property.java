@@ -212,6 +212,11 @@ public class Property extends Member implements IProperty, IContext
 					markers.add(position, "property.access.instance", this.name.unqualified);
 				}
 			}
+			else
+			{
+				IType type = this.theClass.getType();
+				instance = type.convertValue(instance, type, markers, context);
+			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
