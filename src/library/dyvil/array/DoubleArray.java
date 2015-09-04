@@ -60,6 +60,17 @@ public interface DoubleArray
 		return array;
 	}
 	
+	public static double[] rangeOpen(double start, double end)
+	{
+		int i = 0;
+		double[] array = new double[(int) (end - start)];
+		for (; start < end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

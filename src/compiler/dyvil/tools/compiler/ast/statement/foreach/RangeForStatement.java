@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -17,18 +18,24 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class RangeForStatement extends ForEachStatement
 {
-	public IValue	value1;
-	public IValue	value2;
+	private static final int	INT		= 0, LONG = 1, FLOAT = 2, DOUBLE = 3;
+	private static final int	ORDERED	= 4;
+	private static final int	STRING	= 5;
+	
+	protected IValue	value1;
+	protected IValue	value2;
+	protected boolean	halfOpen;
 	
 	private Variable	startVar;
 	private Variable	endVar;
 	
-	public RangeForStatement(ICodePosition position, Variable var, IValue value1, IValue value2, IValue action)
+	public RangeForStatement(ICodePosition position, Variable var, IValue value1, IValue value2, boolean halfOpen, IValue action)
 	{
 		super(position, var, action);
 		
 		this.value1 = value1;
 		this.value2 = value2;
+		this.halfOpen = halfOpen;
 		
 		IType varType = var.getType();
 		
@@ -72,7 +79,7 @@ public class RangeForStatement extends ForEachStatement
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		// Determine the 'type' of the range to fasten up compilation.
-		byte type = 5;
+		byte type = ORDERED;
 		IType rangeType = this.variable.getType();
 		if (rangeType.isPrimitive())
 		{
@@ -82,22 +89,22 @@ public class RangeForStatement extends ForEachStatement
 			case ClassFormat.T_SHORT:
 			case ClassFormat.T_CHAR:
 			case ClassFormat.T_INT:
-				type = 0;
+				type = INT;
 				break;
 			case ClassFormat.T_LONG:
-				type = 1;
+				type = LONG;
 				break;
 			case ClassFormat.T_FLOAT:
-				type = 2;
+				type = FLOAT;
 				break;
 			case ClassFormat.T_DOUBLE:
-				type = 3;
+				type = DOUBLE;
 				break;
 			}
 		}
 		else if (rangeType.getTheClass() == Types.STRING_CLASS)
 		{
-			type = 4;
+			type = STRING;
 		}
 		
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
@@ -121,8 +128,47 @@ public class RangeForStatement extends ForEachStatement
 		this.value2.writeExpression(writer);
 		endVar.writeInit(writer, null);
 		
-		// Jump to boundary check
 		writer.writeTargetLabel(startLabel);
+		
+		int varIndex = var.getIndex();
+		int endIndex = endVar.getIndex();
+		
+		// Check the condition
+		switch (type)
+		{
+		case INT:
+			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
+			writer.writeVarInsn(Opcodes.ILOAD, endIndex);
+			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_ICMPGE : Opcodes.IF_ICMPGT, endLabel);
+			break;
+		case LONG:
+			writer.writeVarInsn(Opcodes.LLOAD, varIndex);
+			writer.writeVarInsn(Opcodes.LLOAD, endIndex);
+			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_LCMPGE : Opcodes.IF_LCMPGT, endLabel);
+			break;
+		case FLOAT:
+			writer.writeVarInsn(Opcodes.FLOAD, varIndex);
+			writer.writeVarInsn(Opcodes.FLOAD, endIndex);
+			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_FCMPGE : Opcodes.IF_FCMPGT, endLabel);
+			break;
+		case DOUBLE:
+			writer.writeVarInsn(Opcodes.DLOAD, varIndex);
+			writer.writeVarInsn(Opcodes.DLOAD, endIndex);
+			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
+			break;
+		case ORDERED:
+			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Ordered", "compareTo", "(Ldyvil/lang/Ordered;)I", true);
+			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
+			break;
+		case STRING:
+			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/string/StringUtils", "compareAlpha", "(Ljava/lang/String;Ljava/lang/String;)I", false);
+			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
+			break;
+		}
 		
 		// Action
 		if (this.action != null)
@@ -130,69 +176,50 @@ public class RangeForStatement extends ForEachStatement
 			this.action.writeStatement(writer);
 		}
 		
-		// Increment / Next and Boundary Check
-		
-		int varIndex = var.getIndex();
-		int endIndex = endVar.getIndex();
-		
+		// Increment
 		writer.writeLabel(updateLabel);
 		switch (type)
 		{
-		case 0: // Integers
+		case INT:
 			writer.writeIINC(varIndex, 1);
-			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
-			writer.writeVarInsn(Opcodes.ILOAD, endIndex);
-			writer.writeJumpInsn(Opcodes.IF_ICMPLE, startLabel);
 			break;
-		case 1: // Long
+		case LONG:
 			writer.writeVarInsn(Opcodes.LLOAD, varIndex);
-			writer.writeLDC(1L);
+			writer.writeInsn(Opcodes.LCONST_1);
 			writer.writeInsn(Opcodes.LADD);
-			writer.writeInsn(Opcodes.DUP2);
 			writer.writeVarInsn(Opcodes.LSTORE, varIndex);
-			writer.writeVarInsn(Opcodes.LLOAD, endIndex);
-			writer.writeJumpInsn(Opcodes.IF_LCMPLE, startLabel);
 			break;
-		case 2: // Float
+		case FLOAT:
 			writer.writeVarInsn(Opcodes.FLOAD, varIndex);
 			writer.writeLDC(1F);
-			writer.writeInsn(Opcodes.FADD);
-			writer.writeInsn(Opcodes.DUP);
+			writer.writeInsn(Opcodes.FCONST_1);
 			writer.writeVarInsn(Opcodes.FSTORE, varIndex);
-			writer.writeVarInsn(Opcodes.FLOAD, endIndex);
-			writer.writeJumpInsn(Opcodes.IF_FCMPLE, startLabel);
 			break;
-		case 3: // Double
+		case DOUBLE:
 			writer.writeVarInsn(Opcodes.DLOAD, varIndex);
-			writer.writeLDC(1D);
+			writer.writeInsn(Opcodes.DCONST_1);
 			writer.writeInsn(Opcodes.DADD);
-			writer.writeInsn(Opcodes.DUP2);
 			writer.writeVarInsn(Opcodes.DSTORE, varIndex);
-			writer.writeVarInsn(Opcodes.DLOAD, endIndex);
-			writer.writeJumpInsn(Opcodes.IF_DCMPLE, startLabel);
 			break;
-		case 4: // String
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "compareTo", "(Ljava/lang/String;)I", false);
-			writer.writeJumpInsn(Opcodes.IFGE, endLabel);
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/StringRange", "next", "(Ljava/lang/String;)Ljava/lang/String;", false);
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
-			break;
-		case 5: // Ordered
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Ordered", "$gt$eq", "(Ldyvil/lang/Ordered;)Z", true);
-			writer.writeJumpInsn(Opcodes.IFNE, endLabel);
+		case ORDERED:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Ordered", "next", "()Ldyvil/lang/Ordered;", true);
-			writer.writeTypeInsn(Opcodes.CHECKCAST, rangeType.getInternalName());
+			
+			if (rangeType.getTheClass() != RangeOperator.LazyFields.ORDERED_CLASS)
+			{
+				RangeOperator.LazyFields.ORDERED.writeCast(writer, rangeType, this.getLineNumber());
+			}
+			
 			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
+			break;
+		case STRING:
+			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/string/StringUtils", "nextAlpha", "(Ljava/lang/String;)Ljava/lang/String;", false);
+			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
 			break;
 		}
+		
+		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 		
 		// Local Variables
 		writer.resetLocals(locals);

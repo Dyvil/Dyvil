@@ -71,7 +71,8 @@ public final class Name
 	public static final Name	minusgt	= new Name("->", "$minus$gt");
 	public static final Name	ltminus	= new Name("<-", "$lt$minus");
 	
-	public static final Name dotdot = new Name("..", "$dot$dot");
+	public static final Name	dotdot		= new Name("..", "$dot$dot");
+	public static final Name	dotdotlt	= new Name("..<", "$dot$dot$lt");
 	
 	public static final Name pluseq = new Name("+=", "$plus$eq");
 	

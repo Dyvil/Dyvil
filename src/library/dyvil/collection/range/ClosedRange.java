@@ -10,17 +10,17 @@ import dyvil.lang.literal.TupleConvertible;
 import dyvil.collection.Range;
 
 @TupleConvertible
-public class SimpleRange<T extends Ordered<T>> implements Range<T>
+public class ClosedRange<T extends Ordered<T>> implements Range<T>
 {
 	protected final T	first;
 	protected final T	last;
 	
-	public static <T extends Ordered<T>> SimpleRange<T> apply(T first, T last)
+	public static <T extends Ordered<T>> ClosedRange<T> apply(T first, T last)
 	{
-		return new SimpleRange(first, last);
+		return new ClosedRange(first, last);
 	}
 	
-	public SimpleRange(T first, T last)
+	public ClosedRange(T first, T last)
 	{
 		this.first = first;
 		this.last = last;
@@ -56,16 +56,22 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
+	public boolean isHalfOpen()
+	{
+		return false;
+	}
+	
+	@Override
 	public Iterator<T> iterator()
 	{
 		return new Iterator<T>()
 		{
-			private T current = SimpleRange.this.first;
+			private T current = ClosedRange.this.first;
 			
 			@Override
 			public T next()
 			{
-				if (this.current.$gt(SimpleRange.this.last))
+				if (this.current.$gt(ClosedRange.this.last))
 				{
 					throw new NoSuchElementException("End of Range");
 				}
@@ -78,13 +84,13 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 			@Override
 			public boolean hasNext()
 			{
-				return this.current.$lt$eq(SimpleRange.this.last);
+				return this.current.$lt$eq(ClosedRange.this.last);
 			}
 			
 			@Override
 			public String toString()
 			{
-				return "RangeIterator(" + SimpleRange.this + ")";
+				return "RangeIterator(" + ClosedRange.this + ")";
 			}
 		};
 	}
@@ -123,7 +129,7 @@ public class SimpleRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public Range<T> copy()
 	{
-		return new SimpleRange(this.first, this.last);
+		return new ClosedRange(this.first, this.last);
 	}
 	
 	@Override

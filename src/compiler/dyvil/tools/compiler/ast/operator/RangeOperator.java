@@ -24,18 +24,21 @@ public class RangeOperator implements IValue
 {
 	public static final class LazyFields
 	{
-		static final IClass			RANGE_CLASS		= Package.dyvilCollection.resolveClass("Range");
-		static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
-		static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-		static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
-		static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
+		public static final IClass			RANGE_CLASS		= Package.dyvilCollection.resolveClass("Range");
+		public static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
+		public static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
+		public static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
+		public static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
 	}
 	
-	public ICodePosition	position;
+	protected ICodePosition	position;
 	protected IValue		firstValue;
 	protected IValue		lastValue;
-	private IType			elementType	= Types.UNKNOWN;
-	private IType			type;
+	
+	// Metadata
+	private boolean	halfOpen;
+	private IType	elementType	= Types.UNKNOWN;
+	private IType	type;
 	
 	public RangeOperator(IValue value1, IValue value2)
 	{
@@ -48,6 +51,16 @@ public class RangeOperator implements IValue
 		this.firstValue = value1;
 		this.lastValue = value2;
 		this.elementType = type;
+	}
+	
+	public void setHalfOpen(boolean halfOpen)
+	{
+		this.halfOpen = halfOpen;
+	}
+	
+	public boolean isHalfOpen()
+	{
+		return this.halfOpen;
 	}
 	
 	@Override
@@ -146,6 +159,7 @@ public class RangeOperator implements IValue
 			return null;
 		}
 		
+		this.type = type;
 		this.elementType = elementType;
 		
 		IValue value1 = this.firstValue.withType(elementType, elementType, markers, context);
@@ -247,67 +261,70 @@ public class RangeOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.type.isArrayType())
+		this.firstValue.writeExpression(writer);
+		this.lastValue.writeExpression(writer);
+		
+		// -- Range --
+		if (!this.type.isArrayType())
 		{
-			this.firstValue.writeExpression(writer);
-			this.lastValue.writeExpression(writer);
+			String method = this.halfOpen ? "halfOpen" : "apply";
 			
-			if (this.elementType.isPrimitive())
-			{
-				switch (this.elementType.getTypecode())
-				{
-				case ClassFormat.T_BYTE:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "range", "(BB)[B", false);
-					return;
-				case ClassFormat.T_SHORT:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "range", "(SS)[S", false);
-					return;
-				case ClassFormat.T_CHAR:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "range", "(CC)[C", false);
-					return;
-				case ClassFormat.T_INT:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "range", "(II)[I", false);
-					return;
-				case ClassFormat.T_LONG:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "range", "(LL)[L", false);
-					return;
-				case ClassFormat.T_FLOAT:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "range", "(FF)[F", false);
-					return;
-				case ClassFormat.T_DOUBLE:
-					writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "range", "(DD)[D", false);
-					return;
-				}
-				
-				return;
-			}
 			if (this.elementType.getTheClass() == Types.STRING_CLASS)
 			{
-				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "range", "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;",
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method, "(Ljava/lang/String;Ljava/lang/String;)Ldyvil/collection/Range;",
 						false);
 				return;
 			}
 			
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "range", "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)[Ldyvil/lang/Ordered;",
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method, "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)Ldyvil/collection/Range;",
 					false);
 			return;
 		}
 		
-		if (this.elementType.getTheClass() == Types.STRING_CLASS)
+		// -- Array --
+		String method = this.halfOpen ? "rangeOpen" : "range";
+		
+		// Reference array
+		if (!this.elementType.isPrimitive())
 		{
-			writer.writeTypeInsn(Opcodes.NEW, "dyvil/collection/range/StringRange");
-			writer.writeInsn(Opcodes.DUP);
-			this.firstValue.writeExpression(writer);
-			this.lastValue.writeExpression(writer);
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/collection/range/StringRange", "<init>", "(Ljava/lang/String;Ljava/lang/String;)V", false);
-			return;
+			if (this.elementType.getTheClass() == Types.STRING_CLASS)
+			{
+				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;",
+						false);
+				return;
+			}
+			
+			// TODO Proper return type, this is currently [Ordered] instead of
+			// [T]
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)[Ldyvil/lang/Ordered;",
+					false);
 		}
 		
-		writer.writeTypeInsn(Opcodes.NEW, "dyvil/collection/range/SimpleRange");
-		writer.writeInsn(Opcodes.DUP);
-		this.firstValue.writeExpression(writer);
-		this.lastValue.writeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/collection/range/SimpleRange", "<init>", "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)V", false);
+		// Primitive array
+		switch (this.elementType.getTypecode())
+		{
+		case ClassFormat.T_BYTE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
+			return;
+		case ClassFormat.T_SHORT:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", method, "(SS)[S", false);
+			return;
+		case ClassFormat.T_CHAR:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", method, "(CC)[C", false);
+			return;
+		case ClassFormat.T_INT:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", method, "(II)[I", false);
+			return;
+		case ClassFormat.T_LONG:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", method, "(LL)[L", false);
+			return;
+		case ClassFormat.T_FLOAT:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", method, "(FF)[F", false);
+			return;
+		case ClassFormat.T_DOUBLE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
+			return;
+		}
 	}
 	
 	@Override
@@ -321,7 +338,7 @@ public class RangeOperator implements IValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.firstValue.toString(prefix, buffer);
-		buffer.append(" .. ");
+		buffer.append(this.halfOpen ? " ..< " : " .. ");
 		this.lastValue.toString(prefix, buffer);
 	}
 }

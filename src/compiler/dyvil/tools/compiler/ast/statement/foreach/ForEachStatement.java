@@ -201,7 +201,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				marker.addInfo("Variable Type: " + varType);
 			}
 			
-			return new RangeForStatement(this.position, this.variable, value1, value2, this.resolveAction(markers, context));
+			return new RangeForStatement(this.position, this.variable, value1, value2, ro.isHalfOpen(), this.resolveAction(markers, context));
 		}
 		
 		IType valueType = value.getType();

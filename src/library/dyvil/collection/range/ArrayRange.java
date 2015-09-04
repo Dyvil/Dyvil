@@ -87,6 +87,12 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	}
 	
 	@Override
+	public boolean isHalfOpen()
+	{
+		return false;
+	}
+	
+	@Override
 	public Iterator<T> iterator()
 	{
 		return new ArrayIterator<T>((T[]) this.array, this.count);

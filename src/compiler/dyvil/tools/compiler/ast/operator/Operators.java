@@ -96,17 +96,21 @@ public interface Operators
 			FieldAccess fa = (FieldAccess) arg1;
 			return new FieldAssign(null, fa.getInstance(), fa.getField(), arg2);
 		}
-		if (name == dotdot)
+		boolean openRange = false;
+		if (name == dotdot || (openRange = name == dotdotlt))
 		{
+			RangeOperator rangeOperator = null;
 			if (arg1.isType(RangeOperator.LazyFields.ORDERED) && arg2.isType(RangeOperator.LazyFields.ORDERED))
 			{
-				return new RangeOperator(arg1, arg2);
+				rangeOperator = new RangeOperator(arg1, arg2);
+				rangeOperator.setHalfOpen(openRange);
 			}
 			if (arg1.isType(Types.STRING) && arg2.isType(Types.STRING))
 			{
-				return new RangeOperator(arg1, arg2, Types.STRING);
+				rangeOperator = new RangeOperator(arg1, arg2, Types.STRING);
+				rangeOperator.setHalfOpen(openRange);
 			}
-			return null;
+			return rangeOperator;
 		}
 		// Swap Operator
 		if (name == coloneqcolon)

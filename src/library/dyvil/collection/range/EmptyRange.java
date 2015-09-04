@@ -42,6 +42,12 @@ public @object class EmptyRange<T> implements Range<T>
 	}
 	
 	@Override
+	public boolean isHalfOpen()
+	{
+		return false;
+	}
+	
+	@Override
 	public Iterator<T> iterator()
 	{
 		return EmptyIterator.instance;

@@ -23,7 +23,7 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.range.StringRange;
+import dyvil.string.StringUtils;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -72,11 +72,33 @@ public interface ObjectArray
 		return (T[]) array;
 	}
 	
+	public static <T extends Ordered<T>> T[] rangeOpen(T start, T end)
+	{
+		int i = 0;
+		Ordered[] array = new Ordered[start.distanceTo(end)];
+		for (T current = start; current.$lt(end); current = current.next())
+		{
+			array[i++] = current;
+		}
+		return (T[]) array;
+	}
+	
 	public static String[] range(String start, String end)
 	{
 		int i = 0;
-		String[] array = new String[StringRange.distance(start, end) + 1];
-		for (String current = start; current.compareTo(end) <= 0; current = StringRange.next(current))
+		String[] array = new String[StringUtils.alphaDistance(start, end) + 1];
+		for (String current = start; StringUtils.compareAlpha(current, end) <= 0; current = StringUtils.nextAlpha(current))
+		{
+			array[i++] = current;
+		}
+		return array;
+	}
+	
+	public static String[] rangeOpen(String start, String end)
+	{
+		int i = 0;
+		String[] array = new String[StringUtils.alphaDistance(start, end)];
+		for (String current = start; StringUtils.compareAlpha(current, end) < 0; current = StringUtils.nextAlpha(current))
 		{
 			array[i++] = current;
 		}
