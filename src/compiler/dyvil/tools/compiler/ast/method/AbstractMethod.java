@@ -651,10 +651,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				this.checkTypeVarsInferred(markers, position, typeContext);
 				return instance;
 			}
-		}
-		
-		if (instance != null)
-		{
+			
 			if ((this.modifiers & Modifiers.STATIC) != 0)
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
@@ -674,7 +671,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(position, "method.access.instance", this.name.unqualified);
 				}
 			}
-			else
+			else if (this.intrinsicOpcodes == null || !instance.isPrimitive())
 			{
 				instance = this.theClass.getType().convertValue(instance, typeContext, markers, context);
 			}

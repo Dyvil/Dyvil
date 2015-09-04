@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 import dyvil.lang.literal.ArrayConvertible;
@@ -51,6 +52,26 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public static <E> ImmutableList<E> apply(E... elements)
 	{
 		return new ArrayList(elements, true);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, E repeatedValue)
+	{
+		Object[] elements = new Object[count];
+		for (int i = 0; i < count; i++)
+		{
+			elements[i] = repeatedValue;
+		}
+		return new ArrayList(elements, count, true);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, IntFunction<E> generator)
+	{
+		Object[] elements = new Object[count];
+		for (int i = 0; i < count; i++)
+		{
+			elements[i] = generator.apply(i);
+		}
+		return new ArrayList(elements, count, true);
 	}
 	
 	public static <E> ImmutableList<E> fromArray(E... elements)

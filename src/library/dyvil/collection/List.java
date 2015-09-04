@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 import dyvil.lang.literal.ArrayConvertible;
@@ -95,6 +96,16 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	public static <E> ImmutableList<E> fromArray(E... elements)
 	{
 		return ImmutableList.fromArray(elements);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, E repeatedValue)
+	{
+		return ImmutableList.apply(count, repeatedValue);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, IntFunction<E> generator)
+	{
+		return ImmutableList.apply(count, generator);
 	}
 	
 	// Simple getters

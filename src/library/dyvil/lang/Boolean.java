@@ -10,7 +10,7 @@ import dyvil.annotation.prefix;
 import static dyvil.reflect.Opcodes.*;
 
 @BooleanConvertible
-public class Boolean
+public class Boolean implements Comparable<Boolean>
 {
 	protected static final Boolean	TRUE	= new Boolean(true);
 	protected static final Boolean	FALSE	= new Boolean(false);
@@ -84,6 +84,17 @@ public class Boolean
 	public Boolean $lt$eq$gt(boolean v)
 	{
 		return apply(v == this.value);
+	}
+	
+	public static @infix int compareTo(boolean b1, boolean b2)
+	{
+		return b1 == b2 ? 0 : b1 ? 1 : -1;
+	}
+	
+	@Override
+	public int compareTo(Boolean o)
+	{
+		return compareTo(this.value, o.value);
 	}
 	
 	// Object methods

@@ -336,6 +336,10 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (type.getTheClass() == Types.OBJECT_CLASS)
+		{
+			return 2;
+		}
 		return this.isType(type) ? 1 : 0;
 	}
 	
