@@ -60,6 +60,17 @@ public interface FloatArray
 		return array;
 	}
 	
+	public static float[] range(float start, float end)
+	{
+		int i = 0;
+		float[] array = new float[(int) (end - start + 1)];
+		for (; start <= end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

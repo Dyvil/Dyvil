@@ -106,12 +106,14 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
+		
+		// Initial Boundary Check - if the length is 0, skip the loop
+		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
+		
 		// Set index to 0
 		writer.writeLDC(0);
 		indexVar.writeInit(writer, null);
 		
-		// Initial Boundary Check - if the length is 0, skip the loop
-		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
 		writer.writeTargetLabel(startLabel);
 		
 		// Load the element
@@ -134,7 +136,7 @@ public class ArrayForStatement extends ForEachStatement
 		}
 		
 		writer.writeLabel(updateLabel);
-		// Increase index
+		// Increment index
 		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
 		indexVar.writeGet(writer, null, lineNumber);

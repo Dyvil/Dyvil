@@ -67,7 +67,7 @@ public interface ObjectArray
 		Ordered[] array = new Ordered[start.distanceTo(end) + 1];
 		for (T current = start; current.$lt$eq(end); current = current.next())
 		{
-			array[i++] = start;
+			array[i++] = current;
 		}
 		return (T[]) array;
 	}

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -269,7 +270,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	
 	private IValue resolveAction(MarkerList markers, IContext context)
 	{
-		return this.action == null ? this.action.resolve(markers, new CombiningContext(this, context)) : null;
+		return this.action != null ? this.action.resolve(markers, new CombiningContext(this, context)) : null;
 	}
 	
 	@Override
@@ -331,6 +332,12 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		throw new BytecodeException("Cannot compile invalid ForEach statement");
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override
