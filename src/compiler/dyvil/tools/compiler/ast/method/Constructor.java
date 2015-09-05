@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -601,24 +602,68 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
+	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
+	{
+		int typeVarCount = this.theClass.genericCount();
+		ClassGenericType gt = new ClassGenericType(this.theClass, new IType[typeVarCount], typeVarCount)
+		{
+			@Override
+			public void addMapping(ITypeVariable typeVar, IType type)
+			{
+				int index = typeVar.getIndex();
+				this.typeArguments[index] = type;
+			}
+		};
+		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int index = this.parameterCount - 1;
+			for (int i = 0; i < index; i++)
+			{
+				arguments.inferType(i, this.parameters[i], gt);
+			}
+			arguments.inferVarargsType(index, this.parameters[index], gt);
+		}
+		else
+		{
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				arguments.inferType(i, this.parameters[i], gt);
+			}
+		}
+		
+		for (int i = 0; i < typeVarCount; i++)
+		{
+			if (gt.getType(i) == null)
+			{
+				gt.setType(i, Types.ANY);
+				
+				markers.add(position, "constructor.typevar.infer", this.theClass.getTypeVariable(i).getName(), this.theClass.getName());
+			}
+		}
+		
+		return gt;
+	}
+	
+	@Override
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
 		int len = arguments.size();
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], this.type, markers, context);
+			arguments.checkVarargsValue(len, this.parameters[len], type, markers, context);
 			
 			for (int i = 0; i < len; i++)
 			{
-				arguments.checkValue(i, this.parameters[i], this.type, markers, context);
+				arguments.checkValue(i, this.parameters[i], type, markers, context);
 			}
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], this.type, markers, context);
+			arguments.checkValue(i, this.parameters[i], type, markers, context);
 		}
 	}
 	

@@ -149,6 +149,12 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public final IType getObjectType()
 	{
 		return new ClassType(this.theClass);

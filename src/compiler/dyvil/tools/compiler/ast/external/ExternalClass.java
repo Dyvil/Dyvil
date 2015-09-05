@@ -517,6 +517,10 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
 		
 		this.body.getConstructorMatches(list, arguments);
 	}
@@ -694,7 +698,19 @@ public final class ExternalClass extends AbstractClass
 			ExternalConstructor constructor = new ExternalConstructor(this);
 			constructor.setModifiers(access);
 			
-			ClassFormat.readConstructorType(desc, constructor);
+			if (signature != null)
+			{
+				ClassFormat.readConstructorType(signature, constructor);
+			}
+			else
+			{
+				ClassFormat.readConstructorType(desc, constructor);
+				
+				if (exceptions != null)
+				{
+					ClassFormat.readExceptions(exceptions, constructor);
+				}
+			}
 			
 			if ((access & Modifiers.VARARGS) != 0)
 			{
@@ -719,10 +735,7 @@ public final class ExternalClass extends AbstractClass
 			
 			if (exceptions != null)
 			{
-				for (String s : exceptions)
-				{
-					method.addException(ClassFormat.internalToType(s));
-				}
+				ClassFormat.readExceptions(exceptions, method);
 			}
 		}
 		

@@ -58,6 +58,12 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return this.type.isGenericType();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;

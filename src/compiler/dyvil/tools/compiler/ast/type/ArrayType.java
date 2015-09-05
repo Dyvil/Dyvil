@@ -64,6 +64,12 @@ public class ArrayType implements IObjectType, ITyped
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public void setType(IType type)
 	{
 		this.type = type;

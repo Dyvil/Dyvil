@@ -28,6 +28,11 @@ public abstract class GenericType implements IObjectType, ITypeList
 		this.typeArguments = new IType[2];
 	}
 	
+	public GenericType(int typeArgumentCount)
+	{
+		this.typeArguments = new IType[typeArgumentCount];
+	}
+	
 	public GenericType(IType[] typeArguments, int typeArgumentCount)
 	{
 		this.typeArguments = typeArguments;
@@ -38,6 +43,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 	public int typeCount()
 	{
 		return this.typeArgumentCount;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return true;
 	}
 	
 	@Override

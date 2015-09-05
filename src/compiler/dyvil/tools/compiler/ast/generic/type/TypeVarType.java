@@ -49,6 +49,12 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.typeVar.getTheClass();

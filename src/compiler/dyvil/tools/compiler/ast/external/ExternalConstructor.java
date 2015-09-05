@@ -57,7 +57,7 @@ public final class ExternalConstructor extends Constructor implements IExternalM
 		this.parametersResolved = true;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(null, Package.rootPackage);
+			this.parameters[i].resolveTypes(null, this.theClass);
 		}
 	}
 	
@@ -151,7 +151,7 @@ public final class ExternalConstructor extends Constructor implements IExternalM
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
 		if (!this.returnTypeResolved)
 		{
@@ -161,7 +161,7 @@ public final class ExternalConstructor extends Constructor implements IExternalM
 		{
 			this.resolveParameters();
 		}
-		super.checkArguments(markers, position, context, arguments);
+		super.checkArguments(markers, position, context, type, arguments);
 	}
 	
 	@Override

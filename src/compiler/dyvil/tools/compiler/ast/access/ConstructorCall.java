@@ -205,7 +205,15 @@ public class ConstructorCall implements ICall
 		if (this.constructor == null)
 		{
 			this.reportResolve(markers);
+			return this;
 		}
+		
+		if (this.constructor.getTheClass().isGeneric() && !this.type.isGenericType())
+		{
+			this.type = this.constructor.checkGenericType(markers, position, context, type, arguments);
+		}
+		
+		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
 		return this;
 	}
 	
@@ -229,11 +237,6 @@ public class ConstructorCall implements ICall
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
-		
-		if (this.constructor != null)
-		{
-			this.constructor.checkArguments(markers, this.position, context, this.arguments);
-		}
 		this.arguments.checkTypes(markers, context);
 	}
 	

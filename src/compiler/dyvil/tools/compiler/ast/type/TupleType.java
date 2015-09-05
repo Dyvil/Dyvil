@@ -113,6 +113,12 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return true;
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return getTupleClass(this.typeCount);

@@ -199,6 +199,14 @@ public final class ClassFormat
 		}
 	}
 	
+	public static void readExceptions(String[] exceptions, IExceptionList exceptionList)
+	{
+		for (String s : exceptions)
+		{
+			exceptionList.addException(internalToType(s));
+		}
+	}
+	
 	private static IType readType(String desc, int start, int end)
 	{
 		if (desc.charAt(start) == '[')

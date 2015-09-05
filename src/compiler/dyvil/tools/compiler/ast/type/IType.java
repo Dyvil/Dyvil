@@ -116,10 +116,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return -1;
 	}
 	
-	public default boolean isGenericType()
-	{
-		return false;
-	}
+	public boolean isGenericType();
 	
 	public Name getName();
 	

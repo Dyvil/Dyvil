@@ -77,6 +77,12 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public Name getName()
 	{
 		return null;

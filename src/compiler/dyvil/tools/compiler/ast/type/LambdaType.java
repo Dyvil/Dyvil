@@ -87,6 +87,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return true;
+	}
+	
+	@Override
 	public Name getName()
 	{
 		return this.getTheClass().getName();

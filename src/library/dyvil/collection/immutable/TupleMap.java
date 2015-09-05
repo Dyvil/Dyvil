@@ -30,7 +30,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 		return new Builder();
 	}
 	
-	public TupleMap(Tuple2<K, V>[] entries)
+	public TupleMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
 	}

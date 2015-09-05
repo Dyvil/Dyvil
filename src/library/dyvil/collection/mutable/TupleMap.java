@@ -45,7 +45,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<
 		super(new Tuple2[capacity], 0);
 	}
 	
-	public TupleMap(Tuple2<K, V>[] entries)
+	public TupleMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
 	}

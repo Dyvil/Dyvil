@@ -22,7 +22,7 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
-public final class ClassGenericType extends GenericType
+public class ClassGenericType extends GenericType
 {
 	protected IClass theClass;
 	
@@ -32,6 +32,7 @@ public final class ClassGenericType extends GenericType
 	
 	public ClassGenericType(IClass iclass)
 	{
+		super(iclass.genericCount());
 		this.theClass = iclass;
 	}
 	
