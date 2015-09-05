@@ -267,17 +267,8 @@ public class RangeOperator implements IValue
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
-			String method = this.halfOpen ? "halfOpen" : "apply";
-			
-			if (this.elementType.getTheClass() == Types.STRING_CLASS)
-			{
-				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method, "(Ljava/lang/String;Ljava/lang/String;)Ldyvil/collection/Range;",
-						false);
-				return;
-			}
-			
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method, "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)Ldyvil/collection/Range;",
-					false);
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", this.halfOpen ? "halfOpen" : "apply",
+					"(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)Ldyvil/collection/Range;", false);
 			return;
 		}
 		
@@ -287,15 +278,8 @@ public class RangeOperator implements IValue
 		// Reference array
 		if (!this.elementType.isPrimitive())
 		{
-			if (this.elementType.getTheClass() == Types.STRING_CLASS)
-			{
-				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;",
-						false);
-				return;
-			}
-			
-			// TODO Proper return type, this is currently [Ordered] instead of
-			// [T]
+			// TODO Proper return type
+			// This is currently [Ordered] instead of [T]
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)[Ldyvil/lang/Ordered;",
 					false);
 		}

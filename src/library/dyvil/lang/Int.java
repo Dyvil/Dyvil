@@ -1040,6 +1040,18 @@ public class Int implements Integer
 		return java.lang.Long.compare(this.value, o.longValue());
 	}
 	
+	@Override
+	public Int next()
+	{
+		return Int.apply(this.value + 1);
+	}
+	
+	@Override
+	public Int previous()
+	{
+		return Int.apply(this.value + 1);
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(int value)

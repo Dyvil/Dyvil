@@ -730,6 +730,18 @@ public class Double implements Number
 		return java.lang.Double.compare(this.value, o.doubleValue());
 	}
 	
+	@Override
+	public Double next()
+	{
+		return Double.apply(this.value + 1D);
+	}
+	
+	@Override
+	public Double previous()
+	{
+		return Double.apply(this.value - 1D);
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(double value)

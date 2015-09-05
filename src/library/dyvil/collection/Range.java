@@ -27,16 +27,6 @@ public interface Range<@Covariant T> extends Iterable<T>
 		return new ClosedRange(first, last);
 	}
 	
-	public static Range<String> apply(String first, String last)
-	{
-		return new ClosedStringRange(first, last);
-	}
-	
-	public static Range<String> halfOpen(String first, String last)
-	{
-		return new HalfOpenStringRange(first, last);
-	}
-	
 	public static <T extends Ordered<T>> Range<T> halfOpen(T first, T last)
 	{
 		return new HalfOpenRange(first, last);

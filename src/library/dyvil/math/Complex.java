@@ -710,6 +710,18 @@ public class Complex implements Number
 	}
 	
 	@Override
+	public Complex next()
+	{
+		return Complex.apply(this.real + 1D, this.imag);
+	}
+	
+	@Override
+	public Number previous()
+	{
+		return Complex.apply(this.real - 1D, this.imag);
+	}
+	
+	@Override
 	public java.lang.String toString()
 	{
 		return new StringBuilder(20).append(this.real).append('+').append(this.imag).append('i').toString();

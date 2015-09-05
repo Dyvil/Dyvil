@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -20,7 +19,6 @@ public class RangeForStatement extends ForEachStatement
 {
 	private static final int	INT		= 0, LONG = 1, FLOAT = 2, DOUBLE = 3;
 	private static final int	ORDERED	= 4;
-	private static final int	STRING	= 5;
 	
 	protected IValue	value1;
 	protected IValue	value2;
@@ -102,10 +100,6 @@ public class RangeForStatement extends ForEachStatement
 				break;
 			}
 		}
-		else if (rangeType.getTheClass() == Types.STRING_CLASS)
-		{
-			type = STRING;
-		}
 		
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
@@ -162,12 +156,6 @@ public class RangeForStatement extends ForEachStatement
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Ordered", "compareTo", "(Ldyvil/lang/Ordered;)I", true);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
 			break;
-		case STRING:
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/string/StringUtils", "compareAlpha", "(Ljava/lang/String;Ljava/lang/String;)I", false);
-			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
-			break;
 		}
 		
 		// Action
@@ -210,11 +198,6 @@ public class RangeForStatement extends ForEachStatement
 				RangeOperator.LazyFields.ORDERED.writeCast(writer, rangeType, this.getLineNumber());
 			}
 			
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-			break;
-		case STRING:
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/string/StringUtils", "nextAlpha", "(Ljava/lang/String;)Ljava/lang/String;", false);
 			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
 			break;
 		}

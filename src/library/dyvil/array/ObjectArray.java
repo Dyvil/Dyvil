@@ -23,7 +23,6 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.string.StringUtils;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -81,28 +80,6 @@ public interface ObjectArray
 			array[i++] = current;
 		}
 		return (T[]) array;
-	}
-	
-	public static String[] range(String start, String end)
-	{
-		int i = 0;
-		String[] array = new String[StringUtils.alphaDistance(start, end) + 1];
-		for (String current = start; StringUtils.compareAlpha(current, end) <= 0; current = StringUtils.nextAlpha(current))
-		{
-			array[i++] = current;
-		}
-		return array;
-	}
-	
-	public static String[] rangeOpen(String start, String end)
-	{
-		int i = 0;
-		String[] array = new String[StringUtils.alphaDistance(start, end)];
-		for (String current = start; StringUtils.compareAlpha(current, end) < 0; current = StringUtils.nextAlpha(current))
-		{
-			array[i++] = current;
-		}
-		return array;
 	}
 	
 	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })

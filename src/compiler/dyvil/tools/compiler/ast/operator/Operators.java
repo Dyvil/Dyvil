@@ -105,11 +105,6 @@ public interface Operators
 				rangeOperator = new RangeOperator(arg1, arg2);
 				rangeOperator.setHalfOpen(openRange);
 			}
-			if (arg1.isType(Types.STRING) && arg2.isType(Types.STRING))
-			{
-				rangeOperator = new RangeOperator(arg1, arg2, Types.STRING);
-				rangeOperator.setHalfOpen(openRange);
-			}
 			return rangeOperator;
 		}
 		// Swap Operator

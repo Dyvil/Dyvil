@@ -1037,6 +1037,18 @@ public class Byte implements Integer
 		return java.lang.Long.compare(this.value, o.longValue());
 	}
 	
+	@Override
+	public Byte next()
+	{
+		return Byte.apply((byte) (this.value + 1));
+	}
+	
+	@Override
+	public Byte previous()
+	{
+		return Byte.apply((byte) (this.value + 1));
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(byte value)

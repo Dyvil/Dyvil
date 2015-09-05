@@ -1040,6 +1040,18 @@ public class Char implements Integer
 		return java.lang.Long.compare(this.value, o.longValue());
 	}
 	
+	@Override
+	public Char next()
+	{
+		return Char.apply((char) (this.value + 1));
+	}
+	
+	@Override
+	public Number previous()
+	{
+		return Char.apply((char) (this.value - 1));
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(char value)

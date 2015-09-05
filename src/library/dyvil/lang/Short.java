@@ -1037,6 +1037,18 @@ public class Short implements Integer
 		return java.lang.Long.compare(this.value, o.longValue());
 	}
 	
+	@Override
+	public Short next()
+	{
+		return Short.apply((short) (this.value + 1));
+	}
+	
+	@Override
+	public Short previous()
+	{
+		return Short.apply((short) (this.value - 1));
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(short value)

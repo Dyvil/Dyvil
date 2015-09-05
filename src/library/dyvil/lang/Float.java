@@ -730,6 +730,18 @@ public class Float implements Number
 		return java.lang.Double.compare(this.value, o.doubleValue());
 	}
 	
+	@Override
+	public Float next()
+	{
+		return Float.apply(this.value + 1F);
+	}
+	
+	@Override
+	public Float previous()
+	{
+		return Float.apply(this.value - 1F);
+	}
+	
 	// Object methods
 	
 	public static @infix @inline String toString(float value)

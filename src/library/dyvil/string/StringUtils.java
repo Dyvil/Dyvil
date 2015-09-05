@@ -31,7 +31,6 @@ public interface StringUtils
 	
 	public static @infix String $times(String string, int count)
 	{
-		
 		switch (count)
 		{
 		case 0:
@@ -507,43 +506,6 @@ public interface StringUtils
 		}
 		
 		return builder.toString();
-	}
-	
-	public static @infix String nextAlpha(String string)
-	{
-		int len = string.length();
-		
-		StringBuilder builder = new StringBuilder(string);
-		for (int i = len - 1; i >= 0; i--)
-		{
-			char c = string.charAt(i);
-			if (c >= 'a' && c < 'z' || c >= 'A' && c < 'Z')
-			{
-				builder.setCharAt(i, (char) (c + 1));
-				break;
-			}
-			if (c == 'z' || c == 'Z')
-			{
-				builder.setCharAt(i, (char) (c - 25));
-				
-				if (i == 0)
-				{
-					return string;
-				}
-			}
-		}
-		return builder.toString();
-	}
-	
-	public static @infix int alphaDistance(String string, String other)
-	{
-		return Integer.parseInt(other, 36) - Integer.parseInt(string, 36);
-	}
-	
-	public static @infix int compareAlpha(String string, String other)
-	{
-		// TODO Improve this implementation
-		return string.compareToIgnoreCase(other);
 	}
 	
 	/**
