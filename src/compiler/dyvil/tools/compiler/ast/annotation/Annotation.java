@@ -125,7 +125,10 @@ public final class Annotation implements IAnnotation
 			IValue value = this.arguments.getValue(i, param);
 			if (value == null)
 			{
-				// TODO Error on non-default parameter
+				if (param.getValue() == null)
+				{
+					markers.add(this.position, "annotation.parameter.missing", this.type, param.getName());
+				}
 				continue;
 			}
 			
@@ -133,7 +136,7 @@ public final class Annotation implements IAnnotation
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "annotation.type", param.getName().qualified);
+				Marker marker = markers.create(value.getPosition(), "annotation.parameter.type", param.getName());
 				marker.addInfo("Required Type: " + type);
 				marker.addInfo("Value Type: " + value.getType());
 				continue;

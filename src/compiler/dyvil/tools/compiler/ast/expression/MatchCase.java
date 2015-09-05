@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
@@ -108,8 +109,18 @@ public class MatchCase implements ICase, IDefaultContext
 		IContext context1 = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			// TODO Check boolean type
 			this.condition = this.condition.resolve(markers, context1);
+			
+			IValue value1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context1);
+			if (value1 == null)
+			{
+				Marker m = markers.create(this.condition.getPosition(), "match.condition.type");
+				m.addInfo("Condition Type: " + this.condition.getType());
+			}
+			else
+			{
+				this.condition = value1;
+			}
 		}
 		
 		if (this.action != null)

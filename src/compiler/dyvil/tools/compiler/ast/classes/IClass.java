@@ -153,7 +153,6 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 		{
 			return new InterfaceMetadata();
 		}
-		// TODO Enums
 		return new ClassMetadata(iclass);
 	}
 }
