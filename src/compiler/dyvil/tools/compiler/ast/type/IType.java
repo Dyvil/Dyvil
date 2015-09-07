@@ -154,32 +154,19 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Super Type
 	
+	public default int getSuperTypeDistance(IType superType)
+	{
+		return this.getTheClass().getSuperTypeDistance(superType);
+	}
+	
 	public default float getSubTypeDistance(IType subtype)
 	{
-		if (subtype.isArrayType())
-		{
-			IClass iclass = this.getTheClass();
-			if (iclass == Types.OBJECT_CLASS)
-			{
-				return 3F;
-			}
-			return 0F;
-		}
-		return subtype.getTheClass().getSuperTypeDistance(this);
+		return subtype.getSuperTypeDistance(this);
 	}
 	
 	public default int getSubClassDistance(IType subtype)
 	{
-		if (subtype.isArrayType())
-		{
-			IClass iclass = this.getTheClass();
-			if (iclass == Types.OBJECT_CLASS)
-			{
-				return 3;
-			}
-			return 0;
-		}
-		return subtype.getTheClass().getSuperTypeDistance(this);
+		return subtype.getSuperTypeDistance(this);
 	}
 	
 	public default IType getSuperType()

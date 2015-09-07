@@ -427,6 +427,12 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.method == null)
+		{
+			IType type = this.getType();
+			this.withType(type, type, markers, context);
+		}
+		
 		this.value.checkTypes(markers, new CombiningContext(this, context));
 	}
 	

@@ -52,6 +52,8 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated
 	
 	public boolean isSuperTypeOf(IType type);
 	
+	public int getSuperTypeDistance(IType superType);
+	
 	// Phases
 	
 	public void resolveTypes(MarkerList markers, IContext context);

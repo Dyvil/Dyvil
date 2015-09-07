@@ -162,6 +162,16 @@ public class ArrayType implements IObjectType, ITyped
 	}
 	
 	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		if (!superType.isArrayType())
+		{
+			return superType.getTheClass() == Types.OBJECT_CLASS ? 1 : 0;
+		}
+		return this.type.getSuperTypeDistance(superType.getElementType());
+	}
+	
+	@Override
 	public float getSubTypeDistance(IType subtype)
 	{
 		if (!subtype.isArrayType())

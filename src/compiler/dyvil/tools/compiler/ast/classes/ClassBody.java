@@ -356,16 +356,23 @@ public class ClassBody implements IClassBody
 			return this.functionalMethod;
 		}
 		
+		boolean found = false;
+		IMethod match = null;
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
 			if (m.hasModifier(Modifiers.ABSTRACT))
 			{
-				this.functionalMethod = m;
-				return m;
+				if (found)
+				{
+					return null;
+				}
+				
+				found = true;
+				match = m;
 			}
 		}
-		return null;
+		return this.functionalMethod = match;
 	}
 	
 	@Override

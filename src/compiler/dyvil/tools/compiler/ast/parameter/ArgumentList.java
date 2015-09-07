@@ -198,7 +198,7 @@ public final class ArgumentList implements IArguments, IValueList
 		IValue argument = this.values[index];
 		IType type = param.getType();
 		float m = argument.getTypeMatch(type);
-		if (m != 0)
+		if (m > 0F)
 		{
 			return m;
 		}

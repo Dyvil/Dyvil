@@ -79,17 +79,9 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
-	public int getSubClassDistance(IType subtype)
+	public int getSuperTypeDistance(IType superType)
 	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
-	}
-	
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
+		return this.typeVar.getSuperTypeDistance(superType);
 	}
 	
 	@Override
