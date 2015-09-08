@@ -1,0 +1,26 @@
+package dyvil.test
+
+public class Main
+{
+	public static void main([String] args)
+	{
+		println "-- Abstract Properties --"
+		AbstractProperties.main(args)
+		println "-- Bridge Methods --"
+		BridgeTest.main(args)
+		println "-- Extension Test --"
+		ExtensionTest.main(args)
+		println "-- For Test --"
+		ForTest.main(args)
+		println "-- Inheritance --"
+		InheritanceTest.main(args)
+		println "-- Intrinsics --"
+		IntrinsicTest.main(args)
+		println "-- Lambdas --"
+		LambdaTest.main(args)
+		println "-- Match Test --"
+		MatchTest.main(args)
+		println "-- Range Test --"
+		RangeTest.main(args)
+	}
+}

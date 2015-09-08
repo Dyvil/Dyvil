@@ -1,0 +1,44 @@
+package dyvil.test
+
+public class ForTest
+{
+	public static void main([String] args) {
+		println "Iterative Test:"
+		testIterative()
+		
+		println "Array Test:"
+		testArray()
+		
+		println "Iterable Test:"
+		testIterable()
+		
+		println "String Test:"
+		testString()
+	}
+	
+	private static void testIterative() {
+		for (int i = 0; i < 3; i += 1) {
+			println i
+		}
+	}
+	
+	private static void testArray() {
+		[int] ints = [ 1, 2, 3 ]
+		for (auto i : ints) {
+			println i
+		}
+	}
+	
+	private static void testIterable() {
+		Iterable[int] it = [ 1, 2, 3 ]
+		for (auto i : it) {
+			println i
+		}
+	}
+	
+	private static void testString() {
+		for (auto c : "abc") {
+			println c
+		}
+	}
+}

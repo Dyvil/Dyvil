@@ -9,8 +9,4 @@ build/
 *.log*
 *.log
 
-src/test/dyvil/test/*
-
-test.txt
-
 .settings/org.eclipse.jdt.core.prefs

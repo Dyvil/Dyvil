@@ -1,0 +1,31 @@
+package dyvil.test
+
+import	dyvil.annotation.Intrinsic
+using	dyvil.reflect.Opcodes._
+
+infix operator +- { right, 120 }
+
+public header IntrinsicTest
+
+/**
+ * A test for annotations and intrinsic methods
+ */
+public class IntrinsicTest
+{
+	@interface NonNull
+	
+	public static void main((@NonNull [@NonNull String]) args)
+	{
+		auto i1 = 1 +- 2
+		auto i2 = 2 +- 4
+		auto i3 = -1 +- 3
+		auto i4 = -7 +- 5
+		println("Expected: -1, Actual: " + i1)
+		println("Expected: -2, Actual: " + i2)
+		println("Expected: -4, Actual: " + i3)
+		println("Expected: -12, Actual: " + i4)
+	}
+	
+	@Intrinsic([ INSTANCE, ARGUMENTS, INEG, IADD ])
+	public infix (@NonNull int) +-(int i, int j) = throw new RuntimeException("Not Intrinsic!")
+}

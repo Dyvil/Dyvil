@@ -1,0 +1,84 @@
+package dyvil.test
+
+public class RangeTest
+{
+	public static void main([String] args)
+	{
+		println "Int Test:"
+		testInts()
+		
+		println "Ordered Test:"
+		testOrdered()
+		
+		println "String Test:"
+		testStrings()
+	}
+	
+	private static void testInts()
+	{
+		auto range1 = 1 .. 3
+		auto range2 = 1 ..< 3
+		
+		for (auto i : range1) {
+			println i
+		}
+		
+		for (auto i : range2) {
+			println i
+		}
+		
+		for (auto i : 1 .. 3) {
+			println i
+		}
+		
+		for (auto i : 1 ..< 3) {
+			println i
+		}
+	}
+	
+	private static void testOrdered()
+	{
+		Ordered[int] one = 1
+		Ordered[int] three = 3
+		auto range1 = one .. three
+		auto range2 = one ..< three
+		
+		for (auto i : range1) {
+			println i
+		}
+		
+		for (auto i : range2) {
+			println i
+		}
+		
+		for (auto i : one .. three) {
+			println i
+		}
+		
+		for (auto i : one ..< three) {
+			println i
+		}
+	}
+	
+	private static void testStrings()
+	{
+		auto range1 = "a" .. "c"
+		auto range2 = "a" ..< "c"
+		
+		for (auto s : range1) {
+			println s
+		}
+				
+		for (auto s : range2) {
+			println s
+		}
+		
+		for (auto s : "a" .. "c") {
+			println s
+		}
+		
+		for (auto s : "a" ..< "c") {
+			println s
+		}
+	}
+}

@@ -1,0 +1,75 @@
+package dyvil.test
+
+public class MatchTest
+{
+	public static void main([String] args)
+	{
+		table()
+		tableHoles()
+		lookup()
+		string()
+		stringCollision()
+		expression()
+	}
+	
+	private static void table() {
+		1 match {
+			case 0: println "zero"
+			case 1: println "one"
+			case 2: println "two"
+			case _ : println "something else"
+		};
+	}
+	
+	private static void tableHoles() {
+		2 match {
+			case 0: println "null"
+			case 1: println "one"
+			case 2: println "two"
+			case 5: println "five"
+			case 6: println "six"
+		};
+	}
+	
+	private static void lookup() {
+		10 match {
+			case 1: println "1"
+			case 10: println "10"
+			case 100: println "100"
+			case _ : println "something else"
+		};
+	}
+	
+	private static void string() {
+		"abc" match {
+			case "abc": println "ABC"
+			case "def": println "DEF"
+			case _ : println "..."
+		};
+		
+		"a" match {
+			case "a" : println "A"
+			case "b": println "B"
+			case "c": println "C"
+			case _ : println "..."
+		};
+	}
+	
+	private static void stringCollision() {
+		/* "BBBB" match {
+			case "AaAa": println "1"
+			case "AaBB": println "2"
+			case "BBAa": println "3"
+			case "BBBB": println "4"
+			case _ :
+		}*/
+	}
+	
+	private static void expression() {
+		println(10 match {
+			case 0: "a"
+			case 1: "b"
+			case var x: x.toString
+		})
+	}
+}	
