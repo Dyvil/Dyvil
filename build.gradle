@@ -39,7 +39,13 @@ processResources {
 }
 
 group = 'dyvil-team'
-version = '0.2.1'
+
+version = '0.3.0'
+
+String compilerVersion = '0.3.0'
+String libraryVersion = '0.2.0'
+String replVersion = '0.1.1'
+
 mainClassName = 'dyvil.tools.repl.DyvilREPL'
 
 def ENV = System.getenv()
@@ -90,7 +96,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	
-	archiveName = "dyvil-library-${version}.jar"
+	archiveName = "dyvil-library-${libraryVersion}.jar"
 }
 
 /**
@@ -99,7 +105,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
 task buildCompiler(type: Jar, dependsOn: 'classes') {
 	from sourceSets.compiler.output
 	
-	archiveName = "dyvil-compiler-${version}.jar"
+	archiveName = "dyvil-compiler-${compilerVersion}.jar"
 	
 	manifest.attributes.put("Main-Class", "dyvil.tools.compiler.DyvilCompiler")
 }
@@ -110,7 +116,7 @@ task buildCompiler(type: Jar, dependsOn: 'classes') {
 task buildREPL(type: Jar, dependsOn: 'classes') {
 	from sourceSets.repl.output
 	
-	archiveName = "dyvil-repl-${version}.jar"
+	archiveName = "dyvil-repl-${replVersion}.jar"
 	
 	manifest.attributes.put("Main-Class", "dyvil.tools.repl.DyvilREPL")
 }

@@ -1,7 +1,7 @@
 Dyvil v0.3.0
 ============
 
-  Dyvil Library v0.2.0
+## Dyvil Library v0.2.0
 
 - Added Half-Open Ranges.
 - Added missing FloatArray.range method.
@@ -12,7 +12,7 @@ Dyvil v0.3.0
 - Fixed Ordered.next and .previous for Number subclasses being implemented incorrectly.
 - Removed String Ranges.
 
-  Dyvil Compiler v0.3.0
+## Dyvil Compiler v0.3.0
 
 - Added argument-based return type inference for Constructors.
 - Added support for Half-Open Ranges using the '..<' operator.
@@ -31,19 +31,19 @@ Dyvil v0.3.0
 - Fixed classes with multiple abstract methods being usable as FunctionalInterface SAM types.
 - Fixed Lambda Expressions causing Compiler errors in some edge cases.
 
-  Dyvil REPL v0.1.1
+## Dyvil REPL v0.1.1
 
 
 Dyvil v0.2.0
 ============
 
-  Dyvil Library v0.1.1
+## Dyvil Library v0.1.1
 - Added the List.removeFirst and .removeLast methods.
 - Added the EmptyRange class.
 - Updated the dyvil.collection.JavaCollections and dyvil.collection.JavaMaps classes.
 - Moved Basic Operators to the Lang Header.
 
-  Dyvil Compiler v0.2.0
+## Dyvil Compiler v0.2.0
 - Added support for custom method names in the NilConvertible annotation.
 - Added support for Type (Use) Annotations.
 - Added support for interfaces as anonymous class bases.
@@ -58,7 +58,7 @@ Dyvil v0.2.0
 - Fixed invalid bridge methods being generated in interfaces.
 - Miscellaneous improvements, bugfixes and changes.
 
-  Dyvil REPL v0.1.1
+## Dyvil REPL v0.1.1
 - Added support for multi-line input.
 - Fixed commands being handled incorrectly.
 
@@ -66,3 +66,9 @@ Dyvil v0.1.0-ALPHA
 ==================
 
 - Alpha Test Release
+
+## Dyvil Library v0.1.0
+
+## Dyvil Compiler v0.1.0
+
+## Dyvil Compiler v0.1.0
