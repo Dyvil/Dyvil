@@ -255,18 +255,15 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
-		if (this.variance == Variance.COVARIANT)
+		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			for (int i = 0; i < this.upperBoundCount; i++)
+			int m = superType.getSubClassDistance(this.upperBounds[i]);
+			if (m > 0)
 			{
-				int m = superType.getSubClassDistance(this.upperBounds[i]);
-				if (m > 0)
-				{
-					return m;
-				}
+				return m;
 			}
 		}
-		return 0;
+		return 2;
 	}
 	
 	@Override
