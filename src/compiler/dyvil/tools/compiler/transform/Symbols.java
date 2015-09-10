@@ -161,8 +161,10 @@ public final class Symbols
 		case "#":
 			return Symbols.HASH;
 		case "=>":
+		case "\u21D2": // Rightwards double arrow
 			return Symbols.ARROW_OPERATOR;
 		case "...":
+		case "\u2026": // Horizontal ellipsis
 			return Symbols.ELLIPSIS;
 		case "@":
 			return Symbols.AT;
