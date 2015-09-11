@@ -14,8 +14,8 @@ public class TypeConverter
 	private static final String	WRAPPER_PREFIX	= "Ldyvil/lang/";
 	
 	// Same for all primitives; name of the boxing method
-	private static final String NAME_BOX_METHOD = "apply";
-	private static final String NAME_UNBOX_METHOD = "unapply";
+	private static final String	NAME_BOX_METHOD		= "apply";
+	private static final String	NAME_UNBOX_METHOD	= "unapply";
 	
 	// Table of opcodes for widening primitive conversions
 	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];
@@ -180,10 +180,34 @@ public class TypeConverter
 		{
 			return;
 		}
-		if (arg == Void.TYPE || target == Void.TYPE)
+		if (arg == Void.TYPE)
 		{
+			if (target == Void.TYPE)
+			{
+				return;
+			}
+			if (target == Object.class || target == dyvil.lang.Void.class)
+			{
+				mv.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
+				return;
+			}
+			if (target != Void.TYPE)
+			{
+				mv.visitInsn(Opcodes.ACONST_NULL);
+			}
 			return;
 		}
+		if (target == Void.TYPE)
+		{
+			if (arg == long.class || arg == double.class)
+			{
+				mv.visitInsn(Opcodes.POP2);
+				return;
+			}
+			mv.visitInsn(Opcodes.POP);
+			return;
+		}
+		
 		if (arg.isPrimitive())
 		{
 			Wrapper wArg = Wrapper.forPrimitiveType(arg);

@@ -131,15 +131,7 @@ public final class Tuple implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IType type = this.values[i].getType();
-			// Tuple Value Boxing
-			if (type.isPrimitive())
-			{
-				t.addType(type.getObjectType());
-			}
-			else
-			{
-				t.addType(type);
-			}
+			t.addType(type);
 		}
 		return this.tupleType = t;
 	}
@@ -314,7 +306,9 @@ public final class Tuple implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].writeExpression(writer);
+			IValue value = this.values[i];
+			value.writeExpression(writer);
+			value.getType().writeCast(writer, Types.OBJECT, 0);
 		}
 		
 		String owner = internal;

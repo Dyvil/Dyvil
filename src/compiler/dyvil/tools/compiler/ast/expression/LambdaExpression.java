@@ -201,14 +201,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			
 			if (this.returnType == Types.UNKNOWN)
 			{
-				if (valueType == Types.VOID)
-				{
-					this.returnType = Types.VOID.getObjectType();
-				}
-				else
-				{
-					this.returnType = valueType;
-				}
+				this.returnType = valueType;
 			}
 			
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);

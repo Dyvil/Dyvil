@@ -117,10 +117,6 @@ public class RangeOperator implements IValue
 			}
 			
 			ClassGenericType gt = new ClassGenericType(LazyFields.RANGE_CLASS);
-			if (this.elementType.isPrimitive())
-			{
-				this.elementType = this.elementType.getObjectType();
-			}
 			gt.addType(this.elementType);
 			this.type = gt;
 		}
@@ -261,12 +257,14 @@ public class RangeOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.firstValue.writeExpression(writer);
-		this.lastValue.writeExpression(writer);
-		
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
+			this.firstValue.writeExpression(writer);
+			this.elementType.writeCast(writer, LazyFields.ORDERED, 0);
+			this.lastValue.writeExpression(writer);
+			this.elementType.writeCast(writer, LazyFields.ORDERED, 0);
+			
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", this.halfOpen ? "halfOpen" : "apply",
 					"(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)Ldyvil/collection/Range;", false);
 			return;
@@ -274,6 +272,9 @@ public class RangeOperator implements IValue
 		
 		// -- Array --
 		String method = this.halfOpen ? "rangeOpen" : "range";
+		
+		this.firstValue.writeExpression(writer);
+		this.lastValue.writeExpression(writer);
 		
 		// Reference array
 		if (!this.elementType.isPrimitive())

@@ -252,7 +252,12 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		return new ArrayType(this.type.getConcreteType(context));
+		IType concrete = this.type.getConcreteType(context);
+		if (!this.type.isPrimitive() && concrete.isPrimitive())
+		{
+			concrete = concrete.getObjectType();
+		}
+		return new ArrayType(concrete);
 	}
 	
 	@Override

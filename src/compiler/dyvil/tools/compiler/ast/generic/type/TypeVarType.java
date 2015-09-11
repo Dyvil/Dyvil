@@ -113,10 +113,6 @@ public class TypeVarType implements IRawType
 		IType t = context.resolveType(this.typeVar);
 		if (t != null)
 		{
-			if (t.isPrimitive())
-			{
-				return t.getObjectType();
-			}
 			return t;
 		}
 		return this;
