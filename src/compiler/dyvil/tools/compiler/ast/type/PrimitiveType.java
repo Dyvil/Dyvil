@@ -247,15 +247,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public boolean classEquals(IType type)
 	{
-		if (this == type)
-		{
-			return true;
-		}
-		if (type.getName() == this.name)
-		{
-			return true;
-		}
-		return IType.super.classEquals(type);
+		return type == this;
 	}
 	
 	@Override

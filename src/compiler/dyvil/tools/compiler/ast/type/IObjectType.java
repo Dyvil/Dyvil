@@ -67,6 +67,12 @@ public interface IObjectType extends IType
 	}
 	
 	@Override
+	public default boolean classEquals(IType type)
+	{
+		return this.getTheClass() == type.getTheClass() && !type.isPrimitive();
+	}
+	
+	@Override
 	public default int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;

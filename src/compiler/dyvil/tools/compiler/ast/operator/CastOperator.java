@@ -90,27 +90,23 @@ public final class CastOperator extends Value
 		IType prevType = this.value.getType();
 		
 		IValue value1 = this.value.withType(this.type, this.type, markers, context);
-		if (value1 != null && value1 != this.value)
+		if (value1 != null)
 		{
 			this.value = value1;
-			this.typeHint = true;
-			this.type = value1.getType();
-			return this;
+			
+			IType valueType = value1.getType();
+			if (!prevType.equals(valueType) && this.type.isSuperClassOf(valueType) && valueType.isPrimitive() == this.type.isPrimitive())
+			{
+				this.typeHint = true;
+				this.type = valueType;
+				return this;
+			}
+			
+			prevType = valueType;
 		}
 		
 		boolean primitiveType = this.type.isPrimitive();
 		boolean primitiveValue = this.value.isPrimitive();
-		if (primitiveType)
-		{
-			if (!primitiveValue)
-			{
-				markers.add(this.position, "cast.reference");
-			}
-		}
-		else if (primitiveValue)
-		{
-			markers.add(this.position, "cast.primitive");
-		}
 		
 		if (value1 == null && !(primitiveType && primitiveValue) && !prevType.isSuperClassOf(this.type))
 		{
@@ -118,7 +114,7 @@ public final class CastOperator extends Value
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.equals(prevType))
+		if (!this.typeHint && this.type.isSuperClassOf(prevType) && primitiveType == primitiveValue)
 		{
 			markers.add(this.position, "cast.unnecessary");
 			this.typeHint = true;

@@ -235,10 +235,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return this.getTheClass() == type.getTheClass();
 	}
 	
-	public default boolean classEquals(IType type)
-	{
-		return this.getTheClass() == type.getTheClass();
-	}
+	public boolean classEquals(IType type);
 	
 	// Resolve
 	
@@ -287,6 +284,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
+	 * 
 	 * @param typeVariables
 	 *            the type variables
 	 * @return
