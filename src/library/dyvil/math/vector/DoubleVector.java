@@ -1,27 +1,27 @@
-package dyvil.math;
+package dyvil.math.vector;
 
 import java.util.Arrays;
 
-public class FloatVector
+public class DoubleVector
 {
 	private static final int	DEFAULT_CAPACITY	= 10;
 	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	private float[]	elementData;
-	private int		size;
+	private double[]	elementData;
+	private int			size;
 	
-	public FloatVector()
+	public DoubleVector()
 	{
 		this(DEFAULT_CAPACITY);
 	}
 	
-	public FloatVector(int initialCapacity)
+	public DoubleVector(int initialCapacity)
 	{
 		if (initialCapacity < 0)
 		{
 			throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
 		}
-		this.elementData = new float[initialCapacity];
+		this.elementData = new double[initialCapacity];
 	}
 	
 	private void ensureCapacity(int minCapacity)
@@ -58,38 +58,38 @@ public class FloatVector
 		return minCapacity > MAX_ARRAY_SIZE ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
 	}
 	
-	public void set(int index, float f)
+	public void set(int index, double d)
 	{
-		this.elementData[index] = f;
+		this.elementData[index] = d;
 	}
 	
-	public void add(float f)
+	public void add(double d)
 	{
 		this.size++;
 		this.ensureCapacity(this.size);
-		this.elementData[this.size] = f;
+		this.elementData[this.size] = d;
 	}
 	
-	public void add(int index, float f)
+	public void add(int index, double d)
 	{
 		this.ensureCapacity(this.size + 1); // Increments modCount!!
 		System.arraycopy(this.elementData, index, this.elementData, index + 1, this.size - index);
-		this.elementData[index] = f;
+		this.elementData[index] = d;
 		this.size++;
 	}
 	
-	public boolean addAll(float... floats)
+	public boolean addAll(double... doubles)
 	{
-		int len = floats.length;
+		int len = doubles.length;
 		this.ensureCapacity(this.size + len);
-		System.arraycopy(floats, 0, this.elementData, this.size, len);
+		System.arraycopy(doubles, 0, this.elementData, this.size, len);
 		this.size += len;
 		return len != 0;
 	}
 	
-	public boolean addAll(int index, float... floats)
+	public boolean addAll(int index, double... doubles)
 	{
-		int len = floats.length;
+		int len = doubles.length;
 		this.ensureCapacity(this.size + len);
 		
 		int numMoved = this.size - index;
@@ -98,26 +98,26 @@ public class FloatVector
 			System.arraycopy(this.elementData, index, this.elementData, index + len, numMoved);
 		}
 		
-		System.arraycopy(floats, 0, this.elementData, index, len);
+		System.arraycopy(doubles, 0, this.elementData, index, len);
 		this.size += len;
 		return len != 0;
 	}
 	
-	public float get(int index)
+	public double get(int index)
 	{
 		return this.elementData[index];
 	}
 	
-	public float remove(float f)
+	public double remove(double d)
 	{
-		return this.removeAt(this.indexOf(f));
+		return this.removeAt(this.indexOf(d));
 	}
 	
-	public float removeAt(int index)
+	public double removeAt(int index)
 	{
-		float f = this.get(index);
+		double l = this.get(index);
 		this.fastRemove(index);
-		return f;
+		return l;
 	}
 	
 	public void fastRemove(int index)
@@ -138,11 +138,11 @@ public class FloatVector
 		}
 	}
 	
-	public int indexOf(float f)
+	public int indexOf(double d)
 	{
 		for (int j = 0; j < this.size; j++)
 		{
-			if (this.elementData[j] == f)
+			if (this.elementData[j] == d)
 			{
 				return j;
 			}
@@ -150,11 +150,11 @@ public class FloatVector
 		return -1;
 	}
 	
-	public int lastIndexOf(float f)
+	public int lastIndexOf(double d)
 	{
 		for (int j = this.size - 1; j >= 0; j--)
 		{
-			if (this.elementData[j] == f)
+			if (this.elementData[j] == d)
 			{
 				return j;
 			}

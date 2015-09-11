@@ -1,33 +1,27 @@
-package dyvil.math;
+package dyvil.math.vector;
 
 import java.util.Arrays;
 
-public class IntVector
+public class LongVector
 {
 	private static final int	DEFAULT_CAPACITY	= 10;
 	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	private int[]	elementData;
+	private long[]	elementData;
 	private int		size;
 	
-	public IntVector()
+	public LongVector()
 	{
 		this(DEFAULT_CAPACITY);
 	}
 	
-	public IntVector(int initialCapacity)
+	public LongVector(int initialCapacity)
 	{
 		if (initialCapacity < 0)
 		{
 			throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
 		}
-		this.elementData = new int[initialCapacity];
-	}
-	
-	public IntVector(int[] data)
-	{
-		this.size = data.length;
-		this.elementData = data.clone();
+		this.elementData = new long[initialCapacity];
 	}
 	
 	private void ensureCapacity(int minCapacity)
@@ -64,38 +58,38 @@ public class IntVector
 		return minCapacity > MAX_ARRAY_SIZE ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
 	}
 	
-	public void set(int index, int i)
+	public void set(int index, long l)
 	{
-		this.elementData[index] = i;
+		this.elementData[index] = l;
 	}
 	
-	public void add(int i)
+	public void add(long l)
 	{
 		this.size++;
 		this.ensureCapacity(this.size);
-		this.elementData[this.size] = i;
+		this.elementData[this.size] = l;
 	}
 	
-	public void add(int index, int i)
+	public void add(int index, long l)
 	{
 		this.ensureCapacity(this.size + 1); // Increments modCount!!
 		System.arraycopy(this.elementData, index, this.elementData, index + 1, this.size - index);
-		this.elementData[index] = i;
+		this.elementData[index] = l;
 		this.size++;
 	}
 	
-	public boolean addAll(int... ints)
+	public boolean addAll(long... longs)
 	{
-		int len = ints.length;
+		int len = longs.length;
 		this.ensureCapacity(this.size + len);
-		System.arraycopy(ints, 0, this.elementData, this.size, len);
+		System.arraycopy(longs, 0, this.elementData, this.size, len);
 		this.size += len;
 		return len != 0;
 	}
 	
-	public boolean addAll(int index, int... ints)
+	public boolean addAll(int index, long... longs)
 	{
-		int len = ints.length;
+		int len = longs.length;
 		this.ensureCapacity(this.size + len);
 		
 		int numMoved = this.size - index;
@@ -104,26 +98,26 @@ public class IntVector
 			System.arraycopy(this.elementData, index, this.elementData, index + len, numMoved);
 		}
 		
-		System.arraycopy(ints, 0, this.elementData, index, len);
+		System.arraycopy(longs, 0, this.elementData, index, len);
 		this.size += len;
 		return len != 0;
 	}
 	
-	public int get(int index)
+	public long get(int index)
 	{
 		return this.elementData[index];
 	}
 	
-	public int remove(int i)
+	public long remove(long l)
 	{
-		return this.removeAt(this.indexOf(i));
+		return this.removeAt(this.indexOf(l));
 	}
 	
-	public int removeAt(int index)
+	public long removeAt(int index)
 	{
-		int i = this.get(index);
+		long l = this.get(index);
 		this.fastRemove(index);
-		return i;
+		return l;
 	}
 	
 	public void fastRemove(int index)
@@ -144,11 +138,11 @@ public class IntVector
 		}
 	}
 	
-	public int indexOf(int i)
+	public int indexOf(long l)
 	{
 		for (int j = 0; j < this.size; j++)
 		{
-			if (this.elementData[j] == i)
+			if (this.elementData[j] == l)
 			{
 				return j;
 			}
@@ -156,26 +150,15 @@ public class IntVector
 		return -1;
 	}
 	
-	public int lastIndexOf(int i)
+	public int lastIndexOf(long l)
 	{
 		for (int j = this.size - 1; j >= 0; j--)
 		{
-			if (this.elementData[j] == i)
+			if (this.elementData[j] == l)
 			{
 				return j;
 			}
 		}
 		return -1;
-	}
-	
-	public int[] toArray()
-	{
-		return this.toArray(new int[this.size]);
-	}
-	
-	public int[] toArray(int[] array)
-	{
-		System.arraycopy(this.elementData, 0, array, 0, this.size);
-		return array;
 	}
 }

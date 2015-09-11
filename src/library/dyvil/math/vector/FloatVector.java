@@ -1,27 +1,27 @@
-package dyvil.math;
+package dyvil.math.vector;
 
 import java.util.Arrays;
 
-public class DoubleVector
+public class FloatVector
 {
 	private static final int	DEFAULT_CAPACITY	= 10;
 	private static final int	MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	private double[]	elementData;
-	private int			size;
+	private float[]	elementData;
+	private int		size;
 	
-	public DoubleVector()
+	public FloatVector()
 	{
 		this(DEFAULT_CAPACITY);
 	}
 	
-	public DoubleVector(int initialCapacity)
+	public FloatVector(int initialCapacity)
 	{
 		if (initialCapacity < 0)
 		{
 			throw new IllegalArgumentException("Illegal Capacity: " + initialCapacity);
 		}
-		this.elementData = new double[initialCapacity];
+		this.elementData = new float[initialCapacity];
 	}
 	
 	private void ensureCapacity(int minCapacity)
@@ -58,38 +58,38 @@ public class DoubleVector
 		return minCapacity > MAX_ARRAY_SIZE ? Integer.MAX_VALUE : MAX_ARRAY_SIZE;
 	}
 	
-	public void set(int index, double d)
+	public void set(int index, float f)
 	{
-		this.elementData[index] = d;
+		this.elementData[index] = f;
 	}
 	
-	public void add(double d)
+	public void add(float f)
 	{
 		this.size++;
 		this.ensureCapacity(this.size);
-		this.elementData[this.size] = d;
+		this.elementData[this.size] = f;
 	}
 	
-	public void add(int index, double d)
+	public void add(int index, float f)
 	{
 		this.ensureCapacity(this.size + 1); // Increments modCount!!
 		System.arraycopy(this.elementData, index, this.elementData, index + 1, this.size - index);
-		this.elementData[index] = d;
+		this.elementData[index] = f;
 		this.size++;
 	}
 	
-	public boolean addAll(double... doubles)
+	public boolean addAll(float... floats)
 	{
-		int len = doubles.length;
+		int len = floats.length;
 		this.ensureCapacity(this.size + len);
-		System.arraycopy(doubles, 0, this.elementData, this.size, len);
+		System.arraycopy(floats, 0, this.elementData, this.size, len);
 		this.size += len;
 		return len != 0;
 	}
 	
-	public boolean addAll(int index, double... doubles)
+	public boolean addAll(int index, float... floats)
 	{
-		int len = doubles.length;
+		int len = floats.length;
 		this.ensureCapacity(this.size + len);
 		
 		int numMoved = this.size - index;
@@ -98,26 +98,26 @@ public class DoubleVector
 			System.arraycopy(this.elementData, index, this.elementData, index + len, numMoved);
 		}
 		
-		System.arraycopy(doubles, 0, this.elementData, index, len);
+		System.arraycopy(floats, 0, this.elementData, index, len);
 		this.size += len;
 		return len != 0;
 	}
 	
-	public double get(int index)
+	public float get(int index)
 	{
 		return this.elementData[index];
 	}
 	
-	public double remove(double d)
+	public float remove(float f)
 	{
-		return this.removeAt(this.indexOf(d));
+		return this.removeAt(this.indexOf(f));
 	}
 	
-	public double removeAt(int index)
+	public float removeAt(int index)
 	{
-		double l = this.get(index);
+		float f = this.get(index);
 		this.fastRemove(index);
-		return l;
+		return f;
 	}
 	
 	public void fastRemove(int index)
@@ -138,11 +138,11 @@ public class DoubleVector
 		}
 	}
 	
-	public int indexOf(double d)
+	public int indexOf(float f)
 	{
 		for (int j = 0; j < this.size; j++)
 		{
-			if (this.elementData[j] == d)
+			if (this.elementData[j] == f)
 			{
 				return j;
 			}
@@ -150,11 +150,11 @@ public class DoubleVector
 		return -1;
 	}
 	
-	public int lastIndexOf(double d)
+	public int lastIndexOf(float f)
 	{
 		for (int j = this.size - 1; j >= 0; j--)
 		{
-			if (this.elementData[j] == d)
+			if (this.elementData[j] == f)
 			{
 				return j;
 			}
