@@ -134,7 +134,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return IValue.autoBox(this, this.getType(), type);
+		return type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
 	@Override
@@ -333,8 +333,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer);
-		writer.writeInsn(this.field.getType().getReturnOpcode());
+		IType t = this.field.getType();
+		this.writeExpression(writer, t);
+		writer.writeInsn(t.getReturnOpcode());
 	}
 	
 	@Override

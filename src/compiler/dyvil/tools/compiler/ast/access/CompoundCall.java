@@ -191,7 +191,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			IValue instance = access.instance;
 			if (instance != null)
 			{
-				instance.writeExpression(writer);
+				instance.writeExpression(writer, f.getTheClass().getType());
 				writer.writeInsn(Opcodes.AUTO_DUP);
 			}
 			
@@ -204,7 +204,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		{
 			AbstractCall call = (AbstractCall) this.instance;
 			
-			call.instance.writeExpression(writer);
+			call.instance.writeExpression(writer, call.method.getTheClass().getType());
 			
 			for (IValue v : call.arguments)
 			{

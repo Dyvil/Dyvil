@@ -245,24 +245,25 @@ public final class ArgumentMap implements IArguments, IValueMap
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
+		Name name = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
 			if (this.keys[i] == name)
 			{
-				this.values[i].writeExpression(writer);
+				this.values[i].writeExpression(writer, param.getType());
 				return;
 			}
 		}
 		
-		defaultValue.writeExpression(writer);
+		param.getValue().writeExpression(writer, param.getType());
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		this.writeValue(index, name, null, writer);
+		this.writeValue(index, param, writer);
 	}
 	
 	@Override

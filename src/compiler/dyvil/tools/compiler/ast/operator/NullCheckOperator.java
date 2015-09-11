@@ -50,7 +50,7 @@ public final class NullCheckOperator implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.BOOLEAN ? this : IValue.autoBox(this, Types.BOOLEAN, type);
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
 	}
 	
 	@Override

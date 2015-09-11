@@ -132,25 +132,25 @@ public class SwapOperator extends Value
 		
 		if (leftInstance != null)
 		{
-			leftInstance.writeExpression(writer);
+			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
 		leftField.writeGet(writer, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
-			rightInstance.writeExpression(writer);
+			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
 		rightField.writeGet(writer, null, lineNumber);
 		
 		if (leftInstance != null)
 		{
-			leftInstance.writeExpression(writer);
+			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
 		leftField.writeSet(writer, null, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
-			rightInstance.writeExpression(writer);
+			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
 		rightField.writeSet(writer, null, null, lineNumber);
 	}

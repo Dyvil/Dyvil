@@ -269,8 +269,6 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeLabel(Label label)
 	{
-		this.hasReturn = false;
-		
 		if (label.info != null)
 		{
 			int maxS = this.frame.maxStack;
@@ -298,6 +296,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.writeLabel(label);
 		this.visitFrame = true;
+		this.hasReturn = false;
 	}
 	
 	@Override

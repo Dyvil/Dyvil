@@ -307,8 +307,7 @@ public final class Tuple implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			value.writeExpression(writer);
-			value.getType().writeCast(writer, Types.OBJECT, 0);
+			value.writeExpression(writer, Types.OBJECT);
 		}
 		
 		String owner = internal;

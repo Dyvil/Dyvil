@@ -171,6 +171,24 @@ public final class TypeVariable implements ITypeVariable
 	}
 	
 	@Override
+	public IType getDefaultType()
+	{
+		switch (this.upperBoundCount)
+		{
+		case 0:
+			return Types.ANY;
+		case 1:
+			return this.upperBounds[0];
+		case 2:
+			if (this.upperBounds[0].getTheClass() == Types.OBJECT_CLASS)
+			{
+				return this.upperBounds[1];
+			}
+		}
+		return Types.ANY;
+	}
+	
+	@Override
 	public int upperBoundCount()
 	{
 		return this.upperBoundCount;

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -145,7 +146,7 @@ public final class SyncStatement extends Value implements IStatement
 		dyvil.tools.asm.Label throwLabel = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label handlerEnd = new dyvil.tools.asm.Label();
 		
-		this.lock.writeExpression(writer);
+		this.lock.writeExpression(writer, Types.OBJECT);
 		writer.writeInsn(Opcodes.DUP);
 		
 		int varIndex = writer.startSync();

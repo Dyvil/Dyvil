@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -295,26 +294,26 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		if (index < this.size)
 		{
-			this.values[index].writeExpression(writer);
+			this.values[index].writeExpression(writer, param.getType());
 			return;
 		}
-		defaultValue.writeExpression(writer);
+		param.getValue().writeExpression(writer, param.getType());
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		if (this.varargs)
 		{
-			this.values[index].writeExpression(writer);
+			this.values[index].writeExpression(writer, param.getType());
 			return;
 		}
 		
-		type = type.getElementType();
+		IType type = param.getType().getElementType();
 		int len = this.size - index;
 		if (len < 0)
 		{
@@ -333,7 +332,7 @@ public final class ArgumentList implements IArguments, IValueList
 			writer.writeInsn(Opcodes.DUP);
 			IValue value = this.values[index + i];
 			writer.writeLDC(i);
-			value.writeExpression(writer);
+			value.writeExpression(writer, type);
 			writer.writeInsn(opcode);
 		}
 	}

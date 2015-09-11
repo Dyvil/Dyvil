@@ -638,7 +638,7 @@ public class Property extends Member implements IProperty, IContext
 			if (this.getter != null)
 			{
 				mw.begin();
-				this.getter.writeExpression(mw);
+				this.getter.writeExpression(mw, this.type);
 				mw.end(this.type);
 			}
 		}
@@ -671,7 +671,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
 		int opcode;
@@ -696,11 +696,11 @@ public class Property extends Member implements IProperty, IContext
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		int opcode;

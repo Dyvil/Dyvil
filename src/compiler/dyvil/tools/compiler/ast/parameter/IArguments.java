@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -72,9 +71,9 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext);
 	
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException;
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException;
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
 	// Phase Methods
 	

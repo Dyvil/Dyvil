@@ -114,12 +114,12 @@ public class RangeForStatement extends ForEachStatement
 		int locals = writer.localCount();
 		
 		// Write the start value and store it in the variable.
-		this.value1.writeExpression(writer);
+		this.value1.writeExpression(writer, var.getType());
 		writer.writeInsn(Opcodes.AUTO_DUP);
 		startVar.writeInit(writer, null);
 		var.writeInit(writer, null);
 		
-		this.value2.writeExpression(writer);
+		this.value2.writeExpression(writer, var.getType());
 		endVar.writeInit(writer, null);
 		
 		writer.writeTargetLabel(startLabel);

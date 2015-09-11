@@ -396,13 +396,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 		
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, Types.OBJECT);
 			instance.getType().appendExtendedName(desc);
 		}
 		
 		for (IValue v : arguments)
 		{
-			v.writeExpression(writer);
+			v.writeExpression(writer, Types.OBJECT);
 			v.getType().appendExtendedName(desc);
 		}
 		desc.append(')');

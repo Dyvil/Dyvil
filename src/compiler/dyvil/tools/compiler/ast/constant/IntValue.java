@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -73,13 +72,9 @@ public final class IntValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.INT)
+		if (type == Types.INT || type.isSuperTypeOf(Types.INT))
 		{
 			return this;
-		}
-		if (type.isSuperTypeOf(Types.INT))
-		{
-			return new BoxedValue(this, Types.INT.getBoxMethod());
 		}
 		if (type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
 		{

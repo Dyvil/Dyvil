@@ -413,7 +413,7 @@ public class Method extends AbstractMethod
 			}
 			else
 			{
-				this.value.writeExpression(mw);
+				this.value.writeExpression(mw, this.type);
 			}
 			mw.writeLabel(end);
 			mw.end(this.type);

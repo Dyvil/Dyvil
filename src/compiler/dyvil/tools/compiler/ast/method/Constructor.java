@@ -852,17 +852,17 @@ public class Constructor extends Member implements IConstructor
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i];
-				arguments.writeValue(i, param.getName(), param.getValue(), writer);
+				arguments.writeValue(i, param, writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
+			arguments.writeVarargsValue(len, param, writer);
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			arguments.writeValue(i, param.getName(), param.getValue(), writer);
+			arguments.writeValue(i, param, writer);
 		}
 	}
 	

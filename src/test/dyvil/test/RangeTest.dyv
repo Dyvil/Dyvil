@@ -9,9 +9,6 @@ public class RangeTest
 		
 		println "Ordered Test:"
 		testOrdered()
-		
-		println "String Test:"
-		testStrings()
 	}
 	
 	private static void testInts()
@@ -57,28 +54,6 @@ public class RangeTest
 		
 		for (auto i : one ..< three) {
 			println i
-		}
-	}
-	
-	private static void testStrings()
-	{
-		auto range1 = "a" .. "c"
-		auto range2 = "a" ..< "c"
-		
-		for (auto s : range1) {
-			println s
-		}
-				
-		for (auto s : range2) {
-			println s
-		}
-		
-		for (auto s : "a" .. "c") {
-			println s
-		}
-		
-		for (auto s : "a" ..< "c") {
-			println s
 		}
 	}
 }

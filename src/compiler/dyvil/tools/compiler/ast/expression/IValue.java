@@ -132,27 +132,6 @@ public interface IValue extends IASTNode, ITyped
 	
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
 	
-	public static IValue autoBox(IValue value, IType valueType, IType targetType)
-	{
-		if (!targetType.isSuperTypeOf(valueType))
-		{
-			return null;
-		}
-		
-		boolean primitive = valueType.isPrimitive();
-		if (primitive != targetType.isPrimitive())
-		{
-			// Box Primitive -> Object
-			if (primitive)
-			{
-				return new BoxedValue(value, valueType.getBoxMethod());
-			}
-			// Unbox Object -> Primitive
-			return new BoxedValue(value, targetType.getUnboxMethod());
-		}
-		return value;
-	}
-	
 	@Override
 	public default boolean isType(IType type)
 	{
@@ -191,6 +170,12 @@ public interface IValue extends IASTNode, ITyped
 	public IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// Compilation
+	
+	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		this.getType().writeCast(writer, type, this.getLineNumber());
+	}
 	
 	/**
 	 * Writes this {@link IValue} to the given {@link MethodWriter}

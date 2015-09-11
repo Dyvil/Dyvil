@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -56,7 +55,8 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public IArguments withLastValue(IValue value)
 	{
-		if (this.value == null) {
+		if (this.value == null)
+		{
 			return new SingleArgument(value);
 		}
 		
@@ -231,19 +231,19 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		if (index == 0 && this.value != null)
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, param.getType());
 			return;
 		}
 		
-		defaultValue.writeExpression(writer);
+		param.getValue().writeExpression(writer, param.getType());
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		if (index != 0 || this.value == null)
 		{
@@ -252,17 +252,17 @@ public final class SingleArgument implements IArguments, IValued
 		if (this.varargs)
 		{
 			// Write the value as is (it is an array)
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, param.getType());
 			return;
 		}
 		
 		// Write an array with one element
-		type = type.getElementType();
+		IType type = param.getType().getElementType();
 		writer.writeLDC(1);
 		writer.writeNewArray(type, 1);
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeLDC(0);
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, type);
 		writer.writeInsn(type.getArrayStoreOpcode());
 	}
 	
@@ -275,42 +275,56 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null) {
-		this.value.resolveTypes(markers, context);}
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.value != null) {
-		this.value = this.value.resolve(markers, context);}
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
-	{if (this.value != null) {
-		this.value.checkTypes(markers, context);
-	}}
+	{
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
+	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
-	{if (this.value != null) {
-		this.value.check(markers, context);
-	}}
+	{
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
+	}
 	
 	@Override
 	public void foldConstants()
 	{
-		if (this.value != null) {
-		this.value = this.value.foldConstants();
-	}}
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
+	}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.value != null) {
-		this.value = this.value.cleanup(context, compilableList);
-	}}
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
+		}
+	}
 	
 	@Override
 	public String toString()

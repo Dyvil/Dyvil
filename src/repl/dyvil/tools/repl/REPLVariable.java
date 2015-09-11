@@ -146,7 +146,7 @@ public class REPLVariable extends Field
 		{
 			if (this.type != Types.VOID)
 			{
-				this.value.writeExpression(mw);
+				this.value.writeExpression(mw, this.type);
 				// Store the value to the field
 				mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 			}
@@ -186,7 +186,7 @@ public class REPLVariable extends Field
 	{
 		if (this.isConstant())
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, this.type);
 			return;
 		}
 		

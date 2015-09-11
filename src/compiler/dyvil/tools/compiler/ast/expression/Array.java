@@ -426,7 +426,7 @@ public final class Array implements IValue, IValueList
 			writer.writeInsn(Opcodes.DUP);
 			IValue value = this.values[i];
 			writer.writeLDC(i);
-			value.writeExpression(writer);
+			value.writeExpression(writer, type);
 			writer.writeInsn(opcode);
 		}
 	}

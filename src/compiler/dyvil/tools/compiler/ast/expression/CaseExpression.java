@@ -367,7 +367,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 		mw.writeLabel(elseLabel);
 		if (this.action != null)
 		{
-			this.action.writeExpression(mw);
+			this.action.writeExpression(mw, returnType);
 		}
 		else
 		{

@@ -186,7 +186,7 @@ public class NestedMethod extends Method
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			this.value.writeExpression(mw);
+			this.value.writeExpression(mw, this.type);
 			mw.writeLabel(end);
 			mw.end(this.type);
 		}

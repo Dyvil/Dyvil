@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -60,11 +59,7 @@ public final class InstanceOfOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.BOOLEAN)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.getBoxMethod()) : null;
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
 	}
 	
 	@Override

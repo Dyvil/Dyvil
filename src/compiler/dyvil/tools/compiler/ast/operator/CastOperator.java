@@ -60,7 +60,7 @@ public final class CastOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return IValue.autoBox(this, this.type, type);
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
@@ -165,19 +165,13 @@ public final class CastOperator extends Value
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
-		if (this.typeHint)
-		{
-			return;
-		}
-		
-		this.value.getType().writeCast(writer, this.type, this.getLineNumber());
+		this.value.writeExpression(writer, this.type);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer);
+		this.writeExpression(writer, this.type);
 		writer.writeInsn(this.type.getReturnOpcode());
 	}
 	

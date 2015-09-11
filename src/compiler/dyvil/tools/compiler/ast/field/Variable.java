@@ -278,7 +278,7 @@ public final class Variable extends Member implements IVariable
 			
 			if (value != null)
 			{
-				value.writeExpression(writer);
+				value.writeExpression(writer, this.type);
 			}
 			else
 			{
@@ -295,7 +295,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		this.index = writer.localCount();
 		writer.setLocalType(this.index, this.type.getFrameType());
@@ -341,7 +341,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);

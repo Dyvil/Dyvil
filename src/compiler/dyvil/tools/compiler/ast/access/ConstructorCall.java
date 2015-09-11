@@ -295,7 +295,7 @@ public class ConstructorCall implements ICall
 			
 			if (len == 1)
 			{
-				this.arguments.getFirstValue().writeExpression(writer);
+				this.arguments.getFirstValue().writeExpression(writer, Types.INT);
 				writer.writeNewArray(this.type.getElementType(), 1);
 				return;
 			}
@@ -305,7 +305,7 @@ public class ConstructorCall implements ICall
 			
 			for (int i = 0; i < len; i++)
 			{
-				paramList.getValue(i).writeExpression(writer);
+				paramList.getValue(i).writeExpression(writer, Types.INT);
 				type = type.getElementType();
 			}
 			

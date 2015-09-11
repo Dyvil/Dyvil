@@ -210,7 +210,7 @@ public final class ClassParameter extends Parameter implements IField
 		String name = "parDefault$class$" + this.index;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, "()" + desc, null, null));
 		mw.begin();
-		this.defaultValue.writeExpression(mw);
+		this.defaultValue.writeExpression(mw, this.type);
 		mw.end(this.type);
 	}
 	
@@ -226,7 +226,7 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
 		writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
@@ -237,12 +237,12 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());

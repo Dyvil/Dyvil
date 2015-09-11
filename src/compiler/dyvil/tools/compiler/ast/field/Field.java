@@ -341,7 +341,7 @@ public class Field extends Member implements IField
 			mw.visitAnnotation("Ldyvil/annotation/lazy;", false);
 			
 			mw.begin();
-			this.value.writeExpression(mw);
+			this.value.writeExpression(mw, this.type);
 			mw.end(this.type);
 			
 			return;
@@ -357,7 +357,7 @@ public class Field extends Member implements IField
 	{
 		if (this.value != null && (this.modifiers & Modifiers.STATIC) != 0)
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, this.type);
 			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
 		}
 	}
@@ -367,7 +367,7 @@ public class Field extends Member implements IField
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
 		String owner = this.theClass.getInternalName();
@@ -389,11 +389,11 @@ public class Field extends Member implements IField
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		String owner = this.theClass.getInternalName();

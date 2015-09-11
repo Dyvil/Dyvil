@@ -37,7 +37,7 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	
 	// Metadata
 	private Map<Name, Variable>	variables;
-	private IType				requiredType;
+	private IType				returnType;
 	
 	public StatementList()
 	{
@@ -75,21 +75,21 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.requiredType.isPrimitive();
+		return this.returnType.isPrimitive();
 	}
 	
 	@Override
 	public IType getType()
 	{
-		if (this.requiredType != null)
+		if (this.returnType != null)
 		{
-			return this.requiredType;
+			return this.returnType;
 		}
 		if (this.valueCount == 0)
 		{
-			return this.requiredType = Types.VOID;
+			return this.returnType = Types.VOID;
 		}
-		return this.requiredType = this.values[this.valueCount - 1].getType();
+		return this.returnType = this.values[this.valueCount - 1].getType();
 	}
 	
 	@Override
@@ -101,7 +101,7 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 			if (v != null)
 			{
 				this.values[this.valueCount - 1] = v;
-				this.requiredType = v.getType();
+				this.returnType = v.getType();
 				return this;
 			}
 		}
@@ -323,21 +323,21 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 		}
 		
 		IValue lastValue = this.values[len];
-		IType type = this.requiredType == null ? lastValue.getType() : this.requiredType;
+		IType type = this.returnType == null ? lastValue.getType() : this.returnType;
 		IValue lastValue1 = lastValue.withType(type, type, markers, context1);
 		
 		if (lastValue1 == null)
 		{
 			Marker marker = markers.create(lastValue.getPosition(), "block.type");
-			marker.addInfo("Block Type: " + this.requiredType);
+			marker.addInfo("Block Type: " + this.returnType);
 			marker.addInfo("Returning Type: " + lastValue.getType());
 		}
 		else
 		{
 			lastValue = lastValue1;
-			if (this.requiredType == null)
+			if (this.returnType == null)
 			{
-				this.requiredType = lastValue.getType();
+				this.returnType = lastValue.getType();
 			}
 		}
 		
@@ -358,7 +358,7 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.valueCount == 1 && this.requiredType != Types.VOID)
+		if (this.valueCount == 1 && this.returnType != Types.VOID)
 		{
 			return this.values[0].foldConstants();
 		}
@@ -373,7 +373,7 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.valueCount == 1 && this.requiredType != Types.VOID)
+		if (this.valueCount == 1 && this.returnType != Types.VOID)
 		{
 			return this.values[0].cleanup(context, compilableList);
 		}
@@ -388,7 +388,7 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.requiredType == Types.VOID)
+		if (this.returnType == Types.VOID)
 		{
 			this.writeStatement(writer);
 			return;
@@ -407,7 +407,7 @@ public final class StatementList implements IStatement, IValueList, IDefaultCont
 			{
 				this.values[i].writeStatement(writer);
 			}
-			this.values[len].writeExpression(writer);
+			this.values[len].writeExpression(writer, this.returnType);
 		}
 		else
 		{

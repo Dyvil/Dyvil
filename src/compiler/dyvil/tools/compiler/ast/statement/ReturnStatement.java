@@ -183,8 +183,7 @@ public class ReturnStatement extends Value implements IStatement, IValued
 		if (this.value != null)
 		{
 			this.value.writeExpression(writer);
-			IType type = this.value.getType();
-			writer.writeInsn(type.getReturnOpcode());
+			writer.writeInsn(this.value.getType().getReturnOpcode());
 			return;
 		}
 		writer.writeInsn(Opcodes.RETURN);

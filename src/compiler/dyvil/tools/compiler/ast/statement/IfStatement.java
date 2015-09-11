@@ -326,7 +326,7 @@ public class IfStatement extends Value implements IStatement
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
-		this.then.writeExpression(writer);
+		this.then.writeExpression(writer, this.commonType);
 		writer.getFrame().set(commonFrameType);
 		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 		writer.writeLabel(elseStart);
@@ -337,7 +337,7 @@ public class IfStatement extends Value implements IStatement
 		}
 		else
 		{
-			this.elseThen.writeExpression(writer);
+			this.elseThen.writeExpression(writer, this.commonType);
 		}
 		writer.getFrame().set(commonFrameType);
 		writer.writeLabel(elseEnd);

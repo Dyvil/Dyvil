@@ -26,6 +26,8 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated
 	
 	public Variance getVariance();
 	
+	public IType getDefaultType();
+	
 	// Upper Bounds
 	
 	public int upperBoundCount();

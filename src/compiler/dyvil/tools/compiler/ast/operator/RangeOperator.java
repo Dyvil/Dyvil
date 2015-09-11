@@ -260,10 +260,8 @@ public class RangeOperator implements IValue
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
-			this.firstValue.writeExpression(writer);
-			this.elementType.writeCast(writer, LazyFields.ORDERED, 0);
-			this.lastValue.writeExpression(writer);
-			this.elementType.writeCast(writer, LazyFields.ORDERED, 0);
+			this.firstValue.writeExpression(writer, LazyFields.ORDERED);
+			this.lastValue.writeExpression(writer, LazyFields.ORDERED);
 			
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", this.halfOpen ? "halfOpen" : "apply",
 					"(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)Ldyvil/collection/Range;", false);

@@ -1024,6 +1024,26 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
+	private void writeInstance(MethodWriter writer, IValue instance) throws BytecodeException
+	{
+		if (instance != null)
+		{
+			if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+			{
+				instance.writeExpression(writer, this.parameters[0].getType());
+				return;
+			}
+			
+			if (instance.isPrimitive() && this.intrinsicOpcodes != null)
+			{
+				instance.writeExpression(writer);
+				return;
+			}
+			
+			instance.writeExpression(writer, this.theClass.getType());
+		}
+	}
+	
 	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		int parIndex = 0;
@@ -1045,10 +1065,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i + parIndex];
-				arguments.writeValue(i, param.getName(), param.getValue(), writer);
+				arguments.writeValue(i, param, writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
+			arguments.writeVarargsValue(len, param, writer);
 			return;
 		}
 		
@@ -1056,7 +1076,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		for (int i = 0; i < len; i++)
 		{
 			IParameter param = this.parameters[i + parIndex];
-			arguments.writeValue(i, param.getName(), param.getValue(), writer);
+			arguments.writeValue(i, param, writer);
 		}
 	}
 	
@@ -1072,10 +1092,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					int insn = this.intrinsicOpcodes[i];
 					if (insn == INSTANCE)
 					{
-						if (instance != null)
-						{
-							instance.writeExpression(writer);
-						}
+						this.writeInstance(writer, instance);
 					}
 					else if (insn == ARGUMENTS)
 					{
@@ -1107,10 +1124,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (i == INSTANCE)
 			{
-				if (instance != null)
-				{
-					instance.writeExpression(writer);
-				}
+				this.writeInstance(writer, instance);
 			}
 			else if (i == ARGUMENTS)
 			{
@@ -1129,7 +1143,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (i == INSTANCE)
 			{
-				instance.writeExpression(writer);
+				this.writeInstance(writer, instance);
 			}
 			else if (i == ARGUMENTS)
 			{
@@ -1152,7 +1166,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (i == INSTANCE)
 			{
-				instance.writeExpression(writer);
+				this.writeInstance(writer, instance);
 			}
 			else if (i == ARGUMENTS)
 			{
@@ -1171,10 +1185,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	
 	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer);
-		}
+		this.writeInstance(writer, instance);
 		this.writeArguments(writer, instance, arguments);
 		this.writeInvoke(writer, instance, arguments, lineNumber);
 	}

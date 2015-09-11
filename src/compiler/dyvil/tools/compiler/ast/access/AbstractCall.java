@@ -113,7 +113,7 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.VOID ? this : IValue.autoBox(this, this.getType(), type);
+		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
 	@Override

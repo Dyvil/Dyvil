@@ -261,7 +261,7 @@ public final class FieldAssign implements IValue, INamed, IValued
 		
 		if (this.instance == null)
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, this.field.getTheClass().getType());
 			writer.writeInsn(Opcodes.AUTO_DUP);
 		}
 		else

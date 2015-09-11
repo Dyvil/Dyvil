@@ -105,13 +105,16 @@ public interface IObjectType extends IType
 	@Override
 	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
-		if (target == this || target.isSuperClassOf(this))
+		if (target == this)
 		{
 			return;
 		}
 		
-		writer.writeLineNumber(lineNumber);
-		writer.writeTypeInsn(Opcodes.CHECKCAST, target.getTheClass().getInternalName());
+		if (!target.isSuperClassOf(this))
+		{
+			writer.writeLineNumber(lineNumber);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+		}
 		if (target.isPrimitive())
 		{
 			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);

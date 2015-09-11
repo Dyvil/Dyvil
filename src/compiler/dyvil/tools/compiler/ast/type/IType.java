@@ -287,7 +287,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
-	 * 
 	 * @param typeVariables
 	 *            the type variables
 	 * @return

@@ -155,7 +155,7 @@ public final class MatchExpression implements IValue
 			}
 		}
 		
-		return type == Types.VOID ? this : IValue.autoBox(this, this.getType(), type);
+		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
 	@Override
@@ -359,7 +359,7 @@ public final class MatchExpression implements IValue
 	{
 		int varIndex = writer.localCount();
 		IType type = this.value.getType();
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, this.type);
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		int localCount = writer.localCount();
 		
@@ -420,7 +420,7 @@ public final class MatchExpression implements IValue
 		{
 			if (expr)
 			{
-				value.writeExpression(writer);
+				value.writeExpression(writer, this.type);
 				writer.getFrame().set(frameType);
 			}
 			else
@@ -501,7 +501,7 @@ public final class MatchExpression implements IValue
 		
 		// Write the value
 		IType type = this.value.getType();
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, Types.INT);
 		
 		int varIndex = -1;
 		if (switchVar)

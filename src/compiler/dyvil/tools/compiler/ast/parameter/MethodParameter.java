@@ -165,7 +165,7 @@ public final class MethodParameter extends Parameter
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
-		this.defaultValue.writeExpression(mw);
+		this.defaultValue.writeExpression(mw, this.type);
 		mw.end(this.type);
 	}
 	
@@ -193,7 +193,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}

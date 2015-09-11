@@ -261,7 +261,7 @@ public final class CaptureField implements IField
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		String owner = this.theClass.getInternalName();
 		String name = this.name;

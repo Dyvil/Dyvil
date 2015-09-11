@@ -737,7 +737,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		// Write the Value
 		
 		mw.begin();
-		this.value.writeExpression(mw);
+		this.value.writeExpression(mw, this.returnType);
 		mw.end(this.returnType);
 	}
 	
