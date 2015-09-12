@@ -213,7 +213,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addImport(declaration);
-		System.out.println("Added import declaration for '" + declaration.getImport() + "'");
+		System.out.println(declaration);
 	}
 	
 	@Override
@@ -227,7 +227,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addUsing(declaration);
-		System.out.println("Added using declaration for '" + declaration.getImport() + "'");
+		System.out.println(declaration);
 	}
 	
 	@Override
@@ -242,7 +242,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		super.addInclude(component);
 		this.operators.putAll(component.getHeader().getOperators());
-		System.out.println("Included the header '" + component.getHeader().getFullName() + "'");
+		System.out.println(component);
 	}
 	
 	@Override
@@ -255,7 +255,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addTypeAlias(typeAlias);
-		System.out.println("Added Type Alias '" + typeAlias.getName() + "' for '" + typeAlias.getType() + "'");
+		System.out.println(typeAlias);
 	}
 	
 	@Override
@@ -278,7 +278,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		REPLContext.compileClass(iclass);
 		
 		classes.put(iclass.getName(), iclass);
-		System.out.println("Defined class " + iclass.getName());
+		
+		StringBuilder buf = new StringBuilder("Defined ");
+		Util.classSignatureToString(iclass, buf);
+		System.out.println(buf.toString());
 	}
 	
 	@Override

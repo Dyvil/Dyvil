@@ -3,6 +3,7 @@ package dyvil.tools.compiler.util;
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -23,7 +24,22 @@ public class Util
 	{
 		buf.append(ModifierTypes.METHOD.toString(method.getModifiers()));
 		method.getType().toString("", buf);
-		buf.append(' ').append(method.getName()).append('(');
+		buf.append(' ').append(method.getName());
+		
+		int typeVariables = method.genericCount();
+		if (typeVariables > 0)
+		{
+			buf.append('[');
+			method.getTypeVariable(0).toString("", buf);
+			for (int i = 1; i < typeVariables; i++)
+			{
+				buf.append(", ");
+				method.getTypeVariable(i).toString("", buf);
+			}
+			buf.append(']');
+		}
+		
+		buf.append('(');
 		
 		int params = method.parameterCount();
 		if (params > 0)
@@ -37,6 +53,42 @@ public class Util
 		}
 		
 		buf.append(')');
+	}
+	
+	public static void classSignatureToString(IClass iclass, StringBuilder buf)
+	{
+		buf.append(ModifierTypes.CLASS_TYPE.toString(iclass.getModifiers()));
+		buf.append(iclass.getName());
+		
+		int typeVariables = iclass.genericCount();
+		if (typeVariables > 0)
+		{
+			buf.append('[');
+			
+			iclass.getTypeVariable(0).toString("", buf);
+			for (int i = 1; i < typeVariables; i++)
+			{
+				buf.append(", ");
+				iclass.getTypeVariable(i).toString("", buf);
+			}
+			
+			buf.append(']');
+		}
+		
+		int params = iclass.parameterCount();
+		if (params > 0)
+		{
+			buf.append('(');
+			
+			iclass.getParameter(0).getType().toString("", buf);
+			for (int i = 1; i < params; i++)
+			{
+				buf.append(", ");
+				iclass.getParameter(i).getType().toString("", buf);
+			}
+			
+			buf.append(')');
+		}
 	}
 	
 	public static void astToString(String prefix, IASTNode[] array, int size, String separator, StringBuilder buffer)
