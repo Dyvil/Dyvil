@@ -36,8 +36,9 @@ public final class PrimitiveType implements IType
 	protected final Name	name;
 	protected IClass		theClass;
 	
-	private final int		typecode;
-	private final String	internalName;
+	private final int	typecode;
+	private final char	typeChar;
+	
 	private final int		opcodeOffset1;
 	private final int		opcodeOffset2;
 	private final Object	frameType;
@@ -49,11 +50,11 @@ public final class PrimitiveType implements IType
 	private ReferenceType	refType;
 	private IType			simpleRefType;
 	
-	public PrimitiveType(Name name, int typecode, String internalName, int loadOpcode, int aloadOpcode, Object frameType)
+	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
 		this.name = name;
 		this.typecode = typecode;
-		this.internalName = internalName;
+		this.typeChar = typeChar;
 		this.opcodeOffset1 = loadOpcode - Opcodes.ILOAD;
 		this.opcodeOffset2 = aloadOpcode - Opcodes.IALOAD;
 		this.frameType = frameType;
@@ -319,13 +320,13 @@ public final class PrimitiveType implements IType
 	@Override
 	public String getInternalName()
 	{
-		return this.internalName;
+		return this.theClass.getInternalName();
 	}
 	
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
-		buf.append(this.internalName);
+		buf.append(this.typeChar);
 	}
 	
 	@Override
@@ -337,7 +338,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
-		buf.append(this.internalName);
+		buf.append(this.typeChar);
 	}
 	
 	@Override
