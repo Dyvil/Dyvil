@@ -13,6 +13,18 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public interface IObjectType extends IType
 {
 	@Override
+	public default boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
+	public default int getTypecode()
+	{
+		return -1;
+	}
+	
+	@Override
 	public default IType getObjectType()
 	{
 		return this;

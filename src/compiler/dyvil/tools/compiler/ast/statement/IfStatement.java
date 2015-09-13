@@ -329,7 +329,7 @@ public class IfStatement extends Value implements IStatement
 		this.then.writeExpression(writer, this.commonType);
 		writer.getFrame().set(commonFrameType);
 		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-		writer.writeLabel(elseStart);
+		writer.writeTargetLabel(elseStart);
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -340,7 +340,7 @@ public class IfStatement extends Value implements IStatement
 			this.elseThen.writeExpression(writer, this.commonType);
 		}
 		writer.getFrame().set(commonFrameType);
-		writer.writeLabel(elseEnd);
+		writer.writeTargetLabel(elseEnd);
 	}
 	
 	@Override
@@ -363,10 +363,10 @@ public class IfStatement extends Value implements IStatement
 			// If Block
 			this.then.writeStatement(writer);
 			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.writeLabel(elseStart);
+			writer.writeTargetLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.writeLabel(elseEnd);
+			writer.writeTargetLabel(elseEnd);
 		}
 		else
 		{
@@ -374,7 +374,7 @@ public class IfStatement extends Value implements IStatement
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.writeLabel(elseStart);
+			writer.writeTargetLabel(elseStart);
 		}
 	}
 	

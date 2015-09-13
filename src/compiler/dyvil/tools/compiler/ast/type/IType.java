@@ -106,15 +106,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public int typeTag();
 	
-	public default boolean isPrimitive()
-	{
-		return false;
-	}
+	public boolean isPrimitive();
 	
-	public default int getTypecode()
-	{
-		return -1;
-	}
+	public int getTypecode();
 	
 	public boolean isGenericType();
 	

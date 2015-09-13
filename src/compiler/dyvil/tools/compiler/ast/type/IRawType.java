@@ -15,7 +15,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default boolean isGenericType()
+	public default boolean isGenericType()
 	{
 		return false;
 	}

@@ -238,7 +238,7 @@ public final class TupleType implements IObjectType, ITypeList
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
-			IType concreteType = concrete.resolveType(typeVar);
+			IType concreteType = concrete.resolveTypeSafely(typeVar);
 			if (concreteType != null)
 			{
 				this.types[i].inferTypes(concreteType, typeContext);

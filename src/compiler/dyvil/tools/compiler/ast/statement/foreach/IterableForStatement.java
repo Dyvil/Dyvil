@@ -85,7 +85,7 @@ public class IterableForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Get the iterator
-		var.getValue().writeExpression(writer, var.getType());
+		var.getValue().writeExpression(writer);
 		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;", true);
 		

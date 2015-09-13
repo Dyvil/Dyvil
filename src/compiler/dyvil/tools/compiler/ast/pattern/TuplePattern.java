@@ -62,7 +62,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		this.tupleType = type;
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IType type1 = type.resolveType(tupleClass.getTypeVariable(i));
+			IType type1 = type.resolveTypeSafely(tupleClass.getTypeVariable(i));
 			IPattern pattern = this.patterns[i];
 			IPattern pattern1 = pattern.withType(type1, markers);
 			if (pattern1 == null)

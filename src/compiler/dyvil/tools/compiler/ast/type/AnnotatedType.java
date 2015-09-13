@@ -58,6 +58,18 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
+	public boolean isPrimitive()
+	{
+		return this.type.isPrimitive();
+	}
+	
+	@Override
+	public int getTypecode()
+	{
+		return this.type.getTypecode();
+	}
+	
+	@Override
 	public boolean isGenericType()
 	{
 		return this.type.isGenericType();

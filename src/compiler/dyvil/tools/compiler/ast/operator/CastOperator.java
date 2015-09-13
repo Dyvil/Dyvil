@@ -161,7 +161,8 @@ public final class CastOperator extends Value
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.value.writeExpression(writer, this.type);
+		this.value.writeExpression(writer);
+		this.value.getType().writeCast(writer, this.type, this.getLineNumber());
 	}
 	
 	@Override

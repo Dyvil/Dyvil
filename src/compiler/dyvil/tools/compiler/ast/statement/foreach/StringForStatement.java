@@ -66,7 +66,7 @@ public class StringForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Load the String
-		var.getValue().writeExpression(writer, var.getType());
+		var.getValue().writeExpression(writer);
 		
 		// Local Variables
 		int locals = writer.localCount();

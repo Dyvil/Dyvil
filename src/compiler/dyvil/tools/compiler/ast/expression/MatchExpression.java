@@ -501,7 +501,7 @@ public final class MatchExpression implements IValue
 		
 		// Write the value
 		IType type = this.value.getType();
-		this.value.writeExpression(writer, Types.INT);
+		this.value.writeExpression(writer);
 		
 		int varIndex = -1;
 		if (switchVar)

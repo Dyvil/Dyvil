@@ -119,7 +119,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 		{
 			this.type = type;
 			
-			IType type1 = this.type.resolveType(RETURN_TYPE);
+			IType type1 = this.type.resolveTypeSafely(RETURN_TYPE);
 			this.action = this.action.withType(type1, typeContext, markers, context);
 			return this;
 		}
@@ -203,7 +203,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 				this.getType();
 			}
 			
-			IType type1 = this.type.resolveType(PAR_TYPE);
+			IType type1 = this.type.resolveTypeSafely(PAR_TYPE);
 			this.pattern = this.pattern.withType(type1, markers);
 			// TODO Handle error
 		}
@@ -289,8 +289,8 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		IType parType = this.type.resolveType(PAR_TYPE);
-		IType returnType = this.type.resolveType(RETURN_TYPE);
+		IType parType = this.type.resolveTypeSafely(PAR_TYPE);
+		IType returnType = this.type.resolveTypeSafely(RETURN_TYPE);
 		String parFrameType = parType.getInternalName();
 		
 		StringBuilder builder = new StringBuilder("Ljava/lang/Object;");

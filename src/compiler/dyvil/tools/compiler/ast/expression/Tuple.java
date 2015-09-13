@@ -162,9 +162,11 @@ public final class Tuple implements IValue, IValueList
 			return null;
 		}
 		
+		this.tupleType = type;
+		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType elementType = type.resolveType(tupleClass.getTypeVariable(i));
+			IType elementType = type.resolveTypeSafely(tupleClass.getTypeVariable(i));
 			IValue value = this.values[i];
 			IValue value1 = value.withType(elementType, typeContext, markers, context);
 			if (value1 == null)

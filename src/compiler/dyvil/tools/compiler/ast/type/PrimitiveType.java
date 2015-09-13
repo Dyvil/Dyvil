@@ -254,7 +254,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return Types.ANY;
+		return null;
 	}
 	
 	@Override

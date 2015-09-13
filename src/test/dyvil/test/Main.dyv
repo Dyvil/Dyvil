@@ -4,6 +4,11 @@ public class Main
 {
 	public static void main([String] args)
 	{
+		runTests(args)
+	}	
+		
+	private static void runTests([String] args)
+	{
 		println "-- Abstract Properties --"
 		AbstractProperties.main(args)
 		println "-- Bridge Methods --"
