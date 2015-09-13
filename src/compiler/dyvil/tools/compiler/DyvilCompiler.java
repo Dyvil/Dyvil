@@ -96,7 +96,7 @@ public final class DyvilCompiler
 		long now = System.nanoTime();
 		long totalTime = now;
 		
-		System.out.println("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
+		System.out.println("Dyvil Compiler v" + VERSION + " for Dyvil v" + DYVIL_VERSION);
 		System.out.println();
 		
 		// Sets up States from arguments
