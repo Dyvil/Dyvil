@@ -36,26 +36,28 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class ExpressionParser extends Parser implements ITypeConsumer, IValueConsumer
 {
-	public static final int		VALUE		= 0x1;
-	public static final int		LIST_END	= 0x2;
-	private static final int	ARRAY_END	= 0x4;
+	public static final int VALUE = 0x1;
 	
-	public static final int	ACCESS		= 0x10;
-	public static final int	ACCESS_2	= 0x20;
+	public static final int	ACCESS		= 0x2;
+	public static final int	ACCESS_2	= 0x4;
 	
-	public static final int	STATEMENT			= 0x80;
-	public static final int	TYPE				= 0x100;
-	public static final int	CONSTRUCTOR			= 0x200;
-	public static final int	CONSTRUCTOR_END		= 0x400;
-	public static final int	PARAMETERS			= 0x800;
-	public static final int	PARAMETERS_END		= 0x1000;
-	public static final int	SUBSCRIPT_END		= 0x2000;
-	public static final int	TYPE_ARGUMENTS_END	= 0x4000;
+	public static final int	STATEMENT			= 0x8;
+	public static final int	TYPE				= 0x10;
+	public static final int	CONSTRUCTOR			= 0x20;
+	public static final int	CONSTRUCTOR_END		= 0x40;
+	public static final int	ANONYMOUS_CLASS_END	= 0x80;
+	public static final int	PARAMETERS			= 0x100;
+	public static final int	PARAMETERS_END		= 0x2000;
+	public static final int	SUBSCRIPT_END		= 0x4000;
+	public static final int	TYPE_ARGUMENTS_END	= 0x8000;
 	
 	public static final int BYTECODE_END = 0x10000;
 	
 	public static final int	PATTERN_IF	= 0x20000;
 	public static final int	PATTERN_END	= 0x40000;
+	
+	public static final int PARAMETERIZED_THIS_END = 0x80000;
+	public static final int PARAMETERIZED_SUPER_END = 0x80000;
 	
 	protected IValueConsumer field;
 	
@@ -97,6 +99,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		switch (type)
 		{
 		case Symbols.SEMICOLON:
+		case Symbols.COLON:
 		case Symbols.COMMA:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_END:
@@ -111,8 +114,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		switch (this.mode)
 		{
 		case VALUE:
-			if (type == Symbols.OPEN_PARENTHESIS)
+			switch (type)
 			{
+			case Symbols.OPEN_PARENTHESIS:
 				IToken next = token.next();
 				if (next.type() == Symbols.CLOSE_PARENTHESIS)
 				{
@@ -131,44 +135,21 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					this.mode = END;
 					return;
 				}
-				
 				pm.pushParser(new LambdaOrTupleParser(this), true);
 				this.mode = ACCESS;
 				return;
-			}
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				this.mode = ARRAY_END;
-				Array vl = new Array(token);
-				this.value = vl;
-				
-				int nextType = token.next().type();
-				if (nextType != Symbols.CLOSE_SQUARE_BRACKET)
-				{
-					pm.pushParser(new ExpressionListParser(vl));
-				}
+			case Symbols.OPEN_SQUARE_BRACKET:
+				this.mode = END;
+				pm.pushParser(new ArrayLiteralParser(this), true);
 				return;
-			}
-			if (type == Symbols.OPEN_CURLY_BRACKET)
-			{
-				this.mode = LIST_END;
-				StatementList sl = new StatementList(token);
-				this.value = sl;
-				
-				int nextType = token.next().type();
-				if (nextType != Symbols.CLOSE_CURLY_BRACKET)
-				{
-					pm.pushParser(new StatementListParser(sl));
-				}
+			case Symbols.OPEN_CURLY_BRACKET:
+				this.mode = END;
+				pm.pushParser(new StatementListParser(this), true);
 				return;
-			}
-			if (type == Tokens.SYMBOL_IDENTIFIER)
-			{
+			case Tokens.SYMBOL_IDENTIFIER:
 				this.getAccess(pm, token.nameValue(), token, type);
 				return;
-			}
-			if (type == Symbols.AT)
-			{
+			case Symbols.AT:
 				if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 				{
 					Bytecode bc = new Bytecode(token);
@@ -178,24 +159,16 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					this.value = bc;
 					return;
 				}
-				
 				Annotation a = new Annotation();
 				pm.pushParser(new AnnotationParser(a));
 				this.value = new AnnotationValue(a);
 				this.mode = 0;
 				return;
-			}
-			if (type == Symbols.ARROW_OPERATOR)
-			{
+			case Symbols.ARROW_OPERATOR:
 				LambdaExpression le = new LambdaExpression(token.raw());
 				this.value = le;
 				this.mode = ACCESS;
 				pm.pushParser(pm.newExpressionParser(le));
-				return;
-			}
-			if (type == Symbols.COLON)
-			{
-				pm.report(new SyntaxError(token, "Invalid Colon - Delete this token"));
 				return;
 			}
 			if ((type & Tokens.IDENTIFIER) != 0)
@@ -230,37 +203,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			pm.report(new SyntaxError(token, "Invalid Pattern - ':' expected"));
 			return;
-		case ARRAY_END:
+		case ANONYMOUS_CLASS_END:
 			this.value.expandPosition(token);
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
-			{
-				this.mode = ACCESS;
-				return;
-			}
 			this.field.setValue(this.value);
-			pm.popParser();
-			pm.report(new SyntaxError(token, "Invalid Array - ']' expected"));
-			return;
-		case LIST_END:
-			this.value.expandPosition(token);
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			this.mode = ACCESS_2;
+			
+			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
-				if (token.next().type() == Symbols.DOT)
-				{
-					this.mode = ACCESS_2;
-					this.dotless = false;
-					pm.skip();
-					return;
-				}
-				
-				this.field.setValue(this.value);
-				pm.popParser();
-				return;
+				pm.reparse();
+				pm.report(new SyntaxError(token, "Invalid Anonymous Class List - '}' expected"));
 			}
 			
-			this.field.setValue(this.value);
-			pm.popParser(true);
-			pm.report(new SyntaxError(token, "Invalid Statement List - '}' expected"));
 			return;
 		case PARAMETERS_END:
 			this.mode = ACCESS;
@@ -570,7 +523,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		IClass iclass = cc.getNestedClass();
 		IClassBody body = iclass.getBody();
 		pm.pushParser(new ClassBodyParser(iclass, body));
-		this.mode = LIST_END;
+		this.mode = ANONYMOUS_CLASS_END;
 		this.value = cc;
 		return;
 	}
@@ -830,7 +783,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			// this[type]
 			case Symbols.OPEN_SQUARE_BRACKET:
 				ThisValue tv = new ThisValue(token.raw());
-				this.mode = ARRAY_END;
+				this.mode = PARAMETERIZED_THIS_END;
 				this.value = tv;
 				pm.skip();
 				pm.pushParser(new TypeParser(tv));
@@ -859,7 +812,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			// super[type]
 			case Symbols.OPEN_SQUARE_BRACKET:
 				SuperValue sv = new SuperValue(token.raw());
-				this.mode = ARRAY_END;
+				this.mode = PARAMETERIZED_SUPER_END;
 				this.value = sv;
 				pm.skip();
 				pm.pushParser(new TypeParser(sv));

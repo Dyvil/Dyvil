@@ -100,10 +100,9 @@ public final class LiteralExpression implements IValue
 			method = IContext.resolveMethod(type, null, this.methodName, this.arguments);
 			if (method == null)
 			{
-				IValue value = this.arguments.getFirstValue();
 				StringBuilder builder = new StringBuilder();
 				this.arguments.typesToString(builder);
-				markers.add(value.getPosition(), "literal.method", value.getType().getName(), type.toString(), builder);
+				markers.add(this.literal.getPosition(), "literal.method", this.literal.getType(), type, builder);
 				this.type = type;
 				return null;
 			}
@@ -112,12 +111,12 @@ public final class LiteralExpression implements IValue
 		}
 		
 		GenericData data = method.getGenericData(null, null, this.arguments);
-		method.checkArguments(markers, this.arguments.getFirstValue().getPosition(), context, null, this.arguments, data);
+		method.checkArguments(markers, this.literal.getPosition(), context, null, this.arguments, data);
 		this.type = method.getType().getConcreteType(data);
 		
 		if (!type.isSuperTypeOf(this.type))
 		{
-			Marker m = markers.create(this.arguments.getFirstValue().getPosition(), "literal.type");
+			Marker m = markers.create(this.literal.getPosition(), "literal.type");
 			m.addInfo("Required Type: " + type);
 			m.addInfo("Conversion Type: " + this.type);
 			

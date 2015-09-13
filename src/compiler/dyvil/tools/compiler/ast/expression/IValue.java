@@ -35,13 +35,14 @@ public interface IValue extends IASTNode, ITyped
 	int	STRING			= 12;
 	int	FORMAT_STRING	= 13;
 	int	STRINGBUILDER	= 14;
+	int	STATEMENT_LIST	= 15;
 	
 	int	THIS	= 16;
 	int	SUPER	= 17;
 	
-	int	STATEMENT_LIST		= 24;
+	int	TUPLE				= 24;
 	int	ARRAY				= 25;
-	int	TUPLE				= 26;
+	int	MAP					= 26;
 	int	CASE_STATEMENT		= 27;
 	int	MATCH				= 28;
 	int	LAMBDA				= 29;

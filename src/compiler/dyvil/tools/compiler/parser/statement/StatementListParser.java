@@ -22,21 +22,22 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
 {
-	private static final int	EXPRESSION	= 1;
-	private static final int	TYPE		= 2;
-	private static final int	SEPARATOR	= 4;
+	private static final int	OPEN_BRACKET	= 1;
+	private static final int	EXPRESSION		= 2;
+	private static final int	TYPE			= 4;
+	private static final int	SEPARATOR		= 8;
 	
-	protected StatementList statementList;
-	
+	protected IValueConsumer consumer;
 	private Name label;
 	
+	private StatementList statementList;
 	private IType			type;
 	private int				modifiers;
 	private AnnotationList	annotations;
 	
-	public StatementListParser(StatementList valueList)
+	public StatementListParser(IValueConsumer consumer)
 	{
-		this.statementList = valueList;
+		this.consumer = consumer;
 		this.mode = EXPRESSION;
 	}
 	
@@ -78,12 +79,22 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				return;
 			}
 			
+			this.consumer.setValue(this.statementList);
 			pm.popParser(true);
 			return;
 		}
 		
 		switch (this.mode)
 		{
+		case OPEN_BRACKET:
+			this.mode = EXPRESSION;
+			this.statementList = new StatementList(token);
+			if (type != Symbols.OPEN_CURLY_BRACKET)
+			{
+				pm.report(new SyntaxError(token, "Invalid Statement List - '{' expected"));
+				pm.reparse();
+			}
+			return;
 		case EXPRESSION:
 			if (type == Symbols.SEMICOLON)
 			{

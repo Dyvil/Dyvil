@@ -101,25 +101,28 @@ public final class Array implements IValue, IValueList
 			return this.elementType;
 		}
 		
-		int len = this.valueCount;
-		if (len == 0)
+		return this.elementType = getCommonType(this.values, this.valueCount);
+	}
+	
+	public static IType getCommonType(IValue[] values, int valueCount)
+	{
+		if (valueCount == 0)
 		{
-			return this.elementType = Types.ANY;
+			return Types.ANY;
 		}
 		
-		IType t = this.values[0].getType();
-		for (int i = 1; i < len; i++)
+		IType t = values[0].getType();
+		for (int i = 1; i < valueCount; i++)
 		{
-			IType t1 = this.values[i].getType();
+			IType t1 = values[i].getType();
 			t = Types.combine(t, t1);
 			if (t == null)
 			{
-				t = Types.ANY;
-				break;
+				return Types.ANY;
 			}
 		}
 		
-		return this.elementType = t;
+		return t;
 	}
 	
 	@Override
@@ -189,12 +192,6 @@ public final class Array implements IValue, IValueList
 				value = value1;
 				this.values[i] = value1;
 			}
-		}
-		
-		if (arrayType.hasTypeVariables())
-		{
-			this.getType();
-			return this;
 		}
 		
 		this.elementType = elementType;
