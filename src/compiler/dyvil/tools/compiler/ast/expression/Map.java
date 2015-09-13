@@ -111,7 +111,7 @@ public class Map implements IValue
 			IAnnotation annotation = mapType.getTheClass().getAnnotation(Types.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
-				ArgumentList arguments = new ArgumentList(new IValue[] { new Array(this.values, this.count), new Array(this.values, this.count) }, 2);
+				ArgumentList arguments = new ArgumentList(new IValue[] { new Array(this.keys, this.count), new Array(this.values, this.count) }, 2);
 				return new LiteralExpression(this, annotation, arguments).withType(mapType, typeContext, markers, context);
 			}
 			return null;
