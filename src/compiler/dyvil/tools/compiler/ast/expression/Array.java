@@ -40,7 +40,7 @@ public final class Array implements IValue, IValueList
 	protected int		valueCount;
 	
 	// Metadata
-	protected IType	requiredType;
+	protected IType	arrayType;
 	protected IType	elementType;
 	
 	public Array()
@@ -138,12 +138,12 @@ public final class Array implements IValue, IValueList
 	@Override
 	public IType getType()
 	{
-		if (this.requiredType != null)
+		if (this.arrayType != null)
 		{
-			return this.requiredType;
+			return this.arrayType;
 		}
 		
-		return this.requiredType = new ArrayType(this.getElementType());
+		return this.arrayType = new ArrayType(this.getElementType());
 	}
 	
 	@Override
@@ -162,40 +162,30 @@ public final class Array implements IValue, IValueList
 			{
 				return new LiteralExpression(this, getArrayToIterable()).withType(arrayType, typeContext, markers, context);
 			}
-			else if (iclass != dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS)
+			if (iclass != dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS)
 			{
 				return null;
 			}
-			else
-			{
-				elementType = this.getElementType();
-			}
+			elementType = this.getElementType();
 		}
 		else
 		{
 			// If the type is an array type, get it's element type
-			elementType = arrayType.getElementType();
+			this.elementType = elementType = arrayType.getElementType();
 		}
-		
-		// Check for every value if it is the element type
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			if (!this.values[i].isType(elementType))
-			{
-				return null;
-			}
-		}
+
+		this.arrayType = arrayType;
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			IValue value1 = value.withType(elementType, typeContext, markers, context);
+			IValue value1 = elementType.convertValue(value, typeContext, markers, context);
 			
 			if (value1 == null)
 			{
 				Marker marker = markers.create(value.getPosition(), "array.element.type");
-				marker.addInfo("Array Type: " + this.requiredType);
-				marker.addInfo("Array Element Type: " + value.getType());
+				marker.addInfo("Array Type: " + arrayType);
+				marker.addInfo("Element Type: " + value.getType());
 			}
 			else
 			{
@@ -203,9 +193,6 @@ public final class Array implements IValue, IValueList
 				this.values[i] = value1;
 			}
 		}
-		
-		this.elementType = elementType;
-		this.requiredType = arrayType;
 		
 		return this;
 	}
@@ -275,22 +262,22 @@ public final class Array implements IValue, IValueList
 		
 		// If the type is an array type, get it's element type
 		IType type1 = type.getElementType();
-		int total = 0;
+		float total = 0;
 		
 		// Get the type match for every value in the array
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			float m = this.values[i].getTypeMatch(type1);
-			if (m == 0)
+			if (m <= 0F)
 			{
 				// If the type match for one value is zero, return 0
-				return 0;
+				return 0F;
 			}
 			total += m;
 		}
 		
 		// Divide by the count
-		return 1 + total / this.valueCount;
+		return 1F + total / this.valueCount;
 	}
 	
 	@Override
@@ -431,9 +418,8 @@ public final class Array implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			writer.writeInsn(Opcodes.DUP);
-			IValue value = this.values[i];
 			writer.writeLDC(i);
-			value.writeExpression(writer, type);
+			this.values[i].writeExpression(writer, type);
 			writer.writeInsn(opcode);
 		}
 	}

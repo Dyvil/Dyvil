@@ -5,8 +5,10 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.mutable.ArrayMap;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.LinkedList;
 import dyvil.collection.mutable.TupleMap;
@@ -16,6 +18,7 @@ import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible
+@MapConvertible
 public interface MutableMap<K, V> extends Map<K, V>
 {
 	public static <K, V> MutableMap<K, V> apply()
@@ -43,6 +46,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 			map.$plus$eq(entry);
 		}
 		return map;
+	}
+	
+	public static <K, V> MutableMap<K, V> apply(K[] keys, V[] values)
+	{
+		return new ArrayMap<K, V>(keys, values, true);
 	}
 	
 	// Simple Getters

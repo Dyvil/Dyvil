@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.tuple.Tuple2;
@@ -21,6 +22,7 @@ import dyvil.util.Some;
 
 @NilConvertible(methodName = "fromNil")
 @ArrayConvertible
+@MapConvertible
 public interface Map<K, V> extends Iterable<Entry<K, V>>
 {
 	public static <K, V> ImmutableMap<K, V> fromNil()
@@ -41,6 +43,11 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
+	{
+		return ImmutableMap.apply(keys, values);
 	}
 	
 	// Simple Getters

@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.Covariant;
@@ -22,6 +23,7 @@ import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible
+@MapConvertible
 public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Immutable
 {
 	public static interface Builder<K, V>
@@ -72,6 +74,11 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 		default:
 			return new TupleMap(entries, len, true);
 		}
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
+	{
+		return new ArrayMap<K, V>(keys, values, true);
 	}
 	
 	public static <K, V> Builder<K, V> builder()
