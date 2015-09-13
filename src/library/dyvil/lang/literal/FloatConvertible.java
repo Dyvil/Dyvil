@@ -29,4 +29,5 @@ package dyvil.lang.literal;
  */
 public @interface FloatConvertible
 {
+	public String methodName() default "apply";
 }

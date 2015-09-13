@@ -139,7 +139,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.mode = ACCESS;
 				return;
 			case Symbols.OPEN_SQUARE_BRACKET:
-				this.mode = END;
+				this.mode = ACCESS;
 				pm.pushParser(new ArrayLiteralParser(this), true);
 				return;
 			case Symbols.OPEN_CURLY_BRACKET:

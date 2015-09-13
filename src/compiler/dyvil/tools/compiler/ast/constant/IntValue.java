@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -76,9 +77,10 @@ public final class IntValue implements IConstantValue
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -157,6 +159,12 @@ public final class IntValue implements IConstantValue
 	{
 		writer.writeLDC(this.value);
 		writer.writeInsn(Opcodes.IRETURN);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return Integer.toString(this.value);
 	}
 	
 	@Override

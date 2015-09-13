@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -56,13 +57,15 @@ public final class StringValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isSuperTypeOf(Types.STRING))
+		if (type == Types.STRING || type.isSuperTypeOf(Types.STRING))
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

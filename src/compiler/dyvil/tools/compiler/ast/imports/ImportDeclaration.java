@@ -91,20 +91,6 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		if (this.isStatic)
-		{
-			buffer.append("using ");
-		}
-		else
-		{
-			buffer.append("import ");
-		}
-		this.theImport.toString(prefix, buffer);
-	}
-	
-	@Override
 	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeByte(this.theImport.importTag());
@@ -116,5 +102,25 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		this.theImport = IImport.fromTag(dis.readByte());
 		this.theImport.read(dis);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.isStatic)
+		{
+			buffer.append("using ");
+		}
+		else
+		{
+			buffer.append("import ");
+		}
+		this.theImport.toString(prefix, buffer);
 	}
 }

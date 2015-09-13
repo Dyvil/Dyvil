@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.Name;
@@ -52,30 +53,16 @@ public final class TuplePattern extends Pattern implements IPatternList
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (!TupleType.getTupleClass(this.patternCount).isSubTypeOf(type))
-		{
-			return null;
-		}
-		int typeTag = type.typeTag();
-		if (typeTag != IType.GENERIC && typeTag != IType.TUPLE)
+		IClass tupleClass = TupleType.getTupleClass(this.patternCount);
+		if (!tupleClass.isSubTypeOf(type))
 		{
 			return null;
 		}
 		
-		ITypeList typeList = (ITypeList) type;
-		
-		for (int i = 0; i < this.patternCount; i++)
-		{
-			if (!this.patterns[i].isType(typeList.getType(i)))
-			{
-				return null;
-			}
-		}
 		this.tupleType = type;
-		
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IType type1 = typeList.getType(i);
+			IType type1 = type.resolveType(tupleClass.getTypeVariable(i));
 			IPattern pattern = this.patterns[i];
 			IPattern pattern1 = pattern.withType(type1, markers);
 			if (pattern1 == null)
@@ -95,11 +82,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	@Override
 	public boolean isType(IType type)
 	{
-		if (TupleType.isSuperType(type, this.patterns, this.patternCount))
-		{
-			return true;
-		}
-		return false;
+		return TupleType.isSuperType(type, this.patterns, this.patternCount);
 	}
 	
 	@Override

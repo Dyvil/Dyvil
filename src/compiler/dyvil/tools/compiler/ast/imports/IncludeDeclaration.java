@@ -132,6 +132,12 @@ public class IncludeDeclaration implements IASTNode
 	}
 	
 	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("include ");

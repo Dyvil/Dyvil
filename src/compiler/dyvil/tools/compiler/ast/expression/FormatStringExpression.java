@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -69,12 +71,14 @@ public final class FormatStringExpression implements IValue
 		{
 			return this;
 		}
+		
 		IClass iclass = type.getTheClass();
-		if (iclass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS) != null)
+		IAnnotation annotation;
+		if ((annotation = iclass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS)) != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
-		if (iclass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null)
+		if ((annotation = iclass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE)) != null)
 		{
 			StringValue string;
 			int len = this.count / 2;
@@ -101,7 +105,7 @@ public final class FormatStringExpression implements IValue
 				list.addValue(this.values[i]);
 			}
 			
-			return new LiteralExpression(this, list).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation, list).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -268,6 +272,12 @@ public final class FormatStringExpression implements IValue
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

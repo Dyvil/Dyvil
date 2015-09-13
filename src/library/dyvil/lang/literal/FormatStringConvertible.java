@@ -21,4 +21,5 @@ package dyvil.lang.literal;
  */
 public @interface FormatStringConvertible
 {
+	public String methodName() default "apply";
 }

@@ -4,17 +4,14 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -43,8 +40,6 @@ public final class Tuple implements IValue, IValueList
 	
 	// Metadata
 	private IType		tupleType;
-	private IMethod		method;
-	private IArguments	arguments;
 	
 	public Tuple(ICodePosition position)
 	{
@@ -155,34 +150,35 @@ public final class Tuple implements IValue, IValueList
 			return this.values[0].withType(type, typeContext, markers, context);
 		}
 		
-		if (type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null)
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE);
+		if (annotation != null)
 		{
-			this.tupleType = type;
-			return this;
-		}
-		if (TupleType.isSuperType(type, this.values, this.valueCount))
-		{
-			ITypeList typeList = (ITypeList) this.getType();
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				IType elementType = typeList.getType(i);
-				IValue value = this.values[i];
-				IValue value1 = value.withType(elementType, typeContext, markers, context);
-				if (value1 == null)
-				{
-					Marker m = markers.create(value.getPosition(), "tuple.type");
-					m.addInfo("Pattern Type: " + value.getType());
-					m.addInfo("Tuple Type: " + elementType);
-				}
-				else
-				{
-					this.values[i] = value = value1;
-				}
-			}
-			return this;
+			return new LiteralExpression(this, annotation, new ArgumentList(this.values, this.valueCount)).withType(type, typeContext, markers, context);
 		}
 		
-		return null;
+		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		if (!tupleClass.isSubTypeOf(type))
+		{
+			return null;
+		}
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			IType elementType = type.resolveType(tupleClass.getTypeVariable(i));
+			IValue value = this.values[i];
+			IValue value1 = value.withType(elementType, typeContext, markers, context);
+			if (value1 == null)
+			{
+				Marker m = markers.create(value.getPosition(), "tuple.type");
+				m.addInfo("Pattern Type: " + value.getType());
+				m.addInfo("Tuple Type: " + elementType);
+			}
+			else
+			{
+				this.values[i] = value = value1;
+			}
+		}
+		return this;
 	}
 	
 	@Override
@@ -235,41 +231,9 @@ public final class Tuple implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.tupleType == null)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.getType();
-		}
-		
-		if (this.tupleType.typeTag() == IType.TUPLE)
-		{
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				this.values[i].checkTypes(markers, context);
-			}
-			
-			return;
-		}
-		
-		IMethod m = IContext.resolveMethod(this.getType(), null, Name.apply, this.arguments = new ArgumentList(this.values, this.valueCount));
-		if (m == null)
-		{
-			StringBuilder builder = new StringBuilder();
-			if (this.valueCount > 0)
-			{
-				this.values[0].getType().toString("", builder);
-				for (int i = 1; i < this.valueCount; i++)
-				{
-					builder.append(", ");
-					this.values[i].getType().toString("", builder);
-				}
-			}
-			
-			markers.add(this.position, "tuple.method", builder.toString(), this.tupleType.toString());
-		}
-		else
-		{
-			this.method = m;
-			m.checkArguments(markers, this.position, context, null, this.arguments, null);
+			this.values[i].checkTypes(markers, context);
 		}
 	}
 	
@@ -305,12 +269,6 @@ public final class Tuple implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.method != null)
-		{
-			this.method.writeCall(writer, null, this.arguments, this.tupleType, this.getLineNumber());
-			return;
-		}
-		
 		String internal = this.tupleType.getInternalName();
 		writer.writeTypeInsn(Opcodes.NEW, internal);
 		writer.writeInsn(Opcodes.DUP);

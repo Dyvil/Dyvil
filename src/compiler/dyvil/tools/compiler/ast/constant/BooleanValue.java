@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -69,9 +70,11 @@ public final class BooleanValue implements IConstantValue
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
+		
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -151,6 +154,12 @@ public final class BooleanValue implements IConstantValue
 		{
 			writer.writeJumpInsn(Opcodes.GOTO, dest);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.value ? "true" : "false";
 	}
 	
 	@Override

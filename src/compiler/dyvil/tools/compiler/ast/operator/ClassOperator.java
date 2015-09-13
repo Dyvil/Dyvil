@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -88,9 +89,10 @@ public final class ClassOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;
