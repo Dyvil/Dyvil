@@ -15,6 +15,7 @@ import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.repl.command.ExitCommand;
 import dyvil.tools.repl.command.HelpCommand;
 import dyvil.tools.repl.command.ICommand;
@@ -22,7 +23,7 @@ import dyvil.tools.repl.command.VersionCommand;
 
 public class DyvilREPL
 {
-	public static final String VERSION = "1.0.0";
+	public static final String VERSION = "0.1.1";
 	
 	private static BufferedReader	reader;
 	protected static REPLContext	context	= new REPLContext();
@@ -57,9 +58,16 @@ public class DyvilREPL
 			library.loadLibrary();
 		}
 		
+		long now = System.nanoTime();
+		
 		Package.init();
 		Types.initHeaders();
 		Types.initTypes();
+		
+		if (DyvilCompiler.debug)
+		{
+			System.out.println("Loaded REPL (" + Util.toTime(System.nanoTime() - now) + ")");
+		}
 		
 		reader = new BufferedReader(new InputStreamReader(System.in));
 		
@@ -83,7 +91,8 @@ public class DyvilREPL
 		{
 			String s = reader.readLine();
 			
-			outer: for (int i = 0, len = s.length(); i < len; i++)
+			outer:
+			for (int i = 0, len = s.length(); i < len; i++)
 			{
 				char c = s.charAt(i);
 				
