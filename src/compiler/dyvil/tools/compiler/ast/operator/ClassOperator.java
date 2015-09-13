@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -8,9 +9,10 @@ import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -19,6 +21,19 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public final class ClassOperator extends Value
 {
+	public static final class Types
+	{
+		public static final IClass		CLASS_CLASS	= Package.javaLang.resolveClass("Class");
+		public static final ClassType	CLASS		= new ClassType(CLASS_CLASS);
+		
+		public static final IClass CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected IType type;
 	
 	// Metadata
@@ -108,7 +123,7 @@ public final class ClassOperator extends Value
 	{
 		if (this.type == null)
 		{
-			this.type = Types.UNKNOWN;
+			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
 			markers.add(this.position, "classoperator.invalid");
 			return;
 		}

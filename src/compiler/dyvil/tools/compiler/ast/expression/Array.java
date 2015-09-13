@@ -11,9 +11,9 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -24,6 +24,16 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Array implements IValue, IValueList
 {
+	public static final class Types
+	{
+		public static final IClass ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected ICodePosition position;
 	
 	protected IValue[]	values;
@@ -108,17 +118,17 @@ public final class Array implements IValue, IValueList
 	{
 		if (valueCount == 0)
 		{
-			return Types.ANY;
+			return dyvil.tools.compiler.ast.type.Types.ANY;
 		}
 		
 		IType t = values[0].getType();
 		for (int i = 1; i < valueCount; i++)
 		{
 			IType t1 = values[i].getType();
-			t = Types.combine(t, t1);
+			t = dyvil.tools.compiler.ast.type.Types.combine(t, t1);
 			if (t == null)
 			{
-				return Types.ANY;
+				return dyvil.tools.compiler.ast.type.Types.ANY;
 			}
 		}
 		
@@ -148,11 +158,11 @@ public final class Array implements IValue, IValueList
 			{
 				return new LiteralExpression(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (arrayType.classEquals(Types.ITERABLE))
+			if (arrayType.classEquals(dyvil.tools.compiler.ast.type.Types.ITERABLE))
 			{
 				return new LiteralExpression(this, getArrayToIterable()).withType(arrayType, typeContext, markers, context);
 			}
-			else if (iclass != Types.OBJECT_CLASS)
+			else if (iclass != dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -208,13 +218,13 @@ public final class Array implements IValue, IValueList
 		{
 			return ARRAY_TO_ITERABLE;
 		}
-		return ARRAY_TO_ITERABLE = Types.getObjectArray().getBody().getMethod(Name.getQualified("toIterable"));
+		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.Types.getObjectArray().getBody().getMethod(Name.getQualified("toIterable"));
 	}
 	
 	private boolean isConvertibleFrom(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		return iclass == Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || Types.ITERABLE.isSuperClassOf(type);
+		return iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || dyvil.tools.compiler.ast.type.Types.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -11,10 +12,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -25,6 +26,16 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Tuple implements IValue, IValueList
 {
+	public static final class Types
+	{
+		public static final IClass TUPLE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TupleConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected ICodePosition position;
 	
 	protected IValue[]	values;
@@ -307,7 +318,7 @@ public final class Tuple implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			value.writeExpression(writer, Types.OBJECT);
+			value.writeExpression(writer, dyvil.tools.compiler.ast.type.Types.OBJECT);
 		}
 		
 		String owner = internal;

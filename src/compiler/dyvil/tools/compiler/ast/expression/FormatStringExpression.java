@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -17,6 +17,16 @@ import dyvil.tools.compiler.transform.CaseClasses;
 
 public final class FormatStringExpression implements IValue
 {
+	public static final class Types
+	{
+		public static final IClass FORMAT_STRING_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected ICodePosition position;
 	
 	private IValue[]	values	= new IValue[1];
@@ -49,18 +59,18 @@ public final class FormatStringExpression implements IValue
 	@Override
 	public IType getType()
 	{
-		return Types.STRING;
+		return dyvil.tools.compiler.ast.type.Types.STRING;
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isSuperTypeOf(Types.STRING))
+		if (type.isSuperTypeOf(dyvil.tools.compiler.ast.type.Types.STRING))
 		{
 			return this;
 		}
 		IClass iclass = type.getTheClass();
-		if (iclass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		if (iclass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
 			return new LiteralExpression(this).withType(type, typeContext, markers, context);
 		}
@@ -99,7 +109,7 @@ public final class FormatStringExpression implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.isSuperTypeOf(Types.STRING))
+		if (type.isSuperTypeOf(dyvil.tools.compiler.ast.type.Types.STRING))
 		{
 			return true;
 		}
@@ -110,13 +120,14 @@ public final class FormatStringExpression implements IValue
 	private boolean isConvertible(IType type)
 	{
 		IClass theClass = type.getTheClass();
-		return theClass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null || theClass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null;
+		return theClass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS) != null
+				|| theClass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null;
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		float distance = type.getSubTypeDistance(Types.STRING);
+		float distance = type.getSubTypeDistance(dyvil.tools.compiler.ast.type.Types.STRING);
 		if (distance != 0)
 		{
 			return distance;
@@ -188,7 +199,7 @@ public final class FormatStringExpression implements IValue
 			IValue v = this.values[i];
 			v.check(markers, context);
 			
-			if (v.getType() == Types.VOID)
+			if (v.getType() == dyvil.tools.compiler.ast.type.Types.VOID)
 			{
 				markers.add(v.getPosition(), "formatstring.void");
 			}

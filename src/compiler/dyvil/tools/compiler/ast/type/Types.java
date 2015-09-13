@@ -34,13 +34,10 @@ public final class Types
 	
 	public static final ClassType	OBJECT				= new ClassType();
 	public static final ClassType	STRING				= new ClassType();
-	public static final ClassType	CLASS				= new ClassType();
-	public static final ClassType	TYPE				= new ClassType();
 	public static final ClassType	ITERABLE			= new ClassType();
 	public static final ClassType	THROWABLE			= new ClassType();
 	public static final ClassType	RUNTIME_EXCEPTION	= new ClassType();
 	public static final ClassType	IMMUTABLE			= new ClassType();
-	public static final ClassType	ANNOTATION			= new ClassType();
 	
 	public static IClass	VOID_CLASS;
 	public static IClass	BOOLEAN_CLASS;
@@ -54,9 +51,7 @@ public final class Types
 	
 	public static IClass	OBJECT_CLASS;
 	public static IClass	STRING_CLASS;
-	public static IClass	CLASS_CLASS;
 	public static IClass	NULL_CLASS;
-	public static IClass	TYPE_CLASS;
 	public static IClass	ITERABLE_CLASS;
 	public static IClass	THROWABLE_CLASS;
 	public static IClass	RUNTIME_EXCEPTION_CLASS;
@@ -64,9 +59,6 @@ public final class Types
 	
 	public static IClass	INTRINSIC_CLASS;
 	public static IClass	OVERRIDE_CLASS;
-	public static IClass	ANNOTATION_CLASS;
-	public static IClass	RETENTION_CLASS;
-	public static IClass	TARGET_CLASS;
 	public static IClass	MUTATING_CLASS;
 	
 	public static IClass	BOOLEAN_CONVERTIBLE_CLASS;
@@ -76,12 +68,6 @@ public final class Types
 	public static IClass	FLOAT_CONVERTIBLE_CLASS;
 	public static IClass	DOUBLE_CONVERTIBLE_CLASS;
 	public static IClass	STRING_CONVERTIBLE_CLASS;
-	public static IClass	FORMAT_STRING_CONVERTIBLE;
-	public static IClass	NIL_CONVERTIBLE_CLASS;
-	public static IClass	ARRAY_CONVERTIBLE;
-	public static IClass	TUPLE_CONVERTIBLE;
-	public static IClass	CLASS_CONVERTIBLE;
-	public static IClass	TYPE_CONVERTIBLE;
 	
 	private static IClass	OBJECT_ARRAY_CLASS;
 	public static IClass	OBJECT_SIMPLE_REF_CLASS;
@@ -107,18 +93,13 @@ public final class Types
 		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
-		CLASS.theClass = CLASS_CLASS = Package.javaLang.resolveClass("Class");
-		TYPE.theClass = TYPE_CLASS = Package.dyvilLang.resolveClass("Type");
 		ITERABLE.theClass = ITERABLE_CLASS = Package.javaLang.resolveClass("Iterable");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
 		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
-		ANNOTATION.theClass = ANNOTATION_CLASS = Package.javaLangAnnotation.resolveClass("Annotation");
 		
 		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
 		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");
-		RETENTION_CLASS = Package.javaLangAnnotation.resolveClass("Retention");
-		TARGET_CLASS = Package.javaLangAnnotation.resolveClass("Target");
 		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("mutating");
 		
 		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");
@@ -128,12 +109,6 @@ public final class Types
 		FLOAT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("FloatConvertible");
 		DOUBLE_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("DoubleConvertible");
 		STRING_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("StringConvertible");
-		NIL_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("NilConvertible");
-		FORMAT_STRING_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
-		ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
-		TUPLE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TupleConvertible");
-		CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
-		TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
 		
 		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
 		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);

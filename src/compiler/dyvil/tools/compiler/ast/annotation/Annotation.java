@@ -24,6 +24,8 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -34,6 +36,20 @@ import dyvil.tools.compiler.util.Util;
 
 public final class Annotation implements IAnnotation
 {
+	public static final class Types
+	{
+		public static final IClass	RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
+		public static final IClass	TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
+		
+		public static final IClass		ANNOTATION_CLASS	= Package.javaLangAnnotation.resolveClass("Annotation");
+		public static final ClassType	ANNOTATION			= new ClassType(ANNOTATION_CLASS);
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
 	
 	protected ICodePosition	position;

@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -62,7 +61,7 @@ public final class AnnotationMetadata implements IClassMetadata
 		}
 		if (this.retention == null)
 		{
-			IAnnotation retention = this.theClass.getAnnotation(Types.RETENTION_CLASS);
+			IAnnotation retention = this.theClass.getAnnotation(Annotation.Types.RETENTION_CLASS);
 			if (retention != null)
 			{
 				INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
@@ -74,7 +73,7 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 		
-		IAnnotation target = this.theClass.getAnnotation(Types.TARGET_CLASS);
+		IAnnotation target = this.theClass.getAnnotation(Annotation.Types.TARGET_CLASS);
 		if (target == null)
 		{
 			return;
@@ -98,9 +97,9 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (!this.theClass.isSubTypeOf(Types.ANNOTATION))
+		if (!this.theClass.isSubTypeOf(Annotation.Types.ANNOTATION))
 		{
-			this.theClass.addInterface(Types.ANNOTATION);
+			this.theClass.addInterface(Annotation.Types.ANNOTATION);
 		}
 	}
 	

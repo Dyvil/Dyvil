@@ -38,7 +38,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	public StatementListParser(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.mode = EXPRESSION;
+		this.mode = OPEN_BRACKET;
 	}
 	
 	@Override
@@ -80,7 +80,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			}
 			
 			this.consumer.setValue(this.statementList);
-			pm.popParser(true);
+			pm.popParser();
 			return;
 		}
 		

@@ -21,6 +21,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
+import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
@@ -267,7 +268,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			this.mode = METHOD_END;
 			if (type == Symbols.OPEN_CURLY_BRACKET)
 			{
-				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member), true);
+				pm.pushParser(new StatementListParser((IValueConsumer) this.member), true);
 				return;
 			}
 			if (type == Symbols.EQUALS)
