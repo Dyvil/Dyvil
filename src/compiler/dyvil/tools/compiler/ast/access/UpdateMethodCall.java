@@ -43,14 +43,8 @@ public class UpdateMethodCall extends AbstractCall
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	protected IValue resolveCall(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
-		{
-			this.instance = this.instance.resolve(markers, context);
-		}
-		this.arguments.resolve(markers, context);
-		
 		IMethod method = ICall.resolveMethod(context, this.instance, Name.update, this.arguments);
 		if (method != null)
 		{

@@ -5,10 +5,9 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -23,8 +22,6 @@ public final class CompoundCall extends AbstractCall implements INamed
 {
 	public Name name;
 	
-	public IMethod updateMethod;
-	
 	public CompoundCall(ICodePosition position)
 	{
 		this.position = position;
@@ -37,10 +34,42 @@ public final class CompoundCall extends AbstractCall implements INamed
 		this.name = name;
 	}
 	
+	public CompoundCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.name = name;
+		this.arguments = arguments;
+	}
+	
 	@Override
 	public int valueTag()
 	{
 		return METHOD_CALL;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return Types.VOID;
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Types.VOID;
+	}
+	
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return type == Types.VOID ? this : null;
+	}
+	
+	@Override
+	public float getTypeMatch(IType type)
+	{
+		return 0F;
 	}
 	
 	@Override
@@ -68,25 +97,39 @@ public final class CompoundCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	protected IValue resolveCall(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		int type = this.instance.valueTag();
+		if (type == APPLY_CALL)
 		{
-			this.instance.resolve(markers, context);
+			AbstractCall ac = (AbstractCall) this.instance;
+			
+			// x(y...) op= z
+			// -> x(y...) = x(y...).op(z)
+			// -> x.update(y..., x.apply(y...).op(z))
+			
+			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
+			IValue update = new UpdateMethodCall(this.position, ac.instance, ac.arguments.withLastValue(Name.update, op)).resolveCall(markers, context);
+			return update;
 		}
-		
-		this.arguments.resolve(markers, context);
-		
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
-		if (method != null)
+		else if (type == SUBSCRIPT_GET)
 		{
-			this.method = method;
-			this.checkArguments(markers, context);
+			AbstractCall ac = (AbstractCall) this.instance;
+			
+			// x[y...] op= z
+			// -> x[y...] = x[y...].op(z)
+			// -> x.subscript_=(y..., x.subscript(y...).op(z))
+			
+			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
+			IValue subscript_$eq = new SubscriptSetter(this.position, ac.instance, ac.arguments.withLastValue(Name.subscript_$eq, op)).resolveCall(markers, context);
+			return subscript_$eq;
+		}
+		else if (type == FIELD_ACCESS)
+		{
 			return this;
 		}
-		
-		ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
-		return this;
+		// TODO Error
+		throw new Error();
 	}
 	
 	@Override
@@ -96,47 +139,11 @@ public final class CompoundCall extends AbstractCall implements INamed
 		{
 			this.instance.checkTypes(markers, context);
 			
-			int valueTag = this.instance.valueTag();
-			if (valueTag == APPLY_CALL)
+			FieldAccess fa = (FieldAccess) this.instance;
+			if (fa.field != null)
 			{
-				ApplyMethodCall call = (ApplyMethodCall) this.instance;
-				IArguments arguments1 = call.arguments.withLastValue(call);
-				
-				IMethod match = ICall.resolveMethod(context, call.instance, Name.update, arguments1);
-				if (match != null)
-				{
-					this.updateMethod = match;
-				}
-				else
-				{
-					Marker marker = markers.create(this.position, "method.compound.update");
-					marker.addInfo("Callee Type: " + call.instance.getType());
-				}
-			}
-			else if (valueTag == SUBSCRIPT_GET)
-			{
-				SubscriptGetter setter = (SubscriptGetter) this.instance;
-				IArguments arguments1 = setter.arguments.withLastValue(setter);
-				
-				IMethod match = ICall.resolveMethod(context, setter.instance, Name.subscript_$eq, arguments1);
-				if (match != null)
-				{
-					this.updateMethod = match;
-				}
-				else
-				{
-					Marker marker = markers.create(this.position, "method.compound.subscript");
-					marker.addInfo("Callee Type: " + setter.instance.getType());
-				}
-			}
-			else if (valueTag == FIELD_ACCESS)
-			{
-				FieldAccess fa = (FieldAccess) this.instance;
-				if (fa.field != null)
-				{
-					fa.field = fa.field.capture(context);
-					this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.instance, this.arguments.getLastValue()));
-				}
+				fa.field = fa.field.capture(context);
+				this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.instance, this.arguments.getLastValue()));
 			}
 		}
 		
@@ -173,98 +180,37 @@ public final class CompoundCall extends AbstractCall implements INamed
 	}
 	
 	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		int i = this.instance.valueTag();
-		if (i == FIELD_ACCESS)
-		{
-			FieldAccess access = (FieldAccess) this.instance;
-			IDataMember f = access.field;
-			
-			int lineNumber = this.instance.getLineNumber();
-			if (this.writeIINC(writer, f))
-			{
-				f.writeGet(writer, null, lineNumber);
-				return;
-			}
-			
-			IValue instance = access.instance;
-			if (instance != null)
-			{
-				instance.writeExpression(writer, f.getTheClass().getType());
-				writer.writeInsn(Opcodes.AUTO_DUP);
-			}
-			
-			f.writeGet(writer, null, lineNumber);
-			this.method.writeCall(writer, null, this.arguments, null, lineNumber);
-			writer.writeInsn(Opcodes.AUTO_DUP);
-			f.writeSet(writer, null, null, lineNumber);
-		}
-		else if (i == APPLY_CALL || i == SUBSCRIPT_GET)
-		{
-			AbstractCall call = (AbstractCall) this.instance;
-			
-			call.instance.writeExpression(writer, call.method.getTheClass().getType());
-			
-			for (IValue v : call.arguments)
-			{
-				v.writeExpression(writer);
-			}
-			
-			writer.writeInsn(Opcodes.DUP2);
-			
-			int line = this.instance.getLineNumber();
-			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null, line);
-			this.method.writeCall(writer, null, this.arguments, null, line);
-			writer.writeInsn(Opcodes.DUP_X2);
-			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, line);
-		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		int i = this.instance.valueTag();
-		if (i == FIELD_ACCESS)
+		FieldAccess access = (FieldAccess) this.instance;
+		IDataMember f = access.field;
+		
+		if (this.writeIINC(writer, f))
 		{
-			FieldAccess access = (FieldAccess) this.instance;
-			IDataMember f = access.field;
-			
-			if (this.writeIINC(writer, f))
-			{
-				return;
-			}
-			
-			IValue instance = access.instance;
-			if (instance != null)
-			{
-				instance.writeExpression(writer);
-				writer.writeInsn(Opcodes.AUTO_DUP);
-			}
-			
-			int lineNumber = this.instance.getLineNumber();
-			f.writeGet(writer, null, lineNumber);
-			this.method.writeCall(writer, null, this.arguments, null, lineNumber);
-			f.writeSet(writer, null, null, lineNumber);
+			return;
 		}
-		else if (i == APPLY_CALL || i == SUBSCRIPT_SET)
+		
+		IValue instance = access.instance;
+		if (instance != null)
 		{
-			AbstractCall call = (ApplyMethodCall) this.instance;
-			
-			call.instance.writeExpression(writer);
-			
-			for (IValue v : call.arguments)
-			{
-				v.writeExpression(writer);
-			}
-			
-			writer.writeInsn(Opcodes.DUP2);
-			
-			int lineNumber = this.instance.getLineNumber();
-			call.method.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
-			this.method.writeCall(writer, null, this.arguments, null, lineNumber);
-			this.updateMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
+			instance.writeExpression(writer);
+			writer.writeInsn(Opcodes.AUTO_DUP);
 		}
+		
+		int lineNumber = this.instance.getLineNumber();
+		f.writeGet(writer, null, lineNumber);
+		this.method.writeCall(writer, null, this.arguments, null, lineNumber);
+		f.writeSet(writer, null, null, lineNumber);
 	}
 	
 	private boolean writeIINC(MethodWriter writer, IDataMember f) throws BytecodeException

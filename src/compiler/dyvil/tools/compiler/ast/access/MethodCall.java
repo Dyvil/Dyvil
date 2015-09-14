@@ -88,17 +88,9 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	protected IValue resolveCall(MarkerList markers, IContext context)
 	{
 		int args = this.arguments.size();
-		
-		if (this.instance != null)
-		{
-			this.instance = this.instance.resolve(markers, context);
-		}
-		
-		this.arguments.resolve(markers, context);
-		
 		if (args == 1)
 		{
 			IValue op;
@@ -133,17 +125,9 @@ public final class MethodCall extends AbstractCall implements INamed
 			{
 				String unqualified = this.name.unqualified;
 				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				IMethod method1 = IContext.resolveMethod(this.instance.getType(), null, name, this.arguments);
-				if (method1 != null)
-				{
-					CompoundCall call = new CompoundCall(this.position);
-					call.method = method1;
-					call.instance = this.instance;
-					call.arguments = this.arguments;
-					call.name = name;
-					call.checkArguments(markers, context);
-					return call;
-				}
+				
+				CompoundCall cc = new CompoundCall(this.position, this.instance, name, this.arguments);
+				return cc.resolveCall(markers, context);
 			}
 			
 			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());

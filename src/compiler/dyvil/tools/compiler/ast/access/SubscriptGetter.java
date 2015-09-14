@@ -27,6 +27,13 @@ public class SubscriptGetter extends AbstractCall
 		this.arguments = new ArgumentList();
 	}
 	
+	public SubscriptGetter(ICodePosition position, IValue instance, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.arguments = arguments;
+	}
+	
 	@Override
 	public int valueTag()
 	{
@@ -37,6 +44,12 @@ public class SubscriptGetter extends AbstractCall
 	public ArgumentList getArguments()
 	{
 		return (ArgumentList) this.arguments;
+	}
+	
+	@Override
+	protected IValue resolveCall(MarkerList markers, IContext context)
+	{
+		return null;
 	}
 	
 	@Override

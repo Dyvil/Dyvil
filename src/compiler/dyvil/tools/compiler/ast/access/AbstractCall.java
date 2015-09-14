@@ -47,30 +47,30 @@ public abstract class AbstractCall implements ICall, IValued
 	{
 		this.instance = value;
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return this.instance;
 	}
-
+	
 	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
 	}
-
+	
 	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
 	}
-
+	
 	public void setGenericData(GenericData data)
 	{
 		this.genericData = data;
 	}
-
+	
 	protected GenericData getGenericData()
 	{
 		if (this.method == null || this.genericData != null && this.genericData.method != null)
@@ -84,7 +84,7 @@ public abstract class AbstractCall implements ICall, IValued
 	{
 		return this.method;
 	}
-
+	
 	@Override
 	public boolean isPrimitive()
 	{
@@ -146,6 +146,25 @@ public abstract class AbstractCall implements ICall, IValued
 			this.arguments.resolveTypes(markers, context);
 		}
 	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.resolveArguments(markers, context);
+		return this.resolveCall(markers, context);
+	}
+	
+	protected void resolveArguments(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		this.arguments.resolve(markers, context);
+	}
+	
+	protected abstract IValue resolveCall(MarkerList markers, IContext context);
 	
 	protected void checkArguments(MarkerList markers, IContext context)
 	{
