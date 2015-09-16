@@ -16,7 +16,7 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 public final class CastOperator extends Value
 {
 	protected IValue	value;
-	protected IType		type;
+	protected IType		type	= Types.UNKNOWN;
 	
 	// Metadata
 	private boolean typeHint;

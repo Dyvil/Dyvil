@@ -85,7 +85,6 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			pm.pushParser(new ExpressionParser(this));
 			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
 			{
-				pm.reparse();
 				pm.report(new SyntaxError(token, "Invalid Array Literal - ',' expected"));
 			}
 			return;
