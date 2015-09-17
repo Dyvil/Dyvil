@@ -203,6 +203,11 @@ public class REPLVariable extends Field
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
+		if (value != null)
+		{
+			value.writeExpression(writer, this.type);
+		}
+		
 		if (this.className == null)
 		{
 			writer.writeInsn(Opcodes.AUTO_POP);

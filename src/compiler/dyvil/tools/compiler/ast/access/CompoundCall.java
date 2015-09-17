@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -121,15 +122,22 @@ public final class CompoundCall extends AbstractCall implements INamed
 			// -> x.subscript_=(y..., x.subscript(y...).op(z))
 			
 			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
-			IValue subscript_$eq = new SubscriptSetter(this.position, ac.instance, ac.arguments.withLastValue(Name.subscript_$eq, op)).resolveCall(markers, context);
+			IValue subscript_$eq = new SubscriptSetter(this.position, ac.instance, ac.arguments.withLastValue(Name.subscript_$eq, op)).resolveCall(markers,
+					context);
 			return subscript_$eq;
 		}
-		else if (type == FIELD_ACCESS)
+		else if (type != FIELD_ACCESS)
 		{
-			return this;
+			// TODO Error
+			throw new Error();
 		}
-		// TODO Error
-		throw new Error();
+		
+		IMethod m = this.method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
+		if (m == null)
+		{
+			ICall.addResolveMarker(markers, position, instance, name, arguments);
+		}
+		return this;
 	}
 	
 	@Override
@@ -165,7 +173,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		if (this.method != null)
 		{
 			IType type1 = this.instance.getType();
-			IType type2 = this.getType();
+			IType type2 = super.getType();
 			if (!type1.isSuperTypeOf(type2))
 			{
 				Marker marker = markers.create(this.position, "method.compound.type", this.name, this.instance.toString());

@@ -254,14 +254,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value == null)
-		{
-			return;
-		}
-		
 		if (this.instance == null)
 		{
-			this.value.writeExpression(writer, this.field.getTheClass().getType());
+			this.value.writeExpression(writer, this.field.getType());
 			writer.writeInsn(Opcodes.AUTO_DUP);
 		}
 		else
