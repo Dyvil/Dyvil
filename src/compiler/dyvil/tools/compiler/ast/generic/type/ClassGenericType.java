@@ -167,12 +167,6 @@ public class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolveType(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 		IClass iclass = this.theClass;
@@ -188,6 +182,8 @@ public class ClassGenericType extends GenericType
 				markers.add(this.getPosition(), "type.access.internal", iclass.getName());
 			}
 		}
+		
+		super.checkType(markers, context, position);
 	}
 	
 	@Override

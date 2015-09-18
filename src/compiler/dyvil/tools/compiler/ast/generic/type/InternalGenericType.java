@@ -17,10 +17,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.LambdaType;
-import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class InternalGenericType extends GenericType
@@ -85,6 +82,12 @@ public class InternalGenericType extends GenericType
 			IType returnType = this.typeArguments[i];
 			this.typeArguments[i] = null;
 			return new LambdaType(this.typeArguments, i, returnType);
+		}
+		switch (this.internalName)
+		{
+		case "dyvil/collection/ImmutableMap":
+		case "dyvil/collection/Map":
+			return new MapType(this.typeArguments[0], this.typeArguments[1]);
 		}
 		
 		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);

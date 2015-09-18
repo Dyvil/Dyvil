@@ -3,8 +3,11 @@ package dyvil.tools.compiler.ast.type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IRawType extends IObjectType
 {
@@ -35,6 +38,38 @@ public interface IRawType extends IObjectType
 	public default IType resolveType(ITypeVariable typeVar)
 	{
 		return null;
+	}
+	
+	@Override
+	default IType resolveType(MarkerList markers, IContext context)
+	{
+		return null;
+	}
+	
+	@Override
+	default void resolve(MarkerList markers, IContext context)
+	{
+		IObjectType.super.resolve(markers, context);
+	}
+	
+	@Override
+	default void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+	}
+	
+	@Override
+	default void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	default void foldConstants()
+	{
+	}
+	
+	@Override
+	default void cleanup(IContext context, IClassCompilableList compilableList)
+	{
 	}
 	
 	@Override

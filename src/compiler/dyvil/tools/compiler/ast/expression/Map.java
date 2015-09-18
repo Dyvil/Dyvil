@@ -6,11 +6,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -95,10 +95,7 @@ public class Map implements IValue
 	{
 		if (this.type == null)
 		{
-			ClassGenericType gt = new ClassGenericType(Types.MAP_CLASS);
-			gt.addType(this.getKeyType());
-			gt.addType(this.getValueType());
-			return this.type = gt;
+			return this.type = new MapType(this.getKeyType(), this.getValueType());
 		}
 		return this.type;
 	}

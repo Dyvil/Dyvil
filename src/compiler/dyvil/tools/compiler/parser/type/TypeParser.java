@@ -21,12 +21,13 @@ public final class TypeParser extends Parser
 	public static final int	NAME			= 1;
 	public static final int	GENERICS		= 2;
 	public static final int	GENERICS_END	= 4;
-	public static final int	ARRAY_END		= 8;
-	public static final int	WILDCARD_TYPE	= 16;
-	public static final int	TUPLE_END		= 128;
-	public static final int	LAMBDA_TYPE		= 256;
-	public static final int	LAMBDA_END		= 512;
-	public static final int	ANNOTATION_END	= 1024;
+	public static final int	ARRAY_COLON		= 8;
+	public static final int	ARRAY_END		= 16;
+	public static final int	WILDCARD_TYPE	= 32;
+	public static final int	TUPLE_END		= 64;
+	public static final int	LAMBDA_TYPE		= 128;
+	public static final int	LAMBDA_END		= 256;
+	public static final int	ANNOTATION_END	= 512;
 	
 	protected ITypeConsumer typed;
 	
@@ -52,42 +53,39 @@ public final class TypeParser extends Parser
 			pm.popParser(true);
 			return;
 		case NAME:
-			if (type == Symbols.AT)
+			switch (type)
 			{
+			case Symbols.AT:
 				Annotation a = new Annotation();
 				pm.pushParser(pm.newAnnotationParser(a));
 				this.type = new AnnotatedType(a);
 				this.mode = ANNOTATION_END;
 				return;
-			}
-			if (type == Symbols.OPEN_PARENTHESIS)
-			{
+			case Symbols.OPEN_PARENTHESIS:
 				TupleType tupleType = new TupleType();
 				pm.pushParser(new TypeListParser(tupleType));
 				this.type = tupleType;
 				this.mode = TUPLE_END;
 				return;
-			}
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
-				this.mode = ARRAY_END;
+			case Symbols.OPEN_SQUARE_BRACKET:
+				this.mode = ARRAY_COLON;
 				ArrayType at = new ArrayType();
 				this.type = at;
 				pm.pushParser(pm.newTypeParser(at));
 				return;
-			}
-			if (type == Symbols.ARROW_OPERATOR)
-			{
+			case Symbols.ARROW_OPERATOR:
 				LambdaType lt = new LambdaType();
 				this.type = lt;
 				pm.pushParser(pm.newTypeParser(lt));
 				this.mode = LAMBDA_END;
 				return;
-			}
-			if (type == Keywords.NULL)
-			{
+			case Keywords.NULL:
 				this.typed.setType(Types.NULL);
 				pm.popParser();
+				return;
+			case Symbols.WILDCARD:
+				this.type = new WildcardType(token.raw());
+				this.mode = WILDCARD_TYPE;
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))
@@ -112,12 +110,6 @@ public final class TypeParser extends Parser
 				this.type = new NamedType(token.raw(), token.nameValue());
 				this.typed.setType(this.type);
 				pm.popParser();
-				return;
-			}
-			if (type == Symbols.WILDCARD)
-			{
-				this.type = new WildcardType(token.raw());
-				this.mode = WILDCARD_TYPE;
 				return;
 			}
 			if (ParserUtil.isTerminator(type))
@@ -154,6 +146,16 @@ public final class TypeParser extends Parser
 			this.typed.setType(this.type);
 			pm.popParser(true);
 			return;
+		case ARRAY_COLON:
+			if (type == Symbols.COLON)
+			{
+				this.mode = ARRAY_END;
+				MapType mt = new MapType(this.type.getElementType(), null);
+				this.type = mt;
+				pm.pushParser(new TypeParser(mt::setValueType));
+				return;
+			}
+			//$FALL-THROUGH$
 		case ARRAY_END:
 			this.type.expandPosition(token);
 			this.typed.setType(this.type);

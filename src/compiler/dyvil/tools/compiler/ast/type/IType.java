@@ -86,6 +86,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int	TUPLE	= 16;
 	int	LAMBDA	= 17;
 	int	ARRAY	= 18;
+	int	MAP		= 19;
 	
 	int	TYPE_VAR_TYPE		= 32;
 	int	INTERNAL_TYPE_VAR	= 33;
@@ -299,17 +300,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public void checkType(MarkerList markers, IContext context, TypePosition position);
 	
-	public default void check(MarkerList markers, IContext context)
-	{
-	}
+	public void check(MarkerList markers, IContext context);
 	
-	public default void foldConstants()
-	{
-	}
+	public void foldConstants();
 	
-	public default void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-	}
+	public void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// IContext
 	
