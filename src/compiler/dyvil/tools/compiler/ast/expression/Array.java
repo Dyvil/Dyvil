@@ -179,7 +179,7 @@ public final class Array implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			IValue value1 = elementType.convertValue(value, typeContext, markers, context);
+			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			
 			if (value1 == null)
 			{

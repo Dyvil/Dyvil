@@ -100,7 +100,7 @@ public interface Operators
 		if (name == dotdot || (openRange = name == dotdotlt))
 		{
 			RangeOperator rangeOperator = null;
-			if (arg1.isType(RangeOperator.LazyFields.ORDERED) && arg2.isType(RangeOperator.LazyFields.ORDERED))
+			if (arg1.isType(RangeOperator.LazyFields.RANGEABLE) && arg2.isType(RangeOperator.LazyFields.RANGEABLE))
 			{
 				rangeOperator = new RangeOperator(arg1, arg2);
 				rangeOperator.setHalfOpen(openRange);

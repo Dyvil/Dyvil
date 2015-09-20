@@ -172,9 +172,17 @@ public class ReturnStatement extends Value implements IStatement, IValued
 	}
 	
 	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.value.writeExpression(writer, type);
+		writer.writeInsn(type.getReturnOpcode());
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.writeStatement(writer);
+		this.value.writeExpression(writer);
+		writer.writeInsn(this.value.getType().getReturnOpcode());
 	}
 	
 	@Override

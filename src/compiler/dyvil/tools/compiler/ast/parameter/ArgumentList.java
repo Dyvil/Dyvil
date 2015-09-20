@@ -214,7 +214,7 @@ public final class ArgumentList implements IArguments, IValueList
 		
 		IType type = param.getActualType();
 		IValue value = this.values[index];
-		IValue value1 = type.convertValue(value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
@@ -233,7 +233,7 @@ public final class ArgumentList implements IArguments, IValueList
 		IType varParamType = param.getActualType();
 		
 		IValue value = this.values[index];
-		IValue value1 = varParamType.convertValue(value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(value, varParamType, typeContext, markers, context);
 		if (value1 != null)
 		{
 			this.values[index] = value1;
@@ -246,7 +246,7 @@ public final class ArgumentList implements IArguments, IValueList
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			value1 = elementType.convertValue(value, typeContext, markers, context);
+			value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());

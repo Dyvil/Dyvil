@@ -160,7 +160,7 @@ public final class SingleArgument implements IArguments, IValued
 		}
 		
 		IType type = param.getActualType();
-		IValue value1 = type.convertValue(this.value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
@@ -182,7 +182,7 @@ public final class SingleArgument implements IArguments, IValued
 		}
 		
 		IType type = param.getActualType();
-		IValue value1 = type.convertValue(this.value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (value1 != null)
 		{
 			this.value = value1;
@@ -190,7 +190,7 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		value1 = type.getElementType().convertValue(this.value, typeContext, markers, context);
+		value1 = IType.convertValue(this.value, type.getElementType(), typeContext, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());

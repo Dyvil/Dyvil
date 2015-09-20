@@ -17,7 +17,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public class IfStatement extends Value implements IStatement
+public class IfStatement extends Value
 {
 	protected IValue	condition;
 	protected IValue	then;
@@ -89,15 +89,14 @@ public class IfStatement extends Value implements IStatement
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		this.commonType = type;
-		
 		if (this.then == null)
 		{
 			return null;
 		}
 		
-		IValue then1 = type.convertValue(this.then, typeContext, markers, context);
-		if (then1 == null)
+		this.commonType = type;
+		IValue value = IType.convertValue(this.then, type, typeContext, markers, context);
+		if (value == null)
 		{
 			Marker m = markers.create(this.then.getPosition(), "if.then.type");
 			m.addInfo("Required Type: " + type);
@@ -105,13 +104,13 @@ public class IfStatement extends Value implements IStatement
 		}
 		else
 		{
-			this.then = then1;
+			this.then = value;
 		}
 		
 		if (this.elseThen != null)
 		{
-			then1 = type.convertValue(this.elseThen, typeContext, markers, context);
-			if (then1 == null)
+			value = IType.convertValue(this.elseThen, type, typeContext, markers, context);
+			if (value == null)
 			{
 				Marker m = markers.create(this.elseThen.getPosition(), "if.else.type");
 				m.addInfo("Required Type: " + type);
@@ -119,7 +118,7 @@ public class IfStatement extends Value implements IStatement
 			}
 			else
 			{
-				this.elseThen = then1;
+				this.elseThen = value;
 			}
 		}
 		

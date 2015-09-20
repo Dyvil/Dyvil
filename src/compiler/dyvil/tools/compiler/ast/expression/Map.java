@@ -120,7 +120,7 @@ public class Map implements IValue
 		for (int i = 0; i < this.count; i++)
 		{
 			IValue value = this.keys[i];
-			IValue value1 = keyType.convertValue(value, typeContext, markers, context);
+			IValue value1 = IType.convertValue(value, keyType, typeContext, markers, context);
 			
 			if (value1 == null)
 			{
@@ -136,7 +136,7 @@ public class Map implements IValue
 			}
 			
 			value = this.values[i];
-			value1 = valueType.convertValue(value, typeContext, markers, context);
+			value1 = IType.convertValue(value, valueType, typeContext, markers, context);
 			
 			if (value1 == null)
 			{

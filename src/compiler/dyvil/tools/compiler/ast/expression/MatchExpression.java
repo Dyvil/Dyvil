@@ -142,7 +142,7 @@ public final class MatchExpression implements IValue
 				continue;
 			}
 			
-			IValue value = type.convertValue(action, typeContext, markers, context);
+			IValue value = IType.convertValue(action, type, typeContext, markers, context);
 			if (value == null)
 			{
 				Marker m = markers.create(action.getPosition(), "match.value.type");

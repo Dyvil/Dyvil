@@ -27,7 +27,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StatementList implements IStatement, IValueList, IDefaultContext, ILabelContext
+public final class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
 	protected ICodePosition position;
 	

@@ -203,7 +203,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 			
 			IType type = param.getActualType();
 			IValue value = this.values[i];
-			IValue value1 = type.convertValue(value, typeContext, markers, context);
+			IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);

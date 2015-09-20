@@ -238,12 +238,18 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public IMethod getUnboxMethod();
 	
+	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (type.hasTypeVariables())
+		{
+			type = type.getConcreteType(typeContext);
+		}
+		return type.convertValue(value, typeContext, markers, context);
+	}
+	
+	@Deprecated
 	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.hasTypeVariables())
-		{
-			return value.withType(this.getConcreteType(typeContext), typeContext, markers, context);
-		}
 		return value.withType(this, typeContext, markers, context);
 	}
 	

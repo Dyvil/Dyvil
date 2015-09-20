@@ -161,7 +161,7 @@ public class Field extends Member implements IField
 			else
 			{
 				IType type = this.theClass.getType();
-				instance = type.convertValue(instance, type, markers, context);
+				instance = IType.convertValue(instance, type, type, markers, context);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -203,7 +203,7 @@ public class Field extends Member implements IField
 			markers.add(position, "field.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
+		IValue value1 = IType.convertValue(newValue, this.type, instance.getType(), markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);
@@ -250,7 +250,7 @@ public class Field extends Member implements IField
 				}
 			}
 			
-			IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
+			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
 			if (value1 == null)
 			{
 				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name.unqualified);

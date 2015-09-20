@@ -5,6 +5,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public interface IStatement extends IValue
@@ -31,5 +33,15 @@ public interface IStatement extends IValue
 	public default float getTypeMatch(IType type)
 	{
 		return 0;
+	}
+	
+	@Override
+	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeStatement(writer);
+		if (type != Types.VOID)
+		{
+			type.writeDefaultValue(writer);
+		}
 	}
 }

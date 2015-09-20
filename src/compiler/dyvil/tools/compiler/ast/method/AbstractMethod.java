@@ -486,7 +486,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		return null;
+		return this.theClass.capture(variable);
 	}
 	
 	@Override
@@ -618,7 +618,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
 			{
 				IParameter par = this.parameters[0];
-				IValue instance1 = par.getType().convertValue(instance, typeContext, markers, context);
+				IValue instance1 = IType.convertValue(instance, par.getType(), typeContext, markers, context);
 				if (instance1 == null)
 				{
 					Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
@@ -673,7 +673,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			else if (this.intrinsicOpcodes == null || !instance.isPrimitive())
 			{
-				instance = this.theClass.getType().convertValue(instance, typeContext, markers, context);
+				instance = IType.convertValue(instance, this.theClass.getType(), typeContext, markers, context);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -900,7 +900,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public String getSignature()
 	{
-		if (this.genericCount == 0 && !this.theClass.isGeneric())
+		if (this.genericCount == 0 && !this.theClass.isGeneric() && !this.type.isGenericType())
 		{
 			return null;
 		}
