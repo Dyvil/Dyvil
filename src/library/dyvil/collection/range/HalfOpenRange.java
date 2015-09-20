@@ -4,18 +4,18 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.collection.Range;
 
 @TupleConvertible
-public class HalfOpenRange<T extends Ordered<T>> implements Range<T>
+public class HalfOpenRange<T extends Rangeable<T>> implements Range<T>
 {
 	protected final T	first;
 	protected final T	last;
 	
-	public static <T extends Ordered<T>> HalfOpenRange<T> apply(T first, T last)
+	public static <T extends Rangeable<T>> HalfOpenRange<T> apply(T first, T last)
 	{
 		return new HalfOpenRange(first, last);
 	}
@@ -116,7 +116,7 @@ public class HalfOpenRange<T extends Ordered<T>> implements Range<T>
 	@Override
 	public boolean contains(Object o)
 	{
-		for (Ordered<T> current = this.first; current.$lt(this.last); current = current.next())
+		for (Rangeable<T> current = this.first; current.$lt(this.last); current = current.next())
 		{
 			if (current.$eq$eq((T) o))
 			{

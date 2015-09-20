@@ -16,7 +16,7 @@ import dyvil.lang.Double;
 import dyvil.lang.Float;
 import dyvil.lang.Int;
 import dyvil.lang.Long;
-import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
 import dyvil.lang.Short;
 
 import dyvil.annotation.Intrinsic;
@@ -60,10 +60,10 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <T extends Ordered<T>> T[] range(T start, T end)
+	public static <T extends Rangeable<T>> T[] range(T start, T end)
 	{
 		int i = 0;
-		Ordered[] array = new Ordered[start.distanceTo(end) + 1];
+		Rangeable[] array = new Rangeable[start.distanceTo(end) + 1];
 		for (T current = start; current.$lt$eq(end); current = current.next())
 		{
 			array[i++] = current;
@@ -71,10 +71,10 @@ public interface ObjectArray
 		return (T[]) array;
 	}
 	
-	public static <T extends Ordered<T>> T[] rangeOpen(T start, T end)
+	public static <T extends Rangeable<T>> T[] rangeOpen(T start, T end)
 	{
 		int i = 0;
-		Ordered[] array = new Ordered[start.distanceTo(end)];
+		Rangeable[] array = new Rangeable[start.distanceTo(end)];
 		for (T current = start; current.$lt(end); current = current.next())
 		{
 			array[i++] = current;

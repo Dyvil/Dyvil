@@ -26,9 +26,9 @@ public class RangeOperator implements IValue
 	{
 		public static final IClass			RANGE_CLASS		= Package.dyvilCollection.resolveClass("Range");
 		public static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
-		public static final IClass			ORDERED_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-		public static final ClassType		ORDERED			= new ClassType(ORDERED_CLASS);
-		public static final ITypeVariable	ORDERED_TYPE	= ORDERED_CLASS.getTypeVariable(0);
+		public static final IClass			RANGEABLE_CLASS	= Package.dyvilLang.resolveClass("Ordered");
+		public static final ClassType		RANGEABLE			= new ClassType(RANGEABLE_CLASS);
+		public static final ITypeVariable	RANGEABLE_TYPE	= RANGEABLE_CLASS.getTypeVariable(0);
 	}
 	
 	protected ICodePosition	position;
@@ -260,11 +260,11 @@ public class RangeOperator implements IValue
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
-			this.firstValue.writeExpression(writer, LazyFields.ORDERED);
-			this.lastValue.writeExpression(writer, LazyFields.ORDERED);
+			this.firstValue.writeExpression(writer, LazyFields.RANGEABLE);
+			this.lastValue.writeExpression(writer, LazyFields.RANGEABLE);
 			
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", this.halfOpen ? "halfOpen" : "apply",
-					"(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)Ldyvil/collection/Range;", false);
+					"(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)Ldyvil/collection/Range;", false);
 			return;
 		}
 		
@@ -278,8 +278,8 @@ public class RangeOperator implements IValue
 		if (!this.elementType.isPrimitive())
 		{
 			// TODO Proper return type
-			// This is currently [Ordered] instead of [T]
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ldyvil/lang/Ordered;Ldyvil/lang/Ordered;)[Ldyvil/lang/Ordered;",
+			// This is currently [Rangeable] instead of [T]
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)[Ldyvil/lang/Rangeable;",
 					false);
 		}
 		

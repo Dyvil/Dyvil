@@ -9,7 +9,7 @@ import dyvil.lang.literal.LongConvertible;
 @LongConvertible
 @FloatConvertible
 @DoubleConvertible
-public interface Number extends Ordered<Number>
+public interface Number extends Rangeable<Number>
 {
 	public static Int apply(int v)
 	{

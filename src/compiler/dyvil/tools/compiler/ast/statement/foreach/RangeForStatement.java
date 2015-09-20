@@ -153,7 +153,7 @@ public class RangeForStatement extends ForEachStatement
 		case ORDERED:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Ordered", "compareTo", "(Ldyvil/lang/Ordered;)I", true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "compareTo", "(Ldyvil/lang/Rangeable;)I", true);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
 			break;
 		}
@@ -191,11 +191,11 @@ public class RangeForStatement extends ForEachStatement
 			break;
 		case ORDERED:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Ordered", "next", "()Ldyvil/lang/Ordered;", true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "next", "()Ldyvil/lang/Rangeable;", true);
 			
-			if (rangeType.getTheClass() != RangeOperator.LazyFields.ORDERED_CLASS)
+			if (rangeType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
 			{
-				RangeOperator.LazyFields.ORDERED.writeCast(writer, rangeType, this.getLineNumber());
+				RangeOperator.LazyFields.RANGEABLE.writeCast(writer, rangeType, this.getLineNumber());
 			}
 			
 			writer.writeVarInsn(Opcodes.ASTORE, varIndex);

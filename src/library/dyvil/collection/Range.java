@@ -7,11 +7,14 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.annotation.Covariant;
-import dyvil.collection.range.*;
+import dyvil.collection.range.ClosedRange;
+import dyvil.collection.range.EmptyRange;
+import dyvil.collection.range.HalfOpenRange;
 
 @NilConvertible
 @TupleConvertible
@@ -22,12 +25,12 @@ public interface Range<@Covariant T> extends Iterable<T>
 		return EmptyRange.instance;
 	}
 	
-	public static <T extends Ordered<T>> Range<T> apply(T first, T last)
+	public static <T extends Rangeable<T>> Range<T> apply(T first, T last)
 	{
 		return new ClosedRange(first, last);
 	}
 	
-	public static <T extends Ordered<T>> Range<T> halfOpen(T first, T last)
+	public static <T extends Rangeable<T>> Range<T> halfOpen(T first, T last)
 	{
 		return new HalfOpenRange(first, last);
 	}
