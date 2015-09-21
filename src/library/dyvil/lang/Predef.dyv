@@ -33,6 +33,22 @@ public final class Predef
 	
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 	
+	public static (=> void) => void repeat(int n) = (=> void closure) => for (int i : 0 ..< n) closure()
+	
+	public static long measureMillis(=> void closure)
+	{
+		long millis = System.currentTimeMillis
+		closure()
+		return System.currentTimeMillis - millis
+	}
+	
+	public static long measureNanos(=> void closure)
+	{
+		long nanos = System.nanoTime
+		closure()
+		return System.nanoTime - nanos
+	}
+	
 	// Strings
 	
 	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
