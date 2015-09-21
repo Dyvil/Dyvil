@@ -247,7 +247,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return type.convertValue(value, typeContext, markers, context);
 	}
 	
-	@Deprecated
 	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return value.withType(this, typeContext, markers, context);
