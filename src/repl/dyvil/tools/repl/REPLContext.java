@@ -367,6 +367,13 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		REPLMemberClass iclass = REPLContext.getREPLClass(method);
 		
 		method.resolveTypes(markers, this);
+		if (reportErrors(markers))
+		{
+			this.cleanup();
+			return;
+		}
+		
+		methods.add(method);
 		method.resolve(markers, this);
 		method.checkTypes(markers, this);
 		method.check(markers, this);
@@ -381,8 +388,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		method.cleanup(this, this);
 		
 		REPLContext.compileClass(iclass);
-		
-		methods.add(method);
 		
 		StringBuilder buf = new StringBuilder("Defined Method '");
 		Util.methodSignatureToString(method, buf);
