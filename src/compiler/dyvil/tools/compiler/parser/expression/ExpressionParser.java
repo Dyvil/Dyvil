@@ -56,8 +56,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public static final int	PATTERN_IF	= 0x20000;
 	public static final int	PATTERN_END	= 0x40000;
 	
-	public static final int PARAMETERIZED_THIS_END = 0x80000;
-	public static final int PARAMETERIZED_SUPER_END = 0x80000;
+	public static final int	PARAMETERIZED_THIS_END	= 0x80000;
+	public static final int	PARAMETERIZED_SUPER_END	= 0x80000;
 	
 	protected IValueConsumer field;
 	
@@ -647,6 +647,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 		}
 		
+		op = pm.getOperator(stripEq(name));
+		
 		SingleArgument sa = new SingleArgument();
 		MethodCall call = new MethodCall(token, this.value, name, sa);
 		call.setDotless(this.dotless);
@@ -654,9 +656,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		this.value = call;
 		this.mode = ACCESS;
 		ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
-		parser.operator = Operators.DEFAULT;
+		parser.operator = op == null ? Operators.DEFAULT : op;
 		pm.pushParser(parser);
 		return;
+	}
+	
+	public static final Name stripEq(Name name)
+	{
+		return Name.get(name.qualified.substring(0, name.qualified.length() - 3), name.unqualified.substring(0, name.unqualified.length() - 1));
 	}
 	
 	private void getAssign(IParserManager pm, IToken token)

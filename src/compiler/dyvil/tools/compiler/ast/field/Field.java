@@ -203,7 +203,7 @@ public class Field extends Member implements IField
 			markers.add(position, "field.assign.final", this.name.unqualified);
 		}
 		
-		IValue value1 = IType.convertValue(newValue, this.type, instance.getType(), markers, context);
+		IValue value1 = IType.convertValue(newValue, this.type, this.type, markers, context);
 		if (value1 == null)
 		{
 			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);

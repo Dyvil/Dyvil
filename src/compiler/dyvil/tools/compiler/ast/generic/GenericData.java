@@ -122,6 +122,11 @@ public final class GenericData implements ITypeList, ITypeContext
 		
 		if (index < this.genericCount)
 		{
+			if (this.generics[index] == null)
+			{
+				this.generics[index] = type;
+				return;
+			}
 			this.generics[index] = Types.combine(this.generics[index], type);
 			return;
 		}
