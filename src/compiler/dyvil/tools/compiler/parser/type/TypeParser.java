@@ -14,6 +14,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 
 public final class TypeParser extends Parser
@@ -46,6 +47,17 @@ public final class TypeParser extends Parser
 		switch (this.mode)
 		{
 		case END:
+			if (type == Tokens.SYMBOL_IDENTIFIER)
+			{
+				Name name = token.nameValue();
+				if (name == Name.qmark)
+				{
+					this.typed.setType(new OptionType(this.type));
+					pm.popParser();
+					return;
+				}
+			}
+			
 			if (this.type != null)
 			{
 				this.typed.setType(this.type);
@@ -90,7 +102,8 @@ public final class TypeParser extends Parser
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				int nextType = token.next().type();
+				IToken next = token.next();
+				int nextType = next.type();
 				if (nextType == Symbols.OPEN_SQUARE_BRACKET || nextType == Symbols.GENERIC_CALL)
 				{
 					this.type = new NamedGenericType(token.raw(), token.nameValue());
@@ -108,8 +121,7 @@ public final class TypeParser extends Parser
 				}
 				
 				this.type = new NamedType(token.raw(), token.nameValue());
-				this.typed.setType(this.type);
-				pm.popParser();
+				this.mode = END;
 				return;
 			}
 			if (ParserUtil.isTerminator(type))
@@ -125,7 +137,9 @@ public final class TypeParser extends Parser
 				pm.reparse();
 				pm.report(new SyntaxError(token, "Invalid Tuple Type - ')' expected"));
 			}
-			if (token.next().type() == Symbols.ARROW_OPERATOR)
+			IToken next = token.next();
+			int nextType = next.type();
+			if (nextType == Symbols.ARROW_OPERATOR)
 			{
 				TupleType tupleType = (TupleType) this.type;
 				this.type = new LambdaType(tupleType);
@@ -133,9 +147,8 @@ public final class TypeParser extends Parser
 				return;
 			}
 			
-			pm.popParser();
 			this.type.expandPosition(token);
-			this.typed.setType(this.type);
+			this.mode = END;
 			return;
 		case LAMBDA_TYPE:
 			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
@@ -158,8 +171,7 @@ public final class TypeParser extends Parser
 			//$FALL-THROUGH$
 		case ARRAY_END:
 			this.type.expandPosition(token);
-			this.typed.setType(this.type);
-			pm.popParser();
+			this.mode = END;
 			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
@@ -199,7 +211,7 @@ public final class TypeParser extends Parser
 			return;
 		case GENERICS_END:
 			this.typed.setType(this.type);
-			pm.popParser();
+			this.mode = END;
 			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();

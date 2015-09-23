@@ -83,10 +83,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int	GENERIC_NAMED		= 12;
 	int	GENERIC_INTERNAL	= 13;
 	
-	int	TUPLE	= 16;
-	int	LAMBDA	= 17;
-	int	ARRAY	= 18;
-	int	MAP		= 19;
+	int	TUPLE		= 16;
+	int	LAMBDA		= 17;
+	int	ARRAY		= 18;
+	int	MAP			= 19;
+	int	OPTIONAL	= 20;
 	
 	int	TYPE_VAR_TYPE		= 32;
 	int	INTERNAL_TYPE_VAR	= 33;

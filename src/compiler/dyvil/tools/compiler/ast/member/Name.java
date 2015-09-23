@@ -65,6 +65,7 @@ public final class Name
 	public static final Name	gteq	= new Name(">=", "$gt$eq");
 	public static final Name	gtcolon	= new Name(">:", "$gt$colon");
 	
+	public static final Name	qmark	= new Name("?", "$qmark");
 	public static final Name	bang	= new Name("!", "$bang");
 	public static final Name	tilde	= new Name("~", "$tilde");
 	
