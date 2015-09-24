@@ -162,8 +162,6 @@ public final class Tuple implements IValue, IValueList
 			return null;
 		}
 		
-		this.tupleType = type;
-		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IType elementType = type.resolveTypeSafely(tupleClass.getTypeVariable(i));
@@ -180,6 +178,8 @@ public final class Tuple implements IValue, IValueList
 				this.values[i] = value = value1;
 			}
 		}
+
+		this.tupleType = this.getType();
 		return this;
 	}
 	
