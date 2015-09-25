@@ -1,3 +1,43 @@
+Dyvil v0.4.0
+
+## Dyvil Library v0.3.0
+
+- Moved `dyvil.math.*Vector` classes to a new package.
+- Added support for custom method names for all `LiteralConvertible` annotations and expressions.
+- Added the `measureMillis(=> void)` and `measureNanos(=> void)` methods to `Predef`.
+- Added the `repeat(int)(=> void)` curried method to `Predef`.
+- Added the `dyvil.Math` header.
+- Added `Rangeable` as a subclass of `Ordered` and made the `next()` and `previous()` methods abstract.
+- Improved the `Ordered` operator implementations
+
+## Dyvil Compiler v0.4.0
+
+- Added support for Unicode identifiers and symbols.
+- Added Map Expressions and Map Types.
+- Added support for the `Option` type syntactic sugar using `Type?`.
+- Added various missing `ASTNode.toString()` implementations.
+- Improved primitive types being used as generic type parameters.
+- Improved operator precedence in compound assignments.
+- Improved boxing and unboxing and implicit type conversions.
+- Fixed incorrect Bytecode generation in some edge cases.
+- Fixed Cast Operators without type declaration causing a compiler error.
+- Fixed Field Assignments working incorrectly and producing JVM errors.
+- Fixed Compound Assignment generating invalid bytecode and causing JVM errors.
+- Fixed Variables in anonymous classes being captured incorrectly.
+- Fixed automatic Lambda Conversion working incorrectly with generics.
+- Fixed Return Statements being compiled incorrectly in some cases.
+- Fixed method signatures not being generated in all cases where they are required.
+- Fixed Tuples being compiled incorrectly when used in a context where `Object` or a super type of the Tuple class is required.
+
+## Dyvil REPL v0.1.2
+
+- Added support for recursive method definitions.
+- Added a debug output for the launch time.
+- Improved the version information that is printed on launch.
+- Improved the output for defined classes, methods and import declarations.
+- Fixed REPL Variable assignment working incorrectly.
+- Fixed Anonymous Classes with unresolved constructors being reported as such twice within the REPL.
+
 Dyvil v0.3.0
 ============
 
