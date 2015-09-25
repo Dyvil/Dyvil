@@ -647,6 +647,11 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public String[] getInterfaceArray()
 	{
+		if (this.interfaceCount <= 0)
+		{
+			return null;
+		}
+		
 		String[] interfaces = new String[this.interfaceCount];
 		for (int i = 0; i < this.interfaceCount; i++)
 		{

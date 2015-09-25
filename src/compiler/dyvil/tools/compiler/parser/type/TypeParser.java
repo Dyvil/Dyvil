@@ -210,7 +210,6 @@ public final class TypeParser extends Parser
 			pm.popParser(true);
 			return;
 		case GENERICS_END:
-			this.typed.setType(this.type);
 			this.mode = END;
 			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
