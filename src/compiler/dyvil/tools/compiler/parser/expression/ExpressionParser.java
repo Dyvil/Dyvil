@@ -205,7 +205,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		case ANONYMOUS_CLASS_END:
 			this.value.expandPosition(token);
-			this.field.setValue(this.value);
 			this.mode = ACCESS_2;
 			
 			if (type != Symbols.CLOSE_CURLY_BRACKET)
