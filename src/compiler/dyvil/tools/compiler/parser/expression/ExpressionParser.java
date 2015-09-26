@@ -645,8 +645,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				}
 			}
 		}
-		
-		op = pm.getOperator(stripEq(name));
+		else
+		{
+			op = pm.getOperator(stripEq(name));
+		}
 		
 		SingleArgument sa = new SingleArgument();
 		MethodCall call = new MethodCall(token, this.value, name, sa);
@@ -662,7 +664,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	public static final Name stripEq(Name name)
 	{
-		return Name.get(name.qualified.substring(0, name.qualified.length() - 3), name.unqualified.substring(0, name.unqualified.length() - 1));
+		String qualified = name.qualified.substring(0, name.qualified.length() - 3);
+		String unqualified = name.unqualified.substring(0, name.unqualified.length() - 1);
+		return Name.get(qualified, unqualified);
 	}
 	
 	private void getAssign(IParserManager pm, IToken token)

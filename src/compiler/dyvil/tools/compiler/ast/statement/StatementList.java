@@ -322,26 +322,7 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 			v.checkTypes(markers, context1);
 		}
 		
-		IValue lastValue = this.values[len];
-		IType type = this.returnType == null ? lastValue.getType() : this.returnType;
-		IValue lastValue1 = lastValue.withType(type, type, markers, context1);
-		
-		if (lastValue1 == null)
-		{
-			Marker marker = markers.create(lastValue.getPosition(), "block.type");
-			marker.addInfo("Block Type: " + this.returnType);
-			marker.addInfo("Returning Type: " + lastValue.getType());
-		}
-		else
-		{
-			lastValue = lastValue1;
-			if (this.returnType == null)
-			{
-				this.returnType = lastValue.getType();
-			}
-		}
-		
-		lastValue.checkTypes(markers, context1);
+		this.values[len].checkTypes(markers, context1);
 	}
 	
 	@Override
