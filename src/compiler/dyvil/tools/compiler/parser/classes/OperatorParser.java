@@ -76,6 +76,11 @@ public final class OperatorParser extends Parser
 				
 				this.operator = new Operator(name);
 				this.operator.type = this.type;
+				
+				if (this.type == Operator.PREFIX || this.type == Operator.POSTFIX)
+				{
+					this.operator.precedence = Operator.PREFIX_PRECEDENCE;
+				}
 				return;
 			}
 			pm.report(new SyntaxError(token, "Invalid Operator - 'operator' expected"));
@@ -84,6 +89,11 @@ public final class OperatorParser extends Parser
 			switch (this.type)
 			{
 			case Operator.PREFIX:
+				if (type == Symbols.OPEN_CURLY_BRACKET)
+				{
+					this.mode = PRECEDENCE;
+					return;
+				}
 				pm.popParser();
 				this.map.addOperator(this.operator);
 				if (type != Symbols.SEMICOLON)
@@ -93,6 +103,11 @@ public final class OperatorParser extends Parser
 				}
 				return;
 			case Operator.POSTFIX:
+				if (type == Symbols.OPEN_CURLY_BRACKET)
+				{
+					this.mode = PRECEDENCE;
+					return;
+				}
 				pm.popParser();
 				this.map.addOperator(this.operator);
 				if (type != Symbols.SEMICOLON)
@@ -146,7 +161,7 @@ public final class OperatorParser extends Parser
 			if ((type & Tokens.INT) == 0)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Infix Operator - Integer Precedence expected"));
+				pm.report(new SyntaxError(token, "Invalid Operator - Integer Precedence expected"));
 				return;
 			}
 			this.operator.precedence = token.intValue();

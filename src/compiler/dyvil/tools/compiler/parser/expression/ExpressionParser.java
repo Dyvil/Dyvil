@@ -65,7 +65,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	private boolean		dotless;
 	private Operator	operator;
-	private boolean		prefix;
 	
 	public ExpressionParser(IValueConsumer field)
 	{
@@ -346,54 +345,41 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			this.dotless = true;
 			
-			if (type == Keywords.ELSE)
+			switch (type)
 			{
+			case Keywords.ELSE:
 				this.field.setValue(this.value);
 				pm.popParser(true);
 				return;
-			}
-			if (type == Symbols.EQUALS)
-			{
+			case Symbols.EQUALS:
 				this.getAssign(pm, token);
 				return;
-			}
-			if (type == Keywords.AS)
-			{
+			case Keywords.AS:
 				CastOperator co = new CastOperator(token.raw(), this.value);
 				pm.pushParser(pm.newTypeParser(co));
 				this.value = co;
 				return;
-			}
-			if (type == Keywords.IS)
-			{
+			case Keywords.IS:
 				InstanceOfOperator io = new InstanceOfOperator(token.raw(), this.value);
 				pm.pushParser(pm.newTypeParser(io));
 				this.value = io;
 				return;
-			}
-			if (type == Keywords.MATCH)
-			{
+			case Keywords.MATCH:
 				MatchExpression me = new MatchExpression(token.raw(), this.value);
 				pm.pushParser(new MatchExpressionParser(me));
 				this.value = me;
 				return;
-			}
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
-			{
+			case Symbols.OPEN_SQUARE_BRACKET:
 				SubscriptGetter getter = new SubscriptGetter(token, this.value);
 				this.value = getter;
 				this.mode = SUBSCRIPT_END;
-				
 				pm.pushParser(new ExpressionListParser(getter.getArguments()));
 				return;
-			}
-			if (type == Symbols.OPEN_PARENTHESIS)
-			{
+			case Symbols.OPEN_PARENTHESIS:
 				IToken prev = token.prev();
 				IToken next = token.next();
 				IArguments args;
 				args = this.getArguments(pm, next);
-				
 				int prevType = prev.type();
 				if (ParserUtil.isIdentifier(prevType))
 				{
@@ -432,13 +418,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				Name name = token.nameValue();
 				if (this.dotless)
 				{
-					if (this.prefix)
-					{
-						this.field.setValue(this.value);
-						pm.popParser(true);
-						return;
-					}
-					
 					if (this.operator != null)
 					{
 						Operator operator = pm.getOperator(name);
@@ -604,7 +583,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				
 				ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
 				parser.operator = op;
-				parser.prefix = true;
 				pm.pushParser(parser);
 				return;
 			}

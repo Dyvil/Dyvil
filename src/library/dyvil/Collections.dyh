@@ -3,19 +3,19 @@ package dyvil
 import	dyvil.collection._
 
 //Collection Operators
-infix operator ? { none, 120 }
-infix operator ++ { left, 120 }
-infix operator -- { left, 120 }
-infix operator ++= { right, 120 }
-infix operator --= { right, 120 }
+infix operator ? { none, 1200 }
+infix operator ++ { left, 1200 }
+infix operator -- { left, 1200 }
+infix operator ++= { right, 1200 }
+infix operator --= { right, 1200 }
 
 //Map Operators
-infix operator ?@ { none, 120 }
-infix operator ?: { none, 120 }
-infix operator -@ { none, 120 }
-infix operator -@= { right, 120 }
-infix operator -: { none, 120 }
-infix operator -:= { right, 120 }
+infix operator ?@ { none, 1200 }
+infix operator ?: { none, 1200 }
+infix operator -@ { none, 1200 }
+infix operator -@= { right, 1200 }
+infix operator -: { none, 1200 }
+infix operator -:= { right, 1200 }
 
 // Lists
 import	dyvil.collection.immutable.ArrayList => ImmutableArrayList

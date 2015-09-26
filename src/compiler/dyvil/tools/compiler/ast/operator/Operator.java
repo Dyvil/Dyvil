@@ -14,6 +14,8 @@ public final class Operator
 	public static final int	INFIX_RIGHT	= 3;
 	public static final int	POSTFIX		= 4;
 	
+	public static final int PREFIX_PRECEDENCE = 1000;
+	
 	public final Name	name;
 	public int			precedence;
 	public int			type;

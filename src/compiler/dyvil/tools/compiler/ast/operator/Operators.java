@@ -12,8 +12,6 @@ import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
 
 public interface Operators
 {
-	public static final int PREFIX = 1000;
-	
 	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
 	
 	public static IValue getPriority(Name name, IValue arg1)
