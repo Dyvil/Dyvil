@@ -42,6 +42,7 @@ public class Package implements INamed, IDefaultContext
 	public static Package	java;
 	public static Package	javaLang;
 	public static Package	javaLangAnnotation;
+	public static Package	javaUtil;
 	
 	protected Package	parent;
 	protected Name		name;
@@ -90,6 +91,7 @@ public class Package implements INamed, IDefaultContext
 		java = rootPackage.resolvePackage("java");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
+		javaUtil = java.resolvePackage("util");
 	}
 	
 	// Name

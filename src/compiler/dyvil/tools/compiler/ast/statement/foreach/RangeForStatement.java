@@ -27,9 +27,9 @@ public class RangeForStatement extends ForEachStatement
 	private Variable	startVar;
 	private Variable	endVar;
 	
-	public RangeForStatement(ICodePosition position, Variable var, IValue value1, IValue value2, boolean halfOpen, IValue action)
+	public RangeForStatement(ICodePosition position, Variable var, IValue value1, IValue value2, boolean halfOpen)
 	{
-		super(position, var, action);
+		super(position, var);
 		
 		this.value1 = value1;
 		this.value2 = value2;

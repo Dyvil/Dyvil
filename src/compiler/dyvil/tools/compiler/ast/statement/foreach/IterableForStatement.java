@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -15,28 +17,29 @@ import dyvil.tools.compiler.lexer.position.ICodePosition;
 
 public class IterableForStatement extends ForEachStatement
 {
-	public static final ITypeVariable ITERABLE_TYPE = Types.ITERABLE.getTheClass().getTypeVariable(0);
+	public static final ITypeVariable	ITERABLE_TYPE	= Types.ITERABLE.getTheClass().getTypeVariable(0);
+	public static final IClass			ITERATOR_CLASS	= Package.javaUtil.resolveClass("Iterator");
 	
 	public static final Name $iterator = Name.getQualified("$iterator");
 	
 	protected Variable	iteratorVar;
 	protected IMethod	boxMethod;
 	
-	public IterableForStatement(ICodePosition position, Variable variable, IValue action)
+	public IterableForStatement(ICodePosition position, Variable variable)
 	{
-		this(position, variable, action, variable.getValue().getType());
+		this(position, variable, variable.getValue().getType());
 	}
 	
-	public IterableForStatement(ICodePosition position, Variable variable, IValue action, IType valueType)
+	public IterableForStatement(ICodePosition position, Variable variable, IType valueType)
 	{
-		this(position, variable, action, valueType, valueType.resolveTypeSafely(ITERABLE_TYPE));
+		this(position, variable, valueType, valueType.resolveTypeSafely(ITERABLE_TYPE));
 	}
 	
-	public IterableForStatement(ICodePosition position, Variable variable, IValue action, IType valueType, IType elementType)
+	public IterableForStatement(ICodePosition position, Variable variable, IType valueType, IType elementType)
 	{
-		super(position, variable, action);
+		super(position, variable);
 		
-		this.iteratorVar = new Variable($iterator, valueType);
+		this.iteratorVar = new Variable($iterator, new ClassGenericType(ITERATOR_CLASS, new IType[] { elementType }, 1));
 		
 		IType varType = variable.getType();
 		boolean primitive = varType.isPrimitive();

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.Name;
@@ -18,9 +17,9 @@ public class StringForStatement extends ForEachStatement
 	protected Variable	lengthVar;
 	protected Variable	stringVar;
 	
-	public StringForStatement(ICodePosition position, Variable var, IValue action)
+	public StringForStatement(ICodePosition position, Variable var)
 	{
-		super(position, var, action);
+		super(position, var);
 		
 		this.indexVar = new Variable(ArrayForStatement.$index, Types.INT);
 		this.lengthVar = new Variable(ArrayForStatement.$length, Types.INT);
