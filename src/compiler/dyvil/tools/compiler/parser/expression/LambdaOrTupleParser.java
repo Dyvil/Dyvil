@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.Tuple;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -40,7 +39,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	}
 	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
 		this.pm.jump(this.firstToken);
 		this.pm.setParser(this);
@@ -124,7 +123,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Tuple - ')' expected"));
+			pm.report(token, "Invalid Tuple - ')' expected");
 			return;
 		case ARROW:
 			if (token.type() != Symbols.ARROW_OPERATOR)

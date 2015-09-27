@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.statement;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.WhileStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -38,14 +37,14 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid While Statement - '(' expected"));
+			pm.report(token, "Invalid While Statement - '(' expected");
 			return;
 		case CONDITION_END:
 			this.mode = BLOCK;
 			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid While Statement - ')' expected"));
+				pm.report(token, "Invalid While Statement - ')' expected");
 			}
 			return;
 		case BLOCK:

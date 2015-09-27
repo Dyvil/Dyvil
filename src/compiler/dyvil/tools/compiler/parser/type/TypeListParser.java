@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -44,7 +43,7 @@ public final class TypeListParser extends Parser
 			{
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Type List - ',' expected"));
+			pm.report(token, "Invalid Type List - ',' expected");
 			return;
 		}
 	}

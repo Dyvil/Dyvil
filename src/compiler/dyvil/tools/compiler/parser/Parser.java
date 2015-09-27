@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.util.ParserUtil;
 
@@ -14,7 +13,7 @@ public abstract class Parser
 		{
 			if (!ParserUtil.isTerminator(token.type()))
 			{
-				pm.report(new SyntaxError(token, "Root Parser"));
+				pm.report(token, "Root Parser");
 				return;
 			}
 		}

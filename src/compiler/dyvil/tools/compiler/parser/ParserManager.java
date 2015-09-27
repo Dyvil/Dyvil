@@ -34,9 +34,9 @@ public class ParserManager implements IParserManager
 	}
 	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
-		this.markers.add(error);
+		this.markers.add(new SyntaxError(token, message));
 	}
 	
 	@Override

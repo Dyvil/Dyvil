@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.imports;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -45,7 +44,7 @@ public class IncludeParser extends Parser
 				this.includeDeclaration = new IncludeDeclaration(token.raw());
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Include Declaration - 'include' expected"));
+			pm.report(token, "Invalid Include Declaration - 'include' expected");
 			return;
 		case NAME:
 			this.mode = DOT;
@@ -55,7 +54,7 @@ public class IncludeParser extends Parser
 				this.includeDeclaration.addNamePart(name);
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Include Declaration - Identifier expected"));
+			pm.report(token, "Invalid Include Declaration - Identifier expected");
 			return;
 		case DOT:
 			if (type == Symbols.SEMICOLON)
@@ -69,7 +68,7 @@ public class IncludeParser extends Parser
 				this.mode = NAME;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Include Declaration - '.' expected"));
+			pm.report(token, "Invalid Include Declaration - '.' expected");
 			return;
 		}
 	}

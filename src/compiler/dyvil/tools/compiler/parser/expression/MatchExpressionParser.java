@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MatchCase;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -46,7 +45,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			}
 			if (type != Keywords.CASE)
 			{
-				pm.report(new SyntaxError(token, "Invalid Match Expression - '{' or 'case' expected"));
+				pm.report(token, "Invalid Match Expression - '{' or 'case' expected");
 				return;
 			}
 			this.singleCase = true;
@@ -67,7 +66,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.popParser();
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Match Expression - 'case' or '}' expected expected"));
+			pm.report(token, "Invalid Match Expression - 'case' or '}' expected expected");
 			return;
 		case CONDITION:
 			if (type == Keywords.IF)
@@ -83,7 +82,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			{
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Match Case - ':' or '=>' expected"));
+			pm.report(token, "Invalid Match Case - ':' or '=>' expected");
 			return;
 		case SEPARATOR:
 			this.matchExpression.addCase(this.currentCase);
@@ -105,7 +104,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Match Case - ';' expected"));
+			pm.report(token, "Invalid Match Case - ';' expected");
 			return;
 		}
 	}

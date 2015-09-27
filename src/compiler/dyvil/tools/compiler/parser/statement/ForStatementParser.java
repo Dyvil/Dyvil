@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.statement.foreach.ForEachStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -69,7 +68,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			if (type != Keywords.FOR)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid For Statement - 'for' expected"));
+				pm.report(token, "Invalid For Statement - 'for' expected");
 			}
 			return;
 		case FOR_START:
@@ -77,7 +76,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			if (type != Symbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid For Statement - '(' expected"));
+				pm.report(token, "Invalid For Statement - '(' expected");
 			}
 			return;
 		case TYPE:
@@ -101,7 +100,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid For statement - Variable Name expected"));
+			pm.report(token, "Invalid For statement - Variable Name expected");
 			return;
 		case SEPERATOR:
 			if (type == Symbols.COLON)
@@ -118,7 +117,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid For Statement - ';' or ':' expected"));
+			pm.report(token, "Invalid For Statement - ';' or ':' expected");
 			return;
 		case VARIABLE_END:
 			this.mode = CONDITION_END;
@@ -133,14 +132,14 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid for statement - ';' expected"));
+			pm.report(token, "Invalid for statement - ';' expected");
 			return;
 		case CONDITION_END:
 			this.mode = FOR_END;
 			if (type != Symbols.SEMICOLON)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid for statement - ';' expected"));
+				pm.report(token, "Invalid for statement - ';' expected");
 				return;
 			}
 			
@@ -155,7 +154,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid for statement - ')' expected"));
+				pm.report(token, "Invalid for statement - ')' expected");
 			}
 			return;
 		case STATEMENT:

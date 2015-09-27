@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.type.NamedType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -48,7 +47,7 @@ public class AnnotationParser extends Parser
 				this.mode = PARAMETERS_START;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Annotation - Name expected"));
+			pm.report(token, "Invalid Annotation - Name expected");
 			return;
 		case PARAMETERS_START:
 			if (type == Symbols.OPEN_PARENTHESIS)
@@ -79,7 +78,7 @@ public class AnnotationParser extends Parser
 				pm.popParser();
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Annotation - ')' expected"));
+			pm.report(token, "Invalid Annotation - ')' expected");
 			return;
 		}
 	}

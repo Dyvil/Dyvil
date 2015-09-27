@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.Map;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -45,7 +44,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			if (type != Symbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Array Literal - '[' expected"));
+				pm.report(token, "Invalid Array Literal - '[' expected");
 			}
 			return;
 		case SEPARATOR | COLON:
@@ -70,7 +69,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Array Literal - ',' expected"));
+				pm.report(token, "Invalid Array Literal - ',' expected");
 			}
 			return;
 		case SEPARATOR:
@@ -85,7 +84,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			pm.pushParser(new ExpressionParser(this));
 			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
 			{
-				pm.report(new SyntaxError(token, "Invalid Array Literal - ',' expected"));
+				pm.report(token, "Invalid Array Literal - ',' expected");
 			}
 			return;
 		case COLON:
@@ -101,7 +100,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			if (type != Symbols.COLON)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Map Literal - ':' expected"));
+				pm.report(token, "Invalid Map Literal - ':' expected");
 			}
 			return;
 		}

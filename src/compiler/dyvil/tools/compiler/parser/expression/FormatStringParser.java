@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.expression.FormatStringExpression;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -30,7 +29,7 @@ public final class FormatStringParser extends Parser implements IValued
 			int nextType = token.next().type();
 			if (nextType == Tokens.STRING_PART || nextType == Tokens.STRING_END)
 			{
-				pm.report(new SyntaxError(token.next(), "Invalid Format String - Expression expected"));
+				pm.report(token.next(), "Invalid Format String - Expression expected");
 				return;
 			}
 			this.value.addString(token.stringValue());
@@ -43,7 +42,7 @@ public final class FormatStringParser extends Parser implements IValued
 			return;
 		}
 		pm.reparse();
-		pm.report(new SyntaxError(token, "Invalid Format String - String part expected"));
+		pm.report(token, "Invalid Format String - String part expected");
 		return;
 	}
 	

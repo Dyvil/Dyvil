@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -65,7 +64,7 @@ public final class OperatorParser extends Parser
 				this.type = Operator.INFIX_NONE;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Operator - 'infix', 'prefix' or 'postfix' expected"));
+			pm.report(token, "Invalid Operator - 'infix', 'prefix' or 'postfix' expected");
 			return;
 		case OPERATOR:
 			this.mode = OPEN_BRACKET;
@@ -76,7 +75,7 @@ public final class OperatorParser extends Parser
 				pm.skip();
 				if (name == null)
 				{
-					pm.report(new SyntaxError(next, "Invalid Operator - Identifier expected"));
+					pm.report(next, "Invalid Operator - Identifier expected");
 					return;
 				}
 				
@@ -89,7 +88,7 @@ public final class OperatorParser extends Parser
 				}
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Operator - 'operator' expected"));
+			pm.report(token, "Invalid Operator - 'operator' expected");
 			return;
 		case OPEN_BRACKET:
 			switch (this.type)
@@ -104,7 +103,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				if (type != Symbols.SEMICOLON)
 				{
-					pm.report(new SyntaxError(token, "Invalid Prefix Operator - ';' expected"));
+					pm.report(token, "Invalid Prefix Operator - ';' expected");
 					return;
 				}
 				return;
@@ -118,7 +117,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				if (type != Symbols.SEMICOLON)
 				{
-					pm.report(new SyntaxError(token, "Invalid Postfix Operator - ';' expected"));
+					pm.report(token, "Invalid Postfix Operator - ';' expected");
 					return;
 				}
 				return;
@@ -127,7 +126,7 @@ public final class OperatorParser extends Parser
 				if (type != Symbols.OPEN_CURLY_BRACKET)
 				{
 					pm.reparse();
-					pm.report(new SyntaxError(token, "Invalid Infix Operator - '{' expected"));
+					pm.report(token, "Invalid Infix Operator - '{' expected");
 					return;
 				}
 				return;
@@ -177,7 +176,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Operator Property - Invalid " + token));
+			pm.report(token, "Invalid Operator Property - Invalid " + token);
 			return;
 		case COMMA:
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
@@ -190,7 +189,7 @@ public final class OperatorParser extends Parser
 			if (type != Symbols.COMMA)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Infix Operator - ',' expected"));
+				pm.report(token, "Invalid Infix Operator - ',' expected");
 				return;
 			}
 			return;
@@ -199,7 +198,7 @@ public final class OperatorParser extends Parser
 			if ((type & Tokens.INT) == 0)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Operator Precedence - Integer expected"));
+				pm.report(token, "Invalid Operator Precedence - Integer expected");
 				return;
 			}
 			this.operator.precedence = token.intValue();
@@ -227,7 +226,7 @@ public final class OperatorParser extends Parser
 			}
 			
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Operator Associativity - 'left', 'none' or 'right' expected"));
+			pm.report(token, "Invalid Operator Associativity - 'left', 'none' or 'right' expected");
 			return;
 		}
 	}
@@ -235,10 +234,10 @@ public final class OperatorParser extends Parser
 	private void setAssociativity(IParserManager pm, IToken token, int associativity) {
 		switch (this.operator.type) {
 		case Operator.POSTFIX:
-			pm.report(new SyntaxError(token, "Invalid Postfix Operator - Postfix Operators cannot have an associativity"));
+			pm.report(token, "Invalid Postfix Operator - Postfix Operators cannot have an associativity");
 			return;
 		case Operator.PREFIX:
-			pm.report(new SyntaxError(token, "Invalid Prefix Operator - Prefix Operators cannot have an associativity"));
+			pm.report(token, "Invalid Prefix Operator - Prefix Operators cannot have an associativity");
 			return;
 		}
 		

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
 import dyvil.tools.compiler.ast.bytecode.MethodInstruction;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -49,13 +48,13 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		case DOT:
 			if (type != Symbols.DOT)
 			{
-				pm.report(new SyntaxError(token, "Invalid Method Instruction - '.' expected")); return;
+				pm.report(token, "Invalid Method Instruction - '.' expected"); return;
 			}
 			this.mode = PARAMETERS;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(new SyntaxError(next, "Invalid Method Instruction - Identifier expected")); return;
+				pm.report(next, "Invalid Method Instruction - Identifier expected"); return;
 			}
 			pm.skip();
 			this.methodInstruction.setMethodName(next.nameValue().qualified);
@@ -67,7 +66,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Method Instruction - '(' expected"));
+			pm.report(token, "Invalid Method Instruction - '(' expected");
 			return;
 		case PARAMETERS_END:
 			if (type == Symbols.COMMA)
@@ -80,12 +79,12 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 				this.mode = COLON;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Method Instruction - ',' or ')' expected"));
+			pm.report(token, "Invalid Method Instruction - ',' or ')' expected");
 			break;
 		case COLON:
 			if (type != Symbols.COLON)
 			{
-				pm.report(new SyntaxError(token, "Invalid Method Instruction - ':' expected")); return;
+				pm.report(token, "Invalid Method Instruction - ':' expected"); return;
 			}
 			pm.pushParser(new InternalTypeParser(this));
 			return;

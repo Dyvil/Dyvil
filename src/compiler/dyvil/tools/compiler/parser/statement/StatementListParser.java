@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -55,7 +54,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	}
 	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
 		this.pm.jump(this.firstToken);
 		this.pm.pushParser(this.pm.newExpressionParser(this));
@@ -91,7 +90,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.statementList = new StatementList(token);
 			if (type != Symbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(new SyntaxError(token, "Invalid Statement List - '{' expected"));
+				pm.report(token, "Invalid Statement List - '{' expected");
 				pm.reparse();
 			}
 			return;
@@ -188,7 +187,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				pm.reparse();
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Statement List - ';' expected"));
+			pm.report(token, "Invalid Statement List - ';' expected");
 			return;
 		}
 	}

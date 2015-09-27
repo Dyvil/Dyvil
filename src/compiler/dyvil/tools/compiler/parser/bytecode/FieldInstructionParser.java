@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.FieldInstruction;
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -42,13 +41,13 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		case DOT:
 			if (type != Symbols.DOT)
 			{
-				pm.report(new SyntaxError(token, "Invalid Field Instruction - '.' expected")); return;
+				pm.report(token, "Invalid Field Instruction - '.' expected"); return;
 			}
 			this.mode = COLON;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(new SyntaxError(next, "Invalid Field Instruction - Field Name expected")); return;
+				pm.report(next, "Invalid Field Instruction - Field Name expected"); return;
 			}
 			pm.skip();
 			this.fieldInstruction.setFieldName(next.nameValue().qualified);
@@ -56,7 +55,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		case COLON:
 			if (type != Symbols.COLON)
 			{
-				pm.report(new SyntaxError(token, "Invalid Field Instruction - ':' expected")); return;
+				pm.report(token, "Invalid Field Instruction - ':' expected"); return;
 			}
 			pm.pushParser(new InternalTypeParser(this));
 			return;

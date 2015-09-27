@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -51,7 +50,7 @@ public final class InternalTypeParser extends Parser
 				this.mode = SLASH;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Type - Identifier expected"));
+			pm.report(token, "Invalid Type - Identifier expected");
 			return;
 		case SLASH:
 			if (ParserUtil.isIdentifier(type))

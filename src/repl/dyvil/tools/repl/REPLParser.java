@@ -25,12 +25,12 @@ public class REPLParser implements IParserManager
 	private boolean		syntaxErrors;
 	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
 		this.syntaxErrors = true;
 		if (this.markers != null)
 		{
-			this.markers.add(error);
+			this.markers.add(new SyntaxError(token, message));
 		}
 	}
 	

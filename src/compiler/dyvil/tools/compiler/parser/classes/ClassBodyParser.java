@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -100,7 +99,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				if (this.theClass == null)
 				{
 					this.mode = 0;
-					pm.report(new SyntaxError(token, "Cannot define a constructor in this context"));
+					pm.report(token, "Cannot define a constructor in this context");
 					return;
 				}
 				
@@ -122,7 +121,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				if (this.theClass == null)
 				{
 					this.reset();
-					pm.report(new SyntaxError(token, "Cannot define a class in this context"));
+					pm.report(token, "Cannot define a class in this context");
 					return;
 				}
 				
@@ -156,7 +155,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
-				pm.report(new SyntaxError(token, "Invalid Member Declaration - Name expected"));
+				pm.report(token, "Invalid Member Declaration - Name expected");
 				return;
 			}
 			IToken next = token.next();
@@ -221,7 +220,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			pm.report(new SyntaxError(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected"));
+			pm.report(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected");
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
@@ -230,7 +229,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Generic Type Parameter List - ']' expected"));
+			pm.report(token, "Invalid Generic Type Parameter List - ']' expected");
 			return;
 		case PARAMETERS:
 			this.mode = PARAMETERS_END;
@@ -240,7 +239,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Parameter List - '(' expected"));
+			pm.report(token, "Invalid Parameter List - '(' expected");
 			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_VALUE;
@@ -250,7 +249,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Parameter List - ')' expected"));
+			pm.report(token, "Invalid Parameter List - ')' expected");
 			return;
 		case METHOD_VALUE:
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
@@ -283,7 +282,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			pm.report(new SyntaxError(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected"));
+			pm.report(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
 			return;
 		case METHOD_END:
 			if (this.member instanceof IMethod)

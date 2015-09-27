@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -114,7 +113,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Parameter Declaration - Name expected"));
+			pm.report(token, "Invalid Parameter Declaration - Name expected");
 			return;
 		case SEPERATOR:
 			if (ParserUtil.isCloseBracket(type))
@@ -132,7 +131,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Parameter Declaration - ',' expected"));
+			pm.report(token, "Invalid Parameter Declaration - ',' expected");
 			return;
 		}
 	}

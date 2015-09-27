@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.statement;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.SyncStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -38,13 +37,13 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Synchronized Block - '(' expected")); return;
+			pm.report(token, "Invalid Synchronized Block - '(' expected"); return;
 		case LOCK_END:
 			this.mode = ACTION;
 			if (token.type() != Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Synchronized Block - ')' expected"));
+				pm.report(token, "Invalid Synchronized Block - ')' expected");
 			}
 			return;
 		case ACTION:

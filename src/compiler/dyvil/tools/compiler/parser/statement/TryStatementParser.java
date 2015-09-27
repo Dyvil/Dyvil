@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.CatchBlock;
 import dyvil.tools.compiler.ast.statement.TryStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -76,7 +75,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			if (type != Symbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Catch Expression - '(' expected"));
+				pm.report(token, "Invalid Catch Expression - '(' expected");
 			}
 			return;
 		case CATCH_VAR:
@@ -87,14 +86,14 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Catch Expression - Name expected"));
+			pm.report(token, "Invalid Catch Expression - Name expected");
 			return;
 		case CATCH_CLOSE:
 			this.mode = CATCH;
 			pm.pushParser(pm.newExpressionParser(this.catchBlock));
 			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				pm.report(new SyntaxError(token, "Invalid Catch Expression - ')' expected"));
+				pm.report(token, "Invalid Catch Expression - ')' expected");
 			}
 			return;
 		}

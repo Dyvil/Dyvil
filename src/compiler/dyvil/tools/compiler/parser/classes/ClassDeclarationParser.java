@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.*;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -82,7 +81,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = GENERICS;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Class Declaration - Name expected"));
+			pm.report(token, "Invalid Class Declaration - Name expected");
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
@@ -91,7 +90,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Generic Type Variable List - ']' expected"));
+			pm.report(token, "Invalid Generic Type Variable List - ']' expected");
 			return;
 		case PARAMETERS_END:
 			this.mode = EXTENDS;
@@ -100,7 +99,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Class Parameter List - ')' expected"));
+			pm.report(token, "Invalid Class Parameter List - ')' expected");
 			return;
 		case GENERICS:
 			if (type == Symbols.OPEN_SQUARE_BRACKET)
@@ -139,7 +138,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				
 				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
-					pm.report(new SyntaxError(token, "Interfaces cannot implement other interfaces - Use 'extends' instead"));
+					pm.report(token, "Interfaces cannot implement other interfaces - Use 'extends' instead");
 					return;
 				}
 				return;
@@ -184,7 +183,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			this.mode = BODY_END;
-			pm.report(new SyntaxError(token, "Invalid Class Declaration - '{' or ';' expected"));
+			pm.report(token, "Invalid Class Declaration - '{' or ';' expected");
 			return;
 		case BODY_END:
 			if (type == Symbols.CLOSE_CURLY_BRACKET)
@@ -194,7 +193,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Class Declaration - '}' expected"));
+			pm.report(token, "Invalid Class Declaration - '}' expected");
 			return;
 		}
 	}

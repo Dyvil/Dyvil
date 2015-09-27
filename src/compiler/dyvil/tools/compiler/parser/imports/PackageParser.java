@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -38,6 +37,6 @@ public class PackageParser extends Parser
 			this.buffer.append(token.nameValue().qualified);
 			return;
 		}
-		pm.report(new SyntaxError(token, "Invalid Package Declaration - Invalid " + token)); return;
+		pm.report(token, "Invalid Package Declaration - Invalid " + token); return;
 	}
 }

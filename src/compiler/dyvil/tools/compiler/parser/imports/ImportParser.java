@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -91,7 +90,7 @@ public final class ImportParser extends Parser
 			}
 			}
 			pm.popParser();
-			pm.report(new SyntaxError(token, "Invalid Import Declaration - Identifier expected"));
+			pm.report(token, "Invalid Import Declaration - Identifier expected");
 			return;
 		case DOT_ALIAS:
 			switch (type)
@@ -109,14 +108,14 @@ public final class ImportParser extends Parser
 					pm.skip();
 					return;
 				}
-				pm.report(new SyntaxError(next, "Invalid Import Alias"));
+				pm.report(next, "Invalid Import Alias");
 				return;
 			case Symbols.CLOSE_CURLY_BRACKET:
 				this.consumer.setImport(this.theImport);
 				pm.popParser(true);
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Import Declaration - '.' expected"));
+			pm.report(token, "Invalid Import Declaration - '.' expected");
 			return;
 		case MULTIIMPORT:
 			this.theImport.expandPosition(token);
@@ -125,7 +124,7 @@ public final class ImportParser extends Parser
 			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Multi-Import - '}' expected"));
+				pm.report(token, "Invalid Multi-Import - '}' expected");
 			}
 			return;
 		}

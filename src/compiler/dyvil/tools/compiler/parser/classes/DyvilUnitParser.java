@@ -2,7 +2,6 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.Keywords;
@@ -64,7 +63,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 				return;
 			}
 		}
-		pm.report(new SyntaxError(token, "Invalid Header Element - Invalid " + token));
+		pm.report(token, "Invalid Header Element - Invalid " + token);
 		return;
 	}
 }

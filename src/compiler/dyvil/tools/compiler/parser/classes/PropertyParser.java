@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -93,7 +92,7 @@ public class PropertyParser extends Parser implements IValued
 				this.mode = GET_OR_SET;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Property Declaration - ':' expected")); return;
+			pm.report(token, "Invalid Property Declaration - ':' expected"); return;
 		}
 	}
 	

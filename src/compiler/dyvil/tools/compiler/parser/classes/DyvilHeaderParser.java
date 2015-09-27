@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.HeaderDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -119,7 +118,7 @@ public class DyvilHeaderParser extends Parser
 				pm.skip();
 				if (this.unit.getHeaderDeclaration() != null)
 				{
-					pm.report(new SyntaxError(token, "Duplicate Header Declaration"));
+					pm.report(token, "Duplicate Header Declaration");
 					return true;
 				}
 				

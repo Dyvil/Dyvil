@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -51,7 +50,7 @@ public final class BytecodeParser extends Parser
 				IToken next = token.next();
 				if (!ParserUtil.isIdentifier(next.type()))
 				{
-					pm.report(new SyntaxError(token, "Invalid Jump Instruction - Identifier expected"));
+					pm.report(token, "Invalid Jump Instruction - Identifier expected");
 					return;
 				}
 				
@@ -71,7 +70,7 @@ public final class BytecodeParser extends Parser
 				int opcode = Opcodes.parseOpcode(name.qualified);
 				if (opcode == -1)
 				{
-					pm.report(new SyntaxError(token, "Invalid Instruction - Unknown Instruction Name '" + name + "'"));
+					pm.report(token, "Invalid Instruction - Unknown Instruction Name '" + name + "'");
 					return;
 				}
 				
@@ -79,7 +78,7 @@ public final class BytecodeParser extends Parser
 			}
 			else
 			{
-				pm.report(new SyntaxError(token, "Invalid Instruction - Identifier expected"));
+				pm.report(token, "Invalid Instruction - Identifier expected");
 				return;
 			}
 			if (insn != null)
@@ -216,14 +215,14 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
 			{
-				pm.report(new SyntaxError(next, "Invalid IINC Instruction - Integer expected"));
+				pm.report(next, "Invalid IINC Instruction - Integer expected");
 				return null;
 			}
 			
 			IToken next2 = next.next();
 			if (next2.type() != Tokens.INT)
 			{
-				pm.report(new SyntaxError(next2, "Invalid IINC Instruction - Integer expected"));
+				pm.report(next2, "Invalid IINC Instruction - Integer expected");
 				return null;
 			}
 			
@@ -238,7 +237,7 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
 			{
-				pm.report(new SyntaxError(token, "Invalid Int Instruction - Integer expected"));
+				pm.report(token, "Invalid Int Instruction - Integer expected");
 				return null;
 			}
 			
@@ -297,7 +296,7 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (next.type() != Tokens.INT)
 			{
-				pm.report(new SyntaxError(token, "Invalid Var Instruction - Integer expected"));
+				pm.report(token, "Invalid Var Instruction - Integer expected");
 				return null;
 			}
 			
@@ -326,7 +325,7 @@ public final class BytecodeParser extends Parser
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(new SyntaxError(token, "Invalid Jump Instruction - Identifier expected"));
+				pm.report(token, "Invalid Jump Instruction - Identifier expected");
 				return null;
 			}
 			

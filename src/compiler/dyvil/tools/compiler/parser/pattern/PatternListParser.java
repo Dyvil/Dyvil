@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.pattern;
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.IPatternList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -48,7 +47,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 				this.patternList.addPattern(this.pattern);
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Pattern List - ',' expected"));
+			pm.report(token, "Invalid Pattern List - ',' expected");
 			return;
 		}
 	}

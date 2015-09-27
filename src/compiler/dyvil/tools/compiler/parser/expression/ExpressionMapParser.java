@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueMap;
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -58,7 +57,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Expression Map - ',' expected"));
+				pm.report(token, "Invalid Expression Map - ',' expected");
 			}
 			return;
 		}

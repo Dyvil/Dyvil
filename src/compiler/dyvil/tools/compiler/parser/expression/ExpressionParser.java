@@ -18,7 +18,6 @@ import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -200,7 +199,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				}
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Pattern - ':' expected"));
+			pm.report(token, "Invalid Pattern - ':' expected");
 			return;
 		case ANONYMOUS_CLASS_END:
 			this.value.expandPosition(token);
@@ -209,7 +208,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Anonymous Class List - '}' expected"));
+				pm.report(token, "Invalid Anonymous Class List - '}' expected");
 			}
 			
 			return;
@@ -221,7 +220,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Argument List - ')' expected"));
+			pm.report(token, "Invalid Argument List - ')' expected");
 			return;
 		case SUBSCRIPT_END:
 			this.mode = ACCESS;
@@ -231,7 +230,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Subscript Arguments - ']' expected"));
+			pm.report(token, "Invalid Subscript Arguments - ']' expected");
 			return;
 		case CONSTRUCTOR:
 		{
@@ -287,7 +286,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Constructor Argument List - ')' expected"));
+			pm.report(token, "Invalid Constructor Argument List - ')' expected");
 			return;
 		case BYTECODE_END:
 			this.field.setValue(this.value);
@@ -298,7 +297,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Bytecode Expression - '}' expected"));
+			pm.report(token, "Invalid Bytecode Expression - '}' expected");
 			return;
 		case TYPE_ARGUMENTS_END:
 			MethodCall mc = (MethodCall) this.value;
@@ -314,14 +313,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Method Type Parameter List - ']' expected"));
+			pm.report(token, "Invalid Method Type Parameter List - ']' expected");
 			return;
 		}
 		
 		if (type == Symbols.COLON)
 		{
 			this.mode = ACCESS;
-			pm.report(new SyntaxError(token, "Invalid Colon - Delete this token"));
+			pm.report(token, "Invalid Colon - Delete this token");
 			return;
 		}
 		if (ParserUtil.isCloseBracket(type))
@@ -437,8 +436,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 								pm.popParser(true);
 								return;
 							case Operator.INFIX_NONE:
-								pm.report(new SyntaxError(token,
-										"Invalid Operator " + name + " - Operator without associativity is not allowed at this location"));
+								pm.report(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
 								return;
 							case Operator.INFIX_RIGHT:
 							}
@@ -457,7 +455,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			if (type == Symbols.HASH || type == Symbols.COLON)
 			{
-				pm.report(new SyntaxError(token, "Invalid Access - Invalid " + token));
+				pm.report(token, "Invalid Access - Invalid " + token);
 				return;
 			}
 			
@@ -481,7 +479,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(ep, true);
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Access - Invalid " + token));
+			pm.report(token, "Invalid Access - Invalid " + token);
 			return;
 		}
 		
@@ -492,7 +490,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			pm.popParser(true);
 			return;
 		}
-		pm.report(new SyntaxError(token, "Invalid Expression - Invalid " + token));
+		pm.report(token, "Invalid Expression - Invalid " + token);
 		return;
 	}
 	
@@ -652,7 +650,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		if (this.value == null)
 		{
 			this.mode = VALUE;
-			pm.report(new SyntaxError(token, "Invalid Assignment - Delete this token"));
+			pm.report(token, "Invalid Assignment - Delete this token");
 			return;
 		}
 		
@@ -695,7 +693,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		}
 		
-		pm.report(new SyntaxError(token, "Invalid Assignment"));
+		pm.report(token, "Invalid Assignment");
 		return;
 	}
 	
@@ -863,7 +861,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
-				pm.report(new SyntaxError(token, "Invalid Expression - 'else' not allowed at this location"));
+				pm.report(token, "Invalid Expression - 'else' not allowed at this location");
 				return true;
 			}
 			this.field.setValue(this.value);
@@ -949,7 +947,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				pm.report(new SyntaxError(token, "Invalid Expression - 'catch' not allowed at this location"));
+				pm.report(token, "Invalid Expression - 'catch' not allowed at this location");
 				return true;
 			}
 			this.field.setValue(this.value);
@@ -960,7 +958,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				pm.report(new SyntaxError(token, "Invalid Expression - 'finally' not allowed at this location"));
+				pm.report(token, "Invalid Expression - 'finally' not allowed at this location");
 				return true;
 			}
 			this.field.setValue(this.value);

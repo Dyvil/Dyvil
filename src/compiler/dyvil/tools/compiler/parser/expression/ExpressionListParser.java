@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -41,7 +40,7 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 				this.mode = 0;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Expression List - ',' expected"));
+			pm.report(token, "Invalid Expression List - ',' expected");
 			return;
 		}
 	}

@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -58,7 +57,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 				this.mode = TYPE_VARIABLE;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Type Variable - Name expected")); return;
+			pm.report(token, "Invalid Type Variable - Name expected"); return;
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
@@ -79,7 +78,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 					this.generic.addTypeVariable(this.variable);
 				}
 				pm.popParser(true);
-				pm.report(new SyntaxError(token, "Invalid Type Variable - '>=', '<=' or '&' expected")); return;
+				pm.report(token, "Invalid Type Variable - '>=', '<=' or '&' expected"); return;
 			}
 			
 			Name name = token.nameValue();

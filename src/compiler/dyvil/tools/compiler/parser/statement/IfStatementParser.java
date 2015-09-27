@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.statement;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.IfStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -43,7 +42,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			if (type != Symbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid if statement - '(' expected"));
+				pm.report(token, "Invalid if statement - '(' expected");
 			}
 			return;
 		}
@@ -53,7 +52,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid if statement - ')' expected"));
+				pm.report(token, "Invalid if statement - ')' expected");
 			}
 			return;
 		}

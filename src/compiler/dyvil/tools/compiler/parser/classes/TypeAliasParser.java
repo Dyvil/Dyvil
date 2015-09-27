@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -51,7 +50,7 @@ public class TypeAliasParser extends Parser
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Type Alias - 'type' expected"));
+			pm.report(token, "Invalid Type Alias - 'type' expected");
 			return;
 		case NAME:
 			if (ParserUtil.isIdentifier(token.type()))
@@ -63,7 +62,7 @@ public class TypeAliasParser extends Parser
 			}
 			pm.skip();
 			pm.popParser();
-			pm.report(new SyntaxError(token, "Invalid Type Alias - Identifier expected"));
+			pm.report(token, "Invalid Type Alias - Identifier expected");
 			return;
 		case EQUAL:
 			this.mode = 0;
@@ -73,7 +72,7 @@ public class TypeAliasParser extends Parser
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Type Alias - '=' expected"));
+			pm.report(token, "Invalid Type Alias - '=' expected");
 			return;
 		}
 	}

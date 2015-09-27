@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.IImportList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -38,7 +37,7 @@ public class ImportListParser extends Parser
 			if (type != Symbols.COMMA)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Import List - ',' expected"));
+				pm.report(token, "Invalid Import List - ',' expected");
 			}
 			return;
 		}

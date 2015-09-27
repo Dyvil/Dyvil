@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.generic.type.NamedGenericType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -129,13 +128,13 @@ public final class TypeParser extends Parser
 				pm.popParser(true);
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Type - Invalid " + token));
+			pm.report(token, "Invalid Type - Invalid " + token);
 			return;
 		case TUPLE_END:
 			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Tuple Type - ')' expected"));
+				pm.report(token, "Invalid Tuple Type - ')' expected");
 			}
 			IToken next = token.next();
 			int nextType = next.type();
@@ -175,7 +174,7 @@ public final class TypeParser extends Parser
 			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Array Type - ']' expected"));
+				pm.report(token, "Invalid Array Type - ']' expected");
 			}
 			return;
 		case GENERICS:
@@ -214,7 +213,7 @@ public final class TypeParser extends Parser
 			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Generic Type - ']' expected"));
+				pm.report(token, "Invalid Generic Type - ']' expected");
 			}
 			return;
 		case ANNOTATION_END:
