@@ -16,10 +16,16 @@ public final class OperatorParser extends Parser
 	private static final int	TYPE			= 1;
 	private static final int	OPERATOR		= 2;
 	private static final int	OPEN_BRACKET	= 4;
-	private static final int	ASSOCIATIVITY	= 8;
-	private static final int	COMMA			= 16;
-	private static final int	PRECEDENCE		= 32;
-	private static final int	CLOSE_BRACKET	= 64;
+	private static final int	PROPERTY		= 8;
+	private static final int	PRECEDENCE		= 16;
+	private static final int	ASSOCIATIVITY	= 32;
+	private static final int	COMMA			= 64;
+	
+	public static final Name	associativity	= Name.getQualified("associativity");
+	public static final Name	precedence		= Name.getQualified("precedence");
+	public static final Name	none			= Name.getQualified("none");
+	public static final Name	left			= Name.getQualified("left");
+	public static final Name	right			= Name.getQualified("right");
 	
 	protected IOperatorMap	map;
 	private int				type;
@@ -91,7 +97,7 @@ public final class OperatorParser extends Parser
 			case Operator.PREFIX:
 				if (type == Symbols.OPEN_CURLY_BRACKET)
 				{
-					this.mode = PRECEDENCE;
+					this.mode = PROPERTY;
 					return;
 				}
 				pm.popParser();
@@ -105,7 +111,7 @@ public final class OperatorParser extends Parser
 			case Operator.POSTFIX:
 				if (type == Symbols.OPEN_CURLY_BRACKET)
 				{
-					this.mode = PRECEDENCE;
+					this.mode = PROPERTY;
 					return;
 				}
 				pm.popParser();
@@ -117,7 +123,7 @@ public final class OperatorParser extends Parser
 				}
 				return;
 			default: // infix
-				this.mode = ASSOCIATIVITY;
+				this.mode = PROPERTY;
 				if (type != Symbols.OPEN_CURLY_BRACKET)
 				{
 					pm.reparse();
@@ -126,29 +132,61 @@ public final class OperatorParser extends Parser
 				}
 				return;
 			}
-		case ASSOCIATIVITY:
-			if (token.type() == Tokens.LETTER_IDENTIFIER)
+		case PROPERTY:
+			if (type == Tokens.LETTER_IDENTIFIER)
 			{
-				switch (token.nameValue().qualified)
+				Name name = token.nameValue();
+				if (name == precedence)
 				{
-				case "none":
-					this.operator.type = Operator.INFIX_NONE;
+					this.mode = PRECEDENCE;
+					return;
+				}
+				if (name == associativity)
+				{
+					this.mode = ASSOCIATIVITY;
+					return;
+				}
+				if (name == left)
+				{
+					this.setAssociativity(pm, token, Operator.INFIX_LEFT);
 					this.mode = COMMA;
 					return;
-				case "left":
-					this.operator.type = Operator.INFIX_LEFT;
+				}
+				if (name == none)
+				{
+					this.setAssociativity(pm, token, Operator.INFIX_NONE);
 					this.mode = COMMA;
 					return;
-				case "right":
-					this.operator.type = Operator.INFIX_RIGHT;
+				}
+				if (name == right)
+				{
+					this.setAssociativity(pm, token, Operator.INFIX_RIGHT);
 					this.mode = COMMA;
 					return;
 				}
 			}
-			pm.report(new SyntaxError(token, "Invalid Operator Type - Invalid " + token));
+			if ((type & Tokens.INT) != 0)
+			{
+				this.operator.precedence = token.intValue();
+				this.mode = COMMA;
+				return;
+			}
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.popParser();
+				this.map.addOperator(this.operator);
+				return;
+			}
+			pm.report(new SyntaxError(token, "Invalid Operator Property - Invalid " + token));
 			return;
 		case COMMA:
-			this.mode = PRECEDENCE;
+			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.popParser();
+				this.map.addOperator(this.operator);
+				return;
+			}
+			this.mode = PROPERTY;
 			if (type != Symbols.COMMA)
 			{
 				pm.reparse();
@@ -157,24 +195,53 @@ public final class OperatorParser extends Parser
 			}
 			return;
 		case PRECEDENCE:
-			this.mode = CLOSE_BRACKET;
+			this.mode = COMMA;
 			if ((type & Tokens.INT) == 0)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Operator - Integer Precedence expected"));
+				pm.report(new SyntaxError(token, "Invalid Operator Precedence - Integer expected"));
 				return;
 			}
 			this.operator.precedence = token.intValue();
 			return;
-		case CLOSE_BRACKET:
-			pm.popParser();
-			this.map.addOperator(this.operator);
-			if (type != Symbols.CLOSE_CURLY_BRACKET)
+		case ASSOCIATIVITY:
+			this.mode = COMMA;
+			if (type == Tokens.LETTER_IDENTIFIER)
 			{
-				pm.report(new SyntaxError(token, "Invalid Operator - '}' expected"));
-				return;
+				Name name = token.nameValue();
+				if (name == left)
+				{
+					this.setAssociativity(pm, token, Operator.INFIX_LEFT);
+					return;
+				}
+				if (name == none)
+				{
+					this.setAssociativity(pm, token, Operator.INFIX_NONE);
+					return;
+				}
+				if (name == right)
+				{
+					this.setAssociativity(pm, token, Operator.INFIX_RIGHT);
+					return;
+				}
 			}
+			
+			pm.reparse();
+			pm.report(new SyntaxError(token, "Invalid Operator Associativity - 'left', 'none' or 'right' expected"));
 			return;
 		}
+	}
+	
+	private void setAssociativity(IParserManager pm, IToken token, int associativity) {
+		switch (this.operator.type) {
+		case Operator.POSTFIX:
+			pm.report(new SyntaxError(token, "Invalid Postfix Operator - Postfix Operators cannot have an associativity"));
+			return;
+		case Operator.PREFIX:
+			pm.report(new SyntaxError(token, "Invalid Prefix Operator - Prefix Operators cannot have an associativity"));
+			return;
+		}
+		
+		this.operator.type = associativity;
 	}
 }

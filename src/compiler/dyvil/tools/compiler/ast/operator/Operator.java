@@ -48,14 +48,6 @@ public final class Operator
 		this.type = type;
 	}
 	
-	@Override
-	public String toString()
-	{
-		StringBuilder buf = new StringBuilder();
-		this.toString(buf);
-		return buf.toString();
-	}
-	
 	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeUTF(this.name.unqualified);
@@ -77,25 +69,42 @@ public final class Operator
 		return new Operator(name, type);
 	}
 	
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		this.toString(buf);
+		return buf.toString();
+	}
+	
 	public void toString(StringBuilder buffer)
 	{
 		switch (this.type)
 		{
 		case PREFIX:
 			buffer.append("prefix operator ").append(this.name);
-			return;
+			break;
 		case POSTFIX:
 			buffer.append("postfix operator ").append(this.name);
+			break;
+		case INFIX_NONE:
+			buffer.append("infix operator ").append(this.name);
+			if (this.precedence != 0)
+			{
+				buffer.append(" { precedence ").append(this.precedence).append(" }");
+			}
 			return;
 		case INFIX_LEFT:
-			buffer.append("infix operator ").append(this.name).append(" { left, ").append(this.precedence).append(" }");
-			return;
-		case INFIX_NONE:
-			buffer.append("infix operator ").append(this.name).append(" { none, ").append(this.precedence).append(" }");
+			buffer.append("infix operator ").append(this.name).append(" { associativity left, precedence ").append(this.precedence).append(" }");
 			return;
 		case INFIX_RIGHT:
-			buffer.append("infix operator ").append(this.name).append(" { right, ").append(this.precedence).append(" }");
+			buffer.append("infix operator ").append(this.name).append(" { associativity right, precedence ").append(this.precedence).append(" }");
 			return;
+		}
+		
+		if (this.precedence != PREFIX_PRECEDENCE)
+		{
+			buffer.append(" { precedence ").append(this.precedence).append(" }");
 		}
 	}
 }

@@ -20,8 +20,8 @@ import	dyvil.tuple.Tuple3 => Triple
 // Import the methods from Predef
 using	dyvil.lang.Predef._
 
-prefix operator print { 1 }
-prefix operator println { 1 }
+prefix operator print { precedence 1 }
+prefix operator println { precedence 1 }
 
 // Prefix Operators
 prefix operator +

@@ -66,10 +66,10 @@ public class MatchTest
 	}
 	
 	private static void expression() {
-		println(10 match {
+		println 10 match {
 			case 0: "a"
 			case 1: "b"
 			case var x: x.toString
-		})
+		}
 	}
 }	
