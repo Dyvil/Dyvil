@@ -51,7 +51,7 @@ public class REPLVariable extends Field
 	private static boolean isConstant(IValue value)
 	{
 		int tag = value.valueTag();
-		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
+		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
 	}
 	
 	protected void compute()
@@ -71,15 +71,7 @@ public class REPLVariable extends Field
 			{
 				java.lang.reflect.Field[] fields = c.getDeclaredFields();
 				Object result = fields[0].get(null);
-				IValue v = IValue.fromObject(result);
-				if (v != null)
-				{
-					this.value = v;
-				}
-				else
-				{
-					this.value = new REPLResult(result);
-				}
+				this.value = new REPLResult(result);
 			}
 			else
 			{

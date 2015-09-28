@@ -51,7 +51,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	private static IClass memberClass;
 	
-	private static Map<IClass, AtomicInteger> resultIndexes = new HashMap();
+	private static Map<String, AtomicInteger> resultIndexes = new HashMap();
 	
 	public REPLContext()
 	{
@@ -122,38 +122,47 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		return true;
 	}
 	
-	private static Name getFieldName(IType type)
+	private static void getClassName(StringBuilder builder, IType type)
 	{
-		IClass c = type.getTheClass();
-		AtomicInteger ai = resultIndexes.get(c);
-		if (ai == null)
+		if (type.isArrayType())
 		{
-			resultIndexes.put(c, ai = new AtomicInteger(0));
+			getClassName(builder, type.getElementType());
+			builder.append("Array");
+			return;
 		}
 		
-		String name = c.getName().unqualified;
-		int nameLength = name.length();
-		int index = ai.incrementAndGet();
-		
+		builder.append(type.getTheClass().getName().unqualified);
+	}
+	
+	private static Name getFieldName(IType type)
+	{
 		StringBuilder sb = new StringBuilder();
+		getClassName(sb, type);
 		
-		// Lowercase the first character
-		sb.append(Character.toLowerCase(name.charAt(0)));
+		// Make the first character lower case
+		sb.setCharAt(0, Character.toLowerCase(sb.charAt(0)));
 		
 		// Strip trailing digits
-		int end = nameLength;
-		for (int i = 0; i < nameLength; i++)
+		for (int i = 0, len = sb.length(); i < len; i++)
 		{
-			if (Character.isDigit(name.charAt(i)))
+			if (Character.isDigit(sb.charAt(i)))
 			{
-				end = i;
+				sb.delete(i, len);
 				break;
 			}
 		}
 		
-		sb.append(name, 1, end);
-		sb.append(index);
-		return Name.get(sb.toString());
+		// The final variable name, without the index
+		String shortName = sb.toString();
+		
+		AtomicInteger ai = resultIndexes.get(shortName);
+		if (ai == null)
+		{
+			resultIndexes.put(shortName, ai = new AtomicInteger(0));
+		}
+		
+		int index = ai.incrementAndGet();
+		return Name.get(sb.append(index).toString());
 	}
 	
 	private void compileVariable(REPLVariable field)
