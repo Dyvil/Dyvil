@@ -113,26 +113,26 @@ public class REPLVariable extends Field
 	{
 		String name = this.name.qualified;
 		String extendedType = this.type.getExtendedName();
-		ClassWriter writer = new ClassWriter();
+		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
-		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
+		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
 		
-		writer.visitSource(className, null);
+		cw.visitSource(className, null);
 		
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
-			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
+			cw.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
 		}
 		
 		// Compilables
 		for (IClassCompilable c : compilableList)
 		{
-			c.write(writer);
+			c.write(cw);
 		}
 		
 		// Generate <clinit> static initializer
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
+		MethodWriter mw = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
 		mw.begin();
 		
 		for (IClassCompilable c : compilableList)
@@ -144,16 +144,7 @@ public class REPLVariable extends Field
 		
 		if (this.value != null)
 		{
-			if (this.type != Types.VOID)
-			{
-				this.value.writeExpression(mw, this.type);
-				// Store the value to the field
-				mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
-			}
-			else
-			{
-				this.value.writeStatement(mw);
-			}
+			writeValue(className, name, extendedType, cw, mw);
 		}
 		
 		// Finish Method compilation
@@ -161,9 +152,9 @@ public class REPLVariable extends Field
 		mw.end();
 		
 		// Finish Class compilation
-		writer.visitEnd();
+		cw.visitEnd();
 		
-		byte[] bytes = writer.toByteArray();
+		byte[] bytes = cw.toByteArray();
 		
 		if (this.type != Types.VOID || !compilableList.isEmpty())
 		{
@@ -173,6 +164,25 @@ public class REPLVariable extends Field
 		// We don't have any variables, so we can throw the Class away after
 		// it has been loaded.
 		return ReflectUtils.unsafe.defineAnonymousClass(REPLVariable.class, bytes, null);
+	}
+	
+	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw) throws BytecodeException
+	{
+		if (this.type == Types.VOID)
+		{
+			this.value.writeStatement(mw);
+			return;
+		}
+		
+		String methodType = "()" + extendedType;
+		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC, "computeValue", methodType, null, null));
+		initWriter.begin();
+		this.value.writeExpression(initWriter, this.type);
+		initWriter.end(this.type);
+		
+		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, className, "computeValue", methodType, false);
+		// Store the value to the field
+		mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 	}
 	
 	@Override

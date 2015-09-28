@@ -1,8 +1,11 @@
 package dyvil.tools.repl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -35,7 +38,6 @@ import dyvil.tools.compiler.util.Util;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
-	private static int			resultIndex;
 	private static int			classIndex;
 	private static String		className;
 	protected static MarkerList	markers	= new MarkerList();
@@ -48,6 +50,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	protected static List<IClassCompilable>	innerClassList	= new ArrayList();
 	
 	private static IClass memberClass;
+	
+	private static Map<IClass, AtomicInteger> resultIndexes = new HashMap();
 	
 	public REPLContext()
 	{
@@ -118,6 +122,40 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		return true;
 	}
 	
+	private static Name getFieldName(IType type)
+	{
+		IClass c = type.getTheClass();
+		AtomicInteger ai = resultIndexes.get(c);
+		if (ai == null)
+		{
+			resultIndexes.put(c, ai = new AtomicInteger(0));
+		}
+		
+		String name = c.getName().unqualified;
+		int nameLength = name.length();
+		int index = ai.incrementAndGet();
+		
+		StringBuilder sb = new StringBuilder();
+		
+		// Lowercase the first character
+		sb.append(Character.toLowerCase(name.charAt(0)));
+		
+		// Strip trailing digits
+		int end = nameLength;
+		for (int i = 0; i < nameLength; i++)
+		{
+			if (Character.isDigit(name.charAt(i)))
+			{
+				end = i;
+				break;
+			}
+		}
+		
+		sb.append(name, 1, end);
+		sb.append(index);
+		return Name.get(sb.toString());
+	}
+	
 	private void compileVariable(REPLVariable field)
 	{
 		compileInnerClasses();
@@ -151,8 +189,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void setValue(IValue value)
 	{
-		Name name = Name.getQualified("res" + resultIndex);
-		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, name, Types.UNKNOWN, value, className, Modifiers.FINAL);
+		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
 		memberClass = getREPLClass(field);
 		
 		value.resolveTypes(markers, this);
@@ -180,12 +217,13 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		field.setValue(value);
 		field.setType(type);
 		
+		field.setName(getFieldName(type));
+		
 		this.compileVariable(field);
 		if (type != Types.VOID)
 		{
 			fields.put(field.getName(), field);
 			System.out.println(field.toString());
-			resultIndex++;
 		}
 	}
 	
