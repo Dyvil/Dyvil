@@ -83,7 +83,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
 		if (this.mode == END)
 		{
 			if (this.value != null)
@@ -94,6 +93,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		}
 		
+		int type = token.type();
 		switch (type)
 		{
 		case Symbols.SEMICOLON:
@@ -474,9 +474,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				ApplyMethodCall call = new ApplyMethodCall(token.raw(), this.value, sa);
 				this.value = call;
 				this.mode = END;
-				ExpressionParser ep = (ExpressionParser) pm.newExpressionParser(sa);
-				ep.operator = Operators.DEFAULT;
-				pm.pushParser(ep, true);
+				
+				this.parseApply(pm, token, sa, Operators.DEFAULT);
+				pm.reparse();
 				return;
 			}
 			pm.report(token, "Invalid Access - Invalid " + token);
@@ -492,6 +492,21 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		pm.report(token, "Invalid Expression - Invalid " + token);
 		return;
+	}
+	
+	private void parseApply(IParserManager pm, IToken token, SingleArgument sa, Operator op)
+	{
+		if (token.type() == Symbols.OPEN_CURLY_BRACKET)
+		{
+			StatementListParser slp = new StatementListParser(sa);
+			slp.setApplied(true);
+			pm.pushParser(slp);
+			return;
+		}
+		
+		ExpressionParser ep = (ExpressionParser) pm.newExpressionParser(sa);
+		ep.operator = op;
+		pm.pushParser(ep);
 	}
 	
 	private void createBody(ClassConstructor cc, IParserManager pm)
@@ -579,9 +594,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = call;
 				this.mode = ACCESS;
 				
-				ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
-				parser.operator = op;
-				pm.pushParser(parser);
+				this.parseApply(pm, token.next(), sa, op);
 				return;
 			}
 			MethodCall call = new MethodCall(token, this.value, name);
@@ -593,9 +606,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				SingleArgument sa = new SingleArgument();
 				call.setArguments(sa);
 				
-				ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
-				parser.operator = op;
-				pm.pushParser(parser);
+				this.parseApply(pm, token, sa, op);
 			}
 			return;
 		}
@@ -632,9 +643,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		
 		this.value = call;
 		this.mode = ACCESS;
-		ExpressionParser parser = (ExpressionParser) pm.newExpressionParser(sa);
-		parser.operator = op == null ? Operators.DEFAULT : op;
-		pm.pushParser(parser);
+		
+		// Applied Statement Lists
+		// someFunction { ... }
+		this.parseApply(pm, token, sa, op == null ? Operators.DEFAULT : op);
 		return;
 	}
 	

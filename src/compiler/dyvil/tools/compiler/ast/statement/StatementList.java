@@ -27,7 +27,7 @@ import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
 
-public final class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
+public class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
 	protected ICodePosition position;
 	
@@ -268,9 +268,15 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		if (this.valueCount <= 0)
+		{
+			return this;
+		}
+		
 		IContext context1 = new CombiningContext(this, context);
 		
-		for (int i = 0; i < this.valueCount; i++)
+		int len = this.valueCount - 1;
+		for (int i = 0; i < len; i++)
 		{
 			IValue v1 = this.values[i];
 			IValue v2 = v1.resolve(markers, context1);
@@ -281,48 +287,46 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 			
 			if (v2.valueTag() == IValue.VARIABLE)
 			{
-				if (this.variables == null)
-				{
-					this.variables = new IdentityHashMap();
-				}
-				
-				FieldInitializer fi = (FieldInitializer) v2;
-				Variable var = fi.variable;
-				this.variables.put(var.getName(), var);
+				this.addVariable(v2);
+			}
+			
+			v1 = v2.withType(Types.VOID, Types.VOID, markers, context1);
+			if (v1 == null)
+			{
+				Marker marker = markers.create(v2.getPosition(), "statement.type");
+				marker.addInfo("Returning Type: " + v2.getType());
+			}
+			else
+			{
+				this.values[i] = v1;
 			}
 		}
+		
+		this.values[len] = this.values[len].resolve(markers, context1);
+		
 		return this;
+	}
+	
+	protected void addVariable(IValue value)
+	{
+		if (this.variables == null)
+		{
+			this.variables = new IdentityHashMap();
+		}
+		
+		Variable var = ((FieldInitializer) value).variable;
+		this.variables.put(var.getName(), var);
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.valueCount == 0)
-		{
-			return;
-		}
-		
 		IContext context1 = this.variables == null ? context : new CombiningContext(this, context);
 		
-		int len = this.valueCount - 1;
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v = this.values[i];
-			IValue v1 = v.withType(Types.VOID, Types.VOID, markers, context1);
-			if (v1 == null)
-			{
-				Marker marker = markers.create(v.getPosition(), "statement.type");
-				marker.addInfo("Returning Type: " + v.getType());
-			}
-			else
-			{
-				v = this.values[i] = v1;
-			}
-			
-			v.checkTypes(markers, context1);
+			this.values[i].checkTypes(markers, context1);
 		}
-		
-		this.values[len].checkTypes(markers, context1);
 	}
 	
 	@Override
@@ -339,7 +343,7 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.valueCount == 1 && this.returnType != Types.VOID)
+		if (this.valueCount == 1)
 		{
 			return this.values[0].foldConstants();
 		}
@@ -354,7 +358,7 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.valueCount == 1 && this.returnType != Types.VOID)
+		if (this.valueCount == 1)
 		{
 			return this.values[0].cleanup(context, compilableList);
 		}
@@ -369,12 +373,6 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.returnType == Types.VOID)
-		{
-			this.writeStatement(writer);
-			return;
-		}
-		
 		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		
@@ -483,41 +481,40 @@ public final class StatementList implements IValue, IValueList, IDefaultContext,
 		if (this.valueCount == 0)
 		{
 			buffer.append(Formatting.Expression.emptyExpression);
+			return;
 		}
-		else
+		
+		buffer.append('\n').append(prefix).append('{').append('\n');
+		String prefix1 = prefix + Formatting.Method.indent;
+		ICodePosition prevPos = null;
+		
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			buffer.append('\n').append(prefix).append('{').append('\n');
-			String prefix1 = prefix + Formatting.Method.indent;
-			ICodePosition prevPos = null;
+			IValue value = this.values[i];
+			buffer.append(prefix1);
 			
-			for (int i = 0; i < this.valueCount; i++)
+			if (prevPos != null)
 			{
-				IValue value = this.values[i];
-				buffer.append(prefix1);
-				
-				if (prevPos != null)
+				ICodePosition pos = value.getPosition();
+				if (pos != null && pos.startLine() - prevPos.endLine() > 1)
 				{
-					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.startLine() - prevPos.endLine() > 1)
-					{
-						buffer.append('\n').append(prefix1);
-					}
-					prevPos = pos;
+					buffer.append('\n').append(prefix1);
 				}
-				
-				if (this.labels != null)
-				{
-					Label l = this.labels[i];
-					if (l != null)
-					{
-						buffer.append(l.name).append(Formatting.Expression.labelSeperator);
-					}
-				}
-				
-				value.toString(prefix1, buffer);
-				buffer.append(";\n");
+				prevPos = pos;
 			}
-			buffer.append(prefix).append('}');
+			
+			if (this.labels != null)
+			{
+				Label l = this.labels[i];
+				if (l != null)
+				{
+					buffer.append(l.name).append(Formatting.Expression.labelSeperator);
+				}
+			}
+			
+			value.toString(prefix1, buffer);
+			buffer.append(";\n");
 		}
+		buffer.append(prefix).append('}');
 	}
 }
