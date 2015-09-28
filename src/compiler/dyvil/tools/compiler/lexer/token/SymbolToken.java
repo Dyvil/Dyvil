@@ -47,12 +47,11 @@ public final class SymbolToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		if (this.type == Symbols.ARROW_OPERATOR)
+		switch (this.type)
 		{
+		case Symbols.ARROW_OPERATOR:
 			return this.start + 2;
-		}
-		if (this.type == Symbols.ELLIPSIS)
-		{
+		case Symbols.ELLIPSIS:
 			return this.start + 3;
 		}
 		return this.start + 1;
@@ -121,6 +120,6 @@ public final class SymbolToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Symbol '" + Symbols.symbolToString(this.type) + "' (line " + this.lineNumber + ")";
+		return "Symbol '" + Symbols.symbolToString(this.type) + '\'';
 	}
 }

@@ -125,19 +125,17 @@ public final class StringToken implements IToken
 	@Override
 	public String toString()
 	{
-		String s = " \"" + this.value + "\" (line " + this.lineNumber + ")";
+		String s = '"' + this.value + '"';
 		
 		switch (this.type)
 		{
-		case Tokens.STRING:
-			return "String" + s;
 		case Tokens.STRING_START:
-			return "String {" + s;
+			return "String Start " + s;
 		case Tokens.STRING_PART:
-			return "} String {" + s;
+			return "String Part " + s;
 		case Tokens.STRING_END:
-			return "} String" + s;
+			return "String End " + s;
 		}
-		return "String" + s;
+		return "String " + s;
 	}
 }

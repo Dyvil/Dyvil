@@ -119,6 +119,6 @@ public final class CharToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Char '" + this.value + "' (line " + this.lineNumber + ")";
+		return "Char '" + this.value + '\'';
 	}
 }

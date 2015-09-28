@@ -122,6 +122,6 @@ public final class DoubleToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Double " + this.value + " (line " + this.lineNumber + ")";
+		return "Double " + this.value;
 	}
 }

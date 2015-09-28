@@ -105,6 +105,6 @@ public class InferredSemicolon implements IToken
 	@Override
 	public String toString()
 	{
-		return "Inferred Semicolon (line " + this.lineNumber + ")";
+		return "Inferred Semicolon";
 	}
 }

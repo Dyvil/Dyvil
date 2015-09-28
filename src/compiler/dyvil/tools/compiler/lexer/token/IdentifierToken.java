@@ -125,6 +125,6 @@ public class IdentifierToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Identifier '" + this.name + "' (line " + this.lineNumber + ")";
+		return "Identifier '" + this.name + "\'";
 	}
 }

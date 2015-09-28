@@ -139,6 +139,6 @@ public final class IntToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Integer " + this.value + " (line " + this.lineNumber + ")";
+		return "Integer " + this.value;
 	}
 }

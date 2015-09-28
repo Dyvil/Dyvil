@@ -122,6 +122,6 @@ public final class FloatToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Float " + this.value + " (line " + this.lineNumber + ")";
+		return "Float " + this.value;
 	}
 }

@@ -138,6 +138,6 @@ public final class LongToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Long " + this.value + " (line " + this.lineNumber + ")";
+		return "Long " + this.value;
 	}
 }

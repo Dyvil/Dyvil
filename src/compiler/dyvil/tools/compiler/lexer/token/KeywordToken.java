@@ -116,6 +116,6 @@ public final class KeywordToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Keyword '" + Keywords.keywordToString(this.type) + "' (line " + this.lineNumber + ")";
+		return "Keyword '" + Keywords.keywordToString(this.type) + '\'';
 	}
 }
