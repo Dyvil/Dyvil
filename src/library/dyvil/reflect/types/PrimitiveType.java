@@ -4,15 +4,15 @@ import dyvil.lang.Type;
 
 public class PrimitiveType implements Type
 {
-	public static final int	VOID	= 0;
-	public static final int	BOOLEAN	= 1;
-	public static final int	BYTE	= 2;
-	public static final int	SHORT	= 3;
-	public static final int	CHAR	= 4;
-	public static final int	INT		= 5;
-	public static final int	LONG	= 6;
-	public static final int	FLOAT	= 7;
-	public static final int	DOUBLE	= 8;
+	public static final int	VOID_CODE		= 0;
+	public static final int	BOOLEAN_CODE	= 1;
+	public static final int	BYTE_CODE		= 2;
+	public static final int	SHORT_CODE		= 3;
+	public static final int	CHAR_CODE		= 4;
+	public static final int	INT_CODE		= 5;
+	public static final int	LONG_CODE		= 6;
+	public static final int	FLOAT_CODE		= 7;
+	public static final int	DOUBLE_CODE		= 8;
 	
 	private static final PrimitiveType[] LOOKUP = new PrimitiveType[9];
 	
@@ -21,7 +21,7 @@ public class PrimitiveType implements Type
 	
 	static
 	{
-		for (int i = VOID; i <= DOUBLE; i++)
+		for (int i = VOID_CODE; i <= DOUBLE_CODE; i++)
 		{
 			LOOKUP[i] = new PrimitiveType(i);
 		}
@@ -37,31 +37,31 @@ public class PrimitiveType implements Type
 		this.id = id;
 		switch (id)
 		{
-		case VOID:
+		case VOID_CODE:
 			this.theClass = void.class;
 			return;
-		case BOOLEAN:
+		case BOOLEAN_CODE:
 			this.theClass = boolean.class;
 			return;
-		case BYTE:
+		case BYTE_CODE:
 			this.theClass = byte.class;
 			return;
-		case SHORT:
+		case SHORT_CODE:
 			this.theClass = short.class;
 			return;
-		case CHAR:
+		case CHAR_CODE:
 			this.theClass = char.class;
 			return;
-		case INT:
+		case INT_CODE:
 			this.theClass = int.class;
 			return;
-		case LONG:
+		case LONG_CODE:
 			this.theClass = long.class;
 			return;
-		case FLOAT:
+		case FLOAT_CODE:
 			this.theClass = float.class;
 			return;
-		case DOUBLE:
+		case DOUBLE_CODE:
 			this.theClass = double.class;
 			return;
 		default:
@@ -74,47 +74,47 @@ public class PrimitiveType implements Type
 		this.theClass = theClass;
 		if (theClass == void.class)
 		{
-			this.id = VOID;
+			this.id = VOID_CODE;
 			return;
 		}
 		if (theClass == boolean.class)
 		{
-			this.id = BOOLEAN;
+			this.id = BOOLEAN_CODE;
 			return;
 		}
 		if (theClass == byte.class)
 		{
-			this.id = BYTE;
+			this.id = BYTE_CODE;
 			return;
 		}
 		if (theClass == short.class)
 		{
-			this.id = SHORT;
+			this.id = SHORT_CODE;
 			return;
 		}
 		if (theClass == char.class)
 		{
-			this.id = CHAR;
+			this.id = CHAR_CODE;
 			return;
 		}
 		if (theClass == int.class)
 		{
-			this.id = INT;
+			this.id = INT_CODE;
 			return;
 		}
 		if (theClass == long.class)
 		{
-			this.id = LONG;
+			this.id = LONG_CODE;
 			return;
 		}
 		if (theClass == float.class)
 		{
-			this.id = FLOAT;
+			this.id = FLOAT_CODE;
 			return;
 		}
 		if (theClass == double.class)
 		{
-			this.id = DOUBLE;
+			this.id = DOUBLE_CODE;
 			return;
 		}
 		throw new IllegalAccessError("class");
@@ -125,23 +125,23 @@ public class PrimitiveType implements Type
 	{
 		switch (this.id)
 		{
-		case VOID:
+		case VOID_CODE:
 			return "void";
-		case BOOLEAN:
+		case BOOLEAN_CODE:
 			return "boolean";
-		case BYTE:
+		case BYTE_CODE:
 			return "byte";
-		case SHORT:
+		case SHORT_CODE:
 			return "short";
-		case CHAR:
+		case CHAR_CODE:
 			return "char";
-		case INT:
+		case INT_CODE:
 			return "int";
-		case LONG:
+		case LONG_CODE:
 			return "long";
-		case FLOAT:
+		case FLOAT_CODE:
 			return "float";
-		case DOUBLE:
+		case DOUBLE_CODE:
 			return "double";
 		}
 		return null;
@@ -170,31 +170,31 @@ public class PrimitiveType implements Type
 	{
 		switch (this.id)
 		{
-		case VOID:
+		case VOID_CODE:
 			builder.append('V');
 			return;
-		case BOOLEAN:
+		case BOOLEAN_CODE:
 			builder.append('Z');
 			return;
-		case BYTE:
+		case BYTE_CODE:
 			builder.append('B');
 			return;
-		case SHORT:
+		case SHORT_CODE:
 			builder.append('S');
 			return;
-		case CHAR:
+		case CHAR_CODE:
 			builder.append('C');
 			return;
-		case INT:
+		case INT_CODE:
 			builder.append('I');
 			return;
-		case LONG:
+		case LONG_CODE:
 			builder.append('J');
 			return;
-		case FLOAT:
+		case FLOAT_CODE:
 			builder.append('F');
 			return;
-		case DOUBLE:
+		case DOUBLE_CODE:
 			builder.append('D');
 			return;
 		}
@@ -205,31 +205,31 @@ public class PrimitiveType implements Type
 	{
 		switch (this.id)
 		{
-		case VOID:
+		case VOID_CODE:
 			builder.append("Ldyvil/lang/Void;");
 			return;
-		case BOOLEAN:
+		case BOOLEAN_CODE:
 			builder.append("Ldyvil/lang/Boolean;");
 			return;
-		case BYTE:
+		case BYTE_CODE:
 			builder.append("Ldyvil/lang/Byte;");
 			return;
-		case SHORT:
+		case SHORT_CODE:
 			builder.append("Ldyvil/lang/Short;");
 			return;
-		case CHAR:
+		case CHAR_CODE:
 			builder.append("Ldyvil/lang/Char;");
 			return;
-		case INT:
+		case INT_CODE:
 			builder.append("Ldyvil/lang/Int;");
 			return;
-		case LONG:
+		case LONG_CODE:
 			builder.append("Ldyvil/lang/Long;");
 			return;
-		case FLOAT:
+		case FLOAT_CODE:
 			builder.append("Ldyvil/lang/Float;");
 			return;
-		case DOUBLE:
+		case DOUBLE_CODE:
 			builder.append("Ldyvil/lang/Double;");
 			return;
 		}

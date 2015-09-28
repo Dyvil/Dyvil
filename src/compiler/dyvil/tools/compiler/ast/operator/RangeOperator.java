@@ -12,8 +12,8 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -286,25 +286,25 @@ public class RangeOperator implements IValue
 		// Primitive array
 		switch (this.elementType.getTypecode())
 		{
-		case ClassFormat.T_BYTE:
+		case PrimitiveType.BYTE_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
 			return;
-		case ClassFormat.T_SHORT:
+		case PrimitiveType.SHORT_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", method, "(SS)[S", false);
 			return;
-		case ClassFormat.T_CHAR:
+		case PrimitiveType.CHAR_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", method, "(CC)[C", false);
 			return;
-		case ClassFormat.T_INT:
+		case PrimitiveType.INT_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", method, "(II)[I", false);
 			return;
-		case ClassFormat.T_LONG:
+		case PrimitiveType.LONG_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", method, "(LL)[L", false);
 			return;
-		case ClassFormat.T_FLOAT:
+		case PrimitiveType.FLOAT_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", method, "(FF)[F", false);
 			return;
-		case ClassFormat.T_DOUBLE:
+		case PrimitiveType.DOUBLE_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
 			return;
 		}

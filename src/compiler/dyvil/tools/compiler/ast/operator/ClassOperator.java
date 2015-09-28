@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -180,28 +180,28 @@ public final class ClassOperator extends Value
 			// class instead of the Java one.
 			switch (this.type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
+			case PrimitiveType.BOOLEAN_CODE:
 				owner = "java/lang/Boolean";
 				break;
-			case ClassFormat.T_BYTE:
+			case PrimitiveType.BYTE_CODE:
 				owner = "java/lang/Byte";
 				break;
-			case ClassFormat.T_SHORT:
+			case PrimitiveType.SHORT_CODE:
 				owner = "java/lang/Short";
 				break;
-			case ClassFormat.T_CHAR:
+			case PrimitiveType.CHAR_CODE:
 				owner = "java/lang/Character";
 				break;
-			case ClassFormat.T_INT:
+			case PrimitiveType.INT_CODE:
 				owner = "java/lang/Integer";
 				break;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				owner = "java/lang/Long";
 				break;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				owner = "java/lang/Float";
 				break;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				owner = "java/lang/Double";
 				break;
 			default:

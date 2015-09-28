@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.Marker;
@@ -83,19 +83,19 @@ public class RangeForStatement extends ForEachStatement
 		{
 			switch (rangeType.getTypecode())
 			{
-			case ClassFormat.T_BYTE:
-			case ClassFormat.T_SHORT:
-			case ClassFormat.T_CHAR:
-			case ClassFormat.T_INT:
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
 				type = INT;
 				break;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				type = LONG;
 				break;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				type = FLOAT;
 				break;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				type = DOUBLE;
 				break;
 			}
