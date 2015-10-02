@@ -21,6 +21,9 @@ public final class Name
 	public static final Name	hashCode		= new Name("hashCode");
 	public static final Name	toString		= new Name("toString");
 	
+	public static final Name	Function	= new Name("Function");
+	public static final Name	Tuple		= new Name("Tuple");
+	
 	public static final Name	_this	= new Name("this");
 	public static final Name	_null	= new Name("null");
 	

@@ -16,9 +16,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.ClassType;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -69,10 +67,30 @@ public class NamedGenericType extends GenericType
 		return false;
 	}
 	
+	private void resolveTypeArguments(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
+		}
+	}
+	
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		// Package.rootPackage.resolveInternalClass(this.internalName);
+		if (this.name == Name.Tuple)
+		{
+			this.resolveTypeArguments(markers, context);
+			return new TupleType(this.typeArguments, this.typeArgumentCount);
+		}
+		if (this.name == Name.Function)
+		{
+			if (this.typeArgumentCount > 0)
+			{
+				this.resolveTypeArguments(markers, context);
+				return new LambdaType(this.typeArguments, this.typeArgumentCount - 1, this.typeArguments[this.typeArgumentCount - 1]);
+			}
+		}
 		
 		IClass iclass = IContext.resolveClass(context, this.name);
 		
@@ -116,10 +134,7 @@ public class NamedGenericType extends GenericType
 		
 		if (iclass == null)
 		{
-			for (int i = 0; i < this.typeArgumentCount; i++)
-			{
-				this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
-			}
+			this.resolveTypeArguments(markers, context);
 			return this;
 		}
 		
