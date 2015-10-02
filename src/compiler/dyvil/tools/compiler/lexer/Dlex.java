@@ -12,7 +12,7 @@ import static dyvil.tools.compiler.util.ParserUtil.*;
 
 public final class Dlex
 {
-	private MarkerList	markers;
+	private MarkerList markers;
 	
 	public Dlex(MarkerList markers)
 	{
@@ -385,7 +385,7 @@ public final class Dlex
 			
 			if (addToken)
 			{
-				prev = addToken(prev, buf, type | subtype, lineNumber, start);
+				prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
 				addToken = false;
 				type = 0;
 				
@@ -402,7 +402,7 @@ public final class Dlex
 		
 		if (buf.length() > 0)
 		{
-			addToken(prev, buf, type | subtype, lineNumber, start);
+			this.addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
 		return new TokenIterator(first.next());
@@ -586,21 +586,21 @@ public final class Dlex
 		case Symbols.CLOSE_CURLY_BRACKET:
 			return new SymbolToken(prev, type, line, start);
 		case INT:
-			return intToken(prev, s, line, start, len, 10, false);
+			return this.intToken(prev, s, line, start, len, 10, false);
 		case INT | MOD_BIN:
-			return intToken(prev, s, line, start, len, 2, false);
+			return this.intToken(prev, s, line, start, len, 2, false);
 		case INT | MOD_OCT:
-			return intToken(prev, s, line, start, len, 8, false);
+			return this.intToken(prev, s, line, start, len, 8, false);
 		case INT | MOD_HEX:
-			return intToken(prev, s, line, start, len, 16, false);
+			return this.intToken(prev, s, line, start, len, 16, false);
 		case LONG:
-			return intToken(prev, s, line, start, len, 10, true);
+			return this.intToken(prev, s, line, start, len, 10, true);
 		case LONG | MOD_BIN:
-			return intToken(prev, s, line, start, len, 2, true);
+			return this.intToken(prev, s, line, start, len, 2, true);
 		case LONG | MOD_OCT:
-			return intToken(prev, s, line, start, len, 8, true);
+			return this.intToken(prev, s, line, start, len, 8, true);
 		case LONG | MOD_HEX:
-			return intToken(prev, s, line, start, len, 16, true);
+			return this.intToken(prev, s, line, start, len, 16, true);
 		case FLOAT:
 			return new FloatToken(prev, Float.parseFloat(s), line, start, start + len);
 		case FLOAT | MOD_HEX:
@@ -676,6 +676,6 @@ public final class Dlex
 		String s = buf.toString();
 		int len = buf.length();
 		buf.delete(0, len);
-		return addToken(prev, s, type, line, start, len);
+		return this.addToken(prev, s, type, line, start, len);
 	}
 }

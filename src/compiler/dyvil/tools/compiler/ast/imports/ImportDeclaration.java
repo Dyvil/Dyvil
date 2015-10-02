@@ -109,7 +109,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		return IASTNode.toString(this);
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

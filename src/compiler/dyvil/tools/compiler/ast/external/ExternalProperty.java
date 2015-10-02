@@ -27,7 +27,8 @@ public final class ExternalProperty extends Property
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		if (this.annotations != null) {
+		if (this.annotations != null)
+		{
 			this.annotations.resolveTypes(null, Package.rootPackage, this);
 		}
 	}

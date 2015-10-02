@@ -39,7 +39,7 @@ public final class Tuple implements IValue, IValueList
 	protected int		valueCount;
 	
 	// Metadata
-	private IType		tupleType;
+	private IType tupleType;
 	
 	public Tuple(ICodePosition position)
 	{
@@ -178,7 +178,7 @@ public final class Tuple implements IValue, IValueList
 				this.values[i] = value = value1;
 			}
 		}
-
+		
 		this.tupleType = this.getType();
 		return this;
 	}

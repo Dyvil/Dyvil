@@ -60,6 +60,7 @@ public interface IValue extends IASTNode, ITyped
 	int	SUBSCRIPT_SET		= 40;
 	int	CONSTRUCTOR_CALL	= 41;
 	int	INITIALIZER_CALL	= 42;
+	int	COMPOUND_CALL		= 43;
 	
 	int	VARIABLE		= 43;
 	int	NESTED_METHOD	= 44;

@@ -1,12 +1,14 @@
 package dyvil.util;
 
-import dyvil.annotation.object;
-import dyvil.lang.literal.NilConvertible;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import dyvil.lang.literal.NilConvertible;
+
+import dyvil.annotation.object;
 
 @NilConvertible
 public final @object class None implements Option

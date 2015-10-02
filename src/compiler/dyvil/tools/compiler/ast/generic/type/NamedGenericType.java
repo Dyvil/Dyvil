@@ -103,23 +103,16 @@ public class NamedGenericType extends GenericType
 			}
 		}
 		
-		/* TODO Position handling
-		 * if (position == TypePosition.CLASS)
-		{
-			markers.add(this.position, "type.class.generic");
-		}
-		
-		// If the position is a SUPER_TYPE position
-		if (position == TypePosition.SUPER_TYPE || position == TypePosition.SUPER_TYPE_ARGUMENT)
-		{
-			position = TypePosition.SUPER_TYPE_ARGUMENT;
-		}
-		else
-		{
-			// Otherwise, resolve the type arguments with a GENERIC_ARGUMENT
-			// position
-			position = TypePosition.GENERIC_ARGUMENT;
-		} */
+		/*
+		 * TODO Position handling if (position == TypePosition.CLASS) {
+		 * markers.add(this.position, "type.class.generic"); } // If the
+		 * position is a SUPER_TYPE position if (position ==
+		 * TypePosition.SUPER_TYPE || position ==
+		 * TypePosition.SUPER_TYPE_ARGUMENT) { position =
+		 * TypePosition.SUPER_TYPE_ARGUMENT; } else { // Otherwise, resolve the
+		 * type arguments with a GENERIC_ARGUMENT // position position =
+		 * TypePosition.GENERIC_ARGUMENT; }
+		 */
 		
 		if (iclass == null)
 		{

@@ -46,7 +46,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public int valueTag()
 	{
-		return METHOD_CALL;
+		return COMPOUND_CALL;
 	}
 	
 	@Override
@@ -135,7 +135,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 		IMethod m = this.method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
 		if (m == null)
 		{
-			ICall.addResolveMarker(markers, position, instance, name, arguments);
+			ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
 		}
 		return this;
 	}
@@ -190,11 +190,13 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		this.writeStatement(writer);
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
+		this.writeStatement(writer);
 	}
 	
 	@Override

@@ -96,7 +96,7 @@ public class ParserManager implements IParserManager
 			catch (Exception ex)
 			{
 				DyvilCompiler.error("ParserManager", "parseToken", ex);
-				markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
+				this.markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 			}
 			
 			if (this.parser == null)

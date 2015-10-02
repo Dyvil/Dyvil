@@ -7,8 +7,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class Util
@@ -175,6 +178,8 @@ public class Util
 		return prepend;
 	}
 	
+	
+	
 	public static String toTime(long nanos)
 	{
 		if (nanos < 1000L)
@@ -207,5 +212,12 @@ public class Util
 			nanos -= l;
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
+	}
+
+	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
+	{
+		Marker marker = markers.create(value.getPosition(), key, args);
+		marker.addInfo("Required Type: " + type.getConcreteType(typeContext));
+		marker.addInfo("Value Type: " + value.getType());
 	}
 }

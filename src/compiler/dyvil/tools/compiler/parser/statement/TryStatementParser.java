@@ -29,7 +29,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (this.mode)
@@ -38,7 +38,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			// TODO Try-With-Resource
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = CATCH;
-			return;			
+			return;
 		case CATCH:
 			if (type == Keywords.CATCH)
 			{

@@ -338,9 +338,17 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements ImmutableMa
 	@Override
 	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
-		dyvil.collection.mutable.ArrayMap<U, R> mutable = new dyvil.collection.mutable.ArrayMap(this.keys, this.values, this.size);
-		mutable.flatMap((BiFunction) mapper);
-		return mutable.trustedImmutable();
+		Builder<U, R> builder = new Builder();
+		
+		for (int i = 0; i < this.size; i++)
+		{
+			for (Entry<? extends U, ? extends R> entry : mapper.apply((K) this.keys[i], (V) this.values[i]))
+			{
+				builder.put(entry);
+			}
+		}
+		
+		return builder.build();
 	}
 	
 	@Override

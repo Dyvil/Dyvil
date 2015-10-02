@@ -18,7 +18,7 @@ import dyvil.tools.compiler.lexer.marker.MarkerList;
 
 public class AnonymousClassMetadata implements IClassMetadata
 {
-	private AnonymousClass		theClass;
+	private AnonymousClass	theClass;
 	private IConstructor	constructor;
 	private String			desc;
 	

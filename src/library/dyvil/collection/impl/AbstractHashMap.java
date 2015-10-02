@@ -189,7 +189,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			for (HashEntry e = entries[i]; e != null; e = e.next)
 			{
 				Object k;
-				if (e.hash == hash && ((k = e.key) == key || (key != null && key.equals(k))))
+				if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 				{
 					e.value = value;
 					continue outer;

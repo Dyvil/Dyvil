@@ -18,7 +18,7 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (type)
@@ -37,6 +37,7 @@ public class PackageParser extends Parser
 			this.buffer.append(token.nameValue().qualified);
 			return;
 		}
-		pm.report(token, "Invalid Package Declaration - Invalid " + token); return;
+		pm.report(token, "Invalid Package Declaration - Invalid " + token);
+		return;
 	}
 }

@@ -173,7 +173,7 @@ public final class Array implements IValue, IValueList
 			// If the type is an array type, get it's element type
 			this.elementType = elementType = arrayType.getElementType();
 		}
-
+		
 		this.arrayType = arrayType;
 		
 		for (int i = 0; i < this.valueCount; i++)
@@ -211,7 +211,8 @@ public final class Array implements IValue, IValueList
 	private boolean isConvertibleFrom(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		return iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || dyvil.tools.compiler.ast.type.Types.ITERABLE.isSuperClassOf(type);
+		return iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null
+				|| dyvil.tools.compiler.ast.type.Types.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override

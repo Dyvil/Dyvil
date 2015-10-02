@@ -23,7 +23,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
@@ -41,13 +41,15 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		case DOT:
 			if (type != Symbols.DOT)
 			{
-				pm.report(token, "Invalid Field Instruction - '.' expected"); return;
+				pm.report(token, "Invalid Field Instruction - '.' expected");
+				return;
 			}
 			this.mode = COLON;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(next, "Invalid Field Instruction - Field Name expected"); return;
+				pm.report(next, "Invalid Field Instruction - Field Name expected");
+				return;
 			}
 			pm.skip();
 			this.fieldInstruction.setFieldName(next.nameValue().qualified);
@@ -55,7 +57,8 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		case COLON:
 			if (type != Symbols.COLON)
 			{
-				pm.report(token, "Invalid Field Instruction - ':' expected"); return;
+				pm.report(token, "Invalid Field Instruction - ':' expected");
+				return;
 			}
 			pm.pushParser(new InternalTypeParser(this));
 			return;

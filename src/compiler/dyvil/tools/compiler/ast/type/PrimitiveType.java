@@ -314,7 +314,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
-		if (this.classEquals(superType))
+		if (this.theClass == superType.getTheClass())
 		{
 			return 1;
 		}
@@ -326,12 +326,12 @@ public final class PrimitiveType implements IType
 		{
 			return 2;
 		}
-		return 0;
+		return this.theClass.getSuperTypeDistance(superType);
 	}
 	
 	private static int bitMask(int from, int to)
 	{
-		return 1 << (from | (to << 3));
+		return 1 << (from | to << 3);
 	}
 	
 	private static boolean isPromotable(int from, int to)

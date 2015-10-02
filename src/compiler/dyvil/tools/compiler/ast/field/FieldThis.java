@@ -10,12 +10,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public class FieldThis implements IAccessible
 {
 	protected IClass			owner;
-	protected final IAccessible outer;
-	protected final IClass	theClass;
+	protected final IAccessible	outer;
+	protected final IClass		theClass;
 	
-	
-	private String			name;
-	private String			desc;
+	private String	name;
+	private String	desc;
 	
 	public FieldThis(IClass owner, IAccessible outer, IClass theClass)
 	{

@@ -449,7 +449,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		
 		if (this.capturedFieldCount == 0)
 		{
-			if (this.value instanceof AbstractCall)
+			if (this.value instanceof AbstractCall && this.value.valueTag() != COMPOUND_CALL)
 			{
 				AbstractCall c = (AbstractCall) this.value;
 				

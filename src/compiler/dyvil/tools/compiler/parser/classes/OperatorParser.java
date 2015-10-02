@@ -231,8 +231,10 @@ public final class OperatorParser extends Parser
 		}
 	}
 	
-	private void setAssociativity(IParserManager pm, IToken token, int associativity) {
-		switch (this.operator.type) {
+	private void setAssociativity(IParserManager pm, IToken token, int associativity)
+	{
+		switch (this.operator.type)
+		{
 		case Operator.POSTFIX:
 			pm.report(token, "Invalid Postfix Operator - Postfix Operators cannot have an associativity");
 			return;

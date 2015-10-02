@@ -17,7 +17,7 @@ public final class TypeListParser extends Parser
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON && token.isInferred() || type == Symbols.OPEN_CURLY_BRACKET)

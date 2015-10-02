@@ -14,8 +14,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.Util;
 
 public final class ArgumentMap implements IArguments, IValueMap
 {
@@ -206,9 +206,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 			IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", key);
-				marker.addInfo("Required Type: " + type);
-				marker.addInfo("Value Type: " + value.getType());
+				Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", key);
 			}
 			else
 			{

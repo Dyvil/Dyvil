@@ -194,21 +194,27 @@ public final class WildcardType implements IRawType, ITyped
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.bound != null)
+		{
 			this.bound.check(markers, context);
+		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
 		if (this.bound != null)
+		{
 			this.bound.foldConstants();
+		}
 	}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		if (this.bound != null)
+		{
 			this.bound.cleanup(context, compilableList);
+		}
 	}
 	
 	@Override

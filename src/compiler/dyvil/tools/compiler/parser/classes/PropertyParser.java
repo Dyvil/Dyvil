@@ -30,7 +30,7 @@ public class PropertyParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.CLOSE_CURLY_BRACKET)
@@ -92,7 +92,8 @@ public class PropertyParser extends Parser implements IValued
 				this.mode = GET_OR_SET;
 				return;
 			}
-			pm.report(token, "Invalid Property Declaration - ':' expected"); return;
+			pm.report(token, "Invalid Property Declaration - ':' expected");
+			return;
 		}
 	}
 	

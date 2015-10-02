@@ -583,7 +583,7 @@ public final class MatchExpression implements IValue
 	 */
 	private static boolean useTableSwitch(int low, int high, int count)
 	{
-		int tableSpace = 4 + (high - low + 1);
+		int tableSpace = 4 + high - low + 1;
 		int tableTime = 3; // constant time
 		int lookupSpace = 3 + 2 * count;
 		int lookupTime = MathUtils.logBaseTwo(count); // binary search O(log n)

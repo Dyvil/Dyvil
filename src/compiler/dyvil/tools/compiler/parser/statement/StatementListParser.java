@@ -29,10 +29,10 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	
 	protected IValueConsumer consumer;
 	
-	private boolean	applied;
-	private StatementList statementList;
+	private boolean			applied;
+	private StatementList	statementList;
 	
-	private Name label;
+	private Name			label;
 	private IType			type;
 	private int				modifiers;
 	private AnnotationList	annotations;

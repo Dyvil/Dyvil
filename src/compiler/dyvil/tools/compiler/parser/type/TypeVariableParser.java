@@ -32,7 +32,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (this.mode == NAME)
@@ -57,7 +57,8 @@ public final class TypeVariableParser extends Parser implements ITyped
 				this.mode = TYPE_VARIABLE;
 				return;
 			}
-			pm.report(token, "Invalid Type Variable - Name expected"); return;
+			pm.report(token, "Invalid Type Variable - Name expected");
+			return;
 		}
 		if (this.mode == TYPE_VARIABLE)
 		{
@@ -78,7 +79,8 @@ public final class TypeVariableParser extends Parser implements ITyped
 					this.generic.addTypeVariable(this.variable);
 				}
 				pm.popParser(true);
-				pm.report(token, "Invalid Type Variable - '>=', '<=' or '&' expected"); return;
+				pm.report(token, "Invalid Type Variable - '>=', '<=' or '&' expected");
+				return;
 			}
 			
 			Name name = token.nameValue();

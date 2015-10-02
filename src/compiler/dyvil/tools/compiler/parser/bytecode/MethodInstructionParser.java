@@ -26,7 +26,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (type == Symbols.SEMICOLON)
@@ -48,13 +48,15 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		case DOT:
 			if (type != Symbols.DOT)
 			{
-				pm.report(token, "Invalid Method Instruction - '.' expected"); return;
+				pm.report(token, "Invalid Method Instruction - '.' expected");
+				return;
 			}
 			this.mode = PARAMETERS;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(next, "Invalid Method Instruction - Identifier expected"); return;
+				pm.report(next, "Invalid Method Instruction - Identifier expected");
+				return;
 			}
 			pm.skip();
 			this.methodInstruction.setMethodName(next.nameValue().qualified);
@@ -84,7 +86,8 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		case COLON:
 			if (type != Symbols.COLON)
 			{
-				pm.report(token, "Invalid Method Instruction - ':' expected"); return;
+				pm.report(token, "Invalid Method Instruction - ':' expected");
+				return;
 			}
 			pm.pushParser(new InternalTypeParser(this));
 			return;

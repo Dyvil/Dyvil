@@ -11,7 +11,7 @@ public class Tuple3<@Covariant A, @Covariant B, @Covariant C> implements Cell<A,
 {
 	public final A	_1;
 	public final B	_2;
-	public final C _3;
+	public final C	_3;
 	
 	public static <A, B, C> Tuple3<A, B, C> apply(A _1, B _2, C _3)
 	{

@@ -10,8 +10,8 @@ public abstract class Marker implements Comparable<Marker>
 	
 	protected ICodePosition position;
 	
-	private String message;
-	private List<String> info;
+	private String			message;
+	private List<String>	info;
 	
 	protected Marker()
 	{

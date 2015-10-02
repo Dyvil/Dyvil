@@ -260,6 +260,18 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public boolean hasTypeVariables()
 	{
+		if (this.returnType.hasTypeVariables())
+		{
+			return true;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameterTypes[i].hasTypeVariables())
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	

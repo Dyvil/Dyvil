@@ -152,9 +152,7 @@ public final class Annotation implements IAnnotation
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "annotation.parameter.type", param.getName());
-				marker.addInfo("Required Type: " + type);
-				marker.addInfo("Value Type: " + value.getType());
+				Util.createTypeError(markers, value, type, type, "annotation.parameter.type", param.getName());
 				continue;
 			}
 			

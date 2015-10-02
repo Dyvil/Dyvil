@@ -172,7 +172,9 @@ public abstract class Member implements IMember
 	public void resolve(MarkerList markers, IContext context)
 	{
 		if (this.type != null)
+		{
 			this.type.resolve(markers, context);
+		}
 		if (this.annotations != null)
 		{
 			this.annotations.resolve(markers, context);
@@ -183,7 +185,9 @@ public abstract class Member implements IMember
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		if (this.type != null)
+		{
 			this.type.checkType(markers, context, TypePosition.RETURN_TYPE);
+		}
 		if (this.annotations != null)
 		{
 			this.annotations.checkTypes(markers, context);
@@ -194,7 +198,9 @@ public abstract class Member implements IMember
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.type != null)
+		{
 			this.type.check(markers, context);
+		}
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
@@ -205,7 +211,9 @@ public abstract class Member implements IMember
 	public void foldConstants()
 	{
 		if (this.type != null)
+		{
 			this.type.foldConstants();
+		}
 		if (this.annotations != null)
 		{
 			this.annotations.foldConstants();

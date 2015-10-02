@@ -125,8 +125,8 @@ public class Map implements IValue
 			if (value1 == null)
 			{
 				Marker marker = markers.create(value.getPosition(), "map.key.type");
-				marker.addInfo("Map Type: " + mapType);
-				marker.addInfo("Required Type: " + keyType);
+				marker.addInfo("Map Type: " + mapType.getConcreteType(typeContext));
+				marker.addInfo("Required Type: " + keyType.getConcreteType(typeContext));
 				marker.addInfo("Key Type: " + value.getType());
 			}
 			else
@@ -320,7 +320,8 @@ public class Map implements IValue
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply", "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
+				"([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 	}
 	
 	@Override

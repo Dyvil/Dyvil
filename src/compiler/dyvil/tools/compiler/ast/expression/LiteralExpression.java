@@ -118,7 +118,7 @@ public final class LiteralExpression implements IValue
 		if (!type.isSuperTypeOf(this.type))
 		{
 			Marker m = markers.create(this.literal.getPosition(), "literal.type");
-			m.addInfo("Required Type: " + type);
+			m.addInfo("Required Type: " + type.getConcreteType(typeContext));
 			m.addInfo("Conversion Type: " + this.type);
 			
 			StringBuilder sb = new StringBuilder("Conversion Method: \n\t\t");

@@ -16,6 +16,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public class IfStatement extends Value
 {
@@ -98,9 +99,7 @@ public class IfStatement extends Value
 		IValue value = IType.convertValue(this.then, type, typeContext, markers, context);
 		if (value == null)
 		{
-			Marker m = markers.create(this.then.getPosition(), "if.then.type");
-			m.addInfo("Required Type: " + type);
-			m.addInfo("Expression Type: " + this.then.getType());
+			Util.createTypeError(markers, this.then, type, typeContext, "if.then.type");
 		}
 		else
 		{
@@ -112,9 +111,7 @@ public class IfStatement extends Value
 			value = IType.convertValue(this.elseThen, type, typeContext, markers, context);
 			if (value == null)
 			{
-				Marker m = markers.create(this.elseThen.getPosition(), "if.else.type");
-				m.addInfo("Required Type: " + type);
-				m.addInfo("Expression Type: " + this.elseThen.getType());
+				Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
 			}
 			else
 			{

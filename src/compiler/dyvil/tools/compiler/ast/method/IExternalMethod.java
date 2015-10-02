@@ -10,6 +10,6 @@ public interface IExternalMethod extends ICallableMember
 	{
 		return this.getParameter(index);
 	}
-
-	public AnnotationVisitor visitTypeAnnotation(int typeRef,TypePath typePath,String desc,boolean visible);
+	
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 }

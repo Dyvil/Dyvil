@@ -13,8 +13,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.Util;
 
 public final class ArgumentList implements IArguments, IValueList
 {
@@ -217,9 +217,7 @@ public final class ArgumentList implements IArguments, IValueList
 		IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
-			marker.addInfo("Required Type: " + type);
-			marker.addInfo("Value Type: " + value.getType());
+			Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
@@ -249,9 +247,7 @@ public final class ArgumentList implements IArguments, IValueList
 			value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
-				marker.addInfo("Required Type: " + elementType);
-				marker.addInfo("Value Type: " + value.getType());
+				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type", param.getName());
 			}
 			else
 			{

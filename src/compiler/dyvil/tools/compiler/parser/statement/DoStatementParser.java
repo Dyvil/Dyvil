@@ -23,7 +23,7 @@ public class DoStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{

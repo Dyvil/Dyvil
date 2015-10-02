@@ -25,7 +25,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{
@@ -37,7 +37,8 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Synchronized Block - '(' expected"); return;
+			pm.report(token, "Invalid Synchronized Block - '(' expected");
+			return;
 		case LOCK_END:
 			this.mode = ACTION;
 			if (token.type() != Symbols.CLOSE_PARENTHESIS)

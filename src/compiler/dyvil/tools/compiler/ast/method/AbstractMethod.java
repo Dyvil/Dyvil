@@ -38,7 +38,6 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.marker.SemanticError;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
@@ -621,9 +620,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				IValue instance1 = IType.convertValue(instance, par.getType(), typeContext, markers, context);
 				if (instance1 == null)
 				{
-					Marker marker = markers.create(instance.getPosition(), "method.access.infix_type", par.getName());
-					marker.addInfo("Required Type: " + par.getType());
-					marker.addInfo("Value Type: " + instance.getType());
+					Util.createTypeError(markers, instance, par.getType(), typeContext, "method.access.infix_type", par.getName());
 				}
 				else
 				{
@@ -1239,11 +1236,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public int getInvokeOpcode()
 	{
-		if ((modifiers & Modifiers.STATIC) != 0)
+		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			return Opcodes.INVOKESTATIC;
 		}
-		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		if ((this.modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
 		{
 			return Opcodes.INVOKESPECIAL;
 		}

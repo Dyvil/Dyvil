@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import dyvil.reflect.Modifiers;
 
 /**
- * Annotation for <b>internal</b> classes and members. This is used to mark that a
- * class, method or field is only visible from inside the current library /
+ * Annotation for <b>internal</b> classes and members. This is used to mark that
+ * a class, method or field is only visible from inside the current library /
  * project.
  * 
  * @see Modifiers#INTERNAL

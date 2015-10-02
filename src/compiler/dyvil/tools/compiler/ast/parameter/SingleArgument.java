@@ -15,8 +15,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.Util;
 
 public final class SingleArgument implements IArguments, IValued
 {
@@ -163,9 +163,7 @@ public final class SingleArgument implements IArguments, IValued
 		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
-			marker.addInfo("Required Type: " + type);
-			marker.addInfo("Value Type: " + this.value.getType());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
@@ -193,9 +191,7 @@ public final class SingleArgument implements IArguments, IValued
 		value1 = IType.convertValue(this.value, type.getElementType(), typeContext, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
-			marker.addInfo("Required Type: " + type);
-			marker.addInfo("Value Type: " + this.value.getType());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{

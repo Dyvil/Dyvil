@@ -16,9 +16,9 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.Util;
 
 public class RangeOperator implements IValue
 {
@@ -27,7 +27,7 @@ public class RangeOperator implements IValue
 		public static final IClass			RANGE_CLASS		= Package.dyvilCollection.resolveClass("Range");
 		public static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
 		public static final IClass			RANGEABLE_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-		public static final ClassType		RANGEABLE			= new ClassType(RANGEABLE_CLASS);
+		public static final ClassType		RANGEABLE		= new ClassType(RANGEABLE_CLASS);
 		public static final ITypeVariable	RANGEABLE_TYPE	= RANGEABLE_CLASS.getTypeVariable(0);
 	}
 	
@@ -161,9 +161,7 @@ public class RangeOperator implements IValue
 		IValue value1 = this.firstValue.withType(elementType, elementType, markers, context);
 		if (value1 == null)
 		{
-			Marker m = markers.create(this.firstValue.getPosition(), "range.start.type");
-			m.addInfo("Required Type: " + elementType);
-			m.addInfo("Value Type: " + this.firstValue.getType());
+			Util.createTypeError(markers, firstValue, elementType, typeContext, "range.start.type");
 		}
 		else
 		{
@@ -173,9 +171,7 @@ public class RangeOperator implements IValue
 		IValue value2 = this.lastValue.withType(elementType, elementType, markers, context);
 		if (value2 == null)
 		{
-			Marker m = markers.create(this.lastValue.getPosition(), "range.end.type");
-			m.addInfo("Required Type: " + elementType);
-			m.addInfo("Value Type: " + this.lastValue.getType());
+			Util.createTypeError(markers, lastValue, elementType, typeContext, "range.end.type");
 		}
 		else
 		{
@@ -279,8 +275,8 @@ public class RangeOperator implements IValue
 		{
 			// TODO Proper return type
 			// This is currently [Rangeable] instead of [T]
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method, "(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)[Ldyvil/lang/Rangeable;",
-					false);
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
+					"(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)[Ldyvil/lang/Rangeable;", false);
 		}
 		
 		// Primitive array

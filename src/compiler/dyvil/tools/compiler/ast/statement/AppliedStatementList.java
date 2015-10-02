@@ -12,7 +12,7 @@ public class AppliedStatementList extends StatementList
 	public AppliedStatementList()
 	{
 	}
-
+	
 	public AppliedStatementList(ICodePosition position)
 	{
 		this.position = position;

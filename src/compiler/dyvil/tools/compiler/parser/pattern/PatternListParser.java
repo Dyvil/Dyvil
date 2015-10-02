@@ -21,7 +21,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))

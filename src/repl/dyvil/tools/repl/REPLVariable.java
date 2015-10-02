@@ -136,7 +136,7 @@ public class REPLVariable extends Field
 		
 		if (this.value != null)
 		{
-			writeValue(className, name, extendedType, cw, mw);
+			this.writeValue(className, name, extendedType, cw, mw);
 		}
 		
 		// Finish Method compilation

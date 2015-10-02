@@ -612,8 +612,10 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
 	
-	private static int getNewArrayCode(int typecode) {
-		switch (typecode) {
+	private static int getNewArrayCode(int typecode)
+	{
+		switch (typecode)
+		{
 		case PrimitiveType.BOOLEAN_CODE:
 			return ClassFormat.T_BOOLEAN;
 		case PrimitiveType.BYTE_CODE:

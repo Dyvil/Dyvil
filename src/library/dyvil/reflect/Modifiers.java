@@ -261,9 +261,8 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on methods.
 	 */
-	public static final int METHOD_MODIFIERS = MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | PREFIX | BRIDGE | VARARGS
-			| SEALED;
-			
+	public static final int METHOD_MODIFIERS = MEMBER_MODIFIERS | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | PREFIX | BRIDGE | VARARGS | SEALED;
+	
 	/**
 	 * The modifiers that can be used on parameters.
 	 */

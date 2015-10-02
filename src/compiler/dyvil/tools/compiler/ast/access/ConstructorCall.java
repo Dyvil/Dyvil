@@ -210,7 +210,7 @@ public class ConstructorCall implements ICall
 		
 		if (this.constructor.getTheClass().isGeneric() && !this.type.isGenericType())
 		{
-			this.type = this.constructor.checkGenericType(markers, position, context, type, arguments);
+			this.type = this.constructor.checkGenericType(markers, this.position, context, this.type, this.arguments);
 		}
 		
 		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);

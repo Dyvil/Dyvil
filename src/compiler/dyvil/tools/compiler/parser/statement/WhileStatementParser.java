@@ -24,7 +24,7 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		switch (this.mode)

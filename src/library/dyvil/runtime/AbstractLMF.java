@@ -44,7 +44,7 @@ public abstract class AbstractLMF
 	final Class<?>						targetClass;
 	/** The type of the invoked method "(CC)II" */
 	protected final MethodType			invokedType;
-	protected final int parameterCount;
+	protected final int					parameterCount;
 	/**
 	 * The type of the returned instance "interface JJ"
 	 */
