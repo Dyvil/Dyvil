@@ -1,7 +1,5 @@
 package dyvil.collection.mutable;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -13,39 +11,18 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
-import dyvil.collection.impl.AbstractHashMap;
+import dyvil.collection.impl.AbstractHashSet;
 import dyvil.math.MathUtils;
 
 import static dyvil.collection.impl.AbstractHashMap.*;
 
 @NilConvertible
 @ArrayConvertible
-public class HashSet<E> implements MutableSet<E>
+public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
 {
-	private static final class HashElement<E>
-	{
-		E				element;
-		int				hash;
-		HashElement<E>	next;
-		
-		HashElement(E element, int hash)
-		{
-			this.element = element;
-			this.hash = hash;
-		}
-		
-		HashElement(E element, int hash, HashElement next)
-		{
-			this.element = element;
-			this.hash = hash;
-			this.next = next;
-		}
-	}
 	
-	protected int			size;
-	private float			loadFactor;
-	private int				threshold;
-	protected HashElement[]	elements;
+	private float	loadFactor;
+	private int		threshold;
 	
 	public static <E> HashSet<E> apply()
 	{
@@ -54,12 +31,7 @@ public class HashSet<E> implements MutableSet<E>
 	
 	public static <E> HashSet<E> apply(E... elements)
 	{
-		HashSet<E> set = new HashSet();
-		for (E element : elements)
-		{
-			set.add(element);
-		}
-		return set;
+		return new HashSet(elements);
 	}
 	
 	HashSet(int size, float loadFactor, HashElement[] elements)
@@ -75,9 +47,9 @@ public class HashSet<E> implements MutableSet<E>
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 	
-	public HashSet(int size)
+	public HashSet(int capacity)
 	{
-		this(size, DEFAULT_LOAD_FACTOR);
+		this(capacity, DEFAULT_LOAD_FACTOR);
 	}
 	
 	public HashSet(float loadFactor)
@@ -85,150 +57,55 @@ public class HashSet<E> implements MutableSet<E>
 		this(DEFAULT_CAPACITY, loadFactor);
 	}
 	
-	public HashSet(int size, float loadFactor)
+	public HashSet(int capacity, float loadFactor)
 	{
-		if (size < 0)
+		if (capacity < 0)
 		{
-			throw new IllegalArgumentException("Invalid Capacity: " + size);
+			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
 		if (loadFactor <= 0 || Float.isNaN(loadFactor))
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
 		
-		this.loadFactor = loadFactor;
-		this.elements = new HashElement[MathUtils.powerOfTwo(size)];
-		this.threshold = (int) Math.min(size * loadFactor, MAX_ARRAY_SIZE + 1);
+		this.elements = new HashElement[MathUtils.powerOfTwo(capacity)];
+		this.defaultThreshold();
 	}
 	
 	public HashSet(Collection<E> collection)
 	{
-		this(collection.size(), DEFAULT_LOAD_FACTOR);
-		for (E element : collection)
-		{
-			this.add(element);
-		}
+		super(collection);
+		this.defaultThreshold();
 	}
 	
-	protected void rehash()
+	public HashSet(Set<E> set)
 	{
-		HashElement[] oldMap = this.elements;
-		int oldCapacity = oldMap.length;
-		
-		// overflow-conscious code
-		int newCapacity = (oldCapacity << 1) + 1;
-		if (newCapacity - MAX_ARRAY_SIZE > 0)
-		{
-			if (oldCapacity == MAX_ARRAY_SIZE)
-			{
-				// Keep running with MAX_ARRAY_SIZE buckets
-				return;
-			}
-			newCapacity = MAX_ARRAY_SIZE;
-		}
-		HashElement[] newMap = new HashElement[newCapacity];
-		
+		super(set);
+		this.defaultThreshold();
+	}
+	
+	public HashSet(AbstractHashSet<E> set)
+	{
+		super(set);
+		this.defaultThreshold();
+	}
+	
+	public HashSet(E... elements)
+	{
+		super(elements);
+		this.defaultThreshold();
+	}
+	
+	private void defaultThreshold()
+	{
+		this.loadFactor = DEFAULT_LOAD_FACTOR;
+		this.threshold = (int) (this.elements.length * DEFAULT_LOAD_FACTOR);
+	}
+	
+	@Override
+	protected void updateThreshold(int newCapacity)
+	{
 		this.threshold = (int) Math.min(newCapacity * this.loadFactor, MAX_ARRAY_SIZE + 1);
-		this.elements = newMap;
-		
-		for (int i = oldCapacity; i-- > 0;)
-		{
-			HashElement e = oldMap[i];
-			while (e != null)
-			{
-				int index = index(e.hash, newCapacity);
-				e.next = newMap[index];
-				newMap[index] = e;
-				e = e.next;
-			}
-		}
-	}
-	
-	@Override
-	public int size()
-	{
-		return this.size;
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new Iterator<E>()
-		{
-			HashElement<E> next; // next entry to return
-			HashElement<E> current; // current entry
-			int index; // current slot
-			
-			{
-				HashElement<E>[] t = HashSet.this.elements;
-				this.current = this.next = null;
-				this.index = 0;
-				// advance to first entry
-				if (t != null && HashSet.this.size > 0)
-				{
-					do
-					{
-					}
-					while (this.index < t.length && (this.next = t[this.index++]) == null);
-				}
-			}
-			
-			@Override
-			public final boolean hasNext()
-			{
-				return this.next != null;
-			}
-			
-			@Override
-			public final E next()
-			{
-				HashElement<E>[] t;
-				HashElement<E> e = this.next;
-				if (e == null)
-				{
-					throw new NoSuchElementException();
-				}
-				if ((this.next = (this.current = e).next) == null && (t = HashSet.this.elements) != null)
-				{
-					do
-					{
-					}
-					while (this.index < t.length && (this.next = t[this.index++]) == null);
-				}
-				return e.element;
-			}
-			
-			@Override
-			public final void remove()
-			{
-				HashElement<E> e = this.current;
-				if (e == null)
-				{
-					throw new IllegalStateException();
-				}
-				
-				HashSet.this.size--;
-				this.current = null;
-				int index = index(e.hash, HashSet.this.elements.length);
-				HashElement<E> entry = HashSet.this.elements[index];
-				if (entry == e)
-				{
-					HashSet.this.elements[index] = e.next;
-				}
-				else
-				{
-					HashElement<E> prev;
-					do
-					{
-						prev = entry;
-						entry = entry.next;
-					}
-					while (entry != e);
-					
-					prev.next = e.next;
-				}
-			}
-		};
 	}
 	
 	@Override
@@ -242,13 +119,14 @@ public class HashSet<E> implements MutableSet<E>
 		}
 	}
 	
+	@Override
 	protected void addElement(int hash, E element, int index)
 	{
 		HashElement[] tab = this.elements;
 		if (this.size >= this.threshold)
 		{
-			// Rehash the table if the threshold is exceeded
-			this.rehash();
+			// Rehash / flatten the table if the threshold is exceeded
+			this.flatten();
 			
 			tab = this.elements;
 			hash = hash(element);
@@ -262,19 +140,7 @@ public class HashSet<E> implements MutableSet<E>
 	@Override
 	public boolean add(E element)
 	{
-		int hash = hash(element);
-		int i = index(hash, this.elements.length);
-		for (HashElement<E> e = this.elements[i]; e != null; e = e.next)
-		{
-			Object k;
-			if (e.hash == hash && ((k = e.element) == element || Objects.equals(element, k)))
-			{
-				return false;
-			}
-		}
-		
-		this.addElement(hash, element, i);
-		return true;
+		return this.addInternal(element);
 	}
 	
 	@Override
@@ -372,25 +238,7 @@ public class HashSet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		int len = MathUtils.powerOfTwo(AbstractHashMap.grow(this.size));
-		HashElement[] newEntries = new HashElement[len];
-		for (HashElement<E> e : this.elements)
-		{
-			while (e != null)
-			{
-				int index = index(e.hash, len);
-				HashElement<E> newEntry = new HashElement<E>(e.element, e.hash);
-				if (newEntries[index] != null)
-				{
-					newEntry.next = newEntries[index];
-				}
-				
-				newEntries[index] = newEntry;
-				e = e.next;
-			}
-		}
-		
-		return new HashSet<E>(this.size, this.loadFactor, newEntries);
+		return new HashSet(this);
 	}
 	
 	@Override
@@ -414,23 +262,5 @@ public class HashSet<E> implements MutableSet<E>
 			set.add(element);
 		}
 		return set;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return Collection.collectionToString(this);
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return Set.setEquals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Set.setHashCode(this);
 	}
 }
