@@ -12,8 +12,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.ConstantFolder;
+import dyvil.tools.compiler.util.Util;
 
 public final class MethodCall extends AbstractCall implements INamed
 {
@@ -124,7 +124,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			String qualified = this.name.qualified;
 			if (qualified.endsWith("$eq"))
 			{
-				Name name = ExpressionParser.stripEq(this.name);
+				Name name = Util.stripEq(this.name);
 				
 				CompoundCall cc = new CompoundCall(this.position, this.instance, name, this.arguments);
 				return cc.resolveCall(markers, context);

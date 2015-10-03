@@ -183,14 +183,38 @@ public class ParserUtil
 	
 	public static boolean isTerminator(int type)
 	{
-		return type == Symbols.COMMA || type == Symbols.SEMICOLON || type == Symbols.COLON || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
+		switch (type)
+		{
+		case Symbols.COMMA:
+		case Symbols.SEMICOLON:
+		case Symbols.COLON:
+		case Symbols.CLOSE_CURLY_BRACKET:
+		case Symbols.CLOSE_PARENTHESIS:
+		case Symbols.CLOSE_SQUARE_BRACKET:
+			return true;
+		}
+		return false;
 	}
 	
-	public static boolean isTerminator2(int type)
+	public static boolean isExpressionTerminator(int type)
 	{
-		return type == Symbols.DOT || type == Symbols.COMMA || type == Symbols.SEMICOLON || type == Symbols.COLON || type == Symbols.EQUALS
-				|| type == Keywords.IS || type == Keywords.AS || type == Keywords.MATCH || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET
-				|| type == Symbols.OPEN_SQUARE_BRACKET || type == Tokens.STRING_PART || type == Tokens.STRING_END;
+		if (isTerminator(type))
+		{
+			return true;
+		}
+		switch (type)
+		{
+		case Symbols.DOT:
+		case Symbols.EQUALS:
+		case Keywords.IS:
+		case Keywords.AS:
+		case Keywords.MATCH:
+		case Symbols.OPEN_SQUARE_BRACKET:
+		case Tokens.STRING_PART:
+		case Tokens.STRING_END:
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isSeperator(int type)

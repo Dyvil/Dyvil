@@ -65,7 +65,14 @@ public final class AnnotationMetadata implements IClassMetadata
 			if (retention != null)
 			{
 				INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
-				this.retention = RetentionPolicy.valueOf(value.getName().qualified);
+				try
+				{
+					this.retention = RetentionPolicy.valueOf(value.getName().qualified);
+				}
+				catch (IllegalArgumentException ex)
+				{
+					// Problematic RentionPolicy annotation - do not handle this
+				}
 			}
 		}
 		if (this.targets != null)
@@ -90,7 +97,17 @@ public final class AnnotationMetadata implements IClassMetadata
 		for (int i = 0; i < count; i++)
 		{
 			INamed value = (INamed) values.getValue(i);
-			this.targets.add(ElementType.valueOf(value.getName().qualified));
+			ElementType elementType;
+			try
+			{
+				elementType = ElementType.valueOf(value.getName().qualified);
+			}
+			catch (IllegalArgumentException ex)
+			{
+				// Problematic Target annotation - do not handle this
+				continue;
+			}
+			this.targets.add(elementType);
 		}
 	}
 	

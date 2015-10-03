@@ -100,15 +100,22 @@ public final class ThisValue implements IValue
 		if (context.isStatic())
 		{
 			markers.add(this.position, "this.access.static");
+			if (this.type == Types.UNKNOWN)
+			{
+				return;
+			}
 		}
 		
-		if (this.type == Types.UNKNOWN)
-		{
-			this.type = context.getThisClass().getType();
-		}
-		else
+		if (this.type != Types.UNKNOWN)
 		{
 			this.type = this.type.resolveType(markers, context);
+			return;
+		}
+		
+		IType t = context.getThisClass().getType();
+		if (t != null)
+		{
+			this.type = t;
 		}
 	}
 	
@@ -122,14 +129,19 @@ public final class ThisValue implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
+		if (this.type == Types.UNKNOWN)
+		{
+			// Static context
+			return;
+		}
 		
+		this.type.checkType(markers, context, TypePosition.CLASS);
 		IClass iclass = this.type.getTheClass();
 		
 		this.getter = context.getAccessibleThis(iclass);
 		if (this.getter == null)
 		{
-			markers.add(this.position, "this.instance", iclass.getFullName());
+			markers.add(this.position, "this.instance", this.type);
 		}
 	}
 	

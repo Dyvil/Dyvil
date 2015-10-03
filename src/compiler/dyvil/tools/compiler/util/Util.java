@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -219,5 +220,12 @@ public class Util
 		Marker marker = markers.create(value.getPosition(), key, args);
 		marker.addInfo("Required Type: " + type.getConcreteType(typeContext));
 		marker.addInfo("Value Type: " + value.getType());
+	}
+
+	public static final Name stripEq(Name name)
+	{
+		String qualified = name.qualified.substring(0, name.qualified.length() - 3);
+		String unqualified = name.unqualified.substring(0, name.unqualified.length() - 1);
+		return Name.get(qualified, unqualified);
 	}
 }
