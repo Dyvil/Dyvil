@@ -81,7 +81,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 		this.size = size;
 	}
 	
-	public HashMap(Map<? extends K, ? extends V> map)
+	public HashMap(Map<K, V> map)
+	{
+		super(map);
+	}
+	
+	public HashMap(AbstractHashMap<K, V> map)
 	{
 		super(map);
 	}
@@ -266,13 +271,13 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new HashMap(this);
+		return new HashMap<K, V>(this);
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.HashMap<>(this);
+		return new dyvil.collection.mutable.HashMap<K, V>(this);
 	}
 	
 	@Override

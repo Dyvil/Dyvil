@@ -158,19 +158,43 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 	}
 	
-	public AbstractHashMap(Map<? extends K, ? extends V> map)
+	public AbstractHashMap(Map<K, V> map)
 	{
 		int size = map.size();
 		int length = MathUtils.powerOfTwo(grow(size));
 		this.entries = new HashEntry[length];
 		this.size = size;
 		
-		for (Entry<? extends K, ? extends V> entry : map)
+		// Assume unique elements
+		for (Entry<K, V> entry : map)
 		{
 			K key = entry.getKey();
 			int hash = hash(key);
 			int i = index(hash, length);
 			this.entries[i] = new HashEntry(key, entry.getValue(), hash, this.entries[i]);
+		}
+	}
+	
+	public AbstractHashMap(AbstractHashMap<K, V> map)
+	{
+		int size = this.size = map.size;
+		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
+		HashEntry[] newEntries = this.entries = new HashEntry[length];
+		
+		for (HashEntry<K, V> e : map.entries)
+		{
+			while (e != null)
+			{
+				int index = index(e.hash, length);
+				HashEntry<K, V> newEntry = new HashEntry<K, V>(e.key, e.value, e.hash);
+				if (newEntries[index] != null)
+				{
+					newEntry.next = newEntries[index];
+				}
+				
+				newEntries[index] = newEntry;
+				e = e.next;
+			}
 		}
 	}
 	

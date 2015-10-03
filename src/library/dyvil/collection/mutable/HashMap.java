@@ -44,9 +44,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 	
-	public HashMap(int size)
+	public HashMap(int capacity)
 	{
-		this(size, DEFAULT_LOAD_FACTOR);
+		this(capacity, DEFAULT_LOAD_FACTOR);
 	}
 	
 	public HashMap(float loadFactor)
@@ -54,11 +54,11 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this(DEFAULT_CAPACITY, loadFactor);
 	}
 	
-	public HashMap(int size, float loadFactor)
+	public HashMap(int capacity, float loadFactor)
 	{
-		if (size < 0)
+		if (capacity < 0)
 		{
-			throw new IllegalArgumentException("Invalid Capacity: " + size);
+			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
 		if (loadFactor <= 0 || Float.isNaN(loadFactor))
 		{
@@ -66,8 +66,8 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		}
 		
 		this.loadFactor = loadFactor;
-		this.entries = new HashEntry[MathUtils.powerOfTwo(size)];
-		this.threshold = (int) Math.min(size * loadFactor, MAX_ARRAY_SIZE + 1);
+		this.entries = new HashEntry[MathUtils.powerOfTwo(capacity)];
+		this.threshold = (int) Math.min(capacity * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 	
 	public HashMap(Map<K, V> map)
@@ -77,9 +77,16 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this.threshold = (int) (this.entries.length * DEFAULT_LOAD_FACTOR);
 	}
 	
+	public HashMap(AbstractHashMap<K, V> map)
+	{
+		super(map);
+	}
+	
 	public HashMap(Tuple2<K, V>... tuples)
 	{
 		super(tuples);
+		this.loadFactor = DEFAULT_LOAD_FACTOR;
+		this.threshold = (int) (this.entries.length * DEFAULT_LOAD_FACTOR);
 	}
 	
 	@Override
@@ -358,25 +365,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	@Override
 	public HashMap<K, V> copy()
 	{
-		int len = MathUtils.powerOfTwo(AbstractHashMap.grow(this.size));
-		HashEntry[] newEntries = new HashEntry[len];
-		for (HashEntry<K, V> e : this.entries)
-		{
-			while (e != null)
-			{
-				int index = index(e.hash, len);
-				HashEntry<K, V> newEntry = new HashEntry<K, V>(e.key, e.value, e.hash);
-				if (newEntries[index] != null)
-				{
-					newEntry.next = newEntries[index];
-				}
-				
-				newEntries[index] = newEntry;
-				e = e.next;
-			}
-		}
-		
-		return new HashMap<K, V>(this.size, this.loadFactor, newEntries);
+		return new HashMap<K, V>(this);
 	}
 	
 	@Override
