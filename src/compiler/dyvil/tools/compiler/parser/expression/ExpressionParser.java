@@ -63,7 +63,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	private IValue value;
 	
-	private boolean		dotless;
+	private boolean		explicitDot;
 	private Operator	operator;
 	
 	public ExpressionParser(IValueConsumer field)
@@ -77,7 +77,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		this.mode = VALUE;
 		this.field = field;
 		this.value = null;
-		this.dotless = false;
+		this.explicitDot = false;
 		this.operator = null;
 	}
 	
@@ -373,11 +373,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type == Symbols.DOT)
 			{
 				this.mode = ACCESS_2;
-				this.dotless = false;
+				this.explicitDot = true;
 				return;
 			}
 			
-			this.dotless = true;
+			this.explicitDot = false;
 			
 			switch (type)
 			{
@@ -428,53 +428,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
-				Name name = token.nameValue();
-				if (this.dotless && this.operator != null)
-				{
-					// Handle operator precedence
-					Operator operator = pm.getOperator(name);
-					int p;
-					if (operator == null || (p = this.operator.precedence) > operator.precedence)
-					{
-						this.field.setValue(this.value);
-						pm.popParser(true);
-						return;
-					}
-					if (p == operator.precedence)
-					{
-						// Handle associativity
-						switch (operator.type)
-						{
-						case Operator.INFIX_LEFT:
-							this.field.setValue(this.value);
-							pm.popParser(true);
-							return;
-						case Operator.INFIX_NONE:
-							pm.report(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
-							return;
-						case Operator.INFIX_RIGHT:
-						}
-					}
-				}
-				
-				this.parseAccess(pm, token, type, name, pm.getOperator(name));
-				return;
-			}
-			if (ParserUtil.isTerminator(type))
-			{
-				this.field.setValue(this.value);
-				pm.popParser(true);
-				return;
-			}
-			
-			// Identifier at the start followed
-			IToken prev = token.prev();
-			if (prev != null && ParserUtil.isIdentifier(prev.type()))
-			{
-				this.value = null;
-				pm.reparse();
-				Name prevName = prev.nameValue();
-				this.parseAccess(pm, prev, type, prevName, pm.getOperator(prevName));
+				this.parseIdentifierAccess(pm, token, type);
 				return;
 			}
 			
@@ -482,13 +436,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		}
 		
-		if (this.value != null)
-		{
-			this.value.expandPosition(token);
-			this.field.setValue(this.value);
-			pm.popParser(true);
-			return;
-		}
 		pm.report(token, "Invalid Expression - Invalid " + token);
 		return;
 	}
@@ -572,11 +519,40 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	{
 		IToken next = token.next();
 		int nextType = next.type();
+		
+		if (op != null && !this.explicitDot)
+		{
+			if (this.value == null)
+			{
+				SingleArgument sa = new SingleArgument();
+				MethodCall call = new MethodCall(token, null, name, sa);
+				call.setDotless(!this.explicitDot);
+				this.value = call;
+				this.mode = ACCESS;
+				
+				this.parseApply(pm, token.next(), sa, op);
+				return;
+			}
+			
+			MethodCall call = new MethodCall(token, this.value, name);
+			call.setDotless(!this.explicitDot);
+			this.value = call;
+			this.mode = ACCESS;
+			if (op.type != Operator.POSTFIX && !ParserUtil.isExpressionTerminator(nextType))
+			{
+				SingleArgument sa = new SingleArgument();
+				call.setArguments(sa);
+				
+				this.parseApply(pm, token, sa, op);
+			}
+			return;
+		}
+		
 		switch (nextType)
 		{
 		case Symbols.OPEN_PARENTHESIS:
 			MethodCall call = new MethodCall(token.raw(), this.value, name);
-			call.setDotless(this.dotless);
+			call.setDotless(!this.explicitDot);
 			this.value = call;
 			this.mode = PARAMETERS_END;
 			pm.skip();
@@ -600,7 +576,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
 			GenericData gd = new GenericData();
 			mc.setGenericData(gd);
-			mc.setDotless(this.dotless);
+			mc.setDotless(!this.explicitDot);
 			this.value = mc;
 			this.mode = TYPE_ARGUMENTS_END;
 			pm.skip();
@@ -608,33 +584,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		}
 		
-		if (op != null)
-		{
-			if (this.value == null)
-			{
-				SingleArgument sa = new SingleArgument();
-				MethodCall call = new MethodCall(token, null, name, sa);
-				call.setDotless(this.dotless);
-				this.value = call;
-				this.mode = ACCESS;
-				
-				this.parseApply(pm, token.next(), sa, op);
-				return;
-			}
-			
-			MethodCall call = new MethodCall(token, this.value, name);
-			call.setDotless(this.dotless);
-			this.value = call;
-			this.mode = ACCESS;
-			if (op.type != Operator.POSTFIX && !ParserUtil.isExpressionTerminator(nextType))
-			{
-				SingleArgument sa = new SingleArgument();
-				call.setArguments(sa);
-				
-				this.parseApply(pm, token, sa, op);
-			}
-			return;
-		}
 		// Name is not a compound operator (does not end with '=')
 		if (!name.qualified.endsWith("$eq"))
 		{
@@ -643,7 +592,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (ParserUtil.isExpressionTerminator(nextType))
 			{
 				FieldAccess access = new FieldAccess(token, this.value, name);
-				access.setDotless(this.dotless);
+				access.setDotless(!this.explicitDot);
 				this.value = access;
 				this.mode = ACCESS;
 				return;
@@ -660,7 +609,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isExpressionTerminator(next.next().type()))
 				{
 					FieldAccess access = new FieldAccess(token, this.value, name);
-					access.setDotless(this.dotless);
+					access.setDotless(!this.explicitDot);
 					this.value = access;
 					this.mode = ACCESS;
 					return;
@@ -679,12 +628,47 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		
 		SingleArgument sa = new SingleArgument();
 		MethodCall call = new MethodCall(token, this.value, name, sa);
-		call.setDotless(this.dotless);
+		call.setDotless(!this.explicitDot);
 		
 		this.value = call;
 		this.mode = ACCESS;
 		
 		this.parseApply(pm, token, sa, op == null ? Operators.DEFAULT : op);
+		return;
+	}
+	
+	private void parseIdentifierAccess(IParserManager pm, IToken token, int type)
+	{
+		Name name = token.nameValue();
+		Operator operator = pm.getOperator(name);
+		if (!this.explicitDot && this.operator != null)
+		{
+			// Handle operator precedence
+			int p;
+			if (operator == null || (p = this.operator.precedence) > operator.precedence)
+			{
+				this.field.setValue(this.value);
+				pm.popParser(true);
+				return;
+			}
+			if (p == operator.precedence)
+			{
+				// Handle associativity
+				switch (operator.type)
+				{
+				case Operator.INFIX_LEFT:
+					this.field.setValue(this.value);
+					pm.popParser(true);
+					return;
+				case Operator.INFIX_NONE:
+					pm.report(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
+					return;
+				case Operator.INFIX_RIGHT:
+				}
+			}
+		}
+		
+		this.parseAccess(pm, token, type, name, operator);
 		return;
 	}
 	

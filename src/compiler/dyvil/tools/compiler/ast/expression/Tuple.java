@@ -6,6 +6,7 @@ import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -217,6 +218,10 @@ public final class Tuple implements IValue, IValueList
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		if (this.valueCount == 0)
+		{
+			return new VoidValue(this.position);
+		}
 		if (this.valueCount == 1)
 		{
 			return this.values[0].resolve(markers, context);

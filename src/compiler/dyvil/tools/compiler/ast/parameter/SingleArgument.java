@@ -350,6 +350,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void typesToString(StringBuilder buffer)
 	{
+		buffer.append('(');
 		if (this.value != null)
 		{
 			this.value.getType().toString("", buffer);
@@ -358,5 +359,6 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			buffer.append("unknown");
 		}
+		buffer.append(')');
 	}
 }
