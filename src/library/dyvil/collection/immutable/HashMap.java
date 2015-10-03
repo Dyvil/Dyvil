@@ -75,12 +75,6 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 		this.entries = new HashEntry[MathUtils.powerOfTwo(capacity)];
 	}
 	
-	protected HashMap(int size, HashEntry[] entries)
-	{
-		this.entries = entries;
-		this.size = size;
-	}
-	
 	public HashMap(Map<K, V> map)
 	{
 		super(map);

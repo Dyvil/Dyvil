@@ -31,14 +31,6 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		return new HashMap(tuples);
 	}
 	
-	HashMap(int size, float loadFactor, HashEntry[] entries)
-	{
-		this.size = size;
-		this.loadFactor = loadFactor;
-		this.threshold = (int) ((size << 1) / loadFactor);
-		this.entries = entries;
-	}
-	
 	public HashMap()
 	{
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);

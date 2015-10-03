@@ -10,7 +10,6 @@ import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
-import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.impl.AbstractHashSet;
 import dyvil.math.MathUtils;
 
@@ -32,14 +31,6 @@ public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
 	public static <E> HashSet<E> apply(E... elements)
 	{
 		return new HashSet(elements);
-	}
-	
-	HashSet(int size, float loadFactor, HashElement[] elements)
-	{
-		this.size = size;
-		this.loadFactor = loadFactor;
-		this.threshold = (int) ((size << 1) / loadFactor);
-		this.elements = elements;
 	}
 	
 	public HashSet()
@@ -219,7 +210,7 @@ public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
 	{
 		// To simplify the implementation of this method, we create a temporary
 		// copy that is used to collect all new elements produced by the mapper.
-		HashSet<E> copy = new HashSet(this.size << 2, this.loadFactor);
+		HashSet<E> copy = new HashSet<E>(this.size << 2, this.loadFactor);
 		for (E element : this)
 		{
 			for (E newElement : mapper.apply(element))
@@ -238,25 +229,25 @@ public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		return new HashSet(this);
+		return new HashSet<E>(this);
 	}
 	
 	@Override
 	public <R> MutableSet<R> emptyCopy()
 	{
-		return new HashSet(this.size);
+		return new HashSet<R>(this.size);
 	}
 	
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return new ArraySet<E>(this); // TODO immutable.HashSet
+		return new dyvil.collection.immutable.HashSet<E>(this);
 	}
 	
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		java.util.HashSet<E> set = new java.util.HashSet<>(this.size);
+		java.util.HashSet<E> set = new java.util.HashSet<E>(this.size);
 		for (E element : this)
 		{
 			set.add(element);
