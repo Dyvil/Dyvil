@@ -231,11 +231,6 @@ public interface Set<E> extends Collection<E>
 	
 	public static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
-		if (c1.size() != c2.size())
-		{
-			return false;
-		}
-		
 		return Collection.unorderedEquals(c1, c2);
 	}
 	

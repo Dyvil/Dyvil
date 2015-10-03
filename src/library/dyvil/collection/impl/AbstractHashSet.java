@@ -93,7 +93,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		
 		for (HashElement hashElement : set.elements)
 		{
-			if (hashElement != null)
+			for (; hashElement != null; hashElement = hashElement.next)
 			{
 				int hash = hashElement.hash;
 				int index = index(hash, length);
@@ -320,7 +320,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		int index = index(hash, this.elements.length);
 		for (HashElement<E> hashElement = this.elements[index]; hashElement != null; hashElement = hashElement.next)
 		{
-			if (hashElement.hash == hash && elements.equals(hashElement.element))
+			if (hashElement.hash == hash && element.equals(hashElement.element))
 			{
 				return true;
 			}

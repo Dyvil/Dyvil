@@ -53,6 +53,12 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	// Accessors
 	
 	@Override
+	public default boolean isImmutable()
+	{
+		return true;
+	}
+	
+	@Override
 	public int size();
 	
 	@Override
@@ -162,8 +168,6 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	{
 		throw new ImmutableException("^= on Immutable Set");
 	}
-	
-	// Mutating Operations
 	
 	// Mutating Operations
 	

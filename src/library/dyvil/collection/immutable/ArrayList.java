@@ -103,6 +103,11 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 		@Override
 		public ArrayList<E> build()
 		{
+			if (this.size < 0)
+			{
+				return null;
+			}
+			
 			ArrayList<E> list = new ArrayList(this.elements, this.size, true);
 			this.size = -1;
 			return list;

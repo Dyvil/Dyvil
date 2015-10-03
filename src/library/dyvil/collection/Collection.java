@@ -753,7 +753,7 @@ public interface Collection<E> extends Queryable<E>
 		{
 			if (!c2.contains(o))
 			{
-				return false;
+				return c2.contains(o);
 			}
 		}
 		return true;

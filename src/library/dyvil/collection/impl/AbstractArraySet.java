@@ -29,7 +29,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	public AbstractArraySet(Object[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
-		this.size = Set.distinct(elements, size);
+		this.size = size;
 	}
 	
 	public AbstractArraySet(Collection<E> elements)

@@ -61,6 +61,16 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 		private Object[]	elements;
 		private int			size;
 		
+		public Builder()
+		{
+			this.elements = new Object[10]; // TODO Constant
+		}
+		
+		public Builder(int capacity)
+		{
+			this.elements = new Object[capacity];
+		}
+		
 		@Override
 		public void add(E element)
 		{
@@ -91,6 +101,11 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 		@Override
 		public ArraySet<E> build()
 		{
+			if (this.size < 0)
+			{
+				return null;
+			}
+			
 			ArraySet<E> set = new ArraySet(this.elements, this.size, true);
 			this.size = -1;
 			return set;

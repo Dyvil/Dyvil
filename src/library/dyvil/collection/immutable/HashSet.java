@@ -249,5 +249,4 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 		}
 		return set;
 	}
-	
 }
