@@ -48,9 +48,18 @@ public class MathTests
 	@Test
 	public void testIntSqrt()
 	{
-		for (int i = 0; i < 46340; i++)
+		int i = 0;
+		try
 		{
-			assertEquals("Sqrt" + i * i, i, MathUtils.sqrt(i * i));
+			for (; i < 46340; i++)
+			{
+				assertEquals("Sqrt" + i * i, i, MathUtils.sqrt(i * i));
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(ex.toString() + " @ " + i, false);
 		}
 	}
 }
