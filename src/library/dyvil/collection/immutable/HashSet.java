@@ -22,6 +22,50 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 		return new HashSet(elements);
 	}
 	
+	public static <E> Builder<E> builder()
+	{
+		return new Builder<E>();
+	}
+	
+	public static <E> Builder<E> builder(int capacity)
+	{
+		return new Builder<E>(capacity);
+	}
+	
+	public static class Builder<E> implements ImmutableSet.Builder<E>
+	{
+		private HashSet<E> set;
+		
+		public Builder()
+		{
+			this.set = new HashSet<E>(DEFAULT_CAPACITY);
+		}
+		
+		public Builder(int capacity)
+		{
+			this.set = new HashSet<E>(capacity);
+		}
+		
+		@Override
+		public void add(E element)
+		{
+			if (this.set == null)
+			{
+				throw new IllegalStateException("Already built!");
+			}
+			
+			this.set.addInternal(element);
+		}
+		
+		@Override
+		public ImmutableSet<E> build()
+		{
+			HashSet<E> set = this.set;
+			this.set = null;
+			return set;
+		}
+	}
+	
 	protected HashSet()
 	{
 		this(DEFAULT_CAPACITY);
