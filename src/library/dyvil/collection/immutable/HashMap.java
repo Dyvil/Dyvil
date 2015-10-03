@@ -15,12 +15,9 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<K, V>
 {
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] entries)
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] tuples)
 	{
-		int len = entries.length;
-		HashEntry[] hashEntries = new HashEntry[MathUtils.powerOfTwo(AbstractHashMap.grow(len))];
-		int size = AbstractHashMap.fillEntries(hashEntries, entries, len);
-		return new HashMap(size, hashEntries);
+		return new HashMap<K, V>(tuples);
 	}
 	
 	public static <K, V> Builder<K, V> builder()
@@ -35,102 +32,50 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
-		private HashEntry<K, V>[]	entries;
-		private int					size;
-		private int					threshold;
+		private HashMap<K, V> map;
 		
 		public Builder()
 		{
-			this.entries = new HashEntry[DEFAULT_CAPACITY];
-			this.threshold = 12;
+			this.map = new HashMap<K, V>();
 		}
 		
 		public Builder(int capacity)
 		{
-			this.entries = new HashEntry[MathUtils.powerOfTwo(capacity)];
-			this.threshold = capacity * 3 / 4;
-		}
-		
-		protected void rehash()
-		{
-			HashEntry[] oldMap = this.entries;
-			int oldCapacity = oldMap.length;
-			
-			// overflow-conscious code
-			int newCapacity = (oldCapacity << 1) + 1;
-			if (newCapacity - MAX_ARRAY_SIZE > 0)
-			{
-				if (oldCapacity == MAX_ARRAY_SIZE)
-				{
-					// Keep running with MAX_ARRAY_SIZE buckets
-					return;
-				}
-				newCapacity = MAX_ARRAY_SIZE;
-			}
-			HashEntry[] newMap = new HashEntry[newCapacity];
-			
-			this.threshold = Math.min(newCapacity * 3 / 4, MAX_ARRAY_SIZE + 1);
-			this.entries = newMap;
-			
-			for (int i = oldCapacity; i-- > 0;)
-			{
-				HashEntry e = oldMap[i];
-				while (e != null)
-				{
-					int index = index(e.hash, newCapacity);
-					HashEntry next = e.next;
-					e.next = newMap[index];
-					newMap[index] = e;
-					e = next;
-				}
-			}
-		}
-		
-		private void addEntry(int hash, K key, V value, int index)
-		{
-			HashEntry[] tab = this.entries;
-			if (this.size >= this.threshold)
-			{
-				// Rehash the table if the threshold is exceeded
-				this.rehash();
-				
-				tab = this.entries;
-				hash = hash(key);
-				index = index(hash, tab.length);
-			}
-			
-			tab[index] = new HashEntry(key, value, hash, tab[index]);
-			this.size++;
+			this.map = new HashMap<K, V>(capacity);
 		}
 		
 		@Override
 		public void put(K key, V value)
 		{
-			int hash = hash(key);
-			int i = index(hash, this.entries.length);
-			for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+			if (this.map == null)
 			{
-				Object k;
-				if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
-				{
-					e.value = value;
-					return;
-				}
+				throw new IllegalStateException("Already built!");
 			}
 			
-			this.addEntry(hash, key, value, i);
+			this.map.putInternal(key, value);
 		}
 		
 		@Override
 		public HashMap<K, V> build()
 		{
-			HashMap<K, V> map = new HashMap(this.size, this.entries);
-			this.size = -1;
+			HashMap<K, V> map = this.map;
+			this.map = null;
+			map.flatten();
 			return map;
 		}
 	}
 	
-	HashMap(int size, HashEntry[] entries)
+	protected HashMap()
+	{
+		this(DEFAULT_CAPACITY);
+	}
+	
+	protected HashMap(int capacity)
+	{
+		this.entries = new HashEntry[MathUtils.powerOfTwo(capacity)];
+	}
+	
+	protected HashMap(int size, HashEntry[] entries)
 	{
 		this.entries = entries;
 		this.size = size;
@@ -141,168 +86,181 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 		super(map);
 	}
 	
+	public HashMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
+	}
+	
+	@Override
+	protected void addEntry(int hash, K key, V value, int index)
+	{
+		this.entries[index] = new HashEntry(key, value, hash, this.entries[index]);
+		this.size++;
+	}
+	
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size + 1);
-		builder.putAll(this);
-		builder.put(key, value);
-		return builder.build();
+		HashMap<K, V> newMap = new HashMap<K, V>(this);
+		newMap.putInternal(key, value);
+		newMap.flatten();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size + map.size());
-		builder.putAll(this);
-		builder.putAll(map);
-		return builder.build();
+		HashMap<K, V> newMap = new HashMap<K, V>(this);
+		newMap.putInternal(map);
+		newMap.flatten();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$at(Object key)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size);
+		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			if (!Objects.equals(entryKey, key))
 			{
-				builder.put(entryKey, entry.getValue());
+				newMap.putInternal(entryKey, entry.getValue());
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size);
+		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
 			if (!Objects.equals(entryKey, key) || !Objects.equals(entryValue, value))
 			{
-				builder.put(entryKey, entryValue);
+				newMap.putInternal(entryKey, entryValue);
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size);
+		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			V entryValue = entry.getValue();
 			if (!Objects.equals(entryValue, value))
 			{
-				builder.put(entry.getKey(), entryValue);
+				newMap.putInternal(entry.getKey(), entryValue);
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size);
+		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
 			if (!map.contains(entryKey, entryValue))
 			{
-				builder.put(entryKey, entryValue);
+				newMap.putInternal(entryKey, entryValue);
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size);
+		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			if (!keys.contains(entryKey))
 			{
-				builder.put(entryKey, entry.getValue());
+				newMap.putInternal(entryKey, entry.getValue());
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
 	{
-		Builder<K, U> builder = new Builder<K, U>(this.size);
+		HashMap<K, U> newMap = new HashMap<K, U>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			U entryValue = mapper.apply(entryKey, entry.getValue());
-			builder.put(entryKey, entryValue);
+			newMap.putInternal(entryKey, entryValue);
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
 	{
-		Builder<U, R> builder = new Builder<U, R>(this.size);
+		HashMap<U, R> newMap = new HashMap<U, R>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			Entry<? extends U, ? extends R> newEntry = mapper.apply(entry.getKey(), entry.getValue());
 			if (newEntry != null)
 			{
-				builder.put(newEntry.getKey(), newEntry.getValue());
+				newMap.putInternal(newEntry.getKey(), newEntry.getValue());
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
-		Builder<U, R> builder = new Builder<U, R>(this.size);
+		HashMap<U, R> newMap = new HashMap<U, R>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
 			{
-				builder.put(newEntry.getKey(), newEntry.getValue());
+				newMap.putInternal(newEntry.getKey(), newEntry.getValue());
 			}
 		}
-		return builder.build();
+		newMap.flatten();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		Builder<K, V> builder = new Builder<K, V>(this.size);
+		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
 			if (condition.test(entryKey, entryValue))
 			{
-				builder.put(entryKey, entryValue);
+				newMap.putInternal(entryKey, entryValue);
 			}
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		Builder<V, K> builder = new Builder<V, K>(this.size);
+		HashMap<V, K> newMap = new HashMap<V, K>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			builder.put(entry.getValue(), entry.getKey());
+			newMap.putInternal(entry.getValue(), entry.getKey());
 		}
-		return builder.build();
+		return newMap;
 	}
 	
 	@Override

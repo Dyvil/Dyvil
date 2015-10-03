@@ -174,9 +174,11 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	protected static int fillEntries(HashEntry<?, ?>[] entries, Tuple2<?, ?>[] tuples, int length)
+	public AbstractHashMap(Tuple2<K, V>... tuples)
 	{
+		int length = MathUtils.powerOfTwo(grow(tuples.length));
 		int size = 0;
+		HashEntry[] entries = this.entries = new HashEntry[length];
 		
 		outer:
 		for (Tuple2 entry : tuples)
@@ -200,7 +202,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			size++;
 		}
 		
-		return size;
+		this.size = size;
 	}
 	
 	public static int hash(Object key)
@@ -218,6 +220,82 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public static int grow(int size)
 	{
 		return (int) ((size + 1) * GROWTH_FACTOR);
+	}
+	
+	protected void putInternal(Map<? extends K, ? extends V> map)
+	{
+		this.ensureCapacity(this.size + map.size());
+		
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	protected void putInternal(K key, V value)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+		{
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				e.value = value;
+				return;
+			}
+		}
+		
+		this.addEntry(hash, key, value, i);
+	}
+	
+	protected abstract void addEntry(int hash, K key, V value, int index);
+	
+	protected void flatten()
+	{
+		this.ensureCapacityInternal((this.entries.length << 1));
+	}
+	
+	public void ensureCapacity(int newCapacity)
+	{
+		this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+	}
+	
+	protected void ensureCapacityInternal(int newCapacity)
+	{
+		HashEntry[] oldMap = this.entries;
+		int oldCapacity = oldMap.length;
+		
+		// overflow-conscious code
+		if (newCapacity - MAX_ARRAY_SIZE > 0)
+		{
+			if (oldCapacity == MAX_ARRAY_SIZE)
+			{
+				// Keep running with MAX_ARRAY_SIZE buckets
+				return;
+			}
+			newCapacity = MAX_ARRAY_SIZE;
+		}
+		
+		HashEntry[] newMap = this.entries = new HashEntry[newCapacity];
+		for (int i = oldCapacity; i-- > 0;)
+		{
+			HashEntry e = oldMap[i];
+			while (e != null)
+			{
+				int index = index(e.hash, newCapacity);
+				HashEntry next = e.next;
+				e.next = newMap[index];
+				newMap[index] = e;
+				e = next;
+			}
+		}
+		
+		this.updateThreshold(newCapacity);
+	}
+	
+	protected void updateThreshold(int newCapacity)
+	{
 	}
 	
 	@Override

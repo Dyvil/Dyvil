@@ -26,12 +26,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		return new HashMap();
 	}
 	
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] entries)
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] tuples)
 	{
-		int len = entries.length;
-		HashEntry[] hashEntries = new HashEntry[MathUtils.powerOfTwo(AbstractHashMap.grow(len))];
-		int size = AbstractHashMap.fillEntries(hashEntries, entries, len);
-		return new HashMap(size, DEFAULT_LOAD_FACTOR, hashEntries);
+		return new HashMap(tuples);
 	}
 	
 	HashMap(int size, float loadFactor, HashEntry[] entries)
@@ -80,39 +77,15 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this.threshold = (int) (this.entries.length * DEFAULT_LOAD_FACTOR);
 	}
 	
-	protected void rehash()
+	public HashMap(Tuple2<K, V>... tuples)
 	{
-		HashEntry[] oldMap = this.entries;
-		int oldCapacity = oldMap.length;
-		
-		// overflow-conscious code
-		int newCapacity = (oldCapacity << 1) + 1;
-		if (newCapacity - MAX_ARRAY_SIZE > 0)
-		{
-			if (oldCapacity == MAX_ARRAY_SIZE)
-			{
-				// Keep running with MAX_ARRAY_SIZE buckets
-				return;
-			}
-			newCapacity = MAX_ARRAY_SIZE;
-		}
-		HashEntry[] newMap = new HashEntry[newCapacity];
-		
+		super(tuples);
+	}
+	
+	@Override
+	protected void updateThreshold(int newCapacity)
+	{
 		this.threshold = (int) Math.min(newCapacity * this.loadFactor, MAX_ARRAY_SIZE + 1);
-		this.entries = newMap;
-		
-		for (int i = oldCapacity; i-- > 0;)
-		{
-			HashEntry e = oldMap[i];
-			while (e != null)
-			{
-				int index = index(e.hash, newCapacity);
-				HashEntry next = e.next;
-				e.next = newMap[index];
-				newMap[index] = e;
-				e = next;
-			}
-		}
 	}
 	
 	@Override
@@ -126,39 +99,10 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		}
 	}
 	
-	private void addEntry(int hash, K key, V value, int index)
-	{
-		HashEntry[] tab = this.entries;
-		if (this.size >= this.threshold)
-		{
-			// Rehash the table if the threshold is exceeded
-			this.rehash();
-			
-			tab = this.entries;
-			hash = hash(key);
-			index = index(hash, tab.length);
-		}
-		
-		tab[index] = new HashEntry(key, value, hash, tab[index]);
-		this.size++;
-	}
-	
 	@Override
 	public void subscript_$eq(K key, V value)
 	{
-		int hash = hash(key);
-		int i = index(hash, this.entries.length);
-		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
-		{
-			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
-			{
-				e.value = value;
-				return;
-			}
-		}
-		
-		this.addEntry(hash, key, value, i);
+		this.putInternal(key, value);
 	}
 	
 	@Override
@@ -179,6 +123,30 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		
 		this.addEntry(hash, key, value, i);
 		return null;
+	}
+	
+	@Override
+	protected void addEntry(int hash, K key, V value, int index)
+	{
+		HashEntry[] tab = this.entries;
+		if (this.size >= this.threshold)
+		{
+			// Rehash / flatten the table if the threshold is exceeded
+			this.flatten();
+			
+			tab = this.entries;
+			hash = hash(key);
+			index = index(hash, tab.length);
+		}
+		
+		tab[index] = new HashEntry(key, value, hash, tab[index]);
+		this.size++;
+	}
+	
+	@Override
+	public void putAll(Map<? extends K, ? extends V> map)
+	{
+		this.putInternal(map);
 	}
 	
 	@Override
