@@ -23,7 +23,7 @@ import dyvil.tools.repl.command.VersionCommand;
 
 public class DyvilREPL
 {
-	public static final String VERSION = "0.1.2";
+	public static final String VERSION = "0.2.0";
 	
 	private static BufferedReader	reader;
 	protected static REPLContext	context	= new REPLContext();
@@ -46,7 +46,7 @@ public class DyvilREPL
 	
 	public static void main(String[] args) throws Exception
 	{
-		System.out.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
+		System.out.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.LIBRARY_VERSION);
 		
 		for (String arg : args)
 		{

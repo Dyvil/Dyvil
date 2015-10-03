@@ -40,11 +40,11 @@ processResources {
 
 group = 'dyvil-team'
 
-version = '0.4.0'
+version = '0.5.0'
 
-String libraryVersion = '0.3.0'
-String compilerVersion = '0.4.0'
-String replVersion = '0.1.2'
+String libraryVersion = '0.4.0'
+String compilerVersion = '0.5.0'
+String replVersion = '0.2.0'
 
 mainClassName = 'dyvil.tools.repl.DyvilREPL'
 
@@ -66,7 +66,7 @@ jar {
  * Creates the Gradle Wrapper (gradlew)
  */
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.5'
+    gradleVersion = '2.7'
 }
 
 /**
