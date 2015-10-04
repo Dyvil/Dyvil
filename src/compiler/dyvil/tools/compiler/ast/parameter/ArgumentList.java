@@ -231,11 +231,16 @@ public final class ArgumentList implements IArguments, IValueList
 		IType varParamType = param.getActualType();
 		
 		IValue value = this.values[index];
-		IValue value1 = IType.convertValue(value, varParamType, typeContext, markers, context);
-		if (value1 != null)
+		if (value.isType(varParamType.getConcreteType(typeContext)))
 		{
-			this.values[index] = value1;
-			this.varargs = true;
+			IValue value1 = IType.convertValue(value, varParamType, typeContext, markers, context);
+			if (value1 != null)
+			{
+				this.values[index] = value1;
+				this.varargs = true;
+				return;
+			}
+			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type", param.getName());
 			return;
 		}
 		
@@ -244,7 +249,7 @@ public final class ArgumentList implements IArguments, IValueList
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			value1 = IType.convertValue(value, elementType, typeContext, markers, context);
+			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type", param.getName());
