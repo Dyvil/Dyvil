@@ -89,10 +89,10 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return list;
 	}
 	
-	public static <E> ImmutableList<E> linked(Collection<E> collection)
+	public static <E> ImmutableList<E> linked(Iterable<E> iterable)
 	{
 		ImmutableList<E> list = EmptyList.instance;
-		for (E element : collection)
+		for (E element : iterable)
 		{
 			list = new AppendList(list, element);
 		}

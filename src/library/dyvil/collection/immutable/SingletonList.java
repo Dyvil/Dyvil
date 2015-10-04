@@ -182,7 +182,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return new SingletonList(mapper.apply(this.element));
+		return ImmutableList.<R> linked((Iterable<R>) mapper.apply(this.element));
 	}
 	
 	@Override
