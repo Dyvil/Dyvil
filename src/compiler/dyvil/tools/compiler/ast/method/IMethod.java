@@ -27,6 +27,8 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	
 	// Misc
 	
+	public boolean isAbstract();
+	
 	public void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override

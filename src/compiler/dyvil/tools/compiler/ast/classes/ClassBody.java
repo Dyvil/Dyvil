@@ -364,7 +364,7 @@ public class ClassBody implements IClassBody
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			if (m.hasModifier(Modifiers.ABSTRACT))
+			if (m.isAbstract())
 			{
 				if (found)
 				{

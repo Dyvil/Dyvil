@@ -371,6 +371,35 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
+	public boolean isAbstract()
+	{
+		return (this.modifiers & Modifiers.ABSTRACT) != 0 && !this.isObjectMethod();
+	}
+	
+	protected boolean isObjectMethod()
+	{
+		switch (this.parameterCount)
+		{
+		case 0:
+			if (this.name == Name.toString)
+			{
+				return true;
+			}
+			if (this.name == Name.hashCode)
+			{
+				return true;
+			}
+			return false;
+		case 1:
+			if (this.name == Name.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public IDyvilHeader getHeader()
 	{
 		return this.theClass.getHeader();

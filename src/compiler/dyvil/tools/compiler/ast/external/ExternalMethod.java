@@ -142,6 +142,16 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
+	protected boolean isObjectMethod()
+	{
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		return super.isObjectMethod();
+	}
+	
+	@Override
 	public IParameter getParameter(int index)
 	{
 		if (!this.parametersResolved)

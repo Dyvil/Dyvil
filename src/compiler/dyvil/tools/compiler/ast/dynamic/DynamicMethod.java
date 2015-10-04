@@ -200,6 +200,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
+	public boolean isAbstract()
+	{
+		return false;
+	}
+	
+	@Override
 	public int getAccessLevel()
 	{
 		return 0;
