@@ -150,6 +150,7 @@ public class REPLParser implements IParserManager
 	public void jump(IToken token)
 	{
 		this.tokens.jump(token);
+		this.reparse = false;
 	}
 	
 	@Override

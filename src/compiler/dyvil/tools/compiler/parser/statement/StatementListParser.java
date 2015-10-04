@@ -184,12 +184,11 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.parser.parse(this, token);
 			return;
 		case SEPARATOR:
+			this.mode = EXPRESSION;
 			if (type == Symbols.SEMICOLON)
 			{
-				this.mode = EXPRESSION;
 				return;
 			}
-			this.mode = EXPRESSION;
 			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();

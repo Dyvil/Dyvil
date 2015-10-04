@@ -633,7 +633,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		this.value = call;
 		this.mode = ACCESS;
 		
-		this.parseApply(pm, token, sa, op == null ? Operators.DEFAULT : op);
+		this.parseApply(pm, token.next(), sa, op == null ? Operators.DEFAULT : op);
 		return;
 	}
 	
