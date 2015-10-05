@@ -11,6 +11,7 @@ import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.math.MathUtils;
 import dyvil.tuple.Tuple2;
+import dyvil.util.ImmutableException;
 
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<K, V>
@@ -95,6 +96,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	{
 		this.entries[index] = new HashEntry(key, value, hash, this.entries[index]);
 		this.size++;
+	}
+	
+	@Override
+	protected void removeEntry(HashEntry<K, V> entry)
+	{
+		throw new ImmutableException("Iterator.remove() on Immutable Map");
 	}
 	
 	@Override

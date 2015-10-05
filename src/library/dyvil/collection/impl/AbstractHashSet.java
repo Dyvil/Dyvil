@@ -268,28 +268,33 @@ public abstract class AbstractHashSet<E> implements Set<E>
 					throw new IllegalStateException();
 				}
 				
-				AbstractHashSet.this.size--;
+				AbstractHashSet.this.removeElement(e);
 				this.current = null;
-				int index = index(e.hash, AbstractHashSet.this.elements.length);
-				HashElement<E> entry = AbstractHashSet.this.elements[index];
-				if (entry == e)
-				{
-					AbstractHashSet.this.elements[index] = e.next;
-				}
-				else
-				{
-					HashElement<E> prev;
-					do
-					{
-						prev = entry;
-						entry = entry.next;
-					}
-					while (entry != e);
-					
-					prev.next = e.next;
-				}
 			}
 		};
+	}
+	
+	protected void removeElement(HashElement<E> element)
+	{
+		this.size--;
+		int index = index(element.hash, this.elements.length);
+		HashElement<E> e = this.elements[index];
+		if (e == element)
+		{
+			this.elements[index] = element.next;
+		}
+		else
+		{
+			HashElement<E> prev;
+			do
+			{
+				prev = e;
+				e = e.next;
+			}
+			while (e != element);
+			
+			prev.next = element.next;
+		}
 	}
 	
 	@Override

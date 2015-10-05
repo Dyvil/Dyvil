@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.math.MathUtils;
+import dyvil.util.ImmutableException;
 
 import static dyvil.collection.impl.AbstractIdentityHashMap.NULL;
 import static dyvil.collection.impl.AbstractIdentityHashMap.index;
@@ -64,7 +65,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	{
 		return i + 1 < len ? i + 1 : 0;
 	}
-
+	
 	protected void flatten()
 	{
 		this.ensureCapacityInternal(this.table.length << 1);
@@ -133,13 +134,13 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		this.addElement(i, element);
 		return true;
 	}
-
+	
 	protected void addElement(int index, Object element)
 	{
 		this.table[index] = element;
 		this.size++;
 	}
-
+	
 	@Override
 	public int size()
 	{
@@ -193,6 +194,10 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 				if (this.lastReturnedIndex == -1)
 				{
 					throw new IllegalStateException();
+				}
+				if (AbstractIdentityHashSet.this.isImmutable())
+				{
+					throw new ImmutableException("Iterator.remove() on Immutable Set");
 				}
 				
 				int deletedSlot = this.lastReturnedIndex;

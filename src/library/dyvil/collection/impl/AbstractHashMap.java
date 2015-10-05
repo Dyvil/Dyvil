@@ -123,26 +123,8 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 				throw new IllegalStateException();
 			}
 			
-			AbstractHashMap.this.size--;
+			AbstractHashMap.this.removeEntry(e);
 			this.current = null;
-			int index = index(e.hash, AbstractHashMap.this.entries.length);
-			HashEntry<K, V> entry = AbstractHashMap.this.entries[index];
-			if (entry == e)
-			{
-				AbstractHashMap.this.entries[index] = e.next;
-			}
-			else
-			{
-				HashEntry<K, V> prev;
-				do
-				{
-					prev = entry;
-					entry = entry.next;
-				}
-				while (entry != e);
-				
-				prev.next = e.next;
-			}
 		}
 	}
 	
@@ -311,7 +293,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			this.putInternal(entry.getKey(), entry.getValue());
 		}
 	}
-
+	
 	protected void putInternal(K key, V value)
 	{
 		int hash = hash(key);
@@ -328,9 +310,32 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		
 		this.addEntry(hash, key, value, i);
 	}
-
+	
 	protected abstract void addEntry(int hash, K key, V value, int index);
-
+	
+	protected void removeEntry(HashEntry<K, V> entry)
+	{
+		AbstractHashMap.this.size--;
+		int index = index(entry.hash, AbstractHashMap.this.entries.length);
+		HashEntry<K, V> e = AbstractHashMap.this.entries[index];
+		if (e == entry)
+		{
+			AbstractHashMap.this.entries[index] = entry.next;
+		}
+		else
+		{
+			HashEntry<K, V> prev;
+			do
+			{
+				prev = e;
+				e = e.next;
+			}
+			while (e != entry);
+			
+			prev.next = entry.next;
+		}
+	}
+	
 	@Override
 	public int size()
 	{

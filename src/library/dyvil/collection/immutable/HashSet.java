@@ -10,6 +10,7 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractHashSet;
+import dyvil.util.ImmutableException;
 
 import static dyvil.collection.impl.AbstractHashMap.DEFAULT_CAPACITY;
 
@@ -100,6 +101,12 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 	{
 		this.elements[index] = new HashElement(element, hash, this.elements[index]);
 		this.size++;
+	}
+	
+	@Override
+	protected void removeElement(HashElement<E> element)
+	{
+		throw new ImmutableException("Iterator.remove() on Immutable Set");
 	}
 	
 	@Override

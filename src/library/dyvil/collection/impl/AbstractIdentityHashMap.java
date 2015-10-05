@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
+import dyvil.util.ImmutableException;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -97,6 +98,10 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 			if (this.lastReturnedIndex == -1)
 			{
 				throw new IllegalStateException();
+			}
+			if (AbstractIdentityHashMap.this.isImmutable())
+			{
+				throw new ImmutableException("Iterator.remove() on Immutable Map");
 			}
 			
 			int deletedSlot = this.lastReturnedIndex;
@@ -206,12 +211,12 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	{
 		this.ensureCapacityInternal(this.table.length << 1);
 	}
-
+	
 	public void ensureCapacity(int newCapacity)
 	{
 		this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
 	}
-
+	
 	protected void ensureCapacityInternal(int newCapacity)
 	{
 		Object[] oldTable = this.table;
@@ -248,11 +253,11 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		
 		this.updateThreshold(newCapacity);
 	}
-
+	
 	protected void updateThreshold(int newCapacity)
 	{
 	}
-
+	
 	protected V putInternal(K key, V value)
 	{
 		Object k = maskNull(key);
@@ -275,13 +280,13 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		this.addEntry(i, k, value);
 		return null;
 	}
-
+	
 	protected void addEntry(int index, Object key, V value)
 	{
 		this.table[index] = key;
 		this.table[index + 1] = value;
 	}
-
+	
 	@Override
 	public int size()
 	{
