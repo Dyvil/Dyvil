@@ -12,6 +12,7 @@ import dyvil.collection.MutableMap;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
+import dyvil.tuple.Tuple2;
 
 @NilConvertible
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements MutableMap<K, V>
@@ -22,6 +23,11 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
 		return new IdentityHashMap();
+	}
+	
+	public static <K, V> IdentityHashMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new IdentityHashMap(entries);
 	}
 	
 	public IdentityHashMap()
@@ -55,14 +61,21 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	{
 		super(map);
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.updateThreshold(this.table.length);
+		this.updateThreshold(this.table.length >> 1);
 	}
 	
 	public IdentityHashMap(AbstractIdentityHashMap<K, V> map)
 	{
 		super(map);
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.updateThreshold(this.table.length);
+		this.updateThreshold(this.table.length >> 1);
+	}
+	
+	public IdentityHashMap(Tuple2<K, V>... entries)
+	{
+		super(entries);
+		this.loadFactor = DEFAULT_LOAD_FACTOR;
+		this.updateThreshold(this.table.length >> 1);
 	}
 	
 	@Override

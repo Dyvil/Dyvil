@@ -43,22 +43,17 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	
 	public AbstractIdentityHashSet(AbstractIdentityHashSet<E> set)
 	{
-		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(set.size));
-		Object[] newTable = this.table = new Object[length];
-		for (Object o : set.table)
-		{
-			if (o != null)
-			{
-				int index = index(o, length);
-				while (newTable[index] != null)
-				{
-					index = nextIndex(index, length);
-				}
-				newTable[index] = o;
-			}
-		}
-		
+		this.table = set.table.clone();
 		this.size = set.size;
+	}
+	
+	public AbstractIdentityHashSet(E... elements)
+	{
+		this(elements.length);
+		for (E element : elements)
+		{
+			this.addInternal(element);
+		}
 	}
 	
 	protected static int nextIndex(int i, int len)

@@ -41,6 +41,6 @@ public class ImmutableIterator<E> implements Iterator<E>
 	@Override
 	public String toString()
 	{
-		return "view " + this.iterator.toString();
+		return this.iterator.toString();
 	}
 }

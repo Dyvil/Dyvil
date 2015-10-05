@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -185,6 +186,15 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		this.table = map.table.clone();
 	}
 	
+	public AbstractIdentityHashMap(Tuple2<K, V>... entries)
+	{
+		this(entries.length);
+		for (Tuple2<K, V> entry : entries)
+		{
+			this.putInternal(entry._1, entry._2);
+		}
+	}
+	
 	public static Object maskNull(Object o)
 	{
 		return o == null ? NULL : o;
@@ -214,7 +224,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	
 	public void ensureCapacity(int newCapacity)
 	{
-		this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+		this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity) << 1);
 	}
 	
 	protected void ensureCapacityInternal(int newCapacity)
@@ -251,7 +261,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 		this.table = newTable;
 		
-		this.updateThreshold(newCapacity);
+		this.updateThreshold(newCapacity >> 1);
 	}
 	
 	protected void updateThreshold(int newCapacity)

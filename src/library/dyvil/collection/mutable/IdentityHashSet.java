@@ -22,6 +22,11 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements Mut
 		return new IdentityHashSet();
 	}
 	
+	public static <E> IdentityHashSet<E> apply(E... elements)
+	{
+		return new IdentityHashSet(elements);
+	}
+	
 	public IdentityHashSet()
 	{
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
@@ -53,14 +58,21 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements Mut
 	{
 		super(collection);
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.threshold = (int) (this.table.length * DEFAULT_LOAD_FACTOR);
+		this.updateThreshold(this.table.length);
 	}
 	
 	public IdentityHashSet(AbstractIdentityHashSet<E> set)
 	{
 		super(set);
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.threshold = (int) (this.table.length * DEFAULT_LOAD_FACTOR);
+		this.updateThreshold(this.table.length);
+	}
+	
+	public IdentityHashSet(E... elements)
+	{
+		super(elements);
+		this.loadFactor = DEFAULT_LOAD_FACTOR;
+		this.updateThreshold(this.table.length);
 	}
 	
 	@Override
