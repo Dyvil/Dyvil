@@ -10,7 +10,6 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractHashSet;
-import dyvil.math.MathUtils;
 
 import static dyvil.collection.impl.AbstractHashMap.DEFAULT_CAPACITY;
 
@@ -68,12 +67,12 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 	
 	protected HashSet()
 	{
-		this(DEFAULT_CAPACITY);
+		super(DEFAULT_CAPACITY);
 	}
 	
 	public HashSet(int capacity)
 	{
-		this.elements = new HashElement[MathUtils.powerOfTwo(capacity)];
+		super(capacity);
 	}
 	
 	public HashSet(Collection<E> collection)
@@ -94,6 +93,13 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 	public HashSet(E... elements)
 	{
 		super(elements);
+	}
+	
+	@Override
+	protected void addElement(int hash, E element, int index)
+	{
+		this.elements[index] = new HashElement(element, hash, this.elements[index]);
+		this.size++;
 	}
 	
 	@Override

@@ -42,6 +42,15 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	{
 	}
 	
+	public AbstractHashSet(int capacity)
+	{
+		if (capacity < 0)
+		{
+			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
+		}
+		this.elements = new HashElement[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity))];
+	}
+	
 	public AbstractHashSet(Collection<E> collection)
 	{
 		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(collection.size()));
@@ -135,7 +144,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		this.ensureCapacityInternal((this.elements.length << 1));
 	}
 	
-	protected void ensureCapacity(int newCapacity)
+	public void ensureCapacity(int newCapacity)
 	{
 		this.ensureCapacity(MathUtils.powerOfTwo(newCapacity));
 	}
@@ -175,7 +184,6 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	
 	protected void updateThreshold(int newCapacity)
 	{
-	
 	}
 	
 	protected boolean addInternal(E element)
@@ -195,11 +203,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		return true;
 	}
 	
-	protected void addElement(int hash, E element, int index)
-	{
-		this.elements[index] = new HashElement(element, hash, this.elements[index]);
-		this.size++;
-	}
+	protected abstract void addElement(int hash, E element, int index);
 	
 	@Override
 	public int size()

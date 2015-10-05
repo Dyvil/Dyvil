@@ -158,11 +158,20 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 	}
 	
+	public AbstractHashMap(int capacity)
+	{
+		if (capacity < 0)
+		{
+			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
+		}
+		this.entries = new HashEntry[MathUtils.powerOfTwo(grow(capacity))];
+	}
+	
 	public AbstractHashMap(Map<K, V> map)
 	{
 		int size = map.size();
 		int length = MathUtils.powerOfTwo(grow(size));
-		this.entries = new HashEntry[length];
+		HashEntry[] entries = this.entries = new HashEntry[length];
 		this.size = size;
 		
 		// Assume unique elements
@@ -171,7 +180,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			K key = entry.getKey();
 			int hash = hash(key);
 			int i = index(hash, length);
-			this.entries[i] = new HashEntry(key, entry.getValue(), hash, this.entries[i]);
+			entries[i] = new HashEntry(key, entry.getValue(), hash, entries[i]);
 		}
 	}
 	
@@ -246,35 +255,6 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return (int) ((size + 1) * GROWTH_FACTOR);
 	}
 	
-	protected void putInternal(Map<? extends K, ? extends V> map)
-	{
-		this.ensureCapacity(this.size + map.size());
-		
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			this.putInternal(entry.getKey(), entry.getValue());
-		}
-	}
-	
-	protected void putInternal(K key, V value)
-	{
-		int hash = hash(key);
-		int i = index(hash, this.entries.length);
-		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
-		{
-			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
-			{
-				e.value = value;
-				return;
-			}
-		}
-		
-		this.addEntry(hash, key, value, i);
-	}
-	
-	protected abstract void addEntry(int hash, K key, V value, int index);
-	
 	protected void flatten()
 	{
 		this.ensureCapacityInternal((this.entries.length << 1));
@@ -322,6 +302,35 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 	}
 	
+	protected void putInternal(Map<? extends K, ? extends V> map)
+	{
+		this.ensureCapacity(this.size + map.size());
+		
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
+
+	protected void putInternal(K key, V value)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+		{
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				e.value = value;
+				return;
+			}
+		}
+		
+		this.addEntry(hash, key, value, i);
+	}
+
+	protected abstract void addEntry(int hash, K key, V value, int index);
+
 	@Override
 	public int size()
 	{

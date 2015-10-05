@@ -11,7 +11,6 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractHashMap;
-import dyvil.math.MathUtils;
 import dyvil.tuple.Tuple2;
 
 @NilConvertible
@@ -26,7 +25,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		return new HashMap();
 	}
 	
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] tuples)
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... tuples)
 	{
 		return new HashMap(tuples);
 	}
@@ -48,17 +47,13 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	
 	public HashMap(int capacity, float loadFactor)
 	{
-		if (capacity < 0)
-		{
-			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
-		}
+		super(capacity);
 		if (loadFactor <= 0 || Float.isNaN(loadFactor))
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
 		
 		this.loadFactor = loadFactor;
-		this.entries = new HashEntry[MathUtils.powerOfTwo(capacity)];
 		this.threshold = (int) Math.min(capacity * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 	

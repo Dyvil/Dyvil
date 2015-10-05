@@ -18,8 +18,7 @@ import static dyvil.collection.impl.AbstractHashMap.*;
 @NilConvertible
 @ArrayConvertible
 public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
-{
-	
+{	
 	private float	loadFactor;
 	private int		threshold;
 	
@@ -50,17 +49,14 @@ public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
 	
 	public HashSet(int capacity, float loadFactor)
 	{
-		if (capacity < 0)
-		{
-			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
-		}
+		super(capacity);
 		if (loadFactor <= 0 || Float.isNaN(loadFactor))
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
 		
-		this.elements = new HashElement[MathUtils.powerOfTwo(capacity)];
-		this.defaultThreshold();
+		this.loadFactor = loadFactor;
+		this.threshold = (int) (capacity * this.loadFactor);
 	}
 	
 	public HashSet(Collection<E> collection)

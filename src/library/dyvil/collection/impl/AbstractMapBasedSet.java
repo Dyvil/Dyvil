@@ -61,6 +61,12 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 			}
 			
 			@Override
+			public void clear()
+			{
+				AbstractMapBasedSet.this.map().clear();
+			}
+			
+			@Override
 			public boolean add(E e)
 			{
 				return AbstractMapBasedSet.this.map().put(e, VALUE) == null;
