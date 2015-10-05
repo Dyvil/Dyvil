@@ -329,6 +329,17 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	}
 	
 	@Override
+	public java.util.Set<E> toJava()
+	{
+		java.util.HashSet<E> set = new java.util.HashSet<E>(this.size);
+		for (E element : this)
+		{
+			set.add(element);
+		}
+		return set;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return Collection.collectionToString(this);

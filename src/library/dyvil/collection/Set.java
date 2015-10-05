@@ -149,7 +149,7 @@ public interface Set<E> extends Collection<E>
 	 */
 	public default void $up$eq(Collection<? extends E> collection)
 	{
-		this.intersect(collection);
+		this.exclusiveOr(collection);
 	}
 	
 	@Override
@@ -173,7 +173,7 @@ public interface Set<E> extends Collection<E>
 		{
 			if (!this.contains(element))
 			{
-				this.$plus$eq(element);
+				this.remove(element);
 				changed = true;
 			}
 		}
@@ -181,7 +181,7 @@ public interface Set<E> extends Collection<E>
 		{
 			if (!collection.contains(element))
 			{
-				this.$minus$eq(element);
+				this.remove(element);
 				changed = true;
 			}
 		}

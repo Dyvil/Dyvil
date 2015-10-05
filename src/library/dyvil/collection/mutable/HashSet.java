@@ -243,15 +243,4 @@ public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
 	{
 		return new dyvil.collection.immutable.HashSet<E>(this);
 	}
-	
-	@Override
-	public java.util.Set<E> toJava()
-	{
-		java.util.HashSet<E> set = new java.util.HashSet<E>(this.size);
-		for (E element : this)
-		{
-			set.add(element);
-		}
-		return set;
-	}
 }

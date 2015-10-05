@@ -12,7 +12,6 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.*;
-import dyvil.collection.immutable.ArrayList;
 
 @NilConvertible
 @ArrayConvertible
@@ -686,7 +685,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return new ArrayList(this); // TODO immutable.LinkedList
+		return ImmutableList.linked(this);
 	}
 	
 	@Override

@@ -242,11 +242,6 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		java.util.Set<E> set = new java.util.HashSet<E>();
-		for (E element : this)
-		{
-			set.add(element);
-		}
-		return set;
+		return java.util.Collections.unmodifiableSet(super.toJava());
 	}
 }

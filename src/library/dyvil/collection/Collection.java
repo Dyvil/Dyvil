@@ -193,6 +193,32 @@ public interface Collection<E> extends Queryable<E>
 		return iterableContains(this, element);
 	}
 	
+	public default boolean intersects(Collection<?> collection)
+	{
+		if (collection.size() < this.size())
+		{
+			for (Object o : this)
+			{
+				if (collection.contains(o))
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		for (Object o : collection)
+		{
+			if (this.contains(o))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	// Non-mutating Operations
 	
 	/**
