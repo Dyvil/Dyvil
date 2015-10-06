@@ -1332,7 +1332,5 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		buffer.append(' ');
 		this.value.toString(prefix, buffer);
-		return;
 	}
-	
 }

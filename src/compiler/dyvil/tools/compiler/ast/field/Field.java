@@ -425,6 +425,5 @@ public class Field extends Member implements IField
 			buffer.append(Formatting.Field.keyValueSeperator);
 			this.value.toString(prefix, buffer);
 		}
-		buffer.append(';');
 	}
 }

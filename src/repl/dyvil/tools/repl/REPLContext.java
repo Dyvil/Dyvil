@@ -427,6 +427,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		if (reportErrors(markers))
 		{
+			methods.remove(method);
 			this.cleanup();
 			return;
 		}

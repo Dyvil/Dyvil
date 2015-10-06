@@ -590,7 +590,7 @@ public class ClassBody implements IClassBody
 			for (int i = 0; i < this.fieldCount; i++)
 			{
 				this.fields[i].toString(prefix1, buffer);
-				buffer.append('\n');
+				buffer.append(';').append('\n');
 			}
 			buffer.append('\n');
 		}
