@@ -37,36 +37,6 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 		return new Builder(capacity);
 	}
 	
-	public ArrayList()
-	{
-		super();
-	}
-	
-	public ArrayList(E... elements)
-	{
-		super(elements);
-	}
-	
-	public ArrayList(E[] elements, boolean trusted)
-	{
-		super(elements, elements.length, trusted);
-	}
-	
-	public ArrayList(E[] elements, int size)
-	{
-		super(elements, size);
-	}
-	
-	public ArrayList(E[] elements, int size, boolean trusted)
-	{
-		super(elements, size, trusted);
-	}
-	
-	public ArrayList(Collection<E> collection)
-	{
-		super(collection);
-	}
-	
 	public static class Builder<E> implements ImmutableList.Builder<E>
 	{
 		private Object[]	elements;
@@ -74,7 +44,7 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 		
 		public Builder()
 		{
-			this.elements = new Object[10];
+			this.elements = new Object[DEFAULT_CAPACITY];
 		}
 		
 		public Builder(int capacity)
@@ -112,6 +82,36 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 			this.size = -1;
 			return list;
 		}
+	}
+
+	public ArrayList()
+	{
+		super();
+	}
+	
+	public ArrayList(E... elements)
+	{
+		super(elements);
+	}
+	
+	public ArrayList(E[] elements, boolean trusted)
+	{
+		super(elements, elements.length, trusted);
+	}
+	
+	public ArrayList(E[] elements, int size)
+	{
+		super(elements, size);
+	}
+	
+	public ArrayList(E[] elements, int size, boolean trusted)
+	{
+		super(elements, size, trusted);
+	}
+	
+	public ArrayList(Collection<E> collection)
+	{
+		super(collection);
 	}
 	
 	@Override

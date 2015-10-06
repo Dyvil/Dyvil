@@ -17,11 +17,9 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<K, V>
 {
-	protected static final int INITIAL_CAPACITY = 10;
-	
 	public static <K, V> ArrayMap<K, V> apply()
 	{
-		return new ArrayMap<K, V>(INITIAL_CAPACITY);
+		return new ArrayMap<K, V>(DEFAULT_CAPACITY);
 	}
 	
 	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... entries)
@@ -35,7 +33,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 	
 	public ArrayMap()
 	{
-		super(new Object[INITIAL_CAPACITY], new Object[INITIAL_CAPACITY], 0, true);
+		super(new Object[DEFAULT_CAPACITY], new Object[DEFAULT_CAPACITY], 0, true);
 	}
 	
 	public ArrayMap(int capacity)

@@ -54,6 +54,8 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	protected static final int DEFAULT_CAPACITY = 10;
+	
 	protected int		size;
 	protected Object[]	keys;
 	protected Object[]	values;

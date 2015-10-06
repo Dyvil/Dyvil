@@ -12,6 +12,8 @@ import dyvil.collection.Set;
 
 public abstract class AbstractArrayList<E> implements List<E>
 {
+	protected static final int DEFAULT_CAPACITY = 10;
+	
 	protected Object[]	elements;
 	protected int		size;
 	

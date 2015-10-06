@@ -15,8 +15,6 @@ import dyvil.collection.impl.AbstractArraySet;
 @ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 {
-	protected static final int INITIAL_CAPACITY = 10;
-	
 	public static <E> ArraySet<E> apply()
 	{
 		return new ArraySet();
@@ -34,7 +32,7 @@ public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 	
 	public ArraySet()
 	{
-		super(new Object[INITIAL_CAPACITY], 0, true);
+		super(new Object[DEFAULT_CAPACITY], 0, true);
 	}
 	
 	public ArraySet(int size)

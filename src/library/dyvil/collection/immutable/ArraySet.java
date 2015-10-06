@@ -18,42 +18,22 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 {
 	public static <E> ArraySet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet<E>(elements, true);
 	}
 	
 	public static <E> ArraySet<E> fromArray(E... elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet<E>(elements);
 	}
 	
 	public static <E> Builder<E> builder()
 	{
-		return new Builder();
+		return new Builder<E>();
 	}
 	
-	public ArraySet(E... elements)
+	public static <E> Builder<E> builder(int capacity)
 	{
-		super(elements);
-	}
-	
-	public ArraySet(E[] elements, int size)
-	{
-		super(elements, size);
-	}
-	
-	public ArraySet(E[] elements, boolean trusted)
-	{
-		super(elements, elements.length, trusted);
-	}
-	
-	public ArraySet(E[] elements, int size, boolean trusted)
-	{
-		super(elements, size, trusted);
-	}
-	
-	public ArraySet(Collection<E> elements)
-	{
-		super(elements);
+		return new Builder<E>(capacity);
 	}
 	
 	public static class Builder<E> implements ImmutableSet.Builder<E>
@@ -63,7 +43,7 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 		
 		public Builder()
 		{
-			this.elements = new Object[10]; // TODO Constant
+			this.elements = new Object[DEFAULT_CAPACITY];
 		}
 		
 		public Builder(int capacity)
@@ -110,6 +90,31 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 			this.size = -1;
 			return set;
 		}
+	}
+	
+	public ArraySet(E... elements)
+	{
+		super(elements);
+	}
+	
+	public ArraySet(E[] elements, int size)
+	{
+		super(elements, size);
+	}
+	
+	public ArraySet(E[] elements, boolean trusted)
+	{
+		super(elements, elements.length, trusted);
+	}
+	
+	public ArraySet(E[] elements, int size, boolean trusted)
+	{
+		super(elements, size, trusted);
+	}
+	
+	public ArraySet(Collection<E> elements)
+	{
+		super(elements);
 	}
 	
 	@Override

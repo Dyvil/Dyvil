@@ -10,6 +10,8 @@ import dyvil.collection.Set;
 
 public abstract class AbstractArraySet<E> implements Set<E>
 {
+	protected static final int DEFAULT_CAPACITY = 10;
+	
 	protected Object[]	elements;
 	protected int		size;
 	

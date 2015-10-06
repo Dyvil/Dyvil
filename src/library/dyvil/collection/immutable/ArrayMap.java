@@ -67,8 +67,8 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements ImmutableMa
 		
 		public Builder()
 		{
-			this.keys = new Object[10];
-			this.values = new Object[10];
+			this.keys = new Object[DEFAULT_CAPACITY];
+			this.values = new Object[DEFAULT_CAPACITY];
 		}
 		
 		public Builder(int capacity)
