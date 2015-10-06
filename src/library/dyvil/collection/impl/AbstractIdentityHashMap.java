@@ -224,7 +224,10 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	
 	public void ensureCapacity(int newCapacity)
 	{
-		this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity) << 1);
+		if (newCapacity > (this.table.length >> 1))
+		{
+			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity) << 1);
+		}
 	}
 	
 	protected void ensureCapacityInternal(int newCapacity)
@@ -295,6 +298,20 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	{
 		this.table[index] = key;
 		this.table[index + 1] = value;
+		
+		if (++this.size >= (this.table.length >> 1) * DEFAULT_LOAD_FACTOR)
+		{
+			this.flatten();
+		}
+	}
+	
+	protected void putInternal(Map<? extends K, ? extends V> map)
+	{
+		this.ensureCapacity(this.size + map.size());
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
 	}
 	
 	@Override

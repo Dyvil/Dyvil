@@ -71,7 +71,7 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 		super(DEFAULT_CAPACITY);
 	}
 	
-	public HashSet(int capacity)
+	protected HashSet(int capacity)
 	{
 		super(capacity);
 	}
@@ -113,6 +113,7 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 	public ImmutableSet<E> $plus(E element)
 	{
 		HashSet<E> newSet = new HashSet<E>(this);
+		newSet.ensureCapacityInternal(this.size + 1);
 		newSet.addInternal(element);
 		return newSet;
 	}
@@ -168,6 +169,7 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<E>(this);
+		newSet.ensureCapacity(this.size + collection.size());
 		for (E element : collection)
 		{
 			newSet.addInternal(element);
@@ -222,6 +224,7 @@ public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 				newSet.addInternal(newElement);
 			}
 		}
+		newSet.flatten();
 		return newSet;
 	}
 	

@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
-import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 
@@ -159,7 +158,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements Mut
 			Object o = this.table[i];
 			if (o != null)
 			{
-				this.table[i] = mapper.apply((E) unmaskNull(o));
+				this.table[i] = maskNull(mapper.apply((E) unmaskNull(o)));
 			}
 		}
 	}
@@ -167,6 +166,18 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements Mut
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
+		IdentityHashSet<E> copy = new IdentityHashSet<E>(this.size, this.loadFactor);
+		for (E element : this)
+		{
+			for (E result : mapper.apply(element))
+			{
+				copy.addInternal(result);
+			}
+		}
+		
+		this.table = copy.table;
+		this.size = copy.size;
+		this.threshold = copy.threshold;
 	}
 	
 	@Override
@@ -185,18 +196,18 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements Mut
 	@Override
 	public MutableSet<E> copy()
 	{
-		return new IdentityHashSet(this);
+		return new IdentityHashSet<E>(this);
 	}
 	
 	@Override
 	public <R> MutableSet<R> emptyCopy()
 	{
-		return new IdentityHashSet(this.size);
+		return new IdentityHashSet<R>(this.size);
 	}
 	
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return new ArraySet<E>(this); // TODO immutable.IdentityHashSet
+		return new dyvil.collection.immutable.IdentityHashSet<E>(this);
 	}
 }

@@ -9,14 +9,13 @@ import dyvil.lang.literal.ArrayConvertible;
 
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
-import dyvil.math.MathUtils;
 import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<K, V>
 {
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>[] tuples)
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... tuples)
 	{
 		return new HashMap<K, V>(tuples);
 	}
@@ -68,12 +67,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	
 	protected HashMap()
 	{
-		this(DEFAULT_CAPACITY);
+		super(DEFAULT_CAPACITY);
 	}
 	
 	protected HashMap(int capacity)
 	{
-		this.entries = new HashEntry[MathUtils.powerOfTwo(capacity)];
+		super(capacity);
 	}
 	
 	public HashMap(Map<K, V> map)
@@ -107,166 +106,165 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this);
-		newMap.putInternal(key, value);
-		newMap.flatten();
-		return newMap;
+		HashMap<K, V> copy = new HashMap<K, V>(this);
+		copy.ensureCapacity(this.size + 1);
+		copy.putInternal(key, value);
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this);
-		newMap.putInternal(map);
-		newMap.flatten();
-		return newMap;
+		HashMap<K, V> copy = new HashMap<K, V>(this);
+		copy.putInternal(map);
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$at(Object key)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			if (!Objects.equals(entryKey, key))
 			{
-				newMap.putInternal(entryKey, entry.getValue());
+				copy.putInternal(entryKey, entry.getValue());
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
 			if (!Objects.equals(entryKey, key) || !Objects.equals(entryValue, value))
 			{
-				newMap.putInternal(entryKey, entryValue);
+				copy.putInternal(entryKey, entryValue);
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			V entryValue = entry.getValue();
 			if (!Objects.equals(entryValue, value))
 			{
-				newMap.putInternal(entry.getKey(), entryValue);
+				copy.putInternal(entry.getKey(), entryValue);
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
 			if (!map.contains(entryKey, entryValue))
 			{
-				newMap.putInternal(entryKey, entryValue);
+				copy.putInternal(entryKey, entryValue);
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			if (!keys.contains(entryKey))
 			{
-				newMap.putInternal(entryKey, entry.getValue());
+				copy.putInternal(entryKey, entry.getValue());
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
 	{
-		HashMap<K, U> newMap = new HashMap<K, U>(this.size);
+		HashMap<K, U> copy = new HashMap<K, U>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			U entryValue = mapper.apply(entryKey, entry.getValue());
-			newMap.putInternal(entryKey, entryValue);
+			copy.putInternal(entryKey, entryValue);
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
 	{
-		HashMap<U, R> newMap = new HashMap<U, R>(this.size);
+		HashMap<U, R> copy = new HashMap<U, R>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			Entry<? extends U, ? extends R> newEntry = mapper.apply(entry.getKey(), entry.getValue());
 			if (newEntry != null)
 			{
-				newMap.putInternal(newEntry.getKey(), newEntry.getValue());
+				copy.putInternal(newEntry.getKey(), newEntry.getValue());
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
-		HashMap<U, R> newMap = new HashMap<U, R>(this.size);
+		HashMap<U, R> copy = new HashMap<U, R>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
 			{
-				newMap.putInternal(newEntry.getKey(), newEntry.getValue());
+				copy.putInternal(newEntry.getKey(), newEntry.getValue());
 			}
 		}
-		newMap.flatten();
-		return newMap;
+		copy.flatten();
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		HashMap<K, V> newMap = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
 			V entryValue = entry.getValue();
 			if (condition.test(entryKey, entryValue))
 			{
-				newMap.putInternal(entryKey, entryValue);
+				copy.putInternal(entryKey, entryValue);
 			}
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		HashMap<V, K> newMap = new HashMap<V, K>(this.size);
+		HashMap<V, K> copy = new HashMap<V, K>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			newMap.putInternal(entry.getValue(), entry.getKey());
+			copy.putInternal(entry.getValue(), entry.getKey());
 		}
-		return newMap;
+		return copy;
 	}
 	
 	@Override

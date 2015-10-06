@@ -9,7 +9,6 @@ import dyvil.lang.literal.NilConvertible;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
-import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.tuple.Tuple2;
@@ -102,6 +101,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	{
 		this.table[index] = key;
 		this.table[index + 1] = value;
+		
 		if (++this.size >= this.threshold)
 		{
 			this.flatten();
@@ -323,6 +323,6 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new ArrayMap(this); // TODO immutable.IdentityHashMap
+		return new dyvil.collection.immutable.IdentityHashMap<K, V>(this);
 	}
 }

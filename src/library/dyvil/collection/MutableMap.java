@@ -96,6 +96,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
+	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
+	{
+		return this.$plus(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
 	public default MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
 		MutableMap<K, V> copy = this.copy();
@@ -117,6 +123,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 		MutableMap<K, V> copy = this.copy();
 		copy.$minus$eq(key, value);
 		return copy;
+	}
+	
+	@Override
+	public default Map<K, V> $minus(Entry<?, ?> entry)
+	{
+		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
@@ -302,6 +314,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	@Override
 	public default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
 	{
+		// TODO Remove standard implementation and specialize for subclasses
 		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
 		for (Entry<K, V> entry : this)
 		{
@@ -322,6 +335,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	@Override
 	public default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
 	{
+		// TODO Remove standard implementation and specialize for subclasses
 		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
 		for (Entry<K, V> entry : this)
 		{

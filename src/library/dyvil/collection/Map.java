@@ -364,10 +364,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the entry
 	 * @return a map that contains all entries of this map plus the new entry
 	 */
-	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
-	{
-		return this.$plus(entry.getKey(), entry.getValue());
-	}
+	public Map<K, V> $plus(Entry<? extends K, ? extends V> entry);
 	
 	/**
 	 * Returns a map that contains all entries of this map plus all entries of
@@ -385,10 +382,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public Map<K, V> $minus(Object key, Object value);
 	
-	public default Map<K, V> $minus(Entry<?, ?> entry)
-	{
-		return this.$minus(entry.getKey(), entry.getValue());
-	}
+	public Map<K, V> $minus(Entry<?, ?> entry);
 	
 	public Map<K, V> $minus$colon(Object value);
 	

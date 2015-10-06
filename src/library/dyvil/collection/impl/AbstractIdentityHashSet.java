@@ -66,9 +66,12 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		this.ensureCapacityInternal(this.table.length << 1);
 	}
 	
-	public void ensureCapacity(int capacity)
+	public void ensureCapacity(int newCapacity)
 	{
-		this.ensureCapacityInternal(MathUtils.powerOfTwo(capacity));
+		if (newCapacity > this.table.length)
+		{
+			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+		}
 	}
 	
 	protected void ensureCapacityInternal(int newCapacity)
@@ -126,14 +129,17 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			i = nextIndex(i, len);
 		}
 		
-		this.addElement(i, element);
+		this.addElement(i, k);
 		return true;
 	}
 	
 	protected void addElement(int index, Object element)
 	{
 		this.table[index] = element;
-		this.size++;
+		if (++this.size >= this.table.length * AbstractIdentityHashMap.DEFAULT_LOAD_FACTOR)
+		{
+			this.flatten();
+		}
 	}
 	
 	@Override

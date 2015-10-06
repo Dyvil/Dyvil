@@ -244,7 +244,10 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	
 	public void ensureCapacity(int newCapacity)
 	{
-		this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+		if (newCapacity > this.entries.length)
+		{
+			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+		}
 	}
 	
 	protected void ensureCapacityInternal(int newCapacity)

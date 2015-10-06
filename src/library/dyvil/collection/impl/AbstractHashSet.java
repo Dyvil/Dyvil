@@ -146,7 +146,10 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	
 	public void ensureCapacity(int newCapacity)
 	{
-		this.ensureCapacity(MathUtils.powerOfTwo(newCapacity));
+		if (newCapacity > this.elements.length)
+		{
+			this.ensureCapacity(MathUtils.powerOfTwo(newCapacity));
+		}
 	}
 	
 	protected void ensureCapacityInternal(int newCapacity)
