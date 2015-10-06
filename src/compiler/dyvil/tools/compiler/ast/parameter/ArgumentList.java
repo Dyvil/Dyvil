@@ -228,6 +228,11 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (index >= this.size)
+		{
+			return;
+		}
+		
 		IType varParamType = param.getActualType();
 		
 		IValue value = this.values[index];
