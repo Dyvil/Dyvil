@@ -16,6 +16,9 @@ import static dyvil.collection.impl.AbstractIdentityHashMap.unmaskNull;
 
 public abstract class AbstractIdentityHashSet<E> implements Set<E>
 {
+	protected static final int		DEFAULT_CAPACITY	= 12;
+	protected static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
+	
 	protected Object[]	table;
 	protected int		size;
 	
@@ -186,7 +189,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 				this.indexValid = false;
 				this.lastReturnedIndex = this.index;
 				this.index++;
-				return (E) this.traversalTable[this.lastReturnedIndex];
+				return (E) unmaskNull(this.traversalTable[this.lastReturnedIndex]);
 			}
 			
 			@Override

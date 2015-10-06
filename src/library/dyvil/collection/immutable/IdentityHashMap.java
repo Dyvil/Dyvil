@@ -5,9 +5,64 @@ import java.util.function.BiPredicate;
 
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashMap;
+import dyvil.tuple.Tuple2;
 
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements ImmutableMap<K, V>
 {
+	public static <K, V> IdentityHashMap<K, V> apply()
+	{
+		return new IdentityHashMap();
+	}
+	
+	public static <K, V> IdentityHashMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new IdentityHashMap(entries);
+	}
+	
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder<K, V>();
+	}
+	
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new Builder<K, V>(capacity);
+	}
+	
+	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
+	{
+		private IdentityHashMap<K, V> map;
+		
+		public Builder()
+		{
+			this.map = new IdentityHashMap<K, V>();
+		}
+		
+		public Builder(int capacity)
+		{
+			this.map = new IdentityHashMap<K, V>(capacity);
+		}
+		
+		@Override
+		public void put(K key, V value)
+		{
+			if (this.map == null)
+			{
+				throw new IllegalStateException("Already built!");
+			}
+			
+			this.map.putInternal(key, value);
+		}
+		
+		@Override
+		public IdentityHashMap<K, V> build()
+		{
+			IdentityHashMap<K, V> map = this.map;
+			this.map = null;
+			return map;
+		}
+	}
+	
 	protected IdentityHashMap()
 	{
 		super(AbstractIdentityHashMap.DEFAULT_CAPACITY);
@@ -26,6 +81,11 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	public IdentityHashMap(AbstractIdentityHashMap<K, V> map)
 	{
 		super(map);
+	}
+	
+	public IdentityHashMap(Tuple2<K, V>... entries)
+	{
+		super(entries);
 	}
 	
 	@Override
@@ -172,7 +232,8 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 		{
 			K key = entry.getKey();
 			V value = entry.getValue();
-			if (condition.test(key, value)) {
+			if (condition.test(key, value))
+			{
 				copy.putInternal(key, value);
 			}
 		}

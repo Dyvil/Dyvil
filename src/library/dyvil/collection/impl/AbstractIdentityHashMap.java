@@ -18,7 +18,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 {
 	protected final class TableEntry implements Entry<K, V>
 	{
-		int index;
+		protected int index;
 		
 		public TableEntry(int index)
 		{
@@ -58,10 +58,10 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	
 	protected abstract class TableIterator<E> implements Iterator<E>
 	{
-		int			index				= AbstractIdentityHashMap.this.size != 0 ? 0 : AbstractIdentityHashMap.this.table.length;
-		int			lastReturnedIndex	= -1;
-		boolean		indexValid;
-		Object[]	traversalTable		= AbstractIdentityHashMap.this.table;
+		protected int		index				= AbstractIdentityHashMap.this.size != 0 ? 0 : AbstractIdentityHashMap.this.table.length;
+		protected int		lastReturnedIndex	= -1;
+		protected boolean	indexValid;
+		protected Object[]	traversalTable		= AbstractIdentityHashMap.this.table;
 		
 		@Override
 		public boolean hasNext()
@@ -153,10 +153,10 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	public static final int		DEFAULT_CAPACITY	= 12;
-	public static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
+	protected static final int		DEFAULT_CAPACITY	= 12;
+	protected static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
 	
-	public static final Object NULL = new Object();
+	protected static final Object NULL = new Object();
 	
 	protected Object[]	table;
 	protected int		size;
@@ -567,7 +567,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 			Object key = tab[i];
 			if (key != null)
 			{
-				builder.append(key).append(" -> ").append(tab[i + 1]);
+				builder.append(unmaskNull(key)).append(" -> ").append(tab[i + 1]);
 				break;
 			}
 		}

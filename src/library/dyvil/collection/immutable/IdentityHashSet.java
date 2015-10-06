@@ -7,10 +7,7 @@ import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
-import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
-
-import static dyvil.collection.impl.AbstractHashMap.DEFAULT_CAPACITY;
 
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements ImmutableSet<E>
 {
@@ -65,7 +62,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements Imm
 	
 	protected IdentityHashSet()
 	{
-		super(AbstractIdentityHashMap.DEFAULT_CAPACITY);
+		super(DEFAULT_CAPACITY);
 	}
 	
 	protected IdentityHashSet(int capacity)
