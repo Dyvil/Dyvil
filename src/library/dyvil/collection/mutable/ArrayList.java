@@ -344,7 +344,7 @@ public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 			{
 				if (index >= array.length)
 				{
-					Object[] temp = new Object[index + 5];
+					Object[] temp = new Object[index << 1];
 					System.arraycopy(array, 0, temp, 0, index);
 					array = temp;
 				}

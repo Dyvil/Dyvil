@@ -2,7 +2,6 @@ package dyvil.collection.mutable;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
@@ -143,15 +142,6 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K,
 		
 		this.deleteEntry(entry);
 		return true;
-	}
-	
-	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action)
-	{
-		for (TreeEntry<K, V> e = this.getFirstEntry(); e != null; e = successor(e))
-		{
-			action.accept(e.key, e.value);
-		}
 	}
 	
 	@Override

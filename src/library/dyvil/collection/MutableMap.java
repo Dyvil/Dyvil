@@ -8,9 +8,9 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.ArrayMap;
 import dyvil.collection.mutable.HashMap;
-import dyvil.collection.mutable.LinkedList;
 import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
 import dyvil.tuple.Tuple2;
@@ -314,29 +314,30 @@ public interface MutableMap<K, V> extends Map<K, V>
 	@Override
 	public default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
 	{
-		// TODO Remove standard implementation and specialize for subclasses
-		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
+		int size = this.size();
+		int i = 0;
+		Entry<? extends K, ? extends V>[] entries = new Entry[size];
+		
 		for (Entry<K, V> entry : this)
 		{
-			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
-			if (newEntry != null)
-			{
-				entryList.add(entry);
-			}
+			entries[i++] = mapper.apply(entry.getKey(), entry.getValue());
 		}
 		
 		this.clear();
-		for (Entry<? extends K, ? extends V> entry : entryList)
+		for (i = 0; i < size; i++)
 		{
-			this.put(entry);
+			Entry<? extends K, ? extends V> entry = entries[i];
+			if (entry != null)
+			{
+				this.put(entry);
+			}
 		}
 	}
 	
 	@Override
 	public default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
 	{
-		// TODO Remove standard implementation and specialize for subclasses
-		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
+		List<Entry<? extends K, ? extends V>> entryList = new ArrayList();
 		for (Entry<K, V> entry : this)
 		{
 			for (Entry<? extends K, ? extends V> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
