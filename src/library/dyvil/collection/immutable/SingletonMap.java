@@ -200,6 +200,42 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
+	public Entry<K, V>[] toArray()
+	{
+		return new Entry[] { this };
+	}
+	
+	@Override
+	public void toArray(int index, Entry<K, V>[] store)
+	{
+		store[index] = this;
+	}
+	
+	@Override
+	public Object[] toKeyArray()
+	{
+		return new Object[] { this.key };
+	}
+	
+	@Override
+	public void toKeyArray(int index, Object[] store)
+	{
+		store[index] = this.key;
+	}
+	
+	@Override
+	public Object[] toValueArray()
+	{
+		return new Object[] { this.value };
+	}
+	
+	@Override
+	public void toValueArray(int index, Object[] store)
+	{
+		store[index] = this.value;
+	}
+	
+	@Override
 	public ImmutableMap<V, K> inverted()
 	{
 		return new SingletonMap<V, K>(this.value, this.key);

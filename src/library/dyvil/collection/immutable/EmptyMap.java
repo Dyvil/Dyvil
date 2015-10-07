@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.object;
+import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.util.None;
@@ -169,6 +170,39 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public ImmutableMap<V, K> inverted()
 	{
 		return (ImmutableMap) this;
+	}
+	
+	@Override
+	public Entry<K, V>[] toArray()
+	{
+		return new Entry[0];
+	}
+	
+	@Override
+	public void toArray(int index, Entry<K, V>[] store)
+	{
+	}
+	
+	@Override
+	public Object[] toKeyArray()
+	{
+		return ObjectArray.EMPTY;
+	}
+	
+	@Override
+	public void toKeyArray(int index, Object[] store)
+	{
+	}
+	
+	@Override
+	public Object[] toValueArray()
+	{
+		return ObjectArray.EMPTY;
+	}
+	
+	@Override
+	public void toValueArray(int index, Object[] store)
+	{
 	}
 	
 	@Override

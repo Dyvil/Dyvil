@@ -272,6 +272,38 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 	
 	@Override
+	public Entry<K, V>[] toArray()
+	{
+		Tuple2<K, V>[] array = new Tuple2[this.size];
+		System.arraycopy(this.entries, 0, array, 0, this.size);
+		return array;
+	}
+	
+	@Override
+	public void toArray(int index, Entry<K, V>[] store)
+	{
+		System.arraycopy(this.entries, 0, store, index, this.size);
+	}
+	
+	@Override
+	public void toKeyArray(int index, Object[] store)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			store[index++] = this.entries[i]._1;
+		}
+	}
+	
+	@Override
+	public void toValueArray(int index, Object[] store)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			store[index++] = this.entries[i]._2;
+		}
+	}
+	
+	@Override
 	public java.util.Map<K, V> toJava()
 	{
 		java.util.LinkedHashMap<K, V> map = new java.util.LinkedHashMap<>(this.size);

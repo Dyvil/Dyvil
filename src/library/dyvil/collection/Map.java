@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -178,17 +179,17 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public default void forEachKey(Consumer<? super K> action)
 	{
-		for (Entry<K, V> entry : this)
+		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
 		{
-			action.accept(entry.getKey());
+			action.accept(iterator.next());
 		}
 	}
 	
 	public default void forEachValue(Consumer<? super V> action)
 	{
-		for (Entry<K, V> entry : this)
+		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
 		{
-			action.accept(entry.getValue());
+			action.accept(iterator.next());
 		}
 	}
 	
@@ -508,6 +509,82 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
 	
 	public void filter(BiPredicate<? super K, ? super V> condition);
+	
+	// Arrays
+	
+	public default Entry<K, V>[] toArray()
+	{
+		Entry<K, V>[] array = new Entry[this.size()];
+		this.toArray(0, array);
+		return array;
+	}
+	
+	public default void toArray(Entry<K, V>[] store)
+	{
+		this.toArray(0, store);
+	}
+	
+	public default void toArray(int index, Entry<K, V>[] store)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			store[index++] = entry;
+		}
+	}
+	
+	public default Object[] toKeyArray()
+	{
+		Object[] array = new Object[this.size()];
+		this.toKeyArray(0, array);
+		return array;
+	}
+	
+	public default K[] toKeyArray(Class<K> type)
+	{
+		K[] array = (K[]) Array.newInstance(type, this.size());
+		this.toKeyArray(0, array);
+		return array;
+	}
+	
+	public default void toKeyArray(Object[] store)
+	{
+		this.toKeyArray(0, store);
+	}
+	
+	public default void toKeyArray(int index, Object[] store)
+	{
+		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
+		{
+			store[index++] = iterator.next();
+		}
+	}
+	
+	public default Object[] toValueArray()
+	{
+		Object[] array = new Object[this.size()];
+		this.toValueArray(0, array);
+		return array;
+	}
+	
+	public default V[] toValueArray(Class<V> type)
+	{
+		V[] array = (V[]) Array.newInstance(type, this.size());
+		this.toValueArray(0, array);
+		return array;
+	}
+	
+	public default void toValueArray(Object[] store)
+	{
+		this.toValueArray(0, store);
+	}
+	
+	public default void toValueArray(int index, Object[] store)
+	{
+		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
+		{
+			store[index++] = iterator.next();
+		}
+	}
 	
 	// Copying and Views
 	
