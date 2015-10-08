@@ -548,46 +548,52 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		}
 		
-		switch (nextType)
-		{
-		case Symbols.OPEN_PARENTHESIS:
-			MethodCall call = new MethodCall(token.raw(), this.value, name);
-			call.setDotless(!this.explicitDot);
-			this.value = call;
-			this.mode = PARAMETERS_END;
-			pm.skip();
-			call.setArguments(this.parseArguments(pm, next.next()));
-			return;
-		case Symbols.OPEN_SQUARE_BRACKET:
-			SubscriptGetter getter = new SubscriptGetter(token, new FieldAccess(token.raw(), this.value, name));
-			this.value = getter;
-			this.mode = SUBSCRIPT_END;
-			pm.skip();
-			pm.pushParser(new ExpressionListParser(getter.getArguments()));
-			return;
-		case Symbols.ARROW_OPERATOR:
-			LambdaExpression lv = new LambdaExpression(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
-			this.mode = END;
-			this.value = lv;
-			pm.pushParser(pm.newExpressionParser(lv));
-			pm.skip();
-			return;
-		case Symbols.GENERIC_CALL:
-			MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
-			GenericData gd = new GenericData();
-			mc.setGenericData(gd);
-			mc.setDotless(!this.explicitDot);
-			this.value = mc;
-			this.mode = TYPE_ARGUMENTS_END;
-			pm.skip();
-			pm.pushParser(new TypeListParser(gd));
-			return;
-		}
-		
 		// Name is not a compound operator (does not end with '=')
-		if (!name.qualified.endsWith("$eq"))
+		if (name.qualified.endsWith("$eq"))
 		{
-			// ... TERMINATOR-2
+			// e.g. this += that
+			
+			op = pm.getOperator(Util.stripEq(name));
+		}
+		else
+		{
+			switch (nextType)
+			{
+			case Symbols.OPEN_PARENTHESIS:
+				MethodCall call = new MethodCall(token.raw(), this.value, name);
+				call.setDotless(!this.explicitDot);
+				this.value = call;
+				this.mode = PARAMETERS_END;
+				pm.skip();
+				call.setArguments(this.parseArguments(pm, next.next()));
+				return;
+			case Symbols.OPEN_SQUARE_BRACKET:
+				SubscriptGetter getter = new SubscriptGetter(token, new FieldAccess(token.raw(), this.value, name));
+				this.value = getter;
+				this.mode = SUBSCRIPT_END;
+				pm.skip();
+				pm.pushParser(new ExpressionListParser(getter.getArguments()));
+				return;
+			case Symbols.ARROW_OPERATOR:
+				LambdaExpression lv = new LambdaExpression(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
+				this.mode = END;
+				this.value = lv;
+				pm.pushParser(pm.newExpressionParser(lv));
+				pm.skip();
+				return;
+			case Symbols.GENERIC_CALL:
+				MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
+				GenericData gd = new GenericData();
+				mc.setGenericData(gd);
+				mc.setDotless(!this.explicitDot);
+				this.value = mc;
+				this.mode = TYPE_ARGUMENTS_END;
+				pm.skip();
+				pm.pushParser(new TypeListParser(gd));
+				return;
+			}
+			
+			// ... EXPRESSION-TERMINATOR
 			// e.g. this.someField ;
 			if (ParserUtil.isExpressionTerminator(nextType))
 			{
@@ -604,7 +610,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				// ... OPERATOR ...
 				// e.g. this + that
-				// ... IDENTIFIER NON-TERMINATOR-2
+				// ... IDENTIFIER NON-EXPRESSION-TERMINATOR
 				// e.g. this.plus that
 				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isExpressionTerminator(next.next().type()))
 				{
@@ -618,12 +624,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			// else ->
 			// e.g. this.call 10;
-		}
-		else
-		{
-			// e.g. this += that
-			
-			op = pm.getOperator(Util.stripEq(name));
 		}
 		
 		SingleArgument sa = new SingleArgument();

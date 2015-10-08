@@ -1,5 +1,6 @@
 package dyvil.tools.repl;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
@@ -15,7 +16,7 @@ import dyvil.tools.compiler.util.ParserUtil;
 
 public class REPLParser extends ParserManager
 {
-	private boolean		syntaxErrors;
+	private boolean syntaxErrors;
 	
 	@Override
 	public void report(IToken token, String message)
@@ -29,6 +30,7 @@ public class REPLParser extends ParserManager
 	
 	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser)
 	{
+		this.tokens = tokens;
 		this.parser = parser;
 		this.skip = 0;
 		this.reparse = false;
@@ -59,7 +61,57 @@ public class REPLParser extends ParserManager
 		
 		tokens.reset();
 		
-		super.parse(tokens);
+		while (true)
+		{
+			if (this.reparse)
+			{
+				this.reparse = false;
+			}
+			else
+			{
+				token = tokens.next();
+				
+				if (token == null)
+				{
+					break;
+				}
+			}
+			
+			if (this.skip > 0)
+			{
+				this.skip--;
+				continue;
+			}
+			
+			if (this.parser == null)
+			{
+				if (!token.isInferred())
+				{
+					this.report(token, "Unexpected Token: " + token);
+				}
+				continue;
+			}
+			
+			try
+			{
+				this.parser.parse(this, token);
+			}
+			catch (Exception ex)
+			{
+				ex.printStackTrace();
+				return false;
+			}
+			
+			if (this.syntaxErrors && this.markers == null)
+			{
+				break;
+			}
+			
+			if (DyvilCompiler.parseStack)
+			{
+				System.out.println(token + ":\t\t" + this.parser.getName() + " @ " + this.parser.getMode());
+			}
+		}
 		
 		return !this.syntaxErrors;
 	}
