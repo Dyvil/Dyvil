@@ -46,7 +46,7 @@ public class DyvilREPL
 	
 	public static void main(String[] args) throws Exception
 	{
-		System.out.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.LIBRARY_VERSION);
+		System.out.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
 		
 		for (String arg : args)
 		{

@@ -24,16 +24,18 @@ import dyvil.tools.compiler.util.Util;
 public final class DyvilCompiler
 {
 	public static final String	VERSION			= "0.5.0";
+	public static final String	DYVIL_VERSION	= "0.5.0";
 	public static final String	LIBRARY_VERSION	= "0.4.0";
 	
 	public static boolean	parseStack;
 	public static boolean	debug;
 	public static int		constantFolding;
 	
-	public static int		classVersion		= Opcodes.V1_8;
-	public static int		asmVersion			= Opcodes.ASM5;
-	public static int		maxConstantDepth	= 10;
-	public static boolean	compilationFailed;
+	public static final int	classVersion		= Opcodes.V1_8;
+	public static final int	asmVersion			= Opcodes.ASM5;
+	public static final int	maxConstantDepth	= 10;
+	
+	public static boolean compilationFailed;
 	
 	private static Logger		logger;
 	public static DateFormat	format	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -96,7 +98,7 @@ public final class DyvilCompiler
 		long now = System.nanoTime();
 		long totalTime = now;
 		
-		System.out.println("Dyvil Compiler v" + VERSION + " for Dyvil v" + LIBRARY_VERSION);
+		System.out.println("Dyvil Compiler v" + VERSION + " for Dyvil v" + DYVIL_VERSION);
 		System.out.println();
 		
 		// Sets up States from arguments
