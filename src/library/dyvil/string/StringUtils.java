@@ -29,6 +29,11 @@ public interface StringUtils
 {
 	public static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
+	public static @infix @inline String $times(int count, String string)
+	{
+		return $times(string, count);
+	}
+	
 	public static @infix String $times(String string, int count)
 	{
 		switch (count)

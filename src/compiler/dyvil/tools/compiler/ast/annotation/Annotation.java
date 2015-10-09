@@ -268,7 +268,7 @@ public final class Annotation implements IAnnotation
 			}
 			arrayVisitor.visitEnd();
 		}
-		else if (valueType == IValue.ENUM)
+		else if (valueType == IValue.ENUM_ACCESS)
 		{
 			EnumValue enumValue = (EnumValue) value;
 			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name.qualified);

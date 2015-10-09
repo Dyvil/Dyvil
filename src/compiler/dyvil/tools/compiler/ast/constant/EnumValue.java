@@ -41,7 +41,7 @@ public class EnumValue implements IConstantValue, INamed
 	@Override
 	public int valueTag()
 	{
-		return ENUM;
+		return ENUM_ACCESS;
 	}
 	
 	@Override
