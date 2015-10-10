@@ -57,7 +57,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public static final int	PATTERN_END	= 0x40000;
 	
 	public static final int	PARAMETERIZED_THIS_END	= 0x80000;
-	public static final int	PARAMETERIZED_SUPER_END	= 0x80000;
+	public static final int	PARAMETERIZED_SUPER_END	= 0x100000;
 	
 	protected IValueConsumer field;
 	
@@ -349,11 +349,24 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			this.mode = ACCESS;
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
-				return;
+				pm.report(token, "Invalid Method Type Parameter List - ']' expected");
 			}
-			pm.report(token, "Invalid Method Type Parameter List - ']' expected");
+			return;
+		case PARAMETERIZED_THIS_END:
+			this.mode = ACCESS;
+			if (type != Symbols.CLOSE_SQUARE_BRACKET)
+			{
+				pm.report(token, "Invalid this Expression - ']' expected");
+			}
+			return;
+		case PARAMETERIZED_SUPER_END:
+			this.mode = ACCESS;
+			if (type != Symbols.CLOSE_SQUARE_BRACKET)
+			{
+				pm.report(token, "Invalid super Expression - ']' expected");
+			}
 			return;
 		}
 		

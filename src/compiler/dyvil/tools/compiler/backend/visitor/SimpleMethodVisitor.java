@@ -17,10 +17,12 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		this.method = method;
 	}
 	
+	private int parameterIndex;
+	
 	@Override
-	public void visitParameter(String name, int index)
+	public void visitParameter(String name, int modifiers)
 	{
-		this.method.getParameter_(index).setName(Name.getQualified(name));
+		this.method.getParameter_(this.parameterIndex++).setName(Name.getQualified(name));
 	}
 	
 	@Override

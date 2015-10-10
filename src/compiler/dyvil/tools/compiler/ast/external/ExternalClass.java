@@ -306,33 +306,9 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 		
-		IMethod m;
 		if (this.body != null)
 		{
-			m = this.body.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		if (!this.superTypesResolved)
-		{
-			this.resolveSuperTypes();
-		}
-		
-		if (this.superType != null)
-		{
-			m = this.superType.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			m = this.interfaces[i].getFunctionalMethod();
+			IMethod m = this.body.getFunctionalMethod();
 			if (m != null)
 			{
 				return m;

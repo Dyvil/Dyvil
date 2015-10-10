@@ -50,6 +50,11 @@ public class ForStatementParser extends Parser implements IValueConsumer
 	
 	private IValue makeForStatement()
 	{
+		if (this.variable != null && this.variable.getType() == null)
+		{
+			this.variable = null;
+		}
+		
 		if (this.forEach)
 		{
 			return new ForEachStatement(this.position, this.variable, this.action);

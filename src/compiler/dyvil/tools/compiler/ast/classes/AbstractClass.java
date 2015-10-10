@@ -581,28 +581,9 @@ public abstract class AbstractClass implements IClass
 			return null;
 		}
 		
-		IMethod m;
 		if (this.body != null)
 		{
-			m = this.body.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		if (this.superType != null)
-		{
-			m = this.superType.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			m = this.interfaces[i].getFunctionalMethod();
+			IMethod m = this.body.getFunctionalMethod();
 			if (m != null)
 			{
 				return m;
