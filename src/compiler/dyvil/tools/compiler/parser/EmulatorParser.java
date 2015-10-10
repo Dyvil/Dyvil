@@ -28,6 +28,12 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 	}
 	
 	@Override
+	public void stop()
+	{
+		this.pm.stop();
+	}
+	
+	@Override
 	public void skip()
 	{
 		this.pm.skip();

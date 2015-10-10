@@ -31,6 +31,8 @@ public interface IParserManager
 		return null;
 	}
 	
+	public void stop();
+	
 	public void skip();
 	
 	public void skip(int n);

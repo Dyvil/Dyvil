@@ -363,7 +363,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void parseHeader()
 	{
-		ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers, this);
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this, false), this.markers, this);
 		manager.parse(this.tokens);
 	}
 	

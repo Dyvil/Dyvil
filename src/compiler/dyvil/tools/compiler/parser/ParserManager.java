@@ -21,6 +21,7 @@ public class ParserManager implements IParserManager
 	protected TokenIterator	tokens;
 	protected int			skip;
 	protected boolean		reparse;
+	protected boolean		hasStopped;
 	
 	public ParserManager()
 	{
@@ -67,7 +68,7 @@ public class ParserManager implements IParserManager
 		this.tokens = tokens;
 		IToken token = null;
 		
-		while (true)
+		while (!this.hasStopped)
 		{
 			if (this.reparse)
 			{
@@ -113,6 +114,12 @@ public class ParserManager implements IParserManager
 				System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
 			}
 		}
+	}
+	
+	@Override
+	public void stop()
+	{
+		this.hasStopped = true;
 	}
 	
 	@Override

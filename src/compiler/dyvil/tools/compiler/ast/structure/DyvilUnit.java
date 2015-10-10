@@ -11,6 +11,7 @@ import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.sources.FileType;
 
@@ -96,6 +97,13 @@ public class DyvilUnit extends DyvilHeader
 	public IClassCompilable getInnerClass(int index)
 	{
 		return this.innerClasses[index];
+	}
+	
+	@Override
+	public void parseHeader()
+	{
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this, true), this.markers, this);
+		manager.parse(this.tokens);
 	}
 	
 	@Override

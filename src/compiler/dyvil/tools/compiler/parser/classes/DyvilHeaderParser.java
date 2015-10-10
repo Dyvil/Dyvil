@@ -26,16 +26,18 @@ public class DyvilHeaderParser extends Parser
 	protected static final int	IMPORT		= 2;
 	protected static final int	METADATA	= 4;
 	
-	protected IDyvilHeader unit;
+	protected IDyvilHeader	unit;
+	protected boolean		unitHeader;
 	
 	protected int				modifiers;
 	protected AnnotationList	annotations;
 	
 	protected IToken lastToken;
 	
-	public DyvilHeaderParser(IDyvilHeader unit)
+	public DyvilHeaderParser(IDyvilHeader unit, boolean unitHeader)
 	{
 		this.unit = unit;
+		this.unitHeader = unitHeader;
 		this.mode = PACKAGE;
 	}
 	
@@ -167,11 +169,18 @@ public class DyvilHeaderParser extends Parser
 			}
 		}
 		
-		if (this.lastToken != null)
+		if (this.unitHeader)
 		{
-			pm.jump(this.lastToken);
+			if (this.lastToken != null)
+			{
+				pm.jump(this.lastToken);
+			}
+			pm.popParser();
+			pm.stop();
+			return;
 		}
-		pm.popParser();
+		
+		pm.report(token, "Invalid Header Element - Invalid " + token);
 		return;
 	}
 	
