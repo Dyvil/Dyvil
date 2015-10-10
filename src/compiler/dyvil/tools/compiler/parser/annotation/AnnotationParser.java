@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.type.NamedType;
+import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -42,7 +43,9 @@ public class AnnotationParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.annotation.setType(new NamedType(token.raw(), name));
+				ICodePosition position = token.raw();
+				this.annotation.setPosition(position);
+				this.annotation.setType(new NamedType(position, name));
 				
 				this.mode = PARAMETERS_START;
 				return;

@@ -11,6 +11,8 @@ public class Main
 	{
 		println "-- Abstract Properties --"
 		AbstractProperties.main(args)
+		println "-- Annotations --"
+		AnnotationTest.main(args)
 		println "-- Bridge Methods --"
 		BridgeTest.main(args)
 		println "-- Extension Test --"

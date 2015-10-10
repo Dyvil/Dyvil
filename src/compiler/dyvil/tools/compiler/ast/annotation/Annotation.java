@@ -149,7 +149,6 @@ public final class Annotation implements IAnnotation
 			}
 			
 			IValue value1 = value.withType(type, type, markers, context);
-			
 			if (value1 == null)
 			{
 				Util.createTypeError(markers, value, type, type, "annotation.parameter.type", param.getName());

@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.lexer.marker.MarkerList;
@@ -56,13 +56,23 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	@Override
 	public IType getType()
 	{
-		return Types.VOID;
+		return this.annotation.getType();
+	}
+	
+	@Override
+	public boolean isType(IType type)
+	{
+		return type.isSuperTypeOf(this.annotation.getType());
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.VOID ? this : null;
+		if (this.isType(type))
+		{
+			return this;
+		}
+		return null;
 	}
 	
 	@Override
@@ -107,11 +117,15 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
+		// TODO Bytecode Generation
+		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		this.writeExpression(writer);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override
