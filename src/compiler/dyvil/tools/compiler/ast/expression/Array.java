@@ -335,6 +335,26 @@ public final class Array implements IValue, IValueList
 	}
 	
 	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			IValue v = this.values[i];
+			IValue v1 = v.toConstant(markers);
+			if (v1 == null)
+			{
+				markers.add(v.getPosition(), "annotation.array.not_constant");
+			}
+			else
+			{
+				this.values[i] = v1;
+			}
+		}
+		
+		return this;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)

@@ -16,6 +16,8 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 {
 	protected IAnnotation annotation;
 	
+	private boolean isAnnotationParameter;
+	
 	public AnnotationValue()
 	{
 	}
@@ -73,6 +75,13 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 			return this;
 		}
 		return null;
+	}
+	
+	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		this.isAnnotationParameter = true;
+		return this;
 	}
 	
 	@Override

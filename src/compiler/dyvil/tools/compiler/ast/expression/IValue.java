@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
@@ -188,57 +189,9 @@ public interface IValue extends IASTNode, ITyped
 	
 	public IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
-	// Compilation
-	
-	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	public default IValue toConstant(MarkerList markers)
 	{
-		this.writeExpression(writer);
-		this.getType().writeCast(writer, type, this.getLineNumber());
-	}
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as an expression. That means that this element remains as
-	 * the first element of the stack.
-	 * 
-	 * @param visitor
-	 * @throws BytecodeException
-	 */
-	public void writeExpression(MethodWriter writer) throws BytecodeException;
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as a statement. That means that this element is removed
-	 * from the stack.
-	 * 
-	 * @param writer
-	 * @throws BytecodeException
-	 */
-	public void writeStatement(MethodWriter writer) throws BytecodeException;
-	
-	public default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeJumpInsn(Opcodes.IFNE, dest);
-	}
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as a jump expression to the given {@link Label}
-	 * {@code dest}. By default, this calls
-	 * {@link #writeExpression(MethodWriter)} and then writes an
-	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
-	 * means the JVM would jump to {@code dest} if the current value on the
-	 * stack equals {@code 0}.
-	 * 
-	 * @param writer
-	 * @param dest
-	 * @throws BytecodeException
-	 */
-	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+		return null;
 	}
 	
 	public default int stringSize()
@@ -249,41 +202,6 @@ public interface IValue extends IASTNode, ITyped
 	public default boolean toStringBuilder(StringBuilder builder)
 	{
 		return false;
-	}
-	
-	public default Object toObject()
-	{
-		return null;
-	}
-	
-	public default boolean booleanValue()
-	{
-		return false;
-	}
-	
-	public default int intValue()
-	{
-		return 0;
-	}
-	
-	public default long longValue()
-	{
-		return 0L;
-	}
-	
-	public default float floatValue()
-	{
-		return 0F;
-	}
-	
-	public default double doubleValue()
-	{
-		return 0D;
-	}
-	
-	public default String stringValue()
-	{
-		return null;
 	}
 	
 	public static IValue fromObject(Object o)
@@ -369,6 +287,99 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 	
+	public default Object toObject()
+	{
+		return null;
+	}
+	
+	public default boolean booleanValue()
+	{
+		return false;
+	}
+	
+	public default int intValue()
+	{
+		return 0;
+	}
+	
+	public default long longValue()
+	{
+		return 0L;
+	}
+	
+	public default float floatValue()
+	{
+		return 0F;
+	}
+	
+	public default double doubleValue()
+	{
+		return 0D;
+	}
+	
+	public default String stringValue()
+	{
+		return null;
+	}
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);
+	
+	// Compilation
+	
+	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		this.getType().writeCast(writer, type, this.getLineNumber());
+	}
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as an expression. That means that this element remains as
+	 * the first element of the stack.
+	 * 
+	 * @param visitor
+	 * @throws BytecodeException
+	 */
+	public void writeExpression(MethodWriter writer) throws BytecodeException;
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as a statement. That means that this element is removed
+	 * from the stack.
+	 * 
+	 * @param writer
+	 * @throws BytecodeException
+	 */
+	public void writeStatement(MethodWriter writer) throws BytecodeException;
+	
+	public default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		writer.writeJumpInsn(Opcodes.IFNE, dest);
+	}
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as a jump expression to the given {@link Label}
+	 * {@code dest}. By default, this calls
+	 * {@link #writeExpression(MethodWriter)} and then writes an
+	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
+	 * means the JVM would jump to {@code dest} if the current value on the
+	 * stack equals {@code 0}.
+	 * 
+	 * @param writer
+	 * @param dest
+	 * @throws BytecodeException
+	 */
+	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+	}
+	
+	public default void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		visitor.visit(key, this.toObject());
+	}
 }

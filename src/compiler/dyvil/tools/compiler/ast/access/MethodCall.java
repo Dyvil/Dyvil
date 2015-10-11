@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -75,6 +76,26 @@ public final class MethodCall extends AbstractCall implements INamed
 	public void setDotless(boolean dotless)
 	{
 		this.dotless = dotless;
+	}
+	
+	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+		IValue v = this;
+		
+		do
+		{
+			if (depth-- < 0)
+			{
+				return null;
+			}
+			
+			v = v.foldConstants();
+		}
+		while (!v.isConstant());
+		
+		return v.toConstant(markers);
 	}
 	
 	@Override

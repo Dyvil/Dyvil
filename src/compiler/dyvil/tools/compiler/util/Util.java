@@ -146,21 +146,6 @@ public class Util
 		return builder.toString();
 	}
 	
-	public static IValue constant(IValue value, MarkerList markers)
-	{
-		int depth = DyvilCompiler.maxConstantDepth;
-		while (!value.isConstant())
-		{
-			if (--depth < 0)
-			{
-				markers.add(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth);
-				return value.getType().getDefaultValue();
-			}
-			value = value.foldConstants();
-		}
-		return value;
-	}
-	
 	public static IValue prependValue(IValue prepend, IValue value)
 	{
 		if (value instanceof IValueList)
@@ -179,7 +164,17 @@ public class Util
 		return prepend;
 	}
 	
-	
+	public static IValue constant(IValue value, MarkerList markers)
+	{
+		IValue value1 = value.toConstant(markers);
+		if (value1 == null)
+		{
+			markers.add(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth);
+			return value.getType().getDefaultValue();
+		}
+		
+		return value1;
+	}
 	
 	public static String toTime(long nanos)
 	{
@@ -214,14 +209,14 @@ public class Util
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
-
+	
 	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
 	{
 		Marker marker = markers.create(value.getPosition(), key, args);
 		marker.addInfo("Required Type: " + type.getConcreteType(typeContext));
 		marker.addInfo("Value Type: " + value.getType());
 	}
-
+	
 	public static final Name stripEq(Name name)
 	{
 		String qualified = name.qualified.substring(0, name.qualified.length() - 3);

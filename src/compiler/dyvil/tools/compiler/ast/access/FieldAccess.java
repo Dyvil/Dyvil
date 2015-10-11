@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -165,6 +166,27 @@ public final class FieldAccess implements IValue, INamed, IValued
 	public IValue getValue()
 	{
 		return this.instance;
+	}
+	
+	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+		IValue v = this;
+		
+		do
+		{
+			if (depth-- < 0)
+			{
+				markers.add(this.getPosition(), "annotation.field.not_constant", this.name);
+				return this;
+			}
+			
+			v = v.foldConstants();
+		}
+		while (!v.isConstantOrField());
+		
+		return v.toConstant(markers);
 	}
 	
 	@Override

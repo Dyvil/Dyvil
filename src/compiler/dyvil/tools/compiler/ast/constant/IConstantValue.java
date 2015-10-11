@@ -47,6 +47,12 @@ public interface IConstantValue extends IValue
 	}
 	
 	@Override
+	public default IValue toConstant(MarkerList markers)
+	{
+		return this;
+	}
+	
+	@Override
 	public int stringSize();
 	
 	@Override

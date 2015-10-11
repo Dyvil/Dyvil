@@ -121,6 +121,12 @@ public final class ClassOperator extends Value
 	}
 	
 	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		return this;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type == null)
