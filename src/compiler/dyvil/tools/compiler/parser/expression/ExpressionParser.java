@@ -39,17 +39,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public static final int VALUE = 0x1;
 	
 	public static final int	ACCESS		= 0x2;
-	public static final int	ACCESS_2	= 0x4;
+	public static final int	DOT_ACCESS	= 0x4;
 	
-	public static final int	STATEMENT			= 0x8;
-	public static final int	TYPE				= 0x10;
-	public static final int	CONSTRUCTOR			= 0x20;
-	public static final int	CONSTRUCTOR_END		= 0x40;
-	public static final int	ANONYMOUS_CLASS_END	= 0x80;
-	public static final int	PARAMETERS			= 0x100;
-	public static final int	PARAMETERS_END		= 0x2000;
-	public static final int	SUBSCRIPT_END		= 0x4000;
-	public static final int	TYPE_ARGUMENTS_END	= 0x8000;
+	public static final int	STATEMENT				= 0x8;
+	public static final int	TYPE					= 0x10;
+	public static final int	CONSTRUCTOR				= 0x20;
+	public static final int	CONSTRUCTOR_END			= 0x40;
+	public static final int	ANONYMOUS_CLASS_END		= 0x80;
+	public static final int	CONSTRUCTOR_PARAMETERS	= 0x100;
+	public static final int	PARAMETERS_END			= 0x2000;
+	public static final int	SUBSCRIPT_END			= 0x4000;
+	public static final int	TYPE_ARGUMENTS_END		= 0x8000;
 	
 	public static final int BYTECODE_END = 0x10000;
 	
@@ -59,7 +59,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public static final int	PARAMETERIZED_THIS_END	= 0x80000;
 	public static final int	PARAMETERIZED_SUPER_END	= 0x100000;
 	
-	protected IValueConsumer field;
+	protected IValueConsumer valueConsumer;
 	
 	private IValue value;
 	
@@ -69,13 +69,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	public ExpressionParser(IValueConsumer field)
 	{
 		this.mode = VALUE;
-		this.field = field;
+		this.valueConsumer = field;
 	}
 	
 	public void reset(IValueConsumer field)
 	{
 		this.mode = VALUE;
-		this.field = field;
+		this.valueConsumer = field;
 		this.value = null;
 		this.explicitDot = false;
 		this.operator = null;
@@ -88,7 +88,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (this.value != null)
 			{
-				this.field.setValue(this.value);
+				this.valueConsumer.setValue(this.value);
 			}
 			pm.popParser(true);
 			return;
@@ -104,7 +104,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case Tokens.STRING_END:
 			if (this.value != null)
 			{
-				this.field.setValue(this.value);
+				this.valueConsumer.setValue(this.value);
 			}
 			pm.popParser(true);
 			return;
@@ -157,6 +157,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				IToken next = token.next();
 				if (next.type() == Symbols.CLOSE_PARENTHESIS)
 				{
+					// () => ...
 					if (next.next().type() == Symbols.ARROW_OPERATOR)
 					{
 						LambdaExpression le = new LambdaExpression(next.next().raw());
@@ -167,11 +168,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 						return;
 					}
 					
+					// ()
 					this.value = new VoidValue(token.to(token.next()));
 					pm.skip();
 					this.mode = END;
 					return;
 				}
+				
+				// ( ...
 				pm.pushParser(new LambdaOrTupleParser(this), true);
 				this.mode = ACCESS;
 				return;
@@ -243,7 +247,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		case ANONYMOUS_CLASS_END:
 			this.value.expandPosition(token);
-			this.mode = ACCESS_2;
+			this.mode = ACCESS;
 			
 			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
@@ -255,22 +259,24 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case PARAMETERS_END:
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			
+			if (type != Symbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Argument List - ')' expected");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Argument List - ')' expected");
+			
 			return;
 		case SUBSCRIPT_END:
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			
+			if (type != Symbols.CLOSE_SQUARE_BRACKET)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Subscript Arguments - ']' expected");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Subscript Arguments - ']' expected");
+			
 			return;
 		case CONSTRUCTOR:
 		{
@@ -281,11 +287,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			this.mode = PARAMETERS;
+			this.mode = CONSTRUCTOR_PARAMETERS;
 			pm.reparse();
 			return;
 		}
-		case PARAMETERS:
+		case CONSTRUCTOR_PARAMETERS:
 		{
 			ICall icall = (ICall) this.value;
 			
@@ -313,6 +319,12 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		}
 		case CONSTRUCTOR_END:
+			if (type != Symbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "Invalid Constructor Argument List - ')' expected");
+			}
+			this.value.expandPosition(token);
 			this.mode = ACCESS;
 			if (token.next().type() == Symbols.OPEN_CURLY_BRACKET)
 			{
@@ -320,24 +332,16 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.parseBody(pm, ((ConstructorCall) this.value).toClassConstructor());
 				return;
 			}
-			this.value.expandPosition(token);
-			if (type == Symbols.CLOSE_PARENTHESIS)
-			{
-				return;
-			}
-			pm.reparse();
-			pm.report(token, "Invalid Constructor Argument List - ')' expected");
 			return;
 		case BYTECODE_END:
-			this.field.setValue(this.value);
+			this.valueConsumer.setValue(this.value);
 			pm.popParser();
 			this.value.expandPosition(token);
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type != Symbols.CLOSE_CURLY_BRACKET)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Bytecode Expression - '}' expected");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Bytecode Expression - '}' expected");
 			return;
 		case TYPE_ARGUMENTS_END:
 			MethodCall mc = (MethodCall) this.value;
@@ -375,7 +379,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			// Close bracket, end expression
 			if (this.value != null)
 			{
-				this.field.setValue(this.value);
+				this.valueConsumer.setValue(this.value);
 			}
 			pm.popParser(true);
 			return;
@@ -385,7 +389,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (type == Symbols.DOT)
 			{
-				this.mode = ACCESS_2;
+				this.mode = DOT_ACCESS;
 				this.explicitDot = true;
 				return;
 			}
@@ -395,7 +399,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			switch (type)
 			{
 			case Keywords.ELSE:
-				this.field.setValue(this.value);
+				this.valueConsumer.setValue(this.value);
 				pm.popParser(true);
 				return;
 			case Symbols.EQUALS:
@@ -435,9 +439,27 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			this.mode = ACCESS_2;
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.parseIdentifierAccess(pm, token, type);
+				return;
+			}
+			
+			if (this.operator != null)
+			{
+				this.valueConsumer.setValue(this.value);
+				pm.popParser(true);
+				return;
+			}
+			
+			SingleArgument sa = new SingleArgument();
+			ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value, sa);
+			this.parseApply(pm, token, sa, Operators.DEFAULT);
+			pm.reparse();
+			this.value = amc;
+			return;
 		}
-		if (this.mode == ACCESS_2)
+		if (this.mode == DOT_ACCESS)
 		{
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -445,7 +467,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			pm.report(token, "Invalid Access - Invalid " + token);
+			pm.report(token, "Invalid Dot Access - Invalid " + token);
 			return;
 		}
 		
@@ -660,7 +682,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			int p;
 			if (operator == null || (p = this.operator.precedence) > operator.precedence)
 			{
-				this.field.setValue(this.value);
+				this.valueConsumer.setValue(this.value);
 				pm.popParser(true);
 				return;
 			}
@@ -670,7 +692,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				switch (operator.type)
 				{
 				case Operator.INFIX_LEFT:
-					this.field.setValue(this.value);
+					this.valueConsumer.setValue(this.value);
 					pm.popParser(true);
 					return;
 				case Operator.INFIX_NONE:
@@ -690,11 +712,12 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	 * {@code pm.reparse()} has to be called after this method, depending on the
 	 * token that is passed. E.g.:
 	 * <p>
-	 * <code>
+	 * 
+	 * <pre>
 	 * this 3
 	 * print "abc"
 	 * button { ... }
-	 * </code>
+	 * </pre>
 	 * 
 	 * @param pm
 	 *            the current parsing context manager
@@ -821,7 +844,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				{
 					this.value = new InitializerCall(next2.raw(), false);
 					pm.skip(2);
-					this.mode = PARAMETERS;
+					this.mode = CONSTRUCTOR_PARAMETERS;
 					return true;
 				}
 			}
@@ -849,7 +872,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				{
 					this.value = new InitializerCall(next2.raw(), true);
 					pm.skip(2);
-					this.mode = PARAMETERS;
+					this.mode = CONSTRUCTOR_PARAMETERS;
 					return true;
 				}
 			}
@@ -903,7 +926,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.report(token, "Invalid Expression - 'else' not allowed at this location");
 				return true;
 			}
-			this.field.setValue(this.value);
+			this.valueConsumer.setValue(this.value);
 			pm.popParser(true);
 			return true;
 		}
@@ -925,7 +948,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case Keywords.FOR:
 		{
-			pm.pushParser(new ForStatementParser(this.field, token.raw()));
+			pm.pushParser(new ForStatementParser(this.valueConsumer, token.raw()));
 			this.mode = END;
 			return true;
 		}
@@ -989,7 +1012,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.report(token, "Invalid Expression - 'catch' not allowed at this location");
 				return true;
 			}
-			this.field.setValue(this.value);
+			this.valueConsumer.setValue(this.value);
 			pm.popParser(true);
 			return true;
 		}
@@ -1000,7 +1023,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.report(token, "Invalid Expression - 'finally' not allowed at this location");
 				return true;
 			}
-			this.field.setValue(this.value);
+			this.valueConsumer.setValue(this.value);
 			pm.popParser(true);
 			return true;
 		}
