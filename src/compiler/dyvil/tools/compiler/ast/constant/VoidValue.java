@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.constant;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -46,19 +47,19 @@ public class VoidValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.VOID ? this : null;
+		return type == Types.VOID || type.isSuperTypeOf(Types.VOID) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.VOID;
+		return type == Types.VOID || type.isSuperTypeOf(Types.VOID);
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		return 0;
+		return type.getSubTypeDistance(Types.VOID);
 	}
 	
 	@Override
@@ -76,6 +77,7 @@ public class VoidValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
 	}
 	
 	@Override

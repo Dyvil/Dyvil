@@ -171,7 +171,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					// ()
 					this.value = new VoidValue(token.to(token.next()));
 					pm.skip();
-					this.mode = END;
+					this.mode = ACCESS;
 					return;
 				}
 				
