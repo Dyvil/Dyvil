@@ -163,16 +163,18 @@ public final class Tuple implements IValue, IValueList
 			return null;
 		}
 		
+		IClass iclass = type.getTheClass();
+		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType elementType = type.resolveTypeSafely(tupleClass.getTypeVariable(i));
+			IType elementType = type.resolveTypeSafely(iclass.getTypeVariable(i));
 			IValue value = this.values[i];
 			IValue value1 = value.withType(elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Marker m = markers.create(value.getPosition(), "tuple.type");
-				m.addInfo("Pattern Type: " + value.getType());
-				m.addInfo("Tuple Type: " + elementType);
+				m.addInfo("Value Type: " + value.getType());
+				m.addInfo("Tuple Element Type: " + elementType);
 			}
 			else
 			{
