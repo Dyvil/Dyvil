@@ -1,6 +1,7 @@
 package dyvil.tools.repl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -16,10 +17,7 @@ import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.repl.command.ExitCommand;
-import dyvil.tools.repl.command.HelpCommand;
-import dyvil.tools.repl.command.ICommand;
-import dyvil.tools.repl.command.VersionCommand;
+import dyvil.tools.repl.command.*;
 
 public class DyvilREPL
 {
@@ -28,6 +26,8 @@ public class DyvilREPL
 	private static BufferedReader	reader;
 	protected static REPLContext	context	= new REPLContext();
 	protected static REPLParser		parser	= new REPLParser();
+	
+	public static File dumpDir;
 	
 	protected static String currentCode;
 	
@@ -42,6 +42,7 @@ public class DyvilREPL
 		command = new ExitCommand();
 		commands.put("exit", command);
 		commands.put("shutdown", command);
+		commands.put("dump", new DumpCommand());
 	}
 	
 	public static void main(String[] args) throws Exception

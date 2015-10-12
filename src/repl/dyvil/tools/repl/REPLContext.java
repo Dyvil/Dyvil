@@ -60,7 +60,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	protected static void reset()
 	{
-		className = "repl$/REPL" + classIndex++;
+		className = "repl$results/REPL$Result$" + classIndex++;
 		markers.clear();
 	}
 	

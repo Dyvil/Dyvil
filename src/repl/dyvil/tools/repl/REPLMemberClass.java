@@ -2,11 +2,13 @@ package dyvil.tools.repl;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.security.ProtectionDomain;
 
 import dyvil.collection.List;
+import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.asm.Opcodes;
@@ -559,7 +561,7 @@ public class REPLMemberClass implements IClass
 			iclass.write(cw);
 			cw.visitEnd();
 			byte[] bytes = cw.toByteArray();
-			return loadClass(iclass.getFullName(), bytes);
+			return loadClass(iclass.getInternalName(), bytes);
 		}
 		catch (Throwable t)
 		{
@@ -570,6 +572,22 @@ public class REPLMemberClass implements IClass
 	
 	protected static Class loadClass(String name, byte[] bytes)
 	{
+		if (DyvilREPL.dumpDir != null)
+		{
+			int index = name.lastIndexOf('/');
+			String fileName;
+			if (index <= 0)
+			{
+				fileName = name + ".class";
+			}
+			else
+			{
+				fileName = name.substring(index + 1) + ".class";
+			}
+			
+			FileUtils.write(new File(DyvilREPL.dumpDir, fileName), bytes);
+		}
+		
 		return ReflectUtils.unsafe.defineClass(name, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
 	}
 	

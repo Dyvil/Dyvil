@@ -3,6 +3,7 @@
 .settings/**
 bin/
 testbin/
+replbin/
 build/
 .gradle/
 
