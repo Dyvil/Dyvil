@@ -167,7 +167,8 @@ public final class Tuple implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType elementType = type.resolveTypeSafely(iclass.getTypeVariable(i));
+			IType elementType = iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS ? dyvil.tools.compiler.ast.type.Types.ANY
+					: type.resolveTypeSafely(iclass.getTypeVariable(i));
 			IValue value = this.values[i];
 			IValue value1 = value.withType(elementType, typeContext, markers, context);
 			if (value1 == null)

@@ -588,7 +588,7 @@ public class REPLMemberClass implements IClass
 			FileUtils.write(new File(DyvilREPL.dumpDir, fileName), bytes);
 		}
 		
-		return ReflectUtils.unsafe.defineClass(name, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+		return ReflectUtils.unsafe.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
 	}
 	
 	@Override

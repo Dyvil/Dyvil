@@ -11,21 +11,26 @@ import dyvil.collection.mutable.ArrayList;
 
 public final class ReflectUtils
 {
-	private static Field				modifiersField;
+	private static final Field			modifiersField;
 	public static final sun.misc.Unsafe	unsafe;
 	
 	static
 	{
+		Field modField;
+		
 		try
 		{
-			modifiersField = Field.class.getDeclaredField("modifiers");
+			modField = Field.class.getDeclaredField("modifiers");
 			// Makes the 'modifiers' field of the java.lang.reflect.Field class
 			// accessible
-			modifiersField.setAccessible(true);
+			modField.setAccessible(true);
 		}
 		catch (ReflectiveOperationException ignored)
 		{
+			modField = null;
 		}
+		
+		modifiersField = modField;
 		
 		try
 		{
