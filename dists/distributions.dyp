@@ -1,0 +1,107 @@
+library
+{
+	info = "Dyvil Library"
+	fileName = @"./libs/dyvil-library-\(library.version).jar"
+	download = @"https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-library-\(library.version).jar"
+	selected = "forced"
+}
+
+compiler
+{
+	info = "Dyvil Compiler"
+	fileName = @"./libs/dyvil-compiler-\(compiler.version).jar"
+	download = @"https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-compiler-\(compiler.version).jar"
+	selected = true
+	
+	launcher
+	{
+		info = "Compiler Command Line Launchers"
+		
+		bash
+		{
+			info = "Compiler Launcher (bash)"
+			fileName = "./bin/dyvilc"
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvilc"
+			selected = true
+			executable = true
+			dependencies = [ compiler ]
+		}
+		
+		batch
+		{
+			info = "Compiler Launcher (batch)"
+			fileName = "./bin/dyvilc.bat"
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvilc.bat"
+			selected = true
+			dependencies = [ compiler ]
+		}
+	}	
+}	
+
+repl
+{
+	info = "Dyvil REPL"
+	fileName = "./libs/dyvil-repl-\(repl.version).jar"
+	download = @"https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-repl-\(repl.version).jar"
+	selected = true
+	dependencies = [ compiler ]
+	
+	launcher
+	{
+		bash
+		{
+			info = "REPL Launcher (bash)"
+			fileName = "./bin/dyvil"
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat"
+			selected = true
+			executable = true
+			dependencies = [ repl ]
+		}
+		
+		batch
+		{
+			info = "REPL Launcher (batch)"
+			fileName = ./bin/dyvil.bat
+			download = https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat
+			selected = true
+			dependencies = [ repl ]
+		}
+	}
+}
+
+textResources
+{
+	info = "Text Resources"
+
+	readme
+	{
+		info = "Read Me"
+		fileName = "./README.txt"
+		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/README.md"
+		selected = true
+	}
+	
+	changelog
+	{
+		info = "Changelog"
+		fileName = "./Changelog.txt"
+		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/Changelog.txt"
+		selected = true
+	}
+	
+	license
+	{
+		info = "License"
+		fileName = "./license/LICENSE.txt"
+		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/LICENSE.txt"
+		selected = true
+		
+		asm
+		{
+			info = "ASM License"
+			fileName = "./license/LICENSE.txt"
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/ASM-LICENSE.txt"
+			selected = true
+		}
+	}
+}
