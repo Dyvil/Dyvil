@@ -7,6 +7,7 @@ sourceSets {
 		java {
 			srcDir 'src/library'
 			srcDir 'src/asm'
+			srcDir 'src/parsing'
 		}
 		resources {
 			srcDir 'build/dyvilbin'

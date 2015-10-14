@@ -2,7 +2,6 @@ package dyvil.tools.parsing;
 
 import java.util.Iterator;
 
-import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -135,8 +134,6 @@ public class TokenIterator implements Iterator<IToken>
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 		case BaseSymbols.OPEN_PARENTHESIS:
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
-		case DyvilKeywords.IS:
-		case DyvilKeywords.AS:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_START:
 			return;

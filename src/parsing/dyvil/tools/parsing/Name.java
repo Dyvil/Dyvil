@@ -1,10 +1,8 @@
 package dyvil.tools.parsing;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.HashMap;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 
 public final class Name
 {
@@ -53,7 +51,7 @@ public final class Name
 			return name;
 		}
 		
-		return new Name(DyvilSymbols.unqualify(value), DyvilSymbols.qualify(value));
+		return new Name(BaseSymbols.unqualify(value), BaseSymbols.qualify(value));
 	}
 	
 	public static Name getSpecial(String value)
@@ -64,7 +62,7 @@ public final class Name
 			return name;
 		}
 		
-		return new Name(value, DyvilSymbols.qualify(value));
+		return new Name(value, BaseSymbols.qualify(value));
 	}
 	
 	public static Name getQualified(String value)
@@ -91,6 +89,6 @@ public final class Name
 	@Override
 	public String toString()
 	{
-		return Formatting.Method.convertQualifiedNames ? this.qualified : this.unqualified;
+		return this.unqualified;
 	}
 }

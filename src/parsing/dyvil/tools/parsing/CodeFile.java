@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import dyvil.tools.compiler.DyvilCompiler;
-
 public class CodeFile extends File
 {
 	private static final long serialVersionUID = 130988432718494125L;
@@ -36,7 +34,8 @@ public class CodeFile extends File
 		}
 		catch (IOException ex)
 		{
-			DyvilCompiler.error("CodeFile", "load", ex);
+			// TODO Don't do this
+			ex.printStackTrace();
 		}
 	}
 	
