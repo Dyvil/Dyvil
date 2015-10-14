@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -127,43 +128,6 @@ public final class StringValue implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		int len = this.value.length();
-		buffer.ensureCapacity(buffer.length() + len + 3);
-		buffer.append('"');
-		append(this.value, len, buffer);
-		buffer.append('"');
-	}
-	
-	public static void append(String value, int len, StringBuilder buffer)
-	{
-		for (int i = 0; i < len; i++)
-		{
-			char c = value.charAt(i);
-			switch (c)
-			{
-			case '"':
-				buffer.append("\\\"");
-				continue;
-			case '\\':
-				buffer.append("\\\\");
-				continue;
-			case '\n':
-				buffer.append("\\n");
-				continue;
-			case '\t':
-				buffer.append("\\t");
-				continue;
-			case '\r':
-				buffer.append("\\r");
-				continue;
-			case '\b':
-				buffer.append("\\b");
-				continue;
-			case '\f':
-				buffer.append("\\f");
-				continue;
-			}
-			buffer.append(c);
-		}
+		LexerUtil.appendStringLiteral(this.value, buffer);
 	}
 }

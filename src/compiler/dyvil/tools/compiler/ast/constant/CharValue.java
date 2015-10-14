@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -150,34 +151,6 @@ public final class CharValue implements IConstantValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.ensureCapacity(buffer.length() + 4);
-		buffer.append('\'');
-		switch (this.value)
-		{
-		case '\'':
-			buffer.append("\\'");
-			break;
-		case '\\':
-			buffer.append("\\\\");
-			break;
-		case '\n':
-			buffer.append("\\n");
-			break;
-		case '\t':
-			buffer.append("\\t");
-			break;
-		case '\r':
-			buffer.append("\\r");
-			break;
-		case '\b':
-			buffer.append("\\b");
-			break;
-		case '\f':
-			buffer.append("\\f");
-			break;
-		default:
-			buffer.append(this.value);
-		}
-		buffer.append('\'');
+		LexerUtil.appendCharLiteral(this.value, buffer);
 	}
 }

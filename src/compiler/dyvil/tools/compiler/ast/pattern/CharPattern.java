@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -98,6 +99,6 @@ public final class CharPattern extends Pattern
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('\'').append(this.value).append('\'');
+		LexerUtil.appendCharLiteral(this.value, buffer);
 	}
 }

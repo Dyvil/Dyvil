@@ -2,7 +2,7 @@ package dyvil.tools.parsing.lexer;
 
 public class LexerUtil
 {
-
+	
 	public static boolean isOpenBracket(char c)
 	{
 		switch (c)
@@ -14,7 +14,7 @@ public class LexerUtil
 		}
 		return false;
 	}
-
+	
 	public static boolean isCloseBracket(char c)
 	{
 		switch (c)
@@ -26,7 +26,7 @@ public class LexerUtil
 		}
 		return false;
 	}
-
+	
 	public static boolean isBinDigit(char c)
 	{
 		switch (c)
@@ -37,7 +37,7 @@ public class LexerUtil
 		}
 		return false;
 	}
-
+	
 	public static boolean isOctDigit(char c)
 	{
 		switch (c)
@@ -54,7 +54,7 @@ public class LexerUtil
 		}
 		return false;
 	}
-
+	
 	public static boolean isDigit(char c)
 	{
 		switch (c)
@@ -73,7 +73,7 @@ public class LexerUtil
 		}
 		return false;
 	}
-
+	
 	public static boolean isHexDigit(char c)
 	{
 		switch (c)
@@ -104,7 +104,7 @@ public class LexerUtil
 		}
 		return false;
 	}
-
+	
 	public static boolean isIdentifierPart(char c)
 	{
 		if (c <= 0xA0)
@@ -114,7 +114,7 @@ public class LexerUtil
 		
 		return Character.isUnicodeIdentifierPart(c);
 	}
-
+	
 	public static boolean isIdentifierSymbol(char c)
 	{
 		if (c <= 0xA0)
@@ -159,5 +159,81 @@ public class LexerUtil
 		}
 		return false;
 	}
+	
+	public static void appendStringLiteral(String value, StringBuilder buffer)
+	{
+		buffer.ensureCapacity(buffer.length() + value.length() + 3);
+		buffer.append('"');
+		appendStringLiteralBody(value, buffer);
+		buffer.append('"');
+	}
 
+	public static void appendStringLiteralBody(String value, StringBuilder buffer)
+	{
+		int len = value.length();
+		for (int i = 0; i < len; i++)
+		{
+			char c = value.charAt(i);
+			switch (c)
+			{
+			case '"':
+				buffer.append("\\\"");
+				continue;
+			case '\\':
+				buffer.append("\\\\");
+				continue;
+			case '\n':
+				buffer.append("\\n");
+				continue;
+			case '\t':
+				buffer.append("\\t");
+				continue;
+			case '\r':
+				buffer.append("\\r");
+				continue;
+			case '\b':
+				buffer.append("\\b");
+				continue;
+			case '\f':
+				buffer.append("\\f");
+				continue;
+			}
+			buffer.append(c);
+		}
+	}
+	
+	public static void appendCharLiteral(char value, StringBuilder buffer)
+	{
+		buffer.ensureCapacity(buffer.length() + 4);
+		buffer.append('\'');
+		
+		switch (value)
+		{
+		case '\'':
+			buffer.append("\\'");
+			break;
+		case '\\':
+			buffer.append("\\\\");
+			break;
+		case '\n':
+			buffer.append("\\n");
+			break;
+		case '\t':
+			buffer.append("\\t");
+			break;
+		case '\r':
+			buffer.append("\\r");
+			break;
+		case '\b':
+			buffer.append("\\b");
+			break;
+		case '\f':
+			buffer.append("\\f");
+			break;
+		default:
+			buffer.append(value);
+		}
+		
+		buffer.append('\'');
+	}
 }

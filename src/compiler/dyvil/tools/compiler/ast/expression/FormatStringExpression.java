@@ -15,6 +15,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -287,7 +288,7 @@ public final class FormatStringExpression implements IValue
 		int len = this.count / 2;
 		String s = this.strings[0];
 		buffer.append("@\"");
-		StringValue.append(s, s.length(), buffer);
+		LexerUtil.appendStringLiteralBody(s, buffer);
 		
 		for (int i = 0; i < len; i++)
 		{
@@ -295,7 +296,7 @@ public final class FormatStringExpression implements IValue
 			this.values[i].toString(prefix, buffer);
 			s = this.strings[i + 1];
 			buffer.append(')');
-			StringValue.append(s, s.length(), buffer);
+			LexerUtil.appendStringLiteralBody(s, buffer);
 		}
 		buffer.append('"');
 	}
