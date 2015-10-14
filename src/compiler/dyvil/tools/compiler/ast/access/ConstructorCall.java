@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -321,6 +322,12 @@ public class ConstructorCall implements ICall
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

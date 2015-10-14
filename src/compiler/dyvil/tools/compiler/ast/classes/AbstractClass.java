@@ -986,7 +986,12 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public String getFileName()
 	{
-		return this.getName().qualified;
+		int index = this.internalName.lastIndexOf('/');
+		if (index < 0)
+		{
+			return this.internalName;
+		}
+		return this.internalName.substring(index + 1);
 	}
 	
 	@Override

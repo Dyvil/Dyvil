@@ -163,12 +163,6 @@ public final class ThisValue implements IValue
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("this");
-	}
-	
-	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.getter.writeGet(writer);
@@ -179,5 +173,18 @@ public final class ThisValue implements IValue
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("this");
+		
+		if (this.type != Types.UNKNOWN)
+		{
+			buffer.append('[');
+			this.type.toString(prefix, buffer);
+			buffer.append(']');
+		}
 	}
 }

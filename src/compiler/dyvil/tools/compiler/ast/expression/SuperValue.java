@@ -144,12 +144,6 @@ public final class SuperValue implements IValue
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("super");
-	}
-	
-	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
@@ -160,5 +154,18 @@ public final class SuperValue implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		writer.writeInsn(Opcodes.ARETURN);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("super");
+		
+		if (this.type != Types.UNKNOWN)
+		{
+			buffer.append('[');
+			this.type.toString(prefix, buffer);
+			buffer.append(']');
+		}
 	}
 }
