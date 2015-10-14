@@ -50,7 +50,9 @@ public interface IContext
 	
 	public boolean handleException(IType type);
 	
-	public IDataMember capture(IVariable variable);
+	public boolean isMember(IVariable variable);
+	
+	public IDataMember capture(IVariable capture);
 	
 	public IAccessible getAccessibleThis(IClass type);
 	

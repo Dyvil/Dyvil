@@ -576,9 +576,19 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.setterParameter;
+	}
+	
+	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		return null;
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
+		return this.theClass.capture(variable);
 	}
 	
 	// Compilation

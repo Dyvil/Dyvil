@@ -51,4 +51,9 @@ public interface IDataMember extends IMember, IValued, IAccessible
 	{
 		return this;
 	}
+	
+	public default IDataMember capture(IContext context, IVariable variable)
+	{
+		return this;
+	}
 }

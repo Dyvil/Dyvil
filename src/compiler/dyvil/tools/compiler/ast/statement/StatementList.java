@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.Name;
@@ -245,6 +246,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	public ILoop getEnclosingLoop()
 	{
 		return null;
+	}
+	
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return this.variables.containsValue(variable);
 	}
 	
 	@Override

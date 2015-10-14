@@ -540,9 +540,26 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameters[i] == variable)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		return null;
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
+		return this.theClass.capture(variable);
 	}
 	
 	@Override

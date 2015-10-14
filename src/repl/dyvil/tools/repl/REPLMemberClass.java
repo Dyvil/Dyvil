@@ -476,9 +476,15 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public IDataMember capture(IVariable variable)
+	public boolean isMember(IVariable variable)
 	{
-		return null;
+		return variable == this.member;
+	}
+	
+	@Override
+	public IDataMember capture(IVariable capture)
+	{
+		return capture;
 	}
 	
 	@Override

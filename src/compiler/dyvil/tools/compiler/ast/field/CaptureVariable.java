@@ -174,9 +174,9 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public IDataMember capture(IContext context)
+	public boolean isCapturable()
 	{
-		return this;
+		return true;
 	}
 	
 	@Override
@@ -259,6 +259,12 @@ public class CaptureVariable implements IVariable
 		this.variable.setIndex(this.index);
 		this.variable.writeSet(writer, instance, value, lineNumber);
 		this.variable.setIndex(index);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "#" + this.variable.toString();
 	}
 	
 	@Override

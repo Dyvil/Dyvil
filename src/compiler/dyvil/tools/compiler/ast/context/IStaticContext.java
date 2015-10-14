@@ -66,9 +66,15 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	public default IDataMember capture(IVariable variable)
+	public default boolean isMember(IVariable variable)
 	{
-		return variable;
+		return false;
+	}
+	
+	@Override
+	public default IDataMember capture(IVariable capture)
+	{
+		return capture;
 	}
 	
 	@Override

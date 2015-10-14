@@ -86,6 +86,11 @@ public class AnonymousClass extends CodeClass
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
+		
 		if (this.capturedFields == null)
 		{
 			this.capturedFields = new CaptureField[2];

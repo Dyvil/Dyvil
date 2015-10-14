@@ -355,18 +355,28 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 	public IAccessible getAccessibleThis(IClass type)
 	{
 		this.thisClass = type;
-		return new VariableThis();
+		return VariableThis.DEFAULT;
 	}
 	
 	@Override
-	public IDataMember capture(IVariable variable)
+	public boolean isMember(IVariable variable)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			if (this.parameters[i] == variable)
 			{
-				return variable;
+				return true;
 			}
+		}
+		return false;
+	}
+	
+	@Override
+	public IDataMember capture(IVariable variable)
+	{
+		if (this.isMember(variable))
+		{
+			return variable;
 		}
 		
 		if (this.capturedFields == null)
@@ -384,7 +394,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			{
 				// If yes, return the match and skip adding the variable
 				// again.
-				return var;
+				return variable;
 			}
 		}
 		

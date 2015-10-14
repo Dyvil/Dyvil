@@ -512,8 +512,25 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameters[i] == variable)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public IDataMember capture(IVariable variable)
 	{
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
 		return this.theClass.capture(variable);
 	}
 	
