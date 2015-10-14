@@ -1,5 +1,7 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.visitor.ValueVisitor;
+
 public class IntValue implements Value
 {
 	protected int value;
@@ -17,6 +19,12 @@ public class IntValue implements Value
 	public void setValue(int value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		visitor.visitInt(this.value);
 	}
 	
 	@Override

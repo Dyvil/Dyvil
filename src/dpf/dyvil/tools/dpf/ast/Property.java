@@ -2,6 +2,7 @@ package dyvil.tools.dpf.ast;
 
 import dyvil.tools.dpf.ast.value.Value;
 import dyvil.tools.dpf.ast.value.ValueCreator;
+import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -50,6 +51,12 @@ public class Property extends ValueCreator implements NodeElement
 	public void setValue(Value value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public void accept(NodeVisitor visitor)
+	{
+		this.value.accept(visitor.visitProperty(this.name));
 	}
 	
 	@Override

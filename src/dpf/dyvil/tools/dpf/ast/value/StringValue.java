@@ -1,5 +1,6 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 
@@ -20,6 +21,12 @@ public class StringValue implements Value
 	public void setValue(String value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		visitor.visitString(this.value);
 	}
 	
 	@Override

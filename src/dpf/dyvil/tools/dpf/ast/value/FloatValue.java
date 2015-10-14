@@ -1,5 +1,7 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.visitor.ValueVisitor;
+
 public class FloatValue implements Value
 {
 	protected float value;
@@ -17,6 +19,12 @@ public class FloatValue implements Value
 	public void setValue(float value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		visitor.visitFloat(this.value);
 	}
 	
 	@Override

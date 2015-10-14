@@ -5,4 +5,8 @@ public interface MapVisitor
 	public ValueVisitor visitKey();
 	
 	public ValueVisitor visitValue();
+	
+	public default void visitEnd()
+	{
+	}
 }

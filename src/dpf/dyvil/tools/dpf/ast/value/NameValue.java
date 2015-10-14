@@ -1,5 +1,6 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.Name;
 
 public class NameValue implements Value
@@ -19,6 +20,12 @@ public class NameValue implements Value
 	public void setValue(Name value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		visitor.visitName(this.value);
 	}
 	
 	@Override

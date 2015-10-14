@@ -43,6 +43,21 @@ public class MapValue extends ValueCreator implements Value, MapVisitor
 	}
 	
 	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		MapVisitor v = visitor.visitMap();
+		
+		int len = this.values.size();
+		for (int i = 0; i < len; i++)
+		{
+			this.keys.get(i).accept(v.visitKey());
+			this.values.get(i).accept(v.visitValue());
+		}
+		
+		v.visitEnd();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int len = this.values.size();
@@ -55,7 +70,7 @@ public class MapValue extends ValueCreator implements Value, MapVisitor
 		buffer.append("[ ");
 		this.keys.get(0).toString(prefix, buffer);
 		buffer.append(" : ");
-		this.keys.get(0).toString(prefix, buffer);
+		this.values.get(0).toString(prefix, buffer);
 		for (int i = 1; i < len; i++)
 		{
 			buffer.append(", ");

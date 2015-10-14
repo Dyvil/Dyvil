@@ -1,5 +1,7 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.visitor.ValueVisitor;
+
 public class DoubleValue implements Value
 {
 	protected double value;
@@ -17,6 +19,12 @@ public class DoubleValue implements Value
 	public void setValue(double value)
 	{
 		this.value = value;
+	}
+	
+	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		visitor.visitDouble(this.value);
 	}
 	
 	@Override

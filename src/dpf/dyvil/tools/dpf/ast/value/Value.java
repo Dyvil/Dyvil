@@ -1,5 +1,6 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -23,4 +24,6 @@ public interface Value extends IASTNode
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer);
+
+	public void accept(ValueVisitor visitor);
 }

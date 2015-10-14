@@ -3,16 +3,17 @@ package dyvil.tools.dpf.ast;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Access implements NodeVisitor, NodeElement
+public class NodeAccess implements NodeVisitor, NodeElement
 {
 	protected Name name;
 	protected NodeElement element;
 	
 	private ICodePosition position;
 	
-	public Access(Name name)
+	public NodeAccess(Name name)
 	{
 		this.name = name;
 	}
@@ -58,11 +59,23 @@ public class Access implements NodeVisitor, NodeElement
 	}
 	
 	@Override
-	public NodeVisitor visitAccess(Name name)
+	public NodeVisitor visitNodeAccess(Name name)
 	{
-		Access access = new Access(name);
+		NodeAccess access = new NodeAccess(name);
 		this.element = access;
 		return access;
+	}
+	
+	@Override
+	public void accept(NodeVisitor visitor)
+	{
+		this.element.accept(visitor.visitNodeAccess(this.name));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override

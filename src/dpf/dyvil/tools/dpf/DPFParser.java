@@ -54,7 +54,7 @@ public class DPFParser
 				return true;
 			case BaseSymbols.DOT:
 				this.tokens.next();
-				this.parseNodeElement(visitor.visitAccess(token.nameValue()));
+				this.parseNodeElement(visitor.visitNodeAccess(token.nameValue()));
 				return true;
 			case BaseSymbols.COLON:
 			case BaseSymbols.EQUALS:
@@ -63,6 +63,7 @@ public class DPFParser
 				return true;
 			}
 		case BaseSymbols.CLOSE_CURLY_BRACKET:
+			visitor.visitEnd();
 			return false;
 		}
 		

@@ -2,6 +2,7 @@ package dyvil.tools.dpf;
 
 import dyvil.tools.dpf.ast.DPFFile;
 import dyvil.tools.dpf.ast.Node;
+import dyvil.tools.dpf.util.Printer;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class DPFTest
@@ -9,8 +10,12 @@ public class DPFTest
 	public static void main(String[] args)
 	{
 		String file = "name = \"super\"\n"
-				+ "package.type = default\n"
+				+ "package.type = type\n"
 				+ "package.name.override = override\n"
+				+ "package.node\n"
+				+ "{\n"
+				+ "name = \"name\"\n"
+				+ "}\n"
 				+ ""
 				+ "package {\n"
 				+ "name = test\n"
@@ -28,7 +33,8 @@ public class DPFTest
 		
 		Node node = new DPFFile();
 		parser.accept(node);
-		
 		System.out.println(node);
+		
+		node.accept(new Printer());
 	}
 }

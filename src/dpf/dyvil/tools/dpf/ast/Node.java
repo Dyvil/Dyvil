@@ -11,8 +11,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class Node implements NodeElement, NodeVisitor
 {
 	protected Name				name;
-	protected List<Node>		nodes		= new ArrayList<Node>();
-	protected List<NodeElement>	nodeElements	= new ArrayList<NodeElement>();
+	protected List<Node>		nodes			= new ArrayList<Node>();
+	protected List<NodeElement>	elements	= new ArrayList<NodeElement>();
 	
 	protected ICodePosition position;
 	
@@ -57,16 +57,31 @@ public class Node implements NodeElement, NodeVisitor
 	public ValueVisitor visitProperty(Name name)
 	{
 		Property property = new Property(name);
-		this.nodeElements.add(property);
+		this.elements.add(property);
 		return property;
 	}
 	
 	@Override
-	public NodeVisitor visitAccess(Name name)
+	public NodeVisitor visitNodeAccess(Name name)
 	{
-		Access access = new Access(name);
-		this.nodeElements.add(access);
+		NodeAccess access = new NodeAccess(name);
+		this.elements.add(access);
 		return access;
+	}
+	
+	@Override
+	public void accept(NodeVisitor visitor)
+	{
+		NodeVisitor v = visitor.visitNode(this.name);
+		for (NodeElement element : this.elements)
+		{
+			element.accept(v);
+		}
+		for (Node node : this.nodes)
+		{
+			node.accept(v);
+		}
+		v.visitEnd();
 	}
 	
 	@Override
@@ -81,7 +96,7 @@ public class Node implements NodeElement, NodeVisitor
 		buffer.append(this.name).append('\n').append(prefix).append('{').append('\n');
 		
 		String s = prefix + "\t";
-		for (NodeElement element : this.nodeElements)
+		for (NodeElement element : this.elements)
 		{
 			buffer.append(s);
 			element.toString(s, buffer);

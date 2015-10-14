@@ -26,6 +26,18 @@ public class ListValue extends ValueCreator implements Value, ListVisitor
 	}
 	
 	@Override
+	public void accept(ValueVisitor visitor)
+	{
+		ListVisitor v = visitor.visitList();
+		for (Value element : this.elements)
+		{
+			element.accept(v.visitElement());
+		}
+		
+		v.visitEnd();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int len = this.elements.size();
