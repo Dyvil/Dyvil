@@ -35,13 +35,12 @@ public class DPFParser
 	
 	private void parseNodeElements(NodeVisitor visitor)
 	{
-		while (this.tokens.hasNext())
+		while (this.tokens.hasNext() && this.parseNodeElement(visitor))
 		{
-			this.parseNodeElement(visitor);
 		}
 	}
 	
-	private void parseNodeElement(NodeVisitor visitor)
+	private boolean parseNodeElement(NodeVisitor visitor)
 	{
 		IToken token = this.tokens.next();
 		switch (token.type())
@@ -52,17 +51,23 @@ public class DPFParser
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.tokens.next();
 				this.parseNodeElements(visitor.visitNode(token.nameValue()));
-				return;
+				return true;
+			case BaseSymbols.DOT:
+				this.tokens.next();
+				this.parseNodeElement(visitor.visitAccess(token.nameValue()));
+				return true;
+			case BaseSymbols.COLON:
 			case BaseSymbols.EQUALS:
 				this.tokens.next();
 				this.parseValue(visitor.visitProperty(token.nameValue()));
-				return;
+				return true;
 			}
 		case BaseSymbols.CLOSE_CURLY_BRACKET:
-			return;
+			return false;
 		}
 		
 		this.markers.add(new SyntaxError(token, "Invalid Node Element - Invalid " + token));
+		return true;
 	}
 	
 	private void parseValue(ValueVisitor valueVisitor)
@@ -86,6 +91,7 @@ public class DPFParser
 			valueVisitor.visitString(token.stringValue());
 			return;
 		case Tokens.IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
 		case Tokens.SYMBOL_IDENTIFIER:
 		case Tokens.SPECIAL_IDENTIFIER:
 			valueVisitor.visitName(token.nameValue());

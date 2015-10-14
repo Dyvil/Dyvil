@@ -1,32 +1,34 @@
 package dyvil.tools.dpf;
 
+import dyvil.tools.dpf.ast.DPFFile;
 import dyvil.tools.dpf.ast.Node;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class DPFTest
 {
 	public static void main(String[] args)
 	{
-		String file = "package {"
-				+ "name = \"test\""
-				+ "node {"
-				+ "i = 10"
-				+ "l = 10L"
-				+ "d = 1.5D"
-				+ "}"
-				+ "node {"
-				+ "list = [ 1, 2, 3 ]"
-				+ "map = [ 1 : 'a', 2 : 'b' ]"
-				+ "}";
+		String file = "name = \"super\"\n"
+				+ "package.type = default\n"
+				+ "package.name.override = override\n"
+				+ ""
+				+ "package {\n"
+				+ "name = test\n"
+				+ "node {\n"
+				+ "int = 10\n"
+				+ "long = 10L\n"
+				+ "double = 1.5D\n"
+				+ "float = 1.2F\n"
+				+ "string = \"test\"\n"
+				+ "}\n"
+				+ "}\n";
 		
 		MarkerList markers = new MarkerList();
 		DPFParser parser = new DPFParser(markers, file);
 		
-		Node node = new Node(Name.get("root"));
+		Node node = new DPFFile();
 		parser.accept(node);
 		
 		System.out.println(node);
 	}
-	
 }

@@ -12,7 +12,7 @@ public class Node implements NodeElement, NodeVisitor
 {
 	protected Name				name;
 	protected List<Node>		nodes		= new ArrayList<Node>();
-	protected List<Property>	properties	= new ArrayList<Property>();
+	protected List<NodeElement>	nodeElements	= new ArrayList<NodeElement>();
 	
 	protected ICodePosition position;
 	
@@ -57,8 +57,16 @@ public class Node implements NodeElement, NodeVisitor
 	public ValueVisitor visitProperty(Name name)
 	{
 		Property property = new Property(name);
-		this.properties.add(property);
+		this.nodeElements.add(property);
 		return property;
+	}
+	
+	@Override
+	public NodeVisitor visitAccess(Name name)
+	{
+		Access access = new Access(name);
+		this.nodeElements.add(access);
+		return access;
 	}
 	
 	@Override
@@ -73,10 +81,10 @@ public class Node implements NodeElement, NodeVisitor
 		buffer.append(this.name).append('\n').append(prefix).append('{').append('\n');
 		
 		String s = prefix + "\t";
-		for (Property property : this.properties)
+		for (NodeElement element : this.nodeElements)
 		{
 			buffer.append(s);
-			property.toString(s, buffer);
+			element.toString(s, buffer);
 			buffer.append('\n');
 		}
 		

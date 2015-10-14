@@ -7,4 +7,6 @@ public interface NodeVisitor
 	public NodeVisitor visitNode(Name name);
 	
 	public ValueVisitor visitProperty(Name name);
+
+	public NodeVisitor visitAccess(Name name);
 }
