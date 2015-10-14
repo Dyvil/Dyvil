@@ -98,6 +98,12 @@ public final class FieldInitializer implements IStatement
 	}
 	
 	@Override
+	public String toString()
+	{
+		return this.variable.toString();
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.variable.toString(prefix, buffer);

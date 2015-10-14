@@ -98,7 +98,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.valueCount > 0)
 		{
-			IValue v = this.values[this.valueCount - 1].withType(type, typeContext, markers, context);
+			IValue v = this.values[this.valueCount - 1].withType(type, typeContext, markers, new CombiningContext(this, context));
 			if (v != null)
 			{
 				this.values[this.valueCount - 1] = v;
