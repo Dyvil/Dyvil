@@ -9,25 +9,27 @@ public class Main
 		
 	private static void runTests([String] args)
 	{
-		println "-- Abstract Properties --"
+		println "- Abstract Properties -"
 		AbstractProperties.main(args)
-		println "-- Annotations --"
+		println "- Annotations -"
 		AnnotationTest.main(args)
-		println "-- Bridge Methods --"
+		println "- Bridge Methods -"
 		BridgeTest.main(args)
-		println "-- Extension Test --"
+		println "- Capture Test -"
+		CaptureTest.main(args)
+		println "- Extension Test -"
 		ExtensionTest.main(args)
-		println "-- For Test --"
+		println "- For Test -"
 		ForTest.main(args)
-		println "-- Inheritance --"
+		println "- Inheritance -"
 		InheritanceTest.main(args)
-		println "-- Intrinsics --"
+		println "- Intrinsics -"
 		IntrinsicTest.main(args)
-		println "-- Lambdas --"
+		println "- Lambdas -"
 		LambdaTest.main(args)
-		println "-- Match Test --"
+		println "- Match Test -"
 		MatchTest.main(args)
-		println "-- Range Test --"
+		println "- Range Test -"
 		RangeTest.main(args)
 	}
 }

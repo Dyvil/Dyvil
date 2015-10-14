@@ -1,12 +1,7 @@
 package dyvil.test
 
 public class LambdaTest
-{
-	object Test
-	{
-		public => Test captureThis() = => this
-	}
-	
+{	
 	functional interface Function[P, R]
 	{
 		public R apply(P par1)
@@ -22,32 +17,22 @@ public class LambdaTest
 	
 	public static void main([String] args)
 	{
+		println "-- Basic Lambda Test --"
 		basicTest()
-		captureTest()
+		println "-- Function Chain Test --"
 		chainTest()
+		println "-- Compound Assignment Test --"
 		compoundAssignmentTest()
+		println "-- Custom SAM Interface Test --"
 		customSAMTest()
 	}
 	
 	private static void basicTest() {
-		println "Basic Lambda Test"
-		
 		auto map = [ 1 : "a", 2 : "b" ].flatMapped((i, s) => [ (i, s.toUpperCase), (i * 10, s) ])
 		println map
 	}
 	
-	private static void captureTest() {
-		println "Lambda This Capture Test"
-		
-		auto test = Test
-		auto getter = test.captureThis
-		println test
-		println getter
-	}
-	
 	private static void chainTest() {
-		println "Function Chain Test"
-		
 		auto fun1 = (int i) => i + 1
 		auto fun2 = (int i) => i * 2
 		auto fun12 = fun1 andThen fun2
@@ -55,8 +40,6 @@ public class LambdaTest
 	}
 	
 	private static void compoundAssignmentTest() {
-		println "Lambda Compound Assignment Test"
-		
 		int localSum = 0
 		auto list = List(1, 2, 3)
 		list.forEach(i => localSum += i)
@@ -66,8 +49,6 @@ public class LambdaTest
 	}
 	
 	private static void customSAMTest() {
-		println "Custom SAM Interface Test"
-		
 		IntFunction intF = i => i * i
 		println(intF(7))
 				

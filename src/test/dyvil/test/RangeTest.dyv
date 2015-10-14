@@ -4,10 +4,10 @@ public class RangeTest
 {
 	public static void main([String] args)
 	{
-		println "Int Test:"
+		println "-- Int Test --"
 		testInts()
 		
-		println "Ordered Test:"
+		println "-- Ordered Test --"
 		testOrdered()
 	}
 	

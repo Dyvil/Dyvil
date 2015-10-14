@@ -3,16 +3,16 @@ package dyvil.test
 public class ForTest
 {
 	public static void main([String] args) {
-		println "Iterative Test:"
+		println "-- Iterative Test --"
 		testIterative()
 		
-		println "Array Test:"
+		println "-- Array Test --"
 		testArray()
 		
-		println "Iterable Test:"
+		println "-- Iterable Test --"
 		testIterable()
 		
-		println "String Test:"
+		println "-- String Test --"
 		testString()
 	}
 	
