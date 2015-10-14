@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class IncludeParser extends Parser
@@ -38,7 +38,7 @@ public class IncludeParser extends Parser
 		switch (this.mode)
 		{
 		case INCLUDE:
-			if (type == Keywords.INCLUDE)
+			if (type == DyvilKeywords.INCLUDE)
 			{
 				this.mode = NAME;
 				this.includeDeclaration = new IncludeDeclaration(token.raw());
@@ -57,13 +57,13 @@ public class IncludeParser extends Parser
 			pm.report(token, "Invalid Include Declaration - Identifier expected");
 			return;
 		case DOT:
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				this.header.addInclude(this.includeDeclaration);
 				pm.popParser();
 				return;
 			}
-			if (type == Symbols.DOT)
+			if (type == BaseSymbols.DOT)
 			{
 				this.mode = NAME;
 				return;

@@ -3,13 +3,13 @@ package dyvil.tools.compiler.ast.statement.foreach;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement

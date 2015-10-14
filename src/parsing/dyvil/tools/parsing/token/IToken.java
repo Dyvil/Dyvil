@@ -1,6 +1,6 @@
 package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IToken extends ICodePosition

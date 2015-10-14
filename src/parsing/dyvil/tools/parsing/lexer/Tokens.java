@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.transform;
+package dyvil.tools.parsing.lexer;
 
 public interface Tokens
 {
@@ -41,6 +41,4 @@ public interface Tokens
 	int	STRING_PART		= 0x00020200;
 	int	STRING_END		= 0x00040200;
 	int	CHAR			= 0x00000400;
-	
-	int GENERIC_CALL = 0x00000800;
 }

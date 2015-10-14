@@ -1,4 +1,4 @@
-package dyvil.tools.parsing;
+package dyvil.tools.parsing.lexer;
 
 public class LexerUtil
 {

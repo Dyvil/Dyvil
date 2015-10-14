@@ -7,8 +7,9 @@ import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class MatchExpressionParser extends Parser implements IValueConsumer
@@ -38,30 +39,30 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = CASE;
 				return;
 			}
-			if (type != Keywords.CASE)
+			if (type != DyvilKeywords.CASE)
 			{
 				pm.report(token, "Invalid Match Expression - '{' or 'case' expected");
 				return;
 			}
 			this.singleCase = true;
 		case CASE:
-			if (type == Symbols.SEMICOLON && token.isInferred())
+			if (type == BaseSymbols.SEMICOLON && token.isInferred())
 			{
 				return;
 			}
-			if (type == Keywords.CASE)
+			if (type == DyvilKeywords.CASE)
 			{
 				this.currentCase = new MatchCase();
 				this.mode = CONDITION;
 				pm.pushParser(new PatternParser(this.currentCase));
 				return;
 			}
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
 				return;
@@ -69,7 +70,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			pm.report(token, "Invalid Match Expression - 'case' or '}' expected expected");
 			return;
 		case CONDITION:
-			if (type == Keywords.IF)
+			if (type == DyvilKeywords.IF)
 			{
 				this.mode = ACTION;
 				pm.pushParser(pm.newExpressionParser(this));
@@ -78,7 +79,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 		case ACTION:
 			this.mode = SEPARATOR;
 			pm.pushParser(pm.newExpressionParser(this));
-			if (type == Symbols.COLON || type == Symbols.ARROW_OPERATOR)
+			if (type == BaseSymbols.COLON || type == DyvilSymbols.ARROW_OPERATOR)
 			{
 				return;
 			}
@@ -93,13 +94,13 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			}
 			
 			this.currentCase = null;
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
 				return;
 			}
 			this.mode = CASE;
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}

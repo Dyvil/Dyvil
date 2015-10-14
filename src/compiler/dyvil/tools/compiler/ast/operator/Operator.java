@@ -4,7 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 public final class Operator
 {

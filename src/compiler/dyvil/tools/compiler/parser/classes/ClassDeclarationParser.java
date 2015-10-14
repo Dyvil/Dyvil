@@ -11,9 +11,9 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
@@ -85,7 +85,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
@@ -94,7 +94,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case PARAMETERS_END:
 			this.mode = EXTENDS;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
@@ -102,7 +102,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			pm.report(token, "Invalid Class Parameter List - ')' expected");
 			return;
 		case GENERICS:
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeVariableListParser(this.theClass));
 				this.theClass.setGeneric();
@@ -110,14 +110,14 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 		case PARAMETERS:
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser(this.theClass));
 				this.mode = PARAMETERS_END;
 				return;
 			}
 		case EXTENDS:
-			if (type == Keywords.EXTENDS)
+			if (type == DyvilKeywords.EXTENDS)
 			{
 				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
@@ -131,7 +131,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 		case IMPLEMENTS:
-			if (type == Keywords.IMPLEMENTS)
+			if (type == DyvilKeywords.IMPLEMENTS)
 			{
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
@@ -144,7 +144,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 		case BODY:
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				IClassBody body = new ClassBody(this.theClass);
 				this.theClass.setBody(body);
@@ -162,16 +162,16 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 						int nextType = next.type();
 						switch (nextType)
 						{
-						case Keywords.EXTENDS:
+						case DyvilKeywords.EXTENDS:
 							this.mode = EXTENDS;
 							return;
-						case Keywords.IMPLEMENTS:
+						case DyvilKeywords.IMPLEMENTS:
 							this.mode = IMPLEMENTS;
 							return;
-						case Symbols.OPEN_SQUARE_BRACKET:
+						case BaseSymbols.OPEN_SQUARE_BRACKET:
 							this.mode = GENERICS;
 							return;
-						case Symbols.OPEN_PARENTHESIS:
+						case BaseSymbols.OPEN_PARENTHESIS:
 							this.mode = PARAMETERS;
 							return;
 						}
@@ -186,7 +186,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			pm.report(token, "Invalid Class Declaration - '{' or ';' expected");
 			return;
 		case BODY_END:
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
 				this.classList.addClass(this.theClass);

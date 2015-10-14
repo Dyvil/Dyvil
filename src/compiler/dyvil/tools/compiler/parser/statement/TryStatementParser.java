@@ -6,9 +6,9 @@ import dyvil.tools.compiler.ast.statement.CatchBlock;
 import dyvil.tools.compiler.ast.statement.TryStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TryStatementParser extends Parser implements IValueConsumer
@@ -40,13 +40,13 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			this.mode = CATCH;
 			return;
 		case CATCH:
-			if (type == Keywords.CATCH)
+			if (type == DyvilKeywords.CATCH)
 			{
 				this.statement.addCatchBlock(this.catchBlock = new CatchBlock(token.raw()));
 				this.mode = CATCH_OPEN;
 				return;
 			}
-			if (type == Keywords.FINALLY)
+			if (type == DyvilKeywords.FINALLY)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = END;
@@ -62,7 +62,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 				}
 				
 				int nextType = token.next().type();
-				if (nextType == Keywords.CATCH || nextType == Keywords.FINALLY)
+				if (nextType == DyvilKeywords.CATCH || nextType == DyvilKeywords.FINALLY)
 				{
 					return;
 				}
@@ -72,7 +72,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		case CATCH_OPEN:
 			this.mode = CATCH_VAR;
 			pm.pushParser(pm.newTypeParser(this.catchBlock));
-			if (type != Symbols.OPEN_PARENTHESIS)
+			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Catch Expression - '(' expected");
@@ -91,7 +91,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		case CATCH_CLOSE:
 			this.mode = CATCH;
 			pm.pushParser(pm.newExpressionParser(this.catchBlock));
-			if (type != Symbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "Invalid Catch Expression - ')' expected");
 			}

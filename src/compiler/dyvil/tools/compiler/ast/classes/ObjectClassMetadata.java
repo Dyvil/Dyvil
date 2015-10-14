@@ -9,14 +9,15 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata
@@ -50,7 +51,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 				markers.add(I18n.createMarker(this.theClass.getPosition(), "class.object.constructor", this.theClass.getName().qualified));
 			}
 			
-			IField f = body.getField(Name.instance);
+			IField f = body.getField(Names.instance);
 			if (f != null)
 			{
 				this.instanceField = f;
@@ -58,7 +59,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			}
 		}
 		
-		Field f = new Field(this.theClass, Name.instance, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.CONST);
+		Field f = new Field(this.theClass, Names.instance, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.CONST);
 		this.instanceField = f;
 		
 		ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
@@ -68,7 +69,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.instanceField != null && name == Name.instance)
+		if (this.instanceField != null && name == Names.instance)
 		{
 			return this.instanceField;
 		}

@@ -3,10 +3,10 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package

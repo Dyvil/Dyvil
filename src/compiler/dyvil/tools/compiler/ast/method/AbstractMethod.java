@@ -24,7 +24,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -38,9 +37,11 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -382,17 +383,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		switch (this.parameterCount)
 		{
 		case 0:
-			if (this.name == Name.toString)
+			if (this.name == Names.toString)
 			{
 				return true;
 			}
-			if (this.name == Name.hashCode)
+			if (this.name == Names.hashCode)
 			{
 				return true;
 			}
 			return false;
 		case 1:
-			if (this.name == Name.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
+			if (this.name == Names.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}

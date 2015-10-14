@@ -2,11 +2,11 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -33,7 +33,7 @@ public class UpdateMethodCall extends AbstractCall
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.withLastValue(Name.update, value);
+		this.arguments = this.arguments.withLastValue(Names.update, value);
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class UpdateMethodCall extends AbstractCall
 	@Override
 	protected IValue resolveCall(MarkerList markers, IContext context)
 	{
-		IMethod method = ICall.resolveMethod(context, this.instance, Name.update, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.instance, Names.update, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -53,7 +53,7 @@ public class UpdateMethodCall extends AbstractCall
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, this.position, this.instance, Name.update, this.arguments);
+		ICall.addResolveMarker(markers, this.position, this.instance, Names.update, this.arguments);
 		return this;
 	}
 	

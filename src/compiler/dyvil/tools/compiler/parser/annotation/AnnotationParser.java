@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.type.NamedType;
@@ -9,8 +8,9 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
@@ -53,10 +53,10 @@ public class AnnotationParser extends Parser
 			pm.report(token, "Invalid Annotation - Name expected");
 			return;
 		case PARAMETERS_START:
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				IToken next = token.next();
-				if (ParserUtil.isIdentifier(next.type()) && next.next().type() == Symbols.COLON)
+				if (ParserUtil.isIdentifier(next.type()) && next.next().type() == BaseSymbols.COLON)
 				{
 					ArgumentMap map = new ArgumentMap();
 					this.annotation.setArguments(map);
@@ -76,7 +76,7 @@ public class AnnotationParser extends Parser
 			pm.popParser(true);
 			return;
 		case PARAMETERS_END:
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.popParser();
 				return;

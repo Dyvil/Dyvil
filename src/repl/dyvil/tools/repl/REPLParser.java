@@ -1,14 +1,14 @@
 package dyvil.tools.repl;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;

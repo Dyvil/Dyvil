@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -22,6 +21,7 @@ import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileType;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.CodePosition;
 

@@ -5,13 +5,14 @@ import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
 import dyvil.tools.compiler.ast.imports.PackageImport;
 import dyvil.tools.compiler.ast.imports.SimpleImport;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ImportParser extends Parser
@@ -36,13 +37,13 @@ public final class ImportParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			this.consumer.setImport(this.theImport);
 			pm.popParser();
 			return;
 		}
-		if (type == Symbols.COMMA || this.mode == 0)
+		if (type == BaseSymbols.COMMA || this.mode == 0)
 		{
 			this.consumer.setImport(this.theImport);
 			pm.popParser(true);
@@ -54,12 +55,12 @@ public final class ImportParser extends Parser
 		case IMPORT:
 			switch (type)
 			{
-			case Symbols.OPEN_CURLY_BRACKET:
+			case BaseSymbols.OPEN_CURLY_BRACKET:
 			{
 				MultiImport mi = new MultiImport(token);
 				mi.setParent(this.theImport);
 				this.theImport = mi;
-				if (token.next().type() != Symbols.CLOSE_CURLY_BRACKET)
+				if (token.next().type() != BaseSymbols.CLOSE_CURLY_BRACKET)
 				{
 					pm.pushParser(new ImportListParser(mi));
 					this.mode = MULTIIMPORT;
@@ -69,7 +70,7 @@ public final class ImportParser extends Parser
 				pm.skip();
 				return;
 			}
-			case Symbols.WILDCARD:
+			case DyvilSymbols.WILDCARD:
 			{
 				PackageImport pi = new PackageImport(token.raw());
 				pi.setParent(this.theImport);
@@ -95,11 +96,11 @@ public final class ImportParser extends Parser
 		case DOT_ALIAS:
 			switch (type)
 			{
-			case Symbols.DOT:
+			case BaseSymbols.DOT:
 				this.mode = IMPORT;
 				return;
-			case Symbols.ARROW_OPERATOR:
-			case Keywords.AS:
+			case DyvilSymbols.ARROW_OPERATOR:
+			case DyvilKeywords.AS:
 				this.mode = 0;
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
@@ -110,7 +111,7 @@ public final class ImportParser extends Parser
 				}
 				pm.report(next, "Invalid Import Alias");
 				return;
-			case Symbols.CLOSE_CURLY_BRACKET:
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				this.consumer.setImport(this.theImport);
 				pm.popParser(true);
 				return;
@@ -121,7 +122,7 @@ public final class ImportParser extends Parser
 			this.theImport.expandPosition(token);
 			this.consumer.setImport(this.theImport);
 			pm.popParser();
-			if (type != Symbols.CLOSE_CURLY_BRACKET)
+			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Multi-Import - '}' expected");

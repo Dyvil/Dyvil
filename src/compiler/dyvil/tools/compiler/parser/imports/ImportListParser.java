@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.imports;
 import dyvil.tools.compiler.ast.imports.IImportList;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class ImportListParser extends Parser
@@ -19,7 +19,7 @@ public class ImportListParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.CLOSE_CURLY_BRACKET || type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET || type == BaseSymbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
@@ -34,7 +34,7 @@ public class ImportListParser extends Parser
 		if (this.mode == 1)
 		{
 			this.mode = 0;
-			if (type != Symbols.COMMA)
+			if (type != BaseSymbols.COMMA)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Import List - ',' expected");

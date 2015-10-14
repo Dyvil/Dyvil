@@ -2,9 +2,9 @@ package dyvil.tools.parsing;
 
 import java.util.Iterator;
 
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 import dyvil.tools.parsing.token.InferredSemicolon;
 
@@ -128,22 +128,22 @@ public class TokenIterator implements Iterator<IToken>
 		int prevType = prev.type();
 		switch (prevType)
 		{
-		case Symbols.DOT:
-		case Symbols.COMMA:
-		case Symbols.COLON:
-		case Symbols.SEMICOLON:
-		case Symbols.OPEN_CURLY_BRACKET:
-		case Symbols.OPEN_PARENTHESIS:
-		case Symbols.OPEN_SQUARE_BRACKET:
-		case Keywords.IS:
-		case Keywords.AS:
+		case BaseSymbols.DOT:
+		case BaseSymbols.COMMA:
+		case BaseSymbols.COLON:
+		case BaseSymbols.SEMICOLON:
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+		case BaseSymbols.OPEN_PARENTHESIS:
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
+		case DyvilKeywords.IS:
+		case DyvilKeywords.AS:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_START:
 			return;
 		}
 		
 		int nextType = next.type();
-		if (nextType == Symbols.OPEN_CURLY_BRACKET)
+		if (nextType == BaseSymbols.OPEN_CURLY_BRACKET)
 		{
 			return;
 		}

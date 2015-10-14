@@ -1,11 +1,13 @@
 package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.lexer.Symbols;
 import dyvil.tools.parsing.position.CodePosition;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public final class SymbolToken implements IToken
 {
+	private Symbols symbols;
+	
 	private IToken	prev;
 	private IToken	next;
 	
@@ -14,18 +16,11 @@ public final class SymbolToken implements IToken
 	private final int	lineNumber;
 	private final int	start;
 	
-	public SymbolToken(IToken prev, int type, int lineNumber, int start)
+	public SymbolToken(Symbols symbols, IToken prev, int type, int lineNumber, int start)
 	{
+		this.symbols = symbols;
 		this.prev = prev;
 		prev.setNext(this);
-		this.type = type;
-		
-		this.lineNumber = lineNumber;
-		this.start = start;
-	}
-	
-	public SymbolToken(String value, int type, int lineNumber, int start)
-	{
 		this.type = type;
 		
 		this.lineNumber = lineNumber;
@@ -47,14 +42,7 @@ public final class SymbolToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		switch (this.type)
-		{
-		case Symbols.ARROW_OPERATOR:
-			return this.start + 2;
-		case Symbols.ELLIPSIS:
-			return this.start + 3;
-		}
-		return this.start + 1;
+		return this.start + this.symbols.getLength(this.type);
 	}
 	
 	@Override
@@ -120,6 +108,6 @@ public final class SymbolToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Symbol '" + Symbols.symbolToString(this.type) + '\'';
+		return "Symbol '" + this.symbols.toString(this.type) + '\'';
 	}
 }

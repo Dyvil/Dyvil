@@ -4,12 +4,13 @@ import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeVariableParser extends Parser implements ITyped
@@ -40,12 +41,12 @@ public final class TypeVariableParser extends Parser implements ITyped
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				if (name == Name.plus || name == Name.minus)
+				if (name == Names.plus || name == Names.minus)
 				{
 					IToken next = token.next();
 					if (ParserUtil.isIdentifier(next.type()))
 					{
-						Variance v = name == Name.minus ? Variance.CONTRAVARIANT : Variance.COVARIANT;
+						Variance v = name == Names.minus ? Variance.CONTRAVARIANT : Variance.COVARIANT;
 						this.variable = new TypeVariable(next, this.generic, next.nameValue(), v);
 						this.mode = TYPE_VARIABLE;
 						pm.skip();
@@ -86,13 +87,13 @@ public final class TypeVariableParser extends Parser implements ITyped
 			Name name = token.nameValue();
 			if (this.boundMode == 0)
 			{
-				if (name == Name.gtcolon) // >: - Lower Bound
+				if (name == Names.gtcolon) // >: - Lower Bound
 				{
 					pm.pushParser(pm.newTypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
-				if (name == Name.ltcolon) // <: - Upper Bounds
+				if (name == Names.ltcolon) // <: - Upper Bounds
 				{
 					pm.pushParser(pm.newTypeParser(this));
 					this.boundMode = UPPER;
@@ -101,7 +102,7 @@ public final class TypeVariableParser extends Parser implements ITyped
 			}
 			else if (this.boundMode == UPPER)
 			{
-				if (name == Name.amp)
+				if (name == Names.amp)
 				{
 					pm.pushParser(pm.newTypeParser(this));
 					return;

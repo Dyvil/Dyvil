@@ -3,14 +3,14 @@ package dyvil.tools.compiler.parser.bytecode;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class BytecodeParser extends Parser
@@ -31,12 +31,12 @@ public final class BytecodeParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			return;
 		}
 		
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser(true);
 			return;
@@ -45,7 +45,7 @@ public final class BytecodeParser extends Parser
 		if (this.mode == INSTRUCTION)
 		{
 			IInstruction insn = null;
-			if (type == Keywords.GOTO)
+			if (type == DyvilKeywords.GOTO)
 			{
 				IToken next = token.next();
 				if (!ParserUtil.isIdentifier(next.type()))
@@ -60,7 +60,7 @@ public final class BytecodeParser extends Parser
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{
 				Name name = token.nameValue();
-				if (token.next().type() == Symbols.COLON)
+				if (token.next().type() == BaseSymbols.COLON)
 				{
 					pm.skip();
 					this.label = name;

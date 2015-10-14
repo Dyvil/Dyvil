@@ -1,6 +1,6 @@
 package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.position.CodePosition;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -27,7 +27,7 @@ public class InferredSemicolon implements IToken
 	@Override
 	public int type()
 	{
-		return Symbols.SEMICOLON;
+		return BaseSymbols.SEMICOLON;
 	}
 	
 	@Override

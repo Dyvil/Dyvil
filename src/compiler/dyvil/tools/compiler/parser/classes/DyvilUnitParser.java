@@ -3,9 +3,10 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class DyvilUnitParser extends DyvilHeaderParser
@@ -25,7 +26,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			return;
 		}
@@ -44,7 +45,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 				return;
 			}
 		case CLASS:
-			if (type == Symbols.AT && token.next().type() == Keywords.INTERFACE)
+			if (type == DyvilSymbols.AT && token.next().type() == DyvilKeywords.INTERFACE)
 			{
 				this.modifiers |= Modifiers.ANNOTATION;
 				return;

@@ -2,10 +2,10 @@ package dyvil.tools.compiler.ast.dynamic;
 
 import dyvil.collection.List;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.UnknownType;
+import dyvil.tools.parsing.Name;
 
 public final class DynamicType extends UnknownType
 {

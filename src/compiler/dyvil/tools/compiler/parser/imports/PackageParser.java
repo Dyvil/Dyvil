@@ -3,8 +3,8 @@ package dyvil.tools.compiler.parser.imports;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class PackageParser extends Parser
@@ -23,11 +23,11 @@ public class PackageParser extends Parser
 		int type = token.type();
 		switch (type)
 		{
-		case Symbols.SEMICOLON:
+		case BaseSymbols.SEMICOLON:
 			this.packageDeclaration.setPackage(this.buffer.toString());
 			pm.popParser();
 			return;
-		case Symbols.DOT:
+		case BaseSymbols.DOT:
 			this.buffer.append('.');
 			return;
 		case Tokens.IDENTIFIER:

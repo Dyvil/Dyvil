@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.Map;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class ArrayLiteralParser extends Parser implements IValueConsumer
@@ -41,21 +41,21 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			this.mode = SEPARATOR | COLON;
 			this.startPosition = token;
 			
-			if (type != Symbols.OPEN_SQUARE_BRACKET)
+			if (type != BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Array Literal - '[' expected");
 			}
 			return;
 		case SEPARATOR | COLON:
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.popParser();
 				this.end(token);
 				return;
 			}
 			
-			if (type == Symbols.COLON)
+			if (type == BaseSymbols.COLON)
 			{
 				this.mode = SEPARATOR;
 				this.map = true;
@@ -66,14 +66,14 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			
 			this.mode = SEPARATOR;
 			pm.pushParser(new ExpressionParser(this));
-			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
+			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Array Literal - ',' expected");
 			}
 			return;
 		case SEPARATOR:
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.popParser();
 				this.end(token);
@@ -82,13 +82,13 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			
 			this.mode = this.map ? COLON : SEPARATOR;
 			pm.pushParser(new ExpressionParser(this));
-			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
+			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.report(token, "Invalid Array Literal - ',' expected");
 			}
 			return;
 		case COLON:
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				this.end(token);
 				pm.popParser();
@@ -97,7 +97,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			
 			this.mode = SEPARATOR;
 			pm.pushParser(new ExpressionParser(this));
-			if (type != Symbols.COLON)
+			if (type != BaseSymbols.COLON)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Map Literal - ':' expected");

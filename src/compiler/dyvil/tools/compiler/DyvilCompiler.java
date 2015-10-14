@@ -17,6 +17,7 @@ import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.FileFinder;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.CodeFile;
@@ -100,6 +101,8 @@ public final class DyvilCompiler
 		
 		System.out.println("Dyvil Compiler v" + VERSION + " for Dyvil v" + DYVIL_VERSION);
 		System.out.println();
+		
+		Names.init();
 		
 		// Sets up States from arguments
 		for (String arg : args)

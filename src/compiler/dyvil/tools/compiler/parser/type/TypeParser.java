@@ -6,14 +6,16 @@ import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
 import dyvil.tools.compiler.ast.generic.type.NamedGenericType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParser extends Parser
@@ -49,7 +51,7 @@ public final class TypeParser extends Parser
 			if (type == Tokens.SYMBOL_IDENTIFIER)
 			{
 				Name name = token.nameValue();
-				if (name == Name.qmark)
+				if (name == Names.qmark)
 				{
 					this.typed.setType(new OptionType(this.type));
 					pm.popParser();
@@ -66,35 +68,35 @@ public final class TypeParser extends Parser
 		case NAME:
 			switch (type)
 			{
-			case Symbols.AT:
+			case DyvilSymbols.AT:
 				Annotation a = new Annotation();
 				pm.pushParser(pm.newAnnotationParser(a));
 				this.type = new AnnotatedType(a);
 				this.mode = ANNOTATION_END;
 				return;
-			case Symbols.OPEN_PARENTHESIS:
+			case BaseSymbols.OPEN_PARENTHESIS:
 				TupleType tupleType = new TupleType();
 				pm.pushParser(new TypeListParser(tupleType));
 				this.type = tupleType;
 				this.mode = TUPLE_END;
 				return;
-			case Symbols.OPEN_SQUARE_BRACKET:
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
 				this.mode = ARRAY_COLON;
 				ArrayType at = new ArrayType();
 				this.type = at;
 				pm.pushParser(pm.newTypeParser(at));
 				return;
-			case Symbols.ARROW_OPERATOR:
+			case DyvilSymbols.ARROW_OPERATOR:
 				LambdaType lt = new LambdaType();
 				this.type = lt;
 				pm.pushParser(pm.newTypeParser(lt));
 				this.mode = LAMBDA_END;
 				return;
-			case Keywords.NULL:
+			case DyvilKeywords.NULL:
 				this.typed.setType(Types.NULL);
 				pm.popParser();
 				return;
-			case Symbols.WILDCARD:
+			case DyvilSymbols.WILDCARD:
 				this.type = new WildcardType(token.raw());
 				this.mode = WILDCARD_TYPE;
 				return;
@@ -103,13 +105,13 @@ public final class TypeParser extends Parser
 			{
 				IToken next = token.next();
 				int nextType = next.type();
-				if (nextType == Symbols.OPEN_SQUARE_BRACKET || nextType == Symbols.GENERIC_CALL)
+				if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || nextType == DyvilSymbols.GENERIC_CALL)
 				{
 					this.type = new NamedGenericType(token.raw(), token.nameValue());
 					this.mode = GENERICS;
 					return;
 				}
-				if (nextType == Symbols.ARROW_OPERATOR)
+				if (nextType == DyvilSymbols.ARROW_OPERATOR)
 				{
 					LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
 					this.type = lt;
@@ -131,14 +133,14 @@ public final class TypeParser extends Parser
 			pm.report(token, "Invalid Type - Invalid " + token);
 			return;
 		case TUPLE_END:
-			if (type != Symbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Tuple Type - ')' expected");
 			}
 			IToken next = token.next();
 			int nextType = next.type();
-			if (nextType == Symbols.ARROW_OPERATOR)
+			if (nextType == DyvilSymbols.ARROW_OPERATOR)
 			{
 				TupleType tupleType = (TupleType) this.type;
 				this.type = new LambdaType(tupleType);
@@ -159,7 +161,7 @@ public final class TypeParser extends Parser
 			pm.popParser(true);
 			return;
 		case ARRAY_COLON:
-			if (type == Symbols.COLON)
+			if (type == BaseSymbols.COLON)
 			{
 				this.mode = ARRAY_END;
 				MapType mt = new MapType(this.type.getElementType(), null);
@@ -171,14 +173,14 @@ public final class TypeParser extends Parser
 		case ARRAY_END:
 			this.type.expandPosition(token);
 			this.mode = END;
-			if (type != Symbols.CLOSE_SQUARE_BRACKET)
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Array Type - ']' expected");
 			}
 			return;
 		case GENERICS:
-			if (type == Symbols.OPEN_SQUARE_BRACKET || type == Symbols.GENERIC_CALL)
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET || type == DyvilSymbols.GENERIC_CALL)
 			{
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
@@ -191,14 +193,14 @@ public final class TypeParser extends Parser
 		case WILDCARD_TYPE:
 			Name name = token.nameValue();
 			WildcardType wt = (WildcardType) this.type;
-			if (name == Name.ltcolon) // <: - Upper Bound
+			if (name == Names.ltcolon) // <: - Upper Bound
 			{
 				wt.setVariance(Variance.COVARIANT);
 				pm.pushParser(pm.newTypeParser(wt));
 				this.mode = END;
 				return;
 			}
-			if (name == Name.gtcolon) // >: - Lower Bound
+			if (name == Names.gtcolon) // >: - Lower Bound
 			{
 				wt.setVariance(Variance.CONTRAVARIANT);
 				pm.pushParser(pm.newTypeParser(wt));
@@ -210,7 +212,7 @@ public final class TypeParser extends Parser
 			return;
 		case GENERICS_END:
 			this.mode = END;
-			if (type != Symbols.CLOSE_SQUARE_BRACKET)
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Generic Type - ']' expected");

@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.SyncStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class SyncStatementParser extends Parser implements IValueConsumer
@@ -31,7 +31,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 		{
 		case LOCK:
 			this.mode = LOCK_END;
-			if (token.type() == Symbols.OPEN_PARENTHESIS)
+			if (token.type() == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
@@ -41,7 +41,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			return;
 		case LOCK_END:
 			this.mode = ACTION;
-			if (token.type() != Symbols.CLOSE_PARENTHESIS)
+			if (token.type() != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid Synchronized Block - ')' expected");

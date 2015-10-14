@@ -24,7 +24,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -44,6 +43,7 @@ import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 

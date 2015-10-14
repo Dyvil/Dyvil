@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
-import dyvil.tools.parsing.DyvilLexer;
+import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IdentifierToken;

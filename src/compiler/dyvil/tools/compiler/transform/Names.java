@@ -1,14 +1,9 @@
-package dyvil.tools.compiler.ast.member;
+package dyvil.tools.compiler.transform;
 
-import java.util.HashMap;
-import java.util.Map;
+import dyvil.tools.parsing.Name;
 
-import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.Symbols;
-
-public final class Name
+public final class Names
 {
-	private static final Map<String, Name> map = new HashMap();
 	
 	public static final Name	instance		= new Name("instance");
 	public static final Name	apply			= new Name("apply");
@@ -24,9 +19,8 @@ public final class Name
 	public static final Name	Function	= new Name("Function");
 	public static final Name	Tuple		= new Name("Tuple");
 	
-	public static final Name	_this	= new Name("this");
-	public static final Name	_null	= new Name("null");
-	
+	public static final Name	_this		= new Name("this");
+	public static final Name	_null		= new Name("null");
 	public static final Name	_void		= new Name("void");
 	public static final Name	_boolean	= new Name("boolean");
 	public static final Name	_byte		= new Name("byte");
@@ -36,9 +30,10 @@ public final class Name
 	public static final Name	_long		= new Name("long");
 	public static final Name	_float		= new Name("float");
 	public static final Name	_double		= new Name("double");
-	public static final Name	dynamic		= new Name("dynamic");
-	public static final Name	any			= new Name("any");
-	public static final Name	auto		= new Name("auto");
+	
+	public static final Name	dynamic	= new Name("dynamic");
+	public static final Name	any		= new Name("any");
+	public static final Name	auto	= new Name("auto");
 	
 	public static final Name	plus	= new Name("+", "$plus");
 	public static final Name	minus	= new Name("-", "$minus");
@@ -67,11 +62,9 @@ public final class Name
 	public static final Name	gt		= new Name(">", "$gt");
 	public static final Name	gteq	= new Name(">=", "$gt$eq");
 	public static final Name	gtcolon	= new Name(">:", "$gt$colon");
-	
 	public static final Name	qmark	= new Name("?", "$qmark");
 	public static final Name	bang	= new Name("!", "$bang");
 	public static final Name	tilde	= new Name("~", "$tilde");
-	
 	public static final Name	minusgt	= new Name("->", "$minus$gt");
 	public static final Name	ltminus	= new Name("<-", "$lt$minus");
 	
@@ -80,87 +73,13 @@ public final class Name
 	
 	public static final Name pluseq = new Name("+=", "$plus$eq");
 	
-	public final String	qualified;
-	public final String	unqualified;
-	
-	protected Name(String name)
+	private Names()
 	{
-		this.qualified = this.unqualified = name;
-		map.put(name, this);
+		// no instances
 	}
 	
-	protected Name(String unqualified, String qualified)
+	public static void init()
 	{
-		this.qualified = qualified;
-		this.unqualified = unqualified;
-		
-		map.put(qualified, this);
-		map.put(unqualified, this);
-	}
-	
-	public static Name get(String unqualified, String qualified)
-	{
-		Name name = map.get(qualified);
-		if (name != null)
-		{
-			return name;
-		}
-		
-		name = map.get(unqualified);
-		if (name != null)
-		{
-			return name;
-		}
-		
-		return new Name(unqualified, qualified);
-	}
-	
-	public static Name get(String value)
-	{
-		Name name = map.get(value);
-		if (name != null)
-		{
-			return name;
-		}
-		
-		return new Name(Symbols.unqualify(value), Symbols.qualify(value));
-	}
-	
-	public static Name getSpecial(String value)
-	{
-		Name name = map.get(value);
-		if (name != null)
-		{
-			return name;
-		}
-		
-		return new Name(value, Symbols.qualify(value));
-	}
-	
-	public static Name getQualified(String value)
-	{
-		Name name = map.get(value);
-		if (name != null)
-		{
-			return name;
-		}
-		
-		return new Name(value);
-	}
-	
-	public boolean equals(String name)
-	{
-		return this.qualified.equals(name);
-	}
-	
-	public boolean endsWith(String name)
-	{
-		return this.qualified.endsWith(name);
-	}
-	
-	@Override
-	public String toString()
-	{
-		return Formatting.Method.convertQualifiedNames ? this.qualified : this.unqualified;
+		// run static initializer of this class
 	}
 }

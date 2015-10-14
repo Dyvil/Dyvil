@@ -18,7 +18,6 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.operator.Operator;
@@ -33,10 +32,12 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.CodeFile;
-import dyvil.tools.parsing.DyvilLexer;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -356,7 +357,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void tokenize()
 	{
-		this.tokens = new DyvilLexer(this.markers).tokenize(this.inputFile.getCode());
+		this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.inputFile.getCode());
 		this.tokens.inferSemicolons();
 	}
 	

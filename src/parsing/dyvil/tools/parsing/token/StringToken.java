@@ -1,6 +1,6 @@
 package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.CodePosition;
 import dyvil.tools.parsing.position.ICodePosition;
 

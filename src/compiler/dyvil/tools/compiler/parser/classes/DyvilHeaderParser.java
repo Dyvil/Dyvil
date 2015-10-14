@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.HeaderDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
@@ -14,10 +13,12 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class DyvilHeaderParser extends Parser
@@ -43,7 +44,7 @@ public class DyvilHeaderParser extends Parser
 	
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
 	{
-		if (type == Keywords.PACKAGE)
+		if (type == DyvilKeywords.PACKAGE)
 		{
 			PackageDeclaration pack = new PackageDeclaration(token.raw());
 			this.unit.setPackageDeclaration(pack);
@@ -57,7 +58,7 @@ public class DyvilHeaderParser extends Parser
 	{
 		switch (type)
 		{
-		case Keywords.IMPORT:
+		case DyvilKeywords.IMPORT:
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw());
 			pm.pushParser(new ImportParser(im -> {
@@ -66,7 +67,7 @@ public class DyvilHeaderParser extends Parser
 			}));
 			return true;
 		}
-		case Keywords.USING:
+		case DyvilKeywords.USING:
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
 			pm.pushParser(new ImportParser(im -> {
@@ -75,21 +76,21 @@ public class DyvilHeaderParser extends Parser
 			}));
 			return true;
 		}
-		case Keywords.OPERATOR:
+		case DyvilKeywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, true), true);
 			return true;
-		case Keywords.PREFIX:
-		case Keywords.POSTFIX:
-		case Keywords.INFIX:
+		case DyvilKeywords.PREFIX:
+		case DyvilKeywords.POSTFIX:
+		case DyvilKeywords.INFIX:
 			pm.pushParser(new OperatorParser(this.unit, false), true);
 			return true;
-		case Keywords.INCLUDE:
+		case DyvilKeywords.INCLUDE:
 		{
 			IncludeDeclaration i = new IncludeDeclaration(token.raw());
 			pm.pushParser(new IncludeParser(this.unit, i));
 			return true;
 		}
-		case Keywords.TYPE:
+		case DyvilKeywords.TYPE:
 		{
 			TypeAlias typeAlias = new TypeAlias();
 			pm.pushParser(new TypeAliasParser(this.unit, typeAlias));
@@ -107,12 +108,12 @@ public class DyvilHeaderParser extends Parser
 			this.modifiers |= i;
 			return true;
 		}
-		if (type == Symbols.AT && token.next().type() != Keywords.INTERFACE)
+		if (type == DyvilSymbols.AT && token.next().type() != DyvilKeywords.INTERFACE)
 		{
 			this.parseAnnotation(pm, token);
 			return true;
 		}
-		if (type == Keywords.HEADER)
+		if (type == DyvilKeywords.HEADER)
 		{
 			IToken next = token.next();
 			if (ParserUtil.isIdentifier(next.type()))
@@ -140,7 +141,7 @@ public class DyvilHeaderParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			return;
 		}

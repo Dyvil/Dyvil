@@ -21,10 +21,11 @@ import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ClassBodyParser extends Parser implements ITypeConsumer
@@ -78,13 +79,13 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case TYPE:
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser(true);
 				return;
 			}
 			
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				if (token.isInferred())
 				{
@@ -94,7 +95,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-			if (type == Keywords.NEW)
+			if (type == DyvilKeywords.NEW)
 			{
 				if (this.theClass == null)
 				{
@@ -130,9 +131,9 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-			if (type == Symbols.AT)
+			if (type == DyvilSymbols.AT)
 			{
-				if (token.next().type() == Keywords.INTERFACE)
+				if (token.next().type() == DyvilKeywords.INTERFACE)
 				{
 					this.modifiers |= Modifiers.ANNOTATION;
 					return;
@@ -160,13 +161,13 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			IToken next = token.next();
 			type = next.type();
-			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				f.setAnnotations(this.annotations);
 				this.consumer.addField(f);
 				
-				if (type == Symbols.CLOSE_CURLY_BRACKET)
+				if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 				{
 					pm.popParser(true);
 					return;
@@ -176,7 +177,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = PARAMETERS;
 				
@@ -185,7 +186,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.member = m;
 				return;
 			}
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				Property p = new Property(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				p.setAnnotations(this.annotations);
@@ -196,7 +197,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.pushParser(new PropertyParser(p));
 				return;
 			}
-			if (type == Symbols.EQUALS)
+			if (type == BaseSymbols.EQUALS)
 			{
 				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				f.setAnnotations(this.annotations);
@@ -207,7 +208,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.pushParser(pm.newExpressionParser(f));
 				return;
 			}
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.annotations);
@@ -224,7 +225,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
@@ -233,7 +234,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			return;
 		case PARAMETERS:
 			this.mode = PARAMETERS_END;
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser((IParameterList) this.member));
 				return;
@@ -243,7 +244,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_VALUE;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
@@ -252,30 +253,30 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			pm.report(token, "Invalid Parameter List - ')' expected");
 			return;
 		case METHOD_VALUE:
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				this.consumer.addMethod((IMethod) this.member);
 				pm.popParser(true);
 				return;
 			}
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				this.consumer.addMethod((IMethod) this.member);
 				this.reset();
 				return;
 			}
 			this.mode = METHOD_END;
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.pushParser(new StatementListParser((IValueConsumer) this.member), true);
 				return;
 			}
-			if (type == Symbols.EQUALS)
+			if (type == BaseSymbols.EQUALS)
 			{
 				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
 				return;
 			}
-			if (type == Keywords.THROWS)
+			if (type == DyvilKeywords.THROWS)
 			{
 				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
 				return;

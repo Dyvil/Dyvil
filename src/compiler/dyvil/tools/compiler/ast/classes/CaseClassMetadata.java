@@ -5,7 +5,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
 import dyvil.tools.compiler.ast.method.MethodMatch;
@@ -17,6 +16,8 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
@@ -37,7 +38,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			Method m = new Method(this.theClass, Name.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
+			Method m = new Method(this.theClass, Names.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
 			IParameter[] parameters = this.theClass.getParameters();
 			int parameterCount = this.theClass.parameterCount();
 			
@@ -55,7 +56,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
-		if (name == Name.apply && this.applyMethod != null)
+		if (name == Names.apply && this.applyMethod != null)
 		{
 			float match = this.applyMethod.getSignatureMatch(name, instance, arguments);
 			if (match > 0)

@@ -7,9 +7,9 @@ import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.statement.foreach.ForEachStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
@@ -70,7 +70,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 		{
 		case FOR:
 			this.mode = FOR_START;
-			if (type != Keywords.FOR)
+			if (type != DyvilKeywords.FOR)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid For Statement - 'for' expected");
@@ -78,14 +78,14 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			return;
 		case FOR_START:
 			this.mode = TYPE;
-			if (type != Symbols.OPEN_PARENTHESIS)
+			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid For Statement - '(' expected");
 			}
 			return;
 		case TYPE:
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				// Condition
 				pm.pushParser(pm.newExpressionParser(this));
@@ -108,7 +108,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			pm.report(token, "Invalid For statement - Variable Name expected");
 			return;
 		case SEPERATOR:
-			if (type == Symbols.COLON)
+			if (type == BaseSymbols.COLON)
 			{
 				this.mode = FOR_END;
 				this.forEach = true;
@@ -116,7 +116,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			this.mode = VARIABLE_END;
-			if (type == Symbols.EQUALS)
+			if (type == BaseSymbols.EQUALS)
 			{
 				pm.pushParser(pm.newExpressionParser(this.variable));
 				return;
@@ -126,9 +126,9 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			return;
 		case VARIABLE_END:
 			this.mode = CONDITION_END;
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				if (token.next().type() == Symbols.SEMICOLON)
+				if (token.next().type() == BaseSymbols.SEMICOLON)
 				{
 					return;
 				}
@@ -141,14 +141,14 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			return;
 		case CONDITION_END:
 			this.mode = FOR_END;
-			if (type != Symbols.SEMICOLON)
+			if (type != BaseSymbols.SEMICOLON)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid for statement - ';' expected");
 				return;
 			}
 			
-			if (token.next().type() != Symbols.SEMICOLON)
+			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 			}
@@ -156,7 +156,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			return;
 		case FOR_END:
 			this.mode = STATEMENT;
-			if (type != Symbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid for statement - ')' expected");

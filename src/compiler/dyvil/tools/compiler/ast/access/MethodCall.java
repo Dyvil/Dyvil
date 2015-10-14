@@ -5,14 +5,15 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.ConstantFolder;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -190,7 +191,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 			
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(itype, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(itype, null, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -207,7 +208,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			access.dotless = this.dotless;
 			
 			// Find the apply method of the field type
-			IMethod match = IContext.resolveMethod(field.getType(), access, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(field.getType(), access, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call

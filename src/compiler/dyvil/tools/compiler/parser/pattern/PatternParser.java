@@ -5,10 +5,11 @@ import dyvil.tools.compiler.ast.pattern.*;
 import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class PatternParser extends Parser
@@ -32,9 +33,9 @@ public class PatternParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == 0 || type == Symbols.COLON)
+		if (this.mode == 0 || type == BaseSymbols.COLON)
 		{
-			if (type == Keywords.AS)
+			if (type == DyvilKeywords.AS)
 			{
 				TypeCheckPattern tcp = new TypeCheckPattern(token.raw(), this.pattern);
 				this.pattern = tcp;
@@ -56,7 +57,7 @@ public class PatternParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				IToken next = token.next();
-				if (next.type() == Symbols.OPEN_PARENTHESIS)
+				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
 					CaseClassPattern ccp = new CaseClassPattern(token.raw());
 					ccp.setType(new NamedType(token.raw(), token.nameValue()));
@@ -70,7 +71,7 @@ public class PatternParser extends Parser
 				pm.report(next, "Invalid Case Class Pattern - '(' expected");
 				return;
 			}
-			if (type == Keywords.VAR)
+			if (type == DyvilKeywords.VAR)
 			{
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
@@ -85,12 +86,12 @@ public class PatternParser extends Parser
 				pm.report(next, "Invalid Binding Pattern - Identifier expected");
 				return;
 			}
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				this.mode = ARRAY_END;
 				return;
 			}
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				TuplePattern tp = new TuplePattern(token);
 				this.pattern = tp;
@@ -108,7 +109,7 @@ public class PatternParser extends Parser
 			pm.report(token, "Invalid Pattern");
 			return;
 		case ARRAY_END:
-			if (type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				this.pattern.expandPosition(token);
 				this.consumer.setPattern(this.pattern);
@@ -121,7 +122,7 @@ public class PatternParser extends Parser
 			pm.report(token, "Invalid Array Pattern - '}' expected");
 			return;
 		case TUPLE_END:
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				this.pattern.expandPosition(token);
 				this.consumer.setPattern(this.pattern);
@@ -134,7 +135,7 @@ public class PatternParser extends Parser
 			pm.report(token, "Invalid Tuple Pattern - ')' expected");
 			return;
 		case CASE_CLASS_END:
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				this.consumer.setPattern(this.pattern);
 				pm.popParser();
@@ -151,13 +152,13 @@ public class PatternParser extends Parser
 	{
 		switch (type)
 		{
-		case Keywords.TRUE:
+		case DyvilKeywords.TRUE:
 			return new BooleanPattern(token.raw(), true);
-		case Keywords.FALSE:
+		case DyvilKeywords.FALSE:
 			return new BooleanPattern(token.raw(), false);
-		case Symbols.WILDCARD:
+		case DyvilSymbols.WILDCARD:
 			return new WildcardPattern(token.raw());
-		case Keywords.NULL:
+		case DyvilKeywords.NULL:
 			return new NullPattern(token.raw());
 		case Tokens.STRING:
 			return new StringPattern(token.raw(), token.stringValue());

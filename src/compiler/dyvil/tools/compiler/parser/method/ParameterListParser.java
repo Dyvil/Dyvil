@@ -12,9 +12,10 @@ import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
@@ -55,7 +56,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case TYPE:
-			if (type == Symbols.SEMICOLON && token.isInferred())
+			if (type == BaseSymbols.SEMICOLON && token.isInferred())
 			{
 				return;
 			}
@@ -65,7 +66,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.modifiers |= i;
 				return;
 			}
-			if (type == Symbols.AT)
+			if (type == DyvilSymbols.AT)
 			{
 				if (this.annotations == null)
 				{
@@ -86,7 +87,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			pm.pushParser(pm.newTypeParser(this), true);
 			return;
 		case NAME:
-			if (type == Symbols.ELLIPSIS)
+			if (type == DyvilSymbols.ELLIPSIS)
 			{
 				this.varargs = true;
 				return;
@@ -121,13 +122,13 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				pm.popParser(true);
 				return;
 			}
-			if (type == Symbols.EQUALS)
+			if (type == BaseSymbols.EQUALS)
 			{
 				pm.pushParser(pm.newExpressionParser(this.parameter));
 				return;
 			}
 			this.reset();
-			if (type == Symbols.COMMA || type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}

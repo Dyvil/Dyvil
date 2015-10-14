@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -12,8 +11,10 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -26,7 +27,7 @@ public final class LiteralExpression implements IValue
 	
 	private IMethod method;
 	
-	private Name methodName = Name.apply;
+	private Name methodName = Names.apply;
 	
 	public LiteralExpression(IValue literal, IAnnotation annotation)
 	{
@@ -61,7 +62,7 @@ public final class LiteralExpression implements IValue
 		{
 			return Name.get(v.stringValue());
 		}
-		return Name.apply;
+		return Names.apply;
 	}
 	
 	@Override

@@ -4,8 +4,8 @@ import dyvil.tools.compiler.ast.bytecode.FieldInstruction;
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class FieldInstructionParser extends Parser implements IInternalTyped
@@ -26,7 +26,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
@@ -39,7 +39,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 			this.mode = DOT;
 			return;
 		case DOT:
-			if (type != Symbols.DOT)
+			if (type != BaseSymbols.DOT)
 			{
 				pm.report(token, "Invalid Field Instruction - '.' expected");
 				return;
@@ -55,7 +55,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 			this.fieldInstruction.setFieldName(next.nameValue().qualified);
 			return;
 		case COLON:
-			if (type != Symbols.COLON)
+			if (type != BaseSymbols.COLON)
 			{
 				pm.report(token, "Invalid Field Instruction - ':' expected");
 				return;

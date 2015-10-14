@@ -10,8 +10,9 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class LambdaOrTupleParser extends EmulatorParser implements IParameterList
@@ -59,7 +60,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			IToken next = token.next();
 			int nextNextType = next.next().type();
 			// Special cases: (x) => ... or (x, y, ...) => ...
-			if (nextNextType == Symbols.CLOSE_PARENTHESIS || nextNextType == Symbols.COMMA)
+			if (nextNextType == BaseSymbols.CLOSE_PARENTHESIS || nextNextType == BaseSymbols.COMMA)
 			{
 				this.mode = PARAMETER_NAME;
 				return;
@@ -68,7 +69,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			this.parser = this.tryParser = new ParameterListParser(this);
 			return;
 		case PARAMETERS:
-			if (token.type() == Symbols.CLOSE_PARENTHESIS && this.tryParser.isInMode(ParameterListParser.SEPERATOR))
+			if (token.type() == BaseSymbols.CLOSE_PARENTHESIS && this.tryParser.isInMode(ParameterListParser.SEPERATOR))
 			{
 				this.mode = ARROW;
 				return;
@@ -89,12 +90,12 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			return;
 		case SEPARATOR:
 			int type = token.type();
-			if (type == Symbols.COMMA)
+			if (type == BaseSymbols.COMMA)
 			{
 				this.mode = PARAMETER_NAME;
 				return;
 			}
-			if (type == Symbols.CLOSE_PARENTHESIS && token.next().type() == Symbols.ARROW_OPERATOR)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS && token.next().type() == DyvilSymbols.ARROW_OPERATOR)
 			{
 				this.mode = ARROW;
 				return;
@@ -104,7 +105,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			this.mode = TUPLE;
 			return;
 		case TUPLE:
-			if (token.type() == Symbols.OPEN_PARENTHESIS)
+			if (token.type() == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				Tuple t = new Tuple(token);
 				this.value = t;
@@ -116,7 +117,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			return;
 		case TUPLE_END:
 			pm.popParser();
-			if (token.type() == Symbols.CLOSE_PARENTHESIS)
+			if (token.type() == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				this.value.expandPosition(token);
 				this.consumer.setValue(this.value);
@@ -126,7 +127,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			pm.report(token, "Invalid Tuple - ')' expected");
 			return;
 		case ARROW:
-			if (token.type() != Symbols.ARROW_OPERATOR)
+			if (token.type() != DyvilSymbols.ARROW_OPERATOR)
 			{
 				pm.jump(this.firstToken);
 				this.mode = TUPLE;

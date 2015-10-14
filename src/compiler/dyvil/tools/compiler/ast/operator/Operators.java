@@ -4,10 +4,10 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringBuilderExpression;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 
-import static dyvil.tools.compiler.ast.member.Name.*;
 import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
 
 public interface Operators
@@ -16,7 +16,7 @@ public interface Operators
 	
 	public static IValue getPriority(Name name, IValue arg1)
 	{
-		if (name == bang)
+		if (name == Names.bang)
 		{
 			if (arg1.isType(Types.BOOLEAN))
 			{
@@ -28,7 +28,7 @@ public interface Operators
 	
 	public static IValue getPriority(IValue arg1, Name name, IValue arg2)
 	{
-		if (name == eqeq || name == eqeqeq)
+		if (name == Names.eqeq || name == Names.eqeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
 			{
@@ -40,7 +40,7 @@ public interface Operators
 			}
 			return null;
 		}
-		if (name == bangeq || name == bangeqeq)
+		if (name == Names.bangeq || name == Names.bangeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
 			{
@@ -56,7 +56,7 @@ public interface Operators
 	
 	public static IValue get(IValue arg1, Name name, IValue arg2)
 	{
-		if (name == plus)
+		if (name == Names.plus)
 		{
 			if (arg1.valueTag() == IValue.STRINGBUILDER)
 			{
@@ -72,7 +72,7 @@ public interface Operators
 				return sbe;
 			}
 		}
-		if (name == pluseq)
+		if (name == Names.pluseq)
 		{
 			if (arg1.valueTag() != IValue.FIELD_ACCESS || !arg1.isType(Types.STRING))
 			{
@@ -95,7 +95,7 @@ public interface Operators
 			return new FieldAssign(null, fa.getInstance(), fa.getField(), arg2);
 		}
 		boolean openRange = false;
-		if (name == dotdot || (openRange = name == dotdotlt))
+		if (name == Names.dotdot || (openRange = name == Names.dotdotlt))
 		{
 			RangeOperator rangeOperator = null;
 			if (arg1.isType(RangeOperator.LazyFields.RANGEABLE) && arg2.isType(RangeOperator.LazyFields.RANGEABLE))
@@ -106,7 +106,7 @@ public interface Operators
 			return rangeOperator;
 		}
 		// Swap Operator
-		if (name == coloneqcolon)
+		if (name == Names.coloneqcolon)
 		{
 			if (arg1.valueTag() == IValue.FIELD_ACCESS && arg2.valueTag() == IValue.FIELD_ACCESS)
 			{
@@ -114,7 +114,7 @@ public interface Operators
 			}
 			return null;
 		}
-		if (name == ampamp)
+		if (name == Names.ampamp)
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
@@ -122,7 +122,7 @@ public interface Operators
 			}
 			return null;
 		}
-		if (name == barbar)
+		if (name == Names.barbar)
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{

@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -19,7 +18,9 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
@@ -64,7 +65,7 @@ public class ClassMetadata implements IClassMetadata
 	private void checkMethod(IMethod m)
 	{
 		Name name = m.getName();
-		if (name == Name.equals)
+		if (name == Names.equals)
 		{
 			if (m.parameterCount() == 1 && m.getParameter(0).getType().equals(Types.OBJECT))
 			{
@@ -72,7 +73,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
-		if (name == Name.hashCode)
+		if (name == Names.hashCode)
 		{
 			if (m.parameterCount() == 0)
 			{
@@ -80,7 +81,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
-		if (name == Name.toString)
+		if (name == Names.toString)
 		{
 			if (m.parameterCount() == 0)
 			{
@@ -88,7 +89,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
-		if (name == Name.apply)
+		if (name == Names.apply)
 		{
 			if (m.parameterCount() == this.theClass.parameterCount())
 			{

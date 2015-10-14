@@ -1,21 +1,22 @@
-package dyvil.tools.parsing;
+package dyvil.tools.parsing.lexer;
 
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.*;
 
-import static dyvil.tools.compiler.transform.Tokens.*;
+import static dyvil.tools.parsing.lexer.Tokens.*;
 
 public final class DyvilLexer
 {
 	private MarkerList markers;
+	private Symbols symbols;
 	
-	public DyvilLexer(MarkerList markers)
+	public DyvilLexer(MarkerList markers, Symbols symbols)
 	{
 		this.markers = markers;
+		this.symbols = symbols;
 	}
 	
 	public TokenIterator tokenize(String code)
@@ -372,14 +373,6 @@ public final class DyvilLexer
 					buf.append(c);
 				}
 				break;
-			case GENERIC_CALL:
-				if (c == '[')
-				{
-					addToken = true;
-					reparse = false;
-					break;
-				}
-				continue;
 			}
 			
 			if (addToken)
@@ -413,12 +406,6 @@ public final class DyvilLexer
 		{
 		case '`':
 			return SPECIAL_IDENTIFIER;
-		case '#':
-			if (code.charAt(i + 1) == '[')
-			{
-				return GENERIC_CALL;
-			}
-			return IDENTIFIER | MOD_SYMBOL;
 		case '"':
 			return STRING;
 		case '\'':
@@ -461,28 +448,28 @@ public final class DyvilLexer
 			}
 			return INT;
 		case '(':
-			return Symbols.OPEN_PARENTHESIS;
+			return BaseSymbols.OPEN_PARENTHESIS;
 		case ')':
-			return Symbols.CLOSE_PARENTHESIS;
+			return BaseSymbols.CLOSE_PARENTHESIS;
 		case '[':
-			return Symbols.OPEN_SQUARE_BRACKET;
+			return BaseSymbols.OPEN_SQUARE_BRACKET;
 		case ']':
-			return Symbols.CLOSE_SQUARE_BRACKET;
+			return BaseSymbols.CLOSE_SQUARE_BRACKET;
 		case '{':
-			return Symbols.OPEN_CURLY_BRACKET;
+			return BaseSymbols.OPEN_CURLY_BRACKET;
 		case '}':
-			return Symbols.CLOSE_CURLY_BRACKET;
+			return BaseSymbols.CLOSE_CURLY_BRACKET;
 		case '.':
 			n = code.charAt(i + 1);
 			if (LexerUtil.isIdentifierSymbol(n))
 			{
 				return IDENTIFIER | MOD_SYMBOL;
 			}
-			return Symbols.DOT;
+			return BaseSymbols.DOT;
 		case ';':
-			return Symbols.SEMICOLON;
+			return BaseSymbols.SEMICOLON;
 		case ',':
-			return Symbols.COMMA;
+			return BaseSymbols.COMMA;
 		case '_':
 		case '$':
 			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
@@ -546,44 +533,41 @@ public final class DyvilLexer
 		case IDENTIFIER:
 		case LETTER_IDENTIFIER:
 		{
-			int i = Keywords.getKeywordType(s);
+			int i = this.symbols.getKeywordType(s);
 			if (i == 0)
 			{
 				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
 			}
-			return new KeywordToken(prev, i, line, start, start + len);
+			return new SymbolToken(this.symbols, prev, i, line, start);
 		}
 		case SYMBOL_IDENTIFIER:
 		case SYMBOL_IDENTIFIER | LETTER_IDENTIFIER:
 		{
-			int i = Symbols.getSymbolType(s);
+			int i = this.symbols.getSymbolType(s);
 			if (i == 0)
 			{
 				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
 			}
-			return new SymbolToken(prev, i, line, start);
+			return new SymbolToken(this.symbols, prev, i, line, start);
 		}
 		case SPECIAL_IDENTIFIER:
 			return new IdentifierToken(prev, Name.getSpecial(s), type, line, start, start + len);
 		case SYMBOL:
-		case Symbols.DOT:
-		case Symbols.COLON:
-		case Symbols.SEMICOLON:
-		case Symbols.COMMA:
-		case Symbols.EQUALS:
-		case Symbols.HASH:
-		case Symbols.WILDCARD:
-		case Symbols.ARROW_OPERATOR:
+		case BaseSymbols.DOT:
+		case BaseSymbols.COLON:
+		case BaseSymbols.SEMICOLON:
+		case BaseSymbols.COMMA:
+		case BaseSymbols.EQUALS:
 			/* Brackets */
-		case Symbols.OPEN_BRACKET:
-		case Symbols.CLOSE_BRACKET:
-		case Symbols.OPEN_PARENTHESIS:
-		case Symbols.CLOSE_PARENTHESIS:
-		case Symbols.OPEN_SQUARE_BRACKET:
-		case Symbols.CLOSE_SQUARE_BRACKET:
-		case Symbols.OPEN_CURLY_BRACKET:
-		case Symbols.CLOSE_CURLY_BRACKET:
-			return new SymbolToken(prev, type, line, start);
+		case BaseSymbols.OPEN_BRACKET:
+		case BaseSymbols.CLOSE_BRACKET:
+		case BaseSymbols.OPEN_PARENTHESIS:
+		case BaseSymbols.CLOSE_PARENTHESIS:
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
+		case BaseSymbols.CLOSE_SQUARE_BRACKET:
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+		case BaseSymbols.CLOSE_CURLY_BRACKET:
+			return new SymbolToken(BaseSymbols.INSTANCE, prev, type, line, start);
 		case INT:
 			return this.intToken(prev, s, line, start, len, 10, false);
 		case INT | MOD_BIN:
@@ -620,8 +604,6 @@ public final class DyvilLexer
 			return new StringToken(prev, STRING_END, s, line, start, start + len);
 		case CHAR:
 			return new CharToken(prev, s.charAt(1), line, start);
-		case GENERIC_CALL:
-			return new SymbolToken(prev, Symbols.GENERIC_CALL, line, start);
 		}
 		return null;
 	}

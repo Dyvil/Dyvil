@@ -7,30 +7,30 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.transform.Names;
 
 public final class Types
 {
 	public static IDyvilHeader LANG_HEADER;
 	
-	public static final PrimitiveType	VOID	= new PrimitiveType(Name._void, PrimitiveType.VOID_CODE, 'V', Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
+	public static final PrimitiveType	VOID	= new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V', Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
 			Opcodes.IALOAD, null);
-	public static final PrimitiveType	BOOLEAN	= new PrimitiveType(Name._boolean, PrimitiveType.BOOLEAN_CODE, 'Z', Opcodes.ILOAD, Opcodes.BALOAD,
+	public static final PrimitiveType	BOOLEAN	= new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z', Opcodes.ILOAD, Opcodes.BALOAD,
 			ClassFormat.BOOLEAN);
-	public static final PrimitiveType	BYTE	= new PrimitiveType(Name._byte, PrimitiveType.BYTE_CODE, 'B', Opcodes.ILOAD, Opcodes.BALOAD,
+	public static final PrimitiveType	BYTE	= new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B', Opcodes.ILOAD, Opcodes.BALOAD,
 			ClassFormat.BOOLEAN);
-	public static final PrimitiveType	SHORT	= new PrimitiveType(Name._short, PrimitiveType.SHORT_CODE, 'S', Opcodes.ILOAD, Opcodes.SALOAD,
+	public static final PrimitiveType	SHORT	= new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S', Opcodes.ILOAD, Opcodes.SALOAD,
 			ClassFormat.SHORT);
-	public static final PrimitiveType	CHAR	= new PrimitiveType(Name._char, PrimitiveType.CHAR_CODE, 'C', Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
-	public static final PrimitiveType	INT		= new PrimitiveType(Name._int, PrimitiveType.INT_CODE, 'I', Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
-	public static final PrimitiveType	LONG	= new PrimitiveType(Name._long, PrimitiveType.LONG_CODE, 'J', Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
-	public static final PrimitiveType	FLOAT	= new PrimitiveType(Name._float, PrimitiveType.FLOAT_CODE, 'F', Opcodes.FLOAD, Opcodes.FALOAD,
+	public static final PrimitiveType	CHAR	= new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C', Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
+	public static final PrimitiveType	INT		= new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I', Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
+	public static final PrimitiveType	LONG	= new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J', Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
+	public static final PrimitiveType	FLOAT	= new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F', Opcodes.FLOAD, Opcodes.FALOAD,
 			ClassFormat.FLOAT);
-	public static final PrimitiveType	DOUBLE	= new PrimitiveType(Name._double, PrimitiveType.DOUBLE_CODE, 'D', Opcodes.DLOAD, Opcodes.DALOAD,
+	public static final PrimitiveType	DOUBLE	= new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D', Opcodes.DLOAD, Opcodes.DALOAD,
 			ClassFormat.DOUBLE);
 			
 	public static final DynamicType	DYNAMIC	= new DynamicType();
@@ -116,24 +116,24 @@ public final class Types
 		DOUBLE_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("DoubleConvertible");
 		STRING_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("StringConvertible");
 		
-		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Name.apply);
-		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Name.unapply);
-		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.apply);
-		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Name.unapply);
-		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Name.apply);
-		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Name.unapply);
-		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Name.apply);
-		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Name.unapply);
-		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Name.apply);
-		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Name.unapply);
-		INT.boxMethod = INT_CLASS.getBody().getMethod(Name.apply);
-		INT.unboxMethod = INT_CLASS.getBody().getMethod(Name.unapply);
-		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Name.apply);
-		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Name.unapply);
-		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Name.apply);
-		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Name.unapply);
-		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Name.apply);
-		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Name.unapply);
+		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Names.apply);
+		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Names.unapply);
+		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Names.apply);
+		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Names.unapply);
+		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Names.apply);
+		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Names.unapply);
+		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Names.apply);
+		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Names.unapply);
+		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Names.apply);
+		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Names.unapply);
+		INT.boxMethod = INT_CLASS.getBody().getMethod(Names.apply);
+		INT.unboxMethod = INT_CLASS.getBody().getMethod(Names.unapply);
+		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Names.apply);
+		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Names.unapply);
+		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Names.apply);
+		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Names.unapply);
+		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Names.apply);
+		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Names.unapply);
 	}
 	
 	public static IType fromASMType(dyvil.tools.asm.Type type)

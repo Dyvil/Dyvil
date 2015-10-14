@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.AppliedStatementList;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.Label;
@@ -15,9 +14,11 @@ import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
@@ -75,7 +76,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	{
 		int type = token.type();
 		
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			if (this.firstToken != null)
 			{
@@ -96,27 +97,27 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		case OPEN_BRACKET:
 			this.mode = EXPRESSION;
 			this.statementList = this.applied ? new AppliedStatementList(token) : new StatementList(token);
-			if (type != Symbols.OPEN_CURLY_BRACKET)
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.report(token, "Invalid Statement List - '{' expected");
 				pm.reparse();
 			}
 			return;
 		case EXPRESSION:
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				int nextType = token.next().type();
-				if (nextType == Symbols.COLON)
+				if (nextType == BaseSymbols.COLON)
 				{
 					this.label = token.nameValue();
 					pm.skip();
 					return;
 				}
-				if (nextType == Symbols.EQUALS)
+				if (nextType == BaseSymbols.EQUALS)
 				{
 					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
 					pm.skip();
@@ -132,7 +133,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				this.modifiers |= i;
 				return;
 			}
-			if (type == Symbols.AT)
+			if (type == DyvilSymbols.AT)
 			{
 				if (this.annotations == null)
 				{
@@ -149,7 +150,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.mode = TYPE;
 			//$FALL-THROUGH$
 		case TYPE:
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.EQUALS)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.EQUALS)
 			{
 				if (this.type != null)
 				{
@@ -185,11 +186,11 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}
-			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
+			if (token.prev().type() == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
 				return;

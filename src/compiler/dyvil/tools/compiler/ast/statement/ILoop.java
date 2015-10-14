@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.context.ILabelContext;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 public interface ILoop extends ILabelContext
 {

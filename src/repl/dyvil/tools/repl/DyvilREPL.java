@@ -14,9 +14,11 @@ import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.DyvilLexer;
 import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.repl.command.*;
 
 public class DyvilREPL
@@ -48,6 +50,8 @@ public class DyvilREPL
 	public static void main(String[] args) throws Exception
 	{
 		System.out.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
+		
+		Names.init();
 		
 		for (String arg : args)
 		{
@@ -196,7 +200,7 @@ public class DyvilREPL
 			}
 			
 			REPLContext.reset();
-			TokenIterator tokens = new DyvilLexer(REPLContext.markers).tokenize(currentCode);
+			TokenIterator tokens = new DyvilLexer(REPLContext.markers, DyvilSymbols.INSTANCE).tokenize(currentCode);
 			tokens.inferSemicolons();
 			
 			if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))

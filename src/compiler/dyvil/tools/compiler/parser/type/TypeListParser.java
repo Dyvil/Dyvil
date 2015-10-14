@@ -3,8 +3,8 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeListParser extends Parser
@@ -20,7 +20,7 @@ public final class TypeListParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON && token.isInferred() || type == Symbols.OPEN_CURLY_BRACKET)
+		if (type == BaseSymbols.SEMICOLON && token.isInferred() || type == BaseSymbols.OPEN_CURLY_BRACKET)
 		{
 			pm.popParser(true);
 			return;

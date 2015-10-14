@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.IPatternList;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class PatternListParser extends Parser implements IPatternConsumer
@@ -42,7 +42,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 			return;
 		case 1:
 			this.mode = 0;
-			if (type == Symbols.COMMA)
+			if (type == BaseSymbols.COMMA)
 			{
 				this.patternList.addPattern(this.pattern);
 				return;

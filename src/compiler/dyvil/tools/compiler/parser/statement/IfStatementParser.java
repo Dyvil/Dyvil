@@ -5,9 +5,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class IfStatementParser extends Parser implements IValueConsumer
@@ -39,7 +39,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 		{
 			this.mode = CONDITION_END;
 			pm.pushParser(pm.newExpressionParser(this));
-			if (type != Symbols.OPEN_PARENTHESIS)
+			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid if statement - '(' expected");
@@ -49,7 +49,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 		if (this.mode == CONDITION_END)
 		{
 			this.mode = THEN;
-			if (type != Symbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid if statement - ')' expected");
@@ -73,7 +73,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			if (ParserUtil.isTerminator(type))
 			{
 				IToken next = token.next();
-				if (next != null && next.type() == Keywords.ELSE)
+				if (next != null && next.type() == DyvilKeywords.ELSE)
 				{
 					return;
 				}
@@ -81,7 +81,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			
-			if (type == Keywords.ELSE)
+			if (type == DyvilKeywords.ELSE)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = -1;

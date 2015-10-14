@@ -3,9 +3,9 @@ package dyvil.tools.compiler.util;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class ParserUtil
@@ -19,19 +19,19 @@ public class ParserUtil
 	
 	public static boolean isCloseBracket(int type)
 	{
-		return (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
+		return (type & BaseSymbols.CLOSE_BRACKET) == BaseSymbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isTerminator(int type)
 	{
 		switch (type)
 		{
-		case Symbols.COMMA:
-		case Symbols.SEMICOLON:
-		case Symbols.COLON:
-		case Symbols.CLOSE_CURLY_BRACKET:
-		case Symbols.CLOSE_PARENTHESIS:
-		case Symbols.CLOSE_SQUARE_BRACKET:
+		case BaseSymbols.COMMA:
+		case BaseSymbols.SEMICOLON:
+		case BaseSymbols.COLON:
+		case BaseSymbols.CLOSE_CURLY_BRACKET:
+		case BaseSymbols.CLOSE_PARENTHESIS:
+		case BaseSymbols.CLOSE_SQUARE_BRACKET:
 			return true;
 		}
 		return false;
@@ -45,12 +45,12 @@ public class ParserUtil
 		}
 		switch (type)
 		{
-		case Symbols.DOT:
-		case Symbols.EQUALS:
-		case Keywords.IS:
-		case Keywords.AS:
-		case Keywords.MATCH:
-		case Symbols.OPEN_SQUARE_BRACKET:
+		case BaseSymbols.DOT:
+		case BaseSymbols.EQUALS:
+		case DyvilKeywords.IS:
+		case DyvilKeywords.AS:
+		case DyvilKeywords.MATCH:
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_END:
 			return true;
@@ -60,7 +60,7 @@ public class ParserUtil
 	
 	public static boolean isSeperator(int type)
 	{
-		return type == Symbols.COMMA || type == Symbols.SEMICOLON;
+		return type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON;
 	}
 	
 	public static boolean isOperator(IParserManager pm, IToken token, int type)
@@ -76,9 +76,9 @@ public class ParserUtil
 	{
 		switch (type)
 		{
-		case Keywords.TRUE:
+		case DyvilKeywords.TRUE:
 			return new BooleanValue(token.raw(), true);
-		case Keywords.FALSE:
+		case DyvilKeywords.FALSE:
 			return new BooleanValue(token.raw(), false);
 		case Tokens.STRING:
 			return new StringValue(token.raw(), token.stringValue());

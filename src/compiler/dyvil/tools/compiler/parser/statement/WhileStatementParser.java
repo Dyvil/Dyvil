@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.WhileStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class WhileStatementParser extends Parser implements IValueConsumer
@@ -31,7 +31,7 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 		{
 		case CONDITION:
 			this.mode = CONDITION_END;
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
@@ -41,7 +41,7 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 			return;
 		case CONDITION_END:
 			this.mode = BLOCK;
-			if (type != Symbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "Invalid While Statement - ')' expected");

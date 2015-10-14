@@ -11,13 +11,14 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -79,12 +80,12 @@ public class NamedGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		if (this.name == Name.Tuple)
+		if (this.name == Names.Tuple)
 		{
 			this.resolveTypeArguments(markers, context);
 			return new TupleType(this.typeArguments, this.typeArgumentCount);
 		}
-		if (this.name == Name.Function)
+		if (this.name == Names.Function)
 		{
 			if (this.typeArgumentCount > 0)
 			{
