@@ -14,9 +14,10 @@ import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface ICall extends IValue
 {
@@ -28,15 +29,17 @@ public interface ICall extends IValue
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
-			Marker marker = markers.create(position, "resolve.method_field", name);
+			Marker marker = I18n.createMarker(position, "resolve.method_field", name);
 			if (instance != null)
 			{
 				marker.addInfo("Callee Type: " + instance.getType());
 			}
+			
+			markers.add(marker);
 			return;
 		}
 		
-		Marker marker = markers.create(position, "resolve.method", name);
+		Marker marker = I18n.createMarker(position, "resolve.method", name);
 		if (instance != null)
 		{
 			marker.addInfo("Callee Type: " + instance.getType());
@@ -47,6 +50,8 @@ public interface ICall extends IValue
 			arguments.typesToString(builder);
 			marker.addInfo(builder.toString());
 		}
+		
+		markers.add(marker);
 	}
 	
 	public static boolean privateAccess(IContext context, IValue instance)

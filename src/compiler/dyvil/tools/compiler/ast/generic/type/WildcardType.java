@@ -25,8 +25,9 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class WildcardType implements IRawType, ITyped
 {
@@ -186,7 +187,7 @@ public final class WildcardType implements IRawType, ITyped
 		
 		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
-			markers.add(this.position, "type.invalid.wildcard");
+			markers.add(I18n.createMarker(this.position, "type.invalid.wildcard"));
 		}
 	}
 	

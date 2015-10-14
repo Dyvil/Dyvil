@@ -9,8 +9,9 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class BreakStatement extends Value implements IStatement
 {
@@ -54,7 +55,7 @@ public class BreakStatement extends Value implements IStatement
 			ILoop loop = context.getEnclosingLoop();
 			if (loop == null)
 			{
-				markers.add(this.position, "break.invalid");
+				markers.add(I18n.createMarker(this.position, "break.invalid"));
 				return;
 			}
 			
@@ -66,7 +67,7 @@ public class BreakStatement extends Value implements IStatement
 		
 		if (!(this.label.value instanceof ILoop))
 		{
-			markers.add(this.position, "break.invalid.type", this.name);
+			markers.add(I18n.createMarker(this.position, "break.invalid.type", this.name));
 			return;
 		}
 		
@@ -80,11 +81,11 @@ public class BreakStatement extends Value implements IStatement
 		{
 			if (this.name == null)
 			{
-				markers.add(this.position, "break.invalid");
+				markers.add(I18n.createMarker(this.position, "break.invalid"));
 			}
 			else
 			{
-				markers.add(this.position, "resolve.label", this.name);
+				markers.add(I18n.createMarker(this.position, "resolve.label", this.name));
 			}
 		}
 	}

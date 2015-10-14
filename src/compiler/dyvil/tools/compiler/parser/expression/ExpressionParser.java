@@ -18,8 +18,6 @@ import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.statement.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -33,6 +31,8 @@ import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.token.IToken;
 
 public final class ExpressionParser extends Parser implements ITypeConsumer, IValueConsumer
 {

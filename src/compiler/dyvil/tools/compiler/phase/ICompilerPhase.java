@@ -12,10 +12,10 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
-import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.lexer.token.IdentifierToken;
+import dyvil.tools.parsing.DyvilLexer;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.token.IdentifierToken;
 
 public interface ICompilerPhase extends Comparable<ICompilerPhase>
 {
@@ -28,7 +28,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	
 	/**
 	 * Splits the input file into {@link IdentifierToken Tokens} using
-	 * {@link Dlex}.
+	 * {@link DyvilLexer}.
 	 */
 	ICompilerPhase TOKENIZE = new SequentialCompilerPhase(10, "TOKENIZE", ICompilationUnit::tokenize);
 	

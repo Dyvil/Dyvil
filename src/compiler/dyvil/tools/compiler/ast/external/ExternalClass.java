@@ -44,8 +44,8 @@ import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalClass extends AbstractClass
 {

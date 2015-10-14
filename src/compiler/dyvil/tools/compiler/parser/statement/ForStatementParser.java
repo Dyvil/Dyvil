@@ -5,13 +5,13 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.ForStatement;
 import dyvil.tools.compiler.ast.statement.foreach.ForEachStatement;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.token.IToken;
 
 public class ForStatementParser extends Parser implements IValueConsumer
 {

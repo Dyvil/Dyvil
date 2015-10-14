@@ -5,13 +5,13 @@ import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.statement.Label;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public final class BytecodeParser extends Parser
 {

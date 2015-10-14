@@ -2,7 +2,6 @@ package dyvil.tools.compiler.util;
 
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
@@ -12,8 +11,9 @@ import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class Util
 {
@@ -169,7 +169,7 @@ public class Util
 		IValue value1 = value.toConstant(markers);
 		if (value1 == null)
 		{
-			markers.add(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth);
+			markers.add(I18n.createMarker(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
 			return value.getType().getDefaultValue();
 		}
 		
@@ -212,9 +212,10 @@ public class Util
 	
 	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
 	{
-		Marker marker = markers.create(value.getPosition(), key, args);
+		Marker marker = I18n.createMarker(value.getPosition(), key, args);
 		marker.addInfo("Required Type: " + type.getConcreteType(typeContext));
 		marker.addInfo("Value Type: " + value.getType());
+		markers.add(marker);
 	}
 	
 	public static final Name stripEq(Name name)

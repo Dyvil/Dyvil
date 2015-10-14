@@ -16,8 +16,9 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class NamedType implements IRawType
 {
@@ -120,7 +121,7 @@ public class NamedType implements IRawType
 		IType type = IContext.resolveType(context, this.name);
 		if (type == null)
 		{
-			markers.add(this.position, "resolve.type", this.toString());
+			markers.add(I18n.createMarker(this.position, "resolve.type", this.toString()));
 			return this;
 		}
 		

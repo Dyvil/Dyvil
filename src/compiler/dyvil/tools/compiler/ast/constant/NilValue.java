@@ -16,8 +16,9 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NilValue implements IValue
 {
@@ -134,7 +135,7 @@ public final class NilValue implements IValue
 	{
 		if (this.requiredType == null)
 		{
-			markers.add(this.position, "nil.type");
+			markers.add(I18n.createMarker(this.position, "nil.type"));
 			return;
 		}
 		
@@ -146,7 +147,7 @@ public final class NilValue implements IValue
 		IMethod match = IContext.resolveMethod(this.requiredType, null, this.methodName, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(this.position, "nil.method", this.requiredType.toString(), this.methodName);
+			markers.add(I18n.createMarker(this.position, "nil.method", this.requiredType.toString(), this.methodName));
 		}
 		else
 		{

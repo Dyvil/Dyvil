@@ -4,15 +4,15 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.InferredSemicolon;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.token.IToken;
+import dyvil.tools.parsing.token.InferredSemicolon;
 
 public class REPLParser extends ParserManager
 {

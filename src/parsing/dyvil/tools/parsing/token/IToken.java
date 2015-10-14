@@ -1,7 +1,7 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IToken extends ICodePosition
 {

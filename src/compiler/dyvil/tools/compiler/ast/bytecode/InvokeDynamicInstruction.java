@@ -5,7 +5,7 @@ import dyvil.tools.asm.util.Printer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class InvokeDynamicInstruction implements IInstruction
 {

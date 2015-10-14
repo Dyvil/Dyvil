@@ -1,41 +1,50 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class SymbolToken implements IToken
+public final class FloatToken implements IToken
 {
 	private IToken	prev;
 	private IToken	next;
 	
-	private final int type;
-	
 	private final int	lineNumber;
 	private final int	start;
+	private final int	end;
 	
-	public SymbolToken(IToken prev, int type, int lineNumber, int start)
+	private float value;
+	
+	public FloatToken(IToken prev, float value, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
-		this.type = type;
+		this.value = value;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
-	public SymbolToken(String value, int type, int lineNumber, int start)
+	public FloatToken(float value, int lineNumber, int start, int end)
 	{
-		this.type = type;
+		this.value = value;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
 	@Override
 	public int type()
 	{
-		return this.type;
+		return Tokens.FLOAT;
+	}
+	
+	@Override
+	public float floatValue()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -47,14 +56,7 @@ public final class SymbolToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		switch (this.type)
-		{
-		case Symbols.ARROW_OPERATOR:
-			return this.start + 2;
-		case Symbols.ELLIPSIS:
-			return this.start + 3;
-		}
-		return this.start + 1;
+		return this.end;
 	}
 	
 	@Override
@@ -120,6 +122,6 @@ public final class SymbolToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Symbol '" + Symbols.symbolToString(this.type) + '\'';
+		return "Float " + this.value;
 	}
 }

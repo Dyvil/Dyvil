@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.imports;
 
-import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class PackageDeclaration implements IASTNode
 {

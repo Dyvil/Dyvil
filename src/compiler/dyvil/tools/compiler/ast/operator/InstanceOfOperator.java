@@ -12,8 +12,9 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class InstanceOfOperator extends Value
 {
@@ -92,29 +93,29 @@ public final class InstanceOfOperator extends Value
 		
 		if (this.type.isPrimitive())
 		{
-			markers.add(this.position, "instanceof.type.primitive");
+			markers.add(I18n.createMarker(this.position, "instanceof.type.primitive"));
 			return;
 		}
 		if (this.value.isPrimitive())
 		{
-			markers.add(this.position, "instanceof.value.primitive");
+			markers.add(I18n.createMarker(this.position, "instanceof.value.primitive"));
 			return;
 		}
 		
 		IType valueType = this.value.getType();
 		if (valueType.classEquals(this.type))
 		{
-			markers.add(this.position, "instanceof.type.equal", valueType);
+			markers.add(I18n.createMarker(this.position, "instanceof.type.equal", valueType));
 			return;
 		}
 		if (this.type.isSuperClassOf(valueType))
 		{
-			markers.add(this.position, "instanceof.type.subtype", valueType, this.type);
+			markers.add(I18n.createMarker(this.position, "instanceof.type.subtype", valueType, this.type));
 			return;
 		}
 		if (!valueType.isSuperClassOf(this.type))
 		{
-			markers.add(this.position, "instanceof.type.incompatible", valueType, this.type);
+			markers.add(I18n.createMarker(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}
 	}
 	

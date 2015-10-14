@@ -1,8 +1,8 @@
-package dyvil.tools.compiler.lexer.marker;
+package dyvil.tools.parsing.marker;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Marker implements Comparable<Marker>
 {

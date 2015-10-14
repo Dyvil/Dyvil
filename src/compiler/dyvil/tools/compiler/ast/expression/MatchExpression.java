@@ -5,7 +5,6 @@ import java.util.Arrays;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -16,9 +15,11 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class MatchExpression implements IValue
 {
@@ -145,9 +146,10 @@ public final class MatchExpression implements IValue
 			IValue value = IType.convertValue(action, type, typeContext, markers, context);
 			if (value == null)
 			{
-				Marker m = markers.create(action.getPosition(), "match.value.type");
+				Marker m = I18n.createMarker(action.getPosition(), "match.value.type");
 				m.addInfo("Return Type: " + type);
 				m.addInfo("Value Type: " + action.getType());
+				markers.add(m);
 			}
 			else
 			{
@@ -240,7 +242,7 @@ public final class MatchExpression implements IValue
 		else
 		{
 			type = Types.ANY;
-			markers.add(this.position, "match.invalid");
+			markers.add(I18n.createMarker(this.position, "match.invalid"));
 		}
 		
 		for (int i = 0; i < this.caseCount; i++)
@@ -248,7 +250,7 @@ public final class MatchExpression implements IValue
 			MatchCase c = this.cases[i];
 			if (this.exhaustive)
 			{
-				markers.add(c.getPattern().getPosition(), "pattern.dead");
+				markers.add(I18n.createMarker(c.getPattern().getPosition(), "pattern.dead"));
 			}
 			
 			c.resolve(markers, type, context);

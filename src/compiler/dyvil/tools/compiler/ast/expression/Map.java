@@ -14,9 +14,10 @@ import dyvil.tools.compiler.ast.type.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Map implements IValue
 {
@@ -124,10 +125,10 @@ public class Map implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "map.key.type");
-				marker.addInfo("Map Type: " + mapType.getConcreteType(typeContext));
+				Marker marker = I18n.createMarker(value.getPosition(), "map.key.type");
 				marker.addInfo("Required Type: " + keyType.getConcreteType(typeContext));
 				marker.addInfo("Key Type: " + value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -140,10 +141,10 @@ public class Map implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "map.value.type");
-				marker.addInfo("Map Type: " + mapType);
-				marker.addInfo("Required Type: " + valueType);
+				Marker marker = I18n.createMarker(value.getPosition(), "map.value.type");
+				marker.addInfo("Required Type: " + valueType.getConcreteType(typeContext));
 				marker.addInfo("Value Type: " + value.getType());
+				markers.add(marker);
 			}
 			else
 			{

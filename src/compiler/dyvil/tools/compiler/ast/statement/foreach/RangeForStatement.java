@@ -11,9 +11,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class RangeForStatement extends ForEachStatement
 {
@@ -49,9 +50,10 @@ public class RangeForStatement extends ForEachStatement
 		IValue v = this.value1.withType(rangeType, typeContext, markers, context);
 		if (v == null)
 		{
-			Marker marker = markers.create(this.value1.getPosition(), "for.range.type");
+			Marker marker = I18n.createMarker(this.value1.getPosition(), "for.range.type");
 			marker.addInfo("Value Type: " + this.value1.getType());
 			marker.addInfo("Variable Type: " + rangeType);
+			markers.add(marker);
 		}
 		else
 		{
@@ -61,9 +63,10 @@ public class RangeForStatement extends ForEachStatement
 		v = this.value2.withType(rangeType, typeContext, markers, context);
 		if (v == null)
 		{
-			Marker marker = markers.create(this.value2.getPosition(), "for.range.type");
+			Marker marker = I18n.createMarker(this.value2.getPosition(), "for.range.type");
 			marker.addInfo("Value Type: " + this.value2.getType());
 			marker.addInfo("Variable Type: " + rangeType);
+			markers.add(marker);
 		}
 		else
 		{

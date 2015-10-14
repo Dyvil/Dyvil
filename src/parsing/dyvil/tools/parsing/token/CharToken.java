@@ -1,21 +1,20 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class FloatToken implements IToken
+public final class CharToken implements IToken
 {
 	private IToken	prev;
 	private IToken	next;
 	
 	private final int	lineNumber;
 	private final int	start;
-	private final int	end;
 	
-	private float value;
+	private char value;
 	
-	public FloatToken(IToken prev, float value, int lineNumber, int start, int end)
+	public CharToken(IToken prev, char value, int lineNumber, int start)
 	{
 		this.prev = prev;
 		prev.setNext(this);
@@ -23,26 +22,24 @@ public final class FloatToken implements IToken
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
-		this.end = end;
 	}
 	
-	public FloatToken(float value, int lineNumber, int start, int end)
+	public CharToken(char value, int lineNumber, int start)
 	{
 		this.value = value;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
-		this.end = end;
 	}
 	
 	@Override
 	public int type()
 	{
-		return Tokens.FLOAT;
+		return Tokens.CHAR;
 	}
 	
 	@Override
-	public float floatValue()
+	public char charValue()
 	{
 		return this.value;
 	}
@@ -56,7 +53,7 @@ public final class FloatToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.end;
+		return this.start + 3;
 	}
 	
 	@Override
@@ -122,6 +119,6 @@ public final class FloatToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Float " + this.value;
+		return "Char '" + this.value + '\'';
 	}
 }

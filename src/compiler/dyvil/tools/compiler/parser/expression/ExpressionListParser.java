@@ -3,11 +3,11 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public final class ExpressionListParser extends Parser implements IValueConsumer
 {

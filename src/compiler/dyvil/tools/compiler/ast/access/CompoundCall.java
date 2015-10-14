@@ -15,9 +15,10 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CompoundCall extends AbstractCall implements INamed
 {
@@ -176,9 +177,10 @@ public final class CompoundCall extends AbstractCall implements INamed
 			IType type2 = super.getType();
 			if (!type1.isSuperTypeOf(type2))
 			{
-				Marker marker = markers.create(this.position, "method.compound.type", this.name, this.instance.toString());
+				Marker marker = I18n.createMarker(this.position, "method.compound.type", this.name, this.instance.toString());
 				marker.addInfo("Callee Type: " + type1);
 				marker.addInfo("Method Type: " + type2);
+				markers.add(marker);
 			}
 			
 			this.method.checkCall(markers, this.position, context, this.instance, this.arguments, this.getGenericData());

@@ -1,34 +1,34 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.Keywords;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class DoubleToken implements IToken
+public final class KeywordToken implements IToken
 {
 	private IToken	prev;
 	private IToken	next;
+	
+	private final int type;
 	
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
 	
-	private double value;
-	
-	public DoubleToken(IToken prev, double value, int lineNumber, int start, int end)
+	public KeywordToken(IToken prev, int type, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
-		this.value = value;
+		this.type = type;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
 	}
 	
-	public DoubleToken(double value, int lineNumber, int start, int end)
+	public KeywordToken(String value, int type, int lineNumber, int start, int end)
 	{
-		this.value = value;
+		this.type = type;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
@@ -38,13 +38,7 @@ public final class DoubleToken implements IToken
 	@Override
 	public int type()
 	{
-		return Tokens.DOUBLE;
-	}
-	
-	@Override
-	public double doubleValue()
-	{
-		return this.value;
+		return this.type;
 	}
 	
 	@Override
@@ -110,7 +104,7 @@ public final class DoubleToken implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.endIndex());
+		return new CodePosition(this.lineNumber, this.start, this.end);
 	}
 	
 	@Override
@@ -122,6 +116,6 @@ public final class DoubleToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Double " + this.value;
+		return "Keyword '" + Keywords.keywordToString(this.type) + '\'';
 	}
 }

@@ -2,11 +2,11 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.FieldInstruction;
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public final class FieldInstructionParser extends Parser implements IInternalTyped
 {

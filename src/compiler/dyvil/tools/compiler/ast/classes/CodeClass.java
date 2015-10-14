@@ -33,9 +33,10 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class CodeClass extends AbstractClass
 {
@@ -281,16 +282,16 @@ public class CodeClass extends AbstractClass
 			int modifiers = iclass.getModifiers();
 			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 			{
-				markers.add(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
+				markers.add(I18n.createMarker(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
 				continue;
 			}
 			if ((modifiers & Modifiers.SEALED) != 0 && iclass instanceof ExternalClass)
 			{
-				markers.add(this.position, "class.implement.sealed", iclass.getName());
+				markers.add(I18n.createMarker(this.position, "class.implement.sealed", iclass.getName()));
 			}
 			if ((modifiers & Modifiers.DEPRECATED) != 0)
 			{
-				markers.add(this.position, "class.implement.deprecated", iclass.getName());
+				markers.add(I18n.createMarker(this.position, "class.implement.deprecated", iclass.getName()));
 			}
 		}
 		
@@ -304,21 +305,21 @@ public class CodeClass extends AbstractClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
+					markers.add(I18n.createMarker(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName()));
 				}
 				else
 				{
 					if ((modifiers & Modifiers.FINAL) != 0)
 					{
-						markers.add(this.position, "class.extend.final", superClass.getName());
+						markers.add(I18n.createMarker(this.position, "class.extend.final", superClass.getName()));
 					}
 					else if ((modifiers & Modifiers.SEALED) != 0 && superClass instanceof ExternalClass)
 					{
-						markers.add(this.position, "class.extend.sealed", superClass.getName());
+						markers.add(I18n.createMarker(this.position, "class.extend.sealed", superClass.getName()));
 					}
 					if ((modifiers & Modifiers.DEPRECATED) != 0)
 					{
-						markers.add(this.position, "class.extend.deprecated", superClass.getName());
+						markers.add(I18n.createMarker(this.position, "class.extend.deprecated", superClass.getName()));
 					}
 				}
 			}

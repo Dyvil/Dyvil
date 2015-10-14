@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -17,7 +16,8 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
 {

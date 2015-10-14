@@ -13,10 +13,11 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class IfStatement extends Value
 {
@@ -212,8 +213,9 @@ public class IfStatement extends Value
 			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");
+				Marker marker = I18n.createMarker(this.condition.getPosition(), "if.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -237,7 +239,7 @@ public class IfStatement extends Value
 		}
 		else
 		{
-			markers.add(this.position, "if.condition.invalid");
+			markers.add(I18n.createMarker(this.position, "if.condition.invalid"));
 		}
 		if (this.then != null)
 		{

@@ -4,12 +4,12 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MatchCase;
 import dyvil.tools.compiler.ast.expression.MatchExpression;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class MatchExpressionParser extends Parser implements IValueConsumer
 {

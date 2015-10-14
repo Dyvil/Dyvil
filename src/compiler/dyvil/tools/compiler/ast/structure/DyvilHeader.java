@@ -10,7 +10,6 @@ import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -31,14 +30,15 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.parsing.DyvilLexer;
+import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
@@ -356,7 +356,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void tokenize()
 	{
-		this.tokens = new Dlex(this.markers).tokenize(this.inputFile.getCode());
+		this.tokens = new DyvilLexer(this.markers).tokenize(this.inputFile.getCode());
 		this.tokens.inferSemicolons();
 	}
 	

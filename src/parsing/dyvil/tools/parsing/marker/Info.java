@@ -1,17 +1,17 @@
-package dyvil.tools.compiler.lexer.marker;
+package dyvil.tools.parsing.marker;
 
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class Warning extends Marker
+public class Info extends Marker
 {
 	private static final long serialVersionUID = 8238564164743045522L;
 	
-	protected Warning(ICodePosition position)
+	protected Info(ICodePosition position)
 	{
 		super(position);
 	}
 	
-	protected Warning(ICodePosition position, String message)
+	public Info(ICodePosition position, String message)
 	{
 		super(position, message);
 	}
@@ -19,7 +19,7 @@ public class Warning extends Marker
 	@Override
 	public String getMarkerType()
 	{
-		return "warning";
+		return "info";
 	}
 	
 	@Override
@@ -31,6 +31,6 @@ public class Warning extends Marker
 	@Override
 	public boolean isWarning()
 	{
-		return true;
-	};
+		return false;
+	}
 }

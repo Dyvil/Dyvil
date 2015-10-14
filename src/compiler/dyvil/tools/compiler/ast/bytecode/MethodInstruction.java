@@ -5,7 +5,7 @@ import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class MethodInstruction implements IInstruction
 {

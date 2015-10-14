@@ -7,11 +7,11 @@ import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.parser.type.TypeVariableParser;
+import dyvil.tools.parsing.token.IToken;
 
 public interface IParserManager
 {

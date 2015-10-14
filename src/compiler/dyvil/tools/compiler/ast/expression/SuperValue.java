@@ -9,9 +9,10 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class SuperValue implements IValue
 {
@@ -76,7 +77,7 @@ public final class SuperValue implements IValue
 	{
 		if (context.isStatic())
 		{
-			markers.add(this.position, "super.access.static");
+			markers.add(I18n.createMarker(this.position, "super.access.static"));
 			return;
 		}
 		
@@ -86,8 +87,9 @@ public final class SuperValue implements IValue
 			this.type = thisType.getSuperType();
 			if (this.type == null)
 			{
-				Marker marker = markers.create(this.position, "super.access.type");
+				Marker marker = I18n.createMarker(this.position, "super.access.type");
 				marker.addInfo("Enclosing Type: " + thisType);
+				markers.add(marker);
 			}
 			return;
 		}
@@ -104,9 +106,10 @@ public final class SuperValue implements IValue
 			return;
 		}
 		
-		Marker marker = markers.create(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
+		Marker marker = I18n.createMarker(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
 		marker.addInfo("Enclosing Type: " + thisType);
 		marker.addInfo("Requested Super Type: " + this.type);
+		markers.add(marker);
 	}
 	
 	@Override

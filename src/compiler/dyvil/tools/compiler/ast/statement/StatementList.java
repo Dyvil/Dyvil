@@ -6,7 +6,6 @@ import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.IdentityHashMap;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -24,9 +23,11 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
@@ -300,8 +301,9 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			v1 = v2.withType(Types.VOID, Types.VOID, markers, context1);
 			if (v1 == null)
 			{
-				Marker marker = markers.create(v2.getPosition(), "statement.type");
+				Marker marker = I18n.createMarker(v2.getPosition(), "statement.type");
 				marker.addInfo("Returning Type: " + v2.getType());
+				markers.add(marker);
 			}
 			else
 			{

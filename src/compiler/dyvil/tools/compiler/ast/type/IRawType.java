@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IRawType extends IObjectType
 {

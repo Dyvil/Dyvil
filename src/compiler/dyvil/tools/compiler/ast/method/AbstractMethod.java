@@ -38,11 +38,12 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.marker.SemanticError;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import static dyvil.reflect.Opcodes.ARGUMENTS;
 import static dyvil.reflect.Opcodes.IFEQ;
@@ -699,11 +700,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(position, "method.access.static", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "method.access.static", this.name.unqualified));
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(position, "method.access.static.type", this.name.unqualified, this.theClass.getFullName());
+					markers.add(I18n.createMarker(position, "method.access.static.type", this.name.unqualified, this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -711,7 +712,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(position, "method.access.instance", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "method.access.instance", this.name.unqualified));
 				}
 			}
 			else if (this.intrinsicOpcodes == null || !instance.isPrimitive())
@@ -723,11 +724,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (context.isStatic())
 			{
-				markers.add(position, "method.access.instance", this.name);
+				markers.add(I18n.createMarker(position, "method.access.instance", this.name));
 			}
 			else
 			{
-				markers.add(position, "method.access.unqualified", this.name.unqualified);
+				markers.add(I18n.createMarker(position, "method.access.unqualified", this.name.unqualified));
 				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
@@ -803,7 +804,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			IType type = typeContext.resolveType(typeVar);
 			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).typeVar == typeVar)
 			{
-				markers.add(position, "method.typevar.infer", this.name, typeVar.getName());
+				markers.add(I18n.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
 				typeContext.addMapping(typeVar, Types.ANY);
 			}
 		}
@@ -814,16 +815,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{
-			markers.add(position, "method.access.deprecated", this.name);
+			markers.add(I18n.createMarker(position, "method.access.deprecated", this.name));
 		}
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.INTERNAL:
-			markers.add(position, "method.access.internal", this.name);
+			markers.add(I18n.createMarker(position, "method.access.internal", this.name));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(position, "method.access.invisible", this.name);
+			markers.add(I18n.createMarker(position, "method.access.invisible", this.name));
 			break;
 		}
 		
@@ -837,7 +838,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			IType type = this.exceptions[i];
 			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
 			{
-				markers.add(position, "method.access.exception", type.toString());
+				markers.add(I18n.createMarker(position, "method.access.exception", type.toString()));
 			}
 		}
 	}

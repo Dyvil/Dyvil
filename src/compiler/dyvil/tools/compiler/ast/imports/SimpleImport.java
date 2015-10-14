@@ -17,8 +17,9 @@ import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class SimpleImport extends Import
 {
@@ -78,7 +79,7 @@ public final class SimpleImport extends Import
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(this.position, "import.using.invalid");
+				markers.add(I18n.createMarker(this.position, "import.using.invalid"));
 				return;
 			}
 			
@@ -106,7 +107,7 @@ public final class SimpleImport extends Import
 				return;
 			}
 			
-			markers.add(this.position, "resolve.method_field", this.name.qualified);
+			markers.add(I18n.createMarker(this.position, "resolve.method_field", this.name.qualified));
 			return;
 		}
 		
@@ -124,7 +125,7 @@ public final class SimpleImport extends Import
 			return;
 		}
 		
-		markers.add(this.position, "resolve.package", this.name.qualified);
+		markers.add(I18n.createMarker(this.position, "resolve.package", this.name.qualified));
 	}
 	
 	@Override

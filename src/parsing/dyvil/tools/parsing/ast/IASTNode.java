@@ -1,6 +1,6 @@
-package dyvil.tools.compiler.ast;
+package dyvil.tools.parsing.ast;
 
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IASTNode
 {

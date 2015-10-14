@@ -9,11 +9,11 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.parsing.CodeFile;
 
 public class DyvilUnit extends DyvilHeader
 {

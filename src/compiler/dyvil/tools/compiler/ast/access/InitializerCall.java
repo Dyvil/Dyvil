@@ -13,9 +13,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class InitializerCall implements ICall
 {
@@ -114,13 +115,15 @@ public class InitializerCall implements ICall
 		IConstructor match = IContext.resolveConstructor(iclass, this.arguments);
 		if (match == null)
 		{
-			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
+			Marker marker = I18n.createMarker(this.position, "resolve.constructor", iclass.getName().qualified);
 			if (!this.arguments.isEmpty())
 			{
 				StringBuilder builder = new StringBuilder("Argument Types: ");
 				this.arguments.typesToString(builder);
 				marker.addInfo(builder.toString());
 			}
+			
+			markers.add(marker);
 		}
 		
 		this.constructor = match;

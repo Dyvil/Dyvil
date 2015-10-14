@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public abstract class Parser
 {

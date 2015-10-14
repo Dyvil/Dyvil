@@ -37,11 +37,12 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Constructor extends Member implements IConstructor
 {
@@ -289,8 +290,9 @@ public class Constructor extends Member implements IConstructor
 			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.position, "constructor.return");
+				Marker marker = I18n.createMarker(this.position, "constructor.return");
 				marker.addInfo("Expression Type: " + this.value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -322,7 +324,7 @@ public class Constructor extends Member implements IConstructor
 		IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(this.position, "constructor.super");
+			markers.add(I18n.createMarker(this.position, "constructor.super"));
 			return;
 		}
 		
@@ -383,8 +385,9 @@ public class Constructor extends Member implements IConstructor
 			IType t = this.exceptions[i];
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
-				Marker m = markers.create(t.getPosition(), "method.exception.type");
+				Marker m = I18n.createMarker(t.getPosition(), "method.exception.type");
 				m.addInfo("Exception Type: " + t);
+				markers.add(m);
 			}
 		}
 		
@@ -394,12 +397,12 @@ public class Constructor extends Member implements IConstructor
 		}
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
 		{
-			markers.add(this.position, "constructor.unimplemented", this.name);
+			markers.add(I18n.createMarker(this.position, "constructor.unimplemented", this.name));
 		}
 		
 		if (this.isStatic())
 		{
-			markers.add(this.position, "constructor.static", this.name);
+			markers.add(I18n.createMarker(this.position, "constructor.static", this.name));
 		}
 	}
 	
@@ -655,7 +658,7 @@ public class Constructor extends Member implements IConstructor
 			{
 				gt.setType(i, Types.ANY);
 				
-				markers.add(position, "constructor.typevar.infer", this.theClass.getTypeVariable(i).getName(), this.theClass.getName());
+				markers.add(I18n.createMarker(position, "constructor.typevar.infer", this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
 			}
 		}
 		
@@ -689,16 +692,16 @@ public class Constructor extends Member implements IConstructor
 	{
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{
-			markers.add(position, "constructor.access.deprecated", this.theClass.getName());
+			markers.add(I18n.createMarker(position, "constructor.access.deprecated", this.theClass.getName()));
 		}
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.INTERNAL:
-			markers.add(position, "constructor.access.internal", this.theClass.getName());
+			markers.add(I18n.createMarker(position, "constructor.access.internal", this.theClass.getName()));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(position, "constructor.access.invisible", this.theClass.getName());
+			markers.add(I18n.createMarker(position, "constructor.access.invisible", this.theClass.getName()));
 			break;
 		}
 		
@@ -707,7 +710,7 @@ public class Constructor extends Member implements IConstructor
 			IType type = this.exceptions[i];
 			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
 			{
-				markers.add(position, "method.access.exception", type.toString());
+				markers.add(I18n.createMarker(position, "method.access.exception", type.toString()));
 			}
 		}
 	}

@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.parsing.token.IToken;
 
 public abstract class EmulatorParser extends Parser implements IParserManager
 {

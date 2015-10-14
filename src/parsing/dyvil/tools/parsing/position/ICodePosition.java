@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.lexer.position;
+package dyvil.tools.parsing.position;
 
 public interface ICodePosition
 {

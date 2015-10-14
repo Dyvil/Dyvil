@@ -25,8 +25,9 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class TupleType implements IObjectType, ITypeList
 {
@@ -286,7 +287,7 @@ public final class TupleType implements IObjectType, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(this.types[0].getPosition(), "type.class.tuple");
+			markers.add(I18n.createMarker(this.types[0].getPosition(), "type.class.tuple"));
 		}
 		
 		for (int i = 0; i < this.typeCount; i++)

@@ -1,12 +1,12 @@
-package dyvil.tools.compiler.lexer;
+package dyvil.tools.parsing;
 
 import java.util.Iterator;
 
-import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.InferredSemicolon;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.token.IToken;
+import dyvil.tools.parsing.token.InferredSemicolon;
 
 public class TokenIterator implements Iterator<IToken>
 {

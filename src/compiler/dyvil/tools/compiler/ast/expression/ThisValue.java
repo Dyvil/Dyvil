@@ -11,8 +11,9 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ThisValue implements IValue
 {
@@ -99,7 +100,7 @@ public final class ThisValue implements IValue
 	{
 		if (context.isStatic())
 		{
-			markers.add(this.position, "this.access.static");
+			markers.add(I18n.createMarker(this.position, "this.access.static"));
 			if (this.type == Types.UNKNOWN)
 			{
 				return;
@@ -141,7 +142,7 @@ public final class ThisValue implements IValue
 		this.getter = context.getAccessibleThis(iclass);
 		if (this.getter == null)
 		{
-			markers.add(this.position, "this.instance", this.type);
+			markers.add(I18n.createMarker(this.position, "this.instance", this.type));
 		}
 	}
 	

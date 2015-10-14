@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAccess;
@@ -27,10 +26,12 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LambdaExpression implements IValue, IValued, IClassCompilable, IDefaultContext
 {
@@ -207,9 +208,10 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.value.getPosition(), "lambda.type");
+				Marker marker = I18n.createMarker(this.value.getPosition(), "lambda.type");
 				marker.addInfo("Method Return Type: " + this.returnType);
 				marker.addInfo("Value Type: " + this.value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -271,7 +273,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
 			{
-				markers.add(param.getPosition(), "lambda.parameter.type", param.getName());
+				markers.add(I18n.createMarker(param.getPosition(), "lambda.parameter.type", param.getName()));
 			}
 			param.setType(concreteType);
 		}

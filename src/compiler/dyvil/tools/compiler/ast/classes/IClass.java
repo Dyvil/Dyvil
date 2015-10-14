@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClass extends IClassMember, IGeneric, IContext, IParameterized, IClassCompilableList
 {

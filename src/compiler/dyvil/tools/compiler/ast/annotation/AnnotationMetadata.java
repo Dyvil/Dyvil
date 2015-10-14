@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class AnnotationMetadata implements IClassMetadata
 {

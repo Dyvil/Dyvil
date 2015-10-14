@@ -1,53 +1,33 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class IdentifierToken implements IToken
+public class InferredSemicolon implements IToken
 {
 	public IToken	prev;
 	public IToken	next;
 	
-	public final int	type;
-	public final Name	name;
-	
 	public final int	lineNumber;
 	public final int	start;
-	public final int	end;
 	
-	public IdentifierToken(IToken prev, Name name, int type, int lineNumber, int start, int end)
+	public InferredSemicolon(int lineNumber, int start)
 	{
-		this.prev = prev;
-		prev.setNext(this);
-		this.name = name;
-		this.type = type;
-		
 		this.lineNumber = lineNumber;
 		this.start = start;
-		this.end = end;
 	}
 	
-	public IdentifierToken(Name name, int type, int lineNumber, int start, int end)
+	@Override
+	public boolean isInferred()
 	{
-		this.name = name;
-		this.type = type;
-		
-		this.lineNumber = lineNumber;
-		this.start = start;
-		this.end = end;
+		return true;
 	}
 	
 	@Override
 	public int type()
 	{
-		return this.type;
-	}
-	
-	@Override
-	public Name nameValue()
-	{
-		return this.name;
+		return Symbols.SEMICOLON;
 	}
 	
 	@Override
@@ -59,7 +39,7 @@ public class IdentifierToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.end;
+		return this.start + 1;
 	}
 	
 	@Override
@@ -113,7 +93,7 @@ public class IdentifierToken implements IToken
 	@Override
 	public ICodePosition raw()
 	{
-		return new CodePosition(this.lineNumber, this.start, this.end);
+		return new CodePosition(this.lineNumber, this.start, this.start + 1);
 	}
 	
 	@Override
@@ -125,6 +105,6 @@ public class IdentifierToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Identifier '" + this.name + "\'";
+		return "Inferred Semicolon";
 	}
 }

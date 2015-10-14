@@ -5,8 +5,9 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
@@ -21,7 +22,7 @@ public final class RootPackage extends Package
 	{
 		if (packageDecl != null)
 		{
-			markers.add(packageDecl.getPosition(), "package.default");
+			markers.add(I18n.createMarker(packageDecl.getPosition(), "package.default"));
 		}
 	}
 	

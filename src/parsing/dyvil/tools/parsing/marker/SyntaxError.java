@@ -1,17 +1,17 @@
-package dyvil.tools.compiler.lexer.marker;
+package dyvil.tools.parsing.marker;
 
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class SemanticError extends Marker
+public class SyntaxError extends Marker
 {
 	private static final long serialVersionUID = -2234451954260010124L;
 	
-	public SemanticError(ICodePosition position)
+	public SyntaxError(ICodePosition position)
 	{
 		super(position);
 	}
 	
-	public SemanticError(ICodePosition position, String message)
+	public SyntaxError(ICodePosition position, String message)
 	{
 		super(position, message);
 	}
@@ -19,7 +19,7 @@ public class SemanticError extends Marker
 	@Override
 	public String getMarkerType()
 	{
-		return "error";
+		return "syntax";
 	}
 	
 	@Override

@@ -11,7 +11,6 @@ import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -29,10 +28,12 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class Annotation implements IAnnotation
 {
@@ -143,7 +144,7 @@ public final class Annotation implements IAnnotation
 			{
 				if (param.getValue() == null)
 				{
-					markers.add(this.position, "annotation.parameter.missing", this.type, param.getName());
+					markers.add(I18n.createMarker(this.position, "annotation.parameter.missing", this.type, param.getName()));
 				}
 				continue;
 			}
@@ -183,7 +184,7 @@ public final class Annotation implements IAnnotation
 		
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(this.position, "annotation.type", this.type.getName());
+			markers.add(I18n.createMarker(this.position, "annotation.type", this.type.getName()));
 			return;
 		}
 		
@@ -195,7 +196,7 @@ public final class Annotation implements IAnnotation
 		IClassMetadata metadata = theClass.getMetadata();
 		if (!metadata.isTarget(target))
 		{
-			Marker error = markers.create(this.position, "annotation.target", this.type.getName());
+			Marker error = I18n.createMarker(this.position, "annotation.target", this.type.getName());
 			error.addInfo("Element Target: " + target);
 			error.addInfo("Allowed Targets: " + metadata.getTargets());
 			markers.add(error);

@@ -1,45 +1,59 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class CharToken implements IToken
+public final class IntToken implements IToken
 {
 	private IToken	prev;
 	private IToken	next;
 	
 	private final int	lineNumber;
 	private final int	start;
+	private final int	end;
 	
-	private char value;
+	private int value;
 	
-	public CharToken(IToken prev, char value, int lineNumber, int start)
+	public IntToken(IToken prev, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
+		
+		this.lineNumber = lineNumber;
+		this.start = start;
+		this.end = end;
+	}
+	
+	public IntToken(IToken prev, int value, int lineNumber, int start, int end)
+	{
+		this.prev = prev;
+		prev.setNext(this);
+		
 		this.value = value;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
-	public CharToken(char value, int lineNumber, int start)
+	public IntToken(int value, int lineNumber, int start, int end)
 	{
 		this.value = value;
 		
 		this.lineNumber = lineNumber;
 		this.start = start;
+		this.end = end;
 	}
 	
 	@Override
 	public int type()
 	{
-		return Tokens.CHAR;
+		return Tokens.INT;
 	}
 	
 	@Override
-	public char charValue()
+	public int intValue()
 	{
 		return this.value;
 	}
@@ -53,7 +67,7 @@ public final class CharToken implements IToken
 	@Override
 	public int endIndex()
 	{
-		return this.start + 3;
+		return this.end;
 	}
 	
 	@Override
@@ -105,6 +119,12 @@ public final class CharToken implements IToken
 	}
 	
 	@Override
+	public void setLong(long value)
+	{
+		this.value = (int) value;
+	}
+	
+	@Override
 	public ICodePosition raw()
 	{
 		return new CodePosition(this.lineNumber, this.start, this.endIndex());
@@ -119,6 +139,6 @@ public final class CharToken implements IToken
 	@Override
 	public String toString()
 	{
-		return "Char '" + this.value + '\'';
+		return "Integer " + this.value;
 	}
 }

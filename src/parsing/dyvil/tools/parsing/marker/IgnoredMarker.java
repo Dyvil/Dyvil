@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.lexer.marker;
+package dyvil.tools.parsing.marker;
 
 public class IgnoredMarker extends Marker
 {

@@ -29,10 +29,11 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Property extends Member implements IProperty, IContext
 {
@@ -197,11 +198,11 @@ public class Property extends Member implements IProperty, IContext
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(position, "property.access.static", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "property.access.static", this.name.unqualified));
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(position, "property.access.static.type", this.name.unqualified, this.theClass.getFullName());
+					markers.add(I18n.createMarker(position, "property.access.static.type", this.name.unqualified, this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -209,7 +210,7 @@ public class Property extends Member implements IProperty, IContext
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(position, "property.access.instance", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "property.access.instance", this.name.unqualified));
 				}
 			}
 			else
@@ -222,27 +223,27 @@ public class Property extends Member implements IProperty, IContext
 		{
 			if (context.isStatic())
 			{
-				markers.add(position, "property.access.instance", this.name.unqualified);
+				markers.add(I18n.createMarker(position, "property.access.instance", this.name.unqualified));
 			}
 			else
 			{
-				markers.add(position, "property.access.unqualified", this.name.unqualified);
+				markers.add(I18n.createMarker(position, "property.access.unqualified", this.name.unqualified));
 				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
 		if (this.hasModifier(Modifiers.DEPRECATED))
 		{
-			markers.add(position, "property.access.deprecated", this.name);
+			markers.add(I18n.createMarker(position, "property.access.deprecated", this.name));
 		}
 		
 		switch (context.getThisClass().getVisibility(this))
 		{
 		case IContext.INTERNAL:
-			markers.add(position, "property.access.sealed", this.name);
+			markers.add(I18n.createMarker(position, "property.access.sealed", this.name));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(position, "property.access.invisible", this.name);
+			markers.add(I18n.createMarker(position, "property.access.invisible", this.name));
 			break;
 		}
 		
@@ -254,15 +255,16 @@ public class Property extends Member implements IProperty, IContext
 	{
 		if (this.setter == null)
 		{
-			markers.add(position, "property.assign.readonly", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "property.assign.readonly", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "property.assign.type", this.name.unqualified);
+			Marker marker = I18n.createMarker(newValue.getPosition(), "property.assign.type", this.name.unqualified);
 			marker.addInfo("Property Type: " + this.type);
 			marker.addInfo("Value Type: " + newValue.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -313,7 +315,7 @@ public class Property extends Member implements IProperty, IContext
 			IValue set1 = this.setter.withType(Types.VOID, Types.VOID, markers, context);
 			if (set1 == null)
 			{
-				markers.add(this.setter.getPosition(), "property.setter.type", this.name);
+				markers.add(I18n.createMarker(this.setter.getPosition(), "property.setter.type", this.name));
 			}
 			else
 			{
@@ -331,7 +333,7 @@ public class Property extends Member implements IProperty, IContext
 				this.type = this.getter.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(this.position, "property.type.infer", this.name.unqualified);
+					markers.add(I18n.createMarker(this.position, "property.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -339,9 +341,10 @@ public class Property extends Member implements IProperty, IContext
 			IValue get1 = this.getter.withType(this.type, this.type, markers, context);
 			if (get1 == null)
 			{
-				Marker marker = markers.create(this.getter.getPosition(), "property.getter.type", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.getter.getPosition(), "property.getter.type", this.name.unqualified);
 				marker.addInfo("Property Type: " + this.type);
 				marker.addInfo("Getter Value Type: " + this.getter.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -356,7 +359,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(this.position, "property.type.infer.writeonly", this.name.unqualified);
+			markers.add(I18n.createMarker(this.position, "property.type.infer.writeonly", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -398,7 +401,7 @@ public class Property extends Member implements IProperty, IContext
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 			{
-				markers.add(this.position, "property.override", this.name);
+				markers.add(I18n.createMarker(this.position, "property.override", this.name));
 			}
 			return;
 		}
@@ -412,20 +415,21 @@ public class Property extends Member implements IProperty, IContext
 		
 		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 		{
-			markers.add(this.position, "property.overrides", this.name);
+			markers.add(I18n.createMarker(this.position, "property.overrides", this.name));
 		}
 		else if (this.overrideProperty.hasModifier(Modifiers.FINAL))
 		{
-			markers.add(this.position, "property.override.final", this.name);
+			markers.add(I18n.createMarker(this.position, "property.override.final", this.name));
 		}
 		else
 		{
 			IType type = this.overrideProperty.getType();
 			if (type != this.type && !type.equals(this.type))
 			{
-				Marker marker = markers.create(this.position, "property.override.type", this.name);
+				Marker marker = I18n.createMarker(this.position, "property.override.type", this.name);
 				marker.addInfo("Property Type: " + this.type);
 				marker.addInfo("Overriden Property Type: " + type);
+				markers.add(marker);
 			}
 		}
 		
@@ -433,12 +437,12 @@ public class Property extends Member implements IProperty, IContext
 		{
 			if ((this.overrideProperty.getGetterModifiers() & Modifiers.ABSTRACT) != 0 && this.getter == null)
 			{
-				markers.add(this.position, "property.getter.abstract", this.name);
+				markers.add(I18n.createMarker(this.position, "property.getter.abstract", this.name));
 			}
 			
 			if ((this.overrideProperty.getSetterModifiers() & Modifiers.ABSTRACT) != 0 && this.setter == null)
 			{
-				markers.add(this.position, "property.setter.abstract", this.name);
+				markers.add(I18n.createMarker(this.position, "property.setter.abstract", this.name));
 			}
 		}
 	}
@@ -458,14 +462,14 @@ public class Property extends Member implements IProperty, IContext
 			
 			if (this.type == Types.VOID)
 			{
-				markers.add(this.position, "property.type.void");
+				markers.add(I18n.createMarker(this.position, "property.type.void"));
 			}
 		}
 		
 		// No setter and no getter
 		if (this.getter == null && this.setter == null && this.getterModifiers == 0 && this.setterModifiers == 0)
 		{
-			markers.add(this.position, "property.empty", this.name);
+			markers.add(I18n.createMarker(this.position, "property.empty", this.name));
 		}
 	}
 	

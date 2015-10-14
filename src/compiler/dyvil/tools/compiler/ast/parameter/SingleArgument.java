@@ -5,7 +5,6 @@ import java.util.Iterator;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
@@ -15,8 +14,9 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class SingleArgument implements IArguments, IValued
 {

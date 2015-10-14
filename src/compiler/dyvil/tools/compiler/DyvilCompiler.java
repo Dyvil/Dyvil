@@ -13,13 +13,13 @@ import dyvil.io.FileUtils;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.CodeFile;
 
 public final class DyvilCompiler
 {

@@ -1,38 +1,35 @@
-package dyvil.tools.compiler.lexer.token;
+package dyvil.tools.parsing.token;
 
-import dyvil.tools.compiler.lexer.position.CodePosition;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class StringToken implements IToken
+public final class DoubleToken implements IToken
 {
 	private IToken	prev;
 	private IToken	next;
 	
-	private final int	type;
 	private final int	lineNumber;
 	private final int	start;
 	private final int	end;
 	
-	private String value;
+	private double value;
 	
-	public StringToken(IToken prev, int type, String value, int lineNumber, int start, int end)
+	public DoubleToken(IToken prev, double value, int lineNumber, int start, int end)
 	{
 		this.prev = prev;
 		prev.setNext(this);
 		this.value = value;
 		
-		this.type = type;
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
 	}
 	
-	public StringToken(String value, int type, int lineNumber, int start, int end)
+	public DoubleToken(double value, int lineNumber, int start, int end)
 	{
 		this.value = value;
 		
-		this.type = type;
 		this.lineNumber = lineNumber;
 		this.start = start;
 		this.end = end;
@@ -41,11 +38,11 @@ public final class StringToken implements IToken
 	@Override
 	public int type()
 	{
-		return this.type;
+		return Tokens.DOUBLE;
 	}
 	
 	@Override
-	public String stringValue()
+	public double doubleValue()
 	{
 		return this.value;
 	}
@@ -125,17 +122,6 @@ public final class StringToken implements IToken
 	@Override
 	public String toString()
 	{
-		String s = '"' + this.value + '"';
-		
-		switch (this.type)
-		{
-		case Tokens.STRING_START:
-			return "String Start " + s;
-		case Tokens.STRING_PART:
-			return "String Part " + s;
-		case Tokens.STRING_END:
-			return "String End " + s;
-		}
-		return "String " + s;
+		return "Double " + this.value;
 	}
 }

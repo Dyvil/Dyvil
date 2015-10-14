@@ -24,9 +24,10 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Method extends AbstractMethod
 {
@@ -135,7 +136,7 @@ public class Method extends AbstractMethod
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(this.position, "method.type.infer", this.name.unqualified);
+					markers.add(I18n.createMarker(this.position, "method.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -143,9 +144,10 @@ public class Method extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.position, "method.type", this.name.unqualified);
 				marker.addInfo("Return Type: " + this.type);
 				marker.addInfo("Value Type: " + this.value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -159,7 +161,7 @@ public class Method extends AbstractMethod
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(this.position, "method.type.abstract", this.name.unqualified);
+			markers.add(I18n.createMarker(this.position, "method.type.abstract", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -213,8 +215,9 @@ public class Method extends AbstractMethod
 			
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
-				Marker m = markers.create(t.getPosition(), "method.exception.type");
+				Marker m = I18n.createMarker(t.getPosition(), "method.exception.type");
 				m.addInfo("Exception Type: " + t);
+				markers.add(m);
 			}
 		}
 		
@@ -225,12 +228,12 @@ public class Method extends AbstractMethod
 		// If the method does not have an implementation and is static
 		else if (this.isStatic())
 		{
-			markers.add(this.position, "method.static", this.name);
+			markers.add(I18n.createMarker(this.position, "method.static", this.name));
 		}
 		// Or not declared abstract and a member of a non-abstract class
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
 		{
-			markers.add(this.position, "method.unimplemented", this.name);
+			markers.add(I18n.createMarker(this.position, "method.unimplemented", this.name));
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
@@ -257,7 +260,7 @@ public class Method extends AbstractMethod
 			
 			if (m.getDescriptor().equals(desc))
 			{
-				markers.add(this.position, "method.duplicate", this.name, desc);
+				markers.add(I18n.createMarker(this.position, "method.duplicate", this.name, desc));
 			}
 		}
 	}
@@ -283,29 +286,30 @@ public class Method extends AbstractMethod
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 			{
-				markers.add(this.position, "method.override", this.name);
+				markers.add(I18n.createMarker(this.position, "method.override", this.name));
 			}
 			return;
 		}
 		
 		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 		{
-			markers.add(this.position, "method.overrides", this.name);
+			markers.add(I18n.createMarker(this.position, "method.overrides", this.name));
 		}
 		
 		for (IMethod m : this.overrideMethods)
 		{
 			if (m.hasModifier(Modifiers.FINAL))
 			{
-				markers.add(this.position, "method.override.final", this.name);
+				markers.add(I18n.createMarker(this.position, "method.override.final", this.name));
 			}
 			
 			IType type = m.getType();
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = markers.create(this.position, "method.override.type", this.name);
+				Marker marker = I18n.createMarker(this.position, "method.override.type", this.name);
 				marker.addInfo("Return Type: " + this.type);
 				marker.addInfo("Overriden Return Type: " + type);
+				markers.add(marker);
 			}
 		}
 	}

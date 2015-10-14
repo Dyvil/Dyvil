@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.lexer.position;
+package dyvil.tools.parsing.position;
 
 public class CodePosition implements ICodePosition
 {
@@ -57,5 +57,11 @@ public class CodePosition implements ICodePosition
 	public ICodePosition to(ICodePosition end)
 	{
 		return new CodePosition(this.startLine, end.endLine(), this.start, end.endIndex());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "CodePosition(startIndex: " + this.start + ", endIndex: " + this.end + ", startLine: " + this.startLine + ", endLine: " + this.endLine;
 	}
 }

@@ -16,8 +16,9 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TypeOperator extends Value
 {
@@ -113,7 +114,7 @@ public final class TypeOperator extends Value
 		if (this.type == null)
 		{
 			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
-			markers.add(this.position, "typeoperator.invalid");
+			markers.add(I18n.createMarker(this.position, "typeoperator.invalid"));
 			return;
 		}
 		

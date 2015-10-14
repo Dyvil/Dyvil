@@ -26,8 +26,9 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
@@ -351,7 +352,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(this.returnType.getPosition(), "type.class.lambda");
+			markers.add(I18n.createMarker(this.returnType.getPosition(), "type.class.lambda"));
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

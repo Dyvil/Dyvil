@@ -17,9 +17,10 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldAssign implements IValue, INamed, IValued
 {
@@ -183,13 +184,14 @@ public final class FieldAssign implements IValue, INamed, IValued
 		
 		if (this.field == null)
 		{
-			Marker marker = markers.create(this.position, "resolve.field", this.name.unqualified);
+			Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
 			marker.addInfo("Qualified Name: " + this.name.qualified);
 			if (this.instance != null)
 			{
 				marker.addInfo("Instance Type: " + this.instance.getType());
 			}
 			
+			markers.add(marker);
 		}
 		
 		if (this.value != null)

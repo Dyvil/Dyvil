@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.*;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
@@ -15,6 +14,7 @@ import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
 {

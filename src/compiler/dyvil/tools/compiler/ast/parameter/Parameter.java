@@ -12,8 +12,8 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public abstract class Parameter extends Member implements IParameter
 {

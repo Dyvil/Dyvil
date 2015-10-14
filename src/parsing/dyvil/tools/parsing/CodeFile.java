@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.lexer;
+package dyvil.tools.parsing;
 
 import java.io.File;
 import java.io.IOException;

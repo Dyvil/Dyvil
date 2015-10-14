@@ -20,10 +20,11 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Field extends Member implements IField
 {
@@ -143,11 +144,11 @@ public class Field extends Member implements IField
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(position, "field.access.static", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "field.access.static", this.name.unqualified));
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(position, "field.access.static.type", this.name.unqualified, this.theClass.getFullName());
+					markers.add(I18n.createMarker(position, "field.access.static.type", this.name.unqualified, this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -155,7 +156,7 @@ public class Field extends Member implements IField
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(position, "field.access.instance", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "field.access.instance", this.name.unqualified));
 				}
 			}
 			else
@@ -168,27 +169,27 @@ public class Field extends Member implements IField
 		{
 			if (context.isStatic())
 			{
-				markers.add(position, "field.access.instance", this.name);
+				markers.add(I18n.createMarker(position, "field.access.instance", this.name));
 			}
 			else
 			{
-				markers.add(position, "field.access.unqualified", this.name.unqualified);
+				markers.add(I18n.createMarker(position, "field.access.unqualified", this.name.unqualified));
 				instance = new ThisValue(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
 		if (this.hasModifier(Modifiers.DEPRECATED))
 		{
-			markers.add(position, "field.access.deprecated", this.name);
+			markers.add(I18n.createMarker(position, "field.access.deprecated", this.name));
 		}
 		
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
-			markers.add(position, "field.access.internal", this.name);
+			markers.add(I18n.createMarker(position, "field.access.internal", this.name));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(position, "field.access.invisible", this.name);
+			markers.add(I18n.createMarker(position, "field.access.invisible", this.name));
 			break;
 		}
 		
@@ -200,15 +201,16 @@ public class Field extends Member implements IField
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
-			markers.add(position, "field.assign.final", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "field.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = IType.convertValue(newValue, this.type, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "field.assign.type", this.name.unqualified);
+			Marker marker = I18n.createMarker(newValue.getPosition(), "field.assign.type", this.name.unqualified);
 			marker.addInfo("Field Type: " + this.type);
 			marker.addInfo("Value Type: " + newValue.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -245,7 +247,7 @@ public class Field extends Member implements IField
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(this.position, "field.type.infer", this.name.unqualified);
+					markers.add(I18n.createMarker(this.position, "field.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -253,9 +255,10 @@ public class Field extends Member implements IField
 			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.value.getPosition(), "field.type", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.value.getPosition(), "field.type", this.name.unqualified);
 				marker.addInfo("Field Type: " + this.type);
 				marker.addInfo("Value Type: " + this.value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -270,7 +273,7 @@ public class Field extends Member implements IField
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(this.position, "field.type.novalue", this.name.unqualified);
+			markers.add(I18n.createMarker(this.position, "field.type.novalue", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -298,7 +301,7 @@ public class Field extends Member implements IField
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "field.type.void");
+			markers.add(I18n.createMarker(this.position, "field.type.void"));
 		}
 	}
 	

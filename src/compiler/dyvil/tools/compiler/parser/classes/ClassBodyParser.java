@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
@@ -26,6 +25,7 @@ import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public final class ClassBodyParser extends Parser implements ITypeConsumer
 {

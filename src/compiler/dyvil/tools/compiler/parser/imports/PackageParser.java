@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.parsing.token.IToken;
 
 public class PackageParser extends Parser
 {

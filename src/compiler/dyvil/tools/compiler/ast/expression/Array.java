@@ -17,10 +17,11 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class Array implements IValue, IValueList
 {
@@ -183,9 +184,10 @@ public final class Array implements IValue, IValueList
 			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "array.element.type");
+				Marker marker = I18n.createMarker(value.getPosition(), "array.element.type");
 				marker.addInfo("Array Type: " + arrayType);
 				marker.addInfo("Element Type: " + value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -343,7 +345,7 @@ public final class Array implements IValue, IValueList
 			IValue v1 = v.toConstant(markers);
 			if (v1 == null)
 			{
-				markers.add(v.getPosition(), "annotation.array.not_constant");
+				markers.add(I18n.createMarker(v.getPosition(), "annotation.array.not_constant"));
 			}
 			else
 			{
@@ -380,7 +382,7 @@ public final class Array implements IValue, IValueList
 		{
 			if (this.valueCount == 0)
 			{
-				markers.add(this.position, "array.empty");
+				markers.add(I18n.createMarker(this.position, "array.empty"));
 				return;
 			}
 			

@@ -1,20 +1,19 @@
-package dyvil.tools.compiler.lexer;
+package dyvil.tools.parsing;
 
 import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.*;
 import dyvil.tools.compiler.transform.Keywords;
 import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.token.*;
 
 import static dyvil.tools.compiler.transform.Tokens.*;
-import static dyvil.tools.compiler.util.ParserUtil.*;
 
-public final class Dlex
+public final class DyvilLexer
 {
 	private MarkerList markers;
 	
-	public Dlex(MarkerList markers)
+	public DyvilLexer(MarkerList markers)
 	{
 		this.markers = markers;
 	}
@@ -79,7 +78,7 @@ public final class Dlex
 						subtype = MOD_LETTER | MOD_SYMBOL;
 						continue;
 					}
-					if (isIdentifierPart(c))
+					if (LexerUtil.isIdentifierPart(c))
 					{
 						buf.append(c);
 						continue;
@@ -93,7 +92,7 @@ public final class Dlex
 						subtype = MOD_LETTER | MOD_SYMBOL;
 						continue;
 					}
-					if (isIdentifierSymbol(c))
+					if (LexerUtil.isIdentifierSymbol(c))
 					{
 						buf.append(c);
 						continue;
@@ -106,13 +105,13 @@ public final class Dlex
 						buf.append(c);
 						continue;
 					}
-					if (isIdentifierPart(c))
+					if (LexerUtil.isIdentifierPart(c))
 					{
 						buf.append(c);
 						subtype = MOD_LETTER;
 						continue;
 					}
-					if (isIdentifierSymbol(c))
+					if (LexerUtil.isIdentifierSymbol(c))
 					{
 						buf.append(c);
 						subtype = MOD_LETTER;
@@ -205,7 +204,7 @@ public final class Dlex
 				}
 				if (subtype == MOD_DEC)
 				{
-					if (isDigit(c))
+					if (LexerUtil.isDigit(c))
 					{
 						buf.append(c);
 					}
@@ -233,7 +232,7 @@ public final class Dlex
 				}
 				else if (subtype == MOD_BIN)
 				{
-					if (c == 'b' || isBinDigit(c))
+					if (c == 'b' || LexerUtil.isBinDigit(c))
 					{
 						buf.append(c);
 					}
@@ -244,7 +243,7 @@ public final class Dlex
 				}
 				else if (subtype == MOD_OCT)
 				{
-					if (c == 'o' || isOctDigit(c))
+					if (c == 'o' || LexerUtil.isOctDigit(c))
 					{
 						buf.append(c);
 					}
@@ -255,7 +254,7 @@ public final class Dlex
 				}
 				else if (subtype == MOD_HEX)
 				{
-					if (c == 'x' || isHexDigit(c))
+					if (c == 'x' || LexerUtil.isHexDigit(c))
 					{
 						buf.append(c);
 					}
@@ -283,7 +282,7 @@ public final class Dlex
 					addToken = true;
 					reparse = false;
 				}
-				else if (isDigit(c) || c == 'e')
+				else if (LexerUtil.isDigit(c) || c == 'e')
 				{
 					buf.append(c);
 				}
@@ -475,7 +474,7 @@ public final class Dlex
 			return Symbols.CLOSE_CURLY_BRACKET;
 		case '.':
 			n = code.charAt(i + 1);
-			if (isIdentifierSymbol(n))
+			if (LexerUtil.isIdentifierSymbol(n))
 			{
 				return IDENTIFIER | MOD_SYMBOL;
 			}
@@ -488,21 +487,21 @@ public final class Dlex
 		case '$':
 			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
 		case '-':
-			if (isDigit(code.charAt(i + 1)))
+			if (LexerUtil.isDigit(code.charAt(i + 1)))
 			{
 				return INT;
 			}
 			return IDENTIFIER | MOD_SYMBOL;
 		}
-		if (isDigit(c))
+		if (LexerUtil.isDigit(c))
 		{
 			return INT;
 		}
-		else if (isIdentifierSymbol(c))
+		else if (LexerUtil.isIdentifierSymbol(c))
 		{
 			return IDENTIFIER | MOD_SYMBOL;
 		}
-		else if (isIdentifierPart(c))
+		else if (LexerUtil.isIdentifierPart(c))
 		{
 			return IDENTIFIER | MOD_LETTER;
 		}

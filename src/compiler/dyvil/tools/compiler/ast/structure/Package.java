@@ -19,10 +19,11 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.backend.ObjectFormat;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.CodePosition;
 
 public class Package implements INamed, IDefaultContext
 {
@@ -147,13 +148,13 @@ public class Package implements INamed, IDefaultContext
 	{
 		if (packageDecl == null)
 		{
-			markers.add(new CodePosition(0, 0, 1), "package.missing");
+			markers.add(I18n.createMarker(new CodePosition(0, 0, 1), "package.missing"));
 			return;
 		}
 		
 		if (!this.fullName.equals(packageDecl.getPackage()))
 		{
-			markers.add(packageDecl.getPosition(), "package.invalid", this.fullName);
+			markers.add(I18n.createMarker(packageDecl.getPosition(), "package.invalid", this.fullName));
 		}
 	}
 	

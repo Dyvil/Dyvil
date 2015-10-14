@@ -17,9 +17,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.*;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class NamedGenericType extends GenericType
 {
@@ -96,7 +97,7 @@ public class NamedGenericType extends GenericType
 		
 		if (iclass == null)
 		{
-			markers.add(this.position, "resolve.type", this.toString());
+			markers.add(I18n.createMarker(this.position, "resolve.type", this.toString()));
 		}
 		else
 		{
@@ -110,20 +111,20 @@ public class NamedGenericType extends GenericType
 			{
 				if (this.typeArgumentCount != 0)
 				{
-					markers.add(this.position, "generic.not_generic", this.name.qualified);
+					markers.add(I18n.createMarker(this.position, "generic.not_generic", this.name.qualified));
 				}
 				return new ClassType(iclass);
 			}
 			if (varCount != this.typeArgumentCount)
 			{
-				markers.add(this.position, "generic.count");
+				markers.add(I18n.createMarker(this.position, "generic.count"));
 				return new ClassType(iclass);
 			}
 		}
 		
 		/*
 		 * TODO Position handling if (position == TypePosition.CLASS) {
-		 * markers.add(this.position, "type.class.generic"); } // If the
+		 * markers.add(I18n.createMarker(this.position, "type.class.generic")); } // If the
 		 * position is a SUPER_TYPE position if (position ==
 		 * TypePosition.SUPER_TYPE || position ==
 		 * TypePosition.SUPER_TYPE_ARGUMENT) { position =
@@ -148,9 +149,10 @@ public class NamedGenericType extends GenericType
 			ITypeVariable var = iclass.getTypeVariable(i);
 			if (!var.isSuperTypeOf(t2))
 			{
-				Marker marker = markers.create(t2.getPosition(), "generic.type", var.getName().qualified);
+				Marker marker = I18n.createMarker(t2.getPosition(), "generic.type", var.getName().qualified);
 				marker.addInfo("Generic Type: " + t2);
 				marker.addInfo("Type Variable: " + var);
+				markers.add(marker);
 			}
 		}
 		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);

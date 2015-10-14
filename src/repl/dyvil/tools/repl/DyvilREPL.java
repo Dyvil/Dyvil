@@ -10,13 +10,13 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.TokenIterator;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.DyvilLexer;
+import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.repl.command.*;
 
 public class DyvilREPL
@@ -196,7 +196,7 @@ public class DyvilREPL
 			}
 			
 			REPLContext.reset();
-			TokenIterator tokens = new Dlex(REPLContext.markers).tokenize(currentCode);
+			TokenIterator tokens = new DyvilLexer(REPLContext.markers).tokenize(currentCode);
 			tokens.inferSemicolons();
 			
 			if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))

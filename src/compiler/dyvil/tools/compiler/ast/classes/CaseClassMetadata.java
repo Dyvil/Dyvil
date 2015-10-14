@@ -16,8 +16,8 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.CaseClasses;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
 {

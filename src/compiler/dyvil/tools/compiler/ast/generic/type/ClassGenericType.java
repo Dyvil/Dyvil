@@ -20,7 +20,8 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassGenericType extends GenericType
 {
@@ -174,12 +175,12 @@ public class ClassGenericType extends GenericType
 		{
 			if (iclass.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.getPosition(), "type.access.deprecated", iclass.getName());
+				markers.add(I18n.createMarker(this.getPosition(), "type.access.deprecated", iclass.getName()));
 			}
 			
 			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
 			{
-				markers.add(this.getPosition(), "type.access.internal", iclass.getName());
+				markers.add(I18n.createMarker(this.getPosition(), "type.access.internal", iclass.getName()));
 			}
 		}
 		

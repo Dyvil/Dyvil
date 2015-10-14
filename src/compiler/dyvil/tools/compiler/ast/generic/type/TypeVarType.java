@@ -21,7 +21,8 @@ import dyvil.tools.compiler.ast.type.IRawType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class TypeVarType implements IRawType
 {
@@ -149,10 +150,10 @@ public class TypeVarType implements IRawType
 		{
 		case CLASS:
 		case TYPE:
-			markers.add(this.getPosition(), "type.class.typevar");
+			markers.add(I18n.createMarker(this.getPosition(), "type.class.typevar"));
 			break;
 		case SUPER_TYPE:
-			markers.add(this.getPosition(), "type.super.typevar");
+			markers.add(I18n.createMarker(this.getPosition(), "type.super.typevar"));
 			break;
 		default:
 			break;

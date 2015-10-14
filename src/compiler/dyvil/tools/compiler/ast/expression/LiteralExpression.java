@@ -12,10 +12,11 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LiteralExpression implements IValue
 {
@@ -103,7 +104,7 @@ public final class LiteralExpression implements IValue
 			{
 				StringBuilder builder = new StringBuilder();
 				this.arguments.typesToString(builder);
-				markers.add(this.literal.getPosition(), "literal.method", this.literal.getType(), type, builder);
+				markers.add(I18n.createMarker(this.literal.getPosition(), "literal.method", this.literal.getType(), type, builder));
 				this.type = type;
 				return null;
 			}
@@ -117,13 +118,15 @@ public final class LiteralExpression implements IValue
 		
 		if (!type.isSuperTypeOf(this.type))
 		{
-			Marker m = markers.create(this.literal.getPosition(), "literal.type");
+			Marker m = I18n.createMarker(this.literal.getPosition(), "literal.type");
 			m.addInfo("Required Type: " + type.getConcreteType(typeContext));
 			m.addInfo("Conversion Type: " + this.type);
 			
 			StringBuilder sb = new StringBuilder("Conversion Method: \n\t\t");
 			Util.methodSignatureToString(method, sb);
 			m.addInfo(sb.toString());
+			
+			markers.add(m);
 		}
 		
 		return this;
