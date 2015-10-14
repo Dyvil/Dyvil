@@ -40,13 +40,13 @@ processResources {
 
 group = 'dyvil-team'
 
-version = '0.5.0'
+version = '0.6.0'
 
-String libraryVersion = '0.4.0'
-String compilerVersion = '0.5.0'
-String replVersion = '0.2.0'
+String libraryVersion = '0.5.0'
+String compilerVersion = '0.6.0'
+String replVersion = '0.3.0'
 
-mainClassName = 'dyvil.tools.repl.DyvilREPL'
+String replMainClass = 'dyvil.tools.repl.DyvilREPL'
 
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
@@ -55,12 +55,6 @@ if (ENV.DRONE_BUILD_NUMBER) {
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
-    }
-}
 
 /**
  * Creates the Gradle Wrapper (gradlew)
@@ -124,7 +118,7 @@ task buildREPL(type: Jar, dependsOn: 'classes') {
 	
 	archiveName = "dyvil-repl-${replVersion}.jar"
 	
-	manifest.attributes.put("Main-Class", "dyvil.tools.repl.DyvilREPL")
+	manifest.attributes.put("Main-Class", replMainClass)
 }
 
 /**
@@ -136,6 +130,8 @@ task build(type: Jar, overwrite: true) {
 	from sourceSets.repl.output
 	
 	archiveName = "dyvil-${version}.jar"
+	
+	manifest.attributes.put("Main-Class", replMainClass)
 }
 
 task buildAll(dependsOn: [ 'build', 'buildLibrary', 'buildCompiler', 'buildREPL' ])
