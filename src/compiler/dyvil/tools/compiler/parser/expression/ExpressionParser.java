@@ -122,14 +122,14 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			case Tokens.STRING_START:
 			{
-				FormatStringExpression ssv = new FormatStringExpression(token);
+				StringInterpolation ssv = new StringInterpolation(token);
 				this.value = ssv;
 				this.mode = ACCESS;
-				pm.pushParser(new FormatStringParser(ssv), true);
+				pm.pushParser(new StingInterpolationParser(ssv), true);
 				return;
 			}
 			case Tokens.CHAR:
-				this.value = new CharValue(token.raw(), token.charValue());
+				this.value = new CharValue(token.raw(), token.stringValue());
 				this.mode = ACCESS;
 				return;
 			case Tokens.INT:

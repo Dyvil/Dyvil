@@ -163,7 +163,7 @@ public class PatternParser extends Parser
 		case Tokens.STRING:
 			return new StringPattern(token.raw(), token.stringValue());
 		case Tokens.CHAR:
-			return new CharPattern(token.raw(), token.charValue());
+			return new CharPattern(token.raw(), token.stringValue());
 		case Tokens.INT:
 			return new IntPattern(token.raw(), token.intValue());
 		case Tokens.LONG:

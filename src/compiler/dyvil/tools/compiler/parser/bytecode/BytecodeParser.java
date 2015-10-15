@@ -257,7 +257,7 @@ public final class BytecodeParser extends Parser
 			if (nextType == Tokens.CHAR)
 			{
 				pm.skip();
-				return new LDCInstruction(new CharValue(next.charValue()));
+				return new LDCInstruction(new CharValue(next, next.stringValue(), true));
 			}
 			if (nextType == Tokens.INT)
 			{

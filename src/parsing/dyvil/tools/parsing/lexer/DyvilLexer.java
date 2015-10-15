@@ -10,8 +10,8 @@ import static dyvil.tools.parsing.lexer.Tokens.*;
 
 public final class DyvilLexer
 {
-	private MarkerList markers;
-	private Symbols symbols;
+	private MarkerList	markers;
+	private Symbols		symbols;
 	
 	public DyvilLexer(MarkerList markers, Symbols symbols)
 	{
@@ -56,7 +56,7 @@ public final class DyvilLexer
 				
 				if (string && c == ')')
 				{
-					type = STRING_2;
+					type = STRING;
 					subtype = STRING_PART;
 					continue;
 				}
@@ -293,28 +293,11 @@ public final class DyvilLexer
 				}
 				break;
 			case STRING:
-				if (c == '"' && buf.length() > 0)
-				{
-					buf.append('"');
-					addToken = true;
-					reparse = false;
-				}
-				else if (c == '\\' && appendEscape(buf, code.charAt(i + 1)))
-				{
-					i++;
-					continue;
-				}
-				else if (c != '\t')
-				{
-					buf.append(c);
-				}
-				break;
-			case STRING_2:
 				if (c == '"' && (buf.length() > 1 || string))
 				{
-					if (!string && buf.charAt(0) == '@')
+					if (!string && buf.charAt(0) == '"')
 					{
-						subtype = STRING_2;
+						subtype = STRING;
 					}
 					else
 					{
@@ -331,7 +314,7 @@ public final class DyvilLexer
 					if (c1 == '(')
 					{
 						i += 2;
-						if (buf.length() == 0 || buf.charAt(0) != '@')
+						if (buf.length() == 0 || buf.charAt(0) != '"')
 						{
 							subtype = STRING_PART;
 						}
@@ -359,7 +342,6 @@ public final class DyvilLexer
 			case CHAR:
 				if (c == '\'' && buf.length() > 0)
 				{
-					buf.append('\'');
 					addToken = true;
 					reparse = false;
 				}
@@ -424,14 +406,6 @@ public final class DyvilLexer
 			{
 				return IDENTIFIER | MOD_SYMBOL;
 			}
-		case '@':
-			n = code.charAt(i + 1);
-			// @"string"
-			if (n == '"')
-			{
-				return STRING_2;
-			}
-			return IDENTIFIER | MOD_SYMBOL;
 		case '0':
 			n = code.charAt(i + 1);
 			if (n == 'b')
@@ -593,17 +567,15 @@ public final class DyvilLexer
 		case DOUBLE | MOD_HEX:
 			return new DoubleToken(prev, Double.parseDouble(s.substring(2)), line, start, start + len);
 		case STRING:
-			return new StringToken(prev, STRING, s.substring(1, len - 1), line, start, start + len);
-		case STRING_2:
-			return new StringToken(prev, STRING, s.substring(2), line, start, start + len);
+			return new StringToken(prev, STRING, s.substring(1), line, start, start + len);
 		case STRING_START:
-			return new StringToken(prev, STRING_START, s.substring(2), line, start, start + len);
+			return new StringToken(prev, STRING_START, s.substring(1), line, start, start + len);
 		case STRING_PART:
 			return new StringToken(prev, STRING_PART, s, line, start, start + len);
 		case STRING_END:
 			return new StringToken(prev, STRING_END, s, line, start, start + len);
 		case CHAR:
-			return new CharToken(prev, s.charAt(1), line, start);
+			return new StringToken(prev, CHAR, s.substring(1), line, start, start + len);
 		}
 		return null;
 	}

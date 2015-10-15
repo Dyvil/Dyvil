@@ -213,7 +213,7 @@ public interface IValue extends IASTNode, ITyped
 		Class c = o.getClass();
 		if (c == Character.class)
 		{
-			return new CharValue((Character) o);
+			return new CharValue(null, o.toString(), true);
 		}
 		else if (c == Integer.class)
 		{

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -17,18 +18,31 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CharValue implements IConstantValue
 {
-	protected ICodePosition	position;
-	protected char			value;
+	private static final byte	UNDEFINED	= 0;
+	private static final byte	CHAR		= 1;
+	private static final byte	STRING		= 2;
 	
-	public CharValue(char value)
+	protected ICodePosition	position;
+	protected String		value;
+	
+	private byte type;
+	
+	public CharValue(String value)
 	{
 		this.value = value;
 	}
 	
-	public CharValue(ICodePosition position, char value)
+	public CharValue(ICodePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
+	}
+	
+	public CharValue(ICodePosition position, String value, boolean forceChar)
+	{
+		this.position = position;
+		this.value = value;
+		this.type = forceChar ? CHAR : STRING;
 	}
 	
 	@Override
@@ -46,80 +60,158 @@ public final class CharValue implements IConstantValue
 	@Override
 	public int valueTag()
 	{
-		return CHAR;
+		return IValue.CHAR;
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return Types.CHAR;
+		if (this.type == CHAR)
+		{
+			return Types.CHAR;
+		}
+		return Types.STRING;
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR))
+		IClass iclass = type.getTheClass();
+		IAnnotation annotation = null;
+		if (this.value.length() == 1 && this.type != STRING)
 		{
+			if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR))
+			{
+				this.type = CHAR;
+				return this;
+			}
+			
+			annotation = iclass.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS);
+			if (annotation != null)
+			{
+				return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
+			}
+		}
+		
+		if (this.type == CHAR)
+		{
+			return null;
+		}
+		
+		if (type == Types.STRING || type.isSuperTypeOf(Types.STRING))
+		{
+			this.type = STRING;
 			return this;
 		}
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.CHAR_CONVERTIBLE_CLASS);
+		
+		annotation = iclass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
+		
 		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.CHAR || type.isSuperTypeOf(Types.CHAR) || type.getTheClass().getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null;
+		IClass iclass = type.getTheClass();
+		if (this.value.length() == 1 && this.type != STRING)
+		{
+			if ((type == Types.CHAR || type.isSuperTypeOf(Types.CHAR)))
+			{
+				return true;
+			}
+			if (iclass.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
+			{
+				return true;
+			}
+		}
+		
+		if (this.type == CHAR)
+		{
+			return false;
+		}
+		if (type == Types.STRING || type.isSuperTypeOf(Types.STRING))
+		{
+			return true;
+		}
+		return iclass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
+		IClass iclass = type.getTheClass();
+		if (this.value.length() == 1 && this.type != STRING)
 		{
-			return CONVERSION_MATCH;
+			float distance = type.getSubTypeDistance(Types.CHAR);
+			if (distance > 0F)
+			{
+				return distance;
+			}
+			
+			if (iclass.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
+			{
+				return CONVERSION_MATCH;
+			}
 		}
-		return type.getSubTypeDistance(Types.CHAR);
+		
+		if (this.type == CHAR)
+		{
+			return 0F;
+		}
+		float distance = type.getSubTypeDistance(Types.STRING);
+		if (distance > 0F)
+		{
+			return distance;
+		}
+		if (iclass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		{
+			return CONVERSION_MATCH + 1F;
+		}
+		return 0F;
 	}
 	
 	@Override
 	public int intValue()
 	{
-		return this.value;
+		return this.value.charAt(0);
 	}
 	
 	@Override
 	public long longValue()
 	{
-		return this.value;
+		return this.value.charAt(0);
 	}
 	
 	@Override
 	public float floatValue()
 	{
-		return this.value;
+		return this.value.charAt(0);
 	}
 	
 	@Override
 	public double doubleValue()
 	{
-		return this.value;
+		return this.value.charAt(0);
 	}
 	
 	@Override
-	public Character toObject()
+	public Object toObject()
 	{
-		return Character.valueOf(this.value);
+		if (this.type == CHAR)
+		{
+			return Character.valueOf(this.value.charAt(0));
+		}
+		return this.value;
 	}
 	
 	@Override
 	public int stringSize()
 	{
-		return 1;
+		return this.value.length();
 	}
 	
 	@Override
@@ -130,16 +222,27 @@ public final class CharValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter visitor) throws BytecodeException
+	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		visitor.writeLDC(this.value);
+		if (this.type == CHAR)
+		{
+			writer.writeLDC(this.value.charAt(0));
+			return;
+		}
+		writer.writeLDC(this.value);
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
+		if (this.type == CHAR)
+		{
+			writer.writeLDC(this.value.charAt(0));
+			writer.writeInsn(Opcodes.IRETURN);
+			return;
+		}
 		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.IRETURN);
+		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override

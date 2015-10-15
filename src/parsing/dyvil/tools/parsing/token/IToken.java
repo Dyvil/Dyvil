@@ -17,11 +17,6 @@ public interface IToken extends ICodePosition
 		return null;
 	}
 	
-	public default char charValue()
-	{
-		return 0;
-	}
-	
 	public default int intValue()
 	{
 		return 0;

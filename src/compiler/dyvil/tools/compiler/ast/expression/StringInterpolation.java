@@ -19,11 +19,11 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class FormatStringExpression implements IValue
+public final class StringInterpolation implements IValue
 {
 	public static final class Types
 	{
-		public static final IClass FORMAT_STRING_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("FormatStringConvertible");
+		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("StringInterpolationConvertible");
 		
 		private Types()
 		{
@@ -37,7 +37,7 @@ public final class FormatStringExpression implements IValue
 	private String[]	strings	= new String[2];
 	private int			count;
 	
-	public FormatStringExpression(ICodePosition position)
+	public StringInterpolation(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -80,7 +80,7 @@ public final class FormatStringExpression implements IValue
 		{
 			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
-		if ((annotation = iclass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE)) != null)
+		if ((annotation = iclass.getAnnotation(Types.STRING_INTERPOLATION_CONVERTIBLE)) != null)
 		{
 			StringValue string;
 			int len = this.count / 2;
@@ -127,7 +127,7 @@ public final class FormatStringExpression implements IValue
 	{
 		IClass theClass = type.getTheClass();
 		return theClass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS) != null
-				|| theClass.getAnnotation(Types.FORMAT_STRING_CONVERTIBLE) != null;
+				|| theClass.getAnnotation(Types.STRING_INTERPOLATION_CONVERTIBLE) != null;
 	}
 	
 	@Override

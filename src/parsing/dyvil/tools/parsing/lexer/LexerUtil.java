@@ -167,7 +167,7 @@ public class LexerUtil
 		appendStringLiteralBody(value, buffer);
 		buffer.append('"');
 	}
-
+	
 	public static void appendStringLiteralBody(String value, StringBuilder buffer)
 	{
 		int len = value.length();
@@ -202,38 +202,46 @@ public class LexerUtil
 		}
 	}
 	
-	public static void appendCharLiteral(char value, StringBuilder buffer)
+	public static void appendCharLiteral(String value, StringBuilder buffer)
 	{
-		buffer.ensureCapacity(buffer.length() + 4);
+		buffer.ensureCapacity(buffer.length() + value.length() + 3);
 		buffer.append('\'');
-		
-		switch (value)
+		appendCharLiteralBody(value, buffer);
+		buffer.append('\'');
+	}
+	
+	public static void appendCharLiteralBody(String value, StringBuilder buffer)
+	{
+		int len = value.length();
+		for (int i = 0; i < len; i++)
 		{
-		case '\'':
-			buffer.append("\\'");
-			break;
-		case '\\':
-			buffer.append("\\\\");
-			break;
-		case '\n':
-			buffer.append("\\n");
-			break;
-		case '\t':
-			buffer.append("\\t");
-			break;
-		case '\r':
-			buffer.append("\\r");
-			break;
-		case '\b':
-			buffer.append("\\b");
-			break;
-		case '\f':
-			buffer.append("\\f");
-			break;
-		default:
-			buffer.append(value);
+			char c = value.charAt(i);
+			switch (c)
+			{
+			case '\'':
+				buffer.append("\\'");
+				break;
+			case '\\':
+				buffer.append("\\\\");
+				break;
+			case '\n':
+				buffer.append("\\n");
+				break;
+			case '\t':
+				buffer.append("\\t");
+				break;
+			case '\r':
+				buffer.append("\\r");
+				break;
+			case '\b':
+				buffer.append("\\b");
+				break;
+			case '\f':
+				buffer.append("\\f");
+				break;
+			default:
+				buffer.append(c);
+			}
 		}
-		
-		buffer.append('\'');
 	}
 }

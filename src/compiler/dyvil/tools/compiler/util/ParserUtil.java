@@ -83,7 +83,7 @@ public class ParserUtil
 		case Tokens.STRING:
 			return new StringValue(token.raw(), token.stringValue());
 		case Tokens.CHAR:
-			return new CharValue(token.raw(), token.charValue());
+			return new CharValue(token.raw(), token.stringValue());
 		case Tokens.INT:
 			return new IntValue(token.raw(), token.intValue());
 		case Tokens.LONG:
