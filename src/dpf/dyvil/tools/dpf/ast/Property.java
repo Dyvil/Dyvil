@@ -62,6 +62,7 @@ public class Property extends ValueCreator implements NodeElement
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.name).append(" = ").append(this.value);
+		buffer.append(this.name).append(" = ");
+		this.value.toString(prefix, buffer);
 	}
 }

@@ -25,6 +25,8 @@ public class DPFTest
 				+ "double = 1.5D\n"
 				+ "float = 1.2F\n"
 				+ "string = \"test\"\n"
+				+ "list = [ 1, 2, 3 ]\n"
+				+ "emptyList = [ ]\n"
 				+ "}\n"
 				+ "}\n";
 		

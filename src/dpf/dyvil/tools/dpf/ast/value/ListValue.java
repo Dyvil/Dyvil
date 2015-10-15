@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.dpf.visitor.ListVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.parsing.ast.IASTNode;
 
 public class ListValue extends ValueCreator implements Value, ListVisitor
 {
@@ -35,6 +36,12 @@ public class ListValue extends ValueCreator implements Value, ListVisitor
 		}
 		
 		v.visitEnd();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

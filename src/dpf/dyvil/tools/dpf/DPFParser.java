@@ -1,5 +1,6 @@
 package dyvil.tools.dpf;
 
+import dyvil.tools.dpf.visitor.ListVisitor;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.TokenIterator;
@@ -97,8 +98,36 @@ public class DPFParser
 		case Tokens.SPECIAL_IDENTIFIER:
 			valueVisitor.visitName(token.nameValue());
 			return;
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
+			this.parseList(valueVisitor.visitList());
+			return;
 		}
 		
 		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid " + token));
+	}
+	
+	private void parseList(ListVisitor visitor)
+	{
+		if (this.tokens.current().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+		{
+			this.tokens.next();
+			return;
+		}
+		
+		while (this.tokens.hasNext())
+		{	
+			this.parseValue(visitor.visitElement());
+			
+			IToken token = this.tokens.next();
+			switch (token.type())
+			{
+			case BaseSymbols.COMMA:
+				continue;
+			case BaseSymbols.CLOSE_SQUARE_BRACKET:
+				return;
+			}
+			
+			this.markers.add(new SyntaxError(token, "Invalid List - ',' expected"));
+		}
 	}
 }
