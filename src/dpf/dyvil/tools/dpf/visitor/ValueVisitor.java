@@ -14,6 +14,8 @@ public interface ValueVisitor
 	
 	public void visitString(String value);
 	
+	public StringInterpolationVisitor visitStringInterpolation();
+	
 	public void visitName(Name name);
 	
 	public ListVisitor visitList();

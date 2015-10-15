@@ -11,7 +11,7 @@ public class DPFTest
 	{
 		String file = "name = \"super\"\n"
 				+ "package.type = type\n"
-				+ "package.name.override = override\n"
+				+ "package.name.override = \" \\(package) \\(name) \"\n"
 				+ "package.node\n"
 				+ "{\n"
 				+ "name = \"name\"\n"

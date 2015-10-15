@@ -162,7 +162,7 @@ public class PatternParser extends Parser
 			return new NullPattern(token.raw());
 		case Tokens.STRING:
 			return new StringPattern(token.raw(), token.stringValue());
-		case Tokens.CHAR:
+		case Tokens.SINGLE_QUOTED_STRING:
 			return new CharPattern(token.raw(), token.stringValue());
 		case Tokens.INT:
 			return new IntPattern(token.raw(), token.intValue());

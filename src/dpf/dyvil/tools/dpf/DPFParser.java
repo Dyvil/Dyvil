@@ -2,6 +2,7 @@ package dyvil.tools.dpf;
 
 import dyvil.tools.dpf.visitor.ListVisitor;
 import dyvil.tools.dpf.visitor.NodeVisitor;
+import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -89,8 +90,13 @@ public class DPFParser
 		case Tokens.DOUBLE:
 			valueVisitor.visitDouble(token.doubleValue());
 			return;
+		case Tokens.SINGLE_QUOTED_STRING:
 		case Tokens.STRING:
 			valueVisitor.visitString(token.stringValue());
+			return;
+		case Tokens.STRING_START:
+			this.tokens.jump(token);
+			this.parseStringInterpolation(valueVisitor.visitStringInterpolation());
 			return;
 		case Tokens.IDENTIFIER:
 		case Tokens.LETTER_IDENTIFIER:
@@ -115,7 +121,7 @@ public class DPFParser
 		}
 		
 		while (this.tokens.hasNext())
-		{	
+		{
 			this.parseValue(visitor.visitElement());
 			
 			IToken token = this.tokens.next();
@@ -128,6 +134,30 @@ public class DPFParser
 			}
 			
 			this.markers.add(new SyntaxError(token, "Invalid List - ',' expected"));
+		}
+	}
+	
+	private void parseStringInterpolation(StringInterpolationVisitor visitor)
+	{
+		IToken token = this.tokens.current();
+		visitor.visitStringPart(token.stringValue());
+		this.tokens.next();
+		
+		while (this.tokens.hasNext())
+		{
+			this.parseValue(visitor.visitValue());
+			
+			token = this.tokens.next();
+			switch (token.type())
+			{
+			case Tokens.STRING_PART:
+				visitor.visitStringPart(token.stringValue());
+				continue;
+			case Tokens.STRING_END:
+				visitor.visitStringPart(token.stringValue());
+				visitor.visitEnd();
+				return;
+			}
 		}
 	}
 }

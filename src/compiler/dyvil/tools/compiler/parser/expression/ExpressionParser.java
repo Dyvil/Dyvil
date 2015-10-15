@@ -128,7 +128,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new StingInterpolationParser(ssv), true);
 				return;
 			}
-			case Tokens.CHAR:
+			case Tokens.SINGLE_QUOTED_STRING:
 				this.value = new CharValue(token.raw(), token.stringValue());
 				this.mode = ACCESS;
 				return;

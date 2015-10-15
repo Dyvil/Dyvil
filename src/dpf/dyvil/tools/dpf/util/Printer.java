@@ -3,7 +3,7 @@ package dyvil.tools.dpf.util;
 import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
 
-public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor
+public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor
 {
 	private int indent = 0;
 	
@@ -74,6 +74,13 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 	}
 	
 	@Override
+	public StringInterpolationVisitor visitStringInterpolation()
+	{
+		this.indent++;
+		return this;
+	}
+	
+	@Override
 	public void visitName(Name name)
 	{
 		this.printIndent();
@@ -131,5 +138,13 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 	public void visitEnd()
 	{
 		this.indent--;
+	}
+	
+	@Override
+	public void visitStringPart(String string)
+	{
+		this.printIndent();
+		System.out.print("String '" + string + "'");
+		return;
 	}
 }

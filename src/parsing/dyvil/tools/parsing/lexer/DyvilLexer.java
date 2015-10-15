@@ -339,7 +339,7 @@ public final class DyvilLexer
 					buf.append(c);
 				}
 				break;
-			case CHAR:
+			case SINGLE_QUOTED_STRING:
 				if (c == '\'' && buf.length() > 0)
 				{
 					addToken = true;
@@ -391,7 +391,7 @@ public final class DyvilLexer
 		case '"':
 			return STRING;
 		case '\'':
-			return CHAR;
+			return SINGLE_QUOTED_STRING;
 		case '/':
 			char n = code.charAt(i + 1);
 			if (n == '*')
@@ -574,8 +574,8 @@ public final class DyvilLexer
 			return new StringToken(prev, STRING_PART, s, line, start, start + len);
 		case STRING_END:
 			return new StringToken(prev, STRING_END, s, line, start, start + len);
-		case CHAR:
-			return new StringToken(prev, CHAR, s.substring(1), line, start, start + len);
+		case SINGLE_QUOTED_STRING:
+			return new StringToken(prev, SINGLE_QUOTED_STRING, s.substring(1), line, start, start + len);
 		}
 		return null;
 	}

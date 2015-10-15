@@ -287,7 +287,7 @@ public final class StringInterpolation implements IValue
 	{
 		int len = this.count / 2;
 		String s = this.strings[0];
-		buffer.append("@\"");
+		buffer.append('"');
 		LexerUtil.appendStringLiteralBody(s, buffer);
 		
 		for (int i = 0; i < len; i++)

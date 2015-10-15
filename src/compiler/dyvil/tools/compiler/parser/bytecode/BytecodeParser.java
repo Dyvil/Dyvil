@@ -254,7 +254,7 @@ public final class BytecodeParser extends Parser
 				pm.skip();
 				return new LDCInstruction(new StringValue(next.stringValue()));
 			}
-			if (nextType == Tokens.CHAR)
+			if (nextType == Tokens.SINGLE_QUOTED_STRING)
 			{
 				pm.skip();
 				return new LDCInstruction(new CharValue(next, next.stringValue(), true));

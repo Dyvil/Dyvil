@@ -1,9 +1,6 @@
 package dyvil.tools.dpf.ast.value;
 
-import dyvil.tools.dpf.visitor.BuilderVisitor;
-import dyvil.tools.dpf.visitor.ListVisitor;
-import dyvil.tools.dpf.visitor.MapVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
 
 public abstract class ValueCreator implements ValueVisitor
@@ -38,6 +35,14 @@ public abstract class ValueCreator implements ValueVisitor
 	public void visitString(String value)
 	{
 		this.setValue(new StringValue(value));
+	}
+	
+	@Override
+	public StringInterpolationVisitor visitStringInterpolation()
+	{
+		StringInterpolation stringInterpolation = new StringInterpolation();
+		this.setValue(stringInterpolation);
+		return stringInterpolation;
 	}
 	
 	@Override
