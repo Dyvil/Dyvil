@@ -114,12 +114,6 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		// TODO
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex < 0)

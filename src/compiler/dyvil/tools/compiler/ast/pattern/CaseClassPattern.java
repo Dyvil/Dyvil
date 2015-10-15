@@ -161,11 +161,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex < 0)

@@ -65,17 +65,6 @@ public class BoxPattern implements IPattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		}
-		this.boxingMethod.writeInvoke(writer, null, null, this.pattern.getLineNumber());
-		this.pattern.writeJump(writer, -1, elseLabel);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex >= 0)

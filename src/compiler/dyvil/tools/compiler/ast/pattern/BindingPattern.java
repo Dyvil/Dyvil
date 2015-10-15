@@ -88,31 +88,17 @@ public final class BindingPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (this.variable != null)
-		{
-			this.writeVar(writer, varIndex);
-		}
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (this.variable != null)
 		{
-			this.writeVar(writer, varIndex);
+			this.variable.setType(this.type);
+			if (varIndex >= 0)
+			{
+				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+			}
+			this.variable.writeInit(writer, null);
 		}
-	}
-	
-	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
-	{
-		this.variable.setType(this.type);
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-		}
-		this.variable.writeInit(writer, null);
 	}
 	
 	@Override

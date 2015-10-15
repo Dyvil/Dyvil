@@ -89,25 +89,14 @@ public final class StringPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		writer.writeLDC(this.value);
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		}
-		else
-		{
-			writer.writeInsn(Opcodes.SWAP);
-		}
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
-		writer.writeJumpInsn(Opcodes.IFNE, elseLabel);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		writer.writeLDC(this.value);
+		writeStringInvJump(writer, varIndex, elseLabel, this.value);
+	}
+
+	protected static void writeStringInvJump(MethodWriter writer, int varIndex, Label elseLabel, String value) throws BytecodeException
+	{
+		writer.writeLDC(value);
 		if (varIndex >= 0)
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);

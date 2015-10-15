@@ -41,13 +41,6 @@ public final class NullPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeJumpInsn(Opcodes.IFNULL, elseLabel);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);

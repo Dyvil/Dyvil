@@ -145,38 +145,6 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		ITypeList typeList = (ITypeList) this.tupleType;
-		String internal = this.tupleType.getInternalName();
-		Label target = new Label();
-		
-		if (varIndex < 0)
-		{
-			varIndex = writer.localCount();
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-		}
-		
-		for (int i = 0; i < this.patternCount; i++)
-		{
-			if (this.patterns[i].getPatternType() == WILDCARD)
-			{
-				// Skip wildcard Patterns
-				continue;
-			}
-			
-			// Copy below
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeFieldInsn(Opcodes.GETFIELD, internal, "_" + (i + 1), "Ljava/lang/Object;");
-			writer.writeTypeInsn(Opcodes.CHECKCAST, typeList.getType(i).getInternalName());
-			this.patterns[i].writeInvJump(writer, -1, target);
-		}
-		
-		writer.writeJumpInsn(Opcodes.GOTO, elseLabel);
-		writer.writeLabel(target);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		ITypeList typeList = (ITypeList) this.tupleType;

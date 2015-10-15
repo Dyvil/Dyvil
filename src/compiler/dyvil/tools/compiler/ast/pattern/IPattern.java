@@ -113,7 +113,5 @@ public interface IPattern extends IASTNode, ITyped
 		return -1;
 	}
 	
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
-	
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
 }

@@ -53,15 +53,6 @@ public final class WildcardPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex < 0)
-		{
-			writer.writeInsn(Opcodes.AUTO_POP);
-		}
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex < 0)

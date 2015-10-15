@@ -44,17 +44,6 @@ public final class LongPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.LLOAD, varIndex);
-		}
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_LCMPEQ, elseLabel);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex >= 0)

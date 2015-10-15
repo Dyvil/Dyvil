@@ -44,17 +44,6 @@ public final class DoublePattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.DLOAD, varIndex);
-		}
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_DCMPEQ, elseLabel);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex >= 0)

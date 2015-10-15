@@ -75,15 +75,9 @@ public final class CharPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
-		if (varIndex >= 0)
 		{
-			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		}
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
-	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
