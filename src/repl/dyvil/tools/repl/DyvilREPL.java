@@ -101,6 +101,11 @@ public class DyvilREPL
 		{
 			String s = reader.readLine();
 			
+			if (s == null)
+			{
+				continue;
+			}
+			
 			outer:
 			for (int i = 0, len = s.length(); i < len; i++)
 			{
