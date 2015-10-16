@@ -1,16 +1,16 @@
 library
 {
 	info = "Dyvil Library"
-	fileName = @"./libs/dyvil-library-\(library.version).jar"
-	download = @"https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-library-\(library.version).jar"
+	fileName = "./libs/dyvil-library-\(library.version).jar"
+	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-library-\(library.version).jar"
 	selected = "forced"
 }
 
 compiler
 {
 	info = "Dyvil Compiler"
-	fileName = @"./libs/dyvil-compiler-\(compiler.version).jar"
-	download = @"https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-compiler-\(compiler.version).jar"
+	fileName = "./libs/dyvil-compiler-\(compiler.version).jar"
+	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-compiler-\(compiler.version).jar"
 	selected = true
 	
 	launcher
@@ -42,7 +42,7 @@ repl
 {
 	info = "Dyvil REPL"
 	fileName = "./libs/dyvil-repl-\(repl.version).jar"
-	download = @"https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-repl-\(repl.version).jar"
+	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-repl-\(repl.version).jar"
 	selected = true
 	dependencies = [ compiler ]
 	

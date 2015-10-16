@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 
 public class StringInterpolation extends ValueCreator implements Value, StringInterpolationVisitor
@@ -49,6 +50,12 @@ public class StringInterpolation extends ValueCreator implements Value, StringIn
 		}
 		
 		v.visitEnd();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

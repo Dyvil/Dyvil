@@ -1,5 +1,9 @@
 package dyvil.tools.dpf;
 
+import java.io.File;
+
+import dyvil.io.FileUtils;
+import dyvil.tools.dpf.ast.DPFFile;
 import dyvil.tools.dpf.visitor.ListVisitor;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
@@ -22,6 +26,19 @@ public class DPFParser
 	{
 		this.code = code;
 		this.markers = markers;
+	}
+	
+	public static DPFFile parse(File file)
+	{
+		return parse(FileUtils.read(file));
+	}
+	
+	public static DPFFile parse(String code)
+	{
+		MarkerList markers = new MarkerList();
+		DPFFile file = new DPFFile();
+		new DPFParser(markers, code).accept(file);
+		return file;
 	}
 	
 	public void accept(NodeVisitor visitor)
@@ -102,6 +119,7 @@ public class DPFParser
 		case Tokens.LETTER_IDENTIFIER:
 		case Tokens.SYMBOL_IDENTIFIER:
 		case Tokens.SPECIAL_IDENTIFIER:
+			
 			valueVisitor.visitName(token.nameValue());
 			return;
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
@@ -158,6 +176,8 @@ public class DPFParser
 				visitor.visitEnd();
 				return;
 			}
+			
+			this.markers.add(new SyntaxError(token, "Invalid String Interpolation - String expected"));
 		}
 	}
 }

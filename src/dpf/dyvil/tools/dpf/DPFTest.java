@@ -1,8 +1,10 @@
 package dyvil.tools.dpf;
 
+import java.io.File;
+
+import dyvil.io.FileUtils;
 import dyvil.tools.dpf.ast.DPFFile;
 import dyvil.tools.dpf.ast.Node;
-import dyvil.tools.dpf.util.Printer;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class DPFTest
@@ -37,6 +39,15 @@ public class DPFTest
 		parser.accept(node);
 		System.out.println(node);
 		
-		node.accept(new Printer());
+		System.out.println("-------------");
+		
+		markers.clear();
+		
+		file = FileUtils.read(new File("dists/distributions.dyp"));
+		parser = new DPFParser(markers, file);
+		
+		node = new DPFFile();
+		parser.accept(node);
+		System.out.println(node);
 	}
 }
