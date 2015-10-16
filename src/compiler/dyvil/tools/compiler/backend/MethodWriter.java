@@ -17,6 +17,8 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 	
 	public void setHasReturn(boolean hasReturn);
 	
+	public boolean hasReturn();
+	
 	// Annotations
 	
 	@Override

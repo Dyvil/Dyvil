@@ -227,6 +227,11 @@ public class Frame
 		}
 	}
 	
+	public int stackCount()
+	{
+		return this.stackCount;
+	}
+	
 	public void set(Object type)
 	{
 		if (type == LONG || type == DOUBLE)
@@ -579,7 +584,7 @@ public class Frame
 		case FRETURN:
 		case DRETURN:
 		case ARETURN:
-			this.pop();
+			this.stackCount = this.actualStackCount = 0;
 			return;
 		case RETURN:
 			return;

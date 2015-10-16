@@ -63,6 +63,12 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
+	public boolean hasReturn()
+	{
+		return this.hasReturn;
+	}
+	
+	@Override
 	public void begin()
 	{
 		this.mv.visitCode();
@@ -811,8 +817,12 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		if (!this.hasReturn)
 		{
-			this.insnCallback();
-			this.mv.visitInsn(type.getReturnOpcode());
+			int opcode = type.getReturnOpcode();
+			if (opcode == RETURN || this.frame.actualStackCount > 0)
+			{
+				this.insnCallback();
+				this.mv.visitInsn(opcode);
+			}
 		}
 		this.mv.visitMaxs(this.frame.maxStack, this.frame.maxLocals);
 		this.mv.visitEnd();

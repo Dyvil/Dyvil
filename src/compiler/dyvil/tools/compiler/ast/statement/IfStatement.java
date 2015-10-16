@@ -325,9 +325,15 @@ public class IfStatement extends Value
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
 		this.then.writeExpression(writer, this.commonType);
-		writer.getFrame().set(commonFrameType);
-		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
+		
+		if (!writer.hasReturn())
+		{
+			writer.getFrame().set(commonFrameType);
+			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
+		}
+		
 		writer.writeTargetLabel(elseStart);
+		
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -337,7 +343,12 @@ public class IfStatement extends Value
 		{
 			this.elseThen.writeExpression(writer, this.commonType);
 		}
-		writer.getFrame().set(commonFrameType);
+		
+		if (!writer.hasReturn())
+		{
+			writer.getFrame().set(commonFrameType);
+		}
+		
 		writer.writeTargetLabel(elseEnd);
 	}
 	
