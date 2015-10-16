@@ -60,7 +60,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	protected static void reset()
 	{
-		className = "repl$results/REPL$Result$" + classIndex++;
+		className = "repl$classes/REPL$Result$" + classIndex++;
 		markers.clear();
 	}
 	
@@ -520,7 +520,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public String getFullName(Name name)
 	{
-		return "repl$." + name.qualified;
+		return "repl$classes." + name.qualified;
 	}
 	
 	@Override
@@ -532,6 +532,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public String getInternalName(Name name)
 	{
-		return "repl$/" + name.qualified;
+		return "repl$classes/" + name.qualified;
 	}
 }
