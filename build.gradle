@@ -13,6 +13,13 @@ sourceSets {
 			srcDir 'build/dyvilbin'
 		}
 	}
+	dpf {
+		java {
+			srcDir 'src/dpf'
+			compileClasspath += library.output
+			runtimeClasspath += library.output
+		}
+	}	
 	compiler {
 		java {
 			srcDir 'src/compiler'
@@ -25,9 +32,9 @@ sourceSets {
 	}
 	repl {
 		java {
+			srcDir 'src/repl'
 			compileClasspath += library.output + compiler.output
 			runtimeClasspath += compiler.runtimeClasspath
-			srcDir 'src/repl'
 		}
 	}
 }
@@ -46,6 +53,7 @@ version = '0.6.0'
 String libraryVersion = '0.5.0'
 String compilerVersion = '0.6.0'
 String replVersion = '0.3.0'
+String dpfVersion = '0.1.0'
 
 String replMainClass = 'dyvil.tools.repl.DyvilREPL'
 
@@ -56,6 +64,7 @@ if (ENV.DRONE_BUILD_NUMBER) {
     libraryVersion += snapshot
     compilerVersion += snapshot
     replVersion += snapshot
+    dpfVersion += snapshot
 }
 
 sourceCompatibility = 1.8
@@ -79,8 +88,6 @@ task clean(overwrite: true) << {
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
-	println 'Compiling Dyvil Runtime Library...'
-	
 	// Required to make UP-TO-DATE work
 	outputs.upToDateSpec = new org.gradle.api.specs.AndSpec()
 	
@@ -90,7 +97,7 @@ task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
 	outputs.dir 'build/dyvilbin/'
 	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
-	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
+	classpath = sourceSets.compiler.runtimeClasspath
 	args = [ '@scripts/lib_options.txt', 'compile' ]
 }
 
@@ -102,6 +109,12 @@ task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
 	from sourceSets.library.resources
 	
 	archiveName = "dyvil-library-${libraryVersion}.jar"
+}
+
+task buildDPF(type: Jar, dependsOn: 'buildLibrary') {
+	from sourceSets.dpf.output
+	
+	archiveName = "dyvil-property-format-${dpfVersion}.jar"
 }
 
 /**
@@ -131,12 +144,14 @@ task buildREPL(type: Jar, dependsOn: 'classes') {
  */
 task build(type: Jar, overwrite: true) {
 	from sourceSets.library.output
+	from sourceSets.library.resources
 	from sourceSets.compiler.output
 	from sourceSets.repl.output
+	from sourceSets.dpf.output
 	
 	archiveName = "dyvil-${version}.jar"
 	
 	manifest.attributes.put("Main-Class", replMainClass)
 }
 
-task buildAll(dependsOn: [ 'build', 'buildLibrary', 'buildCompiler', 'buildREPL' ])
+task buildAll(dependsOn: [ 'build', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF' ])
