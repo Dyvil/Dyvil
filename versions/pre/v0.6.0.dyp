@@ -1,0 +1,4 @@
+version = "0.6.0"
+library.version = "0.5.0"
+compiler.version = "0.6.0"
+repl.version = "0.3.0"
