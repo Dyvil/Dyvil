@@ -72,15 +72,27 @@ public abstract class Marker implements Comparable<Marker>
 			buf.append(": ").append(message);
 		}
 		
-		int prevNL = prevNL(code, this.position.startIndex());
-		int nextNL = nextNL(code, this.position.endIndex());
+		int startIndex = this.position.startIndex();
+		int endIndex = this.position.endIndex();
+		int codeLength = code.length();
+		if (startIndex >= codeLength)
+		{
+			startIndex = codeLength - 1;
+		}
+		if (endIndex >= codeLength)
+		{
+			endIndex = codeLength - 1;
+		}
+		
+		int prevNL = prevNL(code, startIndex);
+		int nextNL = nextNL(code, endIndex);
 		String line = code.substring(prevNL, nextNL);
 		
 		// Append Line
 		buf.append('\n').append(line).append('\n');
 		
 		// Append ^
-		for (int i = prevNL; i < this.position.startIndex(); i++)
+		for (int i = prevNL; i < startIndex; i++)
 		{
 			char c = code.charAt(i);
 			if (c == '\t')
@@ -121,7 +133,7 @@ public abstract class Marker implements Comparable<Marker>
 		int i = code.indexOf('\n', end);
 		if (i < 0)
 		{
-			return code.length();
+			return code.length() - 1;
 		}
 		return i;
 	}

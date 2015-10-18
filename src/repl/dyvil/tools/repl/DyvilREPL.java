@@ -16,6 +16,7 @@ import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
@@ -206,7 +207,7 @@ public class DyvilREPL
 			
 			REPLContext.reset();
 			TokenIterator tokens = new DyvilLexer(REPLContext.markers, DyvilSymbols.INSTANCE).tokenize(currentCode);
-			tokens.inferSemicolons();
+			SemicolonInference.inferSemicolons(tokens.first());
 			
 			if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))
 			{

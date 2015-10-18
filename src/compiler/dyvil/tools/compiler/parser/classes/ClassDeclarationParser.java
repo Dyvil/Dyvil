@@ -186,14 +186,13 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			pm.report(token, "Invalid Class Declaration - '{' or ';' expected");
 			return;
 		case BODY_END:
-			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			pm.popParser();
+			this.classList.addClass(this.theClass);
+			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
-				pm.popParser();
-				this.classList.addClass(this.theClass);
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Class Declaration - '}' expected");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Class Declaration - '}' expected");
 			return;
 		}
 	}

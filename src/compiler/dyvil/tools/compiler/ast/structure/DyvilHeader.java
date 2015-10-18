@@ -33,6 +33,7 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.FileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.parsing.CodeFile;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
@@ -358,7 +359,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public void tokenize()
 	{
 		this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.inputFile.getCode());
-		this.tokens.inferSemicolons();
+		SemicolonInference.inferSemicolons(this.tokens.first());
 	}
 	
 	@Override
