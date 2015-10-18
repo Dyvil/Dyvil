@@ -1,6 +1,7 @@
 package dyvil.tools.parsing;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -27,29 +28,31 @@ public class TokenIterator implements Iterator<IToken>
 	
 	public void jump(IToken next)
 	{
-		this.lastReturned = next.prev();
+		this.lastReturned = null;
 		this.next = next;
 	}
 	
 	@Override
 	public boolean hasNext()
 	{
-		return this.lastReturned != null ? this.lastReturned.hasNext() : this.next != null;
+		return this.next != null;
 	}
 	
-	public IToken current()
+	public IToken lastReturned()
 	{
-		return this.next;
+		return this.lastReturned;
 	}
 	
 	@Override
 	public IToken next()
 	{
-		this.lastReturned = this.next;
-		if (this.next != null)
+		if (this.next == null)
 		{
-			this.next = this.next.next();
+			throw new NoSuchElementException();
 		}
+		
+		this.lastReturned = this.next;
+		this.next = this.next.next();
 		return this.lastReturned;
 	}
 	
@@ -57,28 +60,17 @@ public class TokenIterator implements Iterator<IToken>
 	public void remove()
 	{
 		IToken prev = this.lastReturned;
+		if (prev == null)
+		{
+			throw new IllegalStateException();
+		}
+		
 		IToken next = this.next.next();
 		
 		prev.setNext(next);
 		next.setPrev(prev);
-		this.lastReturned = prev;
+		this.lastReturned = null;
 		this.next = next;
-	}
-	
-	public void set(IToken current)
-	{
-		if (this.next != null)
-		{
-			current.setNext(this.next);
-			this.next.setPrev(current);
-		}
-		IToken prev = this.lastReturned.prev();
-		if (prev != null)
-		{
-			current.setPrev(prev);
-			prev.setNext(current);
-		}
-		this.lastReturned = current;
 	}
 	
 	public void inferSemicolons()
