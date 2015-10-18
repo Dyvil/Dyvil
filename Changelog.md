@@ -1,5 +1,43 @@
+Dyvil v0.7.0
+============
+
+- Added support for String Interpolation in Double-Quoted String Literals without `@` symbols.
+- Single-Quoted Char Literals can now be used as String Literals.
+
+## Dyvil Library v0.6.0
+
+- Added the dyvil.tools.parsing Package and moved various core classes from the Compiler.
+- Fixed `LinkedList.iterator.next` not causing `NoSuchElementException`s.
+
+## Dyvil Compiler v0.7.0
+
+- Moved many parsing-related classes to the `dyvil.tools.parsing` package, which is now part of the Standard Library.
+- Updated and moved the Semicolon Inference algorithm.
+- Fixed a JVM bytecode error that was caused when certain combinations of If/Else and Return Statements where used.
+- Fixed `StringIndexOutOfBoundsException`s caused by markers at the end of files.
+- Fixed infinite parsing instead of proper error reporting with missing `}` to end class bodies.
+- Removed the `IPattern.writeJump(MethodWriter, int, Label)` method and subclass implementations.
+- Removed special handling for `\$` escape sequences in the Dyvil Lexer.
+- Removed the `--pstack` compiler argument.
+
+## Dyvil REPL v0.3.1
+
+- Fixed NPE when the REPL encounters an EOI / End of Input.
+- Fixed custom classes defined in the REPL being unavailable from REPL statements.
+
+## Dyvil Property Format v0.1.0
+
+- Initial Release.
+- Added the `DPFParser` class for easy DPF parsing.
+- Added various visitor classes for use in both AST and parser.
+- Added a basic AST implementation.
+- Added a basic Printer.
+
 Dyvil v0.6.0
 ============
+
+- Added support for the new infix operator behavior with compound assignments.
+- Improved Apply Syntax to work without parenthesis.
 
 ## Dyvil Library v0.5.0
 
@@ -28,16 +66,15 @@ Dyvil v0.6.0
 - Fixed the implementation of `Set.^=`.
 - Fixed the implementation of `SingletonList.flatMapped(Function)` returning an incorrect result.
 - Fixed some typos in the documentation.
+- Fixed `Tuple4.toString()` causing a `StackOverflowError`.
 
 ## Dyvil Compiler v0.6.0
 
-- Added support for the new infix operator behavior with compound assignments.
 - Added `ConstructorCall.toString()` implementation.
 - Added `FieldInitializer.toString()` implementation.
 - Updated the Expression IDs in the `IValue` class.
 - Updated the Type IDs in the `IType` class.
 - Updated the mechanism that converts annotation parameters to compile-time constants.
-- Improved Apply Syntax to work without parenthesis.
 - Fixed tokens that are not parsed not being reported as syntax errors.
 - Fixed compiler errors caused by invalid Annotations.
 - Fixed parameterized this and super being parsed incorrectly.
@@ -46,7 +83,6 @@ Dyvil v0.6.0
 - Fixed the last statement in a statement list not having access to the variables in `withType`.
 - Fixed Applied Statement Lists being parsed incorrectly.
 - Fixed Applied Statement Lists working incorrectly by temporarily removing their special behavior.
-- Fixed `Tuple4.toString()` causing a `StackOverflowError`.
 - Fixed variable capture over multiple levels / lambdas working incorrectly and causing JVM errors.
 - Fixed certain Lambda Expressions being parsed incorrectly within statement lists, e.g. `list.flatMapped { i => [ i, i ] }`.
 - Fixed tuple type checking working incorrectly in contexts where `Object` is expected.
@@ -71,6 +107,10 @@ Dyvil v0.6.0
 Dyvil v0.5.0
 ============
 
+- Added special type treatment for the names `Tuple` and `Function`.
+- Added prefix and postfix operator precedence.
+- Added support for primitive type promotion.
+
 ## Dyvil Library v0.4.0
 
 - Moved the MathUtils.sinTable to a holder class for lazy evaluation.
@@ -85,10 +125,6 @@ Dyvil v0.5.0
 - Fixed `MathUtils.sqrt(int)` causing exceptions for large values.
 
 ## Dyvil Compiler v0.5.0
-
-- Added special type treatment for the names `Tuple` and `Function`.
-- Added prefix and postfix operator precedence.
-- Added support for primitive type promotion.
 - Renamed `ParserUtil.isTerminator2(int)` to `isExpressionTerminator` and improved the implementation.
 - Improved `ParserUtil.isTerminator(int)`.
 - Improved Token toString implementations.
@@ -115,6 +151,10 @@ Dyvil v0.5.0
 Dyvil v0.4.0
 ============
 
+- Added support for Unicode identifiers and symbols.
+- Added Map Expressions and Map Types.
+- Added support for the `Option` type syntactic sugar using `Type?`.
+
 ## Dyvil Library v0.3.0
 
 - Moved `dyvil.math.*Vector` classes to a new package.
@@ -126,10 +166,6 @@ Dyvil v0.4.0
 - Improved the `Ordered` operator implementations
 
 ## Dyvil Compiler v0.4.0
-
-- Added support for Unicode identifiers and symbols.
-- Added Map Expressions and Map Types.
-- Added support for the `Option` type syntactic sugar using `Type?`.
 - Added various missing `ASTNode.toString()` implementations.
 - Improved primitive types being used as generic type parameters.
 - Improved operator precedence in compound assignments.
@@ -162,6 +198,7 @@ Dyvil v0.3.0
 - Added missing FloatArray.range method.
 - Added missing ShortArray.range method.
 - Added Boolean.compareTo and made it implement Comparable.
+- Added ImmutableList.apply(count, repeatedValue) and .apply(count, generator).
 - Inlined the implementations of Ordered.compareTo for all Number classes.
 - Fixed ObjectArray.range generating an invalid output.
 - Fixed Ordered.next and .previous for Number subclasses being implemented incorrectly.
@@ -171,7 +208,6 @@ Dyvil v0.3.0
 
 - Added argument-based return type inference for Constructors.
 - Added support for Half-Open Ranges using the '..<' operator.
-- Added ImmutableList.apply(count, repeatedValue) and .apply(count, generator).
 - Improved Method Overload resolution system for Generic Types.
 - Improved Array and String ForEach bytecode output.
 - Fixed the action blocks of ForEach statements being discarded.
@@ -192,6 +228,8 @@ Dyvil v0.3.0
 Dyvil v0.2.0
 ============
 
+- Added support for Type (Use) Annotations.
+
 ## Dyvil Library v0.1.1
 - Added the List.removeFirst and .removeLast methods.
 - Added the EmptyRange class.
@@ -200,7 +238,6 @@ Dyvil v0.2.0
 
 ## Dyvil Compiler v0.2.0
 - Added support for custom method names in the NilConvertible annotation.
-- Added support for Type (Use) Annotations.
 - Added support for interfaces as anonymous class bases.
 - Updated the abstract / override method resolution system.
 - Improved Windows Compatibility.
