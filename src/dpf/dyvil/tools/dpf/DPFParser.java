@@ -4,10 +4,7 @@ import java.io.File;
 
 import dyvil.io.FileUtils;
 import dyvil.tools.dpf.ast.DPFFile;
-import dyvil.tools.dpf.visitor.ListVisitor;
-import dyvil.tools.dpf.visitor.NodeVisitor;
-import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.DyvilLexer;
@@ -128,6 +125,9 @@ public class DPFParser
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
 			this.parseList(valueVisitor.visitList());
 			return;
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+			this.parseMap(valueVisitor.visitMap());
+			return;
 		}
 		
 		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid " + token));
@@ -138,6 +138,7 @@ public class DPFParser
 		if (this.tokens.lastReturned().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
 		{
 			this.tokens.next();
+			visitor.visitEnd();
 			return;
 		}
 		
@@ -151,10 +152,45 @@ public class DPFParser
 			case BaseSymbols.COMMA:
 				continue;
 			case BaseSymbols.CLOSE_SQUARE_BRACKET:
+				visitor.visitEnd();
 				return;
 			}
 			
 			this.markers.add(new SyntaxError(token, "Invalid List - ',' expected"));
+		}
+	}
+	
+	private void parseMap(MapVisitor visitor)
+	{
+		if (this.tokens.lastReturned().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+		{
+			this.tokens.next();
+			visitor.visitEnd();
+			return;
+		}
+		
+		while (this.tokens.hasNext())
+		{
+			this.parseValue(visitor.visitKey());
+			
+			IToken token = this.tokens.next();
+			if (token.type() != BaseSymbols.COLON) {
+				this.markers.add(new SyntaxError(token, "Invalid Map - ':' expected"));
+			}
+			
+			this.parseValue(visitor.visitValue());
+			
+			token = this.tokens.next();
+			switch (token.type())
+			{
+			case BaseSymbols.COMMA:
+				continue;
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				visitor.visitEnd();
+				return;
+			}
+			
+			this.markers.add(new SyntaxError(token, "Invalid Map - ',' expected"));
 		}
 	}
 	

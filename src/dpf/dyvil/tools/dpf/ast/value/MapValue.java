@@ -63,21 +63,23 @@ public class MapValue extends ValueCreator implements Value, MapVisitor
 		int len = this.values.size();
 		if (len <= 0)
 		{
-			buffer.append("[:]");
+			buffer.append("{}");
 			return;
 		}
 		
-		buffer.append("[ ");
-		this.keys.get(0).toString(prefix, buffer);
+		String prefix1 = prefix + "\t";
+		
+		buffer.append("{\n").append(prefix1);
+		this.keys.get(0).toString(prefix1, buffer);
 		buffer.append(" : ");
-		this.values.get(0).toString(prefix, buffer);
+		this.values.get(0).toString(prefix1, buffer);
 		for (int i = 1; i < len; i++)
 		{
-			buffer.append(", ");
-			this.keys.get(i).toString(prefix, buffer);
+			buffer.append(",\n").append(prefix1);
+			this.keys.get(i).toString(prefix1, buffer);
 			buffer.append(" : ");
-			this.values.get(i).toString(prefix, buffer);
+			this.values.get(i).toString(prefix1, buffer);
 		}
-		buffer.append(" ]");
+		buffer.append('\n').append(prefix).append(')');
 	}
 }

@@ -9,15 +9,18 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class DPFTest
 {
+	private static String[] files = { "versions/distributions.dyp", "versions/versions.dyp" };
+	
 	public static void main(String[] args)
 	{
-		String file = FileUtils.read(new File("dists/distributions.dyp"));
+		for (String fileName : files) {
+		String file = FileUtils.read(new File(fileName));
 		
 		MarkerList markers = new MarkerList();
 		DPFParser parser = new DPFParser(markers, file);
 		
 		Node node = new DPFFile();
 		parser.accept(node);
-		System.out.println(node);
+		System.out.println(node);}
 	}
 }

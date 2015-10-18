@@ -87,7 +87,7 @@ task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
 	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
 	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
-	args = [ '@lib.txt', 'compile' ]
+	args = [ '@scripts/lib_options.txt', 'compile' ]
 }
 
 /**
