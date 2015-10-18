@@ -28,7 +28,6 @@ public final class DyvilCompiler
 	public static final String	DYVIL_VERSION	= "0.6.0";
 	public static final String	LIBRARY_VERSION	= "0.5.0";
 	
-	public static boolean	parseStack;
 	public static boolean	debug;
 	public static int		constantFolding;
 	
@@ -327,9 +326,6 @@ public final class DyvilCompiler
 			phases.add(ICompilerPhase.PRINT);
 			phases.add(ICompilerPhase.TEST);
 			debug = true;
-			return;
-		case "--pstack":
-			parseStack = true;
 			return;
 		}
 		

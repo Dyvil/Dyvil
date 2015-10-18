@@ -1,6 +1,5 @@
 package dyvil.tools.repl;
 
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.parser.Parser;
@@ -69,12 +68,12 @@ public class REPLParser extends ParserManager
 			}
 			else
 			{
-				token = tokens.next();
-				
-				if (token == null)
+				if (!this.tokens.hasNext())
 				{
 					break;
 				}
+				
+				token = tokens.next();
 			}
 			
 			if (this.skip > 0)
@@ -105,11 +104,6 @@ public class REPLParser extends ParserManager
 			if (this.syntaxErrors && this.markers == null)
 			{
 				break;
-			}
-			
-			if (DyvilCompiler.parseStack)
-			{
-				System.out.println(token + ":\t\t" + this.parser.getName() + " @ " + this.parser.getMode());
 			}
 		}
 		

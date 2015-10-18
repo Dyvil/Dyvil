@@ -76,12 +76,12 @@ public class ParserManager implements IParserManager
 			}
 			else
 			{
-				token = tokens.next();
-				
-				if (token == null)
+				if (!this.tokens.hasNext())
 				{
 					break;
 				}
+				
+				token = tokens.next();
 			}
 			
 			if (this.skip > 0)
@@ -107,11 +107,6 @@ public class ParserManager implements IParserManager
 			{
 				DyvilCompiler.error("ParserManager", "parseToken", ex);
 				this.markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
-			}
-			
-			if (DyvilCompiler.parseStack)
-			{
-				System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
 			}
 		}
 	}
