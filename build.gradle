@@ -51,7 +51,11 @@ String replMainClass = 'dyvil.tools.repl.DyvilREPL'
 
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
-    version += ".SNAPSHOT-" + ENV.DRONE_BUILD_NUMBER
+	String snapshot = ".SNAPSHOT-" + ENV.DRONE_BUILD_NUMBER
+    version += snapshot
+    libraryVersion += snapshot
+    compilerVersion += snapshot
+    replVersion += snapshot
 }
 
 sourceCompatibility = 1.8

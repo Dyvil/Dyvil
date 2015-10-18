@@ -80,6 +80,6 @@ public class MapValue extends ValueCreator implements Value, MapVisitor
 			buffer.append(" : ");
 			this.values.get(i).toString(prefix1, buffer);
 		}
-		buffer.append('\n').append(prefix).append(')');
+		buffer.append('\n').append(prefix).append('}');
 	}
 }
