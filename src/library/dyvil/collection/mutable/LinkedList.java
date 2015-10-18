@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -11,7 +8,12 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.*;
+import dyvil.collection.Collection;
+import dyvil.collection.Deque;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
+import dyvil.collection.MutableList;
+import dyvil.collection.Set;
 
 @NilConvertible
 @ArrayConvertible
@@ -84,6 +86,11 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 			@Override
 			public E next()
 			{
+				if (this.next == null)
+				{
+					throw new NoSuchElementException();
+				}
+				
 				this.lastReturned = this.next;
 				this.next = this.next.next;
 				return this.lastReturned.item;

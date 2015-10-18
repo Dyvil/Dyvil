@@ -61,8 +61,8 @@ repl
 		batch
 		{
 			info = "REPL Launcher (batch)"
-			fileName = ./bin/dyvil.bat
-			download = https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat
+			fileName = "./bin/dyvil.bat"
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat"
 			selected = true
 			dependencies = [ repl ]
 		}

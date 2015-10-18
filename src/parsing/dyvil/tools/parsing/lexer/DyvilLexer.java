@@ -478,9 +478,6 @@ public final class DyvilLexer
 		case '\\':
 			buf.append(n);
 			return true;
-		case '$':
-			buf.append('$');
-			return true;
 		case 'n':
 			buf.append('\n');
 			return true;
