@@ -88,6 +88,13 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 	}
 	
 	@Override
+	public ValueVisitor visitValueAccess(Name name)
+	{
+		System.out.println("Access " + name);
+		return this;
+	}
+	
+	@Override
 	public ListVisitor visitList()
 	{
 		this.printIndent();

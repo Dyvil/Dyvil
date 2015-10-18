@@ -4,6 +4,7 @@ import dyvil.tools.dpf.ast.value.Value;
 import dyvil.tools.dpf.ast.value.ValueCreator;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class Property extends ValueCreator implements NodeElement
@@ -57,6 +58,12 @@ public class Property extends ValueCreator implements NodeElement
 	public void accept(NodeVisitor visitor)
 	{
 		this.value.accept(visitor.visitProperty(this.name));
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

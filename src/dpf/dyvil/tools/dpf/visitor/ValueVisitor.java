@@ -18,6 +18,8 @@ public interface ValueVisitor
 	
 	public void visitName(Name name);
 	
+	public ValueVisitor visitValueAccess(Name name);
+	
 	public ListVisitor visitList();
 	
 	public MapVisitor visitMap();

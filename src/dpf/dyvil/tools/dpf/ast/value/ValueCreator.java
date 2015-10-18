@@ -52,6 +52,14 @@ public abstract class ValueCreator implements ValueVisitor
 	}
 	
 	@Override
+	public ValueVisitor visitValueAccess(Name name)
+	{
+		NameAccess access = new NameAccess(name);
+		this.setValue(access);
+		return access;
+	}
+	
+	@Override
 	public ListVisitor visitList()
 	{
 		ListValue list = new ListValue();

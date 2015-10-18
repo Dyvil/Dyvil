@@ -112,14 +112,17 @@ public class DPFParser
 			valueVisitor.visitString(token.stringValue());
 			return;
 		case Tokens.STRING_START:
-			this.tokens.jump(token);
 			this.parseStringInterpolation(valueVisitor.visitStringInterpolation());
 			return;
 		case Tokens.IDENTIFIER:
 		case Tokens.LETTER_IDENTIFIER:
 		case Tokens.SYMBOL_IDENTIFIER:
 		case Tokens.SPECIAL_IDENTIFIER:
-			
+			if (token.next().type() == BaseSymbols.DOT)
+			{
+				this.parseAccessSequence(valueVisitor);
+				return;
+			}
 			valueVisitor.visitName(token.nameValue());
 			return;
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
@@ -132,7 +135,7 @@ public class DPFParser
 	
 	private void parseList(ListVisitor visitor)
 	{
-		if (this.tokens.current().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+		if (this.tokens.lastReturned().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
 		{
 			this.tokens.next();
 			return;
@@ -157,9 +160,8 @@ public class DPFParser
 	
 	private void parseStringInterpolation(StringInterpolationVisitor visitor)
 	{
-		IToken token = this.tokens.current();
+		IToken token = this.tokens.lastReturned();
 		visitor.visitStringPart(token.stringValue());
-		this.tokens.next();
 		
 		while (this.tokens.hasNext())
 		{
@@ -179,5 +181,24 @@ public class DPFParser
 			
 			this.markers.add(new SyntaxError(token, "Invalid String Interpolation - String expected"));
 		}
+	}
+	
+	private void parseAccessSequence(ValueVisitor visitor)
+	{
+		IToken token = this.tokens.lastReturned();
+		while (token.hasNext() && token.next().type() == BaseSymbols.DOT)
+		{
+			token = token.next().next();
+		}
+		
+		this.tokens.jump(token.next());
+		while (token.prev().type() == BaseSymbols.DOT)
+		{
+			visitor = visitor.visitValueAccess(token.nameValue());
+			
+			token = token.prev().prev();
+		}
+		
+		visitor.visitName(token.nameValue());
 	}
 }
