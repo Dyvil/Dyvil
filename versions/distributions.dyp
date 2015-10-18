@@ -5,7 +5,19 @@ library
 	info = "Dyvil Library v\(library.version)"
 	fileName = "./libs/dyvil-library-\(library.version).jar"
 	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-library-\(library.version).jar"
-	selected = "forced"
+	
+	selected = forced
+}
+
+dpf
+{
+	info = "Dyvil Property Format Library v\(dpf.version)"
+	fileName = "./libs/dyvil-property-format-\(dpf.version).jar"
+	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-property-format-\(dpf.version).jar"
+	
+	parent = library
+	selected = false
+	dependencies = [ library ]
 }
 
 compiler
@@ -13,7 +25,9 @@ compiler
 	info = "Dyvil Compiler v\(compiler.version)"
 	fileName = "./libs/dyvil-compiler-\(compiler.version).jar"
 	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-compiler-\(compiler.version).jar"
+	
 	selected = true
+	dependencies = [ library ]
 	
 	launcher
 	{
@@ -23,9 +37,11 @@ compiler
 		{
 			info = "Compiler Launcher (bash)"
 			fileName = "./bin/dyvilc"
-			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvilc"
-			selected = true
 			executable = true
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvilc"
+			
+			parent = compiler.launcher
+			selected = true
 			dependencies = [ compiler ]
 		}
 		
@@ -34,6 +50,8 @@ compiler
 			info = "Compiler Launcher (batch)"
 			fileName = "./bin/dyvilc.bat"
 			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvilc.bat"
+			
+			parent = compiler
 			selected = true
 			dependencies = [ compiler ]
 		}
@@ -45,6 +63,7 @@ repl
 	info = "Dyvil REPL v\(repl.version)"
 	fileName = "./libs/dyvil-repl-\(repl.version).jar"
 	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-repl-\(repl.version).jar"
+	
 	selected = true
 	dependencies = [ compiler ]
 	
@@ -54,9 +73,11 @@ repl
 		{
 			info = "REPL Launcher (bash)"
 			fileName = "./bin/dyvil"
-			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat"
-			selected = true
 			executable = true
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat"
+			
+			parent = repl
+			selected = true
 			dependencies = [ repl ]
 		}
 		
@@ -65,6 +86,8 @@ repl
 			info = "REPL Launcher (batch)"
 			fileName = "./bin/dyvil.bat"
 			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/scripts/dyvil.bat"
+			
+			parent = repl
 			selected = true
 			dependencies = [ repl ]
 		}
@@ -80,6 +103,8 @@ textResources
 		info = "ReadMe"
 		fileName = "./README.txt"
 		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/README.md"
+		
+		parent = textResources
 		selected = true
 	}
 	
@@ -88,6 +113,8 @@ textResources
 		info = "Changelog"
 		fileName = "./Changelog.txt"
 		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/Changelog.md"
+		
+		parent = textResources
 		selected = true
 	}
 	
@@ -96,6 +123,8 @@ textResources
 		info = "License"
 		fileName = "./license/LICENSE.txt"
 		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/LICENSE.txt"
+		
+		parent = textResources
 		selected = true
 		
 		asm
@@ -103,6 +132,8 @@ textResources
 			info = "ASM License"
 			fileName = "./license/LICENSE.txt"
 			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/ASM-LICENSE.txt"
+			
+			parent = textResources
 			selected = true
 		}
 	}
