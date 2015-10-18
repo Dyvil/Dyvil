@@ -1,6 +1,8 @@
+// Dyvil Distribution Files Information
+
 library
 {
-	info = "Dyvil Library"
+	info = "Dyvil Library v\(library.version)"
 	fileName = "./libs/dyvil-library-\(library.version).jar"
 	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-library-\(library.version).jar"
 	selected = "forced"
@@ -8,7 +10,7 @@ library
 
 compiler
 {
-	info = "Dyvil Compiler"
+	info = "Dyvil Compiler v\(compiler.version)"
 	fileName = "./libs/dyvil-compiler-\(compiler.version).jar"
 	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-compiler-\(compiler.version).jar"
 	selected = true
@@ -40,7 +42,7 @@ compiler
 
 repl
 {
-	info = "Dyvil REPL"
+	info = "Dyvil REPL v\(repl.version)"
 	fileName = "./libs/dyvil-repl-\(repl.version).jar"
 	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-repl-\(repl.version).jar"
 	selected = true
@@ -75,9 +77,9 @@ textResources
 
 	readme
 	{
-		info = "Read Me"
+		info = "ReadMe"
 		fileName = "./README.txt"
-		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/README.md"
+		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/README.md"
 		selected = true
 	}
 	
@@ -85,7 +87,7 @@ textResources
 	{
 		info = "Changelog"
 		fileName = "./Changelog.txt"
-		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/Changelog.txt"
+		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/Changelog.md"
 		selected = true
 	}
 	
@@ -93,14 +95,14 @@ textResources
 	{
 		info = "License"
 		fileName = "./license/LICENSE.txt"
-		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/LICENSE.txt"
+		download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/LICENSE.txt"
 		selected = true
 		
 		asm
 		{
 			info = "ASM License"
 			fileName = "./license/LICENSE.txt"
-			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/ASM-LICENSE.txt"
+			download = "https://raw.githubusercontent.com/Dyvil/Dyvil/v\(version)/ASM-LICENSE.txt"
 			selected = true
 		}
 	}
