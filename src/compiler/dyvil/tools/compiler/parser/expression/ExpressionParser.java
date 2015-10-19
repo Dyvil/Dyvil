@@ -446,19 +446,22 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			if (this.operator != null)
+			if (this.value != null)
 			{
-				this.valueConsumer.setValue(this.value);
-				pm.popParser(true);
+				if (this.operator != null)
+				{
+					this.valueConsumer.setValue(this.value);
+					pm.popParser(true);
+					return;
+				}
+				
+				SingleArgument sa = new SingleArgument();
+				ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value, sa);
+				this.parseApply(pm, token, sa, Operators.DEFAULT);
+				pm.reparse();
+				this.value = amc;
 				return;
 			}
-			
-			SingleArgument sa = new SingleArgument();
-			ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value, sa);
-			this.parseApply(pm, token, sa, Operators.DEFAULT);
-			pm.reparse();
-			this.value = amc;
-			return;
 		}
 		if (this.mode == DOT_ACCESS)
 		{
