@@ -38,6 +38,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
+	private static final String REPL$CLASSES = "repl$classes/";
+	
 	private static int			classIndex;
 	private static String		className;
 	protected static MarkerList	markers	= new MarkerList();
@@ -60,7 +62,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	
 	protected static void reset()
 	{
-		className = "repl$classes/REPL$Result$" + classIndex++;
+		className = REPL$CLASSES + "REPL$Result$" + classIndex++;
 		markers.clear();
 	}
 	
@@ -94,7 +96,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			{
 				String fileName = icc.getFileName();
 				byte[] bytes = ClassWriter.compile(icc);
-				REPLMemberClass.loadClass(fileName, bytes);
+				REPLMemberClass.loadClass(REPL$CLASSES.concat(fileName), bytes);
 			}
 			catch (Throwable t)
 			{
@@ -532,6 +534,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public String getInternalName(Name name)
 	{
-		return "repl$classes/" + name.qualified;
+		return REPL$CLASSES + name.qualified;
 	}
 }
