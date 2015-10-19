@@ -3,8 +3,8 @@ package dyvil.tools.compiler.parser.imports;
 import dyvil.tools.compiler.ast.consumer.IImportConsumer;
 import dyvil.tools.compiler.ast.imports.IImport;
 import dyvil.tools.compiler.ast.imports.MultiImport;
-import dyvil.tools.compiler.ast.imports.PackageImport;
-import dyvil.tools.compiler.ast.imports.SimpleImport;
+import dyvil.tools.compiler.ast.imports.WildcardImport;
+import dyvil.tools.compiler.ast.imports.SingleImport;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
@@ -72,7 +72,7 @@ public final class ImportParser extends Parser
 			}
 			case DyvilSymbols.WILDCARD:
 			{
-				PackageImport pi = new PackageImport(token.raw());
+				WildcardImport pi = new WildcardImport(token.raw());
 				pi.setParent(this.theImport);
 				this.theImport = pi;
 				this.mode = 0;
@@ -83,7 +83,7 @@ public final class ImportParser extends Parser
 			case Tokens.SYMBOL_IDENTIFIER:
 			case Tokens.LETTER_IDENTIFIER:
 			{
-				SimpleImport si = new SimpleImport(token.raw(), token.nameValue());
+				SingleImport si = new SingleImport(token.raw(), token.nameValue());
 				si.setParent(this.theImport);
 				this.theImport = si;
 				this.mode = DOT_ALIAS;

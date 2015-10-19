@@ -19,18 +19,18 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IImport extends IASTNode
 {
-	public static final int	SIMPLE	= 1;
-	public static final int	PACKAGE	= 2;
-	public static final int	MULTI	= 3;
+	public static final int	SINGLE		= 1;
+	public static final int	WILDCARD	= 2;
+	public static final int	MULTI		= 3;
 	
 	public static IImport fromTag(int tag)
 	{
 		switch (tag)
 		{
-		case SIMPLE:
-			return new SimpleImport(null);
-		case PACKAGE:
-			return new PackageImport(null);
+		case SINGLE:
+			return new SingleImport(null);
+		case WILDCARD:
+			return new WildcardImport(null);
 		case MULTI:
 			return new MultiImport(null);
 		}

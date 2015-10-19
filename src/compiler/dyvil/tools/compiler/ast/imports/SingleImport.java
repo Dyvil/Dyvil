@@ -21,7 +21,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class SimpleImport extends Import
+public final class SingleImport extends Import
 {
 	public Name	name;
 	public Name	alias;
@@ -32,12 +32,12 @@ public final class SimpleImport extends Import
 	private IDataMember		field;
 	private List<IMethod>	methods;
 	
-	public SimpleImport(ICodePosition position)
+	public SingleImport(ICodePosition position)
 	{
 		super(position);
 	}
 	
-	public SimpleImport(ICodePosition position, Name name)
+	public SingleImport(ICodePosition position, Name name)
 	{
 		super(position);
 		this.name = name;
@@ -46,7 +46,7 @@ public final class SimpleImport extends Import
 	@Override
 	public int importTag()
 	{
-		return SIMPLE;
+		return SINGLE;
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public final class SimpleImport extends Import
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(I18n.createMarker(this.position, "import.using.invalid"));
+				markers.add(I18n.createMarker(this.position, "using.class.invalid"));
 				return;
 			}
 			

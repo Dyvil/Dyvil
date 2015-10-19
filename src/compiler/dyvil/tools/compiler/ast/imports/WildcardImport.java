@@ -17,11 +17,11 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class PackageImport extends Import
+public final class WildcardImport extends Import
 {
 	private IContext context;
 	
-	public PackageImport(ICodePosition position)
+	public WildcardImport(ICodePosition position)
 	{
 		super(position);
 	}
@@ -29,7 +29,7 @@ public final class PackageImport extends Import
 	@Override
 	public int importTag()
 	{
-		return PACKAGE;
+		return WILDCARD;
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public final class PackageImport extends Import
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(I18n.createMarker(this.position, "import.package.invalid"));
+				markers.add(I18n.createMarker(this.position, "using.wildcard.invalid"));
 				return;
 			}
 			
@@ -55,7 +55,7 @@ public final class PackageImport extends Import
 		
 		if (!(context instanceof Package))
 		{
-			markers.add(I18n.createMarker(this.position, "import.package.invalid"));
+			markers.add(I18n.createMarker(this.position, "import.wildcard.invalid"));
 			return;
 		}
 		this.context = context;
