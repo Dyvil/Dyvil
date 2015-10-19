@@ -576,25 +576,40 @@ public class REPLMemberClass implements IClass
 		}
 	}
 	
+	private static void dumpClass(String name, byte[] bytes)
+	{
+		int index = name.lastIndexOf('/');
+		String fileName;
+		if (index <= 0)
+		{
+			fileName = name + ".class";
+		}
+		else
+		{
+			fileName = name.substring(index + 1) + ".class";
+		}
+		
+		FileUtils.write(new File(DyvilREPL.dumpDir, fileName), bytes);
+	}
+	
 	protected static Class loadClass(String name, byte[] bytes)
 	{
 		if (DyvilREPL.dumpDir != null)
 		{
-			int index = name.lastIndexOf('/');
-			String fileName;
-			if (index <= 0)
-			{
-				fileName = name + ".class";
-			}
-			else
-			{
-				fileName = name.substring(index + 1) + ".class";
-			}
-			
-			FileUtils.write(new File(DyvilREPL.dumpDir, fileName), bytes);
+			dumpClass(name, bytes);
 		}
 		
 		return ReflectUtils.unsafe.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+	}
+	
+	protected static Class loadAnonymousClass(String name, byte[] bytes)
+	{
+		if (DyvilREPL.dumpDir != null)
+		{
+			dumpClass(name, bytes);
+		}
+		
+		return ReflectUtils.unsafe.defineAnonymousClass(REPLVariable.class, bytes, null);
 	}
 	
 	@Override

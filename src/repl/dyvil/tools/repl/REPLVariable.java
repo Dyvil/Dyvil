@@ -155,7 +155,7 @@ public class REPLVariable extends Field
 		}
 		// We don't have any variables, so we can throw the Class away after
 		// it has been loaded.
-		return ReflectUtils.unsafe.defineAnonymousClass(REPLVariable.class, bytes, null);
+		return REPLMemberClass.loadAnonymousClass(className, bytes);
 	}
 	
 	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw) throws BytecodeException
