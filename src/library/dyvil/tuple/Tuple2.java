@@ -9,6 +9,8 @@ import dyvil.collection.Entry;
 @ClassParameters(names = { "_1", "_2" })
 public class Tuple2<@Covariant A, @Covariant B> implements Entry<A, B>
 {
+	private static final long serialVersionUID = -5140899078103651408L;
+	
 	public final A	_1;
 	public final B	_2;
 	

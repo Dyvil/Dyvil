@@ -9,6 +9,8 @@ import dyvil.collection.Cell;
 @ClassParameters(names = { "_1", "_2", "_3" })
 public class Tuple3<@Covariant A, @Covariant B, @Covariant C> implements Cell<A, B, C>
 {
+	private static final long serialVersionUID = -1770703458034946695L;
+	
 	public final A	_1;
 	public final B	_2;
 	public final C	_3;
