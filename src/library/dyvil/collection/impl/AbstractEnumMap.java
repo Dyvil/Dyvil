@@ -132,9 +132,37 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.type = type;
 	}
 	
-	protected static Class<?> getKeyType(Tuple2<Enum<?>, ?>[] tuples)
+	public AbstractEnumMap(Map<K, V> map)
 	{
-		for (Tuple2<Enum<?>, ?> entry : tuples)
+		this(getKeyType(map));
+		
+		for (Entry<K, V> entry : map)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public AbstractEnumMap(AbstractEnumMap<K, V> map)
+	{
+		this.keys = map.keys;
+		this.type = map.type;
+		this.values = map.values.clone();
+		this.size = map.size;
+	}
+	
+	public AbstractEnumMap(Tuple2<K, V>... entries)
+	{
+		this(getKeyType(entries));
+		
+		for (Tuple2<K, V> entry : entries)
+		{
+			this.putInternal(entry._1, entry._2);
+		}
+	}
+	
+	private static <K extends Enum<K>> Class<K> getKeyType(Tuple2<K, ?>[] tuples)
+	{
+		for (Tuple2<K, ?> entry : tuples)
 		{
 			if (entry._1 != null)
 			{
@@ -142,6 +170,19 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			}
 		}
 		
+		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
+	}
+	
+	private static <K extends Enum<K>> Class<K> getKeyType(Map<K, ?> map)
+	{
+		for (Iterator<K> keys = map.keyIterator(); keys.hasNext();)
+		{
+			K key = keys.next();
+			if (key != null)
+			{
+				return key.getDeclaringClass();
+			}
+		}
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
 	

@@ -17,13 +17,11 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = -2305035920228304893L;
+	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
 	{
-		int len = entries.length;
-		Class<K> keyType = (Class<K>) getKeyType((Tuple2<Enum<?>, ?>[]) entries);
-		Object[] values = new Object[len];
-		int size = AbstractEnumMap.fillEntries(values, (Tuple2<Enum<?>, ?>[]) entries, len);
-		return new EnumMap<K, V>(keyType, AbstractEnumMap.getKeys(keyType), (V[]) values, size);
+		return new EnumMap(entries);
 	}
 	
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
@@ -36,7 +34,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		return new Builder(type);
 	}
 	
-	public @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	private @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
 		super(type, keys, values, size);
 	}
@@ -49,6 +47,21 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	public EnumMap(Type<K> type)
 	{
 		super(type.getTheClass());
+	}
+	
+	public EnumMap(Map<K, V> map)
+	{
+		super(map);
+	}
+	
+	public EnumMap(AbstractEnumMap<K, V> map)
+	{
+		super(map);
+	}
+	
+	public EnumMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
 	}
 	
 	public static class Builder<K extends Enum<K>, V> implements ImmutableMap.Builder<K, V>
@@ -334,13 +347,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new EnumMap(this.type, this.keys, this.values.clone(), this.size);
+		return new EnumMap(this);
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.EnumMap(this.type, this.keys, this.values.clone(), this.size);
+		return new dyvil.collection.mutable.EnumMap(this);
 	}
 	
 	@Override
