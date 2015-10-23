@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -16,6 +17,8 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 {
 	protected class ArrayMapEntry implements Entry<K, V>
 	{
+		private static final long serialVersionUID = -967348930318928118L;
+		
 		private int index;
 		
 		public ArrayMapEntry(int index)
@@ -54,11 +57,13 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	private static final long serialVersionUID = -4958236535555733690L;
+	
 	protected static final int DEFAULT_CAPACITY = 10;
 	
-	protected int		size;
-	protected Object[]	keys;
-	protected Object[]	values;
+	protected transient int			size;
+	protected transient Object[]	keys;
+	protected transient Object[]	values;
 	
 	public AbstractArrayMap(K[] keys, V[] values)
 	{
@@ -439,5 +444,33 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		
+		for (int i = 0; i < this.size; i++)
+		{
+			out.writeObject(this.keys[i]);
+			out.writeObject(this.values[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.keys = new Object[this.size];
+		this.values = new Object[this.size];
+		
+		for (int i = 0; i < this.size; i++)
+		{
+			this.keys[i] = in.readObject();
+			this.values[i] = in.readObject();
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package dyvil.collection.range;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -12,8 +13,10 @@ import dyvil.collection.iterator.ArrayIterator;
 @TupleConvertible
 public class ArrayRange<T extends Rangeable<T>> implements Range<T>
 {
-	protected final Rangeable[]	array;
-	protected final int			count;
+	private static final long serialVersionUID = 3645807463260154912L;
+	
+	protected transient Rangeable[]	array;
+	protected transient int			count;
 	
 	public static <T extends Rangeable<T>> ArrayRange<T> apply(T first, T last)
 	{
@@ -148,5 +151,28 @@ public class ArrayRange<T extends Rangeable<T>> implements Range<T>
 	public int hashCode()
 	{
 		return Range.rangeHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.count);
+		for (int i = 0; i < this.count; i++)
+		{
+			out.writeObject(this.array[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.count = in.read();
+		this.array = new Rangeable[this.count];
+		for (int i = 0; i < this.count; i++)
+		{
+			this.array[i] = (Rangeable) in.readObject();
+		}
 	}
 }

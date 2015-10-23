@@ -15,6 +15,8 @@ import dyvil.collection.impl.AbstractArraySet;
 @ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 {
+	private static final long serialVersionUID = -6676561653968567088L;
+	
 	public static <E> ArraySet<E> apply()
 	{
 		return new ArraySet();

@@ -9,7 +9,9 @@ import dyvil.collection.impl.AbstractMapBasedSet;
 
 public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements MutableSet<E>
 {
-	protected MutableMap<E, Object> map;
+	private static final long		serialVersionUID	= 3329100687699880194L;
+	
+	protected MutableMap<E, Object>	map;
 	
 	public MapBasedSet(MutableMap<E, ? extends Object> map)
 	{

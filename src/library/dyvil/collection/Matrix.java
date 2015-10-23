@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Objects;
@@ -18,7 +19,7 @@ import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
-public interface Matrix<E> extends Iterable<E>
+public interface Matrix<E> extends Iterable<E>, Serializable
 {
 	public static <E> MutableMatrix<E> apply()
 	{

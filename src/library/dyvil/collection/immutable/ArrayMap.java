@@ -15,6 +15,8 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = 4583062458335627011L;
+
 	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		int len = entries.length;

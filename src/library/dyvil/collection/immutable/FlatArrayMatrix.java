@@ -9,6 +9,8 @@ import dyvil.collection.impl.AbstractFlatArrayMatrix;
 
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements ImmutableMatrix<E>
 {
+	private static final long serialVersionUID = 7265281981107132533L;
+
 	public FlatArrayMatrix()
 	{
 		super();

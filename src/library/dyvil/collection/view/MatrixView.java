@@ -15,6 +15,8 @@ import dyvil.tuple.Tuple2;
 
 public class MatrixView<E> implements ImmutableMatrix<E>
 {
+	private static final long serialVersionUID = -3291167467848562079L;
+	
 	protected final Matrix<E> matrix;
 	
 	public MatrixView(Matrix<E> matrix)

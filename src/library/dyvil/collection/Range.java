@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -18,7 +19,7 @@ import dyvil.collection.range.HalfOpenRange;
 
 @NilConvertible
 @TupleConvertible
-public interface Range<@Covariant T> extends Iterable<T>
+public interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
 	public static <T extends Ordered<T>> Range<T> apply()
 	{

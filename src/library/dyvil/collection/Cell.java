@@ -1,10 +1,11 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import dyvil.tuple.Tuple3;
 
-public interface Cell<R, C, V>
+public interface Cell<R, C, V> extends Serializable
 {
 	/**
 	 * Returns the row stored by this cell

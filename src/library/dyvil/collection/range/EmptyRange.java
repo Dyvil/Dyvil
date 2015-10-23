@@ -12,6 +12,8 @@ import dyvil.collection.iterator.EmptyIterator;
 @NilConvertible
 public @object class EmptyRange<T> implements Range<T>
 {
+	private static final long serialVersionUID = 5914222536371440711L;
+	
 	public static final EmptyRange instance = new EmptyRange();
 	
 	public static <E> EmptyRange<E> apply()
@@ -86,7 +88,7 @@ public @object class EmptyRange<T> implements Range<T>
 	{
 		if (obj instanceof Range)
 		{
-			return ((Range) obj).estimateCount() == 0;
+			return ((Range) obj).count() == 0;
 		}
 		return false;
 	}
@@ -95,5 +97,15 @@ public @object class EmptyRange<T> implements Range<T>
 	public int hashCode()
 	{
 		return 0;
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

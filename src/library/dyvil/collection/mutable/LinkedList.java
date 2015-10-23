@@ -1,5 +1,6 @@
 package dyvil.collection.mutable;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -19,6 +20,8 @@ import dyvil.collection.Set;
 @ArrayConvertible
 public class LinkedList<E> implements MutableList<E>, Deque<E>
 {
+	private static final long serialVersionUID = 7185956993705123890L;
+	
 	protected static class Node<E>
 	{
 		E		item;
@@ -33,9 +36,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 	}
 	
-	protected int		size;
-	protected Node<E>	first;
-	protected Node<E>	last;
+	protected transient int		size;
+	protected transient Node<E>	first;
+	protected transient Node<E>	last;
 	
 	public static <E> LinkedList<E> apply()
 	{
@@ -739,5 +742,39 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		
+		for (Node<E> node = this.first; node != null; node = node.next)
+		{
+			out.writeObject(node.item);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		
+		if (this.size <= 0)
+		{
+			return;
+		}
+		
+		Node<E> node = this.first = new Node(null, in.readObject(), null);
+		for (int i = 1; i < this.size; i++)
+		{
+			Node<E> next = new Node(node, in.readObject(), null);
+			node.next = next;
+			node = next;
+		}
+		
+		this.last = node;
 	}
 }

@@ -10,6 +10,8 @@ import dyvil.collection.mutable.HashMap;
 
 public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements ImmutableSet<E>
 {
+	private static final long serialVersionUID = 2820007412138106503L;
+	
 	protected ImmutableMap<E, Object> map;
 	
 	public MapBasedSet(ImmutableMap<E, ? extends Object> map)

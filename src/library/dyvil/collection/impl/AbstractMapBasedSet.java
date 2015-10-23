@@ -8,6 +8,8 @@ import dyvil.collection.Set;
 
 public abstract class AbstractMapBasedSet<E> implements Set<E>
 {
+	private static final long serialVersionUID = -6579037312574546078L;
+
 	protected abstract Map<E, Object> map();
 	
 	@Override

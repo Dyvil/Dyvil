@@ -16,6 +16,8 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 {
+	private static final long serialVersionUID = 5534347282324757054L;
+	
 	public static <E> ArraySet<E> apply(E... elements)
 	{
 		return new ArraySet<E>(elements, true);

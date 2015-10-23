@@ -19,6 +19,8 @@ import dyvil.collection.impl.AbstractArrayList;
 @ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 {
+	private static final long serialVersionUID = 5286872411535856904L;
+	
 	public static <E> ArrayList<E> apply()
 	{
 		return new ArrayList();

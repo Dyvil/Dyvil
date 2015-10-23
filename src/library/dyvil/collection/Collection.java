@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
@@ -41,7 +42,7 @@ import dyvil.util.ImmutableException;
  */
 @NilConvertible(methodName = "fromNil")
 @ArrayConvertible
-public interface Collection<E> extends Queryable<E>
+public interface Collection<E> extends Queryable<E>, Serializable
 {
 	/**
 	 * Returns an empty, immutable collection. This method is primarily for use

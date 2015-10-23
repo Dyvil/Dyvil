@@ -19,6 +19,8 @@ import dyvil.collection.iterator.EmptyIterator;
 @NilConvertible
 public @object class EmptyList<E> implements ImmutableList<E>
 {
+	private static final long serialVersionUID = -6059901529322971155L;
+	
 	public static final EmptyList instance = new EmptyList();
 	
 	public static <E> EmptyList<E> apply()
@@ -258,5 +260,15 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

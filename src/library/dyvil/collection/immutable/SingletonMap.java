@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
@@ -17,8 +18,10 @@ import dyvil.util.Some;
 
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
-	private K	key;
-	private V	value;
+	private static final long serialVersionUID = 2791619158507681686L;
+	
+	private transient K	key;
+	private transient V	value;
 	
 	public static <K, V> SingletonMap<K, V> apply(K key, V value)
 	{
@@ -283,5 +286,17 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public int hashCode()
 	{
 		return Entry.entryHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.writeObject(this.key);
+		out.writeObject(this.value);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		this.key = (K) in.readObject();
+		this.value = (V) in.readObject();
 	}
 }

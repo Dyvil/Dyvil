@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,7 +20,9 @@ import dyvil.collection.iterator.SingletonIterator;
 @TupleConvertible
 public class SingletonSet<E> implements ImmutableSet<E>
 {
-	private E element;
+	private static final long serialVersionUID = 4398163898648791092L;
+	
+	private transient E element;
 	
 	public static <E> SingletonSet<E> apply(E element)
 	{
@@ -227,5 +230,15 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.writeObject(this.element);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		this.element = (E) in.readObject();
 	}
 }

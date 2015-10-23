@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -19,6 +20,8 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
 	protected class EnumEntry implements Entry<K, V>
 	{
+		private static final long serialVersionUID = 4125489955668261409L;
+		
 		int index;
 		
 		EnumEntry(int index)
@@ -102,10 +105,12 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 	}
 	
-	protected Class<K>	type;
-	protected K[]		keys;
-	protected Object[]	values;
-	protected int		size;
+	private static final long serialVersionUID = 7946242151088885999L;
+	
+	protected transient Class<K>	type;
+	protected transient K[]			keys;
+	protected transient Object[]	values;
+	protected transient int			size;
 	
 	protected AbstractEnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
@@ -140,27 +145,15 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
 	
-	protected static int fillEntries(Object[] values, Tuple2<Enum<?>, ?>[] tuples, int len)
+	protected void putInternal(K key, V value)
 	{
-		int size = 0;
-		for (int i = 0; i < len; i++)
-		{
-			Tuple2<Enum<?>, ?> entry = tuples[i];
-			Enum key = entry._1;
-			if (key == null)
-			{
-				continue;
-			}
-			
-			int index = key.ordinal();
-			if (values[index] == null)
-			{
-				size++;
-			}
-			values[index] = entry._2;
-		}
+		int index = key.ordinal();
 		
-		return size;
+		if (this.values[index] == null)
+		{
+			this.size++;
+		}
+		this.values[index] = value;
 	}
 	
 	protected static boolean checkType(Class<?> type, Object key)
@@ -175,6 +168,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	protected static <K extends Enum<K>> K[] getKeys(Class<K> type)
 	{
+		// TODO Move to ReflectUtils
 		return SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type);
 	}
 	
@@ -333,5 +327,42 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeObject(this.type);
+		out.writeInt(this.size);
+		
+		int entriesToBeWritten = size;
+		for (int i = 0; entriesToBeWritten > 0; i++)
+		{
+			if (this.values[i] != null)
+			{
+				out.writeObject(this.keys[i]);
+				out.writeObject(this.values[i]);
+				entriesToBeWritten--;
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.type = (Class<K>) in.readObject();
+		this.keys = getKeys(this.type);
+		this.values = new Object[this.keys.length];
+		
+		int size = in.readInt();
+		
+		for (int i = 0; i < size; i++)
+		{
+			K key = (K) in.readObject();
+			V value = (V) in.readObject();
+			this.putInternal(key, value);
+		}
 	}
 }

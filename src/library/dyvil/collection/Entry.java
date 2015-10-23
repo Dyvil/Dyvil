@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
@@ -15,7 +16,7 @@ import dyvil.tuple.Tuple2;
  * @param <V>
  *            the type of the value
  */
-public interface Entry<K, V>
+public interface Entry<K, V> extends Serializable
 {
 	/**
 	 * Returns the key stored by this entry

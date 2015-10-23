@@ -13,6 +13,8 @@ import dyvil.util.Option;
 
 public class MapView<K, V> implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = 1586369703282366862L;
+	
 	protected final Map<K, V> map;
 	
 	public MapView(Map<K, V> map)

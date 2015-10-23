@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -13,8 +14,12 @@ import dyvil.util.Some;
 
 public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 {
-	protected int				size;
-	protected Tuple2<K, V>[]	entries;
+	private static final long serialVersionUID = 1636602530347500387L;
+
+	protected static final int DEFAULT_CAPACITY = 10;
+	
+	protected transient int				size;
+	protected transient Tuple2<K, V>[]	entries;
 	
 	public AbstractTupleMap(Tuple2<K, V>[] entries)
 	{
@@ -344,5 +349,28 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			out.writeObject(this.entries[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.entries = new Tuple2[this.size];
+		for (int i = 0; i < this.size; i++)
+		{
+			this.entries[i] = (Tuple2) in.readObject();
+		}
 	}
 }

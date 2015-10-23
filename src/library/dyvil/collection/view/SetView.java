@@ -14,6 +14,8 @@ import dyvil.collection.iterator.ImmutableIterator;
 
 public class SetView<E> implements ImmutableSet<E>
 {
+	private static final long serialVersionUID = 816522991709785465L;
+	
 	protected final Set<E> set;
 	
 	public SetView(Set<E> collection)

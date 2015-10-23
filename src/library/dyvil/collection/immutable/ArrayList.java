@@ -17,6 +17,8 @@ import dyvil.collection.impl.AbstractArrayList;
 @ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E>
 {
+	private static final long serialVersionUID = 1107932890158514157L;
+
 	public static <E> ArrayList<E> apply(E... elements)
 	{
 		return new ArrayList(elements, true);

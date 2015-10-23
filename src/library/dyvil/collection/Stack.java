@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
  * @param <E>
  *            the element type of the stack
  */
-public interface Stack<E> extends Queryable<E>
+public interface Stack<E> extends Queryable<E>, Serializable
 {
 	/**
 	 * Returns the number of elements in this stack.

@@ -22,6 +22,8 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements MutableMap<K, V>
 {
+	private static final long serialVersionUID = 1734016065128722262L;
+	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Type<K> type)
 	{
 		return new EnumMap(type.getTheClass());

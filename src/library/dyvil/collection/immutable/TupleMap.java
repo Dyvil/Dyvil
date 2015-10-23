@@ -15,6 +15,8 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = -5372836862143742212L;
+	
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		return new TupleMap(entries);
@@ -62,7 +64,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 		
 		public Builder()
 		{
-			this.entries = new Tuple2[10];
+			this.entries = new Tuple2[DEFAULT_CAPACITY];
 		}
 		
 		public Builder(int capacity)

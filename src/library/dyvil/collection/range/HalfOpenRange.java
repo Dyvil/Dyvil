@@ -1,5 +1,6 @@
 package dyvil.collection.range;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -12,8 +13,10 @@ import dyvil.collection.Range;
 @TupleConvertible
 public class HalfOpenRange<T extends Rangeable<T>> implements Range<T>
 {
-	protected final T	first;
-	protected final T	last;
+	private static final long serialVersionUID = -8656379367421762895L;
+	
+	protected transient T	first;
+	protected transient T	last;
 	
 	public static <T extends Rangeable<T>> HalfOpenRange<T> apply(T first, T last)
 	{
@@ -148,5 +151,21 @@ public class HalfOpenRange<T extends Rangeable<T>> implements Range<T>
 	public int hashCode()
 	{
 		return Range.rangeHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeObject(this.first);
+		out.writeObject(this.last);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.first = (T) in.readObject();
+		this.last = (T) in.readObject();
 	}
 }

@@ -21,6 +21,8 @@ import dyvil.collection.iterator.EmptyIterator;
 @NilConvertible
 public @object class EmptySet<E> implements ImmutableSet<E>
 {
+	private static final long serialVersionUID = -6445525479912514756L;
+	
 	public static final EmptySet instance = new EmptySet();
 	
 	public static <E> EmptySet<E> apply()
@@ -172,5 +174,15 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

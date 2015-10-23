@@ -17,6 +17,8 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<K, V>
 {
+	private static final long serialVersionUID = 5171722024919718041L;
+	
 	public static <K, V> ArrayMap<K, V> apply()
 	{
 		return new ArrayMap<K, V>(DEFAULT_CAPACITY);

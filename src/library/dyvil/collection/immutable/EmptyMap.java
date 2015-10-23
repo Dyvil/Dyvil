@@ -19,6 +19,8 @@ import dyvil.util.Option;
 @NilConvertible
 public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = 4719096668028950933L;
+	
 	public static final EmptyMap instance = new EmptyMap();
 	
 	public static <K, V> EmptyMap<K, V> apply()
@@ -239,5 +241,15 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

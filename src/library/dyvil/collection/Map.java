@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ import dyvil.util.Some;
 @NilConvertible(methodName = "fromNil")
 @ArrayConvertible
 @MapConvertible
-public interface Map<K, V> extends Iterable<Entry<K, V>>
+public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 {
 	public static <K, V> ImmutableMap<K, V> fromNil()
 	{
