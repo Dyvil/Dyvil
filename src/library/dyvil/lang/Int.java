@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.lang.literal.IntConvertible;
 
 import dyvil.annotation.Intrinsic;
@@ -10,8 +12,10 @@ import dyvil.annotation.prefix;
 import static dyvil.reflect.Opcodes.*;
 
 @IntConvertible
-public class Int implements Integer
+public class Int implements Integer, Serializable
 {
+	private static final long serialVersionUID = -2779746531375152610L;
+	
 	public static final int		min		= java.lang.Integer.MIN_VALUE;
 	public static final int		max		= java.lang.Integer.MAX_VALUE;
 	public static final byte	size	= java.lang.Integer.SIZE;

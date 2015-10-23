@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.lang.literal.BooleanConvertible;
 
 import dyvil.annotation.Intrinsic;
@@ -10,8 +12,10 @@ import dyvil.annotation.prefix;
 import static dyvil.reflect.Opcodes.*;
 
 @BooleanConvertible
-public class Boolean implements Comparable<Boolean>
+public class Boolean implements Comparable<Boolean>, Serializable
 {
+	private static final long serialVersionUID = -4115545030218876277L;
+	
 	protected static final Boolean	TRUE	= new Boolean(true);
 	protected static final Boolean	FALSE	= new Boolean(false);
 	
@@ -129,5 +133,15 @@ public class Boolean implements Comparable<Boolean>
 		}
 		Boolean other = (Boolean) obj;
 		return this.value == other.booleanValue();
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return this.value ? TRUE : FALSE;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return this.value ? TRUE : FALSE;
 	}
 }

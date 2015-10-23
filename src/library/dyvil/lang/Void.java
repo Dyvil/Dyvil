@@ -1,9 +1,13 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.annotation.object;
 
-public final @object class Void
+public final @object class Void implements Serializable
 {
+	private static final long serialVersionUID = -7512474716905358710L;
+	
 	public static final Void instance = new Void();
 	
 	private Void()
@@ -36,5 +40,15 @@ public final @object class Void
 	public int hashCode()
 	{
 		return 0;
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

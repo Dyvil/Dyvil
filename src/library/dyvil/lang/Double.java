@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.lang.literal.DoubleConvertible;
 
 import dyvil.annotation.Intrinsic;
@@ -12,8 +14,10 @@ import static dyvil.reflect.Opcodes.*;
 import sun.misc.FloatingDecimal;
 
 @DoubleConvertible
-public class Double implements Number
+public class Double implements Number, Serializable
 {
+	private static final long serialVersionUID = 4764381743913068148L;
+	
 	public static final double	min					= java.lang.Double.MIN_VALUE;
 	public static final double	max					= java.lang.Double.MAX_VALUE;
 	public static final double	NaN					= java.lang.Double.NaN;
