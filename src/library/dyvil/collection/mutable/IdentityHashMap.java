@@ -16,8 +16,10 @@ import dyvil.tuple.Tuple2;
 @NilConvertible
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements MutableMap<K, V>
 {
-	private float	loadFactor;
-	private int		threshold;
+	private static final long serialVersionUID = -2508405537563871840L;
+	
+	private float			loadFactor;
+	private transient int	threshold;
 	
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{

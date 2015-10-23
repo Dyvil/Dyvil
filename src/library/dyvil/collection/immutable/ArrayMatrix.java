@@ -15,6 +15,8 @@ import dyvil.tuple.Tuple2;
 
 public class ArrayMatrix<E> implements ImmutableMatrix<E>
 {
+	private static final long serialVersionUID = 7258516530768096953L;
+	
 	private int	rows;
 	private int	columns;
 	

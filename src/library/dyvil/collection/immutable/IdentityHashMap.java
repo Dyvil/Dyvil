@@ -9,6 +9,8 @@ import dyvil.tuple.Tuple2;
 
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = 7106880090218416170L;
+
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
 		return new IdentityHashMap();

@@ -15,9 +15,11 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<K, V>
 {
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... tuples)
+	private static final long serialVersionUID = -1489214367993445801L;
+
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... entries)
 	{
-		return new HashMap<K, V>(tuples);
+		return new HashMap<K, V>(entries);
 	}
 	
 	public static <K, V> Builder<K, V> builder()
@@ -85,9 +87,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 		super(map);
 	}
 	
-	public HashMap(Tuple2<K, V>... tuples)
+	public HashMap(Tuple2<K, V>... entries)
 	{
-		super(tuples);
+		super(entries);
 	}
 	
 	@Override

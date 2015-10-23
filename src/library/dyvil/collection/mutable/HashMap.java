@@ -17,8 +17,10 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K, V>
 {
-	private float	loadFactor;
-	private int		threshold;
+	private static final long serialVersionUID = -5390749229591621243L;
+	
+	private float			loadFactor;
+	private transient int	threshold;
 	
 	public static <K, V> HashMap<K, V> apply()
 	{

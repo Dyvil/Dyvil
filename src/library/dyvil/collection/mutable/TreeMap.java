@@ -18,6 +18,8 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K, V>
 {
+	private static final long serialVersionUID = -7707452456610472904L;
+	
 	public static <K, V> TreeMap<K, V> apply()
 	{
 		return new TreeMap();

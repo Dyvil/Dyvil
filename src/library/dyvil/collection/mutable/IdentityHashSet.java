@@ -9,12 +9,16 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 
-import static dyvil.collection.impl.AbstractIdentityHashMap.*;
+import static dyvil.collection.impl.AbstractIdentityHashMap.index;
+import static dyvil.collection.impl.AbstractIdentityHashMap.maskNull;
+import static dyvil.collection.impl.AbstractIdentityHashMap.unmaskNull;
 
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements MutableSet<E>
 {
-	private float	loadFactor;
-	private int		threshold;
+	private static final long serialVersionUID = 5634688694810236366L;
+	
+	private float			loadFactor;
+	private transient int	threshold;
 	
 	public static <E> IdentityHashSet<E> apply()
 	{

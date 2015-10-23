@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -35,8 +36,10 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		}
 	}
 	
-	protected int			size;
-	protected HashElement[]	elements;
+	private static final long serialVersionUID = -2574454530914084132L;
+	
+	protected transient int				size;
+	protected transient HashElement[]	elements;
 	
 	public AbstractHashSet()
 	{
@@ -367,5 +370,38 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		int len = this.elements.length;
+		
+		out.writeInt(this.size);
+		out.writeInt(len);
+		
+		for (int i = 0; i < len; i++)
+		{
+			for (HashElement<E> element = this.elements[i]; element != null; element = element.next)
+			{
+				out.writeObject(element.element);
+				out.writeByte(i);
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		int len = in.readInt();
+		
+		this.elements = new HashElement[len];
+		for (int i = 0; i < len; i++)
+		{
+			this.addInternal((E) in.readObject());
+		}
 	}
 }

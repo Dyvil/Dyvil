@@ -18,9 +18,11 @@ import static dyvil.collection.impl.AbstractHashMap.*;
 @NilConvertible
 @ArrayConvertible
 public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
-{	
-	private float	loadFactor;
-	private int		threshold;
+{
+	private static final long serialVersionUID = -993127062150101200L;
+	
+	private float			loadFactor;
+	private transient int	threshold;
 	
 	public static <E> HashSet<E> apply()
 	{

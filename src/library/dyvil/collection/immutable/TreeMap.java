@@ -15,6 +15,8 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = 2012245218476747334L;
+
 	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		TreeMap<K, V> map = new TreeMap();
@@ -28,20 +30,6 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<K, V>();
-	}
-	
-	public TreeMap()
-	{
-	}
-	
-	public TreeMap(Map<? extends K, ? extends V> map)
-	{
-		super(map, null);
-	}
-	
-	public TreeMap(Map<? extends K, ? extends V> m, Comparator<? super K> comparator)
-	{
-		super(m, comparator);
 	}
 	
 	protected static final class Builder<K, V> implements ImmutableMap.Builder<K, V>
@@ -65,6 +53,20 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<
 			this.map = null;
 			return map;
 		}
+	}
+
+	public TreeMap()
+	{
+	}
+	
+	public TreeMap(Map<? extends K, ? extends V> map)
+	{
+		super(map, null);
+	}
+	
+	public TreeMap(Map<? extends K, ? extends V> m, Comparator<? super K> comparator)
+	{
+		super(m, comparator);
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -13,14 +14,16 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 {
 	protected static final class TreeEntry<K, V> implements dyvil.collection.Entry<K, V>
 	{
-		public K		key;
-		public V		value;
-		TreeEntry<K, V>	left	= null;
-		TreeEntry<K, V>	right	= null;
-		TreeEntry<K, V>	parent;
-		boolean			color	= BLACK;
+		private static final long serialVersionUID = -8592912850607607269L;
 		
-		TreeEntry(K key, V value, TreeEntry<K, V> parent)
+		public transient K					key;
+		public transient V					value;
+		protected transient TreeEntry<K, V>	left	= null;
+		protected transient TreeEntry<K, V>	right	= null;
+		protected transient TreeEntry<K, V>	parent;
+		protected transient boolean			color	= BLACK;
+		
+		protected TreeEntry(K key, V value, TreeEntry<K, V> parent)
 		{
 			this.key = key;
 			this.value = value;
@@ -56,14 +59,38 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		{
 			return this.key + " -> " + this.value;
 		}
+		
+		private void writeObject(java.io.ObjectOutputStream out) throws IOException
+		{
+			out.defaultWriteObject();
+			
+			out.writeObject(this.key);
+			out.writeObject(this.value);
+			out.writeObject(this.left);
+			out.writeObject(this.right);
+			out.writeObject(this.parent);
+			out.writeBoolean(this.color);
+		}
+		
+		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			in.defaultReadObject();
+			
+			this.key = (K) in.readObject();
+			this.value = (V) in.readObject();
+			this.left = (TreeEntry) in.readObject();
+			this.right = (TreeEntry) in.readObject();
+			this.parent = (TreeEntry) in.readObject();
+			this.color = in.readBoolean();
+		}
 	}
 	
-	protected abstract class PrivateEntryIterator<T> implements Iterator<T>
+	protected abstract class TreeEntryIterator<T> implements Iterator<T>
 	{
 		TreeEntry<K, V>	next;
 		TreeEntry<K, V>	lastReturned;
 		
-		protected PrivateEntryIterator(TreeEntry<K, V> first)
+		protected TreeEntryIterator(TreeEntry<K, V> first)
 		{
 			this.lastReturned = null;
 			this.next = first;
@@ -116,12 +143,14 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	private static final long serialVersionUID = 4299609156116845922L;
+	
 	private static final boolean	RED		= false;
 	private static final boolean	BLACK	= true;
 	
-	protected final Comparator<? super K>	comparator;
-	protected TreeEntry<K, V>				root;
-	protected int							size;
+	protected transient final Comparator<? super K>	comparator;
+	protected transient TreeEntry<K, V>				root;
+	protected transient int							size;
 	
 	public AbstractTreeMap()
 	{
@@ -188,7 +217,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		return new PrivateEntryIterator(this.getFirstEntry())
+		return new TreeEntryIterator(this.getFirstEntry())
 		{
 			@Override
 			public Entry<K, V> next()
@@ -207,7 +236,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return new PrivateEntryIterator<K>(this.getFirstEntry())
+		return new TreeEntryIterator<K>(this.getFirstEntry())
 		{
 			@Override
 			public K next()
@@ -226,7 +255,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return new PrivateEntryIterator<V>(this.getFirstEntry())
+		return new TreeEntryIterator<V>(this.getFirstEntry())
 		{
 			@Override
 			public V next()
@@ -1112,10 +1141,11 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	protected void buildFromSorted(int size, Iterator<? extends Entry<? extends K, ? extends V>> iterator)
 	{
 		this.size = size;
-		this.root = this.buildFromSorted(0, 0, size - 1, computeRedLevel(size), iterator);
+		this.root = buildFromSorted(0, 0, size - 1, computeRedLevel(size), iterator);
 	}
 	
-	private final TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel, Iterator<? extends Entry<? extends K, ? extends V>> iterator)
+	private static final <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel,
+			Iterator<? extends Entry<? extends K, ? extends V>> iterator)
 	{
 		if (hi < lo)
 		{
@@ -1127,12 +1157,12 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		TreeEntry<K, V> left = null;
 		if (lo < mid)
 		{
-			left = this.buildFromSorted(level + 1, lo, mid - 1, redLevel, iterator);
+			left = buildFromSorted(level + 1, lo, mid - 1, redLevel, iterator);
 		}
 		
-		// extract key and/or value from iterator or stream
+		// extract key and/or value from iterator
 		Entry<? extends K, ? extends V> entry = iterator.next();
-		TreeEntry<K, V> middle = new TreeEntry<>(entry.getKey(), entry.getValue(), null);
+		TreeEntry<K, V> middle = new TreeEntry<K, V>(entry.getKey(), entry.getValue(), null);
 		
 		// color nodes in non-full bottommost level red
 		if (level == redLevel)
@@ -1148,7 +1178,64 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		
 		if (mid < hi)
 		{
-			TreeEntry<K, V> right = this.buildFromSorted(level + 1, mid + 1, hi, redLevel, iterator);
+			TreeEntry<K, V> right = buildFromSorted(level + 1, mid + 1, hi, redLevel, iterator);
+			middle.right = right;
+			right.parent = middle;
+		}
+		
+		return middle;
+	}
+	
+	protected void buildFromSorted(int size, java.io.ObjectInputStream str)
+	{
+		this.size = size;
+		try
+		{
+			this.root = buildFromSorted(0, 0, size - 1, computeRedLevel(size), str);
+		}
+		catch (IOException | ClassNotFoundException ex)
+		{
+			// ignored
+		}
+	}
+	
+	private static final <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel, java.io.ObjectInputStream str)
+			throws java.io.IOException, ClassNotFoundException
+	{
+		if (hi < lo)
+		{
+			return null;
+		}
+		
+		int mid = (lo + hi) >>> 1;
+		
+		TreeEntry<K, V> left = null;
+		if (lo < mid)
+		{
+			left = buildFromSorted(level + 1, lo, mid - 1, redLevel, str);
+		}
+		
+		// extract key and/or value from stream
+		K key = (K) str.readObject();
+		V value = (V) str.readObject();
+		
+		TreeEntry<K, V> middle = new TreeEntry<K, V>(key, value, null);
+		
+		// color nodes in non-full bottommost level red
+		if (level == redLevel)
+		{
+			middle.color = RED;
+		}
+		
+		if (left != null)
+		{
+			middle.left = left;
+			left.parent = middle;
+		}
+		
+		if (mid < hi)
+		{
+			TreeEntry<K, V> right = buildFromSorted(level + 1, mid + 1, hi, redLevel, str);
 			middle.right = right;
 			right.parent = middle;
 		}
@@ -1193,5 +1280,25 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		
+		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
+		{
+			out.writeObject(entry.key);
+			out.writeObject(entry.value);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.buildFromSorted(in.readInt(), in);
 	}
 }

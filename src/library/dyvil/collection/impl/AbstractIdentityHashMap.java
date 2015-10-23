@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.BiConsumer;
@@ -18,6 +19,8 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 {
 	protected final class TableEntry implements Entry<K, V>
 	{
+		private static final long serialVersionUID = 6124362820238071432L;
+		
 		protected int index;
 		
 		public TableEntry(int index)
@@ -153,13 +156,15 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	private static final long serialVersionUID = -2493470311862510577L;
+	
 	protected static final int		DEFAULT_CAPACITY	= 12;
 	protected static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
 	
 	protected static final Object NULL = new Object();
 	
-	protected Object[]	table;
-	protected int		size;
+	protected transient Object[]	table;
+	protected transient int			size;
 	
 	public AbstractIdentityHashMap()
 	{
@@ -593,5 +598,41 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		int len = this.table.length;
+		
+		out.writeInt(this.size);
+		out.writeInt(len);
+		
+		// Write (size) key-value pairs, sequentially
+		for (int i = 0; i < len; i += 2)
+		{
+			// Avoid the NULL object
+			Object key = this.table[i];
+			if (key != null)
+			{
+				out.writeObject(unmaskNull(key));
+				out.writeObject(this.table[i + 1]);
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.table = new Object[in.readInt()];
+		
+		// Read (size) key-value pairs and put them in this map
+		for (int i = 0; i < this.size; i += 2)
+		{
+			this.putInternal((K) in.readObject(), (V) in.readObject());
+		}
 	}
 }

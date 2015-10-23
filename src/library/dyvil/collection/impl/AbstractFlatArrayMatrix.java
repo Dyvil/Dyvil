@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -11,8 +12,10 @@ import dyvil.tuple.Tuple2;
 
 public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 {
-	protected int	rows;
-	protected int	columns;
+	private static final long serialVersionUID = -8916701566889184575L;
+	
+	protected transient int	rows;
+	protected transient int	columns;
 	
 	protected Object[] cells;
 	
@@ -289,5 +292,34 @@ public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 	public int hashCode()
 	{
 		return Matrix.matrixHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.rows);
+		out.writeInt(this.columns);
+		
+		int len = this.rows * this.columns;
+		for (int i = 0; i < len; i++)
+		{
+			out.writeObject(this.cells[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.rows = in.readInt();
+		this.columns = in.readInt();
+		
+		int len = this.rows * this.columns;
+		this.cells = new Object[len];
+		for (int i = 0; i < len; i++)
+		{
+			this.cells[i] = in.readObject();
+		}
 	}
 }

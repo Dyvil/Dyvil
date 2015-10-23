@@ -11,6 +11,8 @@ import dyvil.collection.impl.AbstractIdentityHashSet;
 
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements ImmutableSet<E>
 {
+	private static final long serialVersionUID = -1347044009183554635L;
+
 	public static <E> IdentityHashSet<E> apply(E... elements)
 	{
 		return new IdentityHashSet<E>(elements);

@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -16,6 +17,8 @@ import static dyvil.collection.impl.AbstractIdentityHashMap.unmaskNull;
 
 public abstract class AbstractIdentityHashSet<E> implements Set<E>
 {
+	private static final long serialVersionUID = -6688373107015354853L;
+	
 	protected static final int		DEFAULT_CAPACITY	= 12;
 	protected static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
 	
@@ -358,5 +361,39 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		int len = this.table.length;
+		
+		out.writeInt(this.size);
+		out.writeInt(len);
+		
+		for (int i = 0; i < len; i++)
+		{
+			// Avoid the NULL object
+			Object key = this.table[i];
+			if (key != null)
+			{
+				out.writeObject(unmaskNull(key));
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.table = new Object[in.readInt()];
+		
+		// Read (size) key-value pairs and put them in this map
+		for (int i = 0; i < this.size; i++)
+		{
+			this.addInternal((E) in.readObject());
+		}
 	}
 }

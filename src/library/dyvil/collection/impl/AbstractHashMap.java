@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -18,10 +19,12 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 {
 	protected static final class HashEntry<K, V> implements Entry<K, V>
 	{
-		public K			key;
-		public V			value;
-		public int			hash;
-		public HashEntry	next;
+		private static final long serialVersionUID = 6421167357975687099L;
+		
+		public transient K			key;
+		public transient V			value;
+		public transient int		hash;
+		public transient HashEntry	next;
 		
 		public HashEntry(K key, V value, int hash)
 		{
@@ -66,6 +69,25 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		public int hashCode()
 		{
 			return Entry.entryHashCode(this);
+		}
+		
+		private void writeObject(java.io.ObjectOutputStream out) throws IOException
+		{
+			out.defaultWriteObject();
+			
+			out.writeObject(this.key);
+			out.writeObject(this.value);
+			out.writeObject(this.next);
+		}
+		
+		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			in.defaultReadObject();
+			
+			this.key = (K) in.readObject();
+			this.value = (V) in.readObject();
+			this.next = (HashEntry) in.readObject();
+			this.hash = hash(this.key);
 		}
 	}
 	
@@ -128,13 +150,15 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	private static final long serialVersionUID = 408161126967974108L;
+	
 	public static final float	GROWTH_FACTOR		= 1.125F;
 	public static final int		DEFAULT_CAPACITY	= 16;
 	public static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
 	public static final int		MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	protected int			size;
-	protected HashEntry[]	entries;
+	protected transient int			size;
+	protected transient HashEntry[]	entries;
 	
 	public AbstractHashMap()
 	{
@@ -198,8 +222,8 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		outer:
 		for (Tuple2 entry : tuples)
 		{
-			Object key = entry.getKey();
-			Object value = entry.getValue();
+			Object key = entry._1;
+			Object value = entry._2;
 			
 			int hash = hash(key);
 			int i = index(hash, length);
@@ -548,5 +572,39 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		int len = this.entries.length;
+		
+		out.writeInt(this.size);
+		out.writeInt(len);
+		
+		// Write key-value pairs, sequentially
+		for (int i = 0; i < len; i++)
+		{
+			for (HashEntry<K, V> entry = this.entries[i]; entry != null; entry = entry.next)
+			{
+				out.writeObject(entry.key);
+				out.writeObject(entry.value);
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		int len = in.readInt();
+		
+		this.entries = new HashEntry[len];
+		for (int i = 0; i < len; i++)
+		{
+			this.putInternal((K) in.readObject(), (V) in.readObject());
+		}
 	}
 }
