@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -77,7 +78,10 @@ public class ClassConstructor extends ConstructorCall
 		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);
 		this.nestedClass.setMetadata(this.metadata);
 		this.nestedClass.setOuterClass(context.getThisClass());
-		this.nestedClass.setHeader(context.getHeader());
+		
+		IDyvilHeader header = context.getHeader();
+		this.nestedClass.setHeader(header);
+		header.addInnerClass(this.nestedClass);
 		
 		this.nestedClass.context = context;
 		this.nestedClass.resolve(markers, context);
@@ -118,8 +122,6 @@ public class ClassConstructor extends ConstructorCall
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.arguments.cleanup(context, compilableList);
-		
-		this.nestedClass.getHeader().addInnerClass(this.nestedClass);
 		this.nestedClass.cleanup(context, compilableList);
 		
 		return this;

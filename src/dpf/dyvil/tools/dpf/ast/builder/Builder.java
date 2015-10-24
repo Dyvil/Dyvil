@@ -73,7 +73,7 @@ public class Builder implements Value, BuilderVisitor
 	{
 		return IASTNode.toString(this);
 	}
-
+	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -93,9 +93,17 @@ public class Builder implements Value, BuilderVisitor
 			
 			buffer.append(')');
 		}
+		else if (this.node == null)
+		{
+			buffer.append("()");
+			return;
+		}
 		
-		buffer.append(" {\n");
-		this.node.bodyToString(prefix + '\t', buffer);
-		buffer.append(prefix).append('}');
+		if (this.node != null)
+		{
+			buffer.append(" {\n");
+			this.node.bodyToString(prefix + '\t', buffer);
+			buffer.append(prefix).append('}');
+		}
 	}
 }

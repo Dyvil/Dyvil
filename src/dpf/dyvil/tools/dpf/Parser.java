@@ -307,6 +307,13 @@ public class Parser
 	private void parseParameters(BuilderVisitor visitor)
 	{
 		IToken token = this.tokens.lastReturned().next();
+		if (token.type() == BaseSymbols.CLOSE_PARENTHESIS)
+		{
+			this.tokens.next();
+			visitor.visitEnd();
+			return;
+		}
+		
 		while (this.tokens.hasNext())
 		{
 			if (token.next().type() == BaseSymbols.COLON)

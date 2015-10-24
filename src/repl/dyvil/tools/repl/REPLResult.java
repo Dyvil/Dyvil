@@ -108,18 +108,28 @@ public class REPLResult implements IConstantValue
 			return;
 		}
 		
-		String s = this.value.toString();
-		int i = s.indexOf('@');
-		if (i >= 0)
-		{
-			String className = c.getName();
-			if (i == className.length() && s.regionMatches(0, className, 0, i))
-			{
-				StringUtils.prettyPrint(this.value, c, buffer, true);
-				return;
-			}
-		}
+		String snapshot = buffer.toString();
 		
-		buffer.append(this.value);
+		try
+		{
+			String s = this.value.toString();
+			int i = s.indexOf('@');
+			if (i >= 0)
+			{
+				String className = c.getName();
+				if (i == className.length() && s.regionMatches(0, className, 0, i))
+				{
+					StringUtils.prettyPrint(this.value, c, buffer, true);
+					return;
+				}
+			}
+			
+			buffer.append(this.value);
+		}
+		catch (Throwable t)
+		{
+			buffer.replace(0, buffer.length(), snapshot);
+			buffer.append("<error>");
+		}
 	}
 }

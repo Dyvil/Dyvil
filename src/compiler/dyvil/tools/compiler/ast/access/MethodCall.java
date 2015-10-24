@@ -255,18 +255,18 @@ public final class MethodCall extends AbstractCall implements INamed
 			return this;
 		}
 		
-		// Prefix methods are transformed to postfix notation
-		if (this.instance.isConstant())
-		{
-			IValue folded = ConstantFolder.apply(this.name, this.instance);
-			if (folded != null)
-			{
-				return folded;
-			}
-		}
-		
 		if (this.instance != null)
 		{
+			// Prefix methods are transformed to postfix notation
+			if (this.instance.isConstant())
+			{
+				IValue folded = ConstantFolder.apply(this.name, this.instance);
+				if (folded != null)
+				{
+					return folded;
+				}
+			}
+			
 			this.instance = this.instance.foldConstants();
 		}
 		return this;
