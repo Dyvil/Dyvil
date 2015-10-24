@@ -37,7 +37,7 @@ public final class ImportParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == BaseSymbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
 		{
 			this.consumer.setImport(this.theImport);
 			pm.popParser();

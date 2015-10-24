@@ -64,6 +64,9 @@ public class DPFParser
 		case Tokens.LETTER_IDENTIFIER:
 			switch (token.next().type())
 			{
+			case BaseSymbols.COMMA:
+			case BaseSymbols.SEMICOLON:
+				return true;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.tokens.next();
 				this.parseNodeElements(visitor.visitNode(token.nameValue()));

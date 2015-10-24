@@ -101,7 +101,7 @@ public final class OperatorParser extends Parser
 				}
 				pm.popParser();
 				this.map.addOperator(this.operator);
-				if (type != BaseSymbols.SEMICOLON)
+				if (type != BaseSymbols.SEMICOLON && type != Tokens.EOF)
 				{
 					pm.report(token, "Invalid Prefix Operator - ';' expected");
 					return;
@@ -115,7 +115,7 @@ public final class OperatorParser extends Parser
 				}
 				pm.popParser();
 				this.map.addOperator(this.operator);
-				if (type != BaseSymbols.SEMICOLON)
+				if (type != BaseSymbols.SEMICOLON && type != Tokens.EOF)
 				{
 					pm.report(token, "Invalid Postfix Operator - ';' expected");
 					return;
@@ -176,7 +176,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				return;
 			}
-			pm.report(token, "Invalid Operator Property - Invalid " + token);
+			pm.report(token, "Invalid Operator Property - Unexpected " + token);
 			return;
 		case COMMA:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)

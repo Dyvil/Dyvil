@@ -82,8 +82,6 @@ public final class SemicolonInference
 			
 			switch (nextType)
 			{
-			case 0:
-				return;
 			case Tokens.STRING_PART:
 			case Tokens.STRING_END:
 			case BaseSymbols.OPEN_CURLY_BRACKET:

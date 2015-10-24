@@ -26,6 +26,7 @@ public class ParserUtil
 	{
 		switch (type)
 		{
+		case Tokens.EOF:
 		case BaseSymbols.COMMA:
 		case BaseSymbols.SEMICOLON:
 		case BaseSymbols.COLON:

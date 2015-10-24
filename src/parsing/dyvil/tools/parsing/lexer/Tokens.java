@@ -2,6 +2,8 @@ package dyvil.tools.parsing.lexer;
 
 public interface Tokens
 {
+	int EOF = 0;
+	
 	// IDENTIFIERS
 	int	MOD_LETTER	= 0x00010000;
 	int	MOD_SYMBOL	= 0x00020000;

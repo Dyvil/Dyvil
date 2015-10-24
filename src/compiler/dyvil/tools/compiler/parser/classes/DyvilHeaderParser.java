@@ -19,6 +19,7 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class DyvilHeaderParser extends Parser
@@ -145,7 +146,7 @@ public class DyvilHeaderParser extends Parser
 		{
 			return;
 		}
-		if (type == 0) // EOF
+		if (type == Tokens.EOF)
 		{
 			pm.popParser();
 			return;

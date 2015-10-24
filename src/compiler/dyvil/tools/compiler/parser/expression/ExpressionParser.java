@@ -98,6 +98,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		int type = token.type();
 		switch (type)
 		{
+		case Tokens.EOF:
 		case BaseSymbols.SEMICOLON:
 		case BaseSymbols.COLON:
 		case BaseSymbols.COMMA:
@@ -475,12 +476,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			return;
 		}
 		
-		if (type == 0)
-		{
-			// no error
-			pm.popParser();
-			return;
-		}
 		pm.report(token, "Invalid Expression - Unexpected " + token);
 		return;
 	}

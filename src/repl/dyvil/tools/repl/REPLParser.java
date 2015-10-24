@@ -84,6 +84,8 @@ public class REPLParser extends ParserManager
 			}
 		}
 		
+		this.parseRemaining(token);
+		
 		return !this.syntaxErrors;
 	}
 	
