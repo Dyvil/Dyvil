@@ -29,7 +29,7 @@ public final class DyvilCompiler
 	public static final String	LIBRARY_VERSION	= "0.6.0";
 	
 	public static boolean	debug;
-	public static int		constantFolding;
+	public static int		constantFolding	= 2;
 	
 	public static final int	classVersion		= Opcodes.V1_8;
 	public static final int	asmVersion			= Opcodes.ASM5;

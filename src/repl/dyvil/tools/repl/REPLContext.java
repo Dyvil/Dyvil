@@ -8,6 +8,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -118,7 +119,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return false;
 		}
 		
-		field.foldConstants();
+		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		{
+			field.foldConstants();
+		}
 		field.cleanup(this, this);
 		this.compileVariable(field);
 		return true;
@@ -224,6 +228,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
+		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		{
+			value = value.foldConstants();
+		}
+		
 		value = value.cleanup(this, this);
 		field.setValue(value);
 		field.setType(type);
@@ -322,7 +331,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		iclass.foldConstants();
+		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		{
+			iclass.foldConstants();
+		}
 		iclass.cleanup(this, this);
 		REPLContext.compileClass(iclass);
 		
@@ -396,7 +408,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		property.foldConstants();
+		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		{
+			property.foldConstants();
+		}
 		property.cleanup(this, this);
 		
 		REPLContext.compileClass(iclass);
@@ -434,7 +449,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		method.foldConstants();
+		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		{
+			method.foldConstants();
+		}
 		method.cleanup(this, this);
 		
 		REPLContext.compileClass(iclass);
