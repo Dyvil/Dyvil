@@ -115,13 +115,15 @@ public class DPFParser
 		case Tokens.LETTER_IDENTIFIER:
 		case Tokens.SYMBOL_IDENTIFIER:
 		case Tokens.SPECIAL_IDENTIFIER:
-			if (token.next().type() == BaseSymbols.DOT)
+		{
+			if (token.hasNext() && token.next().type() == BaseSymbols.DOT)
 			{
 				this.parseAccessSequence(valueVisitor);
 				return;
 			}
 			valueVisitor.visitName(token.nameValue());
 			return;
+		}
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
 			this.parseList(valueVisitor.visitList());
 			return;
@@ -174,7 +176,8 @@ public class DPFParser
 			this.parseValue(visitor.visitKey());
 			
 			IToken token = this.tokens.next();
-			if (token.type() != BaseSymbols.COLON) {
+			if (token.type() != BaseSymbols.COLON)
+			{
 				this.markers.add(new SyntaxError(token, "Invalid Map - ':' expected"));
 			}
 			
