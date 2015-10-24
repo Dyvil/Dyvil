@@ -9,6 +9,7 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -204,11 +205,18 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void setValue(IValue value)
 	{
-		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
-		memberClass = getREPLClass(field);
-		
 		value.resolveTypes(markers, this);
 		value = value.resolve(markers, this);
+		
+		if (value.valueTag() == IValue.FIELD_ACCESS)
+		{
+			IDataMember f = ((FieldAccess) value).getField();
+			if (f instanceof REPLVariable)
+			{
+				System.out.println(f);
+				return;
+			}
+		}
 		
 		IType type = value.getType();
 		value = value.withType(type, type, markers, this);
@@ -227,6 +235,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			this.cleanup();
 			return;
 		}
+		
+		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
+		memberClass = getREPLClass(field);
 		
 		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
 		{
