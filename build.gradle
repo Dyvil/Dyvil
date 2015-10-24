@@ -231,11 +231,11 @@ task prepareRelease(type: Copy) {
 	rename 'template\\.dyp', "v${version}.dyp"
 	
 	filter {
-		replace '$$version$$',			version
-		replace '$$libraryVersion$$',	libraryVersion
-		replace '$$compilerVersion$$',	compilerVersion
-		replace '$$replVersion$$',		replVersion
-		replace '$$dpfVersion$$',		dpfVersion
+		it.replace('$$version$$',			version)
+		  .replace('$$libraryVersion$$',	libraryVersion)
+		  .replace('$$compilerVersion$$',	compilerVersion)
+		  .replace('$$replVersion$$',		replVersion)
+		  .replace('$$dpfVersion$$',		dpfVersion)
 	}
 }
 
