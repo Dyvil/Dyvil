@@ -47,6 +47,8 @@ sourceSets {
 		}
 		resources {
 			srcDir 'build/dyvilbin'
+			
+			include '**/*.dyo'
 		}
 	}
 	dpf {
@@ -172,6 +174,7 @@ task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLi
 task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
+	from 'build/dyvilbin'
 	
 	archiveName = "dyvil-library-${libraryVersion}.jar"
 }
@@ -185,8 +188,9 @@ task buildDPF(type: Jar, dependsOn: 'buildLibrary') {
 /**
  * Creates a Jar file that contains all compiler classes (from src/compiler)
  */
-task buildCompiler(type: Jar, dependsOn: 'classes') {
+task buildCompiler(type: Jar, dependsOn: 'compilerClasses') {
 	from sourceSets.compiler.output
+	from sourceSets.compiler.resources
 	
 	archiveName = "dyvil-compiler-${compilerVersion}.jar"
 	
@@ -196,7 +200,7 @@ task buildCompiler(type: Jar, dependsOn: 'classes') {
 /**
  * Creates a Jar file that contains all REPL classes (from src/repl)
  */
-task buildREPL(type: Jar, dependsOn: 'classes') {
+task buildREPL(type: Jar, dependsOn: 'replClasses') {
 	from sourceSets.repl.output
 	
 	archiveName = "dyvil-repl-${replVersion}.jar"
@@ -207,19 +211,20 @@ task buildREPL(type: Jar, dependsOn: 'classes') {
 /**
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
-task build(type: Jar, overwrite: true) {
+task buildAll(type: Jar, dependsOn: 'classes') {
 	from sourceSets.library.output
-	from sourceSets.library.resources
 	from sourceSets.compiler.output
+	from sourceSets.compiler.resources
 	from sourceSets.repl.output
 	from sourceSets.dpf.output
+	from 'build/dyvilbin'
 	
 	archiveName = "dyvil-${version}.jar"
 	
 	manifest.attributes.put("Main-Class", replMainClass)
 }
 
-task buildAll(dependsOn: [ 'build', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF' ])
+task build(dependsOn: [ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF' ], overwrite: true)
 
 // ---------------------------------------- Version Files ----------------------------------------
 
