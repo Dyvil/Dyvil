@@ -1,5 +1,6 @@
 package dyvil.util;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,12 +11,14 @@ import dyvil.lang.Ordered;
  * {@link Ordered ordered} model for the <a href="http://semver.org">Semantic
  * Versioning</a> format.
  */
-public final class Version implements Ordered<Version>, Immutable
+public final class Version implements Ordered<Version>, Immutable, Serializable
 {
 	public enum Element
 	{
 		MAJOR, MINOR, PATCH, PRERELEASE, BUILD;
 	}
+	
+	private static final long serialVersionUID = 2514051844985966173L;
 	
 	private static final String		FORMAT	= "^(?:v)?(?:(\\d+)\\.(\\d+)\\.(\\d+))(?:-([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?(?:\\+([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?$";
 	private static final Pattern	PATTERN	= Pattern.compile(Version.FORMAT);
