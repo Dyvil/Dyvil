@@ -238,33 +238,30 @@ public final class StringInterpolation implements IValue
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		int len = this.count / 2;
-		String s = this.strings[0];
+		String string = this.strings[0];
+		
+		int estSize = string.length();
+		for (int i = 0; i < len; i++)
+		{
+			estSize += this.values[i].stringSize();
+			estSize += this.strings[i + 1].length();
+		}
 		
 		writer.writeTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
 		writer.writeInsn(Opcodes.DUP);
+		writer.writeLDC(estSize);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(I)V", false);
 		
-		if (s.isEmpty())
-		{
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
-		}
-		else
-		{
-			writer.writeLDC(s);
-			writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
-		}
+		CaseClasses.writeStringAppend(writer, string);
 		
 		for (int i = 0; i < len; i++)
 		{
 			IValue value = this.values[i];
 			value.writeExpression(writer);
-			CaseClasses.writeToString(writer, value.getType());
+			CaseClasses.writeStringAppend(writer, value.getType());
 			
-			s = this.strings[i + 1];
-			if (!s.isEmpty())
-			{
-				writer.writeLDC(this.strings[i + 1]);
-				writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-			}
+			string = this.strings[i + 1];
+			CaseClasses.writeStringAppend(writer, string);
 		}
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
 	}

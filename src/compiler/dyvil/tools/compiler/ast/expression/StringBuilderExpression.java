@@ -167,8 +167,15 @@ public class StringBuilderExpression implements IValue
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
+			if (value.valueTag() == IValue.STRING || value.valueTag() == IValue.CHAR)
+			{
+				String string = value.stringValue();
+				CaseClasses.writeStringAppend(writer, string);
+				continue;
+			}
+			
 			value.writeExpression(writer);
-			CaseClasses.writeToString(writer, value.getType());
+			CaseClasses.writeStringAppend(writer, value.getType());
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);

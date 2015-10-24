@@ -361,7 +361,7 @@ public interface CaseClasses
 			writer.writeVarInsn(ALOAD, 0);
 			field.writeGet(writer, null, 0);
 			
-			writeToString(writer, type);
+			writeStringAppend(writer, type);
 			if (i + 1 < params)
 			{
 				// Separator Comma
@@ -382,7 +382,24 @@ public interface CaseClasses
 		writer.writeInsn(ARETURN);
 	}
 	
-	public static void writeToString(MethodWriter writer, IType type) throws BytecodeException
+	public static void writeStringAppend(MethodWriter writer, String string) throws BytecodeException
+	{
+		switch (string.length())
+		{
+		case 0:
+			return;
+		case 1:
+			writer.writeLDC(string.charAt(0));
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+			return;
+		default:
+			writer.writeLDC(string);
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+			return;
+		}
+	}
+	
+	public static void writeStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
@@ -393,7 +410,7 @@ public interface CaseClasses
 		{
 			writer.writeInsn(Opcodes.SWAP);
 			writer.writeInsn(Opcodes.DUP_X1);
-			writeArrayToString(writer, type.getElementType());
+			writeArrayStringAppend(writer, type.getElementType());
 			return;
 		}
 		
@@ -416,7 +433,7 @@ public interface CaseClasses
 		return;
 	}
 	
-	public static void writeArrayToString(MethodWriter writer, IType type) throws BytecodeException
+	public static void writeArrayStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{
