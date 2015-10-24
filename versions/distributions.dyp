@@ -69,6 +69,8 @@ repl
 	
 	launcher
 	{
+		info = "REPL Command Line Launchers"
+	
 		bash
 		{
 			info = "REPL Launcher (bash)"

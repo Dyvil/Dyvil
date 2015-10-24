@@ -3,7 +3,7 @@ package dyvil.tools.dpf;
 import java.io.File;
 
 import dyvil.io.FileUtils;
-import dyvil.tools.dpf.ast.DPFFile;
+import dyvil.tools.dpf.ast.RootNode;
 import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -13,28 +13,28 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;
 
-public class DPFParser
+public class Parser
 {
 	private String			code;
 	private TokenIterator	tokens;
 	private MarkerList		markers;
 	
-	public DPFParser(MarkerList markers, String code)
+	public Parser(MarkerList markers, String code)
 	{
 		this.code = code;
 		this.markers = markers;
 	}
 	
-	public static DPFFile parse(File file)
+	public static RootNode parse(File file)
 	{
 		return parse(FileUtils.read(file));
 	}
 	
-	public static DPFFile parse(String code)
+	public static RootNode parse(String code)
 	{
 		MarkerList markers = new MarkerList();
-		DPFFile file = new DPFFile();
-		new DPFParser(markers, code).accept(file);
+		RootNode file = new RootNode();
+		new Parser(markers, code).accept(file);
 		return file;
 	}
 	

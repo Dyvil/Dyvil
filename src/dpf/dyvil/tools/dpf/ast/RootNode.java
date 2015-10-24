@@ -1,12 +1,13 @@
 package dyvil.tools.dpf.ast;
 
 import dyvil.tools.dpf.visitor.NodeVisitor;
+import dyvil.tools.parsing.Name;
 
-public class DPFFile extends Node
+public class RootNode extends Node
 {
-	public DPFFile()
+	public RootNode()
 	{
-		super(null);
+		super(Name.getQualified("root"));
 	}
 	
 	@Override
