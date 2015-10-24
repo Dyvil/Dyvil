@@ -8,7 +8,5 @@ public interface NodeElement extends IASTNode
 {
 	public Name getName();
 	
-	public void setName(Name name);
-	
 	public void accept(NodeVisitor visitor);
 }

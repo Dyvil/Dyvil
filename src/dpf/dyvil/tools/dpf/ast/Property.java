@@ -37,19 +37,13 @@ public class Property extends ValueCreator implements NodeElement
 		return this.name;
 	}
 	
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
 	public Value getValue()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public void setValue(Value value)
+	protected void setValue(Value value)
 	{
 		this.value = value;
 	}

@@ -37,12 +37,6 @@ public class NodeAccess implements NodeVisitor, NodeElement
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
-	@Override
 	public NodeVisitor visitNode(Name name)
 	{
 		Node node = new Node(name);

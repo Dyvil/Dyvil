@@ -15,7 +15,7 @@ public class ListValue extends ValueCreator implements Value, ListVisitor
 	}
 	
 	@Override
-	public void setValue(Value value)
+	protected void setValue(Value value)
 	{
 		this.elements.add(value);
 	}

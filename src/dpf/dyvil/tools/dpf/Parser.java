@@ -120,9 +120,14 @@ public class Parser
 		case Tokens.SPECIAL_IDENTIFIER:
 		{
 			IToken next = token.next();
-			if (next.type() == BaseSymbols.DOT)
+			switch (next.type())
 			{
+			case BaseSymbols.DOT:
 				this.parseAccessSequence(valueVisitor);
+				return;
+			case BaseSymbols.OPEN_PARENTHESIS:
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+				this.parseBuilder(valueVisitor.visitBuilder(token.nameValue()));
 				return;
 			}
 			if (token.nameValue().unqualified.equals("-"))
@@ -265,5 +270,67 @@ public class Parser
 		}
 		
 		visitor.visitName(token.nameValue());
+	}
+	
+	private void parseBuilder(BuilderVisitor visitor)
+	{
+		// button = Button(text: 'Hello') { visible = false }
+		
+		IToken token = this.tokens.next();
+		switch (token.type())
+		{
+		case BaseSymbols.OPEN_PARENTHESIS:
+			this.parseParameters(visitor);
+			if (this.tokens.lastReturned().next().type() == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				this.tokens.next();
+				this.parseBuilderNode(visitor);
+			}
+			return;
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+			this.parseBuilderNode(visitor);
+			return;
+		}
+	}
+	
+	private void parseBuilderNode(BuilderVisitor visitor)
+	{
+		this.parseNodeElements(visitor.visitNode());
+		
+		IToken token = this.tokens.next();
+		if (token.type() != BaseSymbols.CLOSE_CURLY_BRACKET)
+		{
+			this.markers.add(new SyntaxError(token, "Invalid Builder - '}' expected"));
+		}
+	}
+	
+	private void parseParameters(BuilderVisitor visitor)
+	{
+		IToken token = this.tokens.lastReturned().next();
+		while (this.tokens.hasNext())
+		{
+			if (token.next().type() == BaseSymbols.COLON)
+			{
+				this.tokens.next();
+				this.tokens.next();
+				this.parseValue(visitor.visitParameter(token.nameValue()));
+			}
+			else
+			{
+				this.parseValue(visitor.visitParameter(null));
+			}
+			
+			token = this.tokens.next();
+			switch (token.type())
+			{
+			case BaseSymbols.CLOSE_PARENTHESIS:
+				visitor.visitEnd();
+				return;
+			case BaseSymbols.COMMA:
+			case BaseSymbols.SEMICOLON:
+				token = token.next();
+				continue;
+			}
+		}
 	}
 }

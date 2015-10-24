@@ -1,11 +1,12 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.tools.dpf.ast.builder.Builder;
 import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
 
 public abstract class ValueCreator implements ValueVisitor
 {
-	public abstract void setValue(Value value);
+	protected abstract void setValue(Value value);
 	
 	@Override
 	public void visitInt(int value)
@@ -78,6 +79,8 @@ public abstract class ValueCreator implements ValueVisitor
 	@Override
 	public BuilderVisitor visitBuilder(Name name)
 	{
-		return null;
+		Builder builder = new Builder(name);
+		this.setValue(builder);
+		return builder;
 	}
 }

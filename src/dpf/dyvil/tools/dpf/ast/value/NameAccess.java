@@ -14,18 +14,13 @@ public class NameAccess extends ValueCreator implements Value
 		this.name = name;
 	}
 	
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
 	public Name getName()
 	{
 		return this.name;
 	}
 
 	@Override
-	public void setValue(Value value)
+	protected void setValue(Value value)
 	{
 		this.value = value;
 	}

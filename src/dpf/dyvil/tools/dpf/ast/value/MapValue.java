@@ -16,7 +16,7 @@ public class MapValue extends ValueCreator implements Value, MapVisitor
 	}
 	
 	@Override
-	public void setValue(Value value)
+	protected void setValue(Value value)
 	{
 		if (this.valueMode)
 		{

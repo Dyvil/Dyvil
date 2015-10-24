@@ -40,12 +40,6 @@ public class Node implements NodeElement, NodeVisitor
 	}
 	
 	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
-	@Override
 	public NodeVisitor visitNode(Name name)
 	{
 		Node node = new Node(name);
@@ -95,21 +89,25 @@ public class Node implements NodeElement, NodeVisitor
 	{
 		buffer.append(this.name).append('\n').append(prefix).append('{').append('\n');
 		
-		String s = prefix + "\t";
+		this.bodyToString(prefix + "\t", buffer);
+		
+		buffer.append(prefix).append('}');
+	}
+
+	public void bodyToString(String prefix, StringBuilder buffer)
+	{
 		for (NodeElement element : this.elements)
 		{
-			buffer.append(s);
-			element.toString(s, buffer);
+			buffer.append(prefix);
+			element.toString(prefix, buffer);
 			buffer.append('\n');
 		}
 		
 		for (Node node : this.nodes)
 		{
-			buffer.append(s).append('\n').append(s);
-			node.toString(s, buffer);
+			buffer.append(prefix).append('\n').append(prefix);
+			node.toString(prefix, buffer);
 			buffer.append('\n');
 		}
-		
-		buffer.append(prefix).append('}');
 	}
 }

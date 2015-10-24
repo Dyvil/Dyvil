@@ -19,7 +19,7 @@ public class StringInterpolation extends ValueCreator implements Value, StringIn
 	}
 	
 	@Override
-	public void setValue(Value value)
+	protected void setValue(Value value)
 	{
 		this.values.add(value);
 	}
