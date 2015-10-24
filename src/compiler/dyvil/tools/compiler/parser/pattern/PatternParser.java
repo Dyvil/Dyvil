@@ -7,6 +7,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -14,6 +15,7 @@ import dyvil.tools.parsing.token.IToken;
 
 public class PatternParser extends Parser
 {
+	private static final int	END				= 0;
 	private static final int	PATTERN			= 1;
 	private static final int	ARRAY_END		= 2;
 	private static final int	TUPLE_END		= 4;
@@ -33,7 +35,7 @@ public class PatternParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == 0 || type == BaseSymbols.COLON)
+		if (this.mode == END || type == BaseSymbols.COLON)
 		{
 			if (type == DyvilKeywords.AS)
 			{
@@ -57,6 +59,33 @@ public class PatternParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				IToken next = token.next();
+				if (token.nameValue() == Names.minus)
+				{
+					switch (next.type())
+					{
+					case Tokens.INT:
+						pm.skip();
+						this.pattern = new IntPattern(token.to(next), -next.intValue());
+						this.mode = END;
+						return;
+					case Tokens.LONG:
+						pm.skip();
+						this.pattern = new LongPattern(token.to(next), -next.intValue());
+						this.mode = END;
+						return;
+					case Tokens.FLOAT:
+						pm.skip();
+						this.pattern = new FloatPattern(token.to(next), -next.intValue());
+						this.mode = END;
+						return;
+					case Tokens.DOUBLE:
+						pm.skip();
+						this.pattern = new DoublePattern(token.to(next), -next.intValue());
+						this.mode = END;
+						return;
+					}
+				}
+				
 				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
 					CaseClassPattern ccp = new CaseClassPattern(token.raw());
@@ -78,7 +107,7 @@ public class PatternParser extends Parser
 				{
 					BindingPattern bp = new BindingPattern(next.raw(), next.nameValue());
 					this.pattern = bp;
-					this.mode = 0;
+					this.mode = END;
 					pm.skip();
 					return;
 				}
@@ -103,7 +132,7 @@ public class PatternParser extends Parser
 			if (p != null)
 			{
 				this.pattern = p;
-				this.mode = 0;
+				this.mode = END;
 				return;
 			}
 			pm.report(token, "Invalid Pattern");

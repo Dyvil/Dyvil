@@ -119,10 +119,33 @@ public class DPFParser
 		case Tokens.SYMBOL_IDENTIFIER:
 		case Tokens.SPECIAL_IDENTIFIER:
 		{
-			if (token.hasNext() && token.next().type() == BaseSymbols.DOT)
+			IToken next = token.next();
+			if (next.type() == BaseSymbols.DOT)
 			{
 				this.parseAccessSequence(valueVisitor);
 				return;
+			}
+			if (token.nameValue().unqualified.equals("-"))
+			{
+				switch (next.type())
+				{
+				case Tokens.INT:
+					this.tokens.next();
+					valueVisitor.visitInt(-next.intValue());
+					return;
+				case Tokens.LONG:
+					this.tokens.next();
+					valueVisitor.visitLong(-next.longValue());
+					return;
+				case Tokens.FLOAT:
+					this.tokens.next();
+					valueVisitor.visitFloat(-next.floatValue());
+					return;
+				case Tokens.DOUBLE:
+					this.tokens.next();
+					valueVisitor.visitDouble(-next.doubleValue());
+					return;
+				}
 			}
 			valueVisitor.visitName(token.nameValue());
 			return;

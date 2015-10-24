@@ -192,16 +192,6 @@ public final class DyvilLexer
 					break;
 				case '_':
 					continue;
-				case '-':
-					if (buf.length() == 0)
-					{
-						buf.append('-');
-						continue;
-					}
-					
-					addToken = true;
-					reparse = true;
-					break;
 				}
 				if (subtype == MOD_DEC)
 				{
@@ -376,7 +366,7 @@ public final class DyvilLexer
 		
 		if (buf.length() > 0)
 		{
-			this.addToken(prev, buf, type | subtype, lineNumber, start);
+			prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
 		}
 		
 		EndToken end = new EndToken(len, lineNumber);
@@ -453,12 +443,6 @@ public final class DyvilLexer
 		case '_':
 		case '$':
 			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
-		case '-':
-			if (LexerUtil.isDigit(code.charAt(i + 1)))
-			{
-				return INT;
-			}
-			return IDENTIFIER | MOD_SYMBOL;
 		}
 		if (LexerUtil.isDigit(c))
 		{
@@ -599,17 +583,6 @@ public final class DyvilLexer
 		long limit = isLong ? -Long.MAX_VALUE : -Integer.MAX_VALUE;
 		long multmin;
 		int digit;
-		
-		char firstChar = str.charAt(from);
-		if (firstChar < '0')
-		{ // Possible leading "+" or "-"
-			if (firstChar == '-')
-			{
-				negative = true;
-				limit = Long.MIN_VALUE;
-			}
-			from++;
-		}
 		
 		multmin = limit / radix;
 		while (from < to)
