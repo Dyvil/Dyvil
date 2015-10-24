@@ -93,12 +93,12 @@ public final class InstanceOfOperator extends Value
 		
 		if (this.type.isPrimitive())
 		{
-			markers.add(I18n.createMarker(this.position, "instanceof.type.primitive"));
+			markers.add(I18n.createError(this.position, "instanceof.type.primitive"));
 			return;
 		}
 		if (this.value.isPrimitive())
 		{
-			markers.add(I18n.createMarker(this.position, "instanceof.value.primitive"));
+			markers.add(I18n.createError(this.position, "instanceof.value.primitive"));
 			return;
 		}
 		
@@ -115,7 +115,7 @@ public final class InstanceOfOperator extends Value
 		}
 		if (!valueType.isSuperClassOf(this.type))
 		{
-			markers.add(I18n.createMarker(this.position, "instanceof.type.incompatible", valueType, this.type));
+			markers.add(I18n.createError(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}
 	}
 	

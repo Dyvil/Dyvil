@@ -104,4 +104,14 @@ public class I18n
 			return null;
 		}
 	}
+	
+	public static Marker createError(ICodePosition position, String key)
+	{
+		return new SemanticError(position, I18n.getString(key));
+	}
+	
+	public static Marker createError(ICodePosition position, String key, Object... args)
+	{
+		return new SemanticError(position, I18n.getString(key, args));
+	}
 }
