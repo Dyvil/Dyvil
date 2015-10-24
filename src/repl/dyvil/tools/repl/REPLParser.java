@@ -4,14 +4,11 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
-import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;
-import dyvil.tools.parsing.token.InferredSemicolon;
 
 public class REPLParser extends ParserManager
 {
@@ -36,27 +33,7 @@ public class REPLParser extends ParserManager
 		this.markers = markers;
 		this.syntaxErrors = false;
 		
-		IToken token = null, prev = null;
-		tokens.reset();
-		while (tokens.hasNext())
-		{
-			token = tokens.next();
-			token.setPrev(prev);
-			prev = token;
-		}
-		
-		if (prev == null)
-		{
-			return false;
-		}
-		
-		int type = prev.type();
-		if (!ParserUtil.isSeperator(type) && type != (Tokens.IDENTIFIER | Tokens.MOD_SYMBOL))
-		{
-			IToken semicolon = new InferredSemicolon(prev.endLine(), prev.endIndex());
-			semicolon.setPrev(prev);
-			prev.setNext(semicolon);
-		}
+		IToken token = null;
 		
 		tokens.reset();
 		
@@ -103,7 +80,7 @@ public class REPLParser extends ParserManager
 			
 			if (this.syntaxErrors && this.markers == null)
 			{
-				break;
+				return false;
 			}
 		}
 		

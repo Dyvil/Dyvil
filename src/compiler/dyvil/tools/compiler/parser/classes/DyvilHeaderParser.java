@@ -145,6 +145,12 @@ public class DyvilHeaderParser extends Parser
 		{
 			return;
 		}
+		if (type == 0) // EOF
+		{
+			pm.popParser();
+			return;
+		}
+		
 		switch (this.mode)
 		{
 		case PACKAGE:

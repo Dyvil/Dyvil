@@ -446,7 +446,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			if (this.value != null)
+			if (this.value != null && type != 0)
 			{
 				if (this.operator != null)
 				{
@@ -471,11 +471,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			pm.report(token, "Invalid Dot Access - Invalid " + token);
+			pm.report(token, "Invalid Dot Access - Unexpected " + token);
 			return;
 		}
 		
-		pm.report(token, "Invalid Expression - Invalid " + token);
+		if (type == 0)
+		{
+			// no error
+			pm.popParser();
+			return;
+		}
+		pm.report(token, "Invalid Expression - Unexpected " + token);
 		return;
 	}
 	
@@ -804,7 +810,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		}
 		
-		pm.report(token, "Invalid Assignment");
+		pm.report(token, "Invalid Assignment - Unexpected " + token);
 		return;
 	}
 	

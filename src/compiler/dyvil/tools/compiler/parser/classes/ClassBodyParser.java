@@ -79,35 +79,32 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case TYPE:
-			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			switch (type)
 			{
+			case 0:
+				// no error
+				pm.popParser();
+				return;
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				pm.popParser(true);
 				return;
-			}
-			
-			if (type == BaseSymbols.SEMICOLON)
-			{
+			case BaseSymbols.SEMICOLON:
 				if (token.isInferred())
 				{
 					return;
 				}
-				
 				this.reset();
 				return;
-			}
-			if (type == DyvilKeywords.NEW)
-			{
+			case DyvilKeywords.NEW:
 				if (this.theClass == null)
 				{
-					this.mode = 0;
+					this.mode = TYPE;
 					pm.report(token, "Cannot define a constructor in this context");
 					return;
 				}
-				
 				Constructor c = new Constructor(token.raw(), this.theClass, this.modifiers);
 				c.setAnnotations(this.annotations);
 				this.member = c;
-				
 				this.mode = PARAMETERS;
 				return;
 			}

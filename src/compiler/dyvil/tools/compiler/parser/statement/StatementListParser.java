@@ -195,6 +195,14 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				pm.reparse();
 				return;
 			}
+			
+			if (type == 0)
+			{
+				this.consumer.setValue(this.statementList);
+				pm.popParser();
+				pm.report(token, "Invalid Statement List - '}' expected");
+				return;
+			}
 			pm.report(token, "Invalid Statement List - ';' expected");
 			return;
 		}

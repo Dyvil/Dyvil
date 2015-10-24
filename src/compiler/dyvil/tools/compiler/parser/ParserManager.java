@@ -109,6 +109,26 @@ public class ParserManager implements IParserManager
 				this.markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 			}
 		}
+		
+		if (token == null || this.hasStopped)
+		{
+			return;
+		}
+		
+		while (this.parser != null)
+		{
+			token = token.next();
+			
+			Parser prevParser = this.parser;
+			int mode = prevParser.getMode();
+			
+			prevParser.parse(this, token);
+			
+			if (this.parser == prevParser && this.parser.getMode() == mode)
+			{
+				break;
+			}
+		}
 	}
 	
 	@Override

@@ -30,6 +30,11 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 		{
 			return;
 		}
+		if (type == 0) // EOF
+		{
+			pm.popParser();
+			return;
+		}
 		
 		switch (this.mode)
 		{

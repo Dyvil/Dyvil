@@ -101,13 +101,13 @@ public class IdentifierToken implements IToken
 	@Override
 	public boolean hasNext()
 	{
-		return this.next != null;
+		return this.next.type() != 0;
 	}
 	
 	@Override
 	public boolean hasPrev()
 	{
-		return this.prev != null;
+		return this.prev.type() != 0;
 	}
 	
 	@Override

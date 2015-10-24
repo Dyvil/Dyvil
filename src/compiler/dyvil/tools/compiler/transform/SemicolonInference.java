@@ -26,7 +26,7 @@ public final class SemicolonInference
 		
 		IToken prev = first;
 		IToken next = first.next();
-		while (next != null)
+		while (next.type() != 0)
 		{
 			inferSemicolon(prev, next);
 			prev = next;
@@ -35,14 +35,12 @@ public final class SemicolonInference
 		
 		prev = first;
 		next = first.next();
-		while (next != null)
+		while (next.type() != 0)
 		{
 			next.setPrev(prev);
 			prev = next;
 			next = next.next();
 		}
-		
-		prev.setNext(new InferredSemicolon(prev.endLine(), prev.endIndex() + 1));
 	}
 	
 	private static void inferSemicolon(IToken prev, IToken next)
@@ -84,6 +82,8 @@ public final class SemicolonInference
 			
 			switch (nextType)
 			{
+			case 0:
+				return;
 			case Tokens.STRING_PART:
 			case Tokens.STRING_END:
 			case BaseSymbols.OPEN_CURLY_BRACKET:

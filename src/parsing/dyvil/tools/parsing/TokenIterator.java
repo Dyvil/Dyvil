@@ -33,7 +33,7 @@ public class TokenIterator implements Iterator<IToken>
 	@Override
 	public boolean hasNext()
 	{
-		return this.next != null;
+		return this.next.type() != 0;
 	}
 	
 	public IToken first()
@@ -80,11 +80,9 @@ public class TokenIterator implements Iterator<IToken>
 	public String toString()
 	{
 		StringBuilder buf = new StringBuilder();
-		IToken token = this.first;
-		while (token != null)
+		for (IToken token = this.first; token.type() != 0; token = token.next())
 		{
 			buf.append(token).append('\n');
-			token = token.next();
 		}
 		return buf.toString();
 	}

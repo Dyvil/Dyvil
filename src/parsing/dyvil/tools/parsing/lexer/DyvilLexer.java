@@ -24,7 +24,7 @@ public final class DyvilLexer
 		int len = code.length();
 		
 		StringBuilder buf = new StringBuilder(20);
-		IToken first = new InferredSemicolon(0, 0);
+		IToken first = new StartToken();
 		IToken prev = first;
 		int start = 0;
 		int lineNumber = 1;
@@ -378,6 +378,12 @@ public final class DyvilLexer
 		{
 			this.addToken(prev, buf, type | subtype, lineNumber, start);
 		}
+		
+		EndToken end = new EndToken(len, lineNumber);
+		prev.setNext(end);
+		end.setPrev(prev);
+		
+		first.next().setPrev(first);
 		
 		return new TokenIterator(first.next());
 	}

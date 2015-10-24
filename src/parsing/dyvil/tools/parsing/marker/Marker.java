@@ -120,12 +120,16 @@ public abstract class Marker implements Comparable<Marker>
 	
 	private static int prevNL(String code, int start)
 	{
+		if (code.charAt(start) == '\n')
+		{
+			start--;
+		}
 		int i = code.lastIndexOf('\n', start);
 		if (i < 0)
 		{
 			return 0;
 		}
-		return i + 1;
+		return i;
 	}
 	
 	private static int nextNL(String code, int end)
