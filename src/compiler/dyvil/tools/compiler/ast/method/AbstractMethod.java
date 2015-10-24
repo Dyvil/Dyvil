@@ -827,7 +827,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			markers.add(I18n.createMarker(position, "method.access.deprecated", this.name));
 		}
 		
-		switch (context.getThisClass().getVisibility(this))
+		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
 			markers.add(I18n.createMarker(position, "method.access.internal", this.name));

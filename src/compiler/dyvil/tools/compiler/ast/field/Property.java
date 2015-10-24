@@ -237,7 +237,7 @@ public class Property extends Member implements IProperty, IContext
 			markers.add(I18n.createMarker(position, "property.access.deprecated", this.name));
 		}
 		
-		switch (context.getThisClass().getVisibility(this))
+		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
 			markers.add(I18n.createMarker(position, "property.access.sealed", this.name));
