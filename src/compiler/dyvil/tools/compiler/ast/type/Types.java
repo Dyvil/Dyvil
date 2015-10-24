@@ -44,6 +44,7 @@ public final class Types
 	public static final ClassType	THROWABLE			= new ClassType();
 	public static final ClassType	RUNTIME_EXCEPTION	= new ClassType();
 	public static final ClassType	IMMUTABLE			= new ClassType();
+	public static final ClassType SERIALIZABLE = new ClassType();
 	
 	public static IClass	VOID_CLASS;
 	public static IClass	BOOLEAN_CLASS;
@@ -62,6 +63,7 @@ public final class Types
 	public static IClass	THROWABLE_CLASS;
 	public static IClass	RUNTIME_EXCEPTION_CLASS;
 	public static IClass	IMMUTABLE_CLASS;
+	public static IClass SERIALIZABLE_CLASS;
 	
 	public static IClass	INTRINSIC_CLASS;
 	public static IClass	OVERRIDE_CLASS;
@@ -103,6 +105,7 @@ public final class Types
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
 		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
+		SERIALIZABLE.theClass = SERIALIZABLE_CLASS = Package.javaIO.resolveClass("Serializable");
 		
 		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
 		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");

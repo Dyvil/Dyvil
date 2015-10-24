@@ -53,6 +53,17 @@ public interface IClassMetadata
 	
 	// Resolve
 	
+	/**
+	 * Called before the class body goes through RESOLVE_TYPES. Super-types and
+	 * -interfaces and generics have already been resolved.
+	 */
+	public void resolveTypes(MarkerList markers, IContext context);
+	
+	/**
+	 * Called after the class body went through RESOLVE_TYPES.
+	 */
+	public void resolveTypesBody(MarkerList markers, IContext context);
+	
 	public void resolve(MarkerList markers, IContext context);
 	
 	public void checkTypes(MarkerList markers, IContext context);

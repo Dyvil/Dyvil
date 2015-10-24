@@ -161,12 +161,14 @@ public class CodeClass extends AbstractClass
 			this.interfaces[i] = this.interfaces[i].resolveType(markers, this);
 		}
 		
+		this.metadata.resolveTypes(markers, context);
+		
 		if (this.body != null)
 		{
 			this.body.resolveTypes(markers);
 		}
 		
-		this.metadata.resolve(markers, context);
+		this.metadata.resolveTypesBody(markers, context);
 	}
 	
 	@Override
@@ -196,6 +198,8 @@ public class CodeClass extends AbstractClass
 		{
 			this.interfaces[i].resolve(markers, this);
 		}
+		
+		this.metadata.resolve(markers, context);
 		
 		if (this.body != null)
 		{

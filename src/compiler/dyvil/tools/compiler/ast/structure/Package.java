@@ -41,6 +41,7 @@ public class Package implements INamed, IDefaultContext
 	public static Package	dyvilTuple;
 	public static Package	dyvilUtil;
 	public static Package	java;
+	public static Package javaIO;
 	public static Package	javaLang;
 	public static Package	javaLangAnnotation;
 	public static Package	javaUtil;
@@ -90,6 +91,7 @@ public class Package implements INamed, IDefaultContext
 		dyvilUtil = dyvil.resolvePackage("util");
 		
 		java = rootPackage.resolvePackage("java");
+		javaIO = java.resolvePackage("io");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
 		javaUtil = java.resolvePackage("util");

@@ -36,10 +36,20 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
-		this.constructor.setModifiers(Modifiers.PRIVATE);
+		super.resolveTypes(markers, context);
+		
+		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
+		{
+			this.theClass.addInterface(Types.SERIALIZABLE);
+		}
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+		super.resolveTypesBody(markers, context);
 		
 		this.checkMethods();
 		
@@ -62,6 +72,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		Field f = new Field(this.theClass, Names.instance, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.CONST);
 		this.instanceField = f;
 		
+		this.constructor.setModifiers(Modifiers.PRIVATE);
 		ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
 		f.setValue(call);
 	}
@@ -137,5 +148,28 @@ public final class ObjectClassMetadata extends ClassMetadata
 			mw.writeInsn(Opcodes.IRETURN);
 			mw.end();
 		}
+		
+		if ((this.methods & READ_RESOLVE) == 0)
+		{
+			MethodWriterImpl mw = new MethodWriterImpl(writer,
+					writer.visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC, "readResolve", "()Ljava/lang/Object;", null, null));
+			writeResolveMethod(mw, internalName);
+		}
+		
+		if ((this.methods & WRITE_REPLACE) == 0)
+		{
+			MethodWriterImpl mw = new MethodWriterImpl(writer,
+					writer.visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC, "writeReplace", "()Ljava/lang/Object;", null, null));
+			writeResolveMethod(mw, internalName);
+		}
+	}
+	
+	private static void writeResolveMethod(MethodWriter mw, String internal) throws BytecodeException
+	{
+		mw.setThisType(internal);
+		mw.begin();
+		mw.writeFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
+		mw.writeInsn(Opcodes.ARETURN);
+		mw.end();
 	}
 }

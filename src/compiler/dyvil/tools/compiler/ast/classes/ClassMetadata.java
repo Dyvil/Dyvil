@@ -31,6 +31,11 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int	HASHCODE	= 8;
 	protected static final int	TOSTRING	= 16;
 	
+	protected static final int	WRITE_OBJECT	= 32;
+	protected static final int	WRITE_REPLACE	= 64;
+	protected static final int	READ_OBJECT		= 128;
+	protected static final int	READ_RESOLVE	= 256;
+	
 	protected final IClass theClass;
 	
 	protected IConstructor	constructor;
@@ -108,10 +113,24 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
+		if (name == Names.readResolve || name == Names.writeReplace)
+		{
+			if (m.parameterCount() == 0 && m.getType().getTheClass() == Types.OBJECT_CLASS)
+			{
+				this.methods |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
+				return;
+			}
+			return;
+		}
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
 	{
 		IClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
@@ -146,7 +165,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		if ((this.methods & CONSTRUCTOR) != 0)
 		{
@@ -167,6 +186,11 @@ public class ClassMetadata implements IClassMetadata
 		}
 		
 		markers.add(I18n.createMarker(this.theClass.getPosition(), "constructor.super", superType.toString()));
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
 	}
 	
 	@Override

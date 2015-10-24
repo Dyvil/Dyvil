@@ -9,6 +9,16 @@ import dyvil.tools.parsing.marker.MarkerList;
 public final class InterfaceMetadata implements IClassMetadata
 {
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}

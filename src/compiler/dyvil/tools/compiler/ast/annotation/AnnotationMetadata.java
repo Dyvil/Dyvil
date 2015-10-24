@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
+import java.util.EnumSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -53,12 +53,13 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.theClass == null)
+		if (!this.theClass.isSubTypeOf(Annotation.Types.ANNOTATION))
 		{
-			return;
+			this.theClass.addInterface(Annotation.Types.ANNOTATION);
 		}
+		
 		if (this.retention == null)
 		{
 			IAnnotation retention = this.theClass.getAnnotation(Annotation.Types.RETENTION_CLASS);
@@ -86,7 +87,7 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 		
-		this.targets = new TreeSet();
+		this.targets = EnumSet.noneOf(ElementType.class);
 		IValueList values = (IValueList) target.getArguments().getValue(0, Annotation.VALUE);
 		if (values == null)
 		{
@@ -112,12 +113,18 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 	
 	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (!this.theClass.isSubTypeOf(Annotation.Types.ANNOTATION))
-		{
-			this.theClass.addInterface(Annotation.Types.ANNOTATION);
-		}
 	}
 	
 	@Override

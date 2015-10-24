@@ -16,6 +16,9 @@ public final class Names
 	public static final Name	hashCode		= new Name("hashCode");
 	public static final Name	toString		= new Name("toString");
 	
+	public static final Name	writeReplace	= new Name("writeReplace");
+	public static final Name	readResolve		= new Name("readResolve");
+	
 	public static final Name	Function	= new Name("Function");
 	public static final Name	Tuple		= new Name("Tuple");
 	

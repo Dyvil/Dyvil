@@ -81,7 +81,8 @@ public final class ExternalClass extends AbstractClass
 	private void resolveMetadata()
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers);
-		this.metadata.resolve(null, this);
+		this.metadata.resolveTypes(null, this);
+		this.metadata.resolveTypesBody(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -122,11 +123,6 @@ public final class ExternalClass extends AbstractClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			this.interfaces[i] = this.interfaces[i].resolveType(null, this);
-		}
-		
-		if (!this.metadataResolved)
-		{
-			this.resolveMetadata();
 		}
 	}
 	
@@ -640,15 +636,7 @@ public final class ExternalClass extends AbstractClass
 			field.setValue(IValue.fromObject(value));
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("instance"))
-		{
-			// This is the instance field of a singleton object class
-			this.getMetadata().setInstanceField(field);
-		}
-		else
-		{
-			this.body.addField(field);
-		}
+		this.body.addField(field);
 		
 		return new SimpleFieldVisitor(field);
 	}

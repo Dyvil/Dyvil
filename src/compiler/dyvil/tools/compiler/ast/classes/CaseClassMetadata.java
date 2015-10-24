@@ -30,9 +30,20 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		super.resolveTypes(markers, context);
+		
+		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
+		{
+			this.theClass.addInterface(Types.SERIALIZABLE);
+		}
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+		super.resolveTypesBody(markers, context);
 		
 		this.checkMethods();
 		

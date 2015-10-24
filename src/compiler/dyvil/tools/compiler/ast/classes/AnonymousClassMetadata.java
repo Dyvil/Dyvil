@@ -29,9 +29,18 @@ public class AnonymousClassMetadata implements IClassMetadata
 	}
 	
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-	
 	}
 	
 	@Override
