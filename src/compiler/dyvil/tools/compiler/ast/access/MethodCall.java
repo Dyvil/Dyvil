@@ -230,36 +230,39 @@ public final class MethodCall extends AbstractCall implements INamed
 	@Override
 	public IValue foldConstants()
 	{
-		this.arguments.foldConstants();
-		if (this.arguments.size() == 1)
+		if (!this.arguments.isEmpty())
 		{
-			IValue argument = this.arguments.getFirstValue();
-			if (argument.isConstant())
-			{
-				if (this.instance != null)
-				{
-					if (this.instance.isConstant())
-					{
-						IValue v1 = ConstantFolder.apply(this.instance, this.name, argument);
-						return v1 == null ? this : v1;
-					}
-					
-					this.instance = this.instance.foldConstants();
-					return this;
-				}
-				
-				IValue v1 = ConstantFolder.apply(this.name, argument);
-				if (v1 != null)
-				{
-					return v1;
-				}
-			}
-			
 			if (this.instance != null)
 			{
-				this.instance = this.instance.foldConstants();
+				if (this.instance.isConstant())
+				{
+					IValue argument;
+					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+					{
+						IValue folded = ConstantFolder.apply(this.instance, this.name, argument);
+						if (folded != null)
+						{
+							return folded;
+						}
+					}
+				}
+				else
+				{
+					this.instance = this.instance.foldConstants();
+				}
 			}
+			this.arguments.foldConstants();
 			return this;
+		}
+		
+		// Prefix methods are transformed to postfix notation
+		if (this.instance.isConstant())
+		{
+			IValue folded = ConstantFolder.apply(this.name, this.instance);
+			if (folded != null)
+			{
+				return folded;
+			}
 		}
 		
 		if (this.instance != null)
