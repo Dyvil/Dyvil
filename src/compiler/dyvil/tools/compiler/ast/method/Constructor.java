@@ -695,7 +695,7 @@ public class Constructor extends Member implements IConstructor
 			markers.add(I18n.createMarker(position, "constructor.access.deprecated", this.theClass.getName()));
 		}
 		
-		switch (context.getThisClass().getVisibility(this))
+		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
 			markers.add(I18n.createMarker(position, "constructor.access.internal", this.theClass.getName()));

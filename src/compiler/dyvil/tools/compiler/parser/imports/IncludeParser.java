@@ -8,6 +8,7 @@ import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class IncludeParser extends Parser
@@ -57,7 +58,7 @@ public class IncludeParser extends Parser
 			pm.report(token, "Invalid Include Declaration - Identifier expected");
 			return;
 		case DOT:
-			if (type == BaseSymbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
 			{
 				this.header.addInclude(this.includeDeclaration);
 				pm.popParser();
