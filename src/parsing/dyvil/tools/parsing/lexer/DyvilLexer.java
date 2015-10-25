@@ -356,6 +356,17 @@ public final class DyvilLexer
 					buf.append(c);
 				}
 				break;
+			case LITERAL_STRING:
+				if (c == '"' && buf.length() > 0)
+				{
+					addToken = true;
+					reparse = false;
+				}
+				else if (c != '@' || buf.length() > 0)
+				{
+					buf.append(c);
+				}
+				break;
 			}
 			
 			if (addToken)
@@ -454,6 +465,12 @@ public final class DyvilLexer
 		case '_':
 		case '$':
 			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
+		case '@':
+			if (code.charAt(i + 1) == '"')
+			{
+				return LITERAL_STRING;
+			}
+			return IDENTIFIER | MOD_SYMBOL;
 		}
 		if (LexerUtil.isDigit(c))
 		{
@@ -574,6 +591,8 @@ public final class DyvilLexer
 			return new StringToken(prev, STRING_END, s, line, start, start + len);
 		case SINGLE_QUOTED_STRING:
 			return new StringToken(prev, SINGLE_QUOTED_STRING, s.substring(1), line, start, start + len);
+		case LITERAL_STRING:
+			return new StringToken(prev, STRING, s.substring(1), line, start, start + len);
 		}
 		return null;
 	}
