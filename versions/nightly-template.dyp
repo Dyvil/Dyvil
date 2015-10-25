@@ -1,0 +1,7 @@
+jarDownloadPrefix = "https://drone.io/github.com/Clashsoft/Dyvil/files/build/libs"
+
+version = "$$version$$"
+library.version = "$$libraryVersion$$"
+compiler.version = "$$compilerVersion$$"
+repl.version = "$$replVersion$$"
+dpf.version = "$$dpfVersion$$"

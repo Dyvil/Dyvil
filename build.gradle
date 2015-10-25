@@ -20,17 +20,23 @@ List<String> javaFilters = [ '**/*.java' ]
 
 String replMainClass = 'dyvil.tools.repl.DyvilREPL'
 
-// ---------------------------------------- Snapshot Versioning ----------------------------------------
+boolean nightly = false
+
+// ---------------------------------------- Nightly Versioning ----------------------------------------
 
 Map<String, String> ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
-	String snapshot = "+snapshot." + ENV.DRONE_BUILD_NUMBER
+	String snapshot = "+nightly." + ENV.DRONE_BUILD_NUMBER
     
     version += snapshot
     libraryVersion += snapshot
     compilerVersion += snapshot
     replVersion += snapshot
     dpfVersion += snapshot
+    
+    nightly = true
+    
+    build.dependsOn prepareRelease
 }
 
 // ---------------------------------------- Source Settings ----------------------------------------
@@ -230,10 +236,20 @@ task build(dependsOn: [ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL'
 
 task prepareRelease(type: Copy) {
 	from 'versions/'
-	into 'versions/pre'
 	
-	include 'template.dyp'
-	rename 'template\\.dyp', "v${version}.dyp"
+	if (nightly)
+	{
+		into 'versions'
+		include 'nightly-template.dyp'
+		rename 'nightly\\-template\\.dyp', 'nightly.dyp'
+	}
+	else
+	{
+		into 'versions/pre'
+		include 'template.dyp'
+		rename 'template\\.dyp', "v${version}.dyp"
+	}
+	
 	
 	filter {
 		it.replace('$$version$$',			version)

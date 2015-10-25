@@ -1,10 +1,12 @@
 // Dyvil Distribution Files Information
 
+jarDownloadPrefix = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)"
+
 library
 {
 	info = "Dyvil Library v\(library.version)"
 	fileName = "./libs/dyvil-library-\(library.version).jar"
-	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-library-\(library.version).jar"
+	download = "\(jarDownloadPrefix)/dyvil-library-\(library.version).jar"
 	
 	selected = forced
 }
@@ -13,7 +15,7 @@ dpf
 {
 	info = "Dyvil Property Format Library v\(dpf.version)"
 	fileName = "./libs/dyvil-property-format-\(dpf.version).jar"
-	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-property-format-\(dpf.version).jar"
+	download = "\(jarDownloadPrefix)/dyvil-property-format-\(dpf.version).jar"
 	
 	parent = library
 	selected = false
@@ -24,7 +26,7 @@ compiler
 {
 	info = "Dyvil Compiler v\(compiler.version)"
 	fileName = "./libs/dyvil-compiler-\(compiler.version).jar"
-	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-compiler-\(compiler.version).jar"
+	download = "\(jarDownloadPrefix)/dyvil-compiler-\(compiler.version).jar"
 	
 	selected = true
 	dependencies = [ library ]
@@ -62,7 +64,7 @@ repl
 {
 	info = "Dyvil REPL v\(repl.version)"
 	fileName = "./libs/dyvil-repl-\(repl.version).jar"
-	download = "https://github.com/Dyvil/Dyvil/releases/download/v\(version)/dyvil-repl-\(repl.version).jar"
+	download = "\(jarDownloadPrefix)/dyvil-repl-\(repl.version).jar"
 	
 	selected = true
 	dependencies = [ compiler ]
