@@ -195,7 +195,7 @@ public class Parser
 	
 	private void parseMap(MapVisitor visitor)
 	{
-		if (this.tokens.lastReturned().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+		if (this.tokens.lastReturned().next().type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
 		{
 			this.tokens.next();
 			visitor.visitEnd();
@@ -214,17 +214,17 @@ public class Parser
 			
 			this.parseValue(visitor.visitValue());
 			
-			token = this.tokens.next();
+			token = this.tokens.lastReturned().next();
 			switch (token.type())
 			{
 			case BaseSymbols.COMMA:
+				this.tokens.next();
 				continue;
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				this.tokens.next();
 				visitor.visitEnd();
 				return;
 			}
-			
-			this.markers.add(new SyntaxError(token, "Invalid Map - ',' expected"));
 		}
 	}
 	
