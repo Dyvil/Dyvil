@@ -35,8 +35,6 @@ if (ENV.DRONE_BUILD_NUMBER) {
     dpfVersion += snapshot
     
     nightly = true
-    
-    build.dependsOn prepareRelease
 }
 
 // ---------------------------------------- Source Settings ----------------------------------------
@@ -258,6 +256,11 @@ task prepareRelease(type: Copy) {
 		  .replace('$$replVersion$$',		replVersion)
 		  .replace('$$dpfVersion$$',		dpfVersion)
 	}
+}
+
+if (nightly)
+{
+	build.dependsOn prepareRelease
 }
 
 // ---------------------------------------- Misc. Tasks ----------------------------------------
