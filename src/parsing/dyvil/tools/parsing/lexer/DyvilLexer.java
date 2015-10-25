@@ -179,11 +179,6 @@ public final class DyvilLexer
 			case LONG:
 				switch (c)
 				{
-				case '.':
-				case 'e':
-					type = FLOAT;
-					buf.append(c);
-					continue;
 				case 'l':
 				case 'L':
 					type = LONG;
@@ -198,6 +193,17 @@ public final class DyvilLexer
 					if (LexerUtil.isDigit(c))
 					{
 						buf.append(c);
+					}
+					else if (c == '.')
+					{
+						if (!LexerUtil.isDigit(code.charAt(i + 1)))
+						{
+							addToken = true;
+							reparse = true;
+							break typeswitch;
+						}
+						type = DOUBLE;
+						buf.append('.');
 					}
 					else if (c == 'e' || c == 'E')
 					{
@@ -264,6 +270,7 @@ public final class DyvilLexer
 				}
 				else if (c == 'f' || c == 'F')
 				{
+					type = FLOAT;
 					addToken = true;
 					reparse = false;
 				}
@@ -276,6 +283,10 @@ public final class DyvilLexer
 				else if (LexerUtil.isDigit(c) || c == 'e')
 				{
 					buf.append(c);
+				}
+				else if (c == '-' && code.charAt(i - 1) == 'e')
+				{
+					buf.append('-');
 				}
 				else
 				{
