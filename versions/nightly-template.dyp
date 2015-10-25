@@ -1,4 +1,4 @@
-jarDownloadPrefix = "https://drone.io/github.com/Clashsoft/Dyvil/files/build/libs"
+jarDownloadPrefix = "https://drone.io/github.com/Dyvil/Dyvil/files/build/libs"
 
 version = "$$version$$"
 library.version = "$$libraryVersion$$"

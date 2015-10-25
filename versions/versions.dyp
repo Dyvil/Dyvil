@@ -1,10 +1,10 @@
 // Dyvil Release Information
 
-baseLink = "https://raw.githubusercontent.com/Dyvil/Dyvil/master/versions"
-distributionInfoFile = "\(baseLink)/distributions.dyp"
+baseLink					= "https://raw.githubusercontent.com/Dyvil/Dyvil/master/versions"
+distributionInfoFile		= "\(baseLink)/distributions.dyp"
 
 versionFiles = {
-	"Latest Nightly Build"	: "https://drone.io/github.com/Clashsoft/Dyvil/files/versions/nightly.dyp"
+	"Latest Nightly Build"	: "https://drone.io/github.com/Dyvil/Dyvil/files/versions/nightly.dyp"
 	"v0.1.0"				: "\(baseLink)/pre/v0.1.0.dyp",
 	"v0.2.0"				: "\(baseLink)/pre/v0.2.0.dyp",
 	"v0.3.0"				: "\(baseLink)/pre/v0.3.0.dyp",
