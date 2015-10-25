@@ -18,7 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	protected String className;
+	protected String	className;
+	private Class		theClass;
 	
 	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
 	{
@@ -54,6 +55,27 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
 	}
 	
+	protected void updateValue()
+	{
+		if (this.type == Types.VOID)
+		{
+			ReflectUtils.unsafe.ensureClassInitialized(this.theClass);
+			return;
+		}
+		
+		java.lang.reflect.Field[] fields = this.theClass.getDeclaredFields();
+		
+		try
+		{
+			Object result = fields[0].get(null);
+			this.value = new REPLResult(result);
+		}
+		catch (IllegalAccessException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
 	protected void compute()
 	{
 		List<IClassCompilable> compilableList = REPLContext.compilableList;
@@ -65,18 +87,8 @@ public class REPLVariable extends Field
 		
 		try
 		{
-			Class c = this.generateClass(this.className, compilableList);
-			
-			if (this.type != Types.VOID)
-			{
-				java.lang.reflect.Field[] fields = c.getDeclaredFields();
-				Object result = fields[0].get(null);
-				this.value = new REPLResult(result);
-			}
-			else
-			{
-				ReflectUtils.unsafe.ensureClassInitialized(c);
-			}
+			this.theClass = this.generateClass(this.className, compilableList);
+			this.updateValue();
 		}
 		catch (ExceptionInInitializerError t)
 		{

@@ -205,6 +205,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void setValue(IValue value)
 	{
+		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
+		memberClass = getREPLClass(field);
+		
 		value.resolveTypes(markers, this);
 		value = value.resolve(markers, this);
 		
@@ -213,6 +216,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			IDataMember f = ((FieldAccess) value).getField();
 			if (f instanceof REPLVariable)
 			{
+				((REPLVariable) f).updateValue();
 				System.out.println(f);
 				return;
 			}
@@ -235,9 +239,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			this.cleanup();
 			return;
 		}
-		
-		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
-		memberClass = getREPLClass(field);
 		
 		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
 		{
