@@ -143,6 +143,13 @@ public final class MethodCall extends AbstractCall implements INamed
 		
 		if (args == 1 && this.instance != null)
 		{
+			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());
+			if (op != null)
+			{
+				op.setPosition(this.position);
+				return op;
+			}
+			
 			String qualified = this.name.qualified;
 			if (qualified.endsWith("$eq"))
 			{
@@ -150,13 +157,6 @@ public final class MethodCall extends AbstractCall implements INamed
 				
 				CompoundCall cc = new CompoundCall(this.position, this.instance, name, this.arguments);
 				return cc.resolveCall(markers, context);
-			}
-			
-			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());
-			if (op != null)
-			{
-				op.setPosition(this.position);
-				return op;
 			}
 		}
 		

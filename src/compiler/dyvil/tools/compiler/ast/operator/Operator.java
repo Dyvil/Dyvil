@@ -25,13 +25,13 @@ public final class Operator
 		this.name = name;
 	}
 	
-	Operator(Name name, int type)
+	public Operator(Name name, int type)
 	{
 		this.name = name;
 		this.type = type;
 	}
 	
-	Operator(Name name, int precedence, int type)
+	public Operator(Name name, int precedence, int type)
 	{
 		this.name = name;
 		this.type = type;
