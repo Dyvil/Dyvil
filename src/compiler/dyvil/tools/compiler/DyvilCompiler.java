@@ -24,8 +24,8 @@ import dyvil.tools.parsing.CodeFile;
 
 public final class DyvilCompiler
 {
-	public static final String	VERSION			= "$$version$$";
-	public static final String	DYVIL_VERSION	= "$$compilerVersion$$";
+	public static final String	VERSION			= "$$compilerVersion$$";
+	public static final String	DYVIL_VERSION	= "$$version$$";
 	public static final String	LIBRARY_VERSION	= "$$libraryVersion$$";
 	
 	public static boolean	debug;

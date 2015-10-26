@@ -46,6 +46,7 @@ public class DyvilREPL
 		commands.put("exit", command);
 		commands.put("shutdown", command);
 		commands.put("dump", new DumpCommand());
+		commands.put("debug", new DebugCommand());
 	}
 	
 	public static void main(String[] args) throws Exception
