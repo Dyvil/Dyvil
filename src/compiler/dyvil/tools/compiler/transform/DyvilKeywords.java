@@ -62,7 +62,8 @@ public class DyvilKeywords
 	public static final int	TYPE			= Tokens.KEYWORD | 0x00380000;
 	public static final int	USING			= Tokens.KEYWORD | 0x00390000;
 	public static final int	VAR				= Tokens.KEYWORD | 0x003A0000;
-	public static final int	WHILE			= Tokens.KEYWORD | 0x003B0000;
+	public static final int WHERE			= Tokens.KEYWORD | 0x003B0000;
+	public static final int	WHILE			= Tokens.KEYWORD | 0x003C0000;
 	
 	public static int getKeywordType(String s)
 	{
@@ -184,6 +185,8 @@ public class DyvilKeywords
 			return USING;
 		case "var":
 			return VAR;
+		case "where":
+			return WHERE;
 		case "while":
 			return WHILE;
 		}
@@ -310,9 +313,11 @@ public class DyvilKeywords
 			return "using";
 		case VAR:
 			return "var";
+		case WHERE:
+			return "where";
 		case WHILE:
 			return "while";
 		}
-		return "";
+		return null;
 	}
 }

@@ -15,6 +15,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -93,7 +94,7 @@ public class IfStatement extends Value
 	{
 		if (this.then == null)
 		{
-			return null;
+			return this;
 		}
 		
 		this.commonType = type;
@@ -385,6 +386,12 @@ public class IfStatement extends Value
 			this.then.writeStatement(writer);
 			writer.writeTargetLabel(elseStart);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

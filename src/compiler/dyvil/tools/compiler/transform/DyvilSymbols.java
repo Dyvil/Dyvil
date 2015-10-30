@@ -59,7 +59,8 @@ public final class DyvilSymbols implements Symbols
 		case DyvilSymbols.ELLIPSIS:
 			return "...";
 		}
-		return BaseSymbols.INSTANCE.toString(type);
+		String s = BaseSymbols.INSTANCE.toString(type);
+		return s != null ? s : DyvilKeywords.keywordToString(type);
 	}
 	
 	@Override
