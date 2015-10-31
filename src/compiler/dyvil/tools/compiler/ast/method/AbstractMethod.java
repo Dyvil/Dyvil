@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.method;
 import java.lang.annotation.ElementType;
 
 import dyvil.annotation.mutating;
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -483,19 +482,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		float selfMatch = this.getSignatureMatch(name, instance, arguments);
 		if (selfMatch > 0)
 		{
-			list.add(new MethodMatch(this, selfMatch));
+			list.add(this, selfMatch);
 		}
 		
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}

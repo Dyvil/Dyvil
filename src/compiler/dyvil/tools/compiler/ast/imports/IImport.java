@@ -4,12 +4,11 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.parsing.Name;
@@ -68,7 +67,7 @@ public interface IImport extends IASTNode
 	
 	public IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	// Compilation
 	

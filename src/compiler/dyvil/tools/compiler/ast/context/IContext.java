@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -9,10 +7,10 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -44,9 +42,9 @@ public interface IContext
 	
 	public IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	public boolean handleException(IType type);
 	
@@ -99,67 +97,16 @@ public interface IContext
 	
 	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{
-		List<ConstructorMatch> matches = new ArrayList();
+		ConstructorMatchList matches = new ConstructorMatchList();
 		context.getConstructorMatches(matches, arguments);
-		return getBestConstructor(matches);
+		return matches.getBestConstructor();
 	}
 	
 	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		List<MethodMatch> matches = new ArrayList();
+		MethodMatchList matches = new MethodMatchList();
 		context.getMethodMatches(matches, instance, name, arguments);
-		return getBestMethod(matches);
-	}
-	
-	public static IMethod getBestMethod(List<MethodMatch> matches)
-	{
-		int size = matches.size();
-		switch (size)
-		{
-		case 0:
-			return null;
-		case 1:
-			return matches.get(0).method;
-		default:
-			MethodMatch bestMethod = matches.get(0);
-			float bestMatch = bestMethod.match;
-			for (int i = 1; i < size; i++)
-			{
-				MethodMatch m = matches.get(i);
-				if (m.match < bestMatch)
-				{
-					bestMethod = m;
-					bestMatch = m.match;
-				}
-			}
-			
-			return bestMethod.method;
-		}
-	}
-	
-	public static IConstructor getBestConstructor(List<ConstructorMatch> matches)
-	{
-		int size = matches.size();
-		switch (size)
-		{
-		case 0:
-			return null;
-		case 1:
-			return matches.get(0).constructor;
-		default:
-			ConstructorMatch bestConstructor = matches.get(0);
-			float bestMatch = bestConstructor.match;
-			for (int i = 1; i < size; i++)
-			{
-				ConstructorMatch m = matches.get(i);
-				if (m.match < bestMatch)
-				{
-					bestConstructor = m;
-					bestMatch = m.match;
-				}
-			}
-			return bestConstructor.constructor;
-		}
+		return matches.getBestMethod();
 	}
 	
 	public static byte getVisibility(IContext context, IClassMember member)

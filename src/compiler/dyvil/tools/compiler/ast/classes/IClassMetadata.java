@@ -4,13 +4,12 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-import dyvil.collection.List;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -73,11 +72,11 @@ public interface IClassMetadata
 		return null;
 	}
 	
-	public default void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
-	public default void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

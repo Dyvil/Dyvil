@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.Types;
@@ -65,14 +64,14 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (name == Names.apply && this.applyMethod != null)
 		{
 			float match = this.applyMethod.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(this.applyMethod, match));
+				list.add(this.applyMethod, match);
 			}
 		}
 	}

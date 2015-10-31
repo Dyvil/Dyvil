@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.Constructor;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -194,7 +193,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		if ((this.methods & CONSTRUCTOR) != 0)
 		{
@@ -204,7 +203,7 @@ public class ClassMetadata implements IClassMetadata
 		float match = this.constructor.getSignatureMatch(arguments);
 		if (match > 0)
 		{
-			list.add(new ConstructorMatch(this.constructor, match));
+			list.add(this.constructor, match);
 		}
 	}
 	

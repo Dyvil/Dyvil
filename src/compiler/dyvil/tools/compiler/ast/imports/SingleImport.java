@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
@@ -165,7 +165,7 @@ public final class SingleImport extends Import
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (name != this.name && name != this.alias)
 		{
@@ -176,12 +176,12 @@ public final class SingleImport extends Import
 		{
 			return;
 		}
-		for (IMethod m : this.methods)
+		for (IMethod method : this.methods)
 		{
-			float match = m.getSignatureMatch(name, instance, arguments);
+			float match = method.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(m, match));
+				list.add(method, match);
 			}
 		}
 	}

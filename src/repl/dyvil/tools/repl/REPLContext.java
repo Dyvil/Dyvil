@@ -533,14 +533,14 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		for (IMethod m : methods)
+		for (IMethod method : this.methods)
 		{
-			float match = m.getSignatureMatch(name, instance, arguments);
+			float match = method.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(m, match));
+				list.add(method, match);
 			}
 		}
 		

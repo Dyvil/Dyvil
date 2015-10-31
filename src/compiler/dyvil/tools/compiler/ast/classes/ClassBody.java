@@ -1,16 +1,15 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
@@ -253,15 +252,15 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			IConstructor c = this.constructors[i];
-			float m = c.getSignatureMatch(arguments);
-			if (m > 0)
+			IConstructor ctor = this.constructors[i];
+			float match = ctor.getSignatureMatch(arguments);
+			if (match > 0)
 			{
-				list.add(new ConstructorMatch(c, m));
+				list.add(ctor, match);
 			}
 		}
 	}
@@ -339,15 +338,15 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod m = this.methods[i];
-			float match = m.getSignatureMatch(name, instance, arguments);
+			IMethod method = this.methods[i];
+			float match = method.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(m, match));
+				list.add(method, match);
 			}
 		}
 	}

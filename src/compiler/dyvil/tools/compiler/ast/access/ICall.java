@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -87,7 +85,7 @@ public interface ICall extends IValue
 	
 	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		List<MethodMatch> matches = new ArrayList();
+		MethodMatchList matches = new MethodMatchList();
 		if (instance != null)
 		{
 			IType type = instance.getType();
@@ -97,7 +95,7 @@ public interface ICall extends IValue
 				
 				if (!matches.isEmpty())
 				{
-					return IContext.getBestMethod(matches);
+					return matches.getBestMethod();
 				}
 			}
 		}
@@ -105,7 +103,7 @@ public interface ICall extends IValue
 		context.getMethodMatches(matches, instance, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return IContext.getBestMethod(matches);
+			return matches.getBestMethod();
 		}
 		
 		// Prefix Methods
@@ -119,7 +117,7 @@ public interface ICall extends IValue
 				
 				if (!matches.isEmpty())
 				{
-					return IContext.getBestMethod(matches);
+					return matches.getBestMethod();
 				}
 			}
 		}
@@ -127,7 +125,7 @@ public interface ICall extends IValue
 		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return IContext.getBestMethod(matches);
+			return matches.getBestMethod();
 		}
 		
 		return null;
