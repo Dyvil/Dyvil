@@ -449,14 +449,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		methods.add(method);
 		method.resolve(markers, this);
 		method.checkTypes(markers, this);
 		method.check(markers, this);
 		
 		if (reportErrors(markers))
 		{
-			methods.remove(method);
 			this.cleanup();
 			return;
 		}
@@ -469,11 +467,39 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		REPLContext.compileClass(iclass);
 		
-		StringBuilder buf = new StringBuilder("Defined Method '");
-		Util.methodSignatureToString(method, buf);
-		System.out.println(buf.append('\'').toString());
+		this.registerMethod(method, iclass);
 		
 		this.cleanup();
+	}
+
+	private void registerMethod(IMethod method, REPLMemberClass iclass)
+	{
+		boolean replaced = false;
+		int methods = REPLContext.methods.size();
+		for (int i = 0; i < methods; i++)
+		{
+			if (REPLContext.methods.get(i).checkOverride(markers, iclass, method, null))
+			{
+				REPLContext.methods.set(i, method);
+				replaced = true;
+				break;
+			}
+		}
+		
+		StringBuilder buf = new StringBuilder();
+		if (!replaced)
+		{
+			REPLContext.methods.add(method);
+			buf.append("Defined method ");
+		}
+		else
+		{
+			buf.append("Re-defined method ");
+		}
+		
+		buf.append('\'');
+		Util.methodSignatureToString(method, buf);
+		System.out.println(buf.append('\'').toString());
 	}
 	
 	@Override

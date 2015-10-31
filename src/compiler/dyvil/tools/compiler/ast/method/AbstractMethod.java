@@ -485,6 +485,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
 	{
+		float selfMatch = this.getSignatureMatch(name, instance, arguments);
+		if (selfMatch > 0)
+		{
+			list.add(new MethodMatch(this, selfMatch));
+		}
+		
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
