@@ -215,10 +215,8 @@ public class DyvilREPL
 			
 			instance.evaluate(currentCode);
 			
-			if (!instance.context.markers.isEmpty())
-			{
-				REPLContext.reportErrors(instance.context.markers, currentCode);
-			}
+			// Wait to make sure the output isn't messed up in IDE consoles.
+			Thread.sleep(4L);
 		}
 		catch (Throwable t)
 		{
@@ -228,21 +226,21 @@ public class DyvilREPL
 	
 	public void evaluate(String code)
 	{
-		context.reset();
+		this.context.startEvaluation(code);
 		
-		TokenIterator tokens = new DyvilLexer(context.markers, DyvilSymbols.INSTANCE).tokenize(code);
+		TokenIterator tokens = new DyvilLexer(this.context.markers, DyvilSymbols.INSTANCE).tokenize(code);
 		SemicolonInference.inferSemicolons(tokens.first());
 		
-		if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))
+		if (this.parser.parse(null, tokens, new DyvilUnitParser(this.context, false)))
 		{
 			return;
 		}
-		if (parser.parse(null, tokens, new ClassBodyParser(context)))
+		if (this.parser.parse(null, tokens, new ClassBodyParser(this.context)))
 		{
 			return;
 		}
 		
-		parser.parse(context.markers, tokens, new ExpressionParser(context));
+		this.parser.parse(this.context.markers, tokens, new ExpressionParser(this.context));
 	}
 	
 	private static void runCommand(String line)
