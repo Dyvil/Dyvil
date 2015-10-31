@@ -127,6 +127,30 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
+	public default Iterable<K> keys()
+	{
+		return new Iterable<K>()
+		{
+			@Override
+			public Iterator<K> iterator()
+			{
+				return Map.this.keyIterator();
+			}
+			
+			@Override
+			public void forEach(Consumer<? super K> action)
+			{
+				Map.this.forEachKey(action);
+			}
+			
+			@Override
+			public Spliterator<K> spliterator()
+			{
+				return Map.this.keySpliterator();
+			}
+		};
+	}
+	
 	public Iterator<K> keyIterator();
 	
 	public default Spliterator<K> keySpliterator()
@@ -142,6 +166,30 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	public default Stream<K> parallelKeyStream()
 	{
 		return StreamSupport.stream(this.keySpliterator(), true);
+	}
+	
+	public default Iterable<V> values()
+	{
+		return new Iterable<V>()
+		{
+			@Override
+			public Iterator<V> iterator()
+			{
+				return Map.this.valueIterator();
+			}
+			
+			@Override
+			public void forEach(Consumer<? super V> action)
+			{
+				Map.this.forEachValue(action);
+			}
+			
+			@Override
+			public Spliterator<V> spliterator()
+			{
+				return Map.this.valueSpliterator();
+			}
+		};
 	}
 	
 	public Iterator<V> valueIterator();
