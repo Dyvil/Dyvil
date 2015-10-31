@@ -21,25 +21,26 @@ public class DumpCommand implements ICommand
 	}
 	
 	@Override
-	public void execute(String... args)
+	public void execute(DyvilREPL repl, String... args)
 	{
 		if (args.length == 0)
 		{
 			System.out.println("Result Class Dumping disabled.");
-			DyvilREPL.dumpDir = null;
+			repl.setDumpDir(null);
 			return;
 		}
 		
-		DyvilREPL.dumpDir = new File(args[0]);
+		File dumpDir = new File(args[0]);
+		repl.setDumpDir(dumpDir);
 		
 		try
 		{
-			String canonical = DyvilREPL.dumpDir.getCanonicalPath();
+			String canonical = dumpDir.getCanonicalPath();
 			System.out.println("Dumping Result Classes to '" + canonical + "'");
 		}
 		catch (IOException ex)
 		{
-			String absolute = DyvilREPL.dumpDir.getAbsolutePath();
+			String absolute = dumpDir.getAbsolutePath();
 			System.err.println("Invalid Dumping Path: " + absolute);
 		}
 	}

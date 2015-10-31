@@ -1,6 +1,7 @@
 package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.repl.DyvilREPL;
 
 public class DebugCommand implements ICommand
 {
@@ -13,11 +14,11 @@ public class DebugCommand implements ICommand
 	@Override
 	public String getDescription()
 	{
-		return "enables or disables debug mode";
+		return "Enables or disables Debug Mode";
 	}
 	
 	@Override
-	public void execute(String... args)
+	public void execute(DyvilREPL repl, String... args)
 	{
 		DyvilCompiler.debug = !DyvilCompiler.debug;
 		System.out.println("Setting debug mode to " + (DyvilCompiler.debug ? "ON" : "OFF"));

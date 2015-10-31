@@ -18,12 +18,14 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
+	private REPLContext context;
 	protected String	className;
 	private Class		theClass;
 	
-	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
+	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
 	{
 		super(null, name, type);
+		this.context = context;
 		this.className = className;
 		this.modifiers = modifiers;
 		this.position = position;
@@ -76,10 +78,8 @@ public class REPLVariable extends Field
 		}
 	}
 	
-	protected void compute()
+	protected void compute(List<IClassCompilable> compilableList)
 	{
-		List<IClassCompilable> compilableList = REPLContext.compilableList;
-		
 		if (this.isConstant() && !compilableList.isEmpty())
 		{
 			return;
@@ -163,11 +163,11 @@ public class REPLVariable extends Field
 		if (this.type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
-			return REPLMemberClass.loadClass(className, bytes);
+			return REPLMemberClass.loadClass(this.context.repl, className, bytes);
 		}
 		// We don't have any variables, so we can throw the Class away after
 		// it has been loaded.
-		return REPLMemberClass.loadAnonymousClass(className, bytes);
+		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
 	}
 	
 	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw) throws BytecodeException

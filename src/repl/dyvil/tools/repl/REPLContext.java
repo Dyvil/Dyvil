@@ -42,38 +42,39 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 {
 	private static final String REPL$CLASSES = "repl$classes/";
 	
-	private static int			classIndex;
-	private static String		className;
-	protected static MarkerList	markers	= new MarkerList();
+	protected DyvilREPL		repl;
+	private int				classIndex;
+	private String			className;
+	protected MarkerList	markers	= new MarkerList();
 	
-	private static Map<Name, IField>	fields	= new IdentityHashMap();
-	private static List<IMethod>		methods	= new ArrayList();
-	private static Map<Name, IClass>	classes	= new IdentityHashMap();
+	public Map<Name, IField>	fields	= new IdentityHashMap();
+	public List<IMethod>		methods	= new ArrayList();
+	public Map<Name, IClass>	classes	= new IdentityHashMap();
 	
-	protected static List<IClassCompilable>	compilableList	= new ArrayList();
-	protected static List<IClassCompilable>	innerClassList	= new ArrayList();
+	protected List<IClassCompilable>	compilableList	= new ArrayList();
+	protected List<IClassCompilable>	innerClassList	= new ArrayList();
 	
-	private static IClass memberClass;
+	private IClass memberClass;
 	
-	private static Map<String, AtomicInteger> resultIndexes = new HashMap();
+	private Map<String, AtomicInteger> resultIndexes = new HashMap();
 	
-	public REPLContext()
+	public REPLContext(DyvilREPL repl)
 	{
 		super(Name.getQualified("REPL"));
+		this.repl = repl;
 	}
 	
-	protected static void reset()
+	protected void reset()
 	{
 		className = REPL$CLASSES + "REPL$Result$" + classIndex++;
 		markers.clear();
 	}
 	
-	protected static boolean reportErrors(MarkerList markers)
+	protected static boolean reportErrors(MarkerList markers, String code)
 	{
 		if (!markers.isEmpty())
 		{
 			StringBuilder buf = new StringBuilder();
-			String code = DyvilREPL.currentCode;
 			markers.sort();
 			for (Marker m : markers)
 			{
@@ -90,7 +91,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		return false;
 	}
 	
-	private static void compileInnerClasses()
+	private void compileInnerClasses()
 	{
 		for (IClassCompilable icc : innerClassList)
 		{
@@ -98,7 +99,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			{
 				String fileName = icc.getFileName();
 				byte[] bytes = ClassWriter.compile(icc);
-				REPLMemberClass.loadClass(REPL$CLASSES.concat(fileName), bytes);
+				REPLMemberClass.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
 			}
 			catch (Throwable t)
 			{
@@ -114,7 +115,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		field.checkTypes(markers, this);
 		field.check(markers, this);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			this.cleanup();
 			return false;
@@ -141,7 +142,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		builder.append(type.getTheClass().getName().unqualified);
 	}
 	
-	private static Name getFieldName(IType type)
+	private Name getFieldName(IType type)
 	{
 		StringBuilder sb = new StringBuilder();
 		getClassName(sb, type);
@@ -175,23 +176,23 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	private void compileVariable(REPLVariable field)
 	{
 		compileInnerClasses();
-		field.compute();
+		field.compute(this.compilableList);
 		
 		this.cleanup();
 	}
 	
-	private static REPLMemberClass getREPLClass(IClassMember member)
+	private REPLMemberClass getREPLClass(IClassMember member)
 	{
-		REPLMemberClass iclass = new REPLMemberClass(Name.getQualified(className), member);
+		REPLMemberClass iclass = new REPLMemberClass(Name.getQualified(className), member, this);
 		member.setTheClass(iclass);
 		member.addModifier(Modifiers.STATIC);
 		return iclass;
 	}
 	
-	private static void compileClass(IClass iclass)
+	private void compileClass(IClass iclass)
 	{
 		compileInnerClasses();
-		REPLMemberClass.compile(iclass);
+		REPLMemberClass.compile(this.repl, iclass);
 	}
 	
 	@Override
@@ -205,7 +206,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void setValue(IValue value)
 	{
-		REPLVariable field = new REPLVariable(ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
+		REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, value, className, Modifiers.FINAL);
 		memberClass = getREPLClass(field);
 		
 		value.resolveTypes(markers, this);
@@ -234,7 +235,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		value.checkTypes(markers, this);
 		value.check(markers, this);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			this.cleanup();
 			return;
@@ -277,7 +278,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		declaration.resolveTypes(markers, this, false);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			return;
 		}
@@ -291,7 +292,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		declaration.resolveTypes(markers, this, true);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			return;
 		}
@@ -305,7 +306,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		component.resolve(markers);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			return;
 		}
@@ -319,7 +320,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
 		typeAlias.resolve(markers, this);
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			return;
 		}
@@ -338,7 +339,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		iclass.checkTypes(markers, this);
 		iclass.check(markers, this);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			return;
 		}
@@ -348,7 +349,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			iclass.foldConstants();
 		}
 		iclass.cleanup(this, this);
-		REPLContext.compileClass(iclass);
+		this.compileClass(iclass);
 		
 		classes.put(iclass.getName(), iclass);
 		
@@ -393,7 +394,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addField(IField field)
 	{
-		REPLVariable var = new REPLVariable(field.getPosition(), field.getName(), field.getType(), field.getValue(), className, field.getModifiers());
+		REPLVariable var = new REPLVariable(this, field.getPosition(), field.getName(), field.getType(), field.getValue(), className, field.getModifiers());
 		var.setAnnotations(field.getAnnotations());
 		memberClass = getREPLClass(var);
 		
@@ -407,14 +408,14 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addProperty(IProperty property)
 	{
-		REPLMemberClass iclass = REPLContext.getREPLClass(property);
+		REPLMemberClass iclass = this.getREPLClass(property);
 		
 		property.resolveTypes(markers, this);
 		property.resolve(markers, this);
 		property.checkTypes(markers, this);
 		property.check(markers, this);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			this.cleanup();
 			return;
@@ -426,7 +427,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		property.cleanup(this, this);
 		
-		REPLContext.compileClass(iclass);
+		this.compileClass(iclass);
 		
 		fields.put(property.getName(), property);
 		
@@ -440,10 +441,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addMethod(IMethod method)
 	{
-		REPLMemberClass iclass = REPLContext.getREPLClass(method);
+		REPLMemberClass iclass = this.getREPLClass(method);
 		
 		method.resolveTypes(markers, this);
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			this.cleanup();
 			return;
@@ -453,7 +454,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		method.checkTypes(markers, this);
 		method.check(markers, this);
 		
-		if (reportErrors(markers))
+		if (markers.getErrors() > 0)
 		{
 			this.cleanup();
 			return;
@@ -465,22 +466,22 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		method.cleanup(this, this);
 		
-		REPLContext.compileClass(iclass);
+		this.compileClass(iclass);
 		
 		this.registerMethod(method, iclass);
 		
 		this.cleanup();
 	}
-
+	
 	private void registerMethod(IMethod method, REPLMemberClass iclass)
 	{
 		boolean replaced = false;
-		int methods = REPLContext.methods.size();
+		int methods = this.methods.size();
 		for (int i = 0; i < methods; i++)
 		{
-			if (REPLContext.methods.get(i).checkOverride(markers, iclass, method, null))
+			if (this.methods.get(i).checkOverride(markers, iclass, method, null))
 			{
-				REPLContext.methods.set(i, method);
+				this.methods.set(i, method);
 				replaced = true;
 				break;
 			}
@@ -489,7 +490,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		StringBuilder buf = new StringBuilder();
 		if (!replaced)
 		{
-			REPLContext.methods.add(method);
+			this.methods.add(method);
 			buf.append("Defined method ");
 		}
 		else

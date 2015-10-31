@@ -12,7 +12,13 @@ import dyvil.tools.parsing.token.IToken;
 
 public class REPLParser extends ParserManager
 {
+	private REPLContext context;
 	private boolean syntaxErrors;
+	
+	public REPLParser(REPLContext context)
+	{
+		this.context = context;
+	}
 	
 	@Override
 	public void report(IToken token, String message)
@@ -92,7 +98,7 @@ public class REPLParser extends ParserManager
 	@Override
 	public Operator getOperator(Name name)
 	{
-		Operator op = DyvilREPL.context.getOperator(name);
+		Operator op = this.context.getOperator(name);
 		if (op != null)
 		{
 			return op;

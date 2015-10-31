@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
+import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
@@ -26,15 +26,15 @@ public class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
 	
+	private static DyvilREPL		instance;
 	private static BufferedReader	reader;
-	protected static REPLContext	context	= new REPLContext();
-	protected static REPLParser		parser	= new REPLParser();
 	
-	public static File dumpDir;
+	protected REPLContext	context	= new REPLContext(this);
+	protected REPLParser	parser	= new REPLParser(this.context);
 	
-	protected static String currentCode;
+	protected File dumpDir;
 	
-	public static final Map<String, ICommand> commands = new HashMap();
+	private static final Map<String, ICommand> commands = new TreeMap();
 	
 	static
 	{
@@ -72,9 +72,7 @@ public class DyvilREPL
 		
 		long now = System.nanoTime();
 		
-		Package.init();
-		Types.initHeaders();
-		Types.initTypes();
+		instance = new DyvilREPL();
 		
 		if (DyvilCompiler.debug)
 		{
@@ -83,11 +81,18 @@ public class DyvilREPL
 		
 		reader = new BufferedReader(new InputStreamReader(System.in));
 		
-		do
+		while (true)
 		{
 			loop();
 		}
-		while (currentCode != null);
+	}
+	
+	private DyvilREPL()
+	{
+		Names.init();
+		Package.init();
+		Types.initHeaders();
+		Types.initTypes();
 	}
 	
 	private static String readLine() throws IOException
@@ -192,13 +197,13 @@ public class DyvilREPL
 		return buffer.toString();
 	}
 	
-	public static synchronized void loop()
+	private static synchronized void loop()
 	{
 		System.out.print("> ");
 		
 		try
 		{
-			currentCode = readLine();
+			String currentCode = readLine();
 			String trim = currentCode.trim();
 			if (trim.startsWith(":"))
 			{
@@ -206,29 +211,36 @@ public class DyvilREPL
 				return;
 			}
 			
-			REPLContext.reset();
-			TokenIterator tokens = new DyvilLexer(REPLContext.markers, DyvilSymbols.INSTANCE).tokenize(currentCode);
-			SemicolonInference.inferSemicolons(tokens.first());
+			instance.evaluate(currentCode);
 			
-			if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))
+			if (!instance.context.markers.isEmpty())
 			{
-				return;
-			}
-			if (parser.parse(null, tokens, new ClassBodyParser(context)))
-			{
-				return;
-			}
-			
-			parser.parse(REPLContext.markers, tokens, new ExpressionParser(context));
-			if (!REPLContext.markers.isEmpty())
-			{
-				REPLContext.reportErrors(REPLContext.markers);
+				REPLContext.reportErrors(instance.context.markers, currentCode);
 			}
 		}
 		catch (Throwable t)
 		{
 			t.printStackTrace();
 		}
+	}
+	
+	public void evaluate(String code)
+	{
+		context.reset();
+		
+		TokenIterator tokens = new DyvilLexer(context.markers, DyvilSymbols.INSTANCE).tokenize(code);
+		SemicolonInference.inferSemicolons(tokens.first());
+		
+		if (parser.parse(null, tokens, new DyvilUnitParser(context, false)))
+		{
+			return;
+		}
+		if (parser.parse(null, tokens, new ClassBodyParser(context)))
+		{
+			return;
+		}
+		
+		parser.parse(context.markers, tokens, new ExpressionParser(context));
 	}
 	
 	private static void runCommand(String line)
@@ -252,11 +264,36 @@ public class DyvilREPL
 			return;
 		}
 		
-		command.execute(arguments);
+		command.execute(instance, arguments);
 	}
 	
 	public static void registerCommand(ICommand command)
 	{
 		commands.put(command.getName(), command);
+	}
+	
+	public REPLContext getContext()
+	{
+		return this.context;
+	}
+	
+	public REPLParser getParser()
+	{
+		return this.parser;
+	}
+	
+	public File getDumpDir()
+	{
+		return this.dumpDir;
+	}
+	
+	public void setDumpDir(File dumpDir)
+	{
+		this.dumpDir = dumpDir;
+	}
+	
+	public static Map<String, ICommand> getCommands()
+	{
+		return commands;
 	}
 }
