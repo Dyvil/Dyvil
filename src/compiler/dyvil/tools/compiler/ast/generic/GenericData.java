@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
@@ -15,7 +16,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	public IMethod	method;
 	public IType[]	generics;
 	public int		genericCount;
-	public IType	instanceType;
+	public IValue	instance;
 	
 	public GenericData()
 	{
@@ -103,7 +104,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			}
 			return this.generics[index];
 		}
-		return this.instanceType.resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override

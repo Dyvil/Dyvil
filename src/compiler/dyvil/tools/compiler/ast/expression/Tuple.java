@@ -171,7 +171,7 @@ public final class Tuple implements IValue, IValueList
 			IType elementType = iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS ? dyvil.tools.compiler.ast.type.Types.ANY
 					: type.resolveTypeSafely(iclass.getTypeVariable(i));
 			IValue value = this.values[i];
-			IValue value1 = value.withType(elementType, typeContext, markers, context);
+			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
 				Marker m = I18n.createMarker(value.getPosition(), "tuple.type");
@@ -185,6 +185,7 @@ public final class Tuple implements IValue, IValueList
 			}
 		}
 		
+		this.tupleType = null;
 		this.tupleType = this.getType();
 		return this;
 	}

@@ -769,11 +769,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (instance != null)
 		{
-			genericData.instanceType = instance.getType();
+			genericData.instance = instance;
 		}
 		else
 		{
-			genericData.instanceType = this.theClass.getType();
+			genericData.instance = new ThisValue(this.theClass.getType());
 		}
 		
 		int parIndex = 0;
