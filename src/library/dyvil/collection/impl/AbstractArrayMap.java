@@ -252,7 +252,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 			Object[] newKeys = new Object[newCapacity];
 			Object[] newValues = new Object[newCapacity];
 			System.arraycopy(this.keys, 0, newKeys, 0, index);
-			System.arraycopy(this.values, 0, newValues, 0, newCapacity);
+			System.arraycopy(this.values, 0, newValues, 0, index);
 			this.keys = newKeys;
 			this.values = newValues;
 		}
