@@ -7,6 +7,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.marker.Warning;
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.util.MarkerLevel;
 
 public class I18n
 {
@@ -41,41 +42,36 @@ public class I18n
 		return String.format(getString(key), args);
 	}
 	
-	public static enum MarkerType
-	{
-		IGNORE, INFO, WARNING, ERROR;
-		
-		static final Map<String, MarkerType> map = new HashMap();
-	}
+	static final Map<String, MarkerLevel> map = new HashMap();
 	
-	public static MarkerType getMarkerType(String key)
+	public static MarkerLevel getMarkerType(String key)
 	{
-		MarkerType m = MarkerType.map.get(key);
+		MarkerLevel m = map.get(key);
 		if (m == null)
 		{
 			switch (getString("marker." + key))
 			{
 			case "info":
-				m = MarkerType.INFO;
+				m = MarkerLevel.INFO;
 				break;
 			case "warning":
-				m = MarkerType.WARNING;
+				m = MarkerLevel.WARNING;
 				break;
 			case "ignore":
-				m = MarkerType.IGNORE;
+				m = MarkerLevel.IGNORE;
 				break;
 			default:
-				m = MarkerType.ERROR;
+				m = MarkerLevel.ERROR;
 			}
 			
-			MarkerType.map.put(key, m);
+			map.put(key, m);
 		}
 		return m;
 	}
 	
 	public static Marker createMarker(ICodePosition position, String key)
 	{
-		MarkerType type = getMarkerType(key);
+		MarkerLevel type = getMarkerType(key);
 		switch (type)
 		{
 		case ERROR:
@@ -91,7 +87,7 @@ public class I18n
 	
 	public static Marker createMarker(ICodePosition position, String key, Object... args)
 	{
-		MarkerType type = getMarkerType(key);
+		MarkerLevel type = getMarkerType(key);
 		switch (type)
 		{
 		case ERROR:

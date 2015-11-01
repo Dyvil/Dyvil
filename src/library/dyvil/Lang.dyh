@@ -2,7 +2,6 @@ package dyvil
 
 // Base imports for primitive types
 import	dyvil.lang._
-import	java.lang._
 
 // Useful classes
 import	dyvil.collection._
@@ -20,6 +19,9 @@ import	dyvil.tuple.Tuple3 => Triple
 // Import useful annotation classes
 import	dyvil.annotation.Intrinsic
 import	dyvil.annotation.{ Native => native, Transient => transient, Volatile => volatile }
+import	dyvil.annotation.{ Deprecated, Experimental }
+
+import	java.lang._
 
 // Import the methods from Predef
 using	dyvil.lang.Predef._
