@@ -17,9 +17,14 @@ import	dyvil.tuple.Tuple2 => Tuple
 import	dyvil.tuple.Tuple2 => Pair
 import	dyvil.tuple.Tuple3 => Triple
 
+// Import useful annotation classes
+import	dyvil.annotation.Intrinsic
+import	dyvil.annotation.{ Native => native, Transient => transient, Volatile => volatile }
+
 // Import the methods from Predef
 using	dyvil.lang.Predef._
 
+// Print Operators
 prefix	operator print		{ precedence 1 }
 prefix	operator println	{ precedence 1 }
 
