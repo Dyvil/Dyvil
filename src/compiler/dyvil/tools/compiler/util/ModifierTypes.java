@@ -1,7 +1,10 @@
 package dyvil.tools.compiler.util;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public enum ModifierTypes
 {
@@ -231,7 +234,7 @@ public enum ModifierTypes
 		{
 			sb.append("extension ");
 		}
-		else if ((mod & Modifiers.INFIX) == Modifiers.INFIX)
+		else if ((mod & Modifiers.INFIX) != 0 && (mod & Modifiers.INFIX) != Modifiers.STATIC)
 		{
 			sb.append("infix ");
 		}
@@ -403,5 +406,55 @@ public enum ModifierTypes
 			return Modifiers.VAR;
 		}
 		return -1;
+	}
+	
+	public static void checkMethodModifiers(MarkerList markers, IClassMember member, int modifiers, boolean hasValue, String type)
+	{
+		boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
+		boolean isAbstract = (modifiers & Modifiers.ABSTRACT) != 0;
+		boolean isNative = (modifiers & Modifiers.NATIVE) != 0;
+		
+		// If the method does not have an implementation and is static
+		if (isStatic && isAbstract)
+		{
+			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", I18n.getString(type, member.getName())));
+		}
+		else if (isAbstract && isNative)
+		{
+			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", I18n.getString(type, member.getName())));
+		}
+		else
+		{
+			if (isStatic)
+			{
+				if (!hasValue)
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.static.unimplemented", I18n.getString(type, member.getName())));
+				}
+			}
+			if (isNative)
+			{
+				if (!hasValue)
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.native.implemented", I18n.getString(type, member.getName())));
+				}
+			}
+			if (isAbstract)
+			{
+				IClass theClass = member.getTheClass();
+				if (!theClass.isAbstract())
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString(type, member.getName(), theClass.getName())));
+				}
+				if (hasValue)
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.implemented", I18n.getString(type, member.getName())));
+				}
+			}
+		}
+		if (!hasValue && !isAbstract && !isNative)
+		{
+			markers.add(I18n.createError(member.getPosition(), "modifiers.unimplemented", I18n.getString(type, member.getName())));
+		}
 	}
 }

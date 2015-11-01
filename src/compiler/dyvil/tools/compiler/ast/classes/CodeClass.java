@@ -257,6 +257,13 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		int illegalModifiers = this.modifiers & ~Modifiers.CLASS_MODIFIERS & ~Modifiers.CLASS_TYPE_MODIFIERS;
+		if (illegalModifiers != 0)
+		{
+			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("class", this.name),
+					ModifierTypes.FIELD_OR_METHOD.toString(illegalModifiers)));
+		}
+		
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());

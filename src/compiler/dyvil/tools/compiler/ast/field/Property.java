@@ -455,6 +455,10 @@ public class Property extends Member implements IProperty, IContext
 		{
 			this.getter.check(markers, context);
 		}
+		if (this.getterModifiers != 0)
+		{
+			ModifierTypes.checkMethodModifiers(markers, this, this.getterModifiers | this.modifiers, this.getter != null, "property.getter");
+		}
 		if (this.setter != null)
 		{
 			this.setter.check(markers, context);
@@ -463,6 +467,11 @@ public class Property extends Member implements IProperty, IContext
 			{
 				markers.add(I18n.createMarker(this.position, "property.type.void"));
 			}
+			
+		}
+		if (this.setterModifiers != 0)
+		{
+			ModifierTypes.checkMethodModifiers(markers, this, this.setterModifiers | this.modifiers, this.setter != null, "property.setter");
 		}
 		
 		// No setter and no getter

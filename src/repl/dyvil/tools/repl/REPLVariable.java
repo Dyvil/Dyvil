@@ -42,15 +42,6 @@ public class REPLVariable extends Field
 		return (this.modifiers & mod) == mod;
 	}
 	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.value != null)
-		{
-			this.value.check(markers, context);
-		}
-	}
-	
 	private static boolean isConstant(IValue value)
 	{
 		int tag = value.valueTag();

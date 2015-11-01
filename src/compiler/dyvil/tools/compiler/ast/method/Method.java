@@ -24,6 +24,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -62,6 +63,13 @@ public class Method extends AbstractMethod
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, this);
+		
+		if ((modifiers & Modifiers.PREFIX) != 0)
+		{
+			// Static & Prefix will cause errors but does happen, so remove the
+			// prefix modifier
+			modifiers &= ~Modifiers.PREFIX;
+		}
 		
 		for (int i = 0; i < this.genericCount; i++)
 		{
@@ -225,16 +233,16 @@ public class Method extends AbstractMethod
 		{
 			this.value.check(markers, this);
 		}
-		// If the method does not have an implementation and is static
-		else if (this.isStatic())
+		
+		// Check for illegal modifiers
+		int illegalModifiers = this.modifiers & ~Modifiers.METHOD_MODIFIERS;
+		if (illegalModifiers != 0)
 		{
-			markers.add(I18n.createMarker(this.position, "method.static", this.name));
+			markers.add(I18n.createError(position, "method.illegal_modifiers", this.name, ModifierTypes.FIELD.toString(illegalModifiers)));
 		}
-		// Or not declared abstract and a member of a non-abstract class
-		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
-		{
-			markers.add(I18n.createMarker(this.position, "method.unimplemented", this.name));
-		}
+		
+		// Check illegal modifier combinations
+		ModifierTypes.checkMethodModifiers(markers, this, this.modifiers, this.value != null, "method");
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -242,7 +250,11 @@ public class Method extends AbstractMethod
 		}
 		
 		// Check for duplicate methods
-		
+		this.checkDuplicates(markers, context);
+	}
+	
+	private void checkDuplicates(MarkerList markers, IContext context)
+	{
 		String desc = this.getDescriptor();
 		IClassBody body = this.theClass.getBody();
 		if (body == null)
