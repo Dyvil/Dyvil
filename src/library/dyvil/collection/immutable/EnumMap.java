@@ -11,7 +11,7 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.annotation.internal;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvil.reflect.ReflectUtils;
+import dyvil.reflect.EnumReflection;
 import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 
@@ -74,7 +74,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		public Builder(Class<K> type)
 		{
 			this.type = type;
-			this.values = new Object[ReflectUtils.getEnumCount(type)];
+			this.values = new Object[EnumReflection.getEnumCount(type)];
 		}
 		
 		@Override
@@ -100,7 +100,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		@Override
 		public EnumMap<K, V> build()
 		{
-			EnumMap<K, V> map = new EnumMap(this.type, ReflectUtils.getEnumConstants(this.type), this.values, this.size);
+			EnumMap<K, V> map = new EnumMap(this.type, EnumReflection.getEnumConstants(this.type), this.values, this.size);
 			this.size = -1;
 			return map;
 		}
