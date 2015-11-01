@@ -99,7 +99,7 @@ public class NamedType implements IRawType
 	@Override
 	public IClass getTheClass()
 	{
-		return Types.OBJECT_CLASS;
+		return null;
 	}
 	
 	@Override

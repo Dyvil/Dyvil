@@ -175,13 +175,12 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		if (this.type == null)
+		if (this.type == null || !this.type.isResolved())
 		{
 			return;
 		}
 		
 		IClass theClass = this.type.getTheClass();
-		
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			markers.add(I18n.createMarker(this.position, "annotation.type", this.type.getName()));
