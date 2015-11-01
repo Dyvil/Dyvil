@@ -13,14 +13,14 @@ public final class UnsafeIntRef implements IntRef
 	
 	public UnsafeIntRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeIntRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeIntRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeIntRef implements IntRef
 	@Override
 	public int get()
 	{
-		return ReflectUtils.unsafe.getInt(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getInt(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(int value)
 	{
-		ReflectUtils.unsafe.putInt(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putInt(this.base, this.offset, value);
 	}
 }

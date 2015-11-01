@@ -9,12 +9,11 @@ import dyvil.lang.Type;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.reflect.ReflectUtils;
 import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
-
-import sun.misc.SharedSecrets;
 
 public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
@@ -127,7 +126,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	public AbstractEnumMap(Class<K> type)
 	{
-		this.keys = getKeys(type);
+		this.keys = ReflectUtils.getEnumConstants(type);
 		this.values = new Object[this.keys.length];
 		this.type = type;
 	}
@@ -205,12 +204,6 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	protected static int index(Object key)
 	{
 		return ((Enum) key).ordinal();
-	}
-	
-	protected static <K extends Enum<K>> K[] getKeys(Class<K> type)
-	{
-		// TODO Move to ReflectUtils
-		return SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type);
 	}
 	
 	@Override
@@ -394,7 +387,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		in.defaultReadObject();
 		
 		this.type = (Class<K>) in.readObject();
-		this.keys = getKeys(this.type);
+		this.keys = ReflectUtils.getEnumConstants(this.type);
 		this.values = new Object[this.keys.length];
 		
 		int size = in.readInt();

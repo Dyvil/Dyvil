@@ -25,7 +25,7 @@ import sun.misc.Unsafe;
 
 public final class AnonymousClassLMF extends AbstractLMF
 {
-	private static final Unsafe UNSAFE = ReflectUtils.unsafe;
+	private static final Unsafe UNSAFE = ReflectUtils.UNSAFE;
 	
 	private static final MethodHandles.Lookup LOOKUP;
 	

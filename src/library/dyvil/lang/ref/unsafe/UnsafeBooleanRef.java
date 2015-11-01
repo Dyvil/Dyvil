@@ -13,14 +13,14 @@ public final class UnsafeBooleanRef implements BooleanRef
 	
 	public UnsafeBooleanRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeBooleanRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeBooleanRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeBooleanRef implements BooleanRef
 	@Override
 	public boolean get()
 	{
-		return ReflectUtils.unsafe.getBoolean(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getBoolean(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(boolean value)
 	{
-		ReflectUtils.unsafe.putBoolean(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putBoolean(this.base, this.offset, value);
 	}
 }

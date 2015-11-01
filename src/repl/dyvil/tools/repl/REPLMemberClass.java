@@ -600,7 +600,7 @@ public class REPLMemberClass implements IClass
 			dumpClass(repl, name, bytes);
 		}
 		
-		return ReflectUtils.unsafe.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+		return ReflectUtils.UNSAFE.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
 	}
 	
 	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
@@ -610,7 +610,7 @@ public class REPLMemberClass implements IClass
 			dumpClass(repl, name, bytes);
 		}
 		
-		return ReflectUtils.unsafe.defineAnonymousClass(REPLVariable.class, bytes, null);
+		return ReflectUtils.UNSAFE.defineAnonymousClass(REPLVariable.class, bytes, null);
 	}
 	
 	@Override

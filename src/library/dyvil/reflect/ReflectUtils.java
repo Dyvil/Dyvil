@@ -9,10 +9,15 @@ import dyvil.annotation.infix;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
+import sun.misc.JavaLangAccess;
+import sun.misc.SharedSecrets;
+
 public final class ReflectUtils
 {
+	private static final JavaLangAccess	JAVA_LANG_ACCESS	= SharedSecrets.getJavaLangAccess();
 	private static final Field			modifiersField;
-	public static final sun.misc.Unsafe	unsafe;
+	
+	public static final sun.misc.Unsafe UNSAFE;
 	
 	static
 	{
@@ -36,7 +41,7 @@ public final class ReflectUtils
 		{
 			Field field = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
 			field.setAccessible(true);
-			unsafe = (sun.misc.Unsafe) field.get(null);
+			UNSAFE = (sun.misc.Unsafe) field.get(null);
 		}
 		catch (Exception ex)
 		{
@@ -635,7 +640,7 @@ public final class ReflectUtils
 	{
 		try
 		{
-			return (T) unsafe.allocateInstance(c);
+			return (T) UNSAFE.allocateInstance(c);
 		}
 		catch (Exception ex)
 		{
@@ -698,16 +703,19 @@ public final class ReflectUtils
 	
 	// Enums
 	
-	public static <E extends Enum> E getEnumConstant(Class<E> enumClass, int index)
+	public static <E extends Enum<E>> E[] getEnumConstants(Class<E> enumClass)
 	{
-		E[] values = enumClass.getEnumConstants();
-		return values[index];
+		return JAVA_LANG_ACCESS.getEnumConstantsShared(enumClass);
 	}
 	
-	public static <E extends Enum> E getEnumConstant(Class<E> enumClass, String name)
+	public static <E extends Enum<E>> E getEnumConstant(Class<E> enumClass, int index)
 	{
-		E[] values = enumClass.getEnumConstants();
-		for (E e : values)
+		return getEnumConstants(enumClass)[index];
+	}
+	
+	public static <E extends Enum<E>> E getEnumConstant(Class<E> enumClass, String name)
+	{
+		for (E e : getEnumConstants(enumClass))
 		{
 			if (e.name().equalsIgnoreCase(name))
 			{
@@ -715,5 +723,17 @@ public final class ReflectUtils
 			}
 		}
 		return null;
+	}
+	
+	public static <E extends Enum<E>> int getEnumCount(Class<E> enumClass)
+	{
+		return getEnumConstants(enumClass).length;
+	}
+	
+	// Misc
+	
+	public static String newUnsafeString(char[] values)
+	{
+		return JAVA_LANG_ACCESS.newStringUnsafe(values);
 	}
 }

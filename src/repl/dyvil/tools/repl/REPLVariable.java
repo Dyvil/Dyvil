@@ -52,7 +52,7 @@ public class REPLVariable extends Field
 	{
 		if (this.type == Types.VOID)
 		{
-			ReflectUtils.unsafe.ensureClassInitialized(this.theClass);
+			ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
 			return;
 		}
 		

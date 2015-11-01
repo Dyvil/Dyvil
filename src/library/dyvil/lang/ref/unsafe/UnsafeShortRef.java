@@ -13,14 +13,14 @@ public final class UnsafeShortRef implements ShortRef
 	
 	public UnsafeShortRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeShortRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeShortRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeShortRef implements ShortRef
 	@Override
 	public short get()
 	{
-		return ReflectUtils.unsafe.getShort(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getShort(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(short value)
 	{
-		ReflectUtils.unsafe.putShort(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putShort(this.base, this.offset, value);
 	}
 }
