@@ -453,11 +453,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	public Map<K, V> $minus$minus(Collection<?> keys);
 	
-	public <U> Map<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
+	public <NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
 	
-	public <U, R> Map<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper);
+	public <NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
-	public <U, R> Map<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper);
+	public <NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	
+	public <NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 	
 	public Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
@@ -551,7 +553,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	public boolean removeAll(Map<?, ?> map);
 	
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
+	public void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper);
+	
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
 	public void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
 	

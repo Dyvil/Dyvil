@@ -246,7 +246,24 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	{
+		int len = this.values.length;
+		ImmutableMap.Builder<NK, V> builder = new ArrayMap.Builder(this.size);
+		
+		for (int i = 0; i < len; i++)
+		{
+			V value = (V) this.values[i];
+			if (value != null)
+			{
+				builder.put(mapper.apply(this.keys[i], value), value);
+			}
+		}
+		return builder.build();
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		int len = this.values.length;
 		Object[] newValues = new Object[len];
@@ -263,9 +280,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		ImmutableMap.Builder<U, R> builder = new ArrayMap.Builder(this.size);
+		ImmutableMap.Builder<NK, NV> builder = new ArrayMap.Builder(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -276,7 +293,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 				continue;
 			}
 			
-			Entry<? extends U, ? extends R> entry = mapper.apply(this.keys[i], (V) value);
+			Entry<? extends NK, ? extends NV> entry = mapper.apply(this.keys[i], (V) value);
 			if (entry != null)
 			{
 				builder.put(entry);
@@ -287,9 +304,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		ImmutableMap.Builder<U, R> builder = new ArrayMap.Builder(this.size);
+		ImmutableMap.Builder<NK, NV> builder = new ArrayMap.Builder(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -300,7 +317,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 				continue;
 			}
 			
-			for (Entry<? extends U, ? extends R> entry : mapper.apply(this.keys[i], (V) value))
+			for (Entry<? extends NK, ? extends NV> entry : mapper.apply(this.keys[i], (V) value))
 			{
 				builder.put(entry);
 			}

@@ -174,7 +174,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			this.putUnsafe(entry.getKey(), entry.getValue());
+			this.putInternal(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -645,7 +645,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		return p == null ? None.instance : new Some(p.value);
 	}
 	
-	protected final V putUnsafe(K key, V value)
+	protected final V putInternal(K key, V value)
 	{
 		TreeEntry<K, V> t = this.root;
 		if (t == null)

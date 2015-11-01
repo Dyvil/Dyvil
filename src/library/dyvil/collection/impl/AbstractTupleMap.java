@@ -2,6 +2,7 @@ package dyvil.collection.impl;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -15,11 +16,16 @@ import dyvil.util.Some;
 public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 {
 	private static final long serialVersionUID = 1636602530347500387L;
-
+	
 	protected static final int DEFAULT_CAPACITY = 10;
 	
 	protected transient int				size;
 	protected transient Tuple2<K, V>[]	entries;
+	
+	protected AbstractTupleMap(int capacity)
+	{
+		this.entries = new Tuple2[capacity];
+	}
 	
 	public AbstractTupleMap(Tuple2<K, V>[] entries)
 	{
@@ -57,6 +63,12 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		{
 			this.entries[index++] = entry.toTuple();
 		}
+	}
+	
+	public AbstractTupleMap(AbstractTupleMap<K, V> map)
+	{
+		this.size = map.size;
+		this.entries = map.entries.clone();
 	}
 	
 	@Override
@@ -165,6 +177,37 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 	
 	protected abstract void removeAt(int index);
+	
+	protected final V putInternal(Tuple2<K, V> tuple)
+	{
+		K key = tuple._1;
+		for (int i = 0; i < this.size; i++)
+		{
+			Tuple2<K, V> entry = this.entries[i];
+			if (Objects.equals(key, entry._1))
+			{
+				V oldValue = entry._2;
+				this.entries[i] = tuple;
+				return oldValue;
+			}
+		}
+		
+		this.putNew(tuple);
+		return null;
+	}
+	
+	protected final void putNew(Tuple2<K, V> tuple)
+	{
+		int index = this.size++;
+		if (index >= this.entries.length)
+		{
+			int newCapacity = (int) (this.size * 1.1F);
+			Tuple2[] newEntries = new Tuple2[newCapacity];
+			System.arraycopy(this.entries, 0, newEntries, 0, index);
+			this.entries = newEntries;
+		}
+		this.entries[index] = tuple;
+	}
 	
 	@Override
 	public void forEach(Consumer<? super Entry<K, V>> action)

@@ -173,27 +173,33 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	{
+		return new SingletonMap(mapper.apply(this.key, this.value), this.value);
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		return new SingletonMap(this.key, mapper.apply(this.key, this.value));
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		Entry<? extends U, ? extends R> entry = mapper.apply(this.key, this.value);
+		Entry<? extends NK, ? extends NV> entry = mapper.apply(this.key, this.value);
 		return entry == null ? EmptyMap.instance : new SingletonMap(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		dyvil.collection.mutable.ArrayMap<U, R> mutable = new dyvil.collection.mutable.ArrayMap();
-		for (Entry<? extends U, ? extends R> entry : mapper.apply(this.key, this.value))
+		ArrayMap.Builder<NK, NV> builder = new ArrayMap.Builder<NK, NV>();
+		for (Entry<? extends NK, ? extends NV> entry : mapper.apply(this.key, this.value))
 		{
-			mutable.put(entry.getKey(), entry.getValue());
+			builder.put(entry.getKey(), entry.getValue());
 		}
-		return mutable.trustedImmutable();
+		return builder.build();
 	}
 	
 	@Override

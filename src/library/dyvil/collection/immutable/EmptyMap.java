@@ -145,21 +145,27 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		return (ImmutableMap<K, U>) this;
+		return (ImmutableMap<NK, V>) this;
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		return (ImmutableMap<U, R>) this;
+		return (ImmutableMap<K, NV>) this;
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		return (ImmutableMap<U, R>) this;
+		return (ImmutableMap<NK, NV>) this;
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	{
+		return (ImmutableMap<NK, NV>) this;
 	}
 	
 	@Override

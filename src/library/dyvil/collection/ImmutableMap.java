@@ -177,13 +177,16 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	public ImmutableMap<K, V> $minus$minus(Collection<?> keys);
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper);
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper);
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 	
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition);
@@ -349,9 +352,16 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	@Override
 	@mutating
-	public default void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
 	{
-		throw new ImmutableException("map() on Immutable Map");
+		throw new ImmutableException("mapKeys() on Immutable Map");
+	}
+	
+	@Override
+	@mutating
+	public default void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
+	{
+		throw new ImmutableException("mapValues() on Immutable Map");
 	}
 	
 	@Override

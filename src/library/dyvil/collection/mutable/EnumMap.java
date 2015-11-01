@@ -214,7 +214,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)

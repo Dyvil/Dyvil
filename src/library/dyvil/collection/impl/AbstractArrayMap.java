@@ -65,6 +65,12 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	protected transient Object[]	keys;
 	protected transient Object[]	values;
 	
+	protected AbstractArrayMap(int capacity)
+	{
+		this.keys = new Object[capacity];
+		this.values = new Object[capacity];
+	}
+	
 	public AbstractArrayMap(K[] keys, V[] values)
 	{
 		int size = keys.length;
@@ -127,8 +133,19 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	protected static int fillEntries(Object[] keys, Object[] values, Tuple2<?, ?>[] tuples, int len)
+	public AbstractArrayMap(AbstractArrayMap<K, V> map)
 	{
+		this.size = map.size;
+		this.keys = map.keys.clone();
+		this.values = map.values.clone();
+	}
+	
+	public AbstractArrayMap(Tuple2<K, V>... tuples)
+	{
+		int len = tuples.length;
+		Object[] keys = this.keys = new Object[len];
+		Object[] values = this.values = new Object[len];
+		
 		int size = 0;
 		
 		outer:
@@ -150,7 +167,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 			size++;
 		}
 		
-		return size;
+		this.size = size;
 	}
 	
 	@Override
@@ -224,6 +241,39 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 				return (V) AbstractArrayMap.this.values[this.index++];
 			}
 		};
+	}
+	
+	protected void putNew(K key, V value)
+	{
+		int index = this.size++;
+		if (index >= this.keys.length)
+		{
+			int newCapacity = (int) (this.size * 1.1F);
+			Object[] newKeys = new Object[newCapacity];
+			Object[] newValues = new Object[newCapacity];
+			System.arraycopy(this.keys, 0, newKeys, 0, index);
+			System.arraycopy(this.values, 0, newValues, 0, newCapacity);
+			this.keys = newKeys;
+			this.values = newValues;
+		}
+		this.keys[index] = key;
+		this.values[index] = value;
+	}
+	
+	protected V putInternal(K key, V value)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (Objects.equals(key, this.keys[i]))
+			{
+				V oldValue = (V) this.values[i];
+				this.values[i] = value;
+				return oldValue;
+			}
+		}
+		
+		this.putNew(key, value);
+		return null;
 	}
 	
 	protected abstract void removeAt(int index);

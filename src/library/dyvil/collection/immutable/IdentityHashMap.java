@@ -10,7 +10,7 @@ import dyvil.tuple.Tuple2;
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 7106880090218416170L;
-
+	
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
 		return new IdentityHashMap();
@@ -186,9 +186,21 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		IdentityHashMap<K, U> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<NK, V> copy = new IdentityHashMap(this.size);
+		for (Entry<K, V> entry : this)
+		{
+			V value = entry.getValue();
+			copy.putInternal(mapper.apply(entry.getKey(), value), value);
+		}
+		return copy;
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	{
+		IdentityHashMap<K, NV> copy = new IdentityHashMap(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
@@ -198,12 +210,12 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		IdentityHashMap<U, R> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<NK, NV> copy = new IdentityHashMap(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			Entry<? extends U, ? extends R> result = mapper.apply(entry.getKey(), entry.getValue());
+			Entry<? extends NK, ? extends NV> result = mapper.apply(entry.getKey(), entry.getValue());
 			if (result != null)
 			{
 				copy.putInternal(result.getKey(), result.getValue());
@@ -213,12 +225,12 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		IdentityHashMap<U, R> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<NK, NV> copy = new IdentityHashMap(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			for (Entry<? extends U, ? extends R> result : mapper.apply(entry.getKey(), entry.getValue()))
+			for (Entry<? extends NK, ? extends NV> result : mapper.apply(entry.getKey(), entry.getValue()))
 			{
 				copy.putInternal(result.getKey(), result.getValue());
 			}

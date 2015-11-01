@@ -65,7 +65,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K,
 	@Override
 	public V put(K key, V value)
 	{
-		return this.putUnsafe(key, value);
+		return this.putInternal(key, value);
 	}
 	
 	@Override
@@ -76,7 +76,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K,
 			return false;
 		}
 		
-		this.putUnsafe(key, value);
+		this.putInternal(key, value);
 		return true;
 	}
 	
@@ -147,7 +147,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K,
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> function)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> function)
 	{
 		for (TreeEntry<K, V> e = this.getFirstEntry(); e != null; e = successor(e))
 		{

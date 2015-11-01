@@ -144,7 +144,7 @@ public interface JavaMaps
 	}
 	
 	/**
-	 * @see Map#map(BiFunction)
+	 * @see Map#mapValues(BiFunction)
 	 */
 	public static @infix @inline <K, V> void map(java.util.Map<K, V> map, BiFunction<? super K, ? super V, ? extends V> mapper)
 	{

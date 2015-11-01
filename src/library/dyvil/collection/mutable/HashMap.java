@@ -310,7 +310,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		for (HashEntry<K, V> entry : this.entries)
 		{

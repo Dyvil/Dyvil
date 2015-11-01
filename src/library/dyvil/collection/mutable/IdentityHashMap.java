@@ -278,7 +278,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implemen
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		Object[] tab = this.table;
 		for (int i = 0; i < tab.length; i += 2)

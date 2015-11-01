@@ -200,25 +200,36 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		HashMap<K, U> copy = new HashMap<K, U>(this.size);
+		HashMap<NK, V> copy = new HashMap<NK, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			K entryKey = entry.getKey();
-			U entryValue = mapper.apply(entryKey, entry.getValue());
-			copy.putInternal(entryKey, entryValue);
+			V value = entry.getValue();
+			copy.putInternal(mapper.apply(entry.getKey(), value), value);
 		}
 		return copy;
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		HashMap<U, R> copy = new HashMap<U, R>(this.size);
+		HashMap<K, NV> copy = new HashMap<K, NV>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			Entry<? extends U, ? extends R> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			K key = entry.getKey();
+			copy.putInternal(key, mapper.apply(key, entry.getValue()));
+		}
+		return copy;
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	{
+		HashMap<NK, NV> copy = new HashMap<NK, NV>(this.size);
+		for (Entry<K, V> entry : this)
+		{
+			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry.getKey(), entry.getValue());
 			if (newEntry != null)
 			{
 				copy.putInternal(newEntry.getKey(), newEntry.getValue());
@@ -228,12 +239,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		HashMap<U, R> copy = new HashMap<U, R>(this.size);
+		HashMap<NK, NV> copy = new HashMap<NK, NV>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
+			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
 			{
 				copy.putInternal(newEntry.getKey(), newEntry.getValue());
 			}
@@ -248,11 +259,11 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<
 		HashMap<K, V> copy = new HashMap<K, V>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			K entryKey = entry.getKey();
-			V entryValue = entry.getValue();
-			if (condition.test(entryKey, entryValue))
+			K key = entry.getKey();
+			V value = entry.getValue();
+			if (condition.test(key, value))
 			{
-				copy.putInternal(entryKey, entryValue);
+				copy.putInternal(key, value);
 			}
 		}
 		return copy;
