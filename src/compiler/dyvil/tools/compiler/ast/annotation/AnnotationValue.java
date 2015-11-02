@@ -1,12 +1,17 @@
 package dyvil.tools.compiler.ast.annotation;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Handle;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -14,6 +19,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class AnnotationValue implements IValue, IAnnotationConsumer
 {
+	private static final Handle ANNOTATION_METAFACTORY = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/AnnotationMetafactory", "metafactory",
+			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "[Ljava/lang/Object;"
+					+ ")Ljava/lang/invoke/CallSite;");
+					
 	protected IAnnotation annotation;
 	
 	private boolean isAnnotationParameter;
@@ -126,8 +135,33 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		// TODO Bytecode Generation
-		writer.writeInsn(Opcodes.ACONST_NULL);
+		StringBuilder descBuilder = new StringBuilder().append('(');
+		
+		IArguments arguments = this.annotation.getArguments();
+		IClass iclass = this.annotation.getType().getTheClass();
+		
+		int len = iclass.parameterCount();
+		String[] parameterNames = new String[len];
+		for (int i = 0; i < len; i++)
+		{
+			IParameter parameter = iclass.getParameter(i);
+			IType type = parameter.getType();
+			parameterNames[i] = parameter.getName().qualified;
+			type.appendExtendedName(descBuilder);
+			
+			IValue value = arguments.getValue(i, parameter);
+			if (value == null)
+			{
+				value = parameter.getValue().withType(type, type, null, null);
+			}
+			
+			arguments.writeValue(i, parameter, writer);
+		}
+		
+		descBuilder.append(')');
+		descBuilder.append('L').append(iclass.getInternalName()).append(';');
+		
+		writer.writeInvokeDynamic("_", descBuilder.toString(), ANNOTATION_METAFACTORY, (Object[]) parameterNames);
 	}
 	
 	@Override

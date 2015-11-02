@@ -2,6 +2,9 @@ package dyvil.runtime;
 
 import java.lang.invoke.*;
 
+import dyvil.runtime.lambda.AbstractLMF;
+import dyvil.runtime.lambda.AnonymousClassLMF;
+
 public class LambdaMetafactory
 {
 	private static final Class<?>[]		EMPTY_CLASS_ARRAY	= new Class<?>[0];

@@ -174,7 +174,7 @@ public class TypeConverter
 		return Wrapper.forBasicType(first);
 	}
 	
-	static void convertType(MethodVisitor mv, Class<?> arg, Class<?> target, Class<?> functional)
+	public static void convertType(MethodVisitor mv, Class<?> arg, Class<?> target, Class<?> functional)
 	{
 		if (arg.equals(target) && arg.equals(functional))
 		{

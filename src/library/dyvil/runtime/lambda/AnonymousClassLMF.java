@@ -1,4 +1,4 @@
-package dyvil.runtime;
+package dyvil.runtime.lambda;
 
 import java.io.File;
 import java.lang.invoke.*;
@@ -13,6 +13,7 @@ import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
+import dyvil.runtime.TypeConverter;
 import dyvil.tools.asm.ClassWriter;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.MethodVisitor;
@@ -47,9 +48,6 @@ public final class AnonymousClassLMF extends AbstractLMF
 	}
 	
 	private static final int	CLASSFILE_VERSION		= 52;
-	private static final String	METHOD_DESCRIPTOR_VOID	= "()V";
-	private static final String	JAVA_LANG_OBJECT		= "java/lang/Object";
-	private static final String	NAME_CTOR				= "<init>";
 	private static final String	NAME_FACTORY			= "get$Lambda";
 	
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
@@ -196,7 +194,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 	{
 		String samIntf = this.samBase.getName().replace('.', '/');
 		
-		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null, JAVA_LANG_OBJECT,
+		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null, "java/lang/Object",
 				new String[] { samIntf });
 				
 		// Generate final fields to be filled in by constructor
@@ -244,7 +242,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 			m.visitVarInsn(getLoadOpcode(argType), varIndex);
 			varIndex += getParameterSize(argType);
 		}
-		m.visitMethodInsn(INVOKESPECIAL, this.lambdaClassName, NAME_CTOR, this.constructorType.toMethodDescriptorString(), false);
+		m.visitMethodInsn(INVOKESPECIAL, this.lambdaClassName, "<init>", this.constructorType.toMethodDescriptorString(), false);
 		m.visitInsn(ARETURN);
 		m.visitMaxs(-1, -1);
 		m.visitEnd();
@@ -253,10 +251,10 @@ public final class AnonymousClassLMF extends AbstractLMF
 	private void generateConstructor()
 	{
 		// Generate constructor
-		MethodVisitor ctor = this.cw.visitMethod(PRIVATE, NAME_CTOR, this.constructorType.toMethodDescriptorString(), null, null);
+		MethodVisitor ctor = this.cw.visitMethod(PRIVATE, "<init>", this.constructorType.toMethodDescriptorString(), null, null);
 		ctor.visitCode();
 		ctor.visitVarInsn(ALOAD, 0);
-		ctor.visitMethodInsn(INVOKESPECIAL, JAVA_LANG_OBJECT, NAME_CTOR, METHOD_DESCRIPTOR_VOID, false);
+		ctor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 		int parameterCount = this.parameterCount;
 		for (int i = 0, lvIndex = 0; i < parameterCount; i++)
 		{

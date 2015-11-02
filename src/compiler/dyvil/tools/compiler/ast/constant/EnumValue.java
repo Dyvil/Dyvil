@@ -65,6 +65,10 @@ public class EnumValue implements IConstantValue, INamed
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (!this.type.isResolved())
+		{
+			this.type = this.type.resolveType(markers, context);
+		}
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	

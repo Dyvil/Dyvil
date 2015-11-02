@@ -1,6 +1,8 @@
-package dyvil.runtime;
+package dyvil.runtime.lambda;
 
 import java.lang.invoke.*;
+
+import dyvil.runtime.Wrapper;
 
 public abstract class AbstractLMF
 {
@@ -120,7 +122,7 @@ public abstract class AbstractLMF
 	
 	public abstract CallSite buildCallSite() throws LambdaConversionException;
 	
-	protected void validateMetafactoryArgs() throws LambdaConversionException
+	public void validateMetafactoryArgs() throws LambdaConversionException
 	{
 		switch (this.implKind)
 		{
