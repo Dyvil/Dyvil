@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -285,7 +286,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (annotation != null)
 			{
 				this.readIntrinsicAnnotation(annotation);
-				return false;
+				return this.getClass() != ExternalMethod.class;
 			}
 		}
 		return true;
@@ -728,7 +729,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				IValue instance1 = IType.convertValue(instance, this.theClass.getType(), typeContext, markers, context);
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, this.theClass.getType(), typeContext, "method.access.receiver_type");
+					Util.createTypeError(markers, instance, this.theClass.getType(), typeContext, "method.access.receiver_type", this.getName());
 				}
 				else
 				{

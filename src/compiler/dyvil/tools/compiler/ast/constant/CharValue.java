@@ -199,6 +199,12 @@ public final class CharValue implements IConstantValue
 	}
 	
 	@Override
+	public String stringValue()
+	{
+		return this.value;
+	}
+	
+	@Override
 	public Object toObject()
 	{
 		if (this.type == CHAR)

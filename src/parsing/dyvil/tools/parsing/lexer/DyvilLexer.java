@@ -294,7 +294,7 @@ public final class DyvilLexer
 				}
 				break;
 			case STRING:
-				if (c == '"' && (buf.length() > 1 || string))
+				if (c == '"' && (buf.length() > 0 || string))
 				{
 					if (!string && buf.charAt(0) == '"')
 					{
