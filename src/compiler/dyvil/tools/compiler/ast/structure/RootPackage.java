@@ -13,7 +13,7 @@ public final class RootPackage extends Package
 {
 	public RootPackage()
 	{
-		this.setInternalName(this.fullName = "");
+		this.setInternalName(this.fullName = ""); // Assignment intentional
 		this.name = Name.getQualified("");
 	}
 	
@@ -36,6 +36,12 @@ public final class RootPackage extends Package
 		}
 		
 		String internal = ClassFormat.internalToPackage(name);
+		return this.resolvePackageInternal(internal);
+	}
+	
+	public Package resolvePackageInternal(String internal)
+	{
+		Package pack;
 		for (Library lib : DyvilCompiler.config.libraries)
 		{
 			pack = lib.resolvePackage(internal);
@@ -61,9 +67,11 @@ public final class RootPackage extends Package
 		{
 			return super.resolveClass(internal);
 		}
+		
 		String packageName = internal.substring(0, index);
 		String className = internal.substring(index + 1);
 		Package pack;
+		
 		for (Library lib : DyvilCompiler.config.libraries)
 		{
 			pack = lib.resolvePackage(packageName);

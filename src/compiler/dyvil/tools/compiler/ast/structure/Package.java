@@ -41,7 +41,7 @@ public class Package implements INamed, IDefaultContext
 	public static Package	dyvilTuple;
 	public static Package	dyvilUtil;
 	public static Package	java;
-	public static Package javaIO;
+	public static Package	javaIO;
 	public static Package	javaLang;
 	public static Package	javaLangAnnotation;
 	public static Package	javaUtil;
@@ -226,12 +226,28 @@ public class Package implements INamed, IDefaultContext
 				return c;
 			}
 		}
-		return this.loadClass(name);
+		
+		String qualifiedName = name.qualified;
+		// Check for inner / nested / anonymous classes
+		int cashIndex = qualifiedName.indexOf('$');
+		if (cashIndex >= 0)
+		{
+			Name firstName = Name.getQualified(qualifiedName.substring(0, cashIndex));
+			Name lastName = Name.getQualified(qualifiedName.substring(cashIndex + 1));
+			
+			IClass c = this.resolveClass(firstName);
+			if (c != null)
+			{
+				return c.resolveClass(lastName);
+			}
+		}
+		
+		return this.loadClass(name, qualifiedName);
 	}
 	
-	private IClass loadClass(Name name)
+	private IClass loadClass(Name name, String qualifiedName)
 	{
-		String fileName = this.getInternalName() + name.qualified + FileType.CLASS_EXTENSION;
+		String fileName = this.getInternalName() + qualifiedName + FileType.CLASS_EXTENSION;
 		
 		for (Library library : DyvilCompiler.config.libraries)
 		{
@@ -257,6 +273,20 @@ public class Package implements INamed, IDefaultContext
 			}
 		}
 		
+		return null;
+	}
+	
+	public static IClass loadClass(String fileName, Name name)
+	{
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			InputStream is = library.getInputStream(fileName);
+			if (is != null)
+			{
+				ExternalClass bclass = new ExternalClass(name);
+				return ClassReader.loadClass(bclass, is, false);
+			}
+		}
 		return null;
 	}
 	

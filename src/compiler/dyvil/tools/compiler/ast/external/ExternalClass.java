@@ -4,8 +4,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.access.MethodCall;
@@ -43,6 +44,7 @@ import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
+import dyvil.tools.compiler.sources.FileType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -51,7 +53,7 @@ public final class ExternalClass extends AbstractClass
 {
 	public Package thePackage;
 	
-	private List<IType> innerTypes;
+	private Map<String, String> innerTypes;
 	
 	private boolean	metadataResolved;
 	private boolean	superTypesResolved;
@@ -139,16 +141,28 @@ public final class ExternalClass extends AbstractClass
 	{
 		this.innerTypesResolved = true;
 		
-		if (this.innerTypes != null)
+		if (this.innerTypes == null)
 		{
-			int len = this.innerTypes.size();
-			for (int i = 0; i < len; i++)
+			return;
+		}
+		
+		for (Entry<String, String> entry : this.innerTypes)
+		{
+			Name name = Name.getQualified(entry.getKey());
+			String internal = entry.getValue();
+			
+			// Resolve the class name
+			String fileName = internal + FileType.CLASS_EXTENSION;
+			IClass c = Package.loadClass(fileName, name);
+			if (c != null)
 			{
-				IType t = this.innerTypes.get(i);
-				this.innerTypes.set(i, t.resolveType(null, Package.rootPackage));
-				t.getTheClass().setOuterClass(this);
+				c.setOuterClass(this);
+				this.body.addClass(c);
+				continue;
 			}
 		}
+		
+		this.innerTypes = null;
 	}
 	
 	@Override
@@ -380,18 +394,7 @@ public final class ExternalClass extends AbstractClass
 			this.resolveInnerTypes();
 		}
 		
-		if (this.innerTypes != null)
-		{
-			for (IType t : this.innerTypes)
-			{
-				if (t.getName() == name)
-				{
-					return t.getTheClass();
-				}
-			}
-		}
-		
-		return null;
+		return this.body.getClass(name);
 	}
 	
 	@Override
@@ -728,11 +731,10 @@ public final class ExternalClass extends AbstractClass
 	{
 		if (this.innerTypes == null)
 		{
-			this.innerTypes = new ArrayList(1);
+			this.innerTypes = new ArrayMap(3);
 		}
 		
-		IType type = ClassFormat.internalToType(name);
-		this.innerTypes.add(type);
+		this.innerTypes.put(innerName, name);
 	}
 	
 	public void visitEnd()
