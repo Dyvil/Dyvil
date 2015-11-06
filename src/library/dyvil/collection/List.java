@@ -98,14 +98,14 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return ImmutableList.fromArray(elements);
 	}
 	
-	public static <E> ImmutableList<E> apply(int count, E repeatedValue)
+	public static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
-		return ImmutableList.apply(count, repeatedValue);
+		return ImmutableList.repeat(count, repeatedValue);
 	}
 	
-	public static <E> ImmutableList<E> apply(int count, IntFunction<E> generator)
+	public static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
 	{
-		return ImmutableList.apply(count, generator);
+		return ImmutableList.generate(count, generator);
 	}
 	
 	// Simple getters

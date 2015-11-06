@@ -54,7 +54,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList(elements, true);
 	}
 	
-	public static <E> ImmutableList<E> apply(int count, E repeatedValue)
+	public static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
 		Object[] elements = new Object[count];
 		for (int i = 0; i < count; i++)
@@ -64,7 +64,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList(elements, count, true);
 	}
 	
-	public static <E> ImmutableList<E> apply(int count, IntFunction<E> generator)
+	public static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
 	{
 		Object[] elements = new Object[count];
 		for (int i = 0; i < count; i++)
