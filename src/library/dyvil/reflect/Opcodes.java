@@ -920,6 +920,8 @@ public interface Opcodes
 	
 	public static final int OBJECT_EQUALS = 318;
 	
+	public static final int SWAP2 = 330;
+	
 	public static final int	AUTO_SWAP	= 350;
 	public static final int	AUTO_POP	= 351;
 	public static final int	AUTO_POP2	= 352;

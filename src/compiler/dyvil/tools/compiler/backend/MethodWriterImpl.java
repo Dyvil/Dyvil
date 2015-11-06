@@ -432,8 +432,13 @@ public final class MethodWriterImpl implements MethodWriter
 			case Opcodes.OBJECT_EQUALS:
 				this.frame.pop();
 				this.frame.pop();
-				this.frame.push(ClassFormat.BOOLEAN);
 				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+				this.frame.push(ClassFormat.BOOLEAN);
+				return;
+			case SWAP2:
+				this.frame.reserve(2);
+				this.mv.visitInsn(Opcodes.DUP2_X2);
+				this.mv.visitInsn(Opcodes.POP2);
 				return;
 			case Opcodes.AUTO_SWAP:
 				BackendUtil.swap(this);

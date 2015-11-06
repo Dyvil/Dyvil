@@ -261,6 +261,14 @@ public class Frame
 		this.stack[this.stackCount++] = type;
 	}
 	
+	public void reserve(int stackSlots)
+	{
+		if (this.actualStackCount + stackSlots > this.maxStack)
+		{
+			this.maxStack = this.actualStackCount + stackSlots;
+		}
+	}
+	
 	public void pop() throws StackUnderflowException
 	{
 		if (this.stackCount == 0)
