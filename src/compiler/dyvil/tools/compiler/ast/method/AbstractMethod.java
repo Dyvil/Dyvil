@@ -56,6 +56,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker", "linkExtension",
 			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
 			
+	static final int VARARGS_MATCH = 100;
+
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
@@ -68,9 +70,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected IValue value;
 	
 	// Metadata
-	protected IClass	theClass;
-	protected String	descriptor;
-	protected IntrinsicData intrinsicData;
+	protected IClass		theClass;
+	protected String		descriptor;
+	protected IntrinsicData	intrinsicData;
 	
 	public AbstractMethod(IClass iclass)
 	{
@@ -569,10 +571,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int len = this.parameterCount - 1 - parIndex;
+			int varargsStart = this.parameterCount - 1 - parIndex;
 			
 			float m;
-			for (int i = parIndex; i < len; i++)
+			for (int i = parIndex; i < varargsStart; i++)
 			{
 				IParameter par = this.parameters[i + parIndex];
 				m = arguments.getTypeMatch(i, par);
@@ -582,12 +584,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 				match += m;
 			}
-			m = arguments.getVarargsTypeMatch(len, this.parameters[len + parIndex]);
-			if (m == 0)
+			
+			IParameter varParam = this.parameters[varargsStart + parIndex];
+			for (int i = varargsStart; i < argumentCount; i++)
 			{
-				return 0;
+				m = arguments.getVarargsTypeMatch(i, varParam);
+				if (m == 0)
+				{
+					return 0;
+				}
+				match += m;
 			}
-			return match + m;
+			return match + VARARGS_MATCH;
 		}
 		
 		int len = this.parameterCount - parIndex;

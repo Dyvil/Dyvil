@@ -570,12 +570,12 @@ public class Constructor extends Member implements IConstructor
 	public float getSignatureMatch(IArguments arguments)
 	{
 		int match = 1;
-		int len = arguments.size();
+		int argumentCount = arguments.size();
 		
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int parCount = this.parameterCount - 1;
-			if (len <= parCount)
+			if (argumentCount <= parCount)
 			{
 				return 0;
 			}
@@ -592,7 +592,7 @@ public class Constructor extends Member implements IConstructor
 				}
 				match += m;
 			}
-			for (int i = parCount; i < len; i++)
+			for (int i = parCount; i < argumentCount; i++)
 			{
 				m = arguments.getVarargsTypeMatch(i, varParam);
 				if (m == 0)
@@ -601,9 +601,9 @@ public class Constructor extends Member implements IConstructor
 				}
 				match += m;
 			}
-			return match;
+			return match + AbstractMethod.VARARGS_MATCH;
 		}
-		else if (len > this.parameterCount)
+		else if (argumentCount > this.parameterCount)
 		{
 			return 0;
 		}

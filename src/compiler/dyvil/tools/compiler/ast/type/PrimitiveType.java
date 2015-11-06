@@ -325,7 +325,12 @@ public final class PrimitiveType implements IType
 		{
 			return 2;
 		}
-		return this.theClass.getSuperTypeDistance(superType);
+		int m = this.theClass.getSuperTypeDistance(superType);
+		if (m <= 0)
+		{
+			return 0;
+		}
+		return m + 1;
 	}
 	
 	private static int bitMask(int from, int to)
