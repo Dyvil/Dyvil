@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldInitializer implements IStatement
 {
@@ -95,6 +95,12 @@ public final class FieldInitializer implements IStatement
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.variable.writeInit(writer);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.variable.toString();
 	}
 	
 	@Override

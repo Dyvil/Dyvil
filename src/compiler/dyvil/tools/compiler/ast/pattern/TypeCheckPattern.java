@@ -4,12 +4,13 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class TypeCheckPattern implements IPattern
 {
@@ -101,21 +102,15 @@ public class TypeCheckPattern implements IPattern
 			
 			if (this.type.isPrimitive())
 			{
-				markers.add(this.position, "pattern.typecheck.primitive");
+				markers.add(I18n.createMarker(this.position, "pattern.typecheck.primitive"));
 			}
 		}
 		else
 		{
-			markers.add(this.position, "pattern.typecheck.invalid");
+			markers.add(I18n.createMarker(this.position, "pattern.typecheck.invalid"));
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		// TODO
 	}
 	
 	@Override

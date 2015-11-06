@@ -4,33 +4,47 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 
-@ArrayConvertible(methodName = "fromLiteral")
+@NilConvertible
+@ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
 {
-	public static <E> ArraySet<E> apply(E... elements)
+	private static final long serialVersionUID = -6676561653968567088L;
+	
+	public static <E> ArraySet<E> apply()
 	{
-		return new ArraySet(elements);
+		return new ArraySet();
 	}
 	
-	public static <E> ArraySet<E> fromLiteral(E... elements)
+	public static <E> ArraySet<E> apply(E... elements)
 	{
 		return new ArraySet(elements, true);
 	}
 	
-	public ArraySet(E... elements)
+	public static <E> ArraySet<E> fromArray(E... elements)
 	{
-		super(elements);
+		return new ArraySet(elements);
+	}
+	
+	public ArraySet()
+	{
+		super(new Object[DEFAULT_CAPACITY], 0, true);
 	}
 	
 	public ArraySet(int size)
 	{
 		super(new Object[size], 0, true);
+	}
+	
+	public ArraySet(E... elements)
+	{
+		super(elements);
 	}
 	
 	public ArraySet(E[] elements, int size)

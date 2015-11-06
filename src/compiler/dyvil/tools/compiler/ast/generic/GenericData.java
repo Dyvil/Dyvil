@@ -1,21 +1,22 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements ITypeList, ITypeContext
 {
 	public IMethod	method;
 	public IType[]	generics;
 	public int		genericCount;
-	public IType	instanceType;
+	public IValue	instance;
 	
 	public GenericData()
 	{
@@ -103,7 +104,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			}
 			return this.generics[index];
 		}
-		return this.instanceType.resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override
@@ -122,6 +123,11 @@ public final class GenericData implements ITypeList, ITypeContext
 		
 		if (index < this.genericCount)
 		{
+			if (this.generics[index] == null)
+			{
+				this.generics[index] = type;
+				return;
+			}
 			this.generics[index] = Types.combine(this.generics[index], type);
 			return;
 		}

@@ -33,7 +33,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 	
 	public static void save(File file, byte[] bytes)
 	{
-		if (!FileUtils.createFile(file))
+		if (!FileUtils.create(file))
 		{
 			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
 		}
@@ -85,7 +85,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		String fileName = config.getJarName();
 		
 		File output = new File(fileName);
-		FileUtils.createFile(output);
+		FileUtils.create(output);
 		
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();
@@ -98,7 +98,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		
 		String outputDir = DyvilCompiler.config.getOutputDir().getAbsolutePath();
 		int len = outputDir.length();
-		if (!outputDir.endsWith("/"))
+		if (outputDir.charAt(len - 1) != File.separatorChar)
 		{
 			len++;
 		}

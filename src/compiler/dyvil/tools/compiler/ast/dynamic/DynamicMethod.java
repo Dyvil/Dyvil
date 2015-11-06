@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.array.ObjectArray;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -17,7 +18,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -29,8 +29,9 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class DynamicMethod implements IMethod, IDefaultContext
 {
@@ -199,6 +200,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
+	public boolean isAbstract()
+	{
+		return false;
+	}
+	
+	@Override
 	public int getAccessLevel()
 	{
 		return 0;
@@ -359,6 +366,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
+	public int getInvokeOpcode()
+	{
+		return Opcodes.INVOKEDYNAMIC;
+	}
+	
+	@Override
 	public String getDescriptor()
 	{
 		return null;
@@ -389,13 +402,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 		
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, Types.OBJECT);
 			instance.getType().appendExtendedName(desc);
 		}
 		
 		for (IValue v : arguments)
 		{
-			v.writeExpression(writer);
+			v.writeExpression(writer, Types.OBJECT);
 			v.getType().appendExtendedName(desc);
 		}
 		desc.append(')');

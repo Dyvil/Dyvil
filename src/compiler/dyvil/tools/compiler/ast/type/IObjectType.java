@@ -13,6 +13,18 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public interface IObjectType extends IType
 {
 	@Override
+	public default boolean isPrimitive()
+	{
+		return false;
+	}
+	
+	@Override
+	public default int getTypecode()
+	{
+		return -1;
+	}
+	
+	@Override
 	public default IType getObjectType()
 	{
 		return this;
@@ -67,6 +79,12 @@ public interface IObjectType extends IType
 	}
 	
 	@Override
+	public default boolean classEquals(IType type)
+	{
+		return this.getTheClass() == type.getTheClass() && !type.isPrimitive();
+	}
+	
+	@Override
 	public default int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;
@@ -105,13 +123,16 @@ public interface IObjectType extends IType
 	@Override
 	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
-		if (target == this || target.isSuperClassOf(this))
+		if (target == this)
 		{
 			return;
 		}
 		
-		writer.writeLineNumber(lineNumber);
-		writer.writeTypeInsn(Opcodes.CHECKCAST, target.getTheClass().getInternalName());
+		if (!target.isSuperClassOf(this))
+		{
+			writer.writeLineNumber(lineNumber);
+			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+		}
 		if (target.isPrimitive())
 		{
 			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);

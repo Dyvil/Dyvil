@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -16,10 +16,14 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
 {
+	// --- Expression IDs ---
+	
+	// Literals
 	int	VOID			= 0;
 	int	NULL			= 1;
 	int	NIL				= 2;
@@ -34,64 +38,80 @@ public interface IValue extends IASTNode, ITyped
 	int	DOUBLE			= 11;
 	int	STRING			= 12;
 	int	FORMAT_STRING	= 13;
-	int	STRINGBUILDER	= 14;
 	
-	int	THIS	= 16;
-	int	SUPER	= 17;
+	// Compound Constructs
+	int	STATEMENT_LIST	= 32;
+	int	BYTECODE		= 33;
+	int	TUPLE			= 34;
+	int	ARRAY			= 35;
+	int	MAP				= 36;
+	int	ANNOTATION		= 37;
 	
-	int	STATEMENT_LIST		= 24;
-	int	ARRAY				= 25;
-	int	TUPLE				= 26;
-	int	CASE_STATEMENT		= 27;
-	int	MATCH				= 28;
-	int	LAMBDA				= 29;
-	int	PARTIAL_FUNCTION	= 30;
-	int	BYTECODE			= 31;
+	// Basic Language Constructs
+	int	THIS	= 64;
+	int	SUPER	= 65;
 	
-	int	CLASS_ACCESS		= 32;
-	int	ENUM				= 33;
-	int	FIELD_ACCESS		= 34;
-	int	FIELD_ASSIGN		= 35;
-	int	METHOD_CALL			= 36;
-	int	APPLY_CALL			= 37;
-	int	UPDATE_CALL			= 38;
-	int	SUBSCRIPT_GET		= 39;
-	int	SUBSCRIPT_SET		= 40;
-	int	CONSTRUCTOR_CALL	= 41;
-	int	INITIALIZER_CALL	= 42;
+	int	CAST_OPERATOR		= 66;
+	int	ISOF_OPERATOR		= 67;
+	int	CASE_STATEMENT		= 68;
+	int	MATCH				= 69;
+	int	LAMBDA				= 70;
+	int	PARTIAL_FUNCTION	= 71;
 	
-	int	VARIABLE		= 43;
-	int	NESTED_METHOD	= 44;
-	int	ANNOTATION		= 45;
+	// Access and Invocation
+	int	CLASS_ACCESS	= 96;
+	int	FIELD_ACCESS	= 97;
+	int	ENUM_ACCESS		= 98;
+	int	METHOD_CALL		= 99;
+	int	APPLY_CALL		= 100;
+	int	UPDATE_CALL		= 101;
+	int	SUBSCRIPT_GET	= 102;
+	int	SUBSCRIPT_SET	= 103;
 	
-	int	CAST_OPERATOR	= 48;
-	int	ISOF_OPERATOR	= 49;
-	int	SWAP_OPERATOR	= 50;
-	int	BOOLEAN_AND		= 51;
-	int	BOOLEAN_OR		= 52;
-	int	BOOLEAN_NOT		= 53;
-	int	CLASS_OPERATOR	= 54;
-	int	TYPE_OPERATOR	= 55;
-	int	NULLCHECK		= 56;
-	int	RANGE_OPERATOR	= 57;
+	// Special Invocation
+	int	CONSTRUCTOR_CALL	= 112;
+	int	INITIALIZER_CALL	= 113;
 	
-	int	RETURN			= 70;
-	int	IF				= 71;
-	int	SWITCH			= 72;
-	int	FOR				= 73;
-	int	WHILE			= 74;
-	int	DO_WHILE		= 75;
-	int	TRY				= 76;
-	int	THROW			= 77;
-	int	SYNCHRONIZED	= 78;
+	// Assignments
+	int	FIELD_ASSIGN	= 120;
+	int	COMPOUND_CALL	= 121;
 	
-	int	BREAK		= 79;
-	int	CONTINUE	= 80;
-	int	GOTO		= 81;
+	// Special Operators and Intrinsics
+	int	SWAP_OPERATOR	= 128;
+	int	BOOLEAN_AND		= 129;
+	int	BOOLEAN_OR		= 130;
+	int	BOOLEAN_NOT		= 131;
+	int	CLASS_OPERATOR	= 132;
+	int	TYPE_OPERATOR	= 133;
+	int	NULLCHECK		= 134;
+	int	RANGE_OPERATOR	= 135;
+	int	STRINGBUILDER	= 136;
+	
+	// Basic Control Statements
+	int	RETURN			= 192;
+	int	IF				= 193;
+	int	SWITCH			= 194;
+	int	FOR				= 195;
+	int	WHILE			= 196;
+	int	DO_WHILE		= 197;
+	int	TRY				= 198;
+	int	THROW			= 199;
+	int	SYNCHRONIZED	= 200;
+	
+	// Jump Statements
+	int	BREAK		= 214;
+	int	CONTINUE	= 215;
+	int	GOTO		= 216;
+	
+	// Pseudo-Expressions
+	int	VARIABLE		= 232;
+	int	NESTED_METHOD	= 233;
 	
 	// Special Types only used by the compiler
-	int	REFERENCE	= 128;
-	int	BOXED		= 129;
+	int	REFERENCE	= 240;
+	int	BOXED		= 241;
+	
+	// --- Other Constants ---
 	
 	float CONVERSION_MATCH = 1000F;
 	
@@ -132,27 +152,6 @@ public interface IValue extends IASTNode, ITyped
 	
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
 	
-	public static IValue autoBox(IValue value, IType valueType, IType targetType)
-	{
-		if (!targetType.isSuperTypeOf(valueType))
-		{
-			return null;
-		}
-		
-		boolean primitive = valueType.isPrimitive();
-		if (primitive != targetType.isPrimitive())
-		{
-			// Box Primitive -> Object
-			if (primitive)
-			{
-				return new BoxedValue(value, valueType.getBoxMethod());
-			}
-			// Unbox Object -> Primitive
-			return new BoxedValue(value, targetType.getUnboxMethod());
-		}
-		return value;
-	}
-	
 	@Override
 	public default boolean isType(IType type)
 	{
@@ -190,7 +189,149 @@ public interface IValue extends IASTNode, ITyped
 	
 	public IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
+	public default IValue toConstant(MarkerList markers)
+	{
+		return null;
+	}
+	
+	public default int stringSize()
+	{
+		return 20;
+	}
+	
+	public default boolean toStringBuilder(StringBuilder builder)
+	{
+		return false;
+	}
+	
+	public static IValue fromObject(Object o)
+	{
+		if (o == null)
+		{
+			return new NullValue();
+		}
+		Class c = o.getClass();
+		if (c == Character.class)
+		{
+			return new CharValue(null, o.toString(), true);
+		}
+		else if (c == Integer.class)
+		{
+			return new IntValue((Integer) o);
+		}
+		else if (c == Long.class)
+		{
+			return new LongValue((Long) o);
+		}
+		else if (c == Float.class)
+		{
+			return new FloatValue((Float) o);
+		}
+		else if (c == Double.class)
+		{
+			return new DoubleValue((Double) o);
+		}
+		else if (c == String.class)
+		{
+			return new StringValue((String) o);
+		}
+		else if (c == int[].class)
+		{
+			Array valueList = new Array(null);
+			valueList.arrayType = new ArrayType(Types.INT);
+			valueList.elementType = Types.INT;
+			for (int i : (int[]) o)
+			{
+				valueList.addValue(new IntValue(i));
+			}
+			return valueList;
+		}
+		else if (c == long[].class)
+		{
+			Array valueList = new Array();
+			valueList.arrayType = new ArrayType(Types.LONG);
+			valueList.elementType = Types.LONG;
+			for (long l : (long[]) o)
+			{
+				valueList.addValue(new LongValue(l));
+			}
+			return valueList;
+		}
+		else if (c == float[].class)
+		{
+			Array valueList = new Array();
+			valueList.arrayType = new ArrayType(Types.FLOAT);
+			valueList.elementType = Types.FLOAT;
+			for (float f : (float[]) o)
+			{
+				valueList.addValue(new FloatValue(f));
+			}
+			return valueList;
+		}
+		else if (c == double[].class)
+		{
+			Array valueList = new Array();
+			valueList.arrayType = new ArrayType(Types.DOUBLE);
+			valueList.elementType = Types.DOUBLE;
+			for (double d : (double[]) o)
+			{
+				valueList.addValue(new DoubleValue(d));
+			}
+			return valueList;
+		}
+		else if (c == dyvil.tools.asm.Type.class)
+		{
+			dyvil.tools.asm.Type type = (dyvil.tools.asm.Type) o;
+			return new ClassOperator(Types.fromASMType(type));
+		}
+		return null;
+	}
+	
+	public default Object toObject()
+	{
+		return null;
+	}
+	
+	public default boolean booleanValue()
+	{
+		return false;
+	}
+	
+	public default int intValue()
+	{
+		return 0;
+	}
+	
+	public default long longValue()
+	{
+		return 0L;
+	}
+	
+	public default float floatValue()
+	{
+		return 0F;
+	}
+	
+	public default double doubleValue()
+	{
+		return 0D;
+	}
+	
+	public default String stringValue()
+	{
+		return null;
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer);
+	
 	// Compilation
+	
+	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		this.getType().writeCast(writer, type, this.getLineNumber());
+	}
 	
 	/**
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
@@ -237,134 +378,8 @@ public interface IValue extends IASTNode, ITyped
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
-	public default int stringSize()
+	public default void writeAnnotationValue(AnnotationVisitor visitor, String key)
 	{
-		return 20;
+		visitor.visit(key, this.toObject());
 	}
-	
-	public default boolean toStringBuilder(StringBuilder builder)
-	{
-		return false;
-	}
-	
-	public default Object toObject()
-	{
-		return null;
-	}
-	
-	public default boolean booleanValue()
-	{
-		return false;
-	}
-	
-	public default int intValue()
-	{
-		return 0;
-	}
-	
-	public default long longValue()
-	{
-		return 0L;
-	}
-	
-	public default float floatValue()
-	{
-		return 0F;
-	}
-	
-	public default double doubleValue()
-	{
-		return 0D;
-	}
-	
-	public default String stringValue()
-	{
-		return null;
-	}
-	
-	public static IValue fromObject(Object o)
-	{
-		if (o == null)
-		{
-			return new NullValue();
-		}
-		Class c = o.getClass();
-		if (c == Character.class)
-		{
-			return new CharValue((Character) o);
-		}
-		else if (c == Integer.class)
-		{
-			return new IntValue((Integer) o);
-		}
-		else if (c == Long.class)
-		{
-			return new LongValue((Long) o);
-		}
-		else if (c == Float.class)
-		{
-			return new FloatValue((Float) o);
-		}
-		else if (c == Double.class)
-		{
-			return new DoubleValue((Double) o);
-		}
-		else if (c == String.class)
-		{
-			return new StringValue((String) o);
-		}
-		else if (c == int[].class)
-		{
-			Array valueList = new Array(null);
-			valueList.requiredType = new ArrayType(Types.INT);
-			valueList.elementType = Types.INT;
-			for (int i : (int[]) o)
-			{
-				valueList.addValue(new IntValue(i));
-			}
-			return valueList;
-		}
-		else if (c == long[].class)
-		{
-			Array valueList = new Array();
-			valueList.requiredType = new ArrayType(Types.LONG);
-			valueList.elementType = Types.LONG;
-			for (long l : (long[]) o)
-			{
-				valueList.addValue(new LongValue(l));
-			}
-			return valueList;
-		}
-		else if (c == float[].class)
-		{
-			Array valueList = new Array();
-			valueList.requiredType = new ArrayType(Types.FLOAT);
-			valueList.elementType = Types.FLOAT;
-			for (float f : (float[]) o)
-			{
-				valueList.addValue(new FloatValue(f));
-			}
-			return valueList;
-		}
-		else if (c == double[].class)
-		{
-			Array valueList = new Array();
-			valueList.requiredType = new ArrayType(Types.DOUBLE);
-			valueList.elementType = Types.DOUBLE;
-			for (double d : (double[]) o)
-			{
-				valueList.addValue(new DoubleValue(d));
-			}
-			return valueList;
-		}
-		else if (c == dyvil.tools.asm.Type.class)
-		{
-			dyvil.tools.asm.Type type = (dyvil.tools.asm.Type) o;
-			return new ClassOperator(Types.fromASMType(type));
-		}
-		return null;
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer);
 }

@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.lang.literal.CharConvertible;
 
 import dyvil.annotation.Intrinsic;
@@ -10,8 +12,10 @@ import dyvil.annotation.prefix;
 import static dyvil.reflect.Opcodes.*;
 
 @CharConvertible
-public class Char implements Integer
+public class Char implements Integer, Serializable
 {
+	private static final long serialVersionUID = -4823027430692159020L;
+	
 	public static final char	min		= java.lang.Character.MIN_VALUE;
 	public static final char	max		= java.lang.Character.MAX_VALUE;
 	public static final byte	size	= java.lang.Character.SIZE;
@@ -1032,6 +1036,24 @@ public class Char implements Integer
 	public Int $gt$gt$gt(Integer v)
 	{
 		return Int.apply(this.value >>> v.intValue());
+	}
+	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Long.compare(this.value, o.longValue());
+	}
+	
+	@Override
+	public Char next()
+	{
+		return Char.apply((char) (this.value + 1));
+	}
+	
+	@Override
+	public Number previous()
+	{
+		return Char.apply((char) (this.value - 1));
 	}
 	
 	// Object methods

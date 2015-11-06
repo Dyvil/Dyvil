@@ -2,11 +2,11 @@ package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.parsing.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor
 {
@@ -17,10 +17,12 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		this.method = method;
 	}
 	
+	private int parameterIndex;
+	
 	@Override
-	public void visitParameter(String name, int index)
+	public void visitParameter(String name, int modifiers)
 	{
-		this.method.getParameter_(index).setName(Name.getQualified(name));
+		this.method.getParameter_(this.parameterIndex++).setName(Name.getQualified(name));
 	}
 	
 	@Override

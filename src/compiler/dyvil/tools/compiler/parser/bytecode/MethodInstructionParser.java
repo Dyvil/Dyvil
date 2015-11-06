@@ -2,13 +2,12 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
 import dyvil.tools.compiler.ast.bytecode.MethodInstruction;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class MethodInstructionParser extends Parser implements IInternalTyped
 {
@@ -27,10 +26,10 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
@@ -39,7 +38,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		switch (this.mode)
 		{
 		case OWNER:
-			if (type == Keywords.INTERFACE)
+			if (type == DyvilKeywords.INTERFACE)
 			{
 				this.methodInstruction.setInterface(true);
 			}
@@ -47,45 +46,48 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 			this.mode = DOT;
 			return;
 		case DOT:
-			if (type != Symbols.DOT)
+			if (type != BaseSymbols.DOT)
 			{
-				pm.report(new SyntaxError(token, "Invalid Method Instruction - '.' expected")); return;
+				pm.report(token, "Invalid Method Instruction - '.' expected");
+				return;
 			}
 			this.mode = PARAMETERS;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(new SyntaxError(next, "Invalid Method Instruction - Identifier expected")); return;
+				pm.report(next, "Invalid Method Instruction - Identifier expected");
+				return;
 			}
 			pm.skip();
 			this.methodInstruction.setMethodName(next.nameValue().qualified);
 			return;
 		case PARAMETERS:
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new InternalTypeParser(this));
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Method Instruction - '(' expected"));
+			pm.report(token, "Invalid Method Instruction - '(' expected");
 			return;
 		case PARAMETERS_END:
-			if (type == Symbols.COMMA)
+			if (type == BaseSymbols.COMMA)
 			{
 				pm.pushParser(new InternalTypeParser(this));
 				return;
 			}
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				this.mode = COLON;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Method Instruction - ',' or ')' expected"));
+			pm.report(token, "Invalid Method Instruction - ',' or ')' expected");
 			break;
 		case COLON:
-			if (type != Symbols.COLON)
+			if (type != BaseSymbols.COLON)
 			{
-				pm.report(new SyntaxError(token, "Invalid Method Instruction - ':' expected")); return;
+				pm.report(token, "Invalid Method Instruction - ':' expected");
+				return;
 			}
 			pm.pushParser(new InternalTypeParser(this));
 			return;

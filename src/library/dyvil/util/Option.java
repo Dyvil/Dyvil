@@ -1,5 +1,6 @@
 package dyvil.util;
 
+import java.io.Serializable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -12,7 +13,7 @@ import dyvil.annotation.sealed;
 
 @NilConvertible
 @TupleConvertible
-public abstract @sealed interface Option<T>
+public abstract @sealed interface Option<T> extends Serializable
 {
 	public static <T> Option<T> of(T t)
 	{

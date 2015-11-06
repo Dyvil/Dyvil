@@ -1,14 +1,15 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IDataMember extends IMember, IValued, IAccessible
 {
@@ -19,6 +20,11 @@ public interface IDataMember extends IMember, IValued, IAccessible
 	public default boolean isEnumConstant()
 	{
 		return (this.getModifiers() & Modifiers.ENUM) != 0;
+	}
+	
+	public default IClass getTheClass()
+	{
+		return null;
 	}
 	
 	public boolean isField();
@@ -42,6 +48,11 @@ public interface IDataMember extends IMember, IValued, IAccessible
 	public String getSignature();
 	
 	public default IDataMember capture(IContext context)
+	{
+		return this;
+	}
+	
+	public default IDataMember capture(IContext context, IVariable variable)
 	{
 		return this;
 	}

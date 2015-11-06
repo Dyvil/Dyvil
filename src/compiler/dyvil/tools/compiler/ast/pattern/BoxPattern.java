@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class BoxPattern implements IPattern
 {
@@ -62,17 +62,6 @@ public class BoxPattern implements IPattern
 	{
 		this.pattern = this.pattern.resolve(markers, context);
 		return this;
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		}
-		this.boxingMethod.writeInvoke(writer, null, null, this.pattern.getLineNumber());
-		this.pattern.writeJump(writer, -1, elseLabel);
 	}
 	
 	@Override

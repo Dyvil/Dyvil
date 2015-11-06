@@ -3,16 +3,17 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
 	public RootPackage()
 	{
-		this.setInternalName(this.fullName = "");
+		this.setInternalName(this.fullName = ""); // Assignment intentional
 		this.name = Name.getQualified("");
 	}
 	
@@ -21,7 +22,7 @@ public final class RootPackage extends Package
 	{
 		if (packageDecl != null)
 		{
-			markers.add(packageDecl.getPosition(), "package.default");
+			markers.add(I18n.createMarker(packageDecl.getPosition(), "package.default"));
 		}
 	}
 	
@@ -35,6 +36,12 @@ public final class RootPackage extends Package
 		}
 		
 		String internal = ClassFormat.internalToPackage(name);
+		return this.resolvePackageInternal(internal);
+	}
+	
+	public Package resolvePackageInternal(String internal)
+	{
+		Package pack;
 		for (Library lib : DyvilCompiler.config.libraries)
 		{
 			pack = lib.resolvePackage(internal);
@@ -60,9 +67,11 @@ public final class RootPackage extends Package
 		{
 			return super.resolveClass(internal);
 		}
+		
 		String packageName = internal.substring(0, index);
 		String className = internal.substring(index + 1);
 		Package pack;
+		
 		for (Library lib : DyvilCompiler.config.libraries)
 		{
 			pack = lib.resolvePackage(packageName);

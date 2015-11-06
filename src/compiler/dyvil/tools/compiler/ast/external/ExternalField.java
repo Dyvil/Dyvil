@@ -4,10 +4,10 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalField extends Field
 {
@@ -23,7 +23,8 @@ public final class ExternalField extends Field
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		if (this.annotations != null) {
+		if (this.annotations != null)
+		{
 			this.annotations.resolveTypes(null, Package.rootPackage, this);
 		}
 	}

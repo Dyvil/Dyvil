@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -16,18 +15,19 @@ import dyvil.tools.compiler.ast.expression.LambdaExpression;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
@@ -84,6 +84,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public int typeTag()
 	{
 		return LAMBDA;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return true;
 	}
 	
 	@Override
@@ -254,6 +260,18 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public boolean hasTypeVariables()
 	{
+		if (this.returnType.hasTypeVariables())
+		{
+			return true;
+		}
+		
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameterTypes[i].hasTypeVariables())
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -313,7 +331,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context);
 		}
-		this.returnType = this.returnType.resolveType(markers, context).getObjectType();
+		this.returnType = this.returnType.resolveType(markers, context);
 		
 		return this;
 	}
@@ -333,7 +351,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(this.returnType.getPosition(), "type.class.lambda");
+			markers.add(I18n.createMarker(this.returnType.getPosition(), "type.class.lambda"));
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -380,13 +398,13 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		getLambdaClass(this.parameterCount).getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -8,16 +10,31 @@ import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TypeOperator extends Value
 {
+	public static final class Types
+	{
+		public static final IClass		TYPE_CLASS	= Package.dyvilLang.resolveClass("Type");
+		public static final ClassType	TYPE		= new ClassType();
+		
+		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected IType type;
 	
 	// Metadata
@@ -60,9 +77,10 @@ public final class TypeOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null)
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;
@@ -95,8 +113,8 @@ public final class TypeOperator extends Value
 	{
 		if (this.type == null)
 		{
-			this.type = Types.UNKNOWN;
-			markers.add(this.position, "typeoperator.invalid");
+			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
+			markers.add(I18n.createMarker(this.position, "typeoperator.invalid"));
 			return;
 		}
 		

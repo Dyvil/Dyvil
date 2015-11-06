@@ -5,10 +5,11 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.mutable.ArrayMap;
 import dyvil.collection.mutable.HashMap;
-import dyvil.collection.mutable.LinkedList;
 import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
 import dyvil.tuple.Tuple2;
@@ -16,6 +17,7 @@ import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible
+@MapConvertible
 public interface MutableMap<K, V> extends Map<K, V>
 {
 	public static <K, V> MutableMap<K, V> apply()
@@ -43,6 +45,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 			map.$plus$eq(entry);
 		}
 		return map;
+	}
+	
+	public static <K, V> MutableMap<K, V> apply(K[] keys, V[] values)
+	{
+		return new ArrayMap<K, V>(keys, values, true);
 	}
 	
 	// Simple Getters
@@ -88,6 +95,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
+	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
+	{
+		return this.$plus(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
 	public default MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
 		MutableMap<K, V> copy = this.copy();
@@ -109,6 +122,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 		MutableMap<K, V> copy = this.copy();
 		copy.$minus$eq(key, value);
 		return copy;
+	}
+	
+	@Override
+	public default Map<K, V> $minus(Entry<?, ?> entry)
+	{
+		return this.$minus(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
@@ -136,9 +155,21 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public default <NK> MutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		MutableMap<K, U> copy = this.emptyCopy();
+		MutableMap<NK, V> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			V value = entry.getValue();
+			copy.put(mapper.apply(entry.getKey(), value), value);
+		}
+		return copy;
+	}
+	
+	@Override
+	public default <NV> MutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	{
+		MutableMap<K, NV> copy = this.emptyCopy();
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
@@ -148,12 +179,12 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default <U, R> MutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public default <NK, NV> MutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		MutableMap<U, R> copy = this.emptyCopy();
+		MutableMap<NK, NV> copy = this.emptyCopy();
 		for (Entry<K, V> entry : this)
 		{
-			Entry<? extends U, ? extends R> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry.getKey(), entry.getValue());
 			if (newEntry != null)
 			{
 				copy.put(newEntry);
@@ -163,12 +194,13 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public default <U, R> MutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public default <NK, NV> MutableMap<NK, NV> flatMapped(
+			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		MutableMap<U, R> copy = (MutableMap<U, R>) this.emptyCopy();
+		MutableMap<NK, NV> copy = (MutableMap<NK, NV>) this.emptyCopy();
 		for (Entry<K, V> entry : this)
 		{
-			for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
+			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
 			{
 				copy.put(newEntry);
 			}
@@ -289,44 +321,51 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
+	public default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
+	{
+		int size = this.size();
+		Entry<K, V>[] entries = this.toArray();
+		
+		this.clear();
+		for (int i = 0; i < size; i++)
+		{
+			Entry<K, V> entry = entries[i];
+			V value = entry.getValue();
+			this.put(mapper.apply(entry.getKey(), value), value);
+		}
+	}
+	
+	@Override
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
 	@Override
 	public default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
 	{
-		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
-		for (Entry<K, V> entry : this)
+		Entry<K, V>[] entries = this.toArray();
+		
+		this.clear();
+		for (Entry<K, V> entry : entries)
 		{
 			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
 			if (newEntry != null)
 			{
-				entryList.add(entry);
+				this.put(newEntry);
 			}
-		}
-		
-		this.clear();
-		for (Entry<? extends K, ? extends V> entry : entryList)
-		{
-			this.put(entry);
 		}
 	}
 	
 	@Override
 	public default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
 	{
-		List<Entry<? extends K, ? extends V>> entryList = new LinkedList();
-		for (Entry<K, V> entry : this)
+		Entry<K, V>[] entries = this.toArray();
+		
+		this.clear();
+		for (Entry<K, V> entry : entries)
 		{
 			for (Entry<? extends K, ? extends V> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
 			{
-				entryList.add(newEntry);
+				this.put(newEntry);
 			}
-		}
-		
-		this.clear();
-		for (Entry<? extends K, ? extends V> entry : entryList)
-		{
-			this.put(entry);
 		}
 	}
 	
@@ -350,7 +389,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 		return this.copy();
 	}
 	
-	public <RK, RV> MutableMap<RK, RV> emptyCopy();
+	public <NK, NV> MutableMap<NK, NV> emptyCopy();
 	
 	@Override
 	public ImmutableMap<K, V> immutable();

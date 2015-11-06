@@ -1,18 +1,21 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class MethodCall extends AbstractCall implements INamed
 {
@@ -77,6 +80,26 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+		IValue v = this;
+		
+		do
+		{
+			if (depth-- < 0)
+			{
+				return null;
+			}
+			
+			v = v.foldConstants();
+		}
+		while (!v.isConstant());
+		
+		return v.toConstant(markers);
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.genericData != null)
@@ -88,17 +111,9 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	protected IValue resolveCall(MarkerList markers, IContext context)
 	{
 		int args = this.arguments.size();
-		
-		if (this.instance != null)
-		{
-			this.instance = this.instance.resolve(markers, context);
-		}
-		
-		this.arguments.resolve(markers, context);
-		
 		if (args == 1)
 		{
 			IValue op;
@@ -128,29 +143,20 @@ public final class MethodCall extends AbstractCall implements INamed
 		
 		if (args == 1 && this.instance != null)
 		{
-			String qualified = this.name.qualified;
-			if (qualified.endsWith("$eq"))
-			{
-				String unqualified = this.name.unqualified;
-				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				IMethod method1 = IContext.resolveMethod(this.instance.getType(), null, name, this.arguments);
-				if (method1 != null)
-				{
-					CompoundCall call = new CompoundCall(this.position);
-					call.method = method1;
-					call.instance = this.instance;
-					call.arguments = this.arguments;
-					call.name = name;
-					call.checkArguments(markers, context);
-					return call;
-				}
-			}
-			
 			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());
 			if (op != null)
 			{
 				op.setPosition(this.position);
 				return op;
+			}
+			
+			String qualified = this.name.qualified;
+			if (qualified.endsWith("$eq"))
+			{
+				Name name = Util.stripEq(this.name);
+				
+				CompoundCall cc = new CompoundCall(this.position, this.instance, name, this.arguments);
+				return cc.resolveCall(markers, context);
 			}
 		}
 		
@@ -185,7 +191,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 			
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(itype, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(itype, null, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -202,7 +208,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			access.dotless = this.dotless;
 			
 			// Find the apply method of the field type
-			IMethod match = IContext.resolveMethod(field.getType(), access, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(field.getType(), access, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -224,40 +230,43 @@ public final class MethodCall extends AbstractCall implements INamed
 	@Override
 	public IValue foldConstants()
 	{
-		this.arguments.foldConstants();
-		if (this.arguments.size() == 1)
+		if (!this.arguments.isEmpty())
 		{
-			IValue argument = this.arguments.getFirstValue();
-			if (argument.isConstant())
-			{
-				if (this.instance != null)
-				{
-					if (this.instance.isConstant())
-					{
-						IValue v1 = ConstantFolder.apply(this.instance, this.name, argument);
-						return v1 == null ? this : v1;
-					}
-					
-					this.instance = this.instance.foldConstants();
-					return this;
-				}
-				
-				IValue v1 = ConstantFolder.apply(this.name, argument);
-				if (v1 != null)
-				{
-					return v1;
-				}
-			}
-			
 			if (this.instance != null)
 			{
-				this.instance = this.instance.foldConstants();
+				if (this.instance.isConstant())
+				{
+					IValue argument;
+					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+					{
+						IValue folded = ConstantFolder.apply(this.instance, this.name, argument);
+						if (folded != null)
+						{
+							return folded;
+						}
+					}
+				}
+				else
+				{
+					this.instance = this.instance.foldConstants();
+				}
 			}
+			this.arguments.foldConstants();
 			return this;
 		}
 		
 		if (this.instance != null)
 		{
+			// Prefix methods are transformed to postfix notation
+			if (this.instance.isConstant())
+			{
+				IValue folded = ConstantFolder.apply(this.name, this.instance);
+				if (folded != null)
+				{
+					return folded;
+				}
+			}
+			
 			this.instance = this.instance.foldConstants();
 		}
 		return this;

@@ -11,26 +11,25 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractHashMap;
-import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K, V>
 {
-	private float	loadFactor;
-	private int		threshold;
+	private static final long serialVersionUID = -5390749229591621243L;
+	
+	private float			loadFactor;
+	private transient int	threshold;
 	
 	public static <K, V> HashMap<K, V> apply()
 	{
 		return new HashMap();
 	}
 	
-	HashMap(int size, float loadFactor, HashEntry[] entries)
+	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... tuples)
 	{
-		this.size = size;
-		this.loadFactor = loadFactor;
-		this.threshold = (int) ((size << 1) / loadFactor);
-		this.entries = entries;
+		return new HashMap(tuples);
 	}
 	
 	public HashMap()
@@ -38,9 +37,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
 	
-	public HashMap(int size)
+	public HashMap(int capacity)
 	{
-		this(size, DEFAULT_LOAD_FACTOR);
+		this(capacity, DEFAULT_LOAD_FACTOR);
 	}
 	
 	public HashMap(float loadFactor)
@@ -48,20 +47,16 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this(DEFAULT_CAPACITY, loadFactor);
 	}
 	
-	public HashMap(int size, float loadFactor)
+	public HashMap(int capacity, float loadFactor)
 	{
-		if (size < 0)
-		{
-			throw new IllegalArgumentException("Invalid Capacity: " + size);
-		}
+		super(capacity);
 		if (loadFactor <= 0 || Float.isNaN(loadFactor))
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
 		
 		this.loadFactor = loadFactor;
-		this.entries = new HashEntry[MathUtils.powerOfTwo(size)];
-		this.threshold = (int) Math.min(size * loadFactor, MAX_ARRAY_SIZE + 1);
+		this.threshold = (int) Math.min(capacity * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 	
 	public HashMap(Map<K, V> map)
@@ -71,39 +66,22 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		this.threshold = (int) (this.entries.length * DEFAULT_LOAD_FACTOR);
 	}
 	
-	protected void rehash()
+	public HashMap(AbstractHashMap<K, V> map)
 	{
-		HashEntry[] oldMap = this.entries;
-		int oldCapacity = oldMap.length;
-		
-		// overflow-conscious code
-		int newCapacity = (oldCapacity << 1) + 1;
-		if (newCapacity - MAX_ARRAY_SIZE > 0)
-		{
-			if (oldCapacity == MAX_ARRAY_SIZE)
-			{
-				// Keep running with MAX_ARRAY_SIZE buckets
-				return;
-			}
-			newCapacity = MAX_ARRAY_SIZE;
-		}
-		HashEntry[] newMap = new HashEntry[newCapacity];
-		
+		super(map);
+	}
+	
+	public HashMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
+		this.loadFactor = DEFAULT_LOAD_FACTOR;
+		this.threshold = (int) (this.entries.length * DEFAULT_LOAD_FACTOR);
+	}
+	
+	@Override
+	protected void updateThreshold(int newCapacity)
+	{
 		this.threshold = (int) Math.min(newCapacity * this.loadFactor, MAX_ARRAY_SIZE + 1);
-		this.entries = newMap;
-		
-		for (int i = oldCapacity; i-- > 0;)
-		{
-			HashEntry e = oldMap[i];
-			while (e != null)
-			{
-				int index = index(e.hash, newCapacity);
-				HashEntry next = e.next;
-				e.next = newMap[index];
-				newMap[index] = e;
-				e = next;
-			}
-		}
 	}
 	
 	@Override
@@ -117,39 +95,10 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		}
 	}
 	
-	private void addEntry(int hash, K key, V value, int index)
-	{
-		HashEntry[] tab = this.entries;
-		if (this.size >= this.threshold)
-		{
-			// Rehash the table if the threshold is exceeded
-			this.rehash();
-			
-			tab = this.entries;
-			hash = hash(key);
-			index = index(hash, tab.length);
-		}
-		
-		tab[index] = new HashEntry(key, value, hash, tab[index]);
-		this.size++;
-	}
-	
 	@Override
 	public void subscript_$eq(K key, V value)
 	{
-		int hash = hash(key);
-		int i = index(hash, this.entries.length);
-		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
-		{
-			Object k;
-			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
-			{
-				e.value = value;
-				return;
-			}
-		}
-		
-		this.addEntry(hash, key, value, i);
+		this.putInternal(key, value);
 	}
 	
 	@Override
@@ -170,6 +119,30 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 		
 		this.addEntry(hash, key, value, i);
 		return null;
+	}
+	
+	@Override
+	protected void addEntry(int hash, K key, V value, int index)
+	{
+		HashEntry[] tab = this.entries;
+		if (this.size >= this.threshold)
+		{
+			// Rehash / flatten the table if the threshold is exceeded
+			this.flatten();
+			
+			tab = this.entries;
+			hash = hash(key);
+			index = index(hash, tab.length);
+		}
+		
+		tab[index] = new HashEntry(key, value, hash, tab[index]);
+		this.size++;
+	}
+	
+	@Override
+	public void putAll(Map<? extends K, ? extends V> map)
+	{
+		this.putInternal(map);
 	}
 	
 	@Override
@@ -337,7 +310,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		for (HashEntry<K, V> entry : this.entries)
 		{
@@ -381,7 +354,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V>implements MutableMap<K,
 	@Override
 	public HashMap<K, V> copy()
 	{
-		return new HashMap(this);
+		return new HashMap<K, V>(this);
 	}
 	
 	@Override

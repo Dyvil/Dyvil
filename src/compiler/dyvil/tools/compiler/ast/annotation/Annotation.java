@@ -11,29 +11,46 @@ import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class Annotation implements IAnnotation
 {
+	public static final class Types
+	{
+		public static final IClass	RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
+		public static final IClass	TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
+		
+		public static final IClass		ANNOTATION_CLASS	= Package.javaLangAnnotation.resolveClass("Annotation");
+		public static final ClassType	ANNOTATION			= new ClassType(ANNOTATION_CLASS);
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
 	
 	protected ICodePosition	position;
@@ -125,17 +142,17 @@ public final class Annotation implements IAnnotation
 			IValue value = this.arguments.getValue(i, param);
 			if (value == null)
 			{
-				// TODO Error on non-default parameter
+				if (param.getValue() == null)
+				{
+					markers.add(I18n.createMarker(this.position, "annotation.parameter.missing", this.type, param.getName()));
+				}
 				continue;
 			}
 			
 			IValue value1 = value.withType(type, type, markers, context);
-			
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "annotation.type", param.getName().qualified);
-				marker.addInfo("Required Type: " + type);
-				marker.addInfo("Value Type: " + value.getType());
+				Util.createTypeError(markers, value, type, type, "annotation.parameter.type", param.getName());
 				continue;
 			}
 			
@@ -158,16 +175,15 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		if (this.type == null)
+		if (this.type == null || !this.type.isResolved())
 		{
 			return;
 		}
 		
 		IClass theClass = this.type.getTheClass();
-		
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(this.position, "annotation.type", this.type.getName());
+			markers.add(I18n.createMarker(this.position, "annotation.type", this.type.getName()));
 			return;
 		}
 		
@@ -179,7 +195,7 @@ public final class Annotation implements IAnnotation
 		IClassMetadata metadata = theClass.getMetadata();
 		if (!metadata.isTarget(target))
 		{
-			Marker error = markers.create(this.position, "annotation.target", this.type.getName());
+			Marker error = I18n.createMarker(this.position, "annotation.target", this.type.getName());
 			error.addInfo("Element Target: " + target);
 			error.addInfo("Allowed Targets: " + metadata.getTargets());
 			markers.add(error);
@@ -251,7 +267,7 @@ public final class Annotation implements IAnnotation
 			}
 			arrayVisitor.visitEnd();
 		}
-		else if (valueType == IValue.ENUM)
+		else if (valueType == IValue.ENUM_ACCESS)
 		{
 			EnumValue enumValue = (EnumValue) value;
 			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name.qualified);

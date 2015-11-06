@@ -111,6 +111,7 @@ public interface Formatting
 		public static String	arrayStart		= "[ ";
 		public static String	arrayEnd		= " ]";
 		public static String	arraySeperator	= ", ";
+		public static String	mapSeparator	= " : ";
 		
 		public static String	lambdaSeperator	= "=> ";
 		public static String	stringConcat	= " + ";

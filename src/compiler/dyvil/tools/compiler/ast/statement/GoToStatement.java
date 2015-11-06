@@ -5,12 +5,13 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.Value;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class GoToStatement extends Value implements IStatement
 {
@@ -49,17 +50,17 @@ public class GoToStatement extends Value implements IStatement
 		this.label = context.resolveLabel(this.name);
 		if (this.label == null)
 		{
-			markers.add(this.position, "resolve.label", this.name);
+			markers.add(I18n.createMarker(this.position, "resolve.label", this.name));
 		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		markers.add(this.position, "goto.warning");
+		markers.add(I18n.createMarker(this.position, "goto.warning"));
 		if (this.label == null)
 		{
-			markers.add(this.position, "goto.invalid");
+			markers.add(I18n.createMarker(this.position, "goto.invalid"));
 			return this;
 		}
 		

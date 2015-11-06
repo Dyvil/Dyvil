@@ -9,12 +9,17 @@ import dyvil.lang.literal.NilConvertible;
 
 import dyvil.annotation.internal;
 
-@NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@NilConvertible(methodName = "fromNil")
+@ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
 	@internal
 	Object VALUE = new Object();
+	
+	public static <E> ImmutableSet<E> fromNil()
+	{
+		return ImmutableSet.apply();
+	}
 	
 	public static <E> MutableSet<E> apply()
 	{
@@ -31,9 +36,9 @@ public interface Set<E> extends Collection<E>
 		return ImmutableSet.apply(elements);
 	}
 	
-	public static <E> ImmutableSet<E> fromLiteral(E... elements)
+	public static <E> ImmutableSet<E> fromArray(E... elements)
 	{
-		return ImmutableSet.fromLiteral(elements);
+		return ImmutableSet.fromArray(elements);
 	}
 	
 	// Accessors
@@ -144,7 +149,7 @@ public interface Set<E> extends Collection<E>
 	 */
 	public default void $up$eq(Collection<? extends E> collection)
 	{
-		this.intersect(collection);
+		this.exclusiveOr(collection);
 	}
 	
 	@Override
@@ -168,7 +173,7 @@ public interface Set<E> extends Collection<E>
 		{
 			if (!this.contains(element))
 			{
-				this.$plus$eq(element);
+				this.remove(element);
 				changed = true;
 			}
 		}
@@ -176,7 +181,7 @@ public interface Set<E> extends Collection<E>
 		{
 			if (!collection.contains(element))
 			{
-				this.$minus$eq(element);
+				this.remove(element);
 				changed = true;
 			}
 		}
@@ -226,11 +231,6 @@ public interface Set<E> extends Collection<E>
 	
 	public static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
-		if (c1.size() != c2.size())
-		{
-			return false;
-		}
-		
 		return Collection.unorderedEquals(c1, c2);
 	}
 	

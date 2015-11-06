@@ -1,22 +1,21 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface ICall extends IValue
 {
@@ -28,15 +27,17 @@ public interface ICall extends IValue
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
-			Marker marker = markers.create(position, "resolve.method_field", name);
+			Marker marker = I18n.createMarker(position, "resolve.method_field", name);
 			if (instance != null)
 			{
 				marker.addInfo("Callee Type: " + instance.getType());
 			}
+			
+			markers.add(marker);
 			return;
 		}
 		
-		Marker marker = markers.create(position, "resolve.method", name);
+		Marker marker = I18n.createMarker(position, "resolve.method", name);
 		if (instance != null)
 		{
 			marker.addInfo("Callee Type: " + instance.getType());
@@ -47,6 +48,8 @@ public interface ICall extends IValue
 			arguments.typesToString(builder);
 			marker.addInfo(builder.toString());
 		}
+		
+		markers.add(marker);
 	}
 	
 	public static boolean privateAccess(IContext context, IValue instance)
@@ -82,7 +85,7 @@ public interface ICall extends IValue
 	
 	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		List<MethodMatch> matches = new ArrayList();
+		MethodMatchList matches = new MethodMatchList();
 		if (instance != null)
 		{
 			IType type = instance.getType();
@@ -92,7 +95,7 @@ public interface ICall extends IValue
 				
 				if (!matches.isEmpty())
 				{
-					return IContext.getBestMethod(matches);
+					return matches.getBestMethod();
 				}
 			}
 		}
@@ -100,7 +103,7 @@ public interface ICall extends IValue
 		context.getMethodMatches(matches, instance, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return IContext.getBestMethod(matches);
+			return matches.getBestMethod();
 		}
 		
 		// Prefix Methods
@@ -114,7 +117,7 @@ public interface ICall extends IValue
 				
 				if (!matches.isEmpty())
 				{
-					return IContext.getBestMethod(matches);
+					return matches.getBestMethod();
 				}
 			}
 		}
@@ -122,7 +125,7 @@ public interface ICall extends IValue
 		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return IContext.getBestMethod(matches);
+			return matches.getBestMethod();
 		}
 		
 		return null;

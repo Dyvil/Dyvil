@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,9 +18,11 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class Variable extends Member implements IVariable
 {
@@ -112,15 +113,16 @@ public final class Variable extends Member implements IVariable
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
-			markers.add(position, "variable.assign.final", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+			Marker marker = I18n.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
 			marker.addInfo("Variable Type: " + this.type);
 			marker.addInfo("Value Type: " + newValue.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -186,7 +188,7 @@ public final class Variable extends Member implements IVariable
 			this.type = this.value.getType();
 			if (this.type == Types.UNKNOWN)
 			{
-				markers.add(this.position, "variable.type.infer", this.name.unqualified);
+				markers.add(I18n.createMarker(this.position, "variable.type.infer", this.name.unqualified));
 				this.type = Types.ANY;
 			}
 		}
@@ -194,9 +196,10 @@ public final class Variable extends Member implements IVariable
 		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.position, "variable.type", this.name.unqualified);
+			Marker marker = I18n.createMarker(this.position, "variable.type", this.name.unqualified);
 			marker.addInfo("Variable Type: " + this.type);
 			marker.addInfo("Value Type: " + this.value.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -225,7 +228,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "variable.type.void");
+			markers.add(I18n.createMarker(this.position, "variable.type.void"));
 		}
 	}
 	
@@ -278,7 +281,7 @@ public final class Variable extends Member implements IVariable
 			
 			if (value != null)
 			{
-				value.writeExpression(writer);
+				value.writeExpression(writer, this.type);
 			}
 			else
 			{
@@ -295,7 +298,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		this.index = writer.localCount();
 		writer.setLocalType(this.index, this.type.getFrameType());
@@ -341,7 +344,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);

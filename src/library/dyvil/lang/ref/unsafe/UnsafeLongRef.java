@@ -13,14 +13,14 @@ public final class UnsafeLongRef implements LongRef
 	
 	public UnsafeLongRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeLongRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeLongRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeLongRef implements LongRef
 	@Override
 	public long get()
 	{
-		return ReflectUtils.unsafe.getLong(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getLong(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(long value)
 	{
-		ReflectUtils.unsafe.putLong(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putLong(this.base, this.offset, value);
 	}
 }

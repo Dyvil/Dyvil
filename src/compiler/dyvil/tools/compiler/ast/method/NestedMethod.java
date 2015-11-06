@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -10,7 +9,6 @@ import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -19,6 +17,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.Name;
 
 public class NestedMethod extends Method
 {
@@ -133,13 +132,13 @@ public class NestedMethod extends Method
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.context.getConstructorMatches(list, arguments);
 	}
@@ -186,7 +185,7 @@ public class NestedMethod extends Method
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			this.value.writeExpression(mw);
+			this.value.writeExpression(mw, this.type);
 			mw.writeLabel(end);
 			mw.end(this.type);
 		}

@@ -1,18 +1,27 @@
 package dyvil.collection.mutable;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.*;
-import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.Collection;
+import dyvil.collection.Deque;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
+import dyvil.collection.MutableList;
+import dyvil.collection.Set;
+
+@NilConvertible
+@ArrayConvertible
 public class LinkedList<E> implements MutableList<E>, Deque<E>
 {
+	private static final long serialVersionUID = 7185956993705123890L;
+	
 	protected static class Node<E>
 	{
 		E		item;
@@ -27,9 +36,24 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 	}
 	
-	protected int		size;
-	protected Node<E>	first;
-	protected Node<E>	last;
+	protected transient int		size;
+	protected transient Node<E>	first;
+	protected transient Node<E>	last;
+	
+	public static <E> LinkedList<E> apply()
+	{
+		return new LinkedList();
+	}
+	
+	public static <E> LinkedList<E> apply(E... elements)
+	{
+		LinkedList<E> list = new LinkedList();
+		for (E element : elements)
+		{
+			list.addLast(element);
+		}
+		return list;
+	}
 	
 	public LinkedList()
 	{
@@ -65,6 +89,11 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 			@Override
 			public E next()
 			{
+				if (this.next == null)
+				{
+					throw new NoSuchElementException();
+				}
+				
 				this.lastReturned = this.next;
 				this.next = this.next.next;
 				return this.lastReturned.item;
@@ -666,7 +695,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return new ArrayList(this); // TODO immutable.LinkedList
+		return ImmutableList.linked(this);
 	}
 	
 	@Override
@@ -713,5 +742,39 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		
+		for (Node<E> node = this.first; node != null; node = node.next)
+		{
+			out.writeObject(node.item);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		
+		if (this.size <= 0)
+		{
+			return;
+		}
+		
+		Node<E> node = this.first = new Node(null, in.readObject(), null);
+		for (int i = 1; i < this.size; i++)
+		{
+			Node<E> next = new Node(node, in.readObject(), null);
+			node.next = next;
+			node = next;
+		}
+		
+		this.last = node;
 	}
 }

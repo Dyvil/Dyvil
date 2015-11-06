@@ -1,16 +1,20 @@
 package dyvil.util;
 
-import dyvil.annotation.object;
-import dyvil.lang.literal.NilConvertible;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import dyvil.lang.literal.NilConvertible;
+
+import dyvil.annotation.object;
+
 @NilConvertible
 public final @object class None implements Option
 {
+	private static final long serialVersionUID = 1853796001996785317L;
+	
 	public static final None instance = new None();
 	
 	public static None apply()
@@ -81,5 +85,15 @@ public final @object class None implements Option
 	public int hashCode()
 	{
 		return 0;
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

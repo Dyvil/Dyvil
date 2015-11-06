@@ -14,7 +14,9 @@ import dyvil.annotation.ClassParameters;
 @ClassParameters(names = { "value" })
 public final class Some<T> implements Option<T>
 {
-	final T value;
+	private static final long serialVersionUID = 4760957059219326387L;
+	
+	protected final T value;
 	
 	public static <T> Some<T> apply(T value)
 	{

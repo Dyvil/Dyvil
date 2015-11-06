@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -7,31 +8,32 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 
 import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.annotation.Covariant;
+import dyvil.collection.range.ClosedRange;
 import dyvil.collection.range.EmptyRange;
-import dyvil.collection.range.SimpleRange;
-import dyvil.collection.range.StringRange;
+import dyvil.collection.range.HalfOpenRange;
 
 @NilConvertible
 @TupleConvertible
-public interface Range<@Covariant T> extends Iterable<T>
+public interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
 	public static <T extends Ordered<T>> Range<T> apply()
 	{
 		return EmptyRange.instance;
 	}
 	
-	public static <T extends Ordered<T>> Range<T> apply(T first, T last)
+	public static <T extends Rangeable<T>> Range<T> apply(T first, T last)
 	{
-		return new SimpleRange(first, last);
+		return new ClosedRange(first, last);
 	}
 	
-	public static Range<String> apply(String first, String last)
+	public static <T extends Rangeable<T>> Range<T> halfOpen(T first, T last)
 	{
-		return new StringRange(first, last);
+		return new HalfOpenRange(first, last);
 	}
 	
 	/**
@@ -68,6 +70,8 @@ public interface Range<@Covariant T> extends Iterable<T>
 	{
 		return this.count();
 	}
+	
+	public boolean isHalfOpen();
 	
 	@Override
 	public Iterator<T> iterator();

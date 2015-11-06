@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class TableSwitchInstruction implements IInstruction
 {

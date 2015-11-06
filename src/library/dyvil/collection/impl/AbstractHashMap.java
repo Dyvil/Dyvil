@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
+import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -17,10 +19,12 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 {
 	protected static final class HashEntry<K, V> implements Entry<K, V>
 	{
-		public K			key;
-		public V			value;
-		public int			hash;
-		public HashEntry	next;
+		private static final long serialVersionUID = 6421167357975687099L;
+		
+		public transient K			key;
+		public transient V			value;
+		public transient int		hash;
+		public transient HashEntry	next;
 		
 		public HashEntry(K key, V value, int hash)
 		{
@@ -65,6 +69,25 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		public int hashCode()
 		{
 			return Entry.entryHashCode(this);
+		}
+		
+		private void writeObject(java.io.ObjectOutputStream out) throws IOException
+		{
+			out.defaultWriteObject();
+			
+			out.writeObject(this.key);
+			out.writeObject(this.value);
+			out.writeObject(this.next);
+		}
+		
+		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			in.defaultReadObject();
+			
+			this.key = (K) in.readObject();
+			this.value = (V) in.readObject();
+			this.next = (HashEntry) in.readObject();
+			this.hash = hash(this.key);
 		}
 	}
 	
@@ -122,68 +145,103 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 				throw new IllegalStateException();
 			}
 			
-			AbstractHashMap.this.size--;
+			AbstractHashMap.this.removeEntry(e);
 			this.current = null;
-			int index = index(e.hash, AbstractHashMap.this.entries.length);
-			HashEntry<K, V> entry = AbstractHashMap.this.entries[index];
-			if (entry == e)
-			{
-				AbstractHashMap.this.entries[index] = e.next;
-			}
-			else
-			{
-				HashEntry<K, V> prev;
-				do
-				{
-					prev = entry;
-					entry = entry.next;
-				}
-				while (entry != e);
-				
-				prev.next = e.next;
-			}
 		}
 	}
 	
-	public static final float	GROWTH_FACTOR		= 1.0625F;
+	private static final long serialVersionUID = 408161126967974108L;
+	
+	public static final float	GROWTH_FACTOR		= 1.125F;
 	public static final int		DEFAULT_CAPACITY	= 16;
 	public static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
 	public static final int		MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
 	
-	protected int			size;
-	protected HashEntry[]	entries;
+	protected transient int			size;
+	protected transient HashEntry[]	entries;
 	
 	public AbstractHashMap()
 	{
 	}
 	
-	public AbstractHashMap(Map<? extends K, ? extends V> map)
+	public AbstractHashMap(int capacity)
+	{
+		if (capacity < 0)
+		{
+			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
+		}
+		this.entries = new HashEntry[MathUtils.powerOfTwo(grow(capacity))];
+	}
+	
+	public AbstractHashMap(Map<K, V> map)
 	{
 		int size = map.size();
 		int length = MathUtils.powerOfTwo(grow(size));
-		this.entries = new HashEntry[length];
+		HashEntry[] entries = this.entries = new HashEntry[length];
 		this.size = size;
 		
-		outer:
-		for (Entry<? extends K, ? extends V> entry : map)
+		// Assume unique elements
+		for (Entry<K, V> entry : map)
 		{
 			K key = entry.getKey();
-			V value = entry.getValue();
+			int hash = hash(key);
+			int i = index(hash, length);
+			entries[i] = new HashEntry(key, entry.getValue(), hash, entries[i]);
+		}
+	}
+	
+	public AbstractHashMap(AbstractHashMap<K, V> map)
+	{
+		int size = this.size = map.size;
+		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
+		HashEntry[] newEntries = this.entries = new HashEntry[length];
+		
+		for (HashEntry<K, V> e : map.entries)
+		{
+			while (e != null)
+			{
+				int index = index(e.hash, length);
+				HashEntry<K, V> newEntry = new HashEntry<K, V>(e.key, e.value, e.hash);
+				if (newEntries[index] != null)
+				{
+					newEntry.next = newEntries[index];
+				}
+				
+				newEntries[index] = newEntry;
+				e = e.next;
+			}
+		}
+	}
+	
+	public AbstractHashMap(Tuple2<K, V>... tuples)
+	{
+		int length = MathUtils.powerOfTwo(grow(tuples.length));
+		int size = 0;
+		HashEntry[] entries = this.entries = new HashEntry[length];
+		
+		outer:
+		for (Tuple2 entry : tuples)
+		{
+			Object key = entry._1;
+			Object value = entry._2;
 			
 			int hash = hash(key);
 			int i = index(hash, length);
-			for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+			for (HashEntry e = entries[i]; e != null; e = e.next)
 			{
 				Object k;
-				if (e.hash == hash && ((k = e.key) == key || key.equals(k)))
+				if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 				{
 					e.value = value;
 					continue outer;
 				}
 			}
 			
-			this.entries[i] = new HashEntry(key, value, hash);
+			entries[i] = new HashEntry(key, value, hash, entries[i]);
+			size++;
 		}
+		
+		this.size = size;
 	}
 	
 	public static int hash(Object key)
@@ -201,6 +259,108 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public static int grow(int size)
 	{
 		return (int) ((size + 1) * GROWTH_FACTOR);
+	}
+	
+	protected void flatten()
+	{
+		this.ensureCapacityInternal(this.entries.length << 1);
+	}
+	
+	public void ensureCapacity(int newCapacity)
+	{
+		if (newCapacity > this.entries.length)
+		{
+			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+		}
+	}
+	
+	protected void ensureCapacityInternal(int newCapacity)
+	{
+		HashEntry[] oldMap = this.entries;
+		int oldCapacity = oldMap.length;
+		
+		// overflow-conscious code
+		if (newCapacity - MAX_ARRAY_SIZE > 0)
+		{
+			if (oldCapacity == MAX_ARRAY_SIZE)
+			{
+				// Keep running with MAX_ARRAY_SIZE buckets
+				return;
+			}
+			newCapacity = MAX_ARRAY_SIZE;
+		}
+		
+		HashEntry[] newMap = this.entries = new HashEntry[newCapacity];
+		for (int i = oldCapacity; i-- > 0;)
+		{
+			HashEntry e = oldMap[i];
+			while (e != null)
+			{
+				int index = index(e.hash, newCapacity);
+				HashEntry next = e.next;
+				e.next = newMap[index];
+				newMap[index] = e;
+				e = next;
+			}
+		}
+		
+		this.updateThreshold(newCapacity);
+	}
+	
+	protected void updateThreshold(int newCapacity)
+	{
+	}
+	
+	protected void putInternal(Map<? extends K, ? extends V> map)
+	{
+		this.ensureCapacity(this.size + map.size());
+		
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	protected void putInternal(K key, V value)
+	{
+		int hash = hash(key);
+		int i = index(hash, this.entries.length);
+		for (HashEntry<K, V> e = this.entries[i]; e != null; e = e.next)
+		{
+			Object k;
+			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
+			{
+				e.value = value;
+				return;
+			}
+		}
+		
+		this.addEntry(hash, key, value, i);
+	}
+	
+	protected abstract void addEntry(int hash, K key, V value, int index);
+	
+	protected void removeEntry(HashEntry<K, V> entry)
+	{
+		AbstractHashMap.this.size--;
+		int index = index(entry.hash, AbstractHashMap.this.entries.length);
+		HashEntry<K, V> e = AbstractHashMap.this.entries[index];
+		if (e == entry)
+		{
+			AbstractHashMap.this.entries[index] = entry.next;
+		}
+		else
+		{
+			HashEntry<K, V> prev;
+			do
+			{
+				prev = e;
+				e = e.next;
+			}
+			while (e != entry);
+			
+			prev.next = entry.next;
+		}
 	}
 	
 	@Override
@@ -412,5 +572,39 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		int len = this.entries.length;
+		
+		out.writeInt(this.size);
+		out.writeInt(len);
+		
+		// Write key-value pairs, sequentially
+		for (int i = 0; i < len; i++)
+		{
+			for (HashEntry<K, V> entry = this.entries[i]; entry != null; entry = entry.next)
+			{
+				out.writeObject(entry.key);
+				out.writeObject(entry.value);
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		int len = in.readInt();
+		
+		this.entries = new HashEntry[len];
+		for (int i = 0; i < len; i++)
+		{
+			this.putInternal((K) in.readObject(), (V) in.readObject());
+		}
 	}
 }

@@ -60,6 +60,17 @@ public interface IntArray
 		return array;
 	}
 	
+	public static int[] rangeOpen(int start, int end)
+	{
+		int i = 0;
+		int[] array = new int[end - start];
+		for (; start < end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })

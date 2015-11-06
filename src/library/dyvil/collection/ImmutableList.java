@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 import dyvil.lang.literal.ArrayConvertible;
@@ -19,7 +20,7 @@ import dyvil.collection.immutable.SingletonList;
 import dyvil.util.ImmutableException;
 
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {
 	public static interface Builder<E> extends ImmutableCollection.Builder<E>
@@ -50,12 +51,32 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	public static <E> ImmutableList<E> apply(E... elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList(elements, true);
 	}
 	
-	public static <E> ImmutableList<E> fromLiteral(E... elements)
+	public static <E> ImmutableList<E> apply(int count, E repeatedValue)
 	{
-		return new ArrayList(elements, true);
+		Object[] elements = new Object[count];
+		for (int i = 0; i < count; i++)
+		{
+			elements[i] = repeatedValue;
+		}
+		return new ArrayList(elements, count, true);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, IntFunction<E> generator)
+	{
+		Object[] elements = new Object[count];
+		for (int i = 0; i < count; i++)
+		{
+			elements[i] = generator.apply(i);
+		}
+		return new ArrayList(elements, count, true);
+	}
+	
+	public static <E> ImmutableList<E> fromArray(E... elements)
+	{
+		return new ArrayList(elements);
 	}
 	
 	public static <E> ImmutableList<E> linked(E... elements)
@@ -68,10 +89,10 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return list;
 	}
 	
-	public static <E> ImmutableList<E> linked(Collection<E> collection)
+	public static <E> ImmutableList<E> linked(Iterable<E> iterable)
 	{
 		ImmutableList<E> list = EmptyList.instance;
-		for (E element : collection)
+		for (E element : iterable)
 		{
 			list = new AppendList(list, element);
 		}
@@ -251,6 +272,20 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	public default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default boolean removeFirst(Object element)
+	{
+		throw new ImmutableException("removeFirst() on Immutable List");
+	}
+	
+	@Override
+	@mutating
+	public default boolean removeLast(Object element)
+	{
+		throw new ImmutableException("removeLast() on Immutable List");
 	}
 	
 	@Override

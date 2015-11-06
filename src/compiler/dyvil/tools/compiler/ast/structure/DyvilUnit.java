@@ -4,15 +4,16 @@ import java.io.File;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.parsing.Name;
 
 public class DyvilUnit extends DyvilHeader
 {
@@ -89,13 +90,20 @@ public class DyvilUnit extends DyvilHeader
 		}
 		this.innerClasses[index] = iclass;
 		
-		iclass.setInnerIndex(null, index);
+		iclass.setInnerIndex(this.getInternalName(), index);
 	}
 	
 	@Override
 	public IClassCompilable getInnerClass(int index)
 	{
 		return this.innerClasses[index];
+	}
+	
+	@Override
+	public void parseHeader()
+	{
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this, true), this.markers, this);
+		manager.parse(this.tokens);
 	}
 	
 	@Override

@@ -15,6 +15,8 @@ import dyvil.collection.impl.AbstractFlatArrayMatrix;
 @NilConvertible
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements MutableMatrix<E>
 {
+	private static final long serialVersionUID = -2034131178592900520L;
+	
 	public static <E> FlatArrayMatrix<E> apply()
 	{
 		return new FlatArrayMatrix();

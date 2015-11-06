@@ -6,11 +6,9 @@ import java.io.File;
 import java.io.IOException;
 
 import dyvil.collection.Entry;
-import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -19,9 +17,8 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
@@ -31,14 +28,18 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.SemicolonInference;
+import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.DyvilLexer;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
@@ -87,12 +88,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.inputFile = input;
 		
 		String name = input.getAbsolutePath();
-		int start = name.lastIndexOf('/');
+		int start = name.lastIndexOf(File.separatorChar);
 		int end = name.lastIndexOf('.');
 		this.name = Name.get(name.substring(start + 1, end));
 		
 		name = output.getPath();
-		start = name.lastIndexOf('/');
+		start = name.lastIndexOf(File.separatorChar);
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + FileType.OBJECT_EXTENSION);
@@ -356,14 +357,14 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void tokenize()
 	{
-		this.tokens = new Dlex(this.markers).tokenize(this.inputFile.getCode());
-		this.tokens.inferSemicolons();
+		this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.inputFile.getCode());
+		SemicolonInference.inferSemicolons(this.tokens.first());
 	}
 	
 	@Override
 	public void parseHeader()
 	{
-		ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers, this);
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this, false), this.markers, this);
 		manager.parse(this.tokens);
 	}
 	
@@ -546,7 +547,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
@@ -560,7 +561,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

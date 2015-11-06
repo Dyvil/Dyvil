@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -25,9 +24,13 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Method extends AbstractMethod
 {
@@ -62,6 +65,13 @@ public class Method extends AbstractMethod
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, this);
+		
+		if ((this.modifiers & Modifiers.PREFIX) != 0)
+		{
+			// Static & Prefix will cause errors but does happen, so remove the
+			// prefix modifier
+			this.modifiers &= ~Modifiers.PREFIX;
+		}
 		
 		for (int i = 0; i < this.genericCount; i++)
 		{
@@ -136,7 +146,7 @@ public class Method extends AbstractMethod
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(this.position, "method.type.infer", this.name.unqualified);
+					markers.add(I18n.createMarker(this.position, "method.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -144,9 +154,10 @@ public class Method extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.position, "method.type", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.position, "method.type", this.name.unqualified);
 				marker.addInfo("Return Type: " + this.type);
 				marker.addInfo("Value Type: " + this.value.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -160,7 +171,7 @@ public class Method extends AbstractMethod
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(this.position, "method.type.abstract", this.name.unqualified);
+			markers.add(I18n.createMarker(this.position, "method.type.abstract", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -214,8 +225,9 @@ public class Method extends AbstractMethod
 			
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
-				Marker m = markers.create(t.getPosition(), "method.exception.type");
+				Marker m = I18n.createMarker(t.getPosition(), "method.exception.type");
 				m.addInfo("Exception Type: " + t);
+				markers.add(m);
 			}
 		}
 		
@@ -223,16 +235,16 @@ public class Method extends AbstractMethod
 		{
 			this.value.check(markers, this);
 		}
-		// If the method does not have an implementation and is static
-		else if (this.isStatic())
+		
+		// Check for illegal modifiers
+		int illegalModifiers = this.modifiers & ~Modifiers.METHOD_MODIFIERS;
+		if (illegalModifiers != 0)
 		{
-			markers.add(this.position, "method.static", this.name);
+			markers.add(I18n.createError(this.position, "method.illegal_modifiers", this.name, ModifierTypes.FIELD.toString(illegalModifiers)));
 		}
-		// Or not declared abstract and a member of a non-abstract class
-		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
-		{
-			markers.add(this.position, "method.unimplemented", this.name);
-		}
+		
+		// Check illegal modifier combinations
+		ModifierTypes.checkMethodModifiers(markers, this, this.modifiers, this.value != null, "method");
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
@@ -240,7 +252,11 @@ public class Method extends AbstractMethod
 		}
 		
 		// Check for duplicate methods
-		
+		this.checkDuplicates(markers, context);
+	}
+	
+	private void checkDuplicates(MarkerList markers, IContext context)
+	{
 		String desc = this.getDescriptor();
 		IClassBody body = this.theClass.getBody();
 		if (body == null)
@@ -258,7 +274,7 @@ public class Method extends AbstractMethod
 			
 			if (m.getDescriptor().equals(desc))
 			{
-				markers.add(this.position, "method.duplicate", this.name, desc);
+				markers.add(I18n.createMarker(this.position, "method.duplicate", this.name, desc));
 			}
 		}
 	}
@@ -284,29 +300,30 @@ public class Method extends AbstractMethod
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 			{
-				markers.add(this.position, "method.override", this.name);
+				markers.add(I18n.createMarker(this.position, "method.override", this.name));
 			}
 			return;
 		}
 		
 		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 		{
-			markers.add(this.position, "method.overrides", this.name);
+			markers.add(I18n.createMarker(this.position, "method.overrides", this.name));
 		}
 		
 		for (IMethod m : this.overrideMethods)
 		{
 			if (m.hasModifier(Modifiers.FINAL))
 			{
-				markers.add(this.position, "method.override.final", this.name);
+				markers.add(I18n.createMarker(this.position, "method.override.final", this.name));
 			}
 			
 			IType type = m.getType();
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = markers.create(this.position, "method.override.type", this.name);
+				Marker marker = I18n.createMarker(this.position, "method.override.type", this.name);
 				marker.addInfo("Return Type: " + this.type);
 				marker.addInfo("Overriden Return Type: " + type);
+				markers.add(marker);
 			}
 		}
 	}
@@ -414,7 +431,7 @@ public class Method extends AbstractMethod
 			}
 			else
 			{
-				this.value.writeExpression(mw);
+				this.value.writeExpression(mw, this.type);
 			}
 			mw.writeLabel(end);
 			mw.end(this.type);
@@ -517,9 +534,9 @@ public class Method extends AbstractMethod
 		{
 			mw.visitAnnotation("Ldyvil/annotation/prefix;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{

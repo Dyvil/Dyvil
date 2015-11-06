@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 public interface IClassList
 {

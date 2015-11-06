@@ -6,27 +6,38 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.Type;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;
 
 import dyvil.annotation.internal;
 import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
+import dyvil.tuple.Tuple2;
 
 @ClassConvertible
 @TypeConvertible
+@ArrayConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements MutableMap<K, V>
 {
+	private static final long serialVersionUID = 1734016065128722262L;
+	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Type<K> type)
 	{
-		return new EnumMap(type);
+		return new EnumMap(type.getTheClass());
 	}
 	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Class<K> type)
 	{
 		return new EnumMap(type);
+	}
+	
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new EnumMap(entries);
 	}
 	
 	public @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)
@@ -42,6 +53,21 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	public EnumMap(Type<K> type)
 	{
 		super(type.getTheClass());
+	}
+	
+	public EnumMap(Map<K, V> map)
+	{
+		super(map);
+	}
+	
+	public EnumMap(AbstractEnumMap<K, V> map)
+	{
+		super(map);
+	}
+	
+	public EnumMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
 	}
 	
 	@Override
@@ -188,7 +214,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -258,7 +284,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new EnumMap(this.type, this.keys, this.values.clone(), this.size);
+		return new EnumMap(this);
 	}
 	
 	@Override
@@ -270,6 +296,6 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.EnumMap(this.type, this.keys, this.values.clone(), this.size);
+		return new dyvil.collection.immutable.EnumMap(this);
 	}
 }

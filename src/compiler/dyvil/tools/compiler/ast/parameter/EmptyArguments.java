@@ -6,13 +6,11 @@ import java.util.Iterator;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class EmptyArguments implements IArguments
 {
@@ -94,19 +92,16 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		if (defaultValue != null)
-		{
-			defaultValue.writeExpression(writer);
-		}
+		param.getValue().writeExpression(writer, param.getType());
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(0);
-		writer.writeNewArray(type, 1);
+		writer.writeNewArray(param.getType().getElementType(), 1);
 	}
 	
 	@Override

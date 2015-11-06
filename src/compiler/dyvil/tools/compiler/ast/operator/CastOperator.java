@@ -10,13 +10,14 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CastOperator extends Value
 {
 	protected IValue	value;
-	protected IType		type;
+	protected IType		type	= Types.UNKNOWN;
 	
 	// Metadata
 	private boolean typeHint;
@@ -60,7 +61,7 @@ public final class CastOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return IValue.autoBox(this, this.type, type);
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
 	@Override
@@ -78,7 +79,7 @@ public final class CastOperator extends Value
 		this.value = this.value.resolve(markers, context);
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "cast.void");
+			markers.add(I18n.createMarker(this.position, "cast.void"));
 			return this;
 		}
 		
@@ -90,37 +91,33 @@ public final class CastOperator extends Value
 		IType prevType = this.value.getType();
 		
 		IValue value1 = this.value.withType(this.type, this.type, markers, context);
-		if (value1 != null && value1 != this.value)
+		if (value1 != null)
 		{
 			this.value = value1;
-			this.typeHint = true;
-			this.type = value1.getType();
-			return this;
+			
+			IType valueType = value1.getType();
+			if (!prevType.equals(valueType) && this.type.isSuperClassOf(valueType) && valueType.isPrimitive() == this.type.isPrimitive())
+			{
+				this.typeHint = true;
+				this.type = valueType;
+				return this;
+			}
+			
+			prevType = valueType;
 		}
 		
 		boolean primitiveType = this.type.isPrimitive();
 		boolean primitiveValue = this.value.isPrimitive();
-		if (primitiveType)
-		{
-			if (!primitiveValue)
-			{
-				markers.add(this.position, "cast.reference");
-			}
-		}
-		else if (primitiveValue)
-		{
-			markers.add(this.position, "cast.primitive");
-		}
 		
 		if (value1 == null && !(primitiveType && primitiveValue) && !prevType.isSuperClassOf(this.type))
 		{
-			markers.add(this.position, "cast.incompatible", prevType, this.type);
+			markers.add(I18n.createMarker(this.position, "cast.incompatible", prevType, this.type));
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.equals(prevType))
+		if (!this.typeHint && this.type.isSuperClassOf(prevType) && primitiveType == primitiveValue)
 		{
-			markers.add(this.position, "cast.unnecessary");
+			markers.add(I18n.createMarker(this.position, "cast.unnecessary"));
 			this.typeHint = true;
 		}
 		
@@ -166,18 +163,13 @@ public final class CastOperator extends Value
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
-		if (this.typeHint)
-		{
-			return;
-		}
-		
 		this.value.getType().writeCast(writer, this.type, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer);
+		this.writeExpression(writer, this.type);
 		writer.writeInsn(this.type.getReturnOpcode());
 	}
 	

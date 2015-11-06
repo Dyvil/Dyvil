@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -26,8 +25,9 @@ import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CaseExpression implements IValue, ICase, IClassCompilable, IDefaultContext
 {
@@ -119,7 +119,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 		{
 			this.type = type;
 			
-			IType type1 = this.type.resolveType(RETURN_TYPE);
+			IType type1 = this.type.resolveTypeSafely(RETURN_TYPE);
 			this.action = this.action.withType(type1, typeContext, markers, context);
 			return this;
 		}
@@ -203,7 +203,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 				this.getType();
 			}
 			
-			IType type1 = this.type.resolveType(PAR_TYPE);
+			IType type1 = this.type.resolveTypeSafely(PAR_TYPE);
 			this.pattern = this.pattern.withType(type1, markers);
 			// TODO Handle error
 		}
@@ -289,8 +289,8 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		IType parType = this.type.resolveType(PAR_TYPE);
-		IType returnType = this.type.resolveType(RETURN_TYPE);
+		IType parType = this.type.resolveTypeSafely(PAR_TYPE);
+		IType returnType = this.type.resolveTypeSafely(RETURN_TYPE);
 		String parFrameType = parType.getInternalName();
 		
 		StringBuilder builder = new StringBuilder("Ljava/lang/Object;");
@@ -367,7 +367,7 @@ public final class CaseExpression implements IValue, ICase, IClassCompilable, ID
 		mw.writeLabel(elseLabel);
 		if (this.action != null)
 		{
-			this.action.writeExpression(mw);
+			this.action.writeExpression(mw, returnType);
 		}
 		else
 		{

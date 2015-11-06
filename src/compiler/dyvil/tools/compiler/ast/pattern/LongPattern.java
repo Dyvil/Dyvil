@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LongPattern extends Pattern
 {
@@ -41,17 +41,6 @@ public final class LongPattern extends Pattern
 	public boolean isType(IType type)
 	{
 		return type == Types.LONG || type.isSuperTypeOf(Types.LONG);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.LLOAD, varIndex);
-		}
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_LCMPEQ, elseLabel);
 	}
 	
 	@Override

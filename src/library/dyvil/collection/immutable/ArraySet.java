@@ -13,53 +13,45 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.util.ImmutableException;
 
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 {
+	private static final long serialVersionUID = 5534347282324757054L;
+	
 	public static <E> ArraySet<E> apply(E... elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet<E>(elements, true);
 	}
 	
-	public static <E> ArraySet<E> fromLiteral(E... elements)
+	public static <E> ArraySet<E> fromArray(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet<E>(elements);
 	}
 	
 	public static <E> Builder<E> builder()
 	{
-		return new Builder();
+		return new Builder<E>();
 	}
 	
-	public ArraySet(E... elements)
+	public static <E> Builder<E> builder(int capacity)
 	{
-		super(elements);
-	}
-	
-	public ArraySet(E[] elements, int size)
-	{
-		super(elements, size);
-	}
-	
-	public ArraySet(E[] elements, boolean trusted)
-	{
-		super(elements, elements.length, trusted);
-	}
-	
-	public ArraySet(E[] elements, int size, boolean trusted)
-	{
-		super(elements, size, trusted);
-	}
-	
-	public ArraySet(Collection<E> elements)
-	{
-		super(elements);
+		return new Builder<E>(capacity);
 	}
 	
 	public static class Builder<E> implements ImmutableSet.Builder<E>
 	{
 		private Object[]	elements;
 		private int			size;
+		
+		public Builder()
+		{
+			this.elements = new Object[DEFAULT_CAPACITY];
+		}
+		
+		public Builder(int capacity)
+		{
+			this.elements = new Object[capacity];
+		}
 		
 		@Override
 		public void add(E element)
@@ -91,10 +83,40 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 		@Override
 		public ArraySet<E> build()
 		{
+			if (this.size < 0)
+			{
+				return null;
+			}
+			
 			ArraySet<E> set = new ArraySet(this.elements, this.size, true);
 			this.size = -1;
 			return set;
 		}
+	}
+	
+	public ArraySet(E... elements)
+	{
+		super(elements);
+	}
+	
+	public ArraySet(E[] elements, int size)
+	{
+		super(elements, size);
+	}
+	
+	public ArraySet(E[] elements, boolean trusted)
+	{
+		super(elements, elements.length, trusted);
+	}
+	
+	public ArraySet(E[] elements, int size, boolean trusted)
+	{
+		super(elements, size, trusted);
+	}
+	
+	public ArraySet(Collection<E> elements)
+	{
+		super(elements);
 	}
 	
 	@Override

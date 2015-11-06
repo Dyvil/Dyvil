@@ -4,10 +4,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -20,10 +18,9 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -31,8 +28,10 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
@@ -70,28 +69,38 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		GENERIC_ARGUMENT;
 	}
 	
+	// Basic Types
 	int	UNKNOWN		= 0;
 	int	NULL		= 1;
 	int	ANY			= 2;
 	int	DYNAMIC		= 3;
 	int	PRIMITIVE	= 4;
 	
-	int	CLASS				= 8;
-	int	NAMED				= 9;
-	int	INTERNAL			= 10;
-	int	GENERIC				= 11;
-	int	GENERIC_NAMED		= 12;
-	int	GENERIC_INTERNAL	= 13;
+	// Class Types
+	int	CLASS		= 16;
+	int	NAMED		= 17;
+	int	INTERNAL	= 18;
 	
-	int	TUPLE	= 16;
-	int	LAMBDA	= 17;
-	int	ARRAY	= 18;
+	// Generic Types
+	int	GENERIC				= 24;
+	int	GENERIC_NAMED		= 25;
+	int	GENERIC_INTERNAL	= 26;
 	
-	int	TYPE_VAR_TYPE		= 32;
-	int	INTERNAL_TYPE_VAR	= 33;
-	int	WILDCARD_TYPE		= 34;
+	// Compound Types
+	int	TUPLE		= 32;
+	int	LAMBDA		= 33;
+	int	ARRAY		= 34;
+	int	MAP			= 35;
+	int	OPTIONAL	= 36;
 	
-	int ANNOTATED = 64;
+	// Type Variable Types
+	int	TYPE_VAR_TYPE		= 64;
+	int	INTERNAL_TYPE_VAR	= 65;
+	
+	int WILDCARD_TYPE = 80;
+	
+	// Other Types
+	int ANNOTATED = 192;
 	
 	@Override
 	public default ICodePosition getPosition()
@@ -106,20 +115,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public int typeTag();
 	
-	public default boolean isPrimitive()
-	{
-		return false;
-	}
+	public boolean isPrimitive();
 	
-	public default int getTypecode()
-	{
-		return -1;
-	}
+	public int getTypecode();
 	
-	public default boolean isGenericType()
-	{
-		return false;
-	}
+	public boolean isGenericType();
 	
 	public Name getName();
 	
@@ -157,32 +157,19 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Super Type
 	
+	public default int getSuperTypeDistance(IType superType)
+	{
+		return this.getTheClass().getSuperTypeDistance(superType);
+	}
+	
 	public default float getSubTypeDistance(IType subtype)
 	{
-		if (subtype.isArrayType())
-		{
-			IClass iclass = this.getTheClass();
-			if (iclass == Types.OBJECT_CLASS)
-			{
-				return 3F;
-			}
-			return 0F;
-		}
-		return subtype.getTheClass().getSuperTypeDistance(this);
+		return subtype.getSuperTypeDistance(this);
 	}
 	
 	public default int getSubClassDistance(IType subtype)
 	{
-		if (subtype.isArrayType())
-		{
-			IClass iclass = this.getTheClass();
-			if (iclass == Types.OBJECT_CLASS)
-			{
-				return 3;
-			}
-			return 0;
-		}
-		return subtype.getTheClass().getSuperTypeDistance(this);
+		return subtype.getSuperTypeDistance(this);
 	}
 	
 	public default IType getSuperType()
@@ -251,10 +238,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return this.getTheClass() == type.getTheClass();
 	}
 	
-	public default boolean classEquals(IType type)
-	{
-		return this.getTheClass() == type.getTheClass();
-	}
+	public boolean classEquals(IType type);
 	
 	// Resolve
 	
@@ -262,12 +246,17 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public IMethod getUnboxMethod();
 	
+	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (type.hasTypeVariables())
+		{
+			type = type.getConcreteType(typeContext);
+		}
+		return type.convertValue(value, typeContext, markers, context);
+	}
+	
 	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.hasTypeVariables())
-		{
-			return value.withType(this.getConcreteType(typeContext), typeContext, markers, context);
-		}
 		return value.withType(this, typeContext, markers, context);
 	}
 	
@@ -324,17 +313,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public void checkType(MarkerList markers, IContext context, TypePosition position);
 	
-	public default void check(MarkerList markers, IContext context)
-	{
-	}
+	public void check(MarkerList markers, IContext context);
 	
-	public default void foldConstants()
-	{
-	}
+	public void foldConstants();
 	
-	public default void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-	}
+	public void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// IContext
 	
@@ -372,10 +355,10 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	public IDataMember resolveField(Name name);
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	public IMethod getFunctionalMethod();
 	

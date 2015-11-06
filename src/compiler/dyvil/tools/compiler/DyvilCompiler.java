@@ -13,27 +13,29 @@ import dyvil.io.FileUtils;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.FileFinder;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.CodeFile;
 
 public final class DyvilCompiler
 {
-	public static final String	VERSION			= "1.0.0";
-	public static final String	DYVIL_VERSION	= "1.0.0";
+	public static final String	VERSION			= "$$compilerVersion$$";
+	public static final String	DYVIL_VERSION	= "$$version$$";
+	public static final String	LIBRARY_VERSION	= "$$libraryVersion$$";
 	
-	public static boolean	parseStack;
 	public static boolean	debug;
-	public static int		constantFolding;
+	public static int		constantFolding	= 2;
 	
-	public static int		classVersion		= Opcodes.V1_8;
-	public static int		asmVersion			= Opcodes.ASM5;
-	public static int		maxConstantDepth	= 10;
-	public static boolean	compilationFailed;
+	public static final int	classVersion		= Opcodes.V1_8;
+	public static final int	asmVersion			= Opcodes.ASM5;
+	public static final int	maxConstantDepth	= 10;
+	
+	public static boolean compilationFailed;
 	
 	private static Logger		logger;
 	public static DateFormat	format	= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -96,8 +98,10 @@ public final class DyvilCompiler
 		long now = System.nanoTime();
 		long totalTime = now;
 		
-		System.err.println("Dyvil Compiler " + VERSION + " for Dyvil " + DYVIL_VERSION);
-		System.err.println();
+		System.out.println("Dyvil Compiler v" + VERSION + " for Dyvil v" + DYVIL_VERSION);
+		System.out.println();
+		
+		Names.init();
 		
 		// Sets up States from arguments
 		for (String arg : args)
@@ -322,9 +326,6 @@ public final class DyvilCompiler
 			phases.add(ICompilerPhase.PRINT);
 			phases.add(ICompilerPhase.TEST);
 			debug = true;
-			return;
-		case "--pstack":
-			parseStack = true;
 			return;
 		}
 		

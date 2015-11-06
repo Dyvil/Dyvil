@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.generic.type.GenericType;
 import dyvil.tools.compiler.ast.generic.type.InternalGenericType;
 import dyvil.tools.compiler.ast.generic.type.InternalTypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
@@ -18,6 +17,7 @@ import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.parsing.Name;
 
 public final class ClassFormat
 {
@@ -196,6 +196,14 @@ public final class ClassFormat
 		while (i < len && desc.charAt(i) == '^')
 		{
 			i = readException(desc, i + 1, constructor);
+		}
+	}
+	
+	public static void readExceptions(String[] exceptions, IExceptionList exceptionList)
+	{
+		for (String s : exceptions)
+		{
+			exceptionList.addException(internalToType(s));
 		}
 	}
 	

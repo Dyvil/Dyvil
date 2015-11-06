@@ -9,14 +9,16 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ObjectClassMetadata extends ClassMetadata
 {
@@ -34,10 +36,20 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
-		this.constructor.setModifiers(Modifiers.PRIVATE);
+		super.resolveTypes(markers, context);
+		
+		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
+		{
+			this.theClass.addInterface(Types.SERIALIZABLE);
+		}
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+		super.resolveTypesBody(markers, context);
 		
 		this.checkMethods();
 		
@@ -46,10 +58,10 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			if (markers != null && body.constructorCount() > 0)
 			{
-				markers.add(this.theClass.getPosition(), "class.object.constructor", this.theClass.getName().qualified);
+				markers.add(I18n.createMarker(this.theClass.getPosition(), "class.object.constructor", this.theClass.getName().qualified));
 			}
 			
-			IField f = body.getField(Name.instance);
+			IField f = body.getField(Names.instance);
 			if (f != null)
 			{
 				this.instanceField = f;
@@ -57,9 +69,10 @@ public final class ObjectClassMetadata extends ClassMetadata
 			}
 		}
 		
-		Field f = new Field(this.theClass, Name.instance, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.CONST);
+		Field f = new Field(this.theClass, Names.instance, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.CONST);
 		this.instanceField = f;
 		
+		this.constructor.setModifiers(Modifiers.PRIVATE);
 		ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
 		f.setValue(call);
 	}
@@ -67,7 +80,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.instanceField != null && name == Name.instance)
+		if (this.instanceField != null && name == Names.instance)
 		{
 			return this.instanceField;
 		}
@@ -135,5 +148,28 @@ public final class ObjectClassMetadata extends ClassMetadata
 			mw.writeInsn(Opcodes.IRETURN);
 			mw.end();
 		}
+		
+		if ((this.methods & READ_RESOLVE) == 0)
+		{
+			MethodWriterImpl mw = new MethodWriterImpl(writer,
+					writer.visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC, "readResolve", "()Ljava/lang/Object;", null, null));
+			writeResolveMethod(mw, internalName);
+		}
+		
+		if ((this.methods & WRITE_REPLACE) == 0)
+		{
+			MethodWriterImpl mw = new MethodWriterImpl(writer,
+					writer.visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC, "writeReplace", "()Ljava/lang/Object;", null, null));
+			writeResolveMethod(mw, internalName);
+		}
+	}
+	
+	private static void writeResolveMethod(MethodWriter mw, String internal) throws BytecodeException
+	{
+		mw.setThisType(internal);
+		mw.begin();
+		mw.writeFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
+		mw.writeInsn(Opcodes.ARETURN);
+		mw.end();
 	}
 }

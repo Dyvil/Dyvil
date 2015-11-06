@@ -3,10 +3,10 @@ package dyvil.tools.compiler.parser.method;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class ExceptionListParser extends Parser implements ITypeConsumer
 {
@@ -27,9 +27,9 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 		int type = token.type();
 		switch (type)
 		{
-		case Symbols.OPEN_CURLY_BRACKET:
-		case Symbols.EQUALS:
-		case Symbols.SEMICOLON:
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+		case BaseSymbols.EQUALS:
+		case BaseSymbols.SEMICOLON:
 			pm.popParser(true);
 			return;
 		}
@@ -41,7 +41,7 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:
-			if (type == Symbols.COMMA)
+			if (type == BaseSymbols.COMMA)
 			{
 				this.mode = TYPE;
 				return;

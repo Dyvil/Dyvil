@@ -5,12 +5,12 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class EnumValue implements IConstantValue, INamed
 {
@@ -41,7 +41,7 @@ public class EnumValue implements IConstantValue, INamed
 	@Override
 	public int valueTag()
 	{
-		return ENUM;
+		return ENUM_ACCESS;
 	}
 	
 	@Override
@@ -65,6 +65,10 @@ public class EnumValue implements IConstantValue, INamed
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (!this.type.isResolved())
+		{
+			this.type = this.type.resolveType(markers, context);
+		}
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	

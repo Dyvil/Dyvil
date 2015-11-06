@@ -1,10 +1,11 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import dyvil.tuple.Tuple3;
 
-public interface Cell<R, C, V>
+public interface Cell<R, C, V> extends Serializable
 {
 	/**
 	 * Returns the row stored by this cell
@@ -64,7 +65,7 @@ public interface Cell<R, C, V>
 		Object column = cell.getColumn();
 		Object value = cell.getValue();
 		int keyHash = (row == null ? 0 : row.hashCode() * 31) + (column == null ? 0 : column.hashCode());
-		int hash = (keyHash * 31) + (value == null ? 0 : value.hashCode());
+		int hash = keyHash * 31 + (value == null ? 0 : value.hashCode());
 		return hash * 31 + hash;
 	}
 }

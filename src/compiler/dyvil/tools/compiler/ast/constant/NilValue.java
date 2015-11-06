@@ -1,27 +1,42 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NilValue implements IValue
 {
+	public static final class Types
+	{
+		public static final IClass NIL_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("NilConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected ICodePosition position;
 	
 	// Metadata
 	private IType	requiredType;
+	private Name	methodName;
 	private IMethod	method;
 	
 	public NilValue()
@@ -60,19 +75,26 @@ public final class NilValue implements IValue
 	@Override
 	public IType getType()
 	{
-		return this.requiredType == null ? Types.UNKNOWN : this.requiredType;
+		return this.requiredType == null ? dyvil.tools.compiler.ast.type.Types.UNKNOWN : this.requiredType;
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.UNKNOWN)
+		if (type == dyvil.tools.compiler.ast.type.Types.UNKNOWN)
 		{
 			return this;
 		}
 		
-		if (this.isType(type))
+		if (type.isArrayType())
 		{
+			return this;
+		}
+		
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.NIL_CONVERTIBLE_CLASS);
+		if (annotation != null)
+		{
+			this.methodName = LiteralExpression.getMethodName(annotation);
 			this.requiredType = type;
 			return this;
 		}
@@ -113,7 +135,7 @@ public final class NilValue implements IValue
 	{
 		if (this.requiredType == null)
 		{
-			markers.add(this.position, "nil.type");
+			markers.add(I18n.createMarker(this.position, "nil.type"));
 			return;
 		}
 		
@@ -122,10 +144,10 @@ public final class NilValue implements IValue
 			return;
 		}
 		
-		IMethod match = IContext.resolveMethod(this.requiredType, null, Name.apply, EmptyArguments.INSTANCE);
+		IMethod match = IContext.resolveMethod(this.requiredType, null, this.methodName, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(this.position, "nil.method", this.requiredType.toString());
+			markers.add(I18n.createMarker(this.position, "nil.method", this.requiredType.toString(), this.methodName));
 		}
 		else
 		{

@@ -39,6 +39,11 @@ public final class CharUtils
 		// no instances
 	}
 	
+	public static @infix boolean isAsciiDigit(char c)
+	{
+		return c >= '0' && c <= '9';
+	}
+	
 	/**
 	 * Returns true if the given {@code char c} is a digit (0-9)
 	 * 
@@ -51,9 +56,14 @@ public final class CharUtils
 	{
 		if (c < 128)
 		{
-			return c >= '0' && c <= '9';
+			return isAsciiDigit(c);
 		}
 		return Character.isDigit((int) c);
+	}
+	
+	public static @infix boolean isAsciiLetter(char c)
+	{
+		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
 	}
 	
 	/**
@@ -68,7 +78,7 @@ public final class CharUtils
 	{
 		if (c < 128)
 		{
-			return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+			return isAsciiLetter(c);
 		}
 		return Character.isLetter((int) c);
 	}

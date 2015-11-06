@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 import static dyvil.reflect.Opcodes.*;
@@ -59,6 +60,12 @@ public final class MethodWriterImpl implements MethodWriter
 	public void setHasReturn(boolean hasReturn)
 	{
 		this.hasReturn = hasReturn;
+	}
+	
+	@Override
+	public boolean hasReturn()
+	{
+		return this.hasReturn;
 	}
 	
 	@Override
@@ -296,6 +303,7 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.writeLabel(label);
 		this.visitFrame = true;
+		this.hasReturn = false;
 	}
 	
 	@Override
@@ -610,14 +618,38 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
 	
+	private static int getNewArrayCode(int typecode)
+	{
+		switch (typecode)
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+			return ClassFormat.T_BOOLEAN;
+		case PrimitiveType.BYTE_CODE:
+			return ClassFormat.T_BYTE;
+		case PrimitiveType.SHORT_CODE:
+			return ClassFormat.T_SHORT;
+		case PrimitiveType.CHAR_CODE:
+			return ClassFormat.T_CHAR;
+		case PrimitiveType.INT_CODE:
+			return ClassFormat.T_INT;
+		case PrimitiveType.LONG_CODE:
+			return ClassFormat.T_LONG;
+		case PrimitiveType.FLOAT_CODE:
+			return ClassFormat.T_FLOAT;
+		case PrimitiveType.DOUBLE_CODE:
+			return ClassFormat.T_DOUBLE;
+		}
+		return 0;
+	}
+	
 	@Override
 	public void writeNewArray(IType type, int dims) throws BytecodeException
 	{
 		if (dims == 1)
 		{
-			if (type.typeTag() == IType.PRIMITIVE)
+			if (type.isPrimitive())
 			{
-				this.writeIntInsn(Opcodes.NEWARRAY, type.getTypecode());
+				this.writeIntInsn(Opcodes.NEWARRAY, getNewArrayCode(type.getTypecode()));
 				return;
 			}
 			
@@ -785,8 +817,12 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		if (!this.hasReturn)
 		{
-			this.insnCallback();
-			this.mv.visitInsn(type.getReturnOpcode());
+			int opcode = type.getReturnOpcode();
+			if (opcode == RETURN || this.frame.actualStackCount > 0)
+			{
+				this.insnCallback();
+				this.mv.visitInsn(opcode);
+			}
 		}
 		this.mv.visitMaxs(this.frame.maxStack, this.frame.maxLocals);
 		this.mv.visitEnd();

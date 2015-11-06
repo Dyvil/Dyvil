@@ -4,33 +4,32 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IImport extends IASTNode
 {
-	public static final int	SIMPLE	= 1;
-	public static final int	PACKAGE	= 2;
-	public static final int	MULTI	= 3;
+	public static final int	SINGLE		= 1;
+	public static final int	WILDCARD	= 2;
+	public static final int	MULTI		= 3;
 	
 	public static IImport fromTag(int tag)
 	{
 		switch (tag)
 		{
-		case SIMPLE:
-			return new SimpleImport(null);
-		case PACKAGE:
-			return new PackageImport(null);
+		case SINGLE:
+			return new SingleImport(null);
+		case WILDCARD:
+			return new WildcardImport(null);
 		case MULTI:
 			return new MultiImport(null);
 		}
@@ -68,7 +67,7 @@ public interface IImport extends IASTNode
 	
 	public IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	// Compilation
 	

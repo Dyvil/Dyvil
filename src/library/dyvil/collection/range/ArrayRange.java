@@ -1,21 +1,24 @@
 package dyvil.collection.range;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.collection.Range;
 import dyvil.collection.iterator.ArrayIterator;
 
 @TupleConvertible
-public class ArrayRange<T extends Ordered<T>> implements Range<T>
+public class ArrayRange<T extends Rangeable<T>> implements Range<T>
 {
-	protected final Ordered[]	array;
-	protected final int			count;
+	private static final long serialVersionUID = 3645807463260154912L;
 	
-	public static <T extends Ordered<T>> ArrayRange<T> apply(T first, T last)
+	protected transient Rangeable[]	array;
+	protected transient int			count;
+	
+	public static <T extends Rangeable<T>> ArrayRange<T> apply(T first, T last)
 	{
 		return new ArrayRange(first, last);
 	}
@@ -25,7 +28,7 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		int size = first.distanceTo(last);
 		if (size >= 0)
 		{
-			this.array = new Ordered[size];
+			this.array = new Rangeable[size];
 			this.count = size;
 			
 			int index = 0;
@@ -38,13 +41,13 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		}
 		
 		size = 0;
-		Ordered[] array = new Ordered[3];
+		Rangeable[] array = new Rangeable[3];
 		for (T current = first; current.$lt$eq(last); current = current.next())
 		{
 			int i = size++;
 			if (i >= array.length)
 			{
-				Ordered[] temp = new Ordered[size];
+				Rangeable[] temp = new Rangeable[size];
 				System.arraycopy(array, 0, temp, 0, array.length);
 				array = temp;
 			}
@@ -56,7 +59,7 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 		this.count = size;
 	}
 	
-	private ArrayRange(Ordered[] array, int count)
+	private ArrayRange(Rangeable[] array, int count)
 	{
 		this.array = array;
 		this.count = count;
@@ -84,6 +87,12 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	public int estimateCount()
 	{
 		return this.count;
+	}
+	
+	@Override
+	public boolean isHalfOpen()
+	{
+		return false;
 	}
 	
 	@Override
@@ -142,5 +151,28 @@ public class ArrayRange<T extends Ordered<T>> implements Range<T>
 	public int hashCode()
 	{
 		return Range.rangeHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.count);
+		for (int i = 0; i < this.count; i++)
+		{
+			out.writeObject(this.array[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.count = in.read();
+		this.array = new Rangeable[this.count];
+		for (int i = 0; i < this.count; i++)
+		{
+			this.array[i] = (Rangeable) in.readObject();
+		}
 	}
 }

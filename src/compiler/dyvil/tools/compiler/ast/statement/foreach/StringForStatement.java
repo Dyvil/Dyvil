@@ -1,14 +1,13 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringForStatement extends ForEachStatement
 {
@@ -18,11 +17,11 @@ public class StringForStatement extends ForEachStatement
 	protected Variable	lengthVar;
 	protected Variable	stringVar;
 	
-	public StringForStatement(ICodePosition position, Variable var, IValue action)
+	public StringForStatement(ICodePosition position, Variable var)
 	{
-		super(position, var, action);
+		super(position, var);
 		
-		this.indexVar = new Variable(ArrayForStatement.$length, Types.INT);
+		this.indexVar = new Variable(ArrayForStatement.$index, Types.INT);
 		this.lengthVar = new Variable(ArrayForStatement.$length, Types.INT);
 		this.stringVar = new Variable($string, Types.STRING);
 	}
@@ -77,12 +76,14 @@ public class StringForStatement extends ForEachStatement
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
+		
+		// Initial Boundary Check - if the length is 0, skip the loop.
+		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
+		
 		// Set index to 0
 		writer.writeLDC(0);
 		indexVar.writeInit(writer, null);
 		
-		// Initial Boundary Check - if the length is 0, skip the loop.
-		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
 		writer.writeTargetLabel(startLabel);
 		
 		// Get the char at the index
@@ -99,7 +100,7 @@ public class StringForStatement extends ForEachStatement
 		}
 		
 		writer.writeLabel(updateLabel);
-		// Increase index
+		// Increment index
 		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
 		indexVar.writeGet(writer, null, lineNumber);

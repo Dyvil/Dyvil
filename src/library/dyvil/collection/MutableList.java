@@ -12,7 +12,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.view.ListView;
 
 @NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public interface MutableList<E> extends List<E>, MutableCollection<E>
 {
 	public static <E> MutableList<E> apply()
@@ -40,7 +40,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		return new ArrayList(elements);
 	}
 	
-	public static <E> MutableList<E> fromLiteral(E... elements)
+	public static <E> MutableList<E> fromArray(E... elements)
 	{
 		return new ArrayList(elements, true);
 	}

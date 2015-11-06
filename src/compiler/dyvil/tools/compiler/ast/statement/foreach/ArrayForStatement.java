@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.ast.statement.foreach;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
@@ -25,14 +24,14 @@ public class ArrayForStatement extends ForEachStatement
 	
 	protected IMethod boxMethod;
 	
-	public ArrayForStatement(ICodePosition position, Variable var, IValue action)
+	public ArrayForStatement(ICodePosition position, Variable var)
 	{
-		this(position, var, action, var.getValue().getType());
+		this(position, var, var.getValue().getType());
 	}
 	
-	public ArrayForStatement(ICodePosition position, Variable var, IValue action, IType arrayType)
+	public ArrayForStatement(ICodePosition position, Variable var, IType arrayType)
 	{
-		super(position, var, action);
+		super(position, var);
 		
 		this.indexVar = new Variable($index, Types.INT);
 		this.lengthVar = new Variable($length, Types.INT);
@@ -106,12 +105,14 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
 		writer.writeInsn(Opcodes.DUP);
 		lengthVar.writeInit(writer, null);
+		
+		// Initial Boundary Check - if the length is 0, skip the loop
+		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
+		
 		// Set index to 0
 		writer.writeLDC(0);
 		indexVar.writeInit(writer, null);
 		
-		// Initial Boundary Check - if the length is 0, skip the loop
-		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
 		writer.writeTargetLabel(startLabel);
 		
 		// Load the element
@@ -134,7 +135,7 @@ public class ArrayForStatement extends ForEachStatement
 		}
 		
 		writer.writeLabel(updateLabel);
-		// Increase index
+		// Increment index
 		writer.writeIINC(indexVar.getIndex(), 1);
 		// Boundary Check
 		indexVar.writeGet(writer, null, lineNumber);

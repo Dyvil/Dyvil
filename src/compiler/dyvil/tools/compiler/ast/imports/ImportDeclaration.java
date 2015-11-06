@@ -4,19 +4,19 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.IObjectCompilable;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ImportDeclaration implements IASTNode, IObjectCompilable
 {
@@ -64,6 +64,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		if (this.theImport == null)
 		{
+			markers.add(I18n.createMarker(this.position, isStatic ? "using.invalid" : "import.invalid"));
 			return;
 		}
 		
@@ -85,23 +86,9 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		return this.theImport.resolveField(name);
 	}
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theImport.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		if (this.isStatic)
-		{
-			buffer.append("using ");
-		}
-		else
-		{
-			buffer.append("import ");
-		}
-		this.theImport.toString(prefix, buffer);
 	}
 	
 	@Override
@@ -116,5 +103,29 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		this.theImport = IImport.fromTag(dis.readByte());
 		this.theImport.read(dis);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.isStatic)
+		{
+			buffer.append("using ");
+		}
+		else
+		{
+			buffer.append("import ");
+		}
+		
+		if (this.theImport != null)
+		{
+			this.theImport.toString(prefix, buffer);
+		}
 	}
 }

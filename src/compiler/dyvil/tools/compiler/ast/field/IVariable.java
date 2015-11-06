@@ -43,8 +43,14 @@ public interface IVariable extends IDataMember
 	@Override
 	public default IDataMember capture(IContext context)
 	{
+		return this.capture(context, this);
+	}
+	
+	@Override
+	public default IDataMember capture(IContext context, IVariable variable)
+	{
 		IDataMember capture = context.capture(this);
-		return capture == null ? this : capture;
+		return capture == null ? variable : capture;
 	}
 	
 	public default void appendDescription(StringBuilder buf)

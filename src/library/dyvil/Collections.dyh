@@ -1,55 +1,58 @@
 package dyvil
 
+// Collection Operators
+infix	operator ?		{ associativity none,	precedence 1200 }
+infix	operator ++		{ associativity left,	precedence 1200 }
+infix	operator --		{ associativity left,	precedence 1200 }
+infix	operator ++=	{ associativity right,	precedence 1200 }
+infix	operator --=	{ associativity right,	precedence 1200 }
+
+// Map Operators
+infix	operator ?@		{ associativity none,	precedence 1200 }
+infix	operator ?:		{ associativity none,	precedence 1200 }
+infix	operator -@		{ associativity none,	precedence 1200 }
+infix	operator -@=	{ associativity right,	precedence 1200 }
+infix	operator -:		{ associativity none,	precedence 1200 }
+infix	operator -:=	{ associativity right,	precedence 1200 }
+
 import	dyvil.collection._
 
-//Collection Operators
-infix operator ? { none, 120 }
-infix operator ++ { left, 120 }
-infix operator -- { left, 120 }
-infix operator ++= { right, 120 }
-infix operator --= { right, 120 }
-
-//Map Operators
-infix operator ?: { none, 120 }
-infix operator -: { none, 120 }
-infix operator -:= { right, 120 }
-
 // Lists
-import	dyvil.collection.immutable.ArrayList => ImmutableArrayList
+import	dyvil.collection.immutable.ArrayList		=> ImmutableArrayList
 // TODO import	dyvil.collection.immutable.LinkedList => ImmutableLinkedList
 
-import	dyvil.collection.mutable.ArrayList => MutableArrayList
-import	dyvil.collection.mutable.LinkedList => MutableLinkedList
+import	dyvil.collection.mutable.ArrayList			=> MutableArrayList
+import	dyvil.collection.mutable.LinkedList			=> MutableLinkedList
 
 // Sets
-import	dyvil.collection.immutable.ArraySet => ImmutableArraySet
-import	dyvil.collection.immutable.MapBasedSet => ImmutableMapBasedSet
-// TODO import	dyvil.collection.immutable.HashSet => ImmutableHashSet
-// TODO import	dyvil.collection.immutable.IdentityHashSet => ImmutableIdentityHashSet
+import	dyvil.collection.immutable.ArraySet			=> ImmutableArraySet
+import	dyvil.collection.immutable.MapBasedSet		=> ImmutableMapBasedSet
+import	dyvil.collection.immutable.HashSet			=> ImmutableHashSet
+import	dyvil.collection.immutable.IdentityHashSet	=> ImmutableIdentityHashSet
 
-import	dyvil.collection.mutable.ArraySet => MutableArraySet
-import	dyvil.collection.mutable.MapBasedSet => MutableMapBasedSet
-import	dyvil.collection.mutable.HashSet => MutableHashSet
-import	dyvil.collection.mutable.IdentityHashSet => MutableIdentityHashSet
+import	dyvil.collection.mutable.ArraySet			=> MutableArraySet
+import	dyvil.collection.mutable.MapBasedSet		=> MutableMapBasedSet
+import	dyvil.collection.mutable.HashSet			=> MutableHashSet
+import	dyvil.collection.mutable.IdentityHashSet	=> MutableIdentityHashSet
 
 // Maps
-import	dyvil.collection.immutable.ArrayMap => ImmutableArrayMap
-import	dyvil.collection.immutable.TupleMap => ImmutableTupleMap
-import	dyvil.collection.immutable.HashMap => ImmutableHashMap
-// TODO import	dyvil.collection.immutable.IdentityHashMap => ImmutableIdentityHashMap
-import	dyvil.collection.immutable.EnumMap => ImmutableEnumMap
-import	dyvil.collection.immutable.TreeMap => ImmutableTreeMap
+import	dyvil.collection.immutable.ArrayMap			=> ImmutableArrayMap
+import	dyvil.collection.immutable.TupleMap			=> ImmutableTupleMap
+import	dyvil.collection.immutable.HashMap			=> ImmutableHashMap
+import	dyvil.collection.immutable.IdentityHashMap	=> ImmutableIdentityHashMap
+import	dyvil.collection.immutable.EnumMap			=> ImmutableEnumMap
+import	dyvil.collection.immutable.TreeMap			=> ImmutableTreeMap
 
-import	dyvil.collection.mutable.ArrayMap => MutableArrayMap
-import	dyvil.collection.mutable.TupleMap => MutableTupleMap
-import	dyvil.collection.mutable.HashMap => MutableHashMap
-import	dyvil.collection.mutable.IdentityHashMap => MutableIdentityHashMap
-import	dyvil.collection.mutable.EnumMap => MutableEnumMap
-import	dyvil.collection.mutable.TreeMap => MutableTreeMap
+import	dyvil.collection.mutable.ArrayMap			=> MutableArrayMap
+import	dyvil.collection.mutable.TupleMap			=> MutableTupleMap
+import	dyvil.collection.mutable.HashMap			=> MutableHashMap
+import	dyvil.collection.mutable.IdentityHashMap	=> MutableIdentityHashMap
+import	dyvil.collection.mutable.EnumMap			=> MutableEnumMap
+import	dyvil.collection.mutable.TreeMap			=> MutableTreeMap
 
 // Matrices
-import	dyvil.collection.immutable.ArrayMatrix => ImmutableArrayMatrix
-import	dyvil.collection.immutable.FlatArrayMatrix => ImmutableFlatArrayMatrix
+import	dyvil.collection.immutable.ArrayMatrix		=> ImmutableArrayMatrix
+import	dyvil.collection.immutable.FlatArrayMatrix	=> ImmutableFlatArrayMatrix
 
 // TODO import	dyvil.collection.mutable.ArrayMatrix => MutableArrayMatrix
-import	dyvil.collection.mutable.FlatArrayMatrix => ImmutableFlatArrayMatrix
+import	dyvil.collection.mutable.FlatArrayMatrix	=> ImmutableFlatArrayMatrix

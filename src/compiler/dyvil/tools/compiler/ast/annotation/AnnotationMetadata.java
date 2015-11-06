@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
+import java.util.EnumSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -15,10 +15,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class AnnotationMetadata implements IClassMetadata
 {
@@ -54,19 +53,28 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.theClass == null)
+		// Add the java.lang.Annotation interface
+		if (!this.theClass.isSubTypeOf(Annotation.Types.ANNOTATION))
 		{
-			return;
+			this.theClass.addInterface(Annotation.Types.ANNOTATION);
 		}
+		
 		if (this.retention == null)
 		{
-			IAnnotation retention = this.theClass.getAnnotation(Types.RETENTION_CLASS);
+			IAnnotation retention = this.theClass.getAnnotation(Annotation.Types.RETENTION_CLASS);
 			if (retention != null)
 			{
 				INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
-				this.retention = RetentionPolicy.valueOf(value.getName().qualified);
+				try
+				{
+					this.retention = RetentionPolicy.valueOf(value.getName().qualified);
+				}
+				catch (IllegalArgumentException ex)
+				{
+					// Problematic RentionPolicy annotation - do not handle this
+				}
 			}
 		}
 		if (this.targets != null)
@@ -74,13 +82,13 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 		
-		IAnnotation target = this.theClass.getAnnotation(Types.TARGET_CLASS);
+		IAnnotation target = this.theClass.getAnnotation(Annotation.Types.TARGET_CLASS);
 		if (target == null)
 		{
 			return;
 		}
 		
-		this.targets = new TreeSet();
+		this.targets = EnumSet.noneOf(ElementType.class);
 		IValueList values = (IValueList) target.getArguments().getValue(0, Annotation.VALUE);
 		if (values == null)
 		{
@@ -91,17 +99,33 @@ public final class AnnotationMetadata implements IClassMetadata
 		for (int i = 0; i < count; i++)
 		{
 			INamed value = (INamed) values.getValue(i);
-			this.targets.add(ElementType.valueOf(value.getName().qualified));
+			ElementType elementType;
+			try
+			{
+				elementType = ElementType.valueOf(value.getName().qualified);
+			}
+			catch (IllegalArgumentException ex)
+			{
+				// Problematic Target annotation - do not handle this
+				continue;
+			}
+			this.targets.add(elementType);
 		}
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (!this.theClass.isSubTypeOf(Types.ANNOTATION))
-		{
-			this.theClass.addInterface(Types.ANNOTATION);
-		}
 	}
 	
 	@Override

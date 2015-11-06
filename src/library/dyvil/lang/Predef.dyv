@@ -33,9 +33,34 @@ public final class Predef
 	
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 	
+	// Closures
+	
+	public static => T closure[T](=> T c) = c
+	
+	public static (=> void) => void repeat(int n) = closure => for (int i : 0 ..< n) closure()
+	
+	public static long measureMillis(=> void closure)
+	{
+		long millis = System.currentTimeMillis
+		closure()
+		return System.currentTimeMillis - millis
+	}
+	
+	public static long measureNanos(=> void closure)
+	{
+		long nanos = System.nanoTime
+		closure()
+		return System.nanoTime - nanos
+	}
+	
 	// Strings
 	
+	@Intrinsic([ ARGUMENTS ])
+	public static char $(char c) = c
+	
 	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
+	
+	public infix char subscript(String s, int index) = s charAt index
 	
 	// Hashing
 	
@@ -68,41 +93,41 @@ public final class Predef
 	
 	public static void println(boolean v) = System.out.println(if (v) "true" else "false")
 	
-	public static void println(byte v) = System.out.println(v)
+	public static void println(byte v) = System.out.println(v.toString)
 	
-	public static void println(short v) = System.out.println(v)
+	public static void println(short v) = System.out.println(v.toString)
 	
-	public static void println(char v) = System.out.println(v)
+	public static void println(char v) = System.out.println(v.toString)
 	
-	public static void println(int v) = System.out.println(v)
+	public static void println(int v) = System.out.println(v.toString)
 	
-	public static void println(long v) = System.out.println(v)
+	public static void println(long v) = System.out.println(v.toString)
 	
-	public static void println(float v) = System.out.println(v)
+	public static void println(float v) = System.out.println(v.toString)
 	
-	public static void println(double v) = System.out.println(v)
+	public static void println(double v) = System.out.println(v.toString)
 	
 	public static void println(String s) = System.out.println(s)
 	
 	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
 	
-	public static void println(boolean... v) = System.out.println(BooleanArray.toString(v));
+	public static void println(boolean... v) = System.out.println(v.toString);
 	
-	public static void println(byte... v) = System.out.println(ByteArray.toString(v));
+	public static void println(byte... v) = System.out.println(v.toString);
 	
-	public static void println(short... v) = System.out.println(ShortArray.toString(v));
+	public static void println(short... v) = System.out.println(v.toString);
 	
-	public static void println(char... v) = System.out.println(CharArray.toString(v));
+	public static void println(char... v) = System.out.println(v.toString);
 	
-	public static void println(int... v) = System.out.println(IntArray.toString(v));
+	public static void println(int... v) = System.out.println(v.toString);
 	
-	public static void println(long... v) = System.out.println(LongArray.toString(v));
+	public static void println(long... v) = System.out.println(v.toString);
 	
-	public static void println(float... v) = System.out.println(FloatArray.toString(v));
+	public static void println(float... v) = System.out.println(v.toString);
 	
-	public static void println(double... v) = System.out.println(DoubleArray.toString(v));
+	public static void println(double... v) = System.out.println(v.toString);
 	
-	public static void println(Object... v) = System.out.println(ObjectArray.deepToString(v));
+	public static void println(Object... v) = System.out.println(v.toString);
 	
 	// Tuples
 	

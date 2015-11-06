@@ -60,6 +60,17 @@ public interface ByteArray
 		return array;
 	}
 	
+	public static byte[] rangeOpen(byte start, byte end)
+	{
+		int i = 0;
+		byte[] array = new byte[end - start];
+		for (; start < end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })

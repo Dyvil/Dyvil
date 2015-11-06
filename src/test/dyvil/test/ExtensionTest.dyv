@@ -1,0 +1,26 @@
+package dyvil.test
+
+public class ExtensionTest
+{
+	class SuperClass
+	
+	class SubClass extends SuperClass {
+		public void foo() {
+			println "SubClass.foo"
+		}
+	}
+	
+	public extension void foo(SuperClass superClass) {
+		println "extension.foo"
+	}
+	
+	public static void main([String] args) {
+		SuperClass sup = new SuperClass
+		SubClass sub = new SubClass
+		SuperClass sub1 = sub
+		
+		sup.foo
+		sub.foo
+		sub1.foo
+	}
+}

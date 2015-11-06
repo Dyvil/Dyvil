@@ -60,6 +60,17 @@ public interface LongArray
 		return array;
 	}
 	
+	public static long[] rangeOpen(long start, long end)
+	{
+		int i = 0;
+		long[] array = new long[(int) (end - start)];
+		for (; start < end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })

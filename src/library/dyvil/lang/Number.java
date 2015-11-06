@@ -9,7 +9,7 @@ import dyvil.lang.literal.LongConvertible;
 @LongConvertible
 @FloatConvertible
 @DoubleConvertible
-public interface Number extends Ordered<Number>
+public interface Number extends Rangeable<Number>
 {
 	public static Int apply(int v)
 	{
@@ -252,16 +252,13 @@ public interface Number extends Ordered<Number>
 	public Number $percent(Number v);
 	
 	@Override
-	public default Number next()
-	{
-		return this.$plus(1);
-	}
+	public Number next();
 	
 	@Override
-	public default Number previous()
-	{
-		return this.$minus(1);
-	}
+	public Number previous();
+	
+	@Override
+	public int compareTo(Number o);
 	
 	@Override
 	public default int distanceTo(Number o)

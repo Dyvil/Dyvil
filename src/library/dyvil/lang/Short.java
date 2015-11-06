@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
@@ -7,8 +9,10 @@ import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
-public class Short implements Integer
+public class Short implements Integer, Serializable
 {
+	private static final long serialVersionUID = -731503833337870116L;
+	
 	public static final int		min		= java.lang.Short.MIN_VALUE;
 	public static final int		max		= java.lang.Short.MAX_VALUE;
 	public static final byte	size	= java.lang.Short.SIZE;
@@ -1029,6 +1033,24 @@ public class Short implements Integer
 	public Int $gt$gt$gt(Integer v)
 	{
 		return Int.apply(this.value >>> v.intValue());
+	}
+	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Long.compare(this.value, o.longValue());
+	}
+	
+	@Override
+	public Short next()
+	{
+		return Short.apply((short) (this.value + 1));
+	}
+	
+	@Override
+	public Short previous()
+	{
+		return Short.apply((short) (this.value - 1));
 	}
 	
 	// Object methods

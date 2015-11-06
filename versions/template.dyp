@@ -1,0 +1,5 @@
+version = "$$version$$"
+library.version = "$$libraryVersion$$"
+compiler.version = "$$compilerVersion$$"
+repl.version = "$$replVersion$$"
+dpf.version = "$$dpfVersion$$"

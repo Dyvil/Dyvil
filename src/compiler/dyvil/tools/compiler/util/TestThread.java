@@ -22,7 +22,7 @@ public final class TestThread extends Thread
 		int index = 1;
 		for (Library l : libraries)
 		{
-			urls[index++] = l.file.toURI().toURL();
+			urls[index++] = l.getURL();
 		}
 		
 		return new URLClassLoader(urls, ClassLoader.getSystemClassLoader());

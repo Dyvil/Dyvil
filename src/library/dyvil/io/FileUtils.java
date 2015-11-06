@@ -37,7 +37,7 @@ public interface FileUtils
 	 * @return true if the file exists or has been created successfully, false
 	 *         otherwise
 	 */
-	public static boolean createFile(File file)
+	public static @infix boolean create(File file)
 	{
 		try
 		{
@@ -48,7 +48,7 @@ public interface FileUtils
 				{
 					parent.mkdirs();
 				}
-				file.createNewFile();
+				return file.createNewFile();
 			}
 			return true;
 		}
@@ -79,19 +79,9 @@ public interface FileUtils
 	
 	public static @infix boolean write(File file, byte[] bytes)
 	{
-		File parent = file.getParentFile();
-		if (!parent.exists())
-		{
-			parent.mkdirs();
-		}
-		
 		try
 		{
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-			
+			create(file);
 			Files.write(file.toPath(), bytes);
 			return true;
 		}
@@ -242,9 +232,13 @@ public interface FileUtils
 	{
 		if (maxDepth > 0 && file.isDirectory())
 		{
-			for (File f : file.listFiles())
+			File[] files = file.listFiles();
+			if (files != null)
 			{
-				delete(f, maxDepth - 1);
+				for (File f : files)
+				{
+					delete(f, maxDepth - 1);
+				}
 			}
 		}
 		file.delete();

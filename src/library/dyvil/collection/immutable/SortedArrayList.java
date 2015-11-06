@@ -9,6 +9,8 @@ import dyvil.collection.Set;
 
 public class SortedArrayList<E> extends ArrayList<E>
 {
+	private static final long serialVersionUID = -5735346326799929699L;
+	
 	protected Comparator<? super E> comparator;
 	
 	public SortedArrayList(E[] elements, Comparator<? super E> comparator)

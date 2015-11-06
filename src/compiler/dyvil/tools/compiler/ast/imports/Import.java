@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.imports;
 
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Import implements IImport
 {

@@ -1,21 +1,20 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 {
@@ -63,7 +62,7 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	
 	public IConstructor getConstructor(IParameter[] parameters, int parameterCount);
 	
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	// Methods
 	
@@ -78,7 +77,7 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	
 	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	public default IMethod getFunctionalMethod()
 	{

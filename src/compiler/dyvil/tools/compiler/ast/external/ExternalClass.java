@@ -4,8 +4,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.access.MethodCall;
@@ -24,10 +25,9 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -44,14 +44,16 @@ import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalClass extends AbstractClass
 {
 	public Package thePackage;
 	
-	private List<IType> innerTypes;
+	private Map<String, String> innerTypes;
 	
 	private boolean	metadataResolved;
 	private boolean	superTypesResolved;
@@ -81,7 +83,8 @@ public final class ExternalClass extends AbstractClass
 	private void resolveMetadata()
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers);
-		this.metadata.resolve(null, this);
+		this.metadata.resolveTypes(null, this);
+		this.metadata.resolveTypesBody(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -123,11 +126,6 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.interfaces[i] = this.interfaces[i].resolveType(null, this);
 		}
-		
-		if (!this.metadataResolved)
-		{
-			this.resolveMetadata();
-		}
 	}
 	
 	private void resolveAnnotations()
@@ -143,16 +141,28 @@ public final class ExternalClass extends AbstractClass
 	{
 		this.innerTypesResolved = true;
 		
-		if (this.innerTypes != null)
+		if (this.innerTypes == null)
 		{
-			int len = this.innerTypes.size();
-			for (int i = 0; i < len; i++)
+			return;
+		}
+		
+		for (Entry<String, String> entry : this.innerTypes)
+		{
+			Name name = Name.getQualified(entry.getKey());
+			String internal = entry.getValue();
+			
+			// Resolve the class name
+			String fileName = internal + FileType.CLASS_EXTENSION;
+			IClass c = Package.loadClass(fileName, name);
+			if (c != null)
 			{
-				IType t = this.innerTypes.get(i);
-				this.innerTypes.set(i, t.resolveType(null, Package.rootPackage));
-				t.getTheClass().setOuterClass(this);
+				c.setOuterClass(this);
+				this.body.addClass(c);
+				continue;
 			}
 		}
+		
+		this.innerTypes = null;
 	}
 	
 	@Override
@@ -306,33 +316,9 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 		
-		IMethod m;
 		if (this.body != null)
 		{
-			m = this.body.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		if (!this.superTypesResolved)
-		{
-			this.resolveSuperTypes();
-		}
-		
-		if (this.superType != null)
-		{
-			m = this.superType.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			m = this.interfaces[i].getFunctionalMethod();
+			IMethod m = this.body.getFunctionalMethod();
 			if (m != null)
 			{
 				return m;
@@ -408,18 +394,7 @@ public final class ExternalClass extends AbstractClass
 			this.resolveInnerTypes();
 		}
 		
-		if (this.innerTypes != null)
-		{
-			for (IType t : this.innerTypes)
-			{
-				if (t.getName() == name)
-				{
-					return t.getTheClass();
-				}
-			}
-		}
-		
-		return null;
+		return this.body.getClass(name);
 	}
 	
 	@Override
@@ -475,7 +450,7 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (!this.genericsResolved)
 		{
@@ -511,11 +486,15 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		if (!this.superTypesResolved)
 		{
 			this.resolveSuperTypes();
+		}
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
 		}
 		
 		this.body.getConstructorMatches(list, arguments);
@@ -660,15 +639,7 @@ public final class ExternalClass extends AbstractClass
 			field.setValue(IValue.fromObject(value));
 		}
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0 && name.equals("instance"))
-		{
-			// This is the instance field of a singleton object class
-			this.getMetadata().setInstanceField(field);
-		}
-		else
-		{
-			this.body.addField(field);
-		}
+		this.body.addField(field);
 		
 		return new SimpleFieldVisitor(field);
 	}
@@ -694,7 +665,19 @@ public final class ExternalClass extends AbstractClass
 			ExternalConstructor constructor = new ExternalConstructor(this);
 			constructor.setModifiers(access);
 			
-			ClassFormat.readConstructorType(desc, constructor);
+			if (signature != null)
+			{
+				ClassFormat.readConstructorType(signature, constructor);
+			}
+			else
+			{
+				ClassFormat.readConstructorType(desc, constructor);
+				
+				if (exceptions != null)
+				{
+					ClassFormat.readExceptions(exceptions, constructor);
+				}
+			}
 			
 			if ((access & Modifiers.VARARGS) != 0)
 			{
@@ -719,10 +702,7 @@ public final class ExternalClass extends AbstractClass
 			
 			if (exceptions != null)
 			{
-				for (String s : exceptions)
-				{
-					method.addException(ClassFormat.internalToType(s));
-				}
+				ClassFormat.readExceptions(exceptions, method);
 			}
 		}
 		
@@ -751,11 +731,10 @@ public final class ExternalClass extends AbstractClass
 	{
 		if (this.innerTypes == null)
 		{
-			this.innerTypes = new ArrayList(1);
+			this.innerTypes = new ArrayMap(3);
 		}
 		
-		IType type = ClassFormat.internalToType(name);
-		this.innerTypes.add(type);
+		this.innerTypes.put(innerName, name);
 	}
 	
 	public void visitEnd()

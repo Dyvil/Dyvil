@@ -1,116 +1,132 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.parsing.Name;
 
 public class CombiningContext implements IContext
 {
-	private final IContext	context1;
-	private final IContext	context2;
+	private final IContext	inner;
+	private final IContext	outer;
 	
 	public CombiningContext(IContext context1, IContext context2)
 	{
-		this.context1 = context1;
-		this.context2 = context2;
+		this.inner = context1;
+		this.outer = context2;
 	}
 	
 	@Override
 	public boolean isStatic()
 	{
-		return this.context1.isStatic() && this.context2.isStatic();
+		return this.inner.isStatic() && this.outer.isStatic();
 	}
 	
 	@Override
 	public IDyvilHeader getHeader()
 	{
-		IDyvilHeader header = this.context1.getHeader();
-		return header == null ? this.context2.getHeader() : header;
+		IDyvilHeader header = this.inner.getHeader();
+		return header == null ? this.outer.getHeader() : header;
 	}
 	
 	@Override
 	public IClass getThisClass()
 	{
-		IClass iclass = this.context1.getThisClass();
-		return iclass == null ? this.context2.getThisClass() : iclass;
+		IClass iclass = this.inner.getThisClass();
+		return iclass == null ? this.outer.getThisClass() : iclass;
 	}
 	
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		Package pack = this.context1.resolvePackage(name);
-		return pack == null ? this.context2.resolvePackage(name) : pack;
+		Package pack = this.inner.resolvePackage(name);
+		return pack == null ? this.outer.resolvePackage(name) : pack;
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		IClass iclass = this.context1.resolveClass(name);
-		return iclass == null ? this.context2.resolveClass(name) : iclass;
+		IClass iclass = this.inner.resolveClass(name);
+		return iclass == null ? this.outer.resolveClass(name) : iclass;
 	}
 	
 	@Override
 	public IType resolveType(Name name)
 	{
-		IType type = this.context1.resolveType(name);
-		return type == null ? this.context2.resolveType(name) : type;
+		IType type = this.inner.resolveType(name);
+		return type == null ? this.outer.resolveType(name) : type;
 	}
 	
 	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
-		ITypeVariable typeVar = this.context1.resolveTypeVariable(name);
-		return typeVar == null ? this.context2.resolveTypeVariable(name) : typeVar;
+		ITypeVariable typeVar = this.inner.resolveTypeVariable(name);
+		return typeVar == null ? this.outer.resolveTypeVariable(name) : typeVar;
 	}
 	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		IDataMember field = this.context1.resolveField(name);
-		return field == null ? this.context2.resolveField(name) : field;
+		IDataMember field = this.inner.resolveField(name);
+		return field == null ? this.outer.resolveField(name) : field;
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		this.context1.getMethodMatches(list, instance, name, arguments);
-		this.context2.getMethodMatches(list, instance, name, arguments);
+		this.inner.getMethodMatches(list, instance, name, arguments);
+		this.outer.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		this.context1.getConstructorMatches(list, arguments);
-		this.context2.getConstructorMatches(list, arguments);
+		this.inner.getConstructorMatches(list, arguments);
+		this.outer.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
 	public boolean handleException(IType type)
 	{
-		return this.context1.handleException(type) || this.context2.handleException(type);
+		return this.inner.handleException(type) || this.outer.handleException(type);
 	}
 	
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		IAccessible i = this.context1.getAccessibleThis(type);
-		return i == null ? this.context2.getAccessibleThis(type) : i;
+		IAccessible i = this.inner.getAccessibleThis(type);
+		IAccessible i2 = this.outer.getAccessibleThis(type);
+		return i == null ? i2 : i;
+	}
+	
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return this.inner.isMember(variable);
 	}
 	
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		return this.context1.capture(variable);
+		if (this.inner.isMember(variable))
+		{
+			return variable;
+		}
+		if (this.outer.isMember(variable))
+		{
+			return this.inner.capture(variable);
+		}
+		
+		IDataMember dm = this.outer.capture(variable);
+		return dm.capture(this.inner);
 	}
 }

@@ -1,15 +1,20 @@
 package dyvil.math;
 
+import java.io.IOException;
+import java.io.Serializable;
+
 import dyvil.lang.Number;
 import dyvil.lang.literal.TupleConvertible;
 
 import dyvil.annotation.prefix;
 
 @TupleConvertible
-public class Complex implements Number
+public class Complex implements Number, Serializable
 {
-	protected double	real;
-	protected double	imag;
+	private static final long serialVersionUID = 9178132461719363395L;
+	
+	protected transient double	real;
+	protected transient double	imag;
 	
 	public static Complex apply(double r, double i)
 	{
@@ -704,8 +709,82 @@ public class Complex implements Number
 	}
 	
 	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Double.compare(this.real, o.doubleValue());
+	}
+	
+	@Override
+	public Complex next()
+	{
+		return Complex.apply(this.real + 1D, this.imag);
+	}
+	
+	@Override
+	public Number previous()
+	{
+		return Complex.apply(this.real - 1D, this.imag);
+	}
+	
+	@Override
 	public java.lang.String toString()
 	{
 		return new StringBuilder(20).append(this.real).append('+').append(this.imag).append('i').toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (this.getClass() != obj.getClass())
+		{
+			return false;
+		}
+		Complex other = (Complex) obj;
+		if (Double.doubleToLongBits(this.imag) != Double.doubleToLongBits(other.imag))
+		{
+			return false;
+		}
+		if (Double.doubleToLongBits(this.real) != Double.doubleToLongBits(other.real))
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(this.imag);
+		result = prime * result + (int) (temp ^ temp >>> 32);
+		temp = Double.doubleToLongBits(this.real);
+		result = prime * result + (int) (temp ^ temp >>> 32);
+		return result;
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeDouble(this.real);
+		out.writeDouble(this.imag);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.real = in.readDouble();
+		this.imag = in.readDouble();
 	}
 }

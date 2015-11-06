@@ -5,19 +5,18 @@ import java.util.Iterator;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class SingleArgument implements IArguments, IValued
 {
@@ -56,7 +55,8 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public IArguments withLastValue(IValue value)
 	{
-		if (this.value == null) {
+		if (this.value == null)
+		{
 			return new SingleArgument(value);
 		}
 		
@@ -160,12 +160,10 @@ public final class SingleArgument implements IArguments, IValued
 		}
 		
 		IType type = param.getActualType();
-		IValue value1 = type.convertValue(this.value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
-			marker.addInfo("Required Type: " + type);
-			marker.addInfo("Value Type: " + this.value.getType());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
@@ -182,7 +180,7 @@ public final class SingleArgument implements IArguments, IValued
 		}
 		
 		IType type = param.getActualType();
-		IValue value1 = type.convertValue(this.value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (value1 != null)
 		{
 			this.value = value1;
@@ -190,12 +188,10 @@ public final class SingleArgument implements IArguments, IValued
 			return;
 		}
 		
-		value1 = type.getElementType().convertValue(this.value, typeContext, markers, context);
+		value1 = IType.convertValue(this.value, type.getElementType(), typeContext, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "method.access.argument_type", param.getName());
-			marker.addInfo("Required Type: " + type);
-			marker.addInfo("Value Type: " + this.value.getType());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
@@ -231,19 +227,19 @@ public final class SingleArgument implements IArguments, IValued
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		if (index == 0 && this.value != null)
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, param.getType());
 			return;
 		}
 		
-		defaultValue.writeExpression(writer);
+		param.getValue().writeExpression(writer, param.getType());
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		if (index != 0 || this.value == null)
 		{
@@ -252,17 +248,17 @@ public final class SingleArgument implements IArguments, IValued
 		if (this.varargs)
 		{
 			// Write the value as is (it is an array)
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, param.getType());
 			return;
 		}
 		
 		// Write an array with one element
-		type = type.getElementType();
+		IType type = param.getType().getElementType();
 		writer.writeLDC(1);
 		writer.writeNewArray(type, 1);
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeLDC(0);
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, type);
 		writer.writeInsn(type.getArrayStoreOpcode());
 	}
 	
@@ -275,42 +271,56 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null) {
-		this.value.resolveTypes(markers, context);}
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.value != null) {
-		this.value = this.value.resolve(markers, context);}
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
-	{if (this.value != null) {
-		this.value.checkTypes(markers, context);
-	}}
+	{
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
+	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
-	{if (this.value != null) {
-		this.value.check(markers, context);
-	}}
+	{
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
+	}
 	
 	@Override
 	public void foldConstants()
 	{
-		if (this.value != null) {
-		this.value = this.value.foldConstants();
-	}}
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
+	}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.value != null) {
-		this.value = this.value.cleanup(context, compilableList);
-	}}
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
+		}
+	}
 	
 	@Override
 	public String toString()
@@ -340,6 +350,7 @@ public final class SingleArgument implements IArguments, IValued
 	@Override
 	public void typesToString(StringBuilder buffer)
 	{
+		buffer.append('(');
 		if (this.value != null)
 		{
 			this.value.getType().toString("", buffer);
@@ -348,5 +359,6 @@ public final class SingleArgument implements IArguments, IValued
 		{
 			buffer.append("unknown");
 		}
+		buffer.append(')');
 	}
 }

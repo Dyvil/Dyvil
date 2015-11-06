@@ -4,24 +4,20 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.LambdaType;
-import dyvil.tools.compiler.ast.type.TupleType;
-import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class InternalGenericType extends GenericType
 {
@@ -86,6 +82,12 @@ public class InternalGenericType extends GenericType
 			this.typeArguments[i] = null;
 			return new LambdaType(this.typeArguments, i, returnType);
 		}
+		switch (this.internalName)
+		{
+		case "dyvil/collection/ImmutableMap":
+		case "dyvil/collection/Map":
+			return new MapType(this.typeArguments[0], this.typeArguments[1]);
+		}
 		
 		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
@@ -103,12 +105,12 @@ public class InternalGenericType extends GenericType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

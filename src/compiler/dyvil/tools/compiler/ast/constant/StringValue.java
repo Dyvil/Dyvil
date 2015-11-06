@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -10,8 +11,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringValue implements IConstantValue
 {
@@ -56,13 +59,15 @@ public final class StringValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isSuperTypeOf(Types.STRING))
+		if (type == Types.STRING || type.isSuperTypeOf(Types.STRING))
 		{
 			return this;
 		}
-		if (type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -122,45 +127,14 @@ public final class StringValue implements IConstantValue
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public String toString()
 	{
-		int len = this.value.length();
-		buffer.ensureCapacity(buffer.length() + len + 3);
-		buffer.append('"');
-		append(this.value, len, buffer);
-		buffer.append('"');
+		return IASTNode.toString(this);
 	}
 	
-	public static void append(String value, int len, StringBuilder buffer)
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < len; i++)
-		{
-			char c = value.charAt(i);
-			switch (c)
-			{
-			case '"':
-				buffer.append("\\\"");
-				continue;
-			case '\\':
-				buffer.append("\\\\");
-				continue;
-			case '\n':
-				buffer.append("\\n");
-				continue;
-			case '\t':
-				buffer.append("\\t");
-				continue;
-			case '\r':
-				buffer.append("\\r");
-				continue;
-			case '\b':
-				buffer.append("\\b");
-				continue;
-			case '\f':
-				buffer.append("\\f");
-				continue;
-			}
-			buffer.append(c);
-		}
+		LexerUtil.appendStringLiteral(this.value, buffer);
 	}
 }

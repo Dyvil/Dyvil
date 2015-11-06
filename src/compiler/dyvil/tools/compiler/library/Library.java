@@ -3,13 +3,13 @@ package dyvil.tools.compiler.library;
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.LinkOption;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 
@@ -26,7 +26,7 @@ public abstract class Library
 	{
 		String classLocation = '/' + klass.getName().replace('.', '/') + ".class";
 		URL url = klass.getResource(classLocation);
-		String path = url.toString();
+		String path = url.toString().replace(File.separatorChar, '/');
 		int index = path.lastIndexOf(classLocation);
 		
 		if (index < 0)
@@ -48,10 +48,13 @@ public abstract class Library
 		String newPath = path.substring(startIndex, index);
 		try
 		{
-			return new File(new URL(newPath).toURI());
+			return new File(new URI(newPath));
 		}
-		catch (URISyntaxException | MalformedURLException ex)
+		catch (Exception ex)
 		{
+			System.err.println("Failed to get Library location for " + klass.getName());
+			System.err.println("URL: " + url);
+			System.err.println("Path: " + newPath + " (" + path + ")");
 			ex.printStackTrace();
 		}
 		return null;
@@ -82,13 +85,13 @@ public abstract class Library
 		}
 	}
 	
-	protected static final Map<String, String> env = Collections.singletonMap("create", "true");
+	protected static final Map<String, String> env = ImmutableMap.apply("create", "true");
 	
 	protected static final String[]		emptyStrings		= {};
 	protected static final LinkOption[]	emptyLinkOptions	= {};
 	
-	public File					file;
-	public Map<String, Package>	packages	= new HashMap();
+	protected final File					file;
+	protected final Map<String, Package>	packages	= new HashMap();
 	
 	protected Library(File file)
 	{
@@ -122,6 +125,11 @@ public abstract class Library
 	public abstract void loadLibrary();
 	
 	public abstract void unloadLibrary();
+	
+	public URL getURL() throws MalformedURLException
+	{
+		return this.file.toURI().toURL();
+	}
 	
 	public abstract boolean isSubPackage(String internal);
 	

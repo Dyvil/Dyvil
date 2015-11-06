@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -12,14 +11,17 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IConstructor extends IClassMember, ICallableMember, ITypeList, IContext
 {
 	public float getSignatureMatch(IArguments arguments);
 	
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
+	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
+	
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	

@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FloatPattern extends Pattern
 {
@@ -41,17 +41,6 @@ public final class FloatPattern extends Pattern
 	public boolean isType(IType type)
 	{
 		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.FLOAD, varIndex);
-		}
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_FCMPEQ, elseLabel);
 	}
 	
 	@Override

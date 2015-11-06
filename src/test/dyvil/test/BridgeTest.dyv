@@ -1,0 +1,46 @@
+package dyvil.test
+
+public class BridgeTest
+{
+	public interface Container[T]
+	{
+		public T get()
+		
+		public void put(T value)
+	}
+	
+	public case class IntContainer(int value) implements Container[int]
+	{
+		public override int get() = this.value
+		
+		public override void put(int value)
+		{
+			this.value = value
+		}
+	}
+	
+	public case class LongContainer(long value) implements Container[long]
+	{
+		public override long get() = this.value
+				
+		public override void put(long value)
+		{
+			this.value = value
+		}
+	}
+	
+	public static void main([String] args)
+	{
+		IntContainer ic = IntContainer(1)
+		Container[int] intContainer = ic
+		
+		println ic.get
+		println intContainer.get
+		
+		LongContainer lc = LongContainer(2L)
+		Container[long] longContainer = lc
+		
+		println lc.get
+		println longContainer.get
+	}
+}

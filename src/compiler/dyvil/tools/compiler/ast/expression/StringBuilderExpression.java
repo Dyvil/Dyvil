@@ -9,9 +9,9 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.CaseClasses;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringBuilderExpression implements IValue
 {
@@ -167,8 +167,15 @@ public class StringBuilderExpression implements IValue
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
+			if (value.valueTag() == IValue.STRING || value.valueTag() == IValue.CHAR)
+			{
+				String string = value.stringValue();
+				CaseClasses.writeStringAppend(writer, string);
+				continue;
+			}
+			
 			value.writeExpression(writer);
-			CaseClasses.writeToString(writer, value.getType());
+			CaseClasses.writeStringAppend(writer, value.getType());
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);

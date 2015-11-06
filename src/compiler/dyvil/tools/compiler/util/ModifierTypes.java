@@ -1,7 +1,10 @@
 package dyvil.tools.compiler.util;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.transform.Keywords;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public enum ModifierTypes
 {
@@ -123,10 +126,6 @@ public enum ModifierTypes
 			break;
 		}
 		
-		if ((mod & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-		{
-			sb.append("@Deprecated ");
-		}
 		if ((mod & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			sb.append("internal ");
@@ -231,7 +230,7 @@ public enum ModifierTypes
 		{
 			sb.append("extension ");
 		}
-		else if ((mod & Modifiers.INFIX) == Modifiers.INFIX)
+		else if ((mod & Modifiers.INFIX) != 0 && (mod & Modifiers.INFIX) != Modifiers.STATIC)
 		{
 			sb.append("infix ");
 		}
@@ -299,15 +298,15 @@ public enum ModifierTypes
 	{
 		switch (mod)
 		{
-		case Keywords.PACKAGE:
+		case DyvilKeywords.PACKAGE:
 			return Modifiers.PACKAGE;
-		case Keywords.PUBLIC:
+		case DyvilKeywords.PUBLIC:
 			return Modifiers.PUBLIC;
-		case Keywords.PRIVATE:
+		case DyvilKeywords.PRIVATE:
 			return Modifiers.PRIVATE;
-		case Keywords.PROTECTED:
+		case DyvilKeywords.PROTECTED:
 			return Modifiers.PROTECTED;
-		case Keywords.INTERNAL:
+		case DyvilKeywords.INTERNAL:
 			return Modifiers.INTERNAL;
 		}
 		return -1;
@@ -317,13 +316,13 @@ public enum ModifierTypes
 	{
 		switch (mod)
 		{
-		case Keywords.CLASS:
+		case DyvilKeywords.CLASS:
 			return 0;
-		case Keywords.INTERFACE:
+		case DyvilKeywords.INTERFACE:
 			return Modifiers.INTERFACE_CLASS;
-		case Keywords.ENUM:
+		case DyvilKeywords.ENUM:
 			return Modifiers.ENUM;
-		case Keywords.OBJECT:
+		case DyvilKeywords.OBJECT:
 			return Modifiers.OBJECT_CLASS;
 		}
 		return -1;
@@ -333,15 +332,15 @@ public enum ModifierTypes
 	{
 		switch (mod)
 		{
-		case Keywords.STATIC:
+		case DyvilKeywords.STATIC:
 			return Modifiers.STATIC;
-		case Keywords.ABSTRACT:
+		case DyvilKeywords.ABSTRACT:
 			return Modifiers.ABSTRACT;
-		case Keywords.FINAL:
+		case DyvilKeywords.FINAL:
 			return Modifiers.FINAL;
-		case Keywords.FUNCTIONAL:
+		case DyvilKeywords.FUNCTIONAL:
 			return Modifiers.FUNCTIONAL;
-		case Keywords.CASE:
+		case DyvilKeywords.CASE:
 			return Modifiers.CASE_CLASS;
 		}
 		return -1;
@@ -351,13 +350,13 @@ public enum ModifierTypes
 	{
 		switch (mod)
 		{
-		case Keywords.STATIC:
+		case DyvilKeywords.STATIC:
 			return Modifiers.STATIC;
-		case Keywords.FINAL:
+		case DyvilKeywords.FINAL:
 			return Modifiers.FINAL;
-		case Keywords.CONST:
+		case DyvilKeywords.CONST:
 			return Modifiers.CONST;
-		case Keywords.LAZY:
+		case DyvilKeywords.LAZY:
 			return Modifiers.LAZY;
 		}
 		return -1;
@@ -367,27 +366,27 @@ public enum ModifierTypes
 	{
 		switch (mod)
 		{
-		case Keywords.STATIC:
+		case DyvilKeywords.STATIC:
 			return Modifiers.STATIC;
-		case Keywords.FINAL:
+		case DyvilKeywords.FINAL:
 			return Modifiers.FINAL;
-		case Keywords.CONST:
+		case DyvilKeywords.CONST:
 			return Modifiers.CONST;
-		case Keywords.SYNCHRONIZED:
+		case DyvilKeywords.SYNCHRONIZED:
 			return Modifiers.SYNCHRONIZED;
-		case Keywords.ABSTRACT:
+		case DyvilKeywords.ABSTRACT:
 			return Modifiers.ABSTRACT;
-		case Keywords.INLINE:
+		case DyvilKeywords.INLINE:
 			return Modifiers.INLINE;
-		case Keywords.INFIX:
+		case DyvilKeywords.INFIX:
 			return Modifiers.INFIX;
-		case Keywords.EXTENSION:
+		case DyvilKeywords.EXTENSION:
 			return Modifiers.EXTENSION;
-		case Keywords.POSTFIX:
+		case DyvilKeywords.POSTFIX:
 			return Modifiers.INFIX;
-		case Keywords.PREFIX:
+		case DyvilKeywords.PREFIX:
 			return Modifiers.PREFIX;
-		case Keywords.OVERRIDE:
+		case DyvilKeywords.OVERRIDE:
 			return Modifiers.OVERRIDE;
 		}
 		return -1;
@@ -397,11 +396,62 @@ public enum ModifierTypes
 	{
 		switch (mod)
 		{
-		case Keywords.FINAL:
+		case DyvilKeywords.FINAL:
 			return Modifiers.FINAL;
-		case Keywords.VAR:
+		case DyvilKeywords.VAR:
 			return Modifiers.VAR;
 		}
 		return -1;
+	}
+	
+	public static void checkMethodModifiers(MarkerList markers, IClassMember member, int modifiers, boolean hasValue, String type)
+	{
+		boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
+		boolean isAbstract = (modifiers & Modifiers.ABSTRACT) != 0;
+		boolean isNative = (modifiers & Modifiers.NATIVE) != 0;
+		
+		// If the method does not have an implementation and is static
+		if (isStatic && isAbstract)
+		{
+			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", I18n.getString("member." + type, member.getName())));
+		}
+		else if (isAbstract && isNative)
+		{
+			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", I18n.getString("member." + type, member.getName())));
+		}
+		else
+		{
+			if (isStatic)
+			{
+				if (!hasValue)
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.static.unimplemented", I18n.getString("member." + type, member.getName())));
+				}
+			}
+			if (isNative)
+			{
+				if (!hasValue)
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.native.implemented", I18n.getString("member." + type, member.getName())));
+				}
+			}
+			if (isAbstract)
+			{
+				IClass theClass = member.getTheClass();
+				if (!theClass.isAbstract())
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString("member." + type, member.getName()),
+							theClass.getName()));
+				}
+				if (hasValue)
+				{
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.implemented", I18n.getString("member." + type, member.getName())));
+				}
+			}
+		}
+		if (!hasValue && !isAbstract && !isNative)
+		{
+			markers.add(I18n.createError(member.getPosition(), "modifiers.unimplemented", I18n.getString("member." + type, member.getName())));
+		}
 	}
 }

@@ -13,14 +13,14 @@ public final class UnsafeStringRef implements StringRef
 	
 	public UnsafeStringRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeStringRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeStringRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeStringRef implements StringRef
 	@Override
 	public String get()
 	{
-		return (String) ReflectUtils.unsafe.getObject(this.base, this.offset);
+		return (String) ReflectUtils.UNSAFE.getObject(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(String value)
 	{
-		ReflectUtils.unsafe.putObject(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putObject(this.base, this.offset, value);
 	}
 }

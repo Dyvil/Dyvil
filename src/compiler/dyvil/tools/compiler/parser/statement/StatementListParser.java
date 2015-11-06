@@ -7,37 +7,46 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.statement.AppliedStatementList;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
 {
-	private static final int	EXPRESSION	= 1;
-	private static final int	TYPE		= 2;
-	private static final int	SEPARATOR	= 4;
+	private static final int	OPEN_BRACKET	= 1;
+	private static final int	EXPRESSION		= 2;
+	private static final int	TYPE			= 4;
+	private static final int	SEPARATOR		= 8;
 	
-	protected StatementList statementList;
+	protected IValueConsumer consumer;
 	
-	private Name label;
+	private boolean			applied;
+	private StatementList	statementList;
 	
+	private Name			label;
 	private IType			type;
 	private int				modifiers;
 	private AnnotationList	annotations;
 	
-	public StatementListParser(StatementList valueList)
+	public StatementListParser(IValueConsumer consumer)
 	{
-		this.statementList = valueList;
-		this.mode = EXPRESSION;
+		this.consumer = consumer;
+		this.mode = OPEN_BRACKET;
+	}
+	
+	public void setApplied(boolean applied)
+	{
+		this.applied = applied;
 	}
 	
 	@Override
@@ -54,7 +63,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	}
 	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
 		this.pm.jump(this.firstToken);
 		this.pm.pushParser(this.pm.newExpressionParser(this));
@@ -67,7 +76,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	{
 		int type = token.type();
 		
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			if (this.firstToken != null)
 			{
@@ -78,27 +87,37 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				return;
 			}
 			
-			pm.popParser(true);
+			this.consumer.setValue(this.statementList);
+			pm.popParser();
 			return;
 		}
 		
 		switch (this.mode)
 		{
+		case OPEN_BRACKET:
+			this.mode = EXPRESSION;
+			this.statementList = this.applied ? new AppliedStatementList(token) : new StatementList(token);
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				pm.report(token, "Invalid Statement List - '{' expected");
+				pm.reparse();
+			}
+			return;
 		case EXPRESSION:
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				int nextType = token.next().type();
-				if (nextType == Symbols.COLON)
+				if (nextType == BaseSymbols.COLON)
 				{
 					this.label = token.nameValue();
 					pm.skip();
 					return;
 				}
-				if (nextType == Symbols.EQUALS)
+				if (nextType == BaseSymbols.EQUALS)
 				{
 					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
 					pm.skip();
@@ -114,7 +133,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				this.modifiers |= i;
 				return;
 			}
-			if (type == Symbols.AT)
+			if (type == DyvilSymbols.AT)
 			{
 				if (this.annotations == null)
 				{
@@ -131,7 +150,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.mode = TYPE;
 			//$FALL-THROUGH$
 		case TYPE:
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.EQUALS)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.EQUALS)
 			{
 				if (this.type != null)
 				{
@@ -166,18 +185,25 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.parser.parse(this, token);
 			return;
 		case SEPARATOR:
-			if (type == Symbols.SEMICOLON)
+			this.mode = EXPRESSION;
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				this.mode = EXPRESSION;
 				return;
 			}
-			this.mode = EXPRESSION;
-			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
+			if (token.prev().type() == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Statement List - ';' expected"));
+			
+			if (type == 0)
+			{
+				this.consumer.setValue(this.statementList);
+				pm.popParser();
+				pm.report(token, "Invalid Statement List - '}' expected");
+				return;
+			}
+			pm.report(token, "Invalid Statement List - ';' expected");
 			return;
 		}
 	}

@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
@@ -8,17 +10,32 @@ import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassOperator extends Value
 {
+	public static final class Types
+	{
+		public static final IClass		CLASS_CLASS	= Package.javaLang.resolveClass("Class");
+		public static final ClassType	CLASS		= new ClassType(CLASS_CLASS);
+		
+		public static final IClass CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
+	
 	protected IType type;
 	
 	// Metadata
@@ -73,9 +90,10 @@ public final class ClassOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;
@@ -104,12 +122,18 @@ public final class ClassOperator extends Value
 	}
 	
 	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		return this;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type == null)
 		{
-			this.type = Types.UNKNOWN;
-			markers.add(this.position, "classoperator.invalid");
+			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
+			markers.add(I18n.createMarker(this.position, "classoperator.invalid"));
 			return;
 		}
 		
@@ -163,28 +187,28 @@ public final class ClassOperator extends Value
 			// class instead of the Java one.
 			switch (this.type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
+			case PrimitiveType.BOOLEAN_CODE:
 				owner = "java/lang/Boolean";
 				break;
-			case ClassFormat.T_BYTE:
+			case PrimitiveType.BYTE_CODE:
 				owner = "java/lang/Byte";
 				break;
-			case ClassFormat.T_SHORT:
+			case PrimitiveType.SHORT_CODE:
 				owner = "java/lang/Short";
 				break;
-			case ClassFormat.T_CHAR:
+			case PrimitiveType.CHAR_CODE:
 				owner = "java/lang/Character";
 				break;
-			case ClassFormat.T_INT:
+			case PrimitiveType.INT_CODE:
 				owner = "java/lang/Integer";
 				break;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				owner = "java/lang/Long";
 				break;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				owner = "java/lang/Float";
 				break;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				owner = "java/lang/Double";
 				break;
 			default:

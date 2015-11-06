@@ -13,14 +13,14 @@ public final class UnsafeObjectRef<T> implements ObjectRef<T>
 	
 	public UnsafeObjectRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeObjectRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeObjectRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeObjectRef<T> implements ObjectRef<T>
 	@Override
 	public T get()
 	{
-		return (T) ReflectUtils.unsafe.getObject(this.base, this.offset);
+		return (T) ReflectUtils.UNSAFE.getObject(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(T value)
 	{
-		ReflectUtils.unsafe.putObject(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putObject(this.base, this.offset, value);
 	}
 }

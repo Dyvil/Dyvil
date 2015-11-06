@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -13,8 +12,9 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class InstanceOfOperator extends Value
 {
@@ -60,11 +60,7 @@ public final class InstanceOfOperator extends Value
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.BOOLEAN)
-		{
-			return this;
-		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.getBoxMethod()) : null;
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
 	}
 	
 	@Override
@@ -97,29 +93,29 @@ public final class InstanceOfOperator extends Value
 		
 		if (this.type.isPrimitive())
 		{
-			markers.add(this.position, "instanceof.type.primitive");
+			markers.add(I18n.createError(this.position, "instanceof.type.primitive"));
 			return;
 		}
 		if (this.value.isPrimitive())
 		{
-			markers.add(this.position, "instanceof.value.primitive");
+			markers.add(I18n.createError(this.position, "instanceof.value.primitive"));
 			return;
 		}
 		
 		IType valueType = this.value.getType();
 		if (valueType.classEquals(this.type))
 		{
-			markers.add(this.position, "instanceof.type.equal", valueType);
+			markers.add(I18n.createMarker(this.position, "instanceof.type.equal", valueType));
 			return;
 		}
 		if (this.type.isSuperClassOf(valueType))
 		{
-			markers.add(this.position, "instanceof.type.subtype", valueType, this.type);
+			markers.add(I18n.createMarker(this.position, "instanceof.type.subtype", valueType, this.type));
 			return;
 		}
 		if (!valueType.isSuperClassOf(this.type))
 		{
-			markers.add(this.position, "instanceof.type.incompatible", valueType, this.type);
+			markers.add(I18n.createError(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}
 	}
 	

@@ -15,8 +15,8 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class AbstractCall implements ICall, IValued
 {
@@ -47,30 +47,30 @@ public abstract class AbstractCall implements ICall, IValued
 	{
 		this.instance = value;
 	}
-
+	
 	@Override
 	public IValue getValue()
 	{
 		return this.instance;
 	}
-
+	
 	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
 	}
-
+	
 	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
 	}
-
+	
 	public void setGenericData(GenericData data)
 	{
 		this.genericData = data;
 	}
-
+	
 	protected GenericData getGenericData()
 	{
 		if (this.method == null || this.genericData != null && this.genericData.method != null)
@@ -79,7 +79,12 @@ public abstract class AbstractCall implements ICall, IValued
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
-
+	
+	public IMethod getMethod()
+	{
+		return this.method;
+	}
+	
 	@Override
 	public boolean isPrimitive()
 	{
@@ -108,7 +113,7 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.VOID ? this : IValue.autoBox(this, this.getType(), type);
+		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
 	@Override
@@ -142,12 +147,34 @@ public abstract class AbstractCall implements ICall, IValued
 		}
 	}
 	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.resolveArguments(markers, context);
+		return this.resolveCall(markers, context);
+	}
+	
+	protected void resolveArguments(MarkerList markers, IContext context)
+	{
+		if (this.instance != null)
+		{
+			this.instance = this.instance.resolve(markers, context);
+		}
+		
+		this.arguments.resolve(markers, context);
+	}
+	
+	protected abstract IValue resolveCall(MarkerList markers, IContext context);
+	
 	protected void checkArguments(MarkerList markers, IContext context)
 	{
 		if (this.method != null)
 		{
 			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
 		}
+		
+		this.type = null;
+		this.type = this.getType();
 	}
 	
 	@Override
@@ -208,6 +235,13 @@ public abstract class AbstractCall implements ICall, IValued
 			return 0;
 		}
 		return this.position.startLine();
+	}
+	
+	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.method.writeCall(writer, this.instance, this.arguments, this.type, this.getLineNumber());
+		this.type.writeCast(writer, type, this.getLineNumber());
 	}
 	
 	@Override

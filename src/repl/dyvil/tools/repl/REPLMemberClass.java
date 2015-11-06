@@ -2,11 +2,12 @@ package dyvil.tools.repl;
 
 import java.io.DataInput;
 import java.io.DataOutput;
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.security.ProtectionDomain;
 
-import dyvil.collection.List;
+import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.asm.Opcodes;
@@ -25,10 +26,9 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -39,21 +39,24 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLMemberClass implements IClass
 {
 	private static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
 	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
 	
+	private REPLContext		context;
 	private Name			name;
 	private IClassMember	member;
 	
-	public REPLMemberClass(Name name, IClassMember member)
+	public REPLMemberClass(Name name, IClassMember member, REPLContext context)
 	{
 		this.name = name;
 		this.member = member;
+		this.context = context;
 	}
 	
 	public void setMember(IClassMember member)
@@ -236,7 +239,7 @@ public class REPLMemberClass implements IClass
 	@Override
 	public IDyvilHeader getHeader()
 	{
-		return DyvilREPL.context;
+		return this.context;
 	}
 	
 	@Override
@@ -402,41 +405,41 @@ public class REPLMemberClass implements IClass
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		return DyvilREPL.context.resolvePackage(name);
+		return this.context.resolvePackage(name);
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return DyvilREPL.context.resolveClass(name);
+		return this.context.resolveClass(name);
 	}
 	
 	@Override
 	public IType resolveType(Name name)
 	{
-		return DyvilREPL.context.resolveType(name);
+		return this.context.resolveType(name);
 	}
 	
 	@Override
 	public ITypeVariable resolveTypeVariable(Name name)
 	{
-		return DyvilREPL.context.resolveTypeVariable(name);
+		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return DyvilREPL.context.resolveField(name);
+		return this.context.resolveField(name);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		DyvilREPL.context.getMethodMatches(list, instance, name, arguments);
+		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
@@ -474,9 +477,15 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public IDataMember capture(IVariable variable)
+	public boolean isMember(IVariable variable)
 	{
-		return null;
+		return variable == this.member;
+	}
+	
+	@Override
+	public IDataMember capture(IVariable capture)
+	{
+		return capture;
 	}
 	
 	@Override
@@ -518,13 +527,13 @@ public class REPLMemberClass implements IClass
 	@Override
 	public int compilableCount()
 	{
-		return DyvilREPL.context.innerClassCount();
+		return this.context.innerClassCount();
 	}
 	
 	@Override
 	public void addCompilable(IClassCompilable compilable)
 	{
-		DyvilREPL.context.addInnerClass(compilable);
+		this.context.addInnerClass(compilable);
 	}
 	
 	@Override
@@ -551,7 +560,7 @@ public class REPLMemberClass implements IClass
 		return null;
 	}
 	
-	public static Class compile(IClass iclass)
+	public static Class compile(DyvilREPL repl, IClass iclass)
 	{
 		try
 		{
@@ -559,7 +568,7 @@ public class REPLMemberClass implements IClass
 			iclass.write(cw);
 			cw.visitEnd();
 			byte[] bytes = cw.toByteArray();
-			return loadClass(iclass.getFullName(), bytes);
+			return loadClass(repl, iclass.getInternalName(), bytes);
 		}
 		catch (Throwable t)
 		{
@@ -568,9 +577,40 @@ public class REPLMemberClass implements IClass
 		}
 	}
 	
-	protected static Class loadClass(String name, byte[] bytes)
+	private static void dumpClass(DyvilREPL repl, String name, byte[] bytes)
 	{
-		return ReflectUtils.unsafe.defineClass(name, bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+		int index = name.lastIndexOf('/');
+		String fileName;
+		if (index <= 0)
+		{
+			fileName = name + ".class";
+		}
+		else
+		{
+			fileName = name.substring(index + 1) + ".class";
+		}
+		
+		FileUtils.write(new File(repl.dumpDir, fileName), bytes);
+	}
+	
+	protected static Class loadClass(DyvilREPL repl, String name, byte[] bytes)
+	{
+		if (repl.dumpDir != null)
+		{
+			dumpClass(repl, name, bytes);
+		}
+		
+		return ReflectUtils.UNSAFE.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+	}
+	
+	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
+	{
+		if (repl.dumpDir != null)
+		{
+			dumpClass(repl, name, bytes);
+		}
+		
+		return ReflectUtils.UNSAFE.defineAnonymousClass(REPLVariable.class, bytes, null);
 	}
 	
 	@Override
@@ -582,7 +622,7 @@ public class REPLMemberClass implements IClass
 		
 		this.member.write(writer);
 		
-		for (IClassCompilable c : REPLContext.compilableList)
+		for (IClassCompilable c : this.context.compilableList)
 		{
 			c.write(writer);
 		}

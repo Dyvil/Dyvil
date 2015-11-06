@@ -1,20 +1,23 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.*;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class ClassBody implements IClassBody
 {
@@ -249,15 +252,15 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			IConstructor c = this.constructors[i];
-			float m = c.getSignatureMatch(arguments);
-			if (m > 0)
+			IConstructor ctor = this.constructors[i];
+			float match = ctor.getSignatureMatch(arguments);
+			if (match > 0)
 			{
-				list.add(new ConstructorMatch(c, m));
+				list.add(ctor, match);
 			}
 		}
 	}
@@ -335,15 +338,15 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod m = this.methods[i];
-			float match = m.getSignatureMatch(name, instance, arguments);
+			IMethod method = this.methods[i];
+			float match = method.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(m, match));
+				list.add(method, match);
 			}
 		}
 	}
@@ -356,16 +359,23 @@ public class ClassBody implements IClassBody
 			return this.functionalMethod;
 		}
 		
+		boolean found = false;
+		IMethod match = null;
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			if (m.hasModifier(Modifiers.ABSTRACT))
+			if (m.isAbstract())
 			{
-				this.functionalMethod = m;
-				return m;
+				if (found)
+				{
+					return null;
+				}
+				
+				found = true;
+				match = m;
 			}
 		}
-		return null;
+		return this.functionalMethod = match;
 	}
 	
 	@Override
@@ -473,7 +483,7 @@ public class ClassBody implements IClassBody
 			
 			if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
 			{
-				markers.add(iclass.getPosition(), "class.method.abstract", iclass.getName(), candidate.getName(), this.theClass.getName());
+				markers.add(I18n.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(), candidate.getName(), this.theClass.getName()));
 			}
 		}
 	}
@@ -580,7 +590,7 @@ public class ClassBody implements IClassBody
 			for (int i = 0; i < this.fieldCount; i++)
 			{
 				this.fields[i].toString(prefix1, buffer);
-				buffer.append('\n');
+				buffer.append(';').append('\n');
 			}
 			buffer.append('\n');
 		}

@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,17 +11,19 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
-public final class ClassGenericType extends GenericType
+public class ClassGenericType extends GenericType
 {
 	protected IClass theClass;
 	
@@ -32,6 +33,7 @@ public final class ClassGenericType extends GenericType
 	
 	public ClassGenericType(IClass iclass)
 	{
+		super(iclass.genericCount());
 		this.theClass = iclass;
 	}
 	
@@ -166,12 +168,6 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolveType(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 		IClass iclass = this.theClass;
@@ -179,14 +175,16 @@ public final class ClassGenericType extends GenericType
 		{
 			if (iclass.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(this.getPosition(), "type.access.deprecated", iclass.getName());
+				Deprecation.checkDeprecation(markers, this.getPosition(), iclass, "type");
 			}
 			
 			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
 			{
-				markers.add(this.getPosition(), "type.access.internal", iclass.getName());
+				markers.add(I18n.createMarker(this.getPosition(), "type.access.internal", iclass.getName()));
 			}
 		}
+		
+		super.checkType(markers, context, position);
 	}
 	
 	@Override
@@ -196,13 +194,13 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}

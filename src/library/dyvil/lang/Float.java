@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.lang.literal.FloatConvertible;
 
 import dyvil.annotation.Intrinsic;
@@ -12,8 +14,10 @@ import static dyvil.reflect.Opcodes.*;
 import sun.misc.FloatingDecimal;
 
 @FloatConvertible
-public class Float implements Number
+public class Float implements Number, Serializable
 {
+	private static final long serialVersionUID = 2128649158072690759L;
+	
 	public static final float	min					= java.lang.Float.MIN_VALUE;
 	public static final float	max					= java.lang.Float.MAX_VALUE;
 	public static final float	NaN					= java.lang.Float.NaN;
@@ -722,6 +726,24 @@ public class Float implements Number
 	public Float $percent(Number v)
 	{
 		return Float.apply(this.value % v.floatValue());
+	}
+	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Double.compare(this.value, o.doubleValue());
+	}
+	
+	@Override
+	public Float next()
+	{
+		return Float.apply(this.value + 1F);
+	}
+	
+	@Override
+	public Float previous()
+	{
+		return Float.apply(this.value - 1F);
 	}
 	
 	// Object methods

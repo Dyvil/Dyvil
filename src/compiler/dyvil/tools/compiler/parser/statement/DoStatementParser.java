@@ -3,11 +3,11 @@ package dyvil.tools.compiler.parser.statement;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.DoStatement;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class DoStatementParser extends Parser implements IValueConsumer
 {
@@ -23,7 +23,7 @@ public class DoStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{
@@ -33,15 +33,15 @@ public class DoStatementParser extends Parser implements IValueConsumer
 			return;
 		case WHILE:
 			int type = token.type();
-			if (type == Keywords.WHILE)
+			if (type == DyvilKeywords.WHILE)
 			{
 				this.mode = END;
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				if (token.next().type() == Keywords.WHILE)
+				if (token.next().type() == DyvilKeywords.WHILE)
 				{
 					this.mode = END;
 					pm.skip(1);

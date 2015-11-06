@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -14,10 +15,12 @@ import dyvil.collection.mutable.LinkedList;
 
 public class PrependList<E> implements ImmutableList<E>
 {
-	private final E					head;
-	private final ImmutableList<E>	tail;
+	private static final long serialVersionUID = -989114482136946209L;
 	
-	private final int size;
+	private transient E					head;
+	private transient ImmutableList<E>	tail;
+	
+	private transient int size;
 	
 	public PrependList(E element)
 	{
@@ -283,5 +286,22 @@ public class PrependList<E> implements ImmutableList<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeObject(this.head);
+		out.writeObject(this.tail);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.head = (E) in.readObject();
+		this.tail = (ImmutableList<E>) in.readObject();
+		this.size = 1 + this.tail.size();
 	}
 }

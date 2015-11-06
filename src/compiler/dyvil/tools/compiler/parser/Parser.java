@@ -1,9 +1,7 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public abstract class Parser
 {
@@ -14,7 +12,7 @@ public abstract class Parser
 		{
 			if (!ParserUtil.isTerminator(token.type()))
 			{
-				pm.report(new SyntaxError(token, "Root Parser"));
+				pm.report(token, "Root Parser");
 				return;
 			}
 		}
@@ -24,24 +22,15 @@ public abstract class Parser
 	
 	protected int mode;
 	
-	protected Parser	parent;
-	protected String	name;
+	protected Parser parent;
 	
 	public Parser()
 	{
-		if (DyvilCompiler.parseStack)
-		{
-			this.name = this.computeName();
-		}
 	}
 	
 	public Parser(Parser parent)
 	{
 		this.parent = parent;
-		if (DyvilCompiler.parseStack)
-		{
-			this.name = parent.name + "." + this.computeName();
-		}
 	}
 	
 	protected String computeName()
@@ -53,11 +42,6 @@ public abstract class Parser
 			s = s.substring(0, index);
 		}
 		return s.toLowerCase();
-	}
-	
-	public String getName()
-	{
-		return this.name;
 	}
 	
 	public int getMode()
@@ -79,10 +63,6 @@ public abstract class Parser
 		if (parent != null)
 		{
 			this.parent = parent;
-			if (DyvilCompiler.parseStack)
-			{
-				this.name = parent.name + "." + this.computeName();
-			}
 		}
 	}
 	

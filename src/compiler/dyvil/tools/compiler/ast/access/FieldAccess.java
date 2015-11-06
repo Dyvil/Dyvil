@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,9 +18,12 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldAccess implements IValue, INamed, IValued
 {
@@ -134,7 +136,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return IValue.autoBox(this, this.getType(), type);
+		return type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
 	@Override
@@ -165,6 +167,27 @@ public final class FieldAccess implements IValue, INamed, IValued
 	public IValue getValue()
 	{
 		return this.instance;
+	}
+	
+	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+		IValue v = this;
+		
+		do
+		{
+			if (depth-- < 0)
+			{
+				markers.add(I18n.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
+				return this;
+			}
+			
+			v = v.foldConstants();
+		}
+		while (!v.isConstantOrField());
+		
+		return v.toConstant(markers);
 	}
 	
 	@Override
@@ -260,12 +283,14 @@ public final class FieldAccess implements IValue, INamed, IValued
 			return v;
 		}
 		
-		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
+		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
 		marker.addInfo("Qualified Name: " + this.name.qualified);
 		if (this.instance != null)
 		{
 			marker.addInfo("Instance Type: " + this.instance.getType());
 		}
+		
+		markers.add(marker);
 		return this;
 	}
 	
@@ -333,8 +358,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer);
-		writer.writeInsn(this.field.getType().getReturnOpcode());
+		IType t = this.field.getType();
+		this.writeExpression(writer, t);
+		writer.writeInsn(t.getReturnOpcode());
 	}
 	
 	@Override

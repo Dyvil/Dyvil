@@ -11,8 +11,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class ReturnStatement extends Value implements IStatement, IValued
 {
@@ -172,9 +172,17 @@ public class ReturnStatement extends Value implements IStatement, IValued
 	}
 	
 	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.value.writeExpression(writer, type);
+		writer.writeInsn(type.getReturnOpcode());
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.writeStatement(writer);
+		this.value.writeExpression(writer);
+		writer.writeInsn(this.value.getType().getReturnOpcode());
 	}
 	
 	@Override
@@ -183,8 +191,7 @@ public class ReturnStatement extends Value implements IStatement, IValued
 		if (this.value != null)
 		{
 			this.value.writeExpression(writer);
-			IType type = this.value.getType();
-			writer.writeInsn(type.getReturnOpcode());
+			writer.writeInsn(this.value.getType().getReturnOpcode());
 			return;
 		}
 		writer.writeInsn(Opcodes.RETURN);

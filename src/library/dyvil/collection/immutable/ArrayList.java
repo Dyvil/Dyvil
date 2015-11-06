@@ -14,17 +14,19 @@ import dyvil.collection.MutableList;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
 
-@ArrayConvertible(methodName = "fromLiteral")
+@ArrayConvertible
 public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E>
 {
+	private static final long serialVersionUID = 1107932890158514157L;
+	
 	public static <E> ArrayList<E> apply(E... elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList(elements, true);
 	}
 	
-	public static <E> ArrayList<E> fromLiteral(E... elements)
+	public static <E> ArrayList<E> fromArray(E... elements)
 	{
-		return new ArrayList(elements, true);
+		return new ArrayList(elements);
 	}
 	
 	public static <E> Builder<E> builder()
@@ -35,6 +37,53 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 	public static <E> Builder<E> builder(int capacity)
 	{
 		return new Builder(capacity);
+	}
+	
+	public static class Builder<E> implements ImmutableList.Builder<E>
+	{
+		private Object[]	elements;
+		private int			size;
+		
+		public Builder()
+		{
+			this.elements = new Object[DEFAULT_CAPACITY];
+		}
+		
+		public Builder(int capacity)
+		{
+			this.elements = new Object[capacity];
+		}
+		
+		@Override
+		public void add(E element)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			
+			int index = this.size++;
+			if (index >= this.elements.length)
+			{
+				Object[] temp = new Object[(int) (this.size * 1.1F)];
+				System.arraycopy(this.elements, 0, temp, 0, index);
+				this.elements = temp;
+			}
+			this.elements[index] = element;
+		}
+		
+		@Override
+		public ArrayList<E> build()
+		{
+			if (this.size < 0)
+			{
+				return null;
+			}
+			
+			ArrayList<E> list = new ArrayList(this.elements, this.size, true);
+			this.size = -1;
+			return list;
+		}
 	}
 	
 	public ArrayList()
@@ -65,48 +114,6 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 	public ArrayList(Collection<E> collection)
 	{
 		super(collection);
-	}
-	
-	public static class Builder<E> implements ImmutableList.Builder<E>
-	{
-		private Object[]	elements;
-		private int			size;
-		
-		public Builder()
-		{
-			this.elements = new Object[10];
-		}
-		
-		public Builder(int capacity)
-		{
-			this.elements = new Object[capacity];
-		}
-		
-		@Override
-		public void add(E element)
-		{
-			if (this.size < 0)
-			{
-				throw new IllegalStateException("Already built");
-			}
-			
-			int index = this.size++;
-			if (index >= this.elements.length)
-			{
-				Object[] temp = new Object[(int) (this.size * 1.1F)];
-				System.arraycopy(this.elements, 0, temp, 0, index);
-				this.elements = temp;
-			}
-			this.elements[index] = element;
-		}
-		
-		@Override
-		public ArrayList<E> build()
-		{
-			ArrayList<E> list = new ArrayList(this.elements, this.size, true);
-			this.size = -1;
-			return list;
-		}
 	}
 	
 	@Override

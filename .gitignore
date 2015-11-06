@@ -3,14 +3,11 @@
 .settings/**
 bin/
 testbin/
+replbin/
 build/
 .gradle/
 
 *.log*
 *.log
-
-src/test/dyvil/test/*
-
-test.txt
 
 .settings/org.eclipse.jdt.core.prefs

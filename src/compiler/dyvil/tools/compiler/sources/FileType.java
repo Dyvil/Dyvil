@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.parsing.CodeFile;
 
 public class FileType implements IFileType
 {

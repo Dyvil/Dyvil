@@ -8,6 +8,8 @@ Dyvil (Dynamic Visual / Virtual Language) is a programming language that is base
 
 ###▶ [Language Features](https://github.com/Dyvil/Dyvil/wiki/Language-Features)
 
+###▶ [Language Reference](https://dyvil.gitbooks.io/dyvil-language-reference/content/)
+
 ###▶ [Tutorials](https://github.com/Dyvil/Dyvil/wiki#tutorials)
 
 ###▶ [Contribution](https://github.com/Dyvil/Dyvil/wiki#contribution)

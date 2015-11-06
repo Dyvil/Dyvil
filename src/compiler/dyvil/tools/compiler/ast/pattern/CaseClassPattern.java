@@ -5,16 +5,17 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class CaseClassPattern extends Pattern implements IPatternList
 {
@@ -62,9 +63,10 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		int paramCount = iclass.parameterCount();
 		if (this.patternCount != paramCount)
 		{
-			Marker m = markers.create(this.position, "pattern.class.count", this.type.toString());
+			Marker m = I18n.createMarker(this.position, "pattern.class.count", this.type.toString());
 			m.addInfo("Pattern Count: " + this.patternCount);
 			m.addInfo("Class Parameter Count: " + paramCount);
+			markers.add(m);
 			return this;
 		}
 		
@@ -76,9 +78,10 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			IPattern pattern1 = pattern.withType(type1, markers);
 			if (pattern1 == null)
 			{
-				Marker m = markers.create(this.position, "pattern.class.type", param.getName());
+				Marker m = I18n.createMarker(this.position, "pattern.class.type", param.getName());
 				m.addInfo("Pattern Type: " + pattern.getType());
 				m.addInfo("Parameter Type: " + type1);
+				markers.add(m);
 			}
 			else
 			{
@@ -155,11 +158,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
 	}
 	
 	@Override

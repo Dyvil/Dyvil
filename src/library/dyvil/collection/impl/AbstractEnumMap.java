@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -8,16 +9,18 @@ import dyvil.lang.Type;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.reflect.EnumReflection;
+import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
-
-import sun.misc.SharedSecrets;
 
 public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
 	protected class EnumEntry implements Entry<K, V>
 	{
+		private static final long serialVersionUID = 4125489955668261409L;
+		
 		int index;
 		
 		EnumEntry(int index)
@@ -101,10 +104,12 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 	}
 	
-	protected Class<K>	type;
-	protected K[]		keys;
-	protected Object[]	values;
-	protected int		size;
+	private static final long serialVersionUID = 7946242151088885999L;
+	
+	protected transient Class<K>	type;
+	protected transient K[]			keys;
+	protected transient Object[]	values;
+	protected transient int			size;
 	
 	protected AbstractEnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
@@ -121,9 +126,74 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	public AbstractEnumMap(Class<K> type)
 	{
-		this.keys = getKeys(type);
+		this.keys = EnumReflection.getEnumConstants(type);
 		this.values = new Object[this.keys.length];
 		this.type = type;
+	}
+	
+	public AbstractEnumMap(Map<K, V> map)
+	{
+		this(getKeyType(map));
+		
+		for (Entry<K, V> entry : map)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public AbstractEnumMap(AbstractEnumMap<K, V> map)
+	{
+		this.keys = map.keys;
+		this.type = map.type;
+		this.values = map.values.clone();
+		this.size = map.size;
+	}
+	
+	public AbstractEnumMap(Tuple2<K, V>... entries)
+	{
+		this(getKeyType(entries));
+		
+		for (Tuple2<K, V> entry : entries)
+		{
+			this.putInternal(entry._1, entry._2);
+		}
+	}
+	
+	private static <K extends Enum<K>> Class<K> getKeyType(Tuple2<K, ?>[] tuples)
+	{
+		for (Tuple2<K, ?> entry : tuples)
+		{
+			if (entry._1 != null)
+			{
+				return entry._1.getDeclaringClass();
+			}
+		}
+		
+		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
+	}
+	
+	private static <K extends Enum<K>> Class<K> getKeyType(Map<K, ?> map)
+	{
+		for (Iterator<K> keys = map.keyIterator(); keys.hasNext();)
+		{
+			K key = keys.next();
+			if (key != null)
+			{
+				return key.getDeclaringClass();
+			}
+		}
+		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
+	}
+	
+	protected void putInternal(K key, V value)
+	{
+		int index = key.ordinal();
+		
+		if (this.values[index] == null)
+		{
+			this.size++;
+		}
+		this.values[index] = value;
 	}
 	
 	protected static boolean checkType(Class<?> type, Object key)
@@ -134,11 +204,6 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	protected static int index(Object key)
 	{
 		return ((Enum) key).ordinal();
-	}
-	
-	protected static <K extends Enum<K>> K[] getKeys(Class<K> type)
-	{
-		return SharedSecrets.getJavaLangAccess().getEnumConstantsShared(type);
 	}
 	
 	@Override
@@ -296,5 +361,42 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeObject(this.type);
+		out.writeInt(this.size);
+		
+		int entriesToBeWritten = this.size;
+		for (int i = 0; entriesToBeWritten > 0; i++)
+		{
+			if (this.values[i] != null)
+			{
+				out.writeObject(this.keys[i]);
+				out.writeObject(this.values[i]);
+				entriesToBeWritten--;
+			}
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.type = (Class<K>) in.readObject();
+		this.keys = EnumReflection.getEnumConstants(this.type);
+		this.values = new Object[this.keys.length];
+		
+		int size = in.readInt();
+		
+		for (int i = 0; i < size; i++)
+		{
+			K key = (K) in.readObject();
+			V value = (V) in.readObject();
+			this.putInternal(key, value);
+		}
 	}
 }

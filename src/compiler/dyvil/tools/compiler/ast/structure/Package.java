@@ -13,16 +13,17 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.backend.ObjectFormat;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.CodePosition;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.CodePosition;
 
 public class Package implements INamed, IDefaultContext
 {
@@ -40,8 +41,10 @@ public class Package implements INamed, IDefaultContext
 	public static Package	dyvilTuple;
 	public static Package	dyvilUtil;
 	public static Package	java;
+	public static Package	javaIO;
 	public static Package	javaLang;
 	public static Package	javaLangAnnotation;
+	public static Package	javaUtil;
 	
 	protected Package	parent;
 	protected Name		name;
@@ -88,8 +91,10 @@ public class Package implements INamed, IDefaultContext
 		dyvilUtil = dyvil.resolvePackage("util");
 		
 		java = rootPackage.resolvePackage("java");
+		javaIO = java.resolvePackage("io");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
+		javaUtil = java.resolvePackage("util");
 	}
 	
 	// Name
@@ -145,13 +150,13 @@ public class Package implements INamed, IDefaultContext
 	{
 		if (packageDecl == null)
 		{
-			markers.add(new CodePosition(0, 0, 1), "package.missing");
+			markers.add(I18n.createMarker(new CodePosition(0, 0, 1), "package.missing"));
 			return;
 		}
 		
 		if (!this.fullName.equals(packageDecl.getPackage()))
 		{
-			markers.add(packageDecl.getPosition(), "package.invalid", this.fullName);
+			markers.add(I18n.createMarker(packageDecl.getPosition(), "package.invalid", this.fullName));
 		}
 	}
 	
@@ -221,12 +226,28 @@ public class Package implements INamed, IDefaultContext
 				return c;
 			}
 		}
-		return this.loadClass(name);
+		
+		String qualifiedName = name.qualified;
+		// Check for inner / nested / anonymous classes
+		int cashIndex = qualifiedName.indexOf('$');
+		if (cashIndex >= 0)
+		{
+			Name firstName = Name.getQualified(qualifiedName.substring(0, cashIndex));
+			Name lastName = Name.getQualified(qualifiedName.substring(cashIndex + 1));
+			
+			IClass c = this.resolveClass(firstName);
+			if (c != null)
+			{
+				return c.resolveClass(lastName);
+			}
+		}
+		
+		return this.loadClass(name, qualifiedName);
 	}
 	
-	private IClass loadClass(Name name)
+	private IClass loadClass(Name name, String qualifiedName)
 	{
-		String fileName = this.getInternalName() + name.qualified + FileType.CLASS_EXTENSION;
+		String fileName = this.getInternalName() + qualifiedName + FileType.CLASS_EXTENSION;
 		
 		for (Library library : DyvilCompiler.config.libraries)
 		{
@@ -252,6 +273,20 @@ public class Package implements INamed, IDefaultContext
 			}
 		}
 		
+		return null;
+	}
+	
+	public static IClass loadClass(String fileName, Name name)
+	{
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			InputStream is = library.getInputStream(fileName);
+			if (is != null)
+			{
+				ExternalClass bclass = new ExternalClass(name);
+				return ClassReader.loadClass(bclass, is, false);
+			}
+		}
 		return null;
 	}
 	

@@ -8,7 +8,7 @@ import java.lang.annotation.ElementType;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class AnnotationList
 {
@@ -107,14 +107,14 @@ public class AnnotationList
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			IAnnotation a = this.annotations[i];
-			String fullName = a.getType().getInternalName();
-			if (fullName != null && !annotated.addRawAnnotation(fullName, a))
+			a.resolveTypes(markers, context);
+			
+			String internalName = a.getType().getInternalName();
+			if (internalName != null && !annotated.addRawAnnotation(internalName, a))
 			{
 				this.removeAnnotation(i--);
 				continue;
 			}
-			
-			this.annotations[i].resolveTypes(markers, context);
 		}
 	}
 	

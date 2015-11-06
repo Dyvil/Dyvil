@@ -11,17 +11,18 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassParameter extends Parameter implements IField
 {
@@ -104,18 +105,18 @@ public final class ClassParameter extends Parameter implements IField
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(position, "classparameter.access.static", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "classparameter.access.static", this.name.unqualified));
 					return null;
 				}
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(position, "classparameter.access.instance", this.name.unqualified);
+				markers.add(I18n.createMarker(position, "classparameter.access.instance", this.name.unqualified));
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
-			markers.add(position, "classparameter.access.unqualified", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "classparameter.access.unqualified", this.name.unqualified));
 			return new ThisValue(position, this.theClass.getType(), context, markers);
 		}
 		
@@ -125,17 +126,22 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
+		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(position, "classparameter.assign.final", this.name.unqualified);
+			markers.add(I18n.createError(position, "classparameter.assign.annotation", this.name.unqualified));
+		}
+		else if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
+		{
+			markers.add(I18n.createMarker(position, "classparameter.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
+			Marker marker = I18n.createMarker(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
 			marker.addInfo("Class Parameter Type: " + this.type);
 			marker.addInfo("Value Type: " + newValue.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -157,9 +163,10 @@ public final class ClassParameter extends Parameter implements IField
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.defaultValue.getPosition(), "classparameter.type", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "classparameter.type", this.name.unqualified);
 				marker.addInfo("Parameter Type: " + this.type);
 				marker.addInfo("Value Type: " + this.defaultValue.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -171,7 +178,7 @@ public final class ClassParameter extends Parameter implements IField
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(this.position, "classparameter.type.nodefault", this.name.unqualified);
+			markers.add(I18n.createMarker(this.position, "classparameter.type.nodefault", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -188,7 +195,7 @@ public final class ClassParameter extends Parameter implements IField
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "classparameter.type.void");
+			markers.add(I18n.createMarker(this.position, "classparameter.type.void"));
 		}
 	}
 	
@@ -210,7 +217,7 @@ public final class ClassParameter extends Parameter implements IField
 		String name = "parDefault$class$" + this.index;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, "()" + desc, null, null));
 		mw.begin();
-		this.defaultValue.writeExpression(mw);
+		this.defaultValue.writeExpression(mw, this.type);
 		mw.end(this.type);
 	}
 	
@@ -226,10 +233,19 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
-		writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
+		{
+			StringBuilder desc = new StringBuilder("()");
+			this.type.appendExtendedName(desc);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.theClass.getInternalName(), this.name.qualified, desc.toString(), true);
+		}
+		else
+		{
+			writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		}
 	}
 	
 	@Override
@@ -237,12 +253,12 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());

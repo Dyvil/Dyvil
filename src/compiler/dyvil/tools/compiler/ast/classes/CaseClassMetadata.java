@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.Types;
@@ -16,8 +14,10 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.CaseClasses;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
@@ -29,15 +29,26 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		super.resolveTypes(markers, context);
+		
+		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
+		{
+			this.theClass.addInterface(Types.SERIALIZABLE);
+		}
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+		super.resolveTypesBody(markers, context);
 		
 		this.checkMethods();
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			Method m = new Method(this.theClass, Name.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
+			Method m = new Method(this.theClass, Names.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
 			IParameter[] parameters = this.theClass.getParameters();
 			int parameterCount = this.theClass.parameterCount();
 			
@@ -53,14 +64,14 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		if (name == Name.apply && this.applyMethod != null)
+		if (name == Names.apply && this.applyMethod != null)
 		{
 			float match = this.applyMethod.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(this.applyMethod, match));
+				list.add(this.applyMethod, match);
 			}
 		}
 	}

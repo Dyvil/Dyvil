@@ -11,8 +11,9 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ThisValue implements IValue
 {
@@ -99,16 +100,23 @@ public final class ThisValue implements IValue
 	{
 		if (context.isStatic())
 		{
-			markers.add(this.position, "this.access.static");
+			markers.add(I18n.createMarker(this.position, "this.access.static"));
+			if (this.type == Types.UNKNOWN)
+			{
+				return;
+			}
 		}
 		
-		if (this.type == Types.UNKNOWN)
-		{
-			this.type = context.getThisClass().getType();
-		}
-		else
+		if (this.type != Types.UNKNOWN)
 		{
 			this.type = this.type.resolveType(markers, context);
+			return;
+		}
+		
+		IType t = context.getThisClass().getType();
+		if (t != null)
+		{
+			this.type = t;
 		}
 	}
 	
@@ -122,14 +130,19 @@ public final class ThisValue implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
+		if (this.type == Types.UNKNOWN)
+		{
+			// Static context
+			return;
+		}
 		
+		this.type.checkType(markers, context, TypePosition.CLASS);
 		IClass iclass = this.type.getTheClass();
 		
 		this.getter = context.getAccessibleThis(iclass);
 		if (this.getter == null)
 		{
-			markers.add(this.position, "this.instance", iclass.getFullName());
+			markers.add(I18n.createMarker(this.position, "this.instance", this.type));
 		}
 	}
 	
@@ -151,12 +164,6 @@ public final class ThisValue implements IValue
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("this");
-	}
-	
-	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.getter.writeGet(writer);
@@ -167,5 +174,18 @@ public final class ThisValue implements IValue
 	{
 		this.writeExpression(writer);
 		writer.writeInsn(Opcodes.ARETURN);
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("this");
+		
+		if (this.type != Types.UNKNOWN)
+		{
+			buffer.append('[');
+			this.type.toString(prefix, buffer);
+			buffer.append(']');
+		}
 	}
 }

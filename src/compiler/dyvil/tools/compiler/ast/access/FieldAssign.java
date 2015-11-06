@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -17,9 +16,12 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldAssign implements IValue, INamed, IValued
 {
@@ -183,13 +185,14 @@ public final class FieldAssign implements IValue, INamed, IValued
 		
 		if (this.field == null)
 		{
-			Marker marker = markers.create(this.position, "resolve.field", this.name.unqualified);
+			Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
 			marker.addInfo("Qualified Name: " + this.name.qualified);
 			if (this.instance != null)
 			{
 				marker.addInfo("Instance Type: " + this.instance.getType());
 			}
 			
+			markers.add(marker);
 		}
 		
 		if (this.value != null)
@@ -254,14 +257,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value == null)
-		{
-			return;
-		}
-		
 		if (this.instance == null)
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, this.field.getType());
 			writer.writeInsn(Opcodes.AUTO_DUP);
 		}
 		else
@@ -282,6 +280,12 @@ public final class FieldAssign implements IValue, INamed, IValued
 		}
 		
 		this.field.writeSet(writer, this.instance, this.value, this.getLineNumber());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

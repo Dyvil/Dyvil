@@ -1,5 +1,7 @@
 package dyvil.collection;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -12,6 +14,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.tuple.Tuple2;
@@ -19,10 +22,16 @@ import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
-@NilConvertible
+@NilConvertible(methodName = "fromNil")
 @ArrayConvertible
-public interface Map<K, V> extends Iterable<Entry<K, V>>
+@MapConvertible
+public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 {
+	public static <K, V> ImmutableMap<K, V> fromNil()
+	{
+		return ImmutableMap.apply();
+	}
+	
 	public static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
@@ -36,6 +45,11 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
+	}
+	
+	public static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
+	{
+		return ImmutableMap.apply(keys, values);
 	}
 	
 	// Simple Getters
@@ -113,6 +127,30 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
+	public default Iterable<K> keys()
+	{
+		return new Iterable<K>()
+		{
+			@Override
+			public Iterator<K> iterator()
+			{
+				return Map.this.keyIterator();
+			}
+			
+			@Override
+			public void forEach(Consumer<? super K> action)
+			{
+				Map.this.forEachKey(action);
+			}
+			
+			@Override
+			public Spliterator<K> spliterator()
+			{
+				return Map.this.keySpliterator();
+			}
+		};
+	}
+	
 	public Iterator<K> keyIterator();
 	
 	public default Spliterator<K> keySpliterator()
@@ -128,6 +166,30 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	public default Stream<K> parallelKeyStream()
 	{
 		return StreamSupport.stream(this.keySpliterator(), true);
+	}
+	
+	public default Iterable<V> values()
+	{
+		return new Iterable<V>()
+		{
+			@Override
+			public Iterator<V> iterator()
+			{
+				return Map.this.valueIterator();
+			}
+			
+			@Override
+			public void forEach(Consumer<? super V> action)
+			{
+				Map.this.forEachValue(action);
+			}
+			
+			@Override
+			public Spliterator<V> spliterator()
+			{
+				return Map.this.valueSpliterator();
+			}
+		};
 	}
 	
 	public Iterator<V> valueIterator();
@@ -166,17 +228,17 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public default void forEachKey(Consumer<? super K> action)
 	{
-		for (Entry<K, V> entry : this)
+		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
 		{
-			action.accept(entry.getKey());
+			action.accept(iterator.next());
 		}
 	}
 	
 	public default void forEachValue(Consumer<? super V> action)
 	{
-		for (Entry<K, V> entry : this)
+		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
 		{
-			action.accept(entry.getValue());
+			action.accept(iterator.next());
 		}
 	}
 	
@@ -188,7 +250,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the key
 	 * @return true, if this map contains a mapping for the key
 	 */
-	public default boolean $qmark(Object key)
+	public default boolean $qmark$at(Object key)
 	{
 		return this.containsKey(key);
 	}
@@ -352,10 +414,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	 *            the entry
 	 * @return a map that contains all entries of this map plus the new entry
 	 */
-	public default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
-	{
-		return this.$plus(entry.getKey(), entry.getValue());
-	}
+	public Map<K, V> $plus(Entry<? extends K, ? extends V> entry);
 	
 	/**
 	 * Returns a map that contains all entries of this map plus all entries of
@@ -373,10 +432,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public Map<K, V> $minus(Object key, Object value);
 	
-	public default Map<K, V> $minus(Entry<?, ?> entry)
-	{
-		return this.$minus(entry.getKey(), entry.getValue());
-	}
+	public Map<K, V> $minus(Entry<?, ?> entry);
 	
 	public Map<K, V> $minus$colon(Object value);
 	
@@ -397,11 +453,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public Map<K, V> $minus$minus(Collection<?> keys);
 	
-	public <U> Map<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
+	public <NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
 	
-	public <U, R> Map<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper);
+	public <NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
-	public <U, R> Map<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper);
+	public <NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	
+	public <NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 	
 	public Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
@@ -495,13 +553,91 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>
 	
 	public boolean removeAll(Map<?, ?> map);
 	
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
+	public void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper);
+	
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
 	public void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
 	
 	public void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
 	
 	public void filter(BiPredicate<? super K, ? super V> condition);
+	
+	// Arrays
+	
+	public default Entry<K, V>[] toArray()
+	{
+		Entry<K, V>[] array = new Entry[this.size()];
+		this.toArray(0, array);
+		return array;
+	}
+	
+	public default void toArray(Entry<K, V>[] store)
+	{
+		this.toArray(0, store);
+	}
+	
+	public default void toArray(int index, Entry<K, V>[] store)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			store[index++] = entry;
+		}
+	}
+	
+	public default Object[] toKeyArray()
+	{
+		Object[] array = new Object[this.size()];
+		this.toKeyArray(0, array);
+		return array;
+	}
+	
+	public default K[] toKeyArray(Class<K> type)
+	{
+		K[] array = (K[]) Array.newInstance(type, this.size());
+		this.toKeyArray(0, array);
+		return array;
+	}
+	
+	public default void toKeyArray(Object[] store)
+	{
+		this.toKeyArray(0, store);
+	}
+	
+	public default void toKeyArray(int index, Object[] store)
+	{
+		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
+		{
+			store[index++] = iterator.next();
+		}
+	}
+	
+	public default Object[] toValueArray()
+	{
+		Object[] array = new Object[this.size()];
+		this.toValueArray(0, array);
+		return array;
+	}
+	
+	public default V[] toValueArray(Class<V> type)
+	{
+		V[] array = (V[]) Array.newInstance(type, this.size());
+		this.toValueArray(0, array);
+		return array;
+	}
+	
+	public default void toValueArray(Object[] store)
+	{
+		this.toValueArray(0, store);
+	}
+	
+	public default void toValueArray(int index, Object[] store)
+	{
+		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
+		{
+			store[index++] = iterator.next();
+		}
+	}
 	
 	// Copying and Views
 	

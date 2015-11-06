@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.token.IToken;
 
 public class ParserManager implements IParserManager
 {
@@ -21,6 +21,7 @@ public class ParserManager implements IParserManager
 	protected TokenIterator	tokens;
 	protected int			skip;
 	protected boolean		reparse;
+	protected boolean		hasStopped;
 	
 	public ParserManager()
 	{
@@ -34,9 +35,9 @@ public class ParserManager implements IParserManager
 	}
 	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
-		this.markers.add(error);
+		this.markers.add(new SyntaxError(token, message));
 	}
 	
 	@Override
@@ -67,7 +68,7 @@ public class ParserManager implements IParserManager
 		this.tokens = tokens;
 		IToken token = null;
 		
-		while (true)
+		while (!this.hasStopped)
 		{
 			if (this.reparse)
 			{
@@ -75,17 +76,26 @@ public class ParserManager implements IParserManager
 			}
 			else
 			{
-				token = tokens.next();
-				
-				if (token == null)
+				if (!this.tokens.hasNext())
 				{
 					break;
 				}
+				
+				token = tokens.next();
 			}
 			
 			if (this.skip > 0)
 			{
 				this.skip--;
+				continue;
+			}
+			
+			if (this.parser == null)
+			{
+				if (!token.isInferred())
+				{
+					this.report(token, "Unexpected Token: " + token);
+				}
 				continue;
 			}
 			
@@ -96,19 +106,40 @@ public class ParserManager implements IParserManager
 			catch (Exception ex)
 			{
 				DyvilCompiler.error("ParserManager", "parseToken", ex);
-				markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
+				this.markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
 			}
+		}
+		
+		this.parseRemaining(token);
+	}
+	
+	protected void parseRemaining(IToken token)
+	{
+		if (token == null || this.hasStopped)
+		{
+			return;
+		}
+		
+		while (this.parser != null)
+		{
+			token = token.next();
 			
-			if (this.parser == null)
+			Parser prevParser = this.parser;
+			int mode = prevParser.getMode();
+			
+			prevParser.parse(this, token);
+			
+			if (this.parser == prevParser && this.parser.getMode() == mode)
 			{
 				break;
 			}
-			
-			if (DyvilCompiler.parseStack)
-			{
-				System.out.println(token + ":\t\t" + this.parser.name + " @ " + this.parser.mode);
-			}
 		}
+	}
+	
+	@Override
+	public void stop()
+	{
+		this.hasStopped = true;
 	}
 	
 	@Override
@@ -133,6 +164,7 @@ public class ParserManager implements IParserManager
 	public void jump(IToken token)
 	{
 		this.tokens.jump(token);
+		this.reparse = false;
 	}
 	
 	@Override

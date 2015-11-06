@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class WildcardPattern extends Pattern
 {
@@ -50,15 +50,6 @@ public final class WildcardPattern extends Pattern
 	public boolean isSwitchable()
 	{
 		return true;
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex < 0)
-		{
-			writer.writeInsn(Opcodes.AUTO_POP);
-		}
 	}
 	
 	@Override

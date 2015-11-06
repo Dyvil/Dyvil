@@ -6,14 +6,17 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CharPattern extends Pattern
 {
-	private char value;
+	private String value;
 	
-	public CharPattern(ICodePosition position, char value)
+	private byte type;
+	
+	public CharPattern(ICodePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
@@ -34,13 +37,45 @@ public final class CharPattern extends Pattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		return IPattern.primitiveWithType(this, type, Types.CHAR);
+		if (this.value.length() == 1 && this.type != STRING)
+		{
+			IPattern v = IPattern.primitiveWithType(this, type, Types.CHAR);
+			if (this.type == CHAR || v != null)
+			{
+				return v;
+			}
+		}
+		if (this.type == CHAR)
+		{
+			return null;
+		}
+		
+		if (type == Types.STRING || type.classEquals(Types.STRING))
+		{
+			return this;
+		}
+		if (type.isSuperTypeOf(Types.STRING))
+		{
+			return new TypeCheckPattern(this, Types.STRING);
+		}
+		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.CHAR || type.isSuperTypeOf(Types.CHAR);
+		if (this.value.length() == 1 && this.type != STRING)
+		{
+			if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR))
+			{
+				return true;
+			}
+		}
+		if (this.type == CHAR)
+		{
+			return false;
+		}
+		return type == Types.STRING || type.isSuperTypeOf(Types.STRING);
 	}
 	
 	@Override
@@ -58,46 +93,44 @@ public final class CharPattern extends Pattern
 	@Override
 	public int switchValue(int index)
 	{
-		return this.value;
+		if (this.type == CHAR)
+		{
+			return this.value.charAt(0);
+		}
+		return this.value.hashCode();
 	}
 	
 	@Override
 	public int minValue()
 	{
-		return this.value;
+		return this.switchValue(0);
 	}
 	
 	@Override
 	public int maxValue()
 	{
-		return this.value;
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
-		}
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
+		return this.switchValue(0);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
+		if (this.type == STRING)
+		{
+			StringPattern.writeStringInvJump(writer, varIndex, elseLabel, this.value);
+			return;
+		}
 		if (varIndex >= 0)
 		{
 			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
 		}
-		writer.writeLDC(this.value);
+		writer.writeLDC(this.value.charAt(0));
 		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('\'').append(this.value).append('\'');
+		LexerUtil.appendCharLiteral(this.value, buffer);
 	}
 }

@@ -1,17 +1,67 @@
+// ---------------------------------------- Plugins ----------------------------------------
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
+
+// ---------------------------------------- Main Settings ----------------------------------------
+
+group = 'dyvil-team'
+
+version					=	'0.8.0'
+
+String libraryVersion	=	'0.7.0'
+String compilerVersion	=	'0.8.0'
+String replVersion		=	'0.4.0'
+String dpfVersion		=	'0.2.0'
+
+List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
+List<String> javaFilters = [ '**/*.java' ]
+
+String replMainClass = 'dyvil.tools.repl.DyvilREPL'
+
+boolean nightly = false
+
+// ---------------------------------------- Nightly Versioning ----------------------------------------
+
+Map<String, String> ENV = System.getenv()
+if (ENV.DRONE_BUILD_NUMBER) {
+	String snapshot = "+nightly." + ENV.DRONE_BUILD_NUMBER
+    
+    version += snapshot
+    libraryVersion += snapshot
+    compilerVersion += snapshot
+    replVersion += snapshot
+    dpfVersion += snapshot
+    
+    nightly = true
+}
+
+// ---------------------------------------- Source Settings ----------------------------------------
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 sourceSets {
 	library {
 		java {
 			srcDir 'src/library'
 			srcDir 'src/asm'
+			srcDir 'src/parsing'
 		}
 		resources {
 			srcDir 'build/dyvilbin'
+			
+			include '**/*.dyo'
 		}
 	}
+	dpf {
+		java {
+			srcDir 'src/dpf'
+			compileClasspath += library.output
+			runtimeClasspath += library.output
+		}
+	}	
 	compiler {
 		java {
 			srcDir 'src/compiler'
@@ -24,82 +74,129 @@ sourceSets {
 	}
 	repl {
 		java {
+			srcDir 'src/repl'
 			compileClasspath += library.output + compiler.output
 			runtimeClasspath += compiler.runtimeClasspath
-			srcDir 'src/repl'
 		}
 	}
 }
 
-processResources {
-	from('dbin') {
-		// Explicity include Compiled Dyvil Headers (.dyo)
-		include '**/*.dyo'
+// ---------------------------------------- Copy Tasks ----------------------------------------
+
+task copyLibraryJava(type: Copy) {
+	from sourceSets.library.java
+	into "${buildDir}/src/java/library"
+	
+	include javaFilters
+}
+
+compileLibraryJava.dependsOn(copyLibraryJava)
+compileLibraryJava.source = "${buildDir}/src/java/library"
+
+task copyLibraryDyvil(type: Copy) {
+	from 'src/library'
+	into "${buildDir}/src/dyvil/library"
+	
+	includeEmptyDirs = false
+	
+	include dyvilFilters
+}
+
+// Compiler
+
+task copyCompilerJava(type: Copy) {
+	from sourceSets.compiler.java
+	into "${buildDir}/src/java/compiler"
+	
+	include javaFilters
+	
+	filter {
+		it.replace('$$version$$', version)
+		  .replace('$$libraryVersion$$', libraryVersion)
+		  .replace('$$compilerVersion$$', compilerVersion)
 	}
 }
 
-group = 'dyvil-team'
-version = '0.1.0'
-mainClassName = 'dyvil.tools.repl.DyvilREPL'
+compileCompilerJava.dependsOn(copyCompilerJava)
+compileCompilerJava.source = "${buildDir}/src/java/compiler"
 
-def ENV = System.getenv()
-if (ENV.DRONE_BUILD_NUMBER) {
-    version += ".nightly_" + ENV.DRONE_BUILD_NUMBER
+// REPL
+
+task copyReplJava(type: Copy) {
+	from sourceSets.repl.java
+	into "${buildDir}/src/java/repl"
+	
+	include javaFilters
+	
+	filter {
+		it.replace('$$replVersion$$', replVersion)
+	}
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+compileReplJava.dependsOn(copyReplJava)
+compileReplJava.source = "${buildDir}/src/java/repl"
 
-/**
- * Creates the Gradle Wrapper (gradlew)
- */
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.5'
+// DPF
+
+task copyDpfJava(type: Copy) {
+	from sourceSets.dpf.java
+	into "${buildDir}/src/java/dpf"
+	
+	include javaFilters
 }
 
-/**
- * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
- */
-task clean(overwrite: true) << {
-	file('build/dyvilbin').mkdirs()
-}
+compileDpfJava.dependsOn(copyDpfJava)
+compileDpfJava.source = "${buildDir}/src/java/dpf"
+
+// ---------------------------------------- Compilation Tasks ----------------------------------------
 
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
-task compileDyvilLibrary(type: JavaExec, dependsOn: 'compilerClasses') {
-	println 'Compiling Dyvil Runtime Library...'
-	
+task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) {
 	// Required to make UP-TO-DATE work
 	outputs.upToDateSpec = new org.gradle.api.specs.AndSpec()
 	
+	String src = "src/dyvil/library/"
+	String bin = "dyvilbin"
+	
 	// All Dyvil Class and Header files
-	inputs.dir 'src/library'
+	inputs.dir "${buildDir}/${src}"
 	// All possible Output Files (.class, .dyo)
-	outputs.dir 'build/dyvilbin/'
+	outputs.dir "${buildDir}/${bin}"
 	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
-	classpath += sourceSets.compiler.output + sourceSets.library.output + sourceSets.compiler.resources
-	args = [ '@lib.txt', 'compile' ]
+	classpath = sourceSets.compiler.runtimeClasspath
+	args = [ "source_dir=build/${src}", "output_dir=build/${bin}", 'compile' ]
 }
+
+// ---------------------------------------- Build Tasks ----------------------------------------
 
 /**
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
-task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileDyvilLibrary' ]) {
+task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
+	from 'build/dyvilbin'
 	
-	archiveName = "dyvil-library-${version}.jar"
+	archiveName = "dyvil-library-${libraryVersion}.jar"
+}
+
+task buildDPF(type: Jar, dependsOn: 'buildLibrary') {
+	from sourceSets.dpf.output
+	
+	archiveName = "dyvil-property-format-${dpfVersion}.jar"
 }
 
 /**
  * Creates a Jar file that contains all compiler classes (from src/compiler)
  */
-task buildCompiler(type: Jar, dependsOn: 'classes') {
+task buildCompiler(type: Jar, dependsOn: 'compilerClasses') {
 	from sourceSets.compiler.output
+	from sourceSets.compiler.resources
 	
-	archiveName = "dyvil-compiler-${version}.jar"
+	archiveName = "dyvil-compiler-${compilerVersion}.jar"
 	
 	manifest.attributes.put("Main-Class", "dyvil.tools.compiler.DyvilCompiler")
 }
@@ -107,23 +204,78 @@ task buildCompiler(type: Jar, dependsOn: 'classes') {
 /**
  * Creates a Jar file that contains all REPL classes (from src/repl)
  */
-task buildREPL(type: Jar, dependsOn: 'classes') {
+task buildREPL(type: Jar, dependsOn: 'replClasses') {
 	from sourceSets.repl.output
 	
-	archiveName = "dyvil-repl-${version}.jar"
+	archiveName = "dyvil-repl-${replVersion}.jar"
 	
-	manifest.attributes.put("Main-Class", "dyvil.tools.repl.DyvilREPL")
+	manifest.attributes.put("Main-Class", replMainClass)
 }
 
 /**
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
-task build(type: Jar, overwrite: true) {
+task buildAll(type: Jar, dependsOn: 'classes') {
 	from sourceSets.library.output
 	from sourceSets.compiler.output
+	from sourceSets.compiler.resources
 	from sourceSets.repl.output
+	from sourceSets.dpf.output
+	from 'build/dyvilbin'
 	
 	archiveName = "dyvil-${version}.jar"
+	
+	manifest.attributes.put("Main-Class", replMainClass)
 }
 
-task buildAll(dependsOn: [ 'build', 'buildLibrary', 'buildCompiler', 'buildREPL' ])
+task build(dependsOn: [ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF' ], overwrite: true)
+
+// ---------------------------------------- Version Files ----------------------------------------
+
+task prepareRelease(type: Copy) {
+	from 'versions/'
+	
+	if (nightly)
+	{
+		into 'versions'
+		include 'nightly-template.dyp'
+		rename 'nightly\\-template\\.dyp', 'nightly.dyp'
+	}
+	else
+	{
+		into 'versions/pre'
+		include 'template.dyp'
+		rename 'template\\.dyp', "v${version}.dyp"
+	}
+	
+	
+	filter {
+		it.replace('$$version$$',			version)
+		  .replace('$$libraryVersion$$',	libraryVersion)
+		  .replace('$$compilerVersion$$',	compilerVersion)
+		  .replace('$$replVersion$$',		replVersion)
+		  .replace('$$dpfVersion$$',		dpfVersion)
+	}
+}
+
+if (nightly)
+{
+	build.dependsOn prepareRelease
+}
+
+// ---------------------------------------- Misc. Tasks ----------------------------------------
+
+/**
+ * Creates the Gradle Wrapper (gradlew)
+ */
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
+
+/**
+ * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
+ */
+clean.doLast {
+	println "Re-recreating build/dyilbin"
+	file('build/dyvilbin').mkdirs()
+}

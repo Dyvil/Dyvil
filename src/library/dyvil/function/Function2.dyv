@@ -6,5 +6,5 @@ public functional interface Function2[-P1, -P2, +R]
 	
 	public P1 => P2 => R curried() = p1 => p2 => this(p1, p2)
 	
-	public ((P1, P2)) => R tupled() = ((P1, P2) tuple) => this(tuple._1, tuple._2)
+	public ((P1, P2)) => R tupled() = tuple => this(tuple._1, tuple._2)
 }

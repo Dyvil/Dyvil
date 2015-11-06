@@ -11,9 +11,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ThrowStatement extends Value implements IValued
 {
@@ -91,8 +92,9 @@ public final class ThrowStatement extends Value implements IValued
 		IValue value1 = this.value.withType(Types.THROWABLE, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.value.getPosition(), "throw.type");
+			Marker marker = I18n.createMarker(this.value.getPosition(), "throw.type");
 			marker.addInfo("Value Type: " + this.value.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -110,7 +112,7 @@ public final class ThrowStatement extends Value implements IValued
 		IType type = this.value.getType();
 		if (Types.THROWABLE.isSuperTypeOf(type) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(this.value.getType()))
 		{
-			markers.add(this.value.getPosition(), "method.access.exception", type.toString());
+			markers.add(I18n.createMarker(this.value.getPosition(), "method.access.exception", type.toString()));
 		}
 	}
 	
@@ -126,6 +128,12 @@ public final class ThrowStatement extends Value implements IValued
 	{
 		this.value = this.value.cleanup(context, compilableList);
 		return this;
+	}
+	
+	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeStatement(writer);
 	}
 	
 	@Override

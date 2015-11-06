@@ -5,24 +5,25 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	protected String className;
+	private REPLContext	context;
+	protected String	className;
+	private Class		theClass;
 	
-	public REPLVariable(ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
+	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
 	{
 		super(null, name, type);
+		this.context = context;
 		this.className = className;
 		this.modifiers = modifiers;
 		this.position = position;
@@ -39,25 +40,35 @@ public class REPLVariable extends Field
 		return (this.modifiers & mod) == mod;
 	}
 	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.value != null)
-		{
-			this.value.check(markers, context);
-		}
-	}
-	
 	private static boolean isConstant(IValue value)
 	{
 		int tag = value.valueTag();
-		return tag >= 0 && tag != IValue.NIL && tag <= IValue.STRING;
+		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
 	}
 	
-	protected void compute()
+	protected void updateValue()
 	{
-		List<IClassCompilable> compilableList = REPLContext.compilableList;
+		if (this.type == Types.VOID)
+		{
+			ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
+			return;
+		}
 		
+		java.lang.reflect.Field[] fields = this.theClass.getDeclaredFields();
+		
+		try
+		{
+			Object result = fields[0].get(null);
+			this.value = new REPLResult(result);
+		}
+		catch (IllegalAccessException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	protected void compute(List<IClassCompilable> compilableList)
+	{
 		if (this.isConstant() && !compilableList.isEmpty())
 		{
 			return;
@@ -65,26 +76,8 @@ public class REPLVariable extends Field
 		
 		try
 		{
-			Class c = this.generateClass(this.className, compilableList);
-			
-			if (this.type != Types.VOID)
-			{
-				java.lang.reflect.Field[] fields = c.getDeclaredFields();
-				Object result = fields[0].get(null);
-				IValue v = IValue.fromObject(result);
-				if (v != null)
-				{
-					this.value = v;
-				}
-				else
-				{
-					this.value = new REPLResult(result);
-				}
-			}
-			else
-			{
-				ReflectUtils.unsafe.ensureClassInitialized(c);
-			}
+			this.theClass = this.generateClass(this.className, compilableList);
+			this.updateValue();
 		}
 		catch (ExceptionInInitializerError t)
 		{
@@ -113,26 +106,26 @@ public class REPLVariable extends Field
 	{
 		String name = this.name.qualified;
 		String extendedType = this.type.getExtendedName();
-		ClassWriter writer = new ClassWriter();
+		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
-		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
+		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
 		
-		writer.visitSource(className, null);
+		cw.visitSource(className, null);
 		
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
-			writer.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
+			cw.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
 		}
 		
 		// Compilables
 		for (IClassCompilable c : compilableList)
 		{
-			c.write(writer);
+			c.write(cw);
 		}
 		
 		// Generate <clinit> static initializer
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
+		MethodWriter mw = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
 		mw.begin();
 		
 		for (IClassCompilable c : compilableList)
@@ -144,16 +137,7 @@ public class REPLVariable extends Field
 		
 		if (this.value != null)
 		{
-			if (this.type != Types.VOID)
-			{
-				this.value.writeExpression(mw);
-				// Store the value to the field
-				mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
-			}
-			else
-			{
-				this.value.writeStatement(mw);
-			}
+			this.writeValue(className, name, extendedType, cw, mw);
 		}
 		
 		// Finish Method compilation
@@ -161,24 +145,37 @@ public class REPLVariable extends Field
 		mw.end();
 		
 		// Finish Class compilation
-		writer.visitEnd();
+		cw.visitEnd();
 		
-		byte[] bytes = writer.toByteArray();
+		byte[] bytes = cw.toByteArray();
 		
 		if (this.type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
-			return REPLMemberClass.loadClass(className, bytes);
+			return REPLMemberClass.loadClass(this.context.repl, className, bytes);
 		}
 		// We don't have any variables, so we can throw the Class away after
 		// it has been loaded.
-		return ReflectUtils.unsafe.defineAnonymousClass(REPLVariable.class, bytes, null);
+		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
 	}
 	
-	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw) throws BytecodeException
 	{
-		return null;
+		if (this.type == Types.VOID)
+		{
+			this.value.writeStatement(mw);
+			return;
+		}
+		
+		String methodType = "()" + extendedType;
+		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC, "computeValue", methodType, null, null));
+		initWriter.begin();
+		this.value.writeExpression(initWriter, this.type);
+		initWriter.end(this.type);
+		
+		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, className, "computeValue", methodType, false);
+		// Store the value to the field
+		mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 	}
 	
 	@Override
@@ -186,7 +183,7 @@ public class REPLVariable extends Field
 	{
 		if (this.isConstant())
 		{
-			this.value.writeExpression(writer);
+			this.value.writeExpression(writer, this.type);
 			return;
 		}
 		
@@ -203,6 +200,11 @@ public class REPLVariable extends Field
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
+		if (value != null)
+		{
+			value.writeExpression(writer, this.type);
+		}
+		
 		if (this.className == null)
 		{
 			writer.writeInsn(Opcodes.AUTO_POP);

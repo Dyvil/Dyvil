@@ -7,7 +7,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.parsing.CodeFile;
 
 public class FileFinder
 {
@@ -47,11 +47,6 @@ public class FileFinder
 	{
 		String fileName = source.getPath();
 		if (!DyvilCompiler.config.isExcluded(fileName))
-		{
-			return;
-		}
-		
-		if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
 		{
 			return;
 		}

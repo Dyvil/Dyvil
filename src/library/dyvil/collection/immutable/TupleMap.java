@@ -15,17 +15,29 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = -5372836862143742212L;
+	
+	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new TupleMap(entries, true);
+	}
+	
+	public static <K, V> TupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
+	{
+		return new TupleMap(entries);
+	}
+	
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder();
 	}
 	
-	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
+	protected TupleMap(int capacity)
 	{
-		return new TupleMap(entries);
+		super(capacity);
 	}
 	
-	public TupleMap(Tuple2<K, V>[] entries)
+	public TupleMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
 	}
@@ -50,6 +62,11 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 		super(map);
 	}
 	
+	public TupleMap(AbstractTupleMap<K, V> map)
+	{
+		super(map);
+	}
+	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
 		private Tuple2<K, V>[]	entries;
@@ -57,7 +74,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 		
 		public Builder()
 		{
-			this.entries = new Tuple2[10];
+			this.entries = new Tuple2[DEFAULT_CAPACITY];
 		}
 		
 		public Builder(int capacity)
@@ -126,45 +143,20 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		for (int i = 0; i < this.size; i++)
-		{
-			if (Objects.equals(key, this.entries[i]._1))
-			{
-				Tuple2[] entries = this.entries.clone();
-				entries[i] = new Tuple2(key, value);
-				return new TupleMap(entries, this.size, true);
-			}
-		}
-		
-		Tuple2[] entries = new Tuple2[this.size + 1];
-		System.arraycopy(this.entries, 0, entries, 0, this.size);
-		entries[this.size] = new Tuple2(key, value);
-		return new TupleMap(entries, this.size + 1, true);
+		TupleMap<K, V> copy = new TupleMap<K, V>(this);
+		copy.putInternal(new Tuple2<K, V>(key, value));
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		int index = this.size;
-		int maxLength = index + map.size();
-		Tuple2[] entries = new Tuple2[maxLength];
-		System.arraycopy(this.entries, 0, entries, 0, index);
-		
-		outer:
+		TupleMap<K, V> copy = new TupleMap<K, V>(this);
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			K key = entry.getKey();
-			for (int i = 0; i < this.size; i++)
-			{
-				if (Objects.equals(entries[i]._1, key))
-				{
-					entries[i] = new Tuple2(key, entry.getValue());
-					continue outer;
-				}
-			}
-			entries[index++] = entry.toTuple();
+			copy.putInternal((Tuple2<K, V>) entry.toTuple());
 		}
-		return new TupleMap(entries, index, true);
+		return copy;
 	}
 	
 	@Override
@@ -263,86 +255,63 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		Tuple2[] entries = new Tuple2[this.size];
-		
+		int len = this.size;
+		TupleMap<NK, V> copy = new TupleMap(len);
+		for (int i = 0; i < len; i++)
+		{
+			Tuple2<K, V> entry = this.entries[i];
+			V value = entry._2;
+			copy.putInternal(new Tuple2<NK, V>(mapper.apply(entry._1, value), value));
+		}
+		return copy;
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	{
+		Tuple2<K, NV>[] entries = new Tuple2[this.size];
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
 			K key = entry._1;
-			entries[i] = new Tuple2(key, mapper.apply(key, entry._2));
+			entries[i] = new Tuple2<K, NV>(key, mapper.apply(key, entry._2));
 		}
-		return new TupleMap(entries, this.size, true);
+		return new TupleMap<K, NV>(entries, this.size, true);
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		Tuple2[] entries = new Tuple2[this.size];
-		
-		int index = 0;
-		outer:
-		for (int i = 0; i < this.size; i++)
+		int len = this.size;
+		TupleMap<NK, NV> copy = new TupleMap<NK, NV>(len);
+		for (int i = 0; i < len; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			Entry<? extends U, ? extends R> newEntry = mapper.apply(entry._1, entry._2);
-			if (newEntry == null)
+			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry._1, entry._2);
+			if (newEntry != null)
 			{
-				continue;
+				copy.putInternal((Tuple2<NK, NV>) newEntry.toTuple());
 			}
-			
-			Tuple2<? extends U, ? extends R> newTuple = newEntry.toTuple();
-			U key = newTuple._1;
-			for (int j = 0; j < index; j++)
-			{
-				if (Objects.equals(entries[j]._1, key))
-				{
-					entries[j] = newTuple;
-					continue outer;
-				}
-			}
-			
-			entries[index++] = newTuple;
 		}
-		return new TupleMap(entries, index, true);
+		return copy;
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		Tuple2[] entries = new Tuple2[this.size << 2];
-		
-		int index = 0;
-		for (int i = 0; i < this.size; i++)
+		int len = this.size;
+		TupleMap<NK, NV> copy = new TupleMap<NK, NV>(len);
+		for (int i = 0; i < len; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			
-			outer:
-			for (Entry<? extends U, ? extends R> newEntry : mapper.apply(entry._1, entry._2))
+			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry._1, entry._2))
 			{
-				Tuple2<? extends U, ? extends R> newTuple = newEntry.toTuple();
-				U key = newTuple._1;
-				for (int j = 0; j < index; j++)
-				{
-					if (Objects.equals(entries[j]._1, key))
-					{
-						entries[j] = newTuple;
-						continue outer;
-					}
-				}
-				
-				int index1 = index++;
-				if (index1 >= entries.length)
-				{
-					Tuple2[] temp = new Tuple2[index << 1];
-					System.arraycopy(entries, 0, temp, 0, index1);
-					entries = temp;
-				}
-				entries[index1] = newTuple;
+				copy.putInternal((Tuple2<NK, NV>) newEntry.toTuple());
 			}
 		}
-		return new TupleMap(entries, index, true);
+		return copy;
 	}
 	
 	@Override
@@ -365,40 +334,26 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements ImmutableMa
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		Tuple2<V, K>[] entries = new Tuple2[this.size];
-		int index = 0;
-		outer:
-		for (int i = 0; i < this.size; i++)
+		int len = this.size;
+		TupleMap<V, K> copy = new TupleMap<V, K>(len);
+		for (int i = 0; i < len; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
-			V value = entry._2;
-			Tuple2<V, K> newEntry = new Tuple2<V, K>(value, entry._1);
-			
-			for (int j = 0; j < index; j++)
-			{
-				if (Objects.equals(entries[j]._1, value))
-				{
-					entries[j] = newEntry;
-					continue outer;
-				}
-			}
-			
-			entries[index++] = newEntry;
+			copy.putInternal(new Tuple2<V, K>(entry._2, entry._1));
 		}
-		
-		return new TupleMap(entries, index, true);
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new TupleMap(this.entries);
+		return new TupleMap(this);
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.TupleMap(this.entries, this.size);
+		return new dyvil.collection.mutable.TupleMap(this);
 	}
 	
 	@Override

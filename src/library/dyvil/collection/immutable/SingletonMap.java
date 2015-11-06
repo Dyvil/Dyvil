@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
@@ -17,8 +18,10 @@ import dyvil.util.Some;
 
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
-	private K	key;
-	private V	value;
+	private static final long serialVersionUID = 2791619158507681686L;
+	
+	private transient K	key;
+	private transient V	value;
 	
 	public static <K, V> SingletonMap<K, V> apply(K key, V value)
 	{
@@ -170,33 +173,75 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	{
+		return new SingletonMap(mapper.apply(this.key, this.value), this.value);
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		return new SingletonMap(this.key, mapper.apply(this.key, this.value));
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		Entry<? extends U, ? extends R> entry = mapper.apply(this.key, this.value);
+		Entry<? extends NK, ? extends NV> entry = mapper.apply(this.key, this.value);
 		return entry == null ? EmptyMap.instance : new SingletonMap(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		dyvil.collection.mutable.ArrayMap<U, R> mutable = new dyvil.collection.mutable.ArrayMap();
-		for (Entry<? extends U, ? extends R> entry : mapper.apply(this.key, this.value))
+		ArrayMap.Builder<NK, NV> builder = new ArrayMap.Builder<NK, NV>();
+		for (Entry<? extends NK, ? extends NV> entry : mapper.apply(this.key, this.value))
 		{
-			mutable.put(entry.getKey(), entry.getValue());
+			builder.put(entry.getKey(), entry.getValue());
 		}
-		return mutable.trustedImmutable();
+		return builder.build();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
 		return condition.test(this.key, this.value) ? this : EmptyMap.instance;
+	}
+	
+	@Override
+	public Entry<K, V>[] toArray()
+	{
+		return new Entry[] { this };
+	}
+	
+	@Override
+	public void toArray(int index, Entry<K, V>[] store)
+	{
+		store[index] = this;
+	}
+	
+	@Override
+	public Object[] toKeyArray()
+	{
+		return new Object[] { this.key };
+	}
+	
+	@Override
+	public void toKeyArray(int index, Object[] store)
+	{
+		store[index] = this.key;
+	}
+	
+	@Override
+	public Object[] toValueArray()
+	{
+		return new Object[] { this.value };
+	}
+	
+	@Override
+	public void toValueArray(int index, Object[] store)
+	{
+		store[index] = this.value;
 	}
 	
 	@Override
@@ -247,5 +292,17 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public int hashCode()
 	{
 		return Entry.entryHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.writeObject(this.key);
+		out.writeObject(this.value);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		this.key = (K) in.readObject();
+		this.value = (V) in.readObject();
 	}
 }

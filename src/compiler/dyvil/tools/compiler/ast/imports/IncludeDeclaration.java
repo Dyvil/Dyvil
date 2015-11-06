@@ -4,19 +4,19 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class IncludeDeclaration implements IASTNode
 {
@@ -76,7 +76,7 @@ public class IncludeDeclaration implements IASTNode
 		return this.header == null ? null : this.header.resolveField(name);
 	}
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.header != null)
 		{
@@ -93,7 +93,7 @@ public class IncludeDeclaration implements IASTNode
 			pack = pack.resolvePackage(this.nameParts[i]);
 			if (pack == null)
 			{
-				markers.add(this.position, "resolve.package", this.nameParts[i]);
+				markers.add(I18n.createMarker(this.position, "resolve.package", this.nameParts[i]));
 				return;
 			}
 		}
@@ -102,13 +102,13 @@ public class IncludeDeclaration implements IASTNode
 		
 		if (this.header == null)
 		{
-			markers.add(this.position, "resolve.header", this.nameParts[count]);
+			markers.add(I18n.createMarker(this.position, "resolve.header", this.nameParts[count]));
 			return;
 		}
 		
 		if (!this.header.isHeader())
 		{
-			markers.add(this.position, "include.unit");
+			markers.add(I18n.createMarker(this.position, "include.unit"));
 		}
 	}
 	
@@ -129,6 +129,12 @@ public class IncludeDeclaration implements IASTNode
 		{
 			this.nameParts[i] = Name.getQualified(in.readUTF());
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

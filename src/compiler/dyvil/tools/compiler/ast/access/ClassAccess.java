@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -14,8 +13,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassAccess implements IValue
 {
@@ -120,7 +121,7 @@ public final class ClassAccess implements IValue
 		
 		if (!this.type.isResolved())
 		{
-			markers.add(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString());
+			markers.add(I18n.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString()));
 		}
 		
 		return this;
@@ -148,7 +149,7 @@ public final class ClassAccess implements IValue
 			return;
 		}
 		
-		markers.add(this.position, "type.access.invalid", this.type.toString());
+		markers.add(I18n.createMarker(this.position, "type.access.invalid", this.type.toString()));
 	}
 	
 	@Override

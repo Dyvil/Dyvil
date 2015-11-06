@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
@@ -10,8 +11,12 @@ import dyvil.collection.Set;
 
 public abstract class AbstractArraySet<E> implements Set<E>
 {
-	protected Object[]	elements;
-	protected int		size;
+	private static final long serialVersionUID = -7004392809193010314L;
+	
+	protected static final int DEFAULT_CAPACITY = 10;
+	
+	protected transient Object[]	elements;
+	protected transient int			size;
 	
 	public AbstractArraySet(Object... elements)
 	{
@@ -29,7 +34,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	public AbstractArraySet(Object[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
-		this.size = Set.distinct(elements, size);
+		this.size = size;
 	}
 	
 	public AbstractArraySet(Collection<E> elements)
@@ -232,5 +237,28 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			out.writeObject(this.elements[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.elements = new Object[this.size];
+		for (int i = 0; i < this.size; i++)
+		{
+			this.elements[i] = in.readObject();
+		}
 	}
 }

@@ -3,14 +3,14 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class SubscriptGetter extends AbstractCall
 {
@@ -27,6 +27,13 @@ public class SubscriptGetter extends AbstractCall
 		this.arguments = new ArgumentList();
 	}
 	
+	public SubscriptGetter(ICodePosition position, IValue instance, IArguments arguments)
+	{
+		this.position = position;
+		this.instance = instance;
+		this.arguments = arguments;
+	}
+	
 	@Override
 	public int valueTag()
 	{
@@ -37,6 +44,12 @@ public class SubscriptGetter extends AbstractCall
 	public ArgumentList getArguments()
 	{
 		return (ArgumentList) this.arguments;
+	}
+	
+	@Override
+	protected IValue resolveCall(MarkerList markers, IContext context)
+	{
+		return null;
 	}
 	
 	@Override
@@ -97,7 +110,7 @@ public class SubscriptGetter extends AbstractCall
 			argumentList.addValue(this.arguments.getValue(i, null));
 		}
 		
-		IMethod m = ICall.resolveMethod(context, this.instance, Name.subscript, argumentList);
+		IMethod m = ICall.resolveMethod(context, this.instance, Names.subscript, argumentList);
 		if (m != null)
 		{
 			this.arguments = argumentList;
@@ -106,7 +119,7 @@ public class SubscriptGetter extends AbstractCall
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, this.position, this.instance, Name.subscript, argumentList);
+		ICall.addResolveMarker(markers, this.position, this.instance, Names.subscript, argumentList);
 		return this;
 	}
 	

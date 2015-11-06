@@ -16,6 +16,8 @@ import dyvil.collection.iterator.ImmutableIterator;
 
 public class ListView<E> implements ImmutableList<E>
 {
+	private static final long serialVersionUID = -4432411036304678600L;
+	
 	protected final List<E> list;
 	
 	public ListView(List<E> list)

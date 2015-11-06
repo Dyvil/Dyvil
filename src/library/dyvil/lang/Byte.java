@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
@@ -7,8 +9,10 @@ import dyvil.annotation.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
-public class Byte implements Integer
+public class Byte implements Integer, Serializable
 {
+	private static final long serialVersionUID = 7537160263489097418L;
+	
 	public static final byte	min		= java.lang.Byte.MIN_VALUE;
 	public static final byte	max		= java.lang.Byte.MAX_VALUE;
 	public static final byte	size	= java.lang.Byte.SIZE;
@@ -1029,6 +1033,24 @@ public class Byte implements Integer
 	public Int $gt$gt$gt(Integer v)
 	{
 		return Int.apply(this.value >>> v.intValue());
+	}
+	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Long.compare(this.value, o.longValue());
+	}
+	
+	@Override
+	public Byte next()
+	{
+		return Byte.apply((byte) (this.value + 1));
+	}
+	
+	@Override
+	public Byte previous()
+	{
+		return Byte.apply((byte) (this.value + 1));
 	}
 	
 	// Object methods

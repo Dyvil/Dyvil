@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
@@ -39,17 +40,27 @@ import dyvil.util.ImmutableException;
  * @param <E>
  *            the element type
  */
-@NilConvertible
+@NilConvertible(methodName = "fromNil")
 @ArrayConvertible
-public interface Collection<E> extends Queryable<E>
+public interface Collection<E> extends Queryable<E>, Serializable
 {
 	/**
-	 * Returns an empty, mutable collection. This method is primarily for use
-	 * with the {@code nil} literal in <i>Dyvil</i> and is defined by
-	 * {@link MutableList#apply()}.
+	 * Returns an empty, immutable collection. This method is primarily for use
+	 * with the {@code nil} literal in <i>Dyvil</i>, and the exact type of the
+	 * returned object is given by {@link ImmutableSet#apply()}.
 	 * 
-	 * @see MutableList#apply()
-	 * @return an empty, mutable collection
+	 * @return an empty, immutable collection
+	 */
+	public static <E> ImmutableCollection<E> fromNil()
+	{
+		return ImmutableSet.apply();
+	}
+	
+	/**
+	 * Returns an empty, mutable collection. The exact type of the returned
+	 * object is given by {@link MutableList#apply()}.
+	 * 
+	 * @return an empty, mutable list
 	 */
 	public static <E> MutableCollection<E> apply()
 	{
@@ -181,6 +192,32 @@ public interface Collection<E> extends Queryable<E>
 	public default boolean contains(Object element)
 	{
 		return iterableContains(this, element);
+	}
+	
+	public default boolean intersects(Collection<?> collection)
+	{
+		if (collection.size() < this.size())
+		{
+			for (Object o : this)
+			{
+				if (collection.contains(o))
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		for (Object o : collection)
+		{
+			if (this.contains(o))
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	// Non-mutating Operations
@@ -743,7 +780,7 @@ public interface Collection<E> extends Queryable<E>
 		{
 			if (!c2.contains(o))
 			{
-				return false;
+				return c2.contains(o);
 			}
 		}
 		return true;
@@ -799,7 +836,7 @@ public interface Collection<E> extends Queryable<E>
 	}
 	
 	public static <E> boolean iteratorSorted(Iterator<E> iterator, Comparator<? super E> comparator)
-	{		
+	{
 		E prev = iterator.next();
 		while (iterator.hasNext())
 		{

@@ -13,11 +13,14 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class IfStatement extends Value implements IStatement
+public class IfStatement extends Value
 {
 	protected IValue	condition;
 	protected IValue	then;
@@ -89,37 +92,32 @@ public class IfStatement extends Value implements IStatement
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		this.commonType = type;
-		
 		if (this.then == null)
 		{
-			return null;
+			return this;
 		}
 		
-		IValue then1 = type.convertValue(this.then, typeContext, markers, context);
-		if (then1 == null)
+		this.commonType = type;
+		IValue value = IType.convertValue(this.then, type, typeContext, markers, context);
+		if (value == null)
 		{
-			Marker m = markers.create(this.then.getPosition(), "if.then.type");
-			m.addInfo("Required Type: " + type);
-			m.addInfo("Expression Type: " + this.then.getType());
+			Util.createTypeError(markers, this.then, type, typeContext, "if.then.type");
 		}
 		else
 		{
-			this.then = then1;
+			this.then = value;
 		}
 		
 		if (this.elseThen != null)
 		{
-			then1 = type.convertValue(this.elseThen, typeContext, markers, context);
-			if (then1 == null)
+			value = IType.convertValue(this.elseThen, type, typeContext, markers, context);
+			if (value == null)
 			{
-				Marker m = markers.create(this.elseThen.getPosition(), "if.else.type");
-				m.addInfo("Required Type: " + type);
-				m.addInfo("Expression Type: " + this.elseThen.getType());
+				Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
 			}
 			else
 			{
-				this.elseThen = then1;
+				this.elseThen = value;
 			}
 		}
 		
@@ -213,11 +211,12 @@ public class IfStatement extends Value implements IStatement
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");
+				Marker marker = I18n.createMarker(this.condition.getPosition(), "if.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -241,7 +240,7 @@ public class IfStatement extends Value implements IStatement
 		}
 		else
 		{
-			markers.add(this.position, "if.condition.invalid");
+			markers.add(I18n.createMarker(this.position, "if.condition.invalid"));
 		}
 		if (this.then != null)
 		{
@@ -326,10 +325,16 @@ public class IfStatement extends Value implements IStatement
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
-		this.then.writeExpression(writer);
-		writer.getFrame().set(commonFrameType);
-		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-		writer.writeLabel(elseStart);
+		this.then.writeExpression(writer, this.commonType);
+		
+		if (!writer.hasReturn())
+		{
+			writer.getFrame().set(commonFrameType);
+			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
+		}
+		
+		writer.writeTargetLabel(elseStart);
+		
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -337,10 +342,15 @@ public class IfStatement extends Value implements IStatement
 		}
 		else
 		{
-			this.elseThen.writeExpression(writer);
+			this.elseThen.writeExpression(writer, this.commonType);
 		}
-		writer.getFrame().set(commonFrameType);
-		writer.writeLabel(elseEnd);
+		
+		if (!writer.hasReturn())
+		{
+			writer.getFrame().set(commonFrameType);
+		}
+		
+		writer.writeTargetLabel(elseEnd);
 	}
 	
 	@Override
@@ -363,10 +373,10 @@ public class IfStatement extends Value implements IStatement
 			// If Block
 			this.then.writeStatement(writer);
 			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.writeLabel(elseStart);
+			writer.writeTargetLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.writeLabel(elseEnd);
+			writer.writeTargetLabel(elseEnd);
 		}
 		else
 		{
@@ -374,8 +384,14 @@ public class IfStatement extends Value implements IStatement
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.writeLabel(elseStart);
+			writer.writeTargetLabel(elseStart);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override

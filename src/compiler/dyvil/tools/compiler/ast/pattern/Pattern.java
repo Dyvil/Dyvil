@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Pattern implements IPattern
 {

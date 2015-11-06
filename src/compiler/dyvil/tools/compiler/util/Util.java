@@ -2,13 +2,18 @@ package dyvil.tools.compiler.util;
 
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class Util
 {
@@ -23,7 +28,22 @@ public class Util
 	{
 		buf.append(ModifierTypes.METHOD.toString(method.getModifiers()));
 		method.getType().toString("", buf);
-		buf.append(' ').append(method.getName()).append('(');
+		buf.append(' ').append(method.getName());
+		
+		int typeVariables = method.genericCount();
+		if (typeVariables > 0)
+		{
+			buf.append('[');
+			method.getTypeVariable(0).toString("", buf);
+			for (int i = 1; i < typeVariables; i++)
+			{
+				buf.append(", ");
+				method.getTypeVariable(i).toString("", buf);
+			}
+			buf.append(']');
+		}
+		
+		buf.append('(');
 		
 		int params = method.parameterCount();
 		if (params > 0)
@@ -37,6 +57,42 @@ public class Util
 		}
 		
 		buf.append(')');
+	}
+	
+	public static void classSignatureToString(IClass iclass, StringBuilder buf)
+	{
+		buf.append(ModifierTypes.CLASS_TYPE.toString(iclass.getModifiers()));
+		buf.append(iclass.getName());
+		
+		int typeVariables = iclass.genericCount();
+		if (typeVariables > 0)
+		{
+			buf.append('[');
+			
+			iclass.getTypeVariable(0).toString("", buf);
+			for (int i = 1; i < typeVariables; i++)
+			{
+				buf.append(", ");
+				iclass.getTypeVariable(i).toString("", buf);
+			}
+			
+			buf.append(']');
+		}
+		
+		int params = iclass.parameterCount();
+		if (params > 0)
+		{
+			buf.append('(');
+			
+			iclass.getParameter(0).getType().toString("", buf);
+			for (int i = 1; i < params; i++)
+			{
+				buf.append(", ");
+				iclass.getParameter(i).getType().toString("", buf);
+			}
+			
+			buf.append(')');
+		}
 	}
 	
 	public static void astToString(String prefix, IASTNode[] array, int size, String separator, StringBuilder buffer)
@@ -90,21 +146,6 @@ public class Util
 		return builder.toString();
 	}
 	
-	public static IValue constant(IValue value, MarkerList markers)
-	{
-		int depth = DyvilCompiler.maxConstantDepth;
-		while (!value.isConstant())
-		{
-			if (--depth < 0)
-			{
-				markers.add(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth);
-				return value.getType().getDefaultValue();
-			}
-			value = value.foldConstants();
-		}
-		return value;
-	}
-	
 	public static IValue prependValue(IValue prepend, IValue value)
 	{
 		if (value instanceof IValueList)
@@ -121,6 +162,18 @@ public class Util
 		}
 		
 		return prepend;
+	}
+	
+	public static IValue constant(IValue value, MarkerList markers)
+	{
+		IValue value1 = value.toConstant(markers);
+		if (value1 == null)
+		{
+			markers.add(I18n.createMarker(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
+			return value.getType().getDefaultValue();
+		}
+		
+		return value1;
 	}
 	
 	public static String toTime(long nanos)
@@ -155,5 +208,20 @@ public class Util
 			nanos -= l;
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
+	}
+	
+	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
+	{
+		Marker marker = I18n.createMarker(value.getPosition(), key, args);
+		marker.addInfo("Required Type: " + type.getConcreteType(typeContext));
+		marker.addInfo("Value Type: " + value.getType());
+		markers.add(marker);
+	}
+	
+	public static final Name stripEq(Name name)
+	{
+		String qualified = name.qualified.substring(0, name.qualified.length() - 3);
+		String unqualified = name.unqualified.substring(0, name.unqualified.length() - 1);
+		return Name.get(qualified, unqualified);
 	}
 }

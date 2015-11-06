@@ -1,5 +1,7 @@
 package dyvil.lang;
 
+import java.io.Serializable;
+
 import dyvil.lang.literal.LongConvertible;
 
 import dyvil.annotation.Intrinsic;
@@ -10,8 +12,10 @@ import dyvil.annotation.prefix;
 import static dyvil.reflect.Opcodes.*;
 
 @LongConvertible
-public class Long implements Integer
+public class Long implements Integer, Serializable
 {
+	private static final long serialVersionUID = 4495480142241309185L;
+	
 	public static final long	min		= java.lang.Long.MIN_VALUE;
 	public static final long	max		= java.lang.Long.MAX_VALUE;
 	public static final byte	size	= java.lang.Long.SIZE;
@@ -1032,6 +1036,24 @@ public class Long implements Integer
 	public Long $gt$gt$gt(Integer v)
 	{
 		return Long.apply(this.value >>> v.longValue());
+	}
+	
+	@Override
+	public int compareTo(Number o)
+	{
+		return java.lang.Long.compare(this.value, o.longValue());
+	}
+	
+	@Override
+	public Long next()
+	{
+		return Long.apply(this.value + 1L);
+	}
+	
+	@Override
+	public Long previous()
+	{
+		return Long.apply(this.value - 1L);
 	}
 	
 	// Object methods

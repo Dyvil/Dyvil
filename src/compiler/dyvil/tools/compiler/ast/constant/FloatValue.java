@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralExpression;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -10,8 +10,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class FloatValue implements IConstantValue
 {
@@ -73,17 +73,14 @@ public class FloatValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.FLOAT)
+		if (type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT))
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(Types.FLOAT))
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS);
+		if (annotation != null)
 		{
-			return new BoxedValue(this, Types.FLOAT.getBoxMethod());
-		}
-		if (type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
-		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
@@ -162,6 +159,12 @@ public class FloatValue implements IConstantValue
 	{
 		writer.writeLDC(this.value);
 		writer.writeInsn(Opcodes.FRETURN);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.value + "F";
 	}
 	
 	@Override

@@ -7,15 +7,16 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.Value;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class WhileStatement extends Value implements IStatement, ILoop
 {
@@ -119,8 +120,9 @@ public final class WhileStatement extends Value implements IStatement, ILoop
 			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = markers.create(this.condition.getPosition(), "while.condition.type");
+				Marker marker = I18n.createMarker(this.condition.getPosition(), "while.condition.type");
 				marker.addInfo("Condition Type: " + this.condition.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -143,7 +145,7 @@ public final class WhileStatement extends Value implements IStatement, ILoop
 		}
 		else
 		{
-			markers.add(this.position, "while.condition.invalid");
+			markers.add(I18n.createMarker(this.position, "while.condition.invalid"));
 		}
 		if (this.action != null)
 		{

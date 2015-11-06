@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,10 +13,12 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class MethodParameter extends Parameter
 {
@@ -80,15 +81,16 @@ public final class MethodParameter extends Parameter
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
-			markers.add(position, "parameter.assign.final", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "parameter.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
+			Marker marker = I18n.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
 			marker.addInfo("Parameter Type: " + this.type);
 			marker.addInfo("Value Type: " + newValue.getType());
+			markers.add(marker);
 		}
 		else
 		{
@@ -110,9 +112,10 @@ public final class MethodParameter extends Parameter
 			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type", this.name.unqualified);
 				marker.addInfo("Parameter Type: " + this.type);
 				marker.addInfo("Value Type: " + this.defaultValue.getType());
+				markers.add(marker);
 			}
 			else
 			{
@@ -136,7 +139,7 @@ public final class MethodParameter extends Parameter
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "parameter.type.void");
+			markers.add(I18n.createMarker(this.position, "parameter.type.void"));
 		}
 	}
 	
@@ -165,7 +168,7 @@ public final class MethodParameter extends Parameter
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
-		this.defaultValue.writeExpression(mw);
+		this.defaultValue.writeExpression(mw, this.type);
 		mw.end(this.type);
 	}
 	
@@ -193,7 +196,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
 	}

@@ -3,12 +3,11 @@ package dyvil.tools.compiler.parser.statement;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.SyncStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class SyncStatementParser extends Parser implements IValueConsumer
 {
@@ -26,25 +25,26 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{
 		case LOCK:
 			this.mode = LOCK_END;
-			if (token.type() == Symbols.OPEN_PARENTHESIS)
+			if (token.type() == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
 			pm.reparse();
-			pm.report(new SyntaxError(token, "Invalid Synchronized Block - '(' expected")); return;
+			pm.report(token, "Invalid Synchronized Block - '(' expected");
+			return;
 		case LOCK_END:
 			this.mode = ACTION;
-			if (token.type() != Symbols.CLOSE_PARENTHESIS)
+			if (token.type() != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Synchronized Block - ')' expected"));
+				pm.report(token, "Invalid Synchronized Block - ')' expected");
 			}
 			return;
 		case ACTION:

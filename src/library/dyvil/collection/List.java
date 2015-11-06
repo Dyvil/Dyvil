@@ -5,11 +5,13 @@ import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
 
 /**
@@ -43,14 +45,25 @@ import dyvil.collection.mutable.ArrayList;
  * @param <E>
  *            the element type
  */
-@NilConvertible
-@ArrayConvertible(methodName = "fromLiteral")
+@NilConvertible(methodName = "fromNil")
+@ArrayConvertible
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {
 	/**
-	 * Returns an empty, mutable list. This method is primarily for use with the
-	 * {@code nil} literal in <i>Dyvil</i> and internally creates an empty
-	 * {@link dyvil.collection.mutable.ArrayList ArrayList}.
+	 * Returns an empty, immutabl list. This method is primarily for use with
+	 * the {@code nil} literal in <i>Dyvil</i> and returns an instance of
+	 * {@link EmptyList}.
+	 * 
+	 * @return an empty, immutable list
+	 */
+	public static <E> ImmutableList<E> fromNil()
+	{
+		return ImmutableList.apply();
+	}
+	
+	/**
+	 * Returns an empty, mutable list. The exact type of the returned object is
+	 * given by {@link MutableList#apply()}.
 	 * 
 	 * @return an empty, mutable list
 	 */
@@ -80,9 +93,19 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return ImmutableList.apply(elements);
 	}
 	
-	public static <E> ImmutableList<E> fromLiteral(E... elements)
+	public static <E> ImmutableList<E> fromArray(E... elements)
 	{
-		return ImmutableList.fromLiteral(elements);
+		return ImmutableList.fromArray(elements);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, E repeatedValue)
+	{
+		return ImmutableList.apply(count, repeatedValue);
+	}
+	
+	public static <E> ImmutableList<E> apply(int count, IntFunction<E> generator)
+	{
+		return ImmutableList.apply(count, generator);
 	}
 	
 	// Simple getters
@@ -306,14 +329,35 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element
 	 * multiple times, implementations should behave so that <i>all</i>
 	 * occurrences of the element are removed, not only the first one. This
-	 * behavior can be achieved using this code snippet:
-	 * 
-	 * <pre>
-	 * list.removeAt(list.indexOf(element))
-	 * </pre>
+	 * behavior can be achieved using the {@link #removeFirst(Object)
+	 * removeFirst} method.
 	 */
 	@Override
 	public boolean remove(Object element);
+	
+	public default boolean removeFirst(Object element)
+	{
+		int index = this.indexOf(element);
+		if (index < 0)
+		{
+			return false;
+		}
+		
+		this.removeAt(index);
+		return true;
+	}
+	
+	public default boolean removeLast(Object element)
+	{
+		int index = this.lastIndexOf(element);
+		if (index < 0)
+		{
+			return false;
+		}
+		
+		this.removeAt(index);
+		return true;
+	}
 	
 	/**
 	 * Removes the element at the given {@code index} from this list. This

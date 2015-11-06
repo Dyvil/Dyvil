@@ -4,19 +4,18 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-import dyvil.collection.List;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClassMetadata
 {
@@ -53,6 +52,17 @@ public interface IClassMetadata
 	
 	// Resolve
 	
+	/**
+	 * Called before the class body goes through RESOLVE_TYPES. Super-types and
+	 * -interfaces and generics have already been resolved.
+	 */
+	public void resolveTypes(MarkerList markers, IContext context);
+	
+	/**
+	 * Called after the class body went through RESOLVE_TYPES.
+	 */
+	public void resolveTypesBody(MarkerList markers, IContext context);
+	
 	public void resolve(MarkerList markers, IContext context);
 	
 	public void checkTypes(MarkerList markers, IContext context);
@@ -62,11 +72,11 @@ public interface IClassMetadata
 		return null;
 	}
 	
-	public default void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
-	public default void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

@@ -13,6 +13,8 @@ import dyvil.util.Option;
 
 public class MapView<K, V> implements ImmutableMap<K, V>
 {
+	private static final long serialVersionUID = 1586369703282366862L;
+	
 	protected final Map<K, V> map;
 	
 	public MapView(Map<K, V> map)
@@ -135,19 +137,25 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		return new MapView(this.map.mapped(mapper));
+		return new MapView(this.map.keyMapped(mapper));
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	{
+		return new MapView(this.map.valueMapped(mapper));
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
 		return new MapView(this.map.entryMapped(mapper));
 	}
 	
 	@Override
-	public <U, R> ImmutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		return new MapView(this.map.flatMapped(mapper));
 	}

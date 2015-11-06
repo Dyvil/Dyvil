@@ -2,181 +2,15 @@ package dyvil.tools.compiler.util;
 
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.token.IToken;
 
 public class ParserUtil
 {
-	public static boolean isWhitespace(char c)
-	{
-		return c <= ' ';
-	}
-	
-	public static boolean isOpenBracket(char c)
-	{
-		switch (c)
-		{
-		case '(':
-		case '[':
-		case '{':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isCloseBracket(char c)
-	{
-		switch (c)
-		{
-		case ')':
-		case ']':
-		case '}':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isBinDigit(char c)
-	{
-		switch (c)
-		{
-		case '0':
-		case '1':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isOctDigit(char c)
-	{
-		switch (c)
-		{
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isDigit(char c)
-	{
-		switch (c)
-		{
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isHexDigit(char c)
-	{
-		switch (c)
-		{
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'e':
-		case 'f':
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'E':
-		case 'F':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isLetter(char c)
-	{
-		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
-	}
-	
-	public static boolean isSymbol(char c)
-	{
-		switch (c)
-		{
-		case '.':
-		case ',':
-		case ';':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isIdentifierPart(char c)
-	{
-		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
-	}
-	
-	public static boolean isIdentifierSymbol(char c)
-	{
-		switch (c)
-		{
-		case '.':
-		case '=':
-		case '>':
-		case '<':
-		case '+':
-		case '-':
-		case '*':
-		case '/':
-		case '!':
-		case '@':
-		case '#':
-		case '%':
-		case '^':
-		case '&':
-		case '~':
-		case '?':
-		case '|':
-		case '\\':
-		case ':':
-			return true;
-		}
-		return false;
-	}
-	
-	public static boolean isSeperator(char c)
-	{
-		switch (c)
-		{
-		case ',':
-		case ';':
-			return true;
-		}
-		return false;
-	}
+	// Token Type Utilities
 	
 	public static boolean isIdentifier(int type)
 	{
@@ -185,24 +19,49 @@ public class ParserUtil
 	
 	public static boolean isCloseBracket(int type)
 	{
-		return (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
+		return (type & BaseSymbols.CLOSE_BRACKET) == BaseSymbols.CLOSE_BRACKET;
 	}
 	
 	public static boolean isTerminator(int type)
 	{
-		return type == Symbols.COMMA || type == Symbols.SEMICOLON || type == Symbols.COLON || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET;
+		switch (type)
+		{
+		case Tokens.EOF:
+		case BaseSymbols.COMMA:
+		case BaseSymbols.SEMICOLON:
+		case BaseSymbols.COLON:
+		case BaseSymbols.CLOSE_CURLY_BRACKET:
+		case BaseSymbols.CLOSE_PARENTHESIS:
+		case BaseSymbols.CLOSE_SQUARE_BRACKET:
+			return true;
+		}
+		return false;
 	}
 	
-	public static boolean isTerminator2(int type)
+	public static boolean isExpressionTerminator(int type)
 	{
-		return type == Symbols.DOT || type == Symbols.COMMA || type == Symbols.SEMICOLON || type == Symbols.COLON || type == Symbols.EQUALS
-				|| type == Keywords.IS || type == Keywords.AS || type == Keywords.MATCH || (type & Symbols.CLOSE_BRACKET) == Symbols.CLOSE_BRACKET
-				|| type == Symbols.OPEN_SQUARE_BRACKET || type == Tokens.STRING_PART || type == Tokens.STRING_END;
+		if (isTerminator(type))
+		{
+			return true;
+		}
+		switch (type)
+		{
+		case BaseSymbols.DOT:
+		case BaseSymbols.EQUALS:
+		case DyvilKeywords.IS:
+		case DyvilKeywords.AS:
+		case DyvilKeywords.MATCH:
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
+		case Tokens.STRING_PART:
+		case Tokens.STRING_END:
+			return true;
+		}
+		return false;
 	}
 	
 	public static boolean isSeperator(int type)
 	{
-		return type == Symbols.COMMA || type == Symbols.SEMICOLON;
+		return type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON;
 	}
 	
 	public static boolean isOperator(IParserManager pm, IToken token, int type)
@@ -218,14 +77,14 @@ public class ParserUtil
 	{
 		switch (type)
 		{
-		case Keywords.TRUE:
+		case DyvilKeywords.TRUE:
 			return new BooleanValue(token.raw(), true);
-		case Keywords.FALSE:
+		case DyvilKeywords.FALSE:
 			return new BooleanValue(token.raw(), false);
 		case Tokens.STRING:
 			return new StringValue(token.raw(), token.stringValue());
-		case Tokens.CHAR:
-			return new CharValue(token.raw(), token.charValue());
+		case Tokens.SINGLE_QUOTED_STRING:
+			return new CharValue(token.raw(), token.stringValue());
 		case Tokens.INT:
 			return new IntValue(token.raw(), token.intValue());
 		case Tokens.LONG:

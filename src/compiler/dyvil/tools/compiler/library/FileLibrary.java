@@ -1,12 +1,16 @@
 package dyvil.tools.compiler.library;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+
+import dyvil.collection.Map;
+import dyvil.collection.mutable.HashMap;
+import dyvil.util.None;
+import dyvil.util.Option;
 
 public final class FileLibrary extends Library
 {
+	protected final Map<String, File> fileMap = new HashMap();
+	
 	public FileLibrary(File file)
 	{
 		super(file);
@@ -22,46 +26,62 @@ public final class FileLibrary extends Library
 	{
 	}
 	
-	@Override
-	public boolean isSubPackage(String name)
+	private File getFile(String name)
 	{
-		File f = new File(this.file, name);
-		if (!f.exists())
+		Option<File> option = this.fileMap.getOption(name);
+		if (option != None.instance)
 		{
-			return false;
+			return option.$bang();
 		}
 		
-		try
-		{
-			if (f.getCanonicalPath().endsWith(name))
-			{
-				return true;
-			}
-		}
-		catch (IOException ex)
-		{
-		}
-		return false;
-	}
-	
-	@Override
-	public InputStream getInputStream(String fileName)
-	{
-		File file = new File(this.file, fileName);
+		String path = name.replace('/', File.separatorChar);
+		File file = new File(this.file, path);
 		if (!file.exists())
 		{
+			this.fileMap.put(name, null);
 			return null;
 		}
 		
 		try
 		{
-			if (file.getCanonicalPath().endsWith(fileName))
+			if (!file.getCanonicalPath().endsWith(path))
 			{
-				return new FileInputStream(file);
+				this.fileMap.put(name, null);
+				return null;
 			}
 		}
 		catch (IOException ex)
 		{
+			System.err.println("Failed to get File Library location for " + name + " in " + this.file);
+			System.err.println("Path: " + path);
+			System.err.println("File: " + file);
+			ex.printStackTrace();
+		}
+		
+		this.fileMap.put(name, file);
+		return file;
+	}
+	
+	@Override
+	public boolean isSubPackage(String name)
+	{
+		return this.getFile(name) != null;
+	}
+	
+	@Override
+	public InputStream getInputStream(String fileName)
+	{
+		File file = this.getFile(fileName);
+		if (file != null)
+		{
+			try
+			{
+				return new FileInputStream(file);
+			}
+			catch (FileNotFoundException ex)
+			{
+				ex.printStackTrace();
+			}
 		}
 		return null;
 	}

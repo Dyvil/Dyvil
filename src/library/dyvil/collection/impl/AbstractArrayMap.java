@@ -1,6 +1,8 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -13,11 +15,13 @@ import dyvil.util.Some;
 
 public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 {
-	protected class ArrayEntry implements Entry<K, V>
+	protected class ArrayMapEntry implements Entry<K, V>
 	{
+		private static final long serialVersionUID = -967348930318928118L;
+		
 		private int index;
 		
-		public ArrayEntry(int index)
+		public ArrayMapEntry(int index)
 		{
 			this.index = index;
 		}
@@ -53,9 +57,19 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	protected int		size;
-	protected Object[]	keys;
-	protected Object[]	values;
+	private static final long serialVersionUID = -4958236535555733690L;
+	
+	protected static final int DEFAULT_CAPACITY = 10;
+	
+	protected transient int			size;
+	protected transient Object[]	keys;
+	protected transient Object[]	values;
+	
+	protected AbstractArrayMap(int capacity)
+	{
+		this.keys = new Object[capacity];
+		this.values = new Object[capacity];
+	}
 	
 	public AbstractArrayMap(K[] keys, V[] values)
 	{
@@ -119,6 +133,43 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	public AbstractArrayMap(AbstractArrayMap<K, V> map)
+	{
+		this.size = map.size;
+		this.keys = map.keys.clone();
+		this.values = map.values.clone();
+	}
+	
+	public AbstractArrayMap(Tuple2<K, V>... tuples)
+	{
+		int len = tuples.length;
+		Object[] keys = this.keys = new Object[len];
+		Object[] values = this.values = new Object[len];
+		
+		int size = 0;
+		
+		outer:
+		for (int i = 0; i < len; i++)
+		{
+			Tuple2 entry = tuples[i];
+			Object key = entry._1;
+			for (int j = 0; j < size; j++)
+			{
+				if (Objects.equals(key, keys[j]))
+				{
+					values[j] = entry._2;
+					continue outer;
+				}
+			}
+			
+			keys[size] = key;
+			values[size] = entry._2;
+			size++;
+		}
+		
+		this.size = size;
+	}
+	
 	@Override
 	public int size()
 	{
@@ -131,12 +182,108 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return this.size == 0;
 	}
 	
+	protected abstract class ArrayIterator<R> implements Iterator<R>
+	{
+		protected int index;
+		
+		@Override
+		public boolean hasNext()
+		{
+			return this.index < AbstractArrayMap.this.size;
+		}
+		
+		@Override
+		public void remove()
+		{
+			if (this.index == 0)
+			{
+				throw new IllegalStateException();
+			}
+			
+			AbstractArrayMap.this.removeAt(this.index--);
+		}
+	}
+	
+	@Override
+	public Iterator<Entry<K, V>> iterator()
+	{
+		return new ArrayIterator<Entry<K, V>>()
+		{
+			@Override
+			public Entry<K, V> next()
+			{
+				return new ArrayMapEntry(this.index++);
+			}
+		};
+	}
+	
+	@Override
+	public Iterator<K> keyIterator()
+	{
+		return new ArrayIterator<K>()
+		{
+			@Override
+			public K next()
+			{
+				return (K) AbstractArrayMap.this.keys[this.index++];
+			}
+		};
+	}
+	
+	@Override
+	public Iterator<V> valueIterator()
+	{
+		return new ArrayIterator<V>()
+		{
+			@Override
+			public V next()
+			{
+				return (V) AbstractArrayMap.this.values[this.index++];
+			}
+		};
+	}
+	
+	protected void putNew(K key, V value)
+	{
+		int index = this.size++;
+		if (index >= this.keys.length)
+		{
+			int newCapacity = (int) (this.size * 1.1F);
+			Object[] newKeys = new Object[newCapacity];
+			Object[] newValues = new Object[newCapacity];
+			System.arraycopy(this.keys, 0, newKeys, 0, index);
+			System.arraycopy(this.values, 0, newValues, 0, index);
+			this.keys = newKeys;
+			this.values = newValues;
+		}
+		this.keys[index] = key;
+		this.values[index] = value;
+	}
+	
+	protected V putInternal(K key, V value)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (Objects.equals(key, this.keys[i]))
+			{
+				V oldValue = (V) this.values[i];
+				this.values[i] = value;
+				return oldValue;
+			}
+		}
+		
+		this.putNew(key, value);
+		return null;
+	}
+	
+	protected abstract void removeAt(int index);
+	
 	@Override
 	public void forEach(Consumer<? super Entry<K, V>> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			action.accept(new Tuple2<K, V>((K) this.keys[i], (V) this.values[i]));
+			action.accept(new ArrayMapEntry(i));
 		}
 	}
 	
@@ -287,68 +434,26 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return None.instance;
 	}
 	
-	protected abstract class ArrayIterator<R> implements Iterator<R>
+	@Override
+	public void toArray(int index, Entry<K, V>[] store)
 	{
-		protected int index;
-		
-		@Override
-		public boolean hasNext()
+		for (int i = 0; i < this.size; i++)
 		{
-			return this.index < AbstractArrayMap.this.size;
-		}
-		
-		@Override
-		public void remove()
-		{
-			if (this.index == 0)
-			{
-				throw new IllegalStateException();
-			}
-			
-			AbstractArrayMap.this.removeAt(this.index--);
+			store[index++] = new ArrayMapEntry(i);
 		}
 	}
 	
 	@Override
-	public Iterator<Entry<K, V>> iterator()
+	public void toKeyArray(int index, Object[] store)
 	{
-		return new ArrayIterator<Entry<K, V>>()
-		{
-			@Override
-			public Entry<K, V> next()
-			{
-				return new ArrayEntry(this.index++);
-			}
-		};
+		System.arraycopy(this.keys, 0, store, index, this.size);
 	}
 	
 	@Override
-	public Iterator<K> keyIterator()
+	public void toValueArray(int index, Object[] store)
 	{
-		return new ArrayIterator<K>()
-		{
-			@Override
-			public K next()
-			{
-				return (K) AbstractArrayMap.this.keys[this.index++];
-			}
-		};
+		System.arraycopy(this.values, 0, store, index, this.size);
 	}
-	
-	@Override
-	public Iterator<V> valueIterator()
-	{
-		return new ArrayIterator<V>()
-		{
-			@Override
-			public V next()
-			{
-				return (V) AbstractArrayMap.this.values[this.index++];
-			}
-		};
-	}
-	
-	protected abstract void removeAt(int index);
 	
 	@Override
 	public java.util.Map<K, V> toJava()
@@ -389,5 +494,33 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		
+		for (int i = 0; i < this.size; i++)
+		{
+			out.writeObject(this.keys[i]);
+			out.writeObject(this.values[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.keys = new Object[this.size];
+		this.values = new Object[this.size];
+		
+		for (int i = 0; i < this.size; i++)
+		{
+			this.keys[i] = in.readObject();
+			this.values[i] = in.readObject();
+		}
 	}
 }

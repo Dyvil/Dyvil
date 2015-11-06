@@ -13,13 +13,11 @@ import dyvil.tools.compiler.ast.access.FieldAssign;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -33,9 +31,12 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class CodeClass extends AbstractClass
 {
@@ -160,12 +161,14 @@ public class CodeClass extends AbstractClass
 			this.interfaces[i] = this.interfaces[i].resolveType(markers, this);
 		}
 		
+		this.metadata.resolveTypes(markers, context);
+		
 		if (this.body != null)
 		{
 			this.body.resolveTypes(markers);
 		}
 		
-		this.metadata.resolve(markers, context);
+		this.metadata.resolveTypesBody(markers, context);
 	}
 	
 	@Override
@@ -195,6 +198,8 @@ public class CodeClass extends AbstractClass
 		{
 			this.interfaces[i].resolve(markers, this);
 		}
+		
+		this.metadata.resolve(markers, context);
 		
 		if (this.body != null)
 		{
@@ -252,6 +257,13 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		int illegalModifiers = this.modifiers & ~Modifiers.CLASS_MODIFIERS & ~Modifiers.CLASS_TYPE_MODIFIERS;
+		if (illegalModifiers != 0)
+		{
+			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("class", this.name),
+					ModifierTypes.FIELD_OR_METHOD.toString(illegalModifiers)));
+		}
+		
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
@@ -281,16 +293,8 @@ public class CodeClass extends AbstractClass
 			int modifiers = iclass.getModifiers();
 			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 			{
-				markers.add(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
+				markers.add(I18n.createMarker(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
 				continue;
-			}
-			if ((modifiers & Modifiers.SEALED) != 0 && iclass instanceof ExternalClass)
-			{
-				markers.add(this.position, "class.implement.sealed", iclass.getName());
-			}
-			if ((modifiers & Modifiers.DEPRECATED) != 0)
-			{
-				markers.add(this.position, "class.implement.deprecated", iclass.getName());
 			}
 		}
 		
@@ -304,22 +308,11 @@ public class CodeClass extends AbstractClass
 				int modifiers = superClass.getModifiers();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
+					markers.add(I18n.createMarker(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName()));
 				}
-				else
+				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					if ((modifiers & Modifiers.FINAL) != 0)
-					{
-						markers.add(this.position, "class.extend.final", superClass.getName());
-					}
-					else if ((modifiers & Modifiers.SEALED) != 0 && superClass instanceof ExternalClass)
-					{
-						markers.add(this.position, "class.extend.sealed", superClass.getName());
-					}
-					if ((modifiers & Modifiers.DEPRECATED) != 0)
-					{
-						markers.add(this.position, "class.extend.deprecated", superClass.getName());
-					}
+					markers.add(I18n.createMarker(this.position, "class.extend.final", superClass.getName()));
 				}
 			}
 		}
@@ -577,9 +570,9 @@ public class CodeClass extends AbstractClass
 		{
 			writer.visitAnnotation("Ldyvil/annotation/internal;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			writer.visitAnnotation("Ljava/lang/Deprecated;", true);
+			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
 		{

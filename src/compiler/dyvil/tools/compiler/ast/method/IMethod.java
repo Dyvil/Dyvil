@@ -7,15 +7,15 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IMethod extends IClassMember, ICallableMember, IMethodSignature, IContext
 {
@@ -26,6 +26,8 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
 	// Misc
+	
+	public boolean isAbstract();
 	
 	public void setParameters(IParameter[] parameters, int parameterCount);
 	
@@ -47,6 +49,8 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	// Compilation
 	
 	public boolean isIntrinsic();
+	
+	public int getInvokeOpcode();
 	
 	public String getDescriptor();
 	

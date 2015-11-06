@@ -5,7 +5,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
@@ -13,12 +12,14 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IModified;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.IObjectCompilable;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotated, IObjectCompilable
 {
@@ -150,9 +151,10 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		Name headerName = this.header.getName();
 		if (headerName != this.name)
 		{
-			Marker m = markers.create(this.position, "header.name");
+			Marker m = I18n.createMarker(this.position, "header.name");
 			m.addInfo("Header Name: " + headerName);
 			m.addInfo("Header Declaration Name: " + this.name);
+			markers.add(m);
 		}
 	}
 	

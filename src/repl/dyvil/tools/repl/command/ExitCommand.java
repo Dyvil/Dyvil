@@ -1,5 +1,7 @@
 package dyvil.tools.repl.command;
 
+import dyvil.tools.repl.DyvilREPL;
+
 public class ExitCommand implements ICommand
 {
 	@Override
@@ -15,7 +17,7 @@ public class ExitCommand implements ICommand
 	}
 	
 	@Override
-	public void execute(String... args)
+	public void execute(DyvilREPL repl, String... args)
 	{
 		if (args.length == 0)
 		{

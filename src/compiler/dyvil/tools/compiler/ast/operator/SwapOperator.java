@@ -12,9 +12,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class SwapOperator extends Value
 {
@@ -89,9 +90,10 @@ public class SwapOperator extends Value
 		IType type2 = this.right.getType();
 		if (!type1.equals(type2))
 		{
-			Marker m = markers.create(this.position, "swap.type");
+			Marker m = I18n.createMarker(this.position, "swap.type");
 			m.addInfo("Left-Hand Type: " + type1);
 			m.addInfo("Right-Hand Type: " + type2);
+			markers.add(m);
 		}
 	}
 	
@@ -132,25 +134,25 @@ public class SwapOperator extends Value
 		
 		if (leftInstance != null)
 		{
-			leftInstance.writeExpression(writer);
+			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
 		leftField.writeGet(writer, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
-			rightInstance.writeExpression(writer);
+			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
 		rightField.writeGet(writer, null, lineNumber);
 		
 		if (leftInstance != null)
 		{
-			leftInstance.writeExpression(writer);
+			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
 		leftField.writeSet(writer, null, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
-			rightInstance.writeExpression(writer);
+			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
 		rightField.writeSet(writer, null, null, lineNumber);
 	}

@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,16 +11,17 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IRawType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class TypeVarType implements IRawType
 {
@@ -49,6 +49,12 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.typeVar.getTheClass();
@@ -63,39 +69,31 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return type == this || this.typeVar.isSuperTypeOf(type);
 	}
 	
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return type == this || this.typeVar.isSuperTypeOf(type);
 	}
 	
 	@Override
-	public int getSubClassDistance(IType subtype)
+	public int getSuperTypeDistance(IType superType)
 	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
-	}
-	
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
+		return this.typeVar.getSuperTypeDistance(superType);
 	}
 	
 	@Override
 	public boolean equals(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return type == this || this.typeVar.isSuperTypeOf(type);
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return false;
+		return type == this;
 	}
 	
 	@Override
@@ -115,19 +113,15 @@ public class TypeVarType implements IRawType
 		IType t = context.resolveType(this.typeVar);
 		if (t != null)
 		{
-			if (t.isPrimitive())
-			{
-				return t.getObjectType();
-			}
 			return t;
 		}
-		return this;
+		return this.typeVar.getDefaultType();
 	}
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.typeVar == typeVar ? this : null;
+		return this.typeVar == typeVar ? this : this.typeVar.getDefaultType().resolveType(typeVar);
 	}
 	
 	@Override
@@ -155,10 +149,10 @@ public class TypeVarType implements IRawType
 		{
 		case CLASS:
 		case TYPE:
-			markers.add(this.getPosition(), "type.class.typevar");
+			markers.add(I18n.createMarker(this.getPosition(), "type.class.typevar"));
 			break;
 		case SUPER_TYPE:
-			markers.add(this.getPosition(), "type.super.typevar");
+			markers.add(I18n.createMarker(this.getPosition(), "type.super.typevar"));
 			break;
 		default:
 			break;
@@ -168,23 +162,24 @@ public class TypeVarType implements IRawType
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return null;
+		return this.typeVar.getDefaultType().resolveField(name);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		this.typeVar.getDefaultType().getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return null;
+		return this.typeVar.getDefaultType().getFunctionalMethod();
 	}
 	
 	@Override

@@ -7,13 +7,14 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class CaptureVariable implements IVariable
 {
@@ -174,9 +175,9 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public IDataMember capture(IContext context)
+	public boolean isCapturable()
 	{
-		return this;
+		return true;
 	}
 	
 	@Override
@@ -190,7 +191,7 @@ public class CaptureVariable implements IVariable
 	{
 		if (!this.variable.isCapturable())
 		{
-			markers.add(position, "capture.variable", this.variable.getName());
+			markers.add(I18n.createMarker(position, "capture.variable", this.variable.getName()));
 		}
 		else
 		{
@@ -259,6 +260,12 @@ public class CaptureVariable implements IVariable
 		this.variable.setIndex(this.index);
 		this.variable.writeSet(writer, instance, value, lineNumber);
 		this.variable.setIndex(index);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "#" + this.variable.toString();
 	}
 	
 	@Override

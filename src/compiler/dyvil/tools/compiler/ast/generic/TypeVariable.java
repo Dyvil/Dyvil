@@ -10,15 +10,15 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TypeVariable implements ITypeVariable
 {
@@ -171,6 +171,24 @@ public final class TypeVariable implements ITypeVariable
 	}
 	
 	@Override
+	public IType getDefaultType()
+	{
+		switch (this.upperBoundCount)
+		{
+		case 0:
+			return Types.ANY;
+		case 1:
+			return this.upperBounds[0];
+		case 2:
+			if (this.upperBounds[0].getTheClass() == Types.OBJECT_CLASS)
+			{
+				return this.upperBounds[1];
+			}
+		}
+		return Types.ANY;
+	}
+	
+	@Override
 	public int upperBoundCount()
 	{
 		return this.upperBoundCount;
@@ -250,6 +268,20 @@ public final class TypeVariable implements ITypeVariable
 			}
 		}
 		return true;
+	}
+	
+	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			int m = superType.getSubClassDistance(this.upperBounds[i]);
+			if (m > 0)
+			{
+				return m;
+			}
+		}
+		return 2;
 	}
 	
 	@Override

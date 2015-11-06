@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -15,15 +14,16 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class ArrayType implements IObjectType, ITyped
 {
@@ -61,6 +61,12 @@ public class ArrayType implements IObjectType, ITyped
 	public int typeTag()
 	{
 		return ARRAY;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return false;
 	}
 	
 	@Override
@@ -156,6 +162,16 @@ public class ArrayType implements IObjectType, ITyped
 	}
 	
 	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		if (!superType.isArrayType())
+		{
+			return superType.getTheClass() == Types.OBJECT_CLASS ? 1 : 0;
+		}
+		return this.type.getSuperTypeDistance(superType.getElementType());
+	}
+	
+	@Override
 	public float getSubTypeDistance(IType subtype)
 	{
 		if (!subtype.isArrayType())
@@ -203,7 +219,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(this.type.getPosition(), "type.super.array");
+			markers.add(I18n.createMarker(this.type.getPosition(), "type.super.array"));
 		}
 		
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -236,7 +252,12 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		return new ArrayType(this.type.getConcreteType(context));
+		IType concrete = this.type.getConcreteType(context);
+		if (!this.type.isPrimitive() && concrete.isPrimitive())
+		{
+			concrete = concrete.getObjectType();
+		}
+		return new ArrayType(concrete);
 	}
 	
 	@Override
@@ -261,13 +282,13 @@ public class ArrayType implements IObjectType, ITyped
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.type.getArrayClass().getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

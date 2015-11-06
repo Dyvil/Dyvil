@@ -1,6 +1,7 @@
 package dyvil.collection;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
@@ -10,49 +11,64 @@ import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public interface JavaMaps
 {
 	// Accessors
 	
 	/**
-	 * @see Map#containsKey(Object)
+	 * @see Map#$qmark$at(Object)
 	 */
-	public static @infix @inline boolean $qmark(java.util.Map map, Object key)
+	public static @infix @inline boolean $qmark$at(java.util.Map<?, ?> map, Object key)
 	{
 		return map.containsKey(key);
 	}
 	
 	/**
-	 * @see Map#contains(Object, Object)
+	 * @see Map#$qmark(Object, Object)
 	 */
-	public static @infix boolean $qmark(java.util.Map map, Object key, Object value)
+	public static @infix boolean $qmark(java.util.Map<?, ?> map, Object key, Object value)
 	{
 		return value == null ? map.get(key) == null : value.equals(map.get(key));
 	}
 	
 	/**
-	 * @see Map#contains(Entry)
+	 * @see Map#$qmark(Entry)
 	 */
-	public static @infix boolean $qmark(java.util.Map map, Tuple2 entry)
+	public static @infix boolean $qmark(java.util.Map<?, ?> map, Entry<?, ?> entry)
 	{
-		return $qmark(map, entry._1, entry._2);
+		return $qmark(map, entry.getKey(), entry.getValue());
 	}
 	
 	/**
-	 * @see Map#containsValue(Object)
+	 * @see Map#$qmark(Object)
 	 */
-	public static @infix @inline boolean $qmark$colon(java.util.Map map, Object value)
+	public static @infix @inline boolean $qmark$colon(java.util.Map<?, ?> map, Object value)
 	{
 		return map.containsValue(value);
 	}
 	
 	/**
-	 * @see Map#get(Object)
+	 * @see Map#subscript(Object)
 	 */
-	public static @infix @inline <K, V> V apply(java.util.Map<K, V> map, K key)
+	public static @infix @inline <K, V> V subscript(java.util.Map<K, V> map, Object key)
 	{
 		return map.get(key);
+	}
+	
+	/**
+	 * @see Map#subscript(Object)
+	 */
+	public static @infix @inline <K, V> Option<V> getOption(java.util.Map<K, V> map, Object key)
+	{
+		if (!map.containsKey(key))
+		{
+			return None.instance;
+		}
+		return new Some(map.get(key));
 	}
 	
 	// Mutating Operations
@@ -60,7 +76,7 @@ public interface JavaMaps
 	/**
 	 * @see Map#subscript_$eq(Object, Object)
 	 */
-	public static @infix @inline <K, V> void update(java.util.Map<K, V> map, K key, V value)
+	public static @infix @inline <K, V> void subscript_$eq(java.util.Map<K, V> map, K key, V value)
 	{
 		map.put(key, value);
 	}
@@ -68,9 +84,9 @@ public interface JavaMaps
 	/**
 	 * @see Map#$plus$eq(Tuple2)
 	 */
-	public static @infix @inline <K, V> void $plus$eq(java.util.Map<K, V> map, Tuple2<? extends K, ? extends V> entry)
+	public static @infix @inline <K, V> void $plus$eq(java.util.Map<K, V> map, Entry<? extends K, ? extends V> entry)
 	{
-		map.put(entry._1, entry._2);
+		map.put(entry.getKey(), entry.getValue());
 	}
 	
 	/**
@@ -82,11 +98,19 @@ public interface JavaMaps
 	}
 	
 	/**
+	 * @see Map#$minus$at$eq(Entry)
+	 */
+	public static @infix @inline <K, V> void $minus$at$eq(java.util.Map<K, V> map, Object key)
+	{
+		map.remove(key);
+	}
+	
+	/**
 	 * @see Map#$minus$eq(Entry)
 	 */
-	public static @infix @inline <K, V> void $minus$eq(java.util.Map<K, V> map, Tuple2<? super K, ? super V> entry)
+	public static @infix @inline <K, V> void $minus$eq(java.util.Map<K, V> map, Entry<?, ?> entry)
 	{
-		map.remove(entry._1, entry._2);
+		map.remove(entry.getKey(), entry.getKey());
 	}
 	
 	/**
@@ -100,20 +124,70 @@ public interface JavaMaps
 	/**
 	 * @see Map#$minus$minus$eq(Map)
 	 */
-	public static @infix <K, V> void $minus$minus$eq(java.util.Map<K, V> map1, java.util.Map<? super K, ? super V> map2)
+	public static @infix <K, V> void $minus$minus$eq(java.util.Map<K, V> map, java.util.Map<?, ?> remove)
 	{
-		for (java.util.Map.Entry<? super K, ? super V> e : map2.entrySet())
+		for (java.util.Map.Entry<?, ?> e : remove.entrySet())
 		{
-			map1.remove(e.getKey(), e.getValue());
+			remove.remove(e.getKey(), e.getValue());
 		}
 	}
 	
 	/**
-	 * @see Map#map(BiFunction)
+	 * @see Map#$minus$minus$eq(Collection)
+	 */
+	public static @infix <K, V> void $minus$minus$eq(java.util.Map<K, V> map, java.util.Collection<?> remove)
+	{
+		for (Object e : remove)
+		{
+			map.remove(e);
+		}
+	}
+	
+	/**
+	 * @see Map#mapValues(BiFunction)
 	 */
 	public static @infix @inline <K, V> void map(java.util.Map<K, V> map, BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		map.replaceAll(mapper);
+	}
+	
+	/**
+	 * @see Map#mapEntries(BiFunction)
+	 */
+	public static @infix @inline <K, V> void mapEntries(java.util.Map<K, V> map,
+			BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+	{
+		java.util.Map<K, V> temp = new LinkedHashMap<>(map.size() << 2);
+		for (java.util.Map.Entry<K, V> entry : map.entrySet())
+		{
+			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			if (newEntry != null)
+			{
+				temp.put(newEntry.getKey(), newEntry.getValue());
+			}
+		}
+		
+		map.clear();
+		map.putAll(temp);
+	}
+	
+	/**
+	 * @see Map#flatMap(BiFunction)
+	 */
+	public static @infix @inline <K, V> void flatMap(java.util.Map<K, V> map,
+			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+	{
+		java.util.Map<K, V> temp = new LinkedHashMap<>(map.size() << 2);
+		for (java.util.Map.Entry<K, V> entry : map.entrySet())
+		{
+			for (Entry<? extends K, ? extends V> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
+			{
+				temp.put(newEntry.getKey(), newEntry.getValue());
+			}
+		}
+		
+		map.clear();
+		map.putAll(temp);
 	}
 	
 	/**
@@ -140,7 +214,7 @@ public interface JavaMaps
 		MutableMap<K, V> newMap = new dyvil.collection.mutable.HashMap();
 		for (java.util.Map.Entry<K, V> entry : map.entrySet())
 		{
-			newMap.subscript_$eq(entry.getKey(), entry.getValue());
+			newMap.put(entry.getKey(), entry.getValue());
 		}
 		return newMap;
 	}

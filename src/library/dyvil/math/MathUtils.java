@@ -23,28 +23,39 @@ import dyvil.annotation.postfix;
 @Utility({ byte.class, short.class, int.class, long.class, float.class, double.class })
 public final class MathUtils
 {
-	/**
-	 * Used to calculate the index of a sin value in the {@link #sinTable}.
-	 * <p>
-	 * Value:<br>
-	 * <b>3.141592653589793D * 2D / 65536D</b>
-	 */
-	private static final double sinFactor = 0.00009587379924285257D;
-	
-	/**
-	 * Used to calculate the index of a sin value in the {@link #sinTable}.
-	 * <p>
-	 * Value:<br>
-	 * <b>1 / sinFactor<br>
-	 * 65536D / 3.141592653589793D * 2D</b>
-	 */
-	private static final double sinFactor2 = 10430.378350470453D;
-	
-	/**
-	 * A table of sin values storing 65536 values between {@code 0} and
-	 * {@code PI}.
-	 */
-	private static final float[] sinTable = new float[65536];
+	private static final class SinHolder
+	{
+		/**
+		 * Used to calculate the index of a sin value in the {@link #sinTable}.
+		 * <p>
+		 * Value:<br>
+		 * <b>3.141592653589793D * 2D / 65536D</b>
+		 */
+		private static final double sinFactor = 0.00009587379924285257D;
+		
+		/**
+		 * Used to calculate the index of a sin value in the {@link #sinTable}.
+		 * <p>
+		 * Value:<br>
+		 * <b>1 / sinFactor<br>
+		 * 65536D / 3.141592653589793D * 2D</b>
+		 */
+		private static final double sinFactor2 = 10430.378350470453D;
+		
+		/**
+		 * A table of sin values storing 65536 values between {@code 0} and
+		 * {@code PI}.
+		 */
+		private static final float[] sinTable = new float[65536];
+		
+		static
+		{
+			for (int i = 0; i < 65536; ++i)
+			{
+				sinTable[i] = (float) Math.sin(i * sinFactor);
+			}
+		}
+	}
 	
 	private static final int[] deBruijnBits = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18,
 			6, 11, 5, 10, 9 };
@@ -59,14 +70,6 @@ public final class MathUtils
 			227, 228, 229, 229, 230, 230, 231, 231, 232, 232, 233, 234, 234, 235, 235, 236, 236, 237, 237, 238, 238, 239, 240, 240, 241, 241, 242, 242, 243,
 			243, 244, 244, 245, 245, 246, 246, 247, 247, 248, 248, 249, 249, 250, 250, 251, 251, 252, 252, 253, 253, 254, 254, 255 };
 			
-	static
-	{
-		for (int i = 0; i < 65536; ++i)
-		{
-			sinTable[i] = (float) Math.sin(i * sinFactor);
-		}
-	}
-	
 	private MathUtils()
 	{
 	}
@@ -313,12 +316,12 @@ public final class MathUtils
 	
 	public static @infix float sin(float f)
 	{
-		return sinTable[(int) (f * sinFactor2) & 0xFFFF];
+		return SinHolder.sinTable[(int) (f * SinHolder.sinFactor2) & 0xFFFF];
 	}
 	
 	public static @infix float cos(float f)
 	{
-		return sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
+		return SinHolder.sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
 	public static @infix float tan(float f)
@@ -405,7 +408,7 @@ public final class MathUtils
 						xn = sqrtTable[i >> 22] << 7;
 					}
 				}
-				if (i >= 0x4000000)
+				else if (i >= 0x4000000)
 				{
 					xn = sqrtTable[i >> 20] << 6;
 				}
@@ -701,7 +704,7 @@ public final class MathUtils
 		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
-	public static @infix int sum(int[] ints)
+	public static @infix int sum(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -711,7 +714,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix long sum(long[] longs)
+	public static @infix long sum(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -721,7 +724,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix float sum(float[] floats)
+	public static @infix float sum(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -731,7 +734,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix double sum(double[] doubles)
+	public static @infix double sum(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -741,7 +744,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix float average(int[] ints)
+	public static @infix float average(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -751,7 +754,7 @@ public final class MathUtils
 		return total / (float) ints.length;
 	}
 	
-	public static @infix double average(long[] longs)
+	public static @infix double average(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -761,7 +764,7 @@ public final class MathUtils
 		return total / (double) longs.length;
 	}
 	
-	public static @infix float average(float[] floats)
+	public static @infix float average(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -771,7 +774,7 @@ public final class MathUtils
 		return total / floats.length;
 	}
 	
-	public static @infix double average(double[] doubles)
+	public static @infix double average(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -851,7 +854,7 @@ public final class MathUtils
 	
 	public static @infix int clearBit(int i, byte bit)
 	{
-		return i ^ ~(1 << bit);
+		return i & ~(1 << bit);
 	}
 	
 	public static @infix boolean apply(long l, byte bit)
@@ -871,6 +874,6 @@ public final class MathUtils
 	
 	public static @infix long clearBit(long l, byte bit)
 	{
-		return l ^ ~(1 << bit);
+		return l & ~(1 << bit);
 	}
 }

@@ -4,7 +4,7 @@ import java.io.File;
 
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.parsing.CodeFile;
 
 public interface IFileType
 {

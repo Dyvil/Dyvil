@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.Constructor;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -19,7 +17,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
 {
@@ -28,6 +29,11 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int	EQUALS		= 4;
 	protected static final int	HASHCODE	= 8;
 	protected static final int	TOSTRING	= 16;
+	
+	protected static final int	WRITE_OBJECT	= 32;
+	protected static final int	WRITE_REPLACE	= 64;
+	protected static final int	READ_OBJECT		= 128;
+	protected static final int	READ_RESOLVE	= 256;
 	
 	protected final IClass theClass;
 	
@@ -63,7 +69,7 @@ public class ClassMetadata implements IClassMetadata
 	private void checkMethod(IMethod m)
 	{
 		Name name = m.getName();
-		if (name == Name.equals)
+		if (name == Names.equals)
 		{
 			if (m.parameterCount() == 1 && m.getParameter(0).getType().equals(Types.OBJECT))
 			{
@@ -71,7 +77,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
-		if (name == Name.hashCode)
+		if (name == Names.hashCode)
 		{
 			if (m.parameterCount() == 0)
 			{
@@ -79,7 +85,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
-		if (name == Name.toString)
+		if (name == Names.toString)
 		{
 			if (m.parameterCount() == 0)
 			{
@@ -87,7 +93,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
-		if (name == Name.apply)
+		if (name == Names.apply)
 		{
 			if (m.parameterCount() == this.theClass.parameterCount())
 			{
@@ -106,10 +112,24 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		}
+		if (name == Names.readResolve || name == Names.writeReplace)
+		{
+			if (m.parameterCount() == 0 && m.getType().getTheClass() == Types.OBJECT_CLASS)
+			{
+				this.methods |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
+				return;
+			}
+			return;
+		}
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
 	{
 		IClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
@@ -144,7 +164,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers, IContext context)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		if ((this.methods & CONSTRUCTOR) != 0)
 		{
@@ -164,11 +184,16 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 		
-		markers.add(this.theClass.getPosition(), "constructor.super", superType.toString());
+		markers.add(I18n.createMarker(this.theClass.getPosition(), "constructor.super", superType.toString()));
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		if ((this.methods & CONSTRUCTOR) != 0)
 		{
@@ -178,7 +203,7 @@ public class ClassMetadata implements IClassMetadata
 		float match = this.constructor.getSignatureMatch(arguments);
 		if (match > 0)
 		{
-			list.add(new ConstructorMatch(this.constructor, match));
+			list.add(this.constructor, match);
 		}
 	}
 	

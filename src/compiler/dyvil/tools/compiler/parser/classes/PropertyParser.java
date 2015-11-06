@@ -3,14 +3,13 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.token.IToken;
 
 public class PropertyParser extends Parser implements IValued
 {
@@ -31,10 +30,10 @@ public class PropertyParser extends Parser implements IValued
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser();
 			return;
@@ -43,7 +42,7 @@ public class PropertyParser extends Parser implements IValued
 		switch (this.mode)
 		{
 		case GET_OR_SET:
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}
@@ -58,7 +57,7 @@ public class PropertyParser extends Parser implements IValued
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{
 				int nextType = token.next().type();
-				if (nextType == Symbols.COLON || nextType == Symbols.CLOSE_CURLY_BRACKET || nextType == Symbols.SEMICOLON)
+				if (nextType == BaseSymbols.COLON || nextType == BaseSymbols.CLOSE_CURLY_BRACKET || nextType == BaseSymbols.SEMICOLON)
 				{
 					Name name = token.nameValue();
 					if (name == get)
@@ -83,17 +82,18 @@ public class PropertyParser extends Parser implements IValued
 			return;
 		case GET:
 		case SET:
-			if (type == Symbols.COLON)
+			if (type == BaseSymbols.COLON)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			if (type == Symbols.SEMICOLON || type == Symbols.CLOSE_CURLY_BRACKET)
+			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				this.mode = GET_OR_SET;
 				return;
 			}
-			pm.report(new SyntaxError(token, "Invalid Property Declaration - ':' expected")); return;
+			pm.report(token, "Invalid Property Declaration - ':' expected");
+			return;
 		}
 	}
 	

@@ -4,23 +4,39 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractArrayMap;
+import dyvil.tuple.Tuple2;
 
+@NilConvertible
+@ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<K, V>
 {
-	protected static final int DEFAULT_CAPACITY = 10;
+	private static final long serialVersionUID = 5171722024919718041L;
+	
+	public static <K, V> ArrayMap<K, V> apply()
+	{
+		return new ArrayMap<K, V>(DEFAULT_CAPACITY);
+	}
+	
+	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... tuples)
+	{
+		return new ArrayMap(tuples);
+	}
 	
 	public ArrayMap()
 	{
-		super(new Object[DEFAULT_CAPACITY], new Object[DEFAULT_CAPACITY], 0, true);
+		super(DEFAULT_CAPACITY);
 	}
 	
 	public ArrayMap(int capacity)
 	{
-		super(new Object[capacity], new Object[capacity], 0, true);
+		super(capacity);
 	}
 	
 	public ArrayMap(K[] keys, V[] values)
@@ -48,6 +64,16 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 		super(map);
 	}
 	
+	public ArrayMap(AbstractArrayMap<K, V> map)
+	{
+		super(map);
+	}
+	
+	public ArrayMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
+	}
+	
 	@Override
 	public void clear()
 	{
@@ -58,38 +84,10 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 		this.size = 0;
 	}
 	
-	private void putNew(K key, V value)
-	{
-		int index = this.size++;
-		if (index >= this.keys.length)
-		{
-			int newCapacity = (int) (this.size * 1.1F);
-			Object[] newKeys = new Object[newCapacity];
-			Object[] newValues = new Object[newCapacity];
-			System.arraycopy(this.keys, 0, newKeys, 0, index);
-			System.arraycopy(this.values, 0, newValues, 0, newCapacity);
-			this.keys = newKeys;
-			this.values = newValues;
-		}
-		this.keys[index] = key;
-		this.values[index] = value;
-	}
-	
 	@Override
 	public V put(K key, V value)
 	{
-		for (int i = 0; i < this.size; i++)
-		{
-			if (Objects.equals(key, this.keys[i]))
-			{
-				V oldValue = (V) this.values[i];
-				this.values[i] = value;
-				return oldValue;
-			}
-		}
-		
-		this.putNew(key, value);
-		return null;
+		return this.putInternal(key, value);
 	}
 	
 	@Override
@@ -201,7 +199,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -224,7 +222,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new ArrayMap(this.keys, this.values, this.size);
+		return new ArrayMap(this);
 	}
 	
 	@Override
@@ -236,11 +234,6 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayMap(this.keys, this.values, this.size);
-	}
-	
-	public ImmutableMap<K, V> trustedImmutable()
-	{
-		return new dyvil.collection.immutable.ArrayMap(this.keys, this.values, this.size, true);
+		return new dyvil.collection.immutable.ArrayMap(this);
 	}
 }

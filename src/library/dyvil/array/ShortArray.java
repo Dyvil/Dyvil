@@ -60,6 +60,28 @@ public interface ShortArray
 		return array;
 	}
 	
+	public static short[] range(short start, short end)
+	{
+		int i = 0;
+		short[] array = new short[end - start + 1];
+		for (; start <= end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
+	public static short[] rangeOpen(short start, short end)
+	{
+		int i = 0;
+		short[] array = new short[end - start];
+		for (; start < end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })

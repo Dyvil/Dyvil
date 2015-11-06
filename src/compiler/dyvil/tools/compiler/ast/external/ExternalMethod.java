@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -27,8 +26,9 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalMethod extends AbstractMethod implements IExternalMethod
 {
@@ -139,6 +139,16 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			this.resolveAnnotations();
 		}
 		return this.intrinsicData != null;
+	}
+	
+	@Override
+	protected boolean isObjectMethod()
+	{
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		return super.isObjectMethod();
 	}
 	
 	@Override

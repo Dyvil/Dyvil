@@ -1,0 +1,34 @@
+package dyvil.test
+
+public class InheritanceTest
+{
+	interface IFoo[T] {
+		public T foo()
+	}
+	
+	interface IBar[T] {
+		public T bar()
+	}
+	
+	interface IFooBar[T] extends IFoo[T], IBar[T]
+	
+	class FooBar implements IFooBar[String]
+	{
+		public override String foo() = "FooBar.foo"
+		public override String bar() = "FooBar.bar"
+	}
+	
+	interface IFoo2 {
+		public String foo() = "IFoo2.foo"
+	}
+	
+	class FooFoo implements IFoo[Object] {
+		public override Object foo() = "FooFoo.foo"
+	}
+	
+	public static void main([String] args)
+	{
+		println(new FooFoo.foo)
+		println(new FooBar.foo)
+	}
+}

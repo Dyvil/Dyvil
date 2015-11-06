@@ -15,9 +15,10 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TryStatement extends Value implements IStatement, IDefaultContext
 {
@@ -269,8 +270,9 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 			
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
-				Marker marker = markers.create(block.position, "try.catch.type");
+				Marker marker = I18n.createMarker(block.position, "try.catch.type");
 				marker.addInfo("Exception Type: " + block.type);
+				markers.add(marker);
 			}
 			
 			block.action.check(markers, context);

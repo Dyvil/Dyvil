@@ -10,8 +10,9 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NullCheckOperator implements IValue
 {
@@ -50,7 +51,7 @@ public final class NullCheckOperator implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.BOOLEAN ? this : IValue.autoBox(this, Types.BOOLEAN, type);
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
 	}
 	
 	@Override
@@ -73,7 +74,7 @@ public final class NullCheckOperator implements IValue
 		
 		if (this.value.isPrimitive())
 		{
-			markers.add(this.value.getPosition(), "nullcheck.primitive");
+			markers.add(I18n.createMarker(this.value.getPosition(), "nullcheck.primitive"));
 		}
 	}
 	

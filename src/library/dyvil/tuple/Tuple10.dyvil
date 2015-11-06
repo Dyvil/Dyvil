@@ -12,5 +12,5 @@ public case class Tuple10[+A, +B, +C, +D, +E, +F, +G, +H, +I, +J] (
 		public final I _9
 		public final J _10)
 {
-	public override String toString() = @"(\(this._1), \(this._2), \(this._3), \(this._4), \(this._5), \(this._6), \(this._7), \(this._8), \(this._9), \(this._10))"
+	public override String toString() = "(\(this._1), \(this._2), \(this._3), \(this._4), \(this._5), \(this._6), \(this._7), \(this._8), \(this._9), \(this._10))"
 }

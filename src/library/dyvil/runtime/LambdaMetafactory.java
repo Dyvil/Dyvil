@@ -2,6 +2,9 @@ package dyvil.runtime;
 
 import java.lang.invoke.*;
 
+import dyvil.runtime.lambda.AbstractLMF;
+import dyvil.runtime.lambda.AnonymousClassLMF;
+
 public class LambdaMetafactory
 {
 	private static final Class<?>[]		EMPTY_CLASS_ARRAY	= new Class<?>[0];
@@ -10,7 +13,7 @@ public class LambdaMetafactory
 	public static CallSite metafactory(MethodHandles.Lookup caller, String invokedName, MethodType invokedType, MethodType samMethodType,
 			MethodHandle implMethod, MethodType instantiatedMethodType) throws LambdaConversionException
 	{
-		String type = '<' + invokedType.returnType().getName() + '>';
+		String type = '<' + invokedType.returnType().getName() + "::" + invokedName + '>';
 		return metafactory(caller, invokedName, invokedType, samMethodType, implMethod, instantiatedMethodType, type);
 	}
 	

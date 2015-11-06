@@ -2,17 +2,39 @@ package dyvil.collection.mutable;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTreeMap;
+import dyvil.tuple.Tuple2;
 
-public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K, V>
+@NilConvertible
+@ArrayConvertible
+public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements MutableMap<K, V>
 {
+	private static final long serialVersionUID = -7707452456610472904L;
+	
+	public static <K, V> TreeMap<K, V> apply()
+	{
+		return new TreeMap();
+	}
+	
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		TreeMap<K, V> map = new TreeMap();
+		for (Tuple2<K, V> entry : entries)
+		{
+			map.put(entry._1, entry._2);
+		}
+		return map;
+	}
+	
 	public TreeMap()
 	{
 		super();
@@ -43,7 +65,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public V put(K key, V value)
 	{
-		return this.putUnsafe(key, value);
+		return this.putInternal(key, value);
 	}
 	
 	@Override
@@ -54,7 +76,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 			return false;
 		}
 		
-		this.putUnsafe(key, value);
+		this.putInternal(key, value);
 		return true;
 	}
 	
@@ -125,16 +147,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 	
 	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action)
-	{
-		for (TreeEntry<K, V> e = this.getFirstEntry(); e != null; e = successor(e))
-		{
-			action.accept(e.key, e.value);
-		}
-	}
-	
-	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> function)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> function)
 	{
 		for (TreeEntry<K, V> e = this.getFirstEntry(); e != null; e = successor(e))
 		{

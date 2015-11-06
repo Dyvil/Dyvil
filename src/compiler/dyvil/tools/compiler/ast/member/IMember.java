@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.member;
 
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotated
 {

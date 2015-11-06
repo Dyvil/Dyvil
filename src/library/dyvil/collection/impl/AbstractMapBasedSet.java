@@ -1,6 +1,5 @@
 package dyvil.collection.impl;
 
-import java.util.Collections;
 import java.util.Iterator;
 
 import dyvil.collection.Entry;
@@ -9,6 +8,8 @@ import dyvil.collection.Set;
 
 public abstract class AbstractMapBasedSet<E> implements Set<E>
 {
+	private static final long serialVersionUID = -6579037312574546078L;
+	
 	protected abstract Map<E, Object> map();
 	
 	@Override
@@ -41,8 +42,44 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		// TODO Ensure type safety
-		return Collections.newSetFromMap((java.util.Map) this.map().toJava());
+		return new java.util.AbstractSet<E>()
+		{
+			@Override
+			public int size()
+			{
+				return AbstractMapBasedSet.this.map().size();
+			}
+			
+			@Override
+			public Iterator<E> iterator()
+			{
+				return AbstractMapBasedSet.this.map().keyIterator();
+			}
+			
+			@Override
+			public boolean contains(Object o)
+			{
+				return AbstractMapBasedSet.this.map().containsKey(o);
+			}
+			
+			@Override
+			public void clear()
+			{
+				AbstractMapBasedSet.this.map().clear();
+			}
+			
+			@Override
+			public boolean add(E e)
+			{
+				return AbstractMapBasedSet.this.map().put(e, VALUE) == null;
+			}
+			
+			@Override
+			public boolean remove(Object o)
+			{
+				return AbstractMapBasedSet.this.map().removeKey(o) != null;
+			}
+		};
 	}
 	
 	@Override

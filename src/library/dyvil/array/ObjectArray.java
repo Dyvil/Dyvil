@@ -16,14 +16,13 @@ import dyvil.lang.Double;
 import dyvil.lang.Float;
 import dyvil.lang.Int;
 import dyvil.lang.Long;
-import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
 import dyvil.lang.Short;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.range.StringRange;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -61,26 +60,26 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <T extends Ordered<T>> T[] range(T start, T end)
+	public static <T extends Rangeable<T>> T[] range(T start, T end)
 	{
 		int i = 0;
-		Ordered[] array = new Ordered[start.distanceTo(end) + 1];
+		Rangeable[] array = new Rangeable[start.distanceTo(end) + 1];
 		for (T current = start; current.$lt$eq(end); current = current.next())
 		{
-			array[i++] = start;
+			array[i++] = current;
 		}
 		return (T[]) array;
 	}
 	
-	public static String[] range(String start, String end)
+	public static <T extends Rangeable<T>> T[] rangeOpen(T start, T end)
 	{
 		int i = 0;
-		String[] array = new String[StringRange.distance(start, end) + 1];
-		for (String current = start; current.compareTo(end) <= 0; current = StringRange.next(current))
+		Rangeable[] array = new Rangeable[start.distanceTo(end)];
+		for (T current = start; current.$lt(end); current = current.next())
 		{
 			array[i++] = current;
 		}
-		return array;
+		return (T[]) array;
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })

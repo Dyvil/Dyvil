@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 
 /**
- * A <b>BidiQueryable</b> is a specialization of {@link Queryable} adds directed
- * specializations for direction-dependent methods such as
+ * A <b>BidiQueryable</b> is a specialization of {@link Queryable} that adds
+ * directed specializations for direction-dependent methods such as
  * {@link #fold(Object, BiFunction)} and {@link #reduce(BiFunction)}. These
  * specializations include {@link #reverseIterator()},
  * {@link #foldLeft(Object, BiFunction)}, {@link #foldRight(Object, BiFunction)}

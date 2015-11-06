@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -16,10 +15,9 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -30,9 +28,11 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public abstract class AbstractClass implements IClass
 {
@@ -131,9 +131,10 @@ public abstract class AbstractClass implements IClass
 		case "dyvil/annotation/object":
 			this.modifiers |= Modifiers.OBJECT_CLASS;
 			return false;
-		case "java/lang/Deprecated":
+		case Deprecation.DYVIL_INTERNAL:
+		case Deprecation.JAVA_INTERNAL:
 			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
+			return true;
 		case "java/lang/FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;
@@ -581,28 +582,9 @@ public abstract class AbstractClass implements IClass
 			return null;
 		}
 		
-		IMethod m;
 		if (this.body != null)
 		{
-			m = this.body.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		if (this.superType != null)
-		{
-			m = this.superType.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			m = this.interfaces[i].getFunctionalMethod();
+			IMethod m = this.body.getFunctionalMethod();
 			if (m != null)
 			{
 				return m;
@@ -647,6 +629,11 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public String[] getInterfaceArray()
 	{
+		if (this.interfaceCount <= 0)
+		{
+			return null;
+		}
+		
 		String[] interfaces = new String[this.interfaceCount];
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
@@ -661,7 +648,7 @@ public abstract class AbstractClass implements IClass
 		if (this.superType != null)
 		{
 			IType type = this.superType.resolveType(typeVar);
-			if (type != null && type != Types.ANY)
+			if (type != null)
 			{
 				return type.getConcreteType(concrete);
 			}
@@ -669,7 +656,7 @@ public abstract class AbstractClass implements IClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			IType type = this.interfaces[i].resolveType(typeVar);
-			if (type != null && type != Types.ANY)
+			if (type != null)
 			{
 				return type.getConcreteType(concrete);
 			}
@@ -812,7 +799,7 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.body != null)
 		{
@@ -854,7 +841,7 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		if (this.body != null)
 		{
@@ -916,9 +903,22 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameters[i] == variable)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		return null;
+		return variable;
 	}
 	
 	@Override
@@ -987,7 +987,12 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public String getFileName()
 	{
-		return this.getName().qualified;
+		int index = this.internalName.lastIndexOf('/');
+		if (index < 0)
+		{
+			return this.internalName;
+		}
+		return this.internalName.substring(index + 1);
 	}
 	
 	@Override
@@ -1003,7 +1008,7 @@ public abstract class AbstractClass implements IClass
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.toString();
+			this.annotations.toString(prefix, buffer);
 		}
 		
 		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));

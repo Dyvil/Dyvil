@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -13,10 +12,9 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IRawType;
@@ -25,8 +23,10 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class WildcardType implements IRawType, ITyped
 {
@@ -74,6 +74,12 @@ public final class WildcardType implements IRawType, ITyped
 	public int typeTag()
 	{
 		return WILDCARD_TYPE;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return false;
 	}
 	
 	@Override
@@ -180,7 +186,7 @@ public final class WildcardType implements IRawType, ITyped
 		
 		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
-			markers.add(this.position, "type.invalid.wildcard");
+			markers.add(I18n.createMarker(this.position, "type.invalid.wildcard"));
 		}
 	}
 	
@@ -188,21 +194,27 @@ public final class WildcardType implements IRawType, ITyped
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.bound != null)
+		{
 			this.bound.check(markers, context);
+		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
 		if (this.bound != null)
+		{
 			this.bound.foldConstants();
+		}
 	}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		if (this.bound != null)
+		{
 			this.bound.cleanup(context, compilableList);
+		}
 	}
 	
 	@Override
@@ -255,7 +267,7 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
@@ -264,7 +276,7 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	

@@ -3,13 +3,13 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueMap;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class ExpressionMapParser extends Parser implements IValueConsumer
 {
@@ -28,7 +28,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) 
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
@@ -41,13 +41,13 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 		{
 		case NAME:
 			this.mode = VALUE;
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.COLON)
+			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
 			{
 				this.key = token.nameValue();
 				pm.skip();
 				return;
 			}
-			this.key = Name.update;
+			this.key = Names.update;
 			return;
 		case VALUE:
 			this.mode = SEPERATOR;
@@ -55,10 +55,10 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 			return;
 		case SEPERATOR:
 			this.mode = NAME;
-			if (type != Symbols.COMMA && type != Symbols.SEMICOLON)
+			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.reparse();
-				pm.report(new SyntaxError(token, "Invalid Expression Map - ',' expected"));
+				pm.report(token, "Invalid Expression Map - ',' expected");
 			}
 			return;
 		}

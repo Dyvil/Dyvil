@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.collection.List;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -16,28 +15,66 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import static dyvil.reflect.Opcodes.*;
 
 public final class PrimitiveType implements IType
 {
+	// Duplicate of this mapping is present in dyvil.reflect.types.PrimitiveType
+	public static final int	VOID_CODE		= 0;
+	public static final int	BOOLEAN_CODE	= 1;
+	public static final int	BYTE_CODE		= 2;
+	public static final int	SHORT_CODE		= 3;
+	public static final int	CHAR_CODE		= 4;
+	public static final int	INT_CODE		= 5;
+	public static final int	LONG_CODE		= 6;
+	public static final int	FLOAT_CODE		= 7;
+	public static final int	DOUBLE_CODE		= 8;
+	
+	private static final long PROMOTION_BITS = 0x3C3C0CFC;
+	
+	static
+	{
+		// Code to generate the value of PROMOTION_BITS. Uncomment as needed.
+		// @formatter:off
+		/*
+		long promoBits = 0L;
+		promoBits |= bitMask(BYTE_CODE, SHORT_CODE) | bitMask(BYTE_CODE, CHAR_CODE) | bitMask(BYTE_CODE, INT_CODE);
+		promoBits |= bitMask(SHORT_CODE, CHAR_CODE) | bitMask(SHORT_CODE, INT_CODE);
+		// Integer types can be promoted to long, float and double
+		for (int i = BYTE_CODE; i <= INT_CODE; i++)
+		{
+			promoBits |= bitMask(i, LONG_CODE);
+			promoBits |= bitMask(i, FLOAT_CODE);
+		}
+		// Everything can be promoted to double
+		for (int i = BYTE_CODE; i <= FLOAT_CODE; i++)
+		{
+			promoBits |= bitMask(i, DOUBLE_CODE);
+		}
+		PROMOTION_BITS = promoBits;
+		*/
+		// @formatter:on
+	}
+	
 	protected final Name	name;
 	protected IClass		theClass;
 	
-	private final int		typecode;
-	private final String	internalName;
+	private final int	typecode;
+	private final char	typeChar;
+	
 	private final int		opcodeOffset1;
 	private final int		opcodeOffset2;
 	private final Object	frameType;
@@ -49,11 +86,11 @@ public final class PrimitiveType implements IType
 	private ReferenceType	refType;
 	private IType			simpleRefType;
 	
-	public PrimitiveType(Name name, int typecode, String internalName, int loadOpcode, int aloadOpcode, Object frameType)
+	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
 		this.name = name;
 		this.typecode = typecode;
-		this.internalName = internalName;
+		this.typeChar = typeChar;
 		this.opcodeOffset1 = loadOpcode - Opcodes.ILOAD;
 		this.opcodeOffset2 = aloadOpcode - Opcodes.IALOAD;
 		this.frameType = frameType;
@@ -109,21 +146,21 @@ public final class PrimitiveType implements IType
 	{
 		switch (typecode)
 		{
-		case ClassFormat.T_BOOLEAN:
+		case BOOLEAN_CODE:
 			return Types.BOOLEAN;
-		case ClassFormat.T_BYTE:
+		case BYTE_CODE:
 			return Types.BYTE;
-		case ClassFormat.T_SHORT:
+		case SHORT_CODE:
 			return Types.SHORT;
-		case ClassFormat.T_CHAR:
+		case CHAR_CODE:
 			return Types.CHAR;
-		case ClassFormat.T_INT:
+		case INT_CODE:
 			return Types.INT;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			return Types.LONG;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			return Types.FLOAT;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			return Types.DOUBLE;
 		default:
 			return Types.VOID;
@@ -146,6 +183,12 @@ public final class PrimitiveType implements IType
 	public int getTypecode()
 	{
 		return this.typecode;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return false;
 	}
 	
 	@Override
@@ -233,29 +276,78 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		if (type == this)
+		{
+			return true;
+		}
+		if (type.typeTag() == WILDCARD_TYPE)
+		{
+			return type.equals(this);
+		}
+		if (type.isArrayType())
+		{
+			return false;
+		}
+		
+		return this.isSuperClassOf(type);
+	}
+	
+	@Override
 	public boolean isSuperClassOf(IType that)
 	{
-		return this.theClass == that.getTheClass();
+		if (this.theClass == that.getTheClass())
+		{
+			return true;
+		}
+		
+		if (that.isPrimitive())
+		{
+			return isPromotable(that.getTypecode(), this.typecode);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		if (this.theClass == superType.getTheClass())
+		{
+			return 1;
+		}
+		if (superType.isArrayType())
+		{
+			return 0;
+		}
+		if (superType.isPrimitive() && isPromotable(this.typecode, superType.getTypecode()))
+		{
+			return 2;
+		}
+		return this.theClass.getSuperTypeDistance(superType);
+	}
+	
+	private static int bitMask(int from, int to)
+	{
+		return 1 << (from | to << 3);
+	}
+	
+	private static boolean isPromotable(int from, int to)
+	{
+		return (PROMOTION_BITS & bitMask(from, to)) != 0;
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		if (this == type)
-		{
-			return true;
-		}
-		if (type.getName() == this.name)
-		{
-			return true;
-		}
-		return IType.super.classEquals(type);
+		return type == this;
 	}
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return Types.ANY;
+		return null;
 	}
 	
 	@Override
@@ -276,7 +368,27 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
 	
@@ -299,7 +411,7 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.theClass != null)
 		{
@@ -308,7 +420,7 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
@@ -321,13 +433,13 @@ public final class PrimitiveType implements IType
 	@Override
 	public String getInternalName()
 	{
-		return this.internalName;
+		return this.theClass.getInternalName();
 	}
 	
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
-		buf.append(this.internalName);
+		buf.append(this.typeChar);
 	}
 	
 	@Override
@@ -339,7 +451,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
-		buf.append(this.internalName);
+		buf.append(this.typeChar);
 	}
 	
 	@Override
@@ -381,38 +493,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		int i;
-		switch (this.typecode)
-		{
-		case ClassFormat.T_BOOLEAN:
-			i = dyvil.reflect.types.PrimitiveType.BOOLEAN;
-			break;
-		case ClassFormat.T_BYTE:
-			i = dyvil.reflect.types.PrimitiveType.BYTE;
-			break;
-		case ClassFormat.T_SHORT:
-			i = dyvil.reflect.types.PrimitiveType.SHORT;
-			break;
-		case ClassFormat.T_CHAR:
-			i = dyvil.reflect.types.PrimitiveType.CHAR;
-			break;
-		case ClassFormat.T_INT:
-			i = dyvil.reflect.types.PrimitiveType.INT;
-			break;
-		case ClassFormat.T_LONG:
-			i = dyvil.reflect.types.PrimitiveType.LONG;
-			break;
-		case ClassFormat.T_FLOAT:
-			i = dyvil.reflect.types.PrimitiveType.FLOAT;
-			break;
-		case ClassFormat.T_DOUBLE:
-			i = dyvil.reflect.types.PrimitiveType.DOUBLE;
-			break;
-		default:
-			i = 0;
-		}
-		
-		writer.writeLDC(i);
+		writer.writeLDC(this.typecode);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/PrimitiveType", "apply", "(I)Ldyvil/reflect/types/PrimitiveType;", false);
 	}
 	
@@ -421,20 +502,20 @@ public final class PrimitiveType implements IType
 	{
 		switch (this.typecode)
 		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
+		case BOOLEAN_CODE:
+		case BYTE_CODE:
+		case SHORT_CODE:
+		case CHAR_CODE:
+		case INT_CODE:
 			writer.writeLDC(0);
 			break;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			writer.writeLDC(0L);
 			break;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			writer.writeLDC(0F);
 			break;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			writer.writeLDC(0D);
 			break;
 		}
@@ -451,20 +532,20 @@ public final class PrimitiveType implements IType
 		
 		switch (this.typecode)
 		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
+		case BOOLEAN_CODE:
+		case BYTE_CODE:
+		case SHORT_CODE:
+		case CHAR_CODE:
+		case INT_CODE:
 			writeIntCast(target, writer);
 			return;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			writeLongCast(target, writer);
 			return;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			writeFloatCast(target, writer);
 			return;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			writeDoubleCast(target, writer);
 			return;
 		}
@@ -474,19 +555,19 @@ public final class PrimitiveType implements IType
 	{
 		switch (cast.getTypecode())
 		{
-		case ClassFormat.T_BOOLEAN:
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
+		case BOOLEAN_CODE:
+		case BYTE_CODE:
+		case SHORT_CODE:
+		case CHAR_CODE:
+		case INT_CODE:
 			break;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			writer.writeInsn(I2L);
 			break;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			writer.writeInsn(I2F);
 			break;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			writer.writeInsn(I2D);
 			break;
 		}
@@ -496,27 +577,27 @@ public final class PrimitiveType implements IType
 	{
 		switch (cast.getTypecode())
 		{
-		case ClassFormat.T_BOOLEAN:
+		case BOOLEAN_CODE:
 			writer.writeInsn(L2I);
 			break;
-		case ClassFormat.T_BYTE:
+		case BYTE_CODE:
 			writer.writeInsn(L2B);
 			break;
-		case ClassFormat.T_SHORT:
+		case SHORT_CODE:
 			writer.writeInsn(L2S);
 			break;
-		case ClassFormat.T_CHAR:
+		case CHAR_CODE:
 			writer.writeInsn(L2C);
 			break;
-		case ClassFormat.T_INT:
+		case INT_CODE:
 			writer.writeInsn(L2I);
 			break;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			break;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			writer.writeInsn(L2F);
 			break;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			writer.writeInsn(L2D);
 			break;
 		}
@@ -526,27 +607,27 @@ public final class PrimitiveType implements IType
 	{
 		switch (cast.getTypecode())
 		{
-		case ClassFormat.T_BOOLEAN:
+		case BOOLEAN_CODE:
 			writer.writeInsn(F2I);
 			break;
-		case ClassFormat.T_BYTE:
+		case BYTE_CODE:
 			writer.writeInsn(F2B);
 			break;
-		case ClassFormat.T_SHORT:
+		case SHORT_CODE:
 			writer.writeInsn(F2S);
 			break;
-		case ClassFormat.T_CHAR:
+		case CHAR_CODE:
 			writer.writeInsn(F2C);
 			break;
-		case ClassFormat.T_INT:
+		case INT_CODE:
 			writer.writeInsn(F2I);
 			break;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			writer.writeInsn(F2L);
 			break;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			break;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			writer.writeInsn(F2D);
 			break;
 		}
@@ -556,28 +637,28 @@ public final class PrimitiveType implements IType
 	{
 		switch (cast.getTypecode())
 		{
-		case ClassFormat.T_BOOLEAN:
+		case BOOLEAN_CODE:
 			writer.writeInsn(D2I);
 			break;
-		case ClassFormat.T_BYTE:
+		case BYTE_CODE:
 			writer.writeInsn(D2B);
 			break;
-		case ClassFormat.T_SHORT:
+		case SHORT_CODE:
 			writer.writeInsn(D2S);
 			break;
-		case ClassFormat.T_CHAR:
+		case CHAR_CODE:
 			writer.writeInsn(D2C);
 			break;
-		case ClassFormat.T_INT:
+		case INT_CODE:
 			writer.writeInsn(D2I);
 			break;
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			writer.writeInsn(D2L);
 			break;
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			writer.writeInsn(D2F);
 			break;
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			break;
 		}
 	}
@@ -587,18 +668,18 @@ public final class PrimitiveType implements IType
 	{
 		switch (this.typecode)
 		{
-		case ClassFormat.T_BOOLEAN:
+		case BOOLEAN_CODE:
 			return BooleanValue.TRUE;
-		case ClassFormat.T_BYTE:
-		case ClassFormat.T_SHORT:
-		case ClassFormat.T_CHAR:
-		case ClassFormat.T_INT:
+		case BYTE_CODE:
+		case SHORT_CODE:
+		case CHAR_CODE:
+		case INT_CODE:
 			return IntValue.getNull();
-		case ClassFormat.T_LONG:
+		case LONG_CODE:
 			return LongValue.getNull();
-		case ClassFormat.T_FLOAT:
+		case FLOAT_CODE:
 			return FloatValue.getNull();
-		case ClassFormat.T_DOUBLE:
+		case DOUBLE_CODE:
 			return DoubleValue.getNull();
 		}
 		return null;

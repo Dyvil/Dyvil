@@ -3,13 +3,13 @@ package dyvil.tools.compiler.ast.pattern;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class BindingPattern extends Pattern
 {
@@ -88,31 +88,17 @@ public final class BindingPattern extends Pattern
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		if (this.variable != null)
-		{
-			this.writeVar(writer, varIndex);
-		}
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
 		if (this.variable != null)
 		{
-			this.writeVar(writer, varIndex);
+			this.variable.setType(this.type);
+			if (varIndex >= 0)
+			{
+				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+			}
+			this.variable.writeInit(writer, null);
 		}
-	}
-	
-	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
-	{
-		this.variable.setType(this.type);
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-		}
-		this.variable.writeInit(writer, null);
 	}
 	
 	@Override

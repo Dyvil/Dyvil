@@ -1,36 +1,32 @@
 package dyvil.tools.repl;
 
-import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
-import dyvil.tools.compiler.lexer.token.InferredSemicolon;
-import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Tokens;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.token.IToken;
 
-public class REPLParser implements IParserManager
+public class REPLParser extends ParserManager
 {
-	private TokenIterator	tokens;
-	private Parser			parser;
-	private int				skip;
-	private boolean			reparse;
-	
-	private MarkerList	markers;
+	private REPLContext	context;
 	private boolean		syntaxErrors;
 	
+	public REPLParser(REPLContext context)
+	{
+		this.context = context;
+	}
+	
 	@Override
-	public void report(SyntaxError error)
+	public void report(IToken token, String message)
 	{
 		this.syntaxErrors = true;
 		if (this.markers != null)
 		{
-			this.markers.add(error);
+			this.markers.add(new SyntaxError(token, message));
 		}
 	}
 	
@@ -43,29 +39,10 @@ public class REPLParser implements IParserManager
 		this.markers = markers;
 		this.syntaxErrors = false;
 		
-		IToken token = null, prev = null;
-		tokens.reset();
-		while (tokens.hasNext())
-		{
-			token = tokens.next();
-			token.setPrev(prev);
-			prev = token;
-		}
-		
-		if (prev == null)
-		{
-			return false;
-		}
-		
-		int type = prev.type();
-		if (!ParserUtil.isSeperator(type) && type != (Tokens.IDENTIFIER | Tokens.MOD_SYMBOL))
-		{
-			IToken semicolon = new InferredSemicolon(prev.endLine(), prev.endIndex());
-			semicolon.setPrev(prev);
-			prev.setNext(semicolon);
-		}
+		IToken token = null;
 		
 		tokens.reset();
+		
 		while (true)
 		{
 			if (this.reparse)
@@ -74,17 +51,26 @@ public class REPLParser implements IParserManager
 			}
 			else
 			{
-				token = tokens.next();
-				
-				if (token == null)
+				if (!this.tokens.hasNext())
 				{
 					break;
 				}
+				
+				token = tokens.next();
 			}
 			
 			if (this.skip > 0)
 			{
 				this.skip--;
+				continue;
+			}
+			
+			if (this.parser == null)
+			{
+				if (!token.isInferred())
+				{
+					this.report(token, "Unexpected Token: " + token);
+				}
 				continue;
 			}
 			
@@ -98,16 +84,13 @@ public class REPLParser implements IParserManager
 				return false;
 			}
 			
-			if (this.parser == null || (this.syntaxErrors && this.markers == null))
+			if (this.syntaxErrors && this.markers == null)
 			{
-				break;
-			}
-			
-			if (DyvilCompiler.parseStack)
-			{
-				System.out.println(token + ":\t\t" + this.parser.getName() + " @ " + this.parser.getMode());
+				return false;
 			}
 		}
+		
+		this.parseRemaining(token);
 		
 		return !this.syntaxErrors;
 	}
@@ -115,7 +98,7 @@ public class REPLParser implements IParserManager
 	@Override
 	public Operator getOperator(Name name)
 	{
-		Operator op = DyvilREPL.context.getOperator(name);
+		Operator op = this.context.getOperator(name);
 		if (op != null)
 		{
 			return op;
@@ -126,69 +109,5 @@ public class REPLParser implements IParserManager
 	protected boolean isRoot()
 	{
 		return this.parser == Parser.rootParser;
-	}
-	
-	@Override
-	public void skip()
-	{
-		this.skip++;
-	}
-	
-	@Override
-	public void skip(int tokens)
-	{
-		this.skip += tokens;
-	}
-	
-	@Override
-	public void reparse()
-	{
-		this.reparse = true;
-	}
-	
-	@Override
-	public void jump(IToken token)
-	{
-		this.tokens.jump(token);
-	}
-	
-	@Override
-	public void setParser(Parser parser)
-	{
-		this.parser = parser;
-	}
-	
-	@Override
-	public Parser getParser()
-	{
-		return this.parser;
-	}
-	
-	@Override
-	public void pushParser(Parser parser)
-	{
-		parser.setParent(this.parser);
-		this.parser = parser;
-	}
-	
-	@Override
-	public void pushParser(Parser parser, boolean reparse)
-	{
-		parser.setParent(this.parser);
-		this.parser = parser;
-		this.reparse = reparse;
-	}
-	
-	@Override
-	public void popParser()
-	{
-		this.parser = this.parser.getParent();
-	}
-	
-	@Override
-	public void popParser(boolean reparse)
-	{
-		this.parser = this.parser.getParent();
-		this.reparse = reparse;
 	}
 }

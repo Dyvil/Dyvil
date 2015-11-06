@@ -14,11 +14,11 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class AnonymousClassMetadata implements IClassMetadata
 {
-	private AnonymousClass		theClass;
+	private AnonymousClass	theClass;
 	private IConstructor	constructor;
 	private String			desc;
 	
@@ -29,9 +29,18 @@ public class AnonymousClassMetadata implements IClassMetadata
 	}
 	
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-	
 	}
 	
 	@Override
@@ -100,7 +109,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
 		CaptureField[] capturedFields = this.theClass.capturedFields;
-		int len = this.theClass.capturedFieldCount;
+		int capturedFieldCount = this.theClass.capturedFieldCount;
 		
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.MANDATED, "<init>", this.getDesc(), null, null));
 		int params = this.constructor.parameterCount();
@@ -123,15 +132,16 @@ public class AnonymousClassMetadata implements IClassMetadata
 		}
 		
 		int[] indexes = null;
-		if (len > 0)
+		if (capturedFieldCount > 0)
 		{
-			indexes = new int[len];
+			indexes = new int[capturedFieldCount];
 			
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < capturedFieldCount; i++)
 			{
 				CaptureField field = capturedFields[i];
 				field.write(writer);
-				indexes[i] = index = mw.registerParameter(index, field.name, field.getType(), Modifiers.MANDATED);
+				indexes[i] = index;
+				index = mw.registerParameter(index, field.name, field.getType(), Modifiers.MANDATED);
 			}
 		}
 		
@@ -151,9 +161,9 @@ public class AnonymousClassMetadata implements IClassMetadata
 			mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(), thisField.getDescription());
 		}
 		
-		if (len > 0)
+		if (capturedFieldCount > 0)
 		{
-			for (int i = 0; i < len; i++)
+			for (int i = 0; i < capturedFieldCount; i++)
 			{
 				CaptureField field = capturedFields[i];
 				mw.writeVarInsn(Opcodes.ALOAD, 0);

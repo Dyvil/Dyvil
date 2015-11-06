@@ -4,7 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 public final class Operator
 {
@@ -13,6 +13,8 @@ public final class Operator
 	public static final int	INFIX_NONE	= 2;
 	public static final int	INFIX_RIGHT	= 3;
 	public static final int	POSTFIX		= 4;
+	
+	public static final int PREFIX_PRECEDENCE = 1000;
 	
 	public final Name	name;
 	public int			precedence;
@@ -23,13 +25,13 @@ public final class Operator
 		this.name = name;
 	}
 	
-	Operator(Name name, int type)
+	public Operator(Name name, int type)
 	{
 		this.name = name;
 		this.type = type;
 	}
 	
-	Operator(Name name, int precedence, int type)
+	public Operator(Name name, int precedence, int type)
 	{
 		this.name = name;
 		this.type = type;
@@ -44,14 +46,6 @@ public final class Operator
 	public void setType(int type)
 	{
 		this.type = type;
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder buf = new StringBuilder();
-		this.toString(buf);
-		return buf.toString();
 	}
 	
 	public void write(DataOutput dos) throws IOException
@@ -75,25 +69,42 @@ public final class Operator
 		return new Operator(name, type);
 	}
 	
+	@Override
+	public String toString()
+	{
+		StringBuilder buf = new StringBuilder();
+		this.toString(buf);
+		return buf.toString();
+	}
+	
 	public void toString(StringBuilder buffer)
 	{
 		switch (this.type)
 		{
 		case PREFIX:
 			buffer.append("prefix operator ").append(this.name);
-			return;
+			break;
 		case POSTFIX:
 			buffer.append("postfix operator ").append(this.name);
+			break;
+		case INFIX_NONE:
+			buffer.append("infix operator ").append(this.name);
+			if (this.precedence != 0)
+			{
+				buffer.append(" { precedence ").append(this.precedence).append(" }");
+			}
 			return;
 		case INFIX_LEFT:
-			buffer.append("infix operator ").append(this.name).append(" { left, ").append(this.precedence).append(" }");
-			return;
-		case INFIX_NONE:
-			buffer.append("infix operator ").append(this.name).append(" { none, ").append(this.precedence).append(" }");
+			buffer.append("infix operator ").append(this.name).append(" { associativity left, precedence ").append(this.precedence).append(" }");
 			return;
 		case INFIX_RIGHT:
-			buffer.append("infix operator ").append(this.name).append(" { right, ").append(this.precedence).append(" }");
+			buffer.append("infix operator ").append(this.name).append(" { associativity right, precedence ").append(this.precedence).append(" }");
 			return;
+		}
+		
+		if (this.precedence != PREFIX_PRECEDENCE)
+		{
+			buffer.append(" { precedence ").append(this.precedence).append(" }");
 		}
 	}
 }

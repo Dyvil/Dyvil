@@ -5,32 +5,47 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.*;
+import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.tuple.Tuple2;
 
+@NilConvertible
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<K, V>
 {
-	protected static final int DEFAULT_CAPACITY = 10;
+	private static final long serialVersionUID = 5771226814337471265L;
+	
+	public static <K, V> TupleMap<K, V> apply()
+	{
+		return new TupleMap(DEFAULT_CAPACITY);
+	}
 	
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new TupleMap(entries, true);
+	}
+	
+	public static <K, V> AbstractTupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
 	{
 		return new TupleMap(entries);
 	}
 	
 	public TupleMap()
 	{
-		super(new Tuple2[DEFAULT_CAPACITY], 0);
+		super(DEFAULT_CAPACITY);
 	}
 	
 	public TupleMap(int capacity)
 	{
-		super(new Tuple2[capacity], 0);
+		super(capacity);
 	}
 	
-	public TupleMap(Tuple2<K, V>[] entries)
+	public TupleMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
 	}
@@ -55,6 +70,11 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<
 		super(map);
 	}
 	
+	public TupleMap(AbstractTupleMap<K, V> map)
+	{
+		super(map);
+	}
+	
 	@Override
 	public void clear()
 	{
@@ -63,19 +83,6 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<
 			this.entries[i] = null;
 		}
 		this.size = 0;
-	}
-	
-	private void putNew(Tuple2<K, V> tuple)
-	{
-		int index = this.size++;
-		if (index >= this.entries.length)
-		{
-			int newCapacity = (int) (this.size * 1.1F);
-			Tuple2[] newEntries = new Tuple2[newCapacity];
-			System.arraycopy(this.entries, 0, newEntries, 0, index);
-			this.entries = newEntries;
-		}
-		this.entries[index] = tuple;
 	}
 	
 	@Override
@@ -88,24 +95,6 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<
 	public V put(Entry<? extends K, ? extends V> entry)
 	{
 		return this.put(entry.toTuple());
-	}
-	
-	private V put(Tuple2<K, V> tuple)
-	{
-		K key = tuple._1;
-		for (int i = 0; i < this.size; i++)
-		{
-			Tuple2<K, V> entry = this.entries[i];
-			if (Objects.equals(key, entry._1))
-			{
-				V oldValue = entry._2;
-				this.entries[i] = tuple;
-				return oldValue;
-			}
-		}
-		
-		this.putNew(tuple);
-		return null;
 	}
 	
 	@Override
@@ -244,7 +233,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<
 	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -270,18 +259,18 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V>implements MutableMap<
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new TupleMap<K, V>(this.entries, this.size);
+		return new TupleMap<K, V>(this);
 	}
 	
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
-		return new TupleMap<RK, RV>();
+		return new TupleMap<RK, RV>(this.size);
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.TupleMap<>(this.entries, this.size);
+		return new dyvil.collection.immutable.TupleMap<K, V>(this);
 	}
 }

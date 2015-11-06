@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,7 +22,9 @@ import dyvil.collection.iterator.SingletonIterator;
 @TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>
 {
-	private E element;
+	private static final long serialVersionUID = -3612390510825873413L;
+	
+	private transient E element;
 	
 	public static <E> SingletonList<E> apply(E element)
 	{
@@ -182,7 +185,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return new SingletonList(mapper.apply(this.element));
+		return ImmutableList.<R> linked((Iterable<R>) mapper.apply(this.element));
 	}
 	
 	@Override
@@ -279,5 +282,15 @@ public class SingletonList<E> implements ImmutableList<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.writeObject(this.element);
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		this.element = (E) in.readObject();
 	}
 }
