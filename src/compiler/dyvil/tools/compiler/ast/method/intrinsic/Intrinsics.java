@@ -25,8 +25,6 @@ public class Intrinsics
 			return null;
 		}
 		
-		IValue strings = arguments.getValue(1, STRINGS);
-		
 		Array values = (Array) value;
 		
 		int length = values.valueCount();
@@ -53,6 +51,8 @@ public class Intrinsics
 		
 		if (complex)
 		{
+			IValue strings = arguments.getValue(1, STRINGS);
+			
 			// return readComplex(method, values, strings);
 		}
 		

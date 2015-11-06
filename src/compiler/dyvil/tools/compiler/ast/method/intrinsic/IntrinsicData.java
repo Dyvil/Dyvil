@@ -17,6 +17,18 @@ public interface IntrinsicData
 	
 	public static void writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments) throws BytecodeException
 	{
+		if (instance == null)
+		{
+			arguments.writeValue(index, method.getParameter(index), writer);
+			return;
+		}
 		
+		if (index == 0)
+		{
+			instance.writeExpression(writer);
+			return;
+		}
+		
+		arguments.writeValue(index - 1, method.getParameter(index - 1), writer);
 	}
 }

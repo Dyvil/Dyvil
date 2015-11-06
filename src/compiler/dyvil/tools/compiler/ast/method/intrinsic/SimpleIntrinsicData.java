@@ -29,13 +29,13 @@ public class SimpleIntrinsicData implements IntrinsicData
 			switch (i)
 			{
 			case LOAD_0:
-				IntrinsicData.writeArgument(writer, method, 0, instance, arguments);
+				IntrinsicData.writeArgument(writer, this.method, 0, instance, arguments);
 				continue;
 			case LOAD_1:
-				IntrinsicData.writeArgument(writer, method, 0, instance, arguments);
+				IntrinsicData.writeArgument(writer, this.method, 1, instance, arguments);
 				continue;
 			case LOAD_2:
-				IntrinsicData.writeArgument(writer, method, 0, instance, arguments);
+				IntrinsicData.writeArgument(writer, this.method, 2, instance, arguments);
 				continue;
 			}
 			
