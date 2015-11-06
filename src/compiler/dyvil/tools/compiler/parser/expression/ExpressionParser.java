@@ -596,7 +596,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			op = pm.getOperator(Util.stripEq(name));
 			if (op.type == Operator.INFIX_LEFT)
 			{
-				// Compound Operators are always right-associative, so create a copy
+				// Compound Operators are always right-associative, so create a
+				// copy
 				op = new Operator(op.name, op.precedence, Operator.INFIX_RIGHT);
 			}
 		}

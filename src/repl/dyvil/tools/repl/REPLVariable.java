@@ -5,7 +5,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.type.IType;
@@ -13,12 +12,11 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	private REPLContext context;
+	private REPLContext	context;
 	protected String	className;
 	private Class		theClass;
 	

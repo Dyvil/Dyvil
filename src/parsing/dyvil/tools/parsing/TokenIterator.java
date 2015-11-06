@@ -7,10 +7,10 @@ import dyvil.tools.parsing.token.IToken;
 
 public class TokenIterator implements Iterator<IToken>
 {
-	protected final IToken	first;
+	protected final IToken first;
 	
-	protected IToken		lastReturned;
-	protected IToken		next;
+	protected IToken	lastReturned;
+	protected IToken	next;
 	
 	public TokenIterator(IToken first)
 	{

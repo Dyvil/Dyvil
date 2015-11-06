@@ -9,7 +9,7 @@ import dyvil.collection.Set;
 public abstract class AbstractMapBasedSet<E> implements Set<E>
 {
 	private static final long serialVersionUID = -6579037312574546078L;
-
+	
 	protected abstract Map<E, Object> map();
 	
 	@Override
@@ -43,13 +43,13 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 	public java.util.Set<E> toJava()
 	{
 		return new java.util.AbstractSet<E>()
-		{		
+		{
 			@Override
 			public int size()
 			{
 				return AbstractMapBasedSet.this.map().size();
 			}
-
+			
 			@Override
 			public Iterator<E> iterator()
 			{

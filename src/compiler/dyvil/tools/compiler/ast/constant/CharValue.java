@@ -119,7 +119,7 @@ public final class CharValue implements IConstantValue
 		IClass iclass = type.getTheClass();
 		if (this.value.length() == 1 && this.type != STRING)
 		{
-			if ((type == Types.CHAR || type.isSuperTypeOf(Types.CHAR)))
+			if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR))
 			{
 				return true;
 			}

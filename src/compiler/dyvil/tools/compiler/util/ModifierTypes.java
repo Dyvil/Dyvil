@@ -440,7 +440,8 @@ public enum ModifierTypes
 				IClass theClass = member.getTheClass();
 				if (!theClass.isAbstract())
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString("member." + type, member.getName()), theClass.getName()));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString("member." + type, member.getName()),
+							theClass.getName()));
 				}
 				if (hasValue)
 				{

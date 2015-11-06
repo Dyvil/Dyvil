@@ -370,7 +370,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		out.writeObject(this.type);
 		out.writeInt(this.size);
 		
-		int entriesToBeWritten = size;
+		int entriesToBeWritten = this.size;
 		for (int i = 0; entriesToBeWritten > 0; i++)
 		{
 			if (this.values[i] != null)

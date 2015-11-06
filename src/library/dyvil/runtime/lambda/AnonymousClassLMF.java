@@ -47,8 +47,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 		LOOKUP = lookup;
 	}
 	
-	private static final int	CLASSFILE_VERSION		= 52;
-	private static final String	NAME_FACTORY			= "get$Lambda";
+	private static final int	CLASSFILE_VERSION	= 52;
+	private static final String	NAME_FACTORY		= "get$Lambda";
 	
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 	

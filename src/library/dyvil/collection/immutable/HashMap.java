@@ -16,7 +16,7 @@ import dyvil.util.ImmutableException;
 public class HashMap<K, V> extends AbstractHashMap<K, V>implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = -1489214367993445801L;
-
+	
 	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		return new HashMap<K, V>(entries);

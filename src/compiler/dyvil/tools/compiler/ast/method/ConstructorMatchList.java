@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.method;
 public final class ConstructorMatchList
 {
 	private IConstructor[]	constructors	= new IConstructor[4];
-	private float[]		values	= new float[4];
-	private int			size;
+	private float[]			values			= new float[4];
+	private int				size;
 	
 	public int size()
 	{
@@ -52,12 +52,12 @@ public final class ConstructorMatchList
 		
 		IConstructor bestCtor = this.constructors[0];
 		float bestMatch = this.values[0];
-		for (int i = 1; i < size; i++)
+		for (int i = 1; i < this.size; i++)
 		{
 			float match = this.values[i];
 			if (match < bestMatch)
 			{
-				bestCtor = constructors[i];
+				bestCtor = this.constructors[i];
 				bestMatch = match;
 			}
 		}

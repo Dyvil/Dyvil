@@ -263,7 +263,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	
 	protected void flatten()
 	{
-		this.ensureCapacityInternal((this.entries.length << 1));
+		this.ensureCapacityInternal(this.entries.length << 1);
 	}
 	
 	public void ensureCapacity(int newCapacity)

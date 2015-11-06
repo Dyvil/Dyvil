@@ -1207,7 +1207,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			return null;
 		}
 		
-		int mid = (lo + hi) >>> 1;
+		int mid = lo + hi >>> 1;
 		
 		TreeEntry<K, V> left = null;
 		if (lo < mid)

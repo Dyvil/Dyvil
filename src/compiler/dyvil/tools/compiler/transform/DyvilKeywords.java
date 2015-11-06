@@ -2,7 +2,7 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.parsing.lexer.Tokens;
 
-public class DyvilKeywords 
+public class DyvilKeywords
 {
 	public static final int	ABSTRACT		= Tokens.KEYWORD | 0x00010000;
 	public static final int	AS				= Tokens.KEYWORD | 0x00020000;
@@ -62,7 +62,7 @@ public class DyvilKeywords
 	public static final int	TYPE			= Tokens.KEYWORD | 0x00380000;
 	public static final int	USING			= Tokens.KEYWORD | 0x00390000;
 	public static final int	VAR				= Tokens.KEYWORD | 0x003A0000;
-	public static final int WHERE			= Tokens.KEYWORD | 0x003B0000;
+	public static final int	WHERE			= Tokens.KEYWORD | 0x003B0000;
 	public static final int	WHILE			= Tokens.KEYWORD | 0x003C0000;
 	
 	public static int getKeywordType(String s)

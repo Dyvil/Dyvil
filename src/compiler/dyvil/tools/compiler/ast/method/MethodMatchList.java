@@ -52,12 +52,12 @@ public final class MethodMatchList
 		
 		IMethod bestMethod = this.methods[0];
 		float bestMatch = this.values[0];
-		for (int i = 1; i < size; i++)
+		for (int i = 1; i < this.size; i++)
 		{
 			float match = this.values[i];
 			if (match < bestMatch)
 			{
-				bestMethod = methods[i];
+				bestMethod = this.methods[i];
 				bestMatch = match;
 			}
 		}

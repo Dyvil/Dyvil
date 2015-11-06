@@ -129,8 +129,8 @@ public final class Version implements Ordered<Version>, Immutable, Serializable
 		result = prime * result + this.major;
 		result = prime * result + this.minor;
 		result = prime * result + this.patch;
-		result = prime * result + ((this.prerelease == null) ? 0 : this.prerelease.hashCode());
-		result = prime * result + ((this.build == null) ? 0 : this.build.hashCode());
+		result = prime * result + (this.prerelease == null ? 0 : this.prerelease.hashCode());
+		result = prime * result + (this.build == null ? 0 : this.build.hashCode());
 		return result;
 	}
 	

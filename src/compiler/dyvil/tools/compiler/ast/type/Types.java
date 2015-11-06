@@ -44,7 +44,7 @@ public final class Types
 	public static final ClassType	THROWABLE			= new ClassType();
 	public static final ClassType	RUNTIME_EXCEPTION	= new ClassType();
 	public static final ClassType	IMMUTABLE			= new ClassType();
-	public static final ClassType SERIALIZABLE = new ClassType();
+	public static final ClassType	SERIALIZABLE		= new ClassType();
 	
 	public static IClass	VOID_CLASS;
 	public static IClass	BOOLEAN_CLASS;
@@ -63,7 +63,7 @@ public final class Types
 	public static IClass	THROWABLE_CLASS;
 	public static IClass	RUNTIME_EXCEPTION_CLASS;
 	public static IClass	IMMUTABLE_CLASS;
-	public static IClass SERIALIZABLE_CLASS;
+	public static IClass	SERIALIZABLE_CLASS;
 	
 	public static IClass	INTRINSIC_CLASS;
 	public static IClass	OVERRIDE_CLASS;

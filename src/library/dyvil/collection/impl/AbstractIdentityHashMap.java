@@ -229,7 +229,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	
 	public void ensureCapacity(int newCapacity)
 	{
-		if (newCapacity > (this.table.length >> 1))
+		if (newCapacity > this.table.length >> 1)
 		{
 			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity) << 1);
 		}

@@ -93,7 +93,7 @@ public final class StringPattern extends Pattern
 	{
 		writeStringInvJump(writer, varIndex, elseLabel, this.value);
 	}
-
+	
 	protected static void writeStringInvJump(MethodWriter writer, int varIndex, Label elseLabel, String value) throws BytecodeException
 	{
 		writer.writeLDC(value);

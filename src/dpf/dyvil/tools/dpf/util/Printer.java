@@ -7,8 +7,10 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 {
 	private int indent = 0;
 	
-	private void printIndent() {
-		for (int i = 0;i < this.indent; i++) {
+	private void printIndent()
+	{
+		for (int i = 0; i < this.indent; i++)
+		{
 			System.out.print('\t');
 		}
 	}

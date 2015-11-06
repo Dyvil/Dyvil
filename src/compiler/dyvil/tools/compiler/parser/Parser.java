@@ -22,7 +22,7 @@ public abstract class Parser
 	
 	protected int mode;
 	
-	protected Parser	parent;
+	protected Parser parent;
 	
 	public Parser()
 	{

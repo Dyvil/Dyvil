@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.expression.StringInterpolation;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.expression.StringInterpolation;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.parsing.lexer.Tokens;

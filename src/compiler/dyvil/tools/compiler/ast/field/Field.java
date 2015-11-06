@@ -309,7 +309,8 @@ public class Field extends Member implements IField
 		int illegalModifiers = this.modifiers & ~Modifiers.FIELD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("field", this.name), ModifierTypes.METHOD.toString(illegalModifiers)));
+			markers.add(
+					I18n.createError(this.position, "modifiers.illegal", I18n.getString("field", this.name), ModifierTypes.METHOD.toString(illegalModifiers)));
 		}
 	}
 	

@@ -11,7 +11,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class Node implements NodeElement, NodeVisitor
 {
 	protected Name				name;
-	protected List<Node>		nodes			= new ArrayList<Node>();
+	protected List<Node>		nodes		= new ArrayList<Node>();
 	protected List<NodeElement>	elements	= new ArrayList<NodeElement>();
 	
 	protected ICodePosition position;
@@ -93,7 +93,7 @@ public class Node implements NodeElement, NodeVisitor
 		
 		buffer.append(prefix).append('}');
 	}
-
+	
 	public void bodyToString(String prefix, StringBuilder buffer)
 	{
 		for (NodeElement element : this.elements)

@@ -65,11 +65,11 @@ public class Method extends AbstractMethod
 	{
 		super.resolveTypes(markers, this);
 		
-		if ((modifiers & Modifiers.PREFIX) != 0)
+		if ((this.modifiers & Modifiers.PREFIX) != 0)
 		{
 			// Static & Prefix will cause errors but does happen, so remove the
 			// prefix modifier
-			modifiers &= ~Modifiers.PREFIX;
+			this.modifiers &= ~Modifiers.PREFIX;
 		}
 		
 		for (int i = 0; i < this.genericCount; i++)
@@ -239,7 +239,7 @@ public class Method extends AbstractMethod
 		int illegalModifiers = this.modifiers & ~Modifiers.METHOD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(I18n.createError(position, "method.illegal_modifiers", this.name, ModifierTypes.FIELD.toString(illegalModifiers)));
+			markers.add(I18n.createError(this.position, "method.illegal_modifiers", this.name, ModifierTypes.FIELD.toString(illegalModifiers)));
 		}
 		
 		// Check illegal modifier combinations

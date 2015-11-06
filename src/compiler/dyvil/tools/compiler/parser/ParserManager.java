@@ -112,7 +112,7 @@ public class ParserManager implements IParserManager
 		
 		this.parseRemaining(token);
 	}
-
+	
 	protected void parseRemaining(IToken token)
 	{
 		if (token == null || this.hasStopped)

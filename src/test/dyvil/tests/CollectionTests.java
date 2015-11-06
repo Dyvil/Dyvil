@@ -31,24 +31,24 @@ public class CollectionTests
 	@Test
 	public void testSets()
 	{
-		testSet(EmptySet.apply());
-		testSet(SingletonSet.apply("abc"));
-		testSet(this.testSetBuilder(dyvil.collection.immutable.ArraySet.builder()));
-		testSet(this.testSetBuilder(dyvil.collection.immutable.HashSet.builder()));
+		this.testSet(EmptySet.apply());
+		this.testSet(SingletonSet.apply("abc"));
+		this.testSet(this.testSetBuilder(dyvil.collection.immutable.ArraySet.builder()));
+		this.testSet(this.testSetBuilder(dyvil.collection.immutable.HashSet.builder()));
 		
-		testSet(dyvil.collection.mutable.ArraySet.apply(SAMPLES));
-		testSet(dyvil.collection.mutable.HashSet.apply(SAMPLES));
+		this.testSet(dyvil.collection.mutable.ArraySet.apply(SAMPLES));
+		this.testSet(dyvil.collection.mutable.HashSet.apply(SAMPLES));
 	}
 	
 	@Test
 	public void testLists()
 	{
-		testList(EmptyList.apply());
-		testList(SingletonList.apply("abc"));
-		testList(this.testListBuilder(dyvil.collection.immutable.ArrayList.builder()));
+		this.testList(EmptyList.apply());
+		this.testList(SingletonList.apply("abc"));
+		this.testList(this.testListBuilder(dyvil.collection.immutable.ArrayList.builder()));
 		
-		testList(dyvil.collection.mutable.ArrayList.apply(SAMPLES));
-		testList(dyvil.collection.mutable.LinkedList.apply(SAMPLES));
+		this.testList(dyvil.collection.mutable.ArrayList.apply(SAMPLES));
+		this.testList(dyvil.collection.mutable.LinkedList.apply(SAMPLES));
 	}
 	
 	@Test
@@ -109,16 +109,16 @@ public class CollectionTests
 	
 	public void testSet(Set set)
 	{
-		testQueryable(set);
-		testCollection(set);
+		this.testQueryable(set);
+		this.testCollection(set);
 		
 	}
 	
 	public void testList(List list)
 	{
-		testQueryable(list);
-		testBidiQueryable(list);
-		testCollection(list);
+		this.testQueryable(list);
+		this.testBidiQueryable(list);
+		this.testCollection(list);
 	}
 	
 	public void testMap(Map map)
@@ -135,7 +135,7 @@ public class CollectionTests
 		
 		ImmutableList list = builder.build();
 		assertFalse("Builder list must not be null", list == null);
-		testBuilderError(builder);
+		this.testBuilderError(builder);
 		assertEquals("Builder list has incorrect size", list.size(), SAMPLES.length);
 		return list;
 	}
@@ -154,7 +154,7 @@ public class CollectionTests
 		
 		ImmutableSet set = builder.build();
 		assertFalse("Builder set must not be null", set == null);
-		testBuilderError(builder);
+		this.testBuilderError(builder);
 		assertEquals("Builder set has incorrect size", set.size(), SAMPLES.length);
 		return set;
 	}

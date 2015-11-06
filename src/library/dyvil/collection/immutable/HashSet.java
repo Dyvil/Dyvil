@@ -18,7 +18,7 @@ import static dyvil.collection.impl.AbstractHashMap.DEFAULT_CAPACITY;
 public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -1698577535888129119L;
-
+	
 	public static <E> HashSet<E> apply(E... elements)
 	{
 		return new HashSet(elements);

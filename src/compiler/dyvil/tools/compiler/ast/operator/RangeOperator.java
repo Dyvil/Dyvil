@@ -161,7 +161,7 @@ public class RangeOperator implements IValue
 		IValue value1 = this.firstValue.withType(elementType, elementType, markers, context);
 		if (value1 == null)
 		{
-			Util.createTypeError(markers, firstValue, elementType, typeContext, "range.start.type");
+			Util.createTypeError(markers, this.firstValue, elementType, typeContext, "range.start.type");
 		}
 		else
 		{
@@ -171,7 +171,7 @@ public class RangeOperator implements IValue
 		IValue value2 = this.lastValue.withType(elementType, elementType, markers, context);
 		if (value2 == null)
 		{
-			Util.createTypeError(markers, lastValue, elementType, typeContext, "range.end.type");
+			Util.createTypeError(markers, this.lastValue, elementType, typeContext, "range.end.type");
 		}
 		else
 		{

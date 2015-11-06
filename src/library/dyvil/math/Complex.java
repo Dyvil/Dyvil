@@ -743,7 +743,7 @@ public class Complex implements Number, Serializable
 		{
 			return false;
 		}
-		if (getClass() != obj.getClass())
+		if (this.getClass() != obj.getClass())
 		{
 			return false;
 		}
@@ -766,9 +766,9 @@ public class Complex implements Number, Serializable
 		int result = 1;
 		long temp;
 		temp = Double.doubleToLongBits(this.imag);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (temp ^ temp >>> 32);
 		temp = Double.doubleToLongBits(this.real);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + (int) (temp ^ temp >>> 32);
 		return result;
 	}
 	

@@ -144,7 +144,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	
 	protected void flatten()
 	{
-		this.ensureCapacityInternal((this.elements.length << 1));
+		this.ensureCapacityInternal(this.elements.length << 1);
 	}
 	
 	public void ensureCapacity(int newCapacity)
