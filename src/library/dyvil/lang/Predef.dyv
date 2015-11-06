@@ -33,6 +33,10 @@ public final class Predef
 	
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 	
+	// Closures
+	
+	public static => T closure[T](=> T c) = c
+	
 	public static (=> void) => void repeat(int n) = closure => for (int i : 0 ..< n) closure()
 	
 	public static long measureMillis(=> void closure)
@@ -51,7 +55,12 @@ public final class Predef
 	
 	// Strings
 	
+	@Intrinsic([ ARGUMENTS ])
+	public static char $(char c) = c
+	
 	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
+	
+	public infix char subscript(String s, int index) = s charAt index
 	
 	// Hashing
 	
