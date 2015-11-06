@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method.intrinsic;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.Array;
@@ -29,38 +30,79 @@ public class Intrinsics
 		
 		int length = values.valueCount();
 		int count = 0;
-		boolean complex = false;
+		
+		int[] ints = new int[length];
 		
 		for (int i = 0; i < length; i++)
 		{
-			value = values.getValue(i);
-			int opcode = value.intValue();
+			int opcode = values.getValue(i).intValue();
+			ints[i] = opcode;
+			
 			count++;
 			
 			if (Opcodes.isFieldOrMethodOpcode(opcode))
 			{
+				ints[i + 1] = values.getValue(i + 1).intValue();
+				ints[i + 2] = values.getValue(i + 2).intValue();
+				ints[i + 3] = values.getValue(i + 3).intValue();
 				i += 3;
-				complex = true;
+			}
+			else if (Opcodes.isJumpOpcode(opcode))
+			{
+				ints[i + 1] = values.getValue(i + 1).intValue();
+				i += 1;
+			}
+		}
+		
+		if (length > count)
+		{
+			IValue stringValue = arguments.getValue(1, STRINGS);
+			Array strings = (Array) stringValue;
+			
+			return readComplex(method, count, ints, strings);
+		}
+		
+		return new SimpleIntrinsicData(method, ints);
+	}
+	
+	private static IntrinsicData readComplex(IMethod method, int count, int[] ints, Array stringArray)
+	{
+		String[] strings;
+		
+		if (stringArray != null)
+		{
+			// Convert string constants to an array
+			int stringCount = stringArray.valueCount();
+			strings = new String[stringCount];
+			for (int i = 0; i < stringCount; i++)
+			{
+				strings[i] = stringArray.getValue(i).stringValue();
+			}
+		}
+		else
+		{
+			strings = null;
+		}
+		
+		// Convert jump instructions into a label array
+		int length = ints.length;
+		Label[] labels = new Label[count];
+		for (int i = 0; i < length; i++)
+		{
+			int opcode = ints[i];
+			
+			if (Opcodes.isFieldOrMethodOpcode(opcode))
+			{
+				i += 3;
 			}
 			else if (Opcodes.isJumpOpcode(opcode))
 			{
 				i += 1;
-				complex = true;
+				int target = ints[i + 1];
+				labels[target] = new Label();
 			}
 		}
 		
-		if (complex)
-		{
-			IValue strings = arguments.getValue(1, STRINGS);
-			
-			// return readComplex(method, values, strings);
-		}
-		
-		int[] ints = new int[count];
-		for (int i = 0; i < length; i++)
-		{
-			ints[i] = values.getValue(i).intValue();
-		}
-		return new SimpleIntrinsicData(method, ints);
+		return new SpecialIntrinsicData(method, ints, strings, labels);
 	}
 }
