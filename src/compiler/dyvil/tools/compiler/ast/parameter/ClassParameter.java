@@ -126,7 +126,11 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
+		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
+		{
+			markers.add(I18n.createError(position, "classparameter.assign.annotation", this.name.unqualified));
+		}
+		else if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
 		{
 			markers.add(I18n.createMarker(position, "classparameter.assign.final", this.name.unqualified));
 		}
@@ -232,7 +236,16 @@ public final class ClassParameter extends Parameter implements IField
 			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
-		writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
+		{
+			StringBuilder desc = new StringBuilder("()");
+			this.type.appendExtendedName(desc);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.theClass.getInternalName(), this.name.qualified, desc.toString(), true);
+		}
+		else
+		{
+			writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		}
 	}
 	
 	@Override

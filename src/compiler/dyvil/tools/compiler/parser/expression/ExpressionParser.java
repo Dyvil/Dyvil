@@ -202,7 +202,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				Annotation a = new Annotation();
 				pm.pushParser(new AnnotationParser(a));
 				this.value = new AnnotationValue(a);
-				this.mode = 0;
+				this.mode = END;
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
 				LambdaExpression le = new LambdaExpression(token.raw());
