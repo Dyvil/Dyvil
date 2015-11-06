@@ -28,7 +28,7 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	
 	static IValue getEnumValue(String enumClass, String name)
 	{
-		IType t = ClassFormat.internalToType(enumClass);
+		IType t = ClassFormat.extendedToType(enumClass);
 		return new EnumValue(t, Name.getQualified(name));
 	}
 	
