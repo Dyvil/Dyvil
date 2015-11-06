@@ -126,10 +126,6 @@ public enum ModifierTypes
 			break;
 		}
 		
-		if ((mod & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-		{
-			sb.append("@Deprecated ");
-		}
 		if ((mod & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			sb.append("internal ");
@@ -417,11 +413,11 @@ public enum ModifierTypes
 		// If the method does not have an implementation and is static
 		if (isStatic && isAbstract)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", I18n.getString(type, member.getName())));
+			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", I18n.getString("member." + type, member.getName())));
 		}
 		else if (isAbstract && isNative)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", I18n.getString(type, member.getName())));
+			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", I18n.getString("member." + type, member.getName())));
 		}
 		else
 		{
@@ -429,14 +425,14 @@ public enum ModifierTypes
 			{
 				if (!hasValue)
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.static.unimplemented", I18n.getString(type, member.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.static.unimplemented", I18n.getString("member." + type, member.getName())));
 				}
 			}
 			if (isNative)
 			{
 				if (!hasValue)
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.native.implemented", I18n.getString(type, member.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.native.implemented", I18n.getString("member." + type, member.getName())));
 				}
 			}
 			if (isAbstract)
@@ -444,17 +440,17 @@ public enum ModifierTypes
 				IClass theClass = member.getTheClass();
 				if (!theClass.isAbstract())
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString(type, member.getName(), theClass.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString("member." + type, member.getName()), theClass.getName()));
 				}
 				if (hasValue)
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.implemented", I18n.getString(type, member.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.implemented", I18n.getString("member." + type, member.getName())));
 				}
 			}
 		}
 		if (!hasValue && !isAbstract && !isNative)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.unimplemented", I18n.getString(type, member.getName())));
+			markers.add(I18n.createError(member.getPosition(), "modifiers.unimplemented", I18n.getString("member." + type, member.getName())));
 		}
 	}
 }

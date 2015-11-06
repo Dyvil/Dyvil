@@ -28,6 +28,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -130,9 +131,10 @@ public abstract class AbstractClass implements IClass
 		case "dyvil/annotation/object":
 			this.modifiers |= Modifiers.OBJECT_CLASS;
 			return false;
-		case "java/lang/Deprecated":
+		case Deprecation.DYVIL_INTERNAL:
+		case Deprecation.JAVA_INTERNAL:
 			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
+			return true;
 		case "java/lang/FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;

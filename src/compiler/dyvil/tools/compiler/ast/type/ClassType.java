@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -91,7 +92,7 @@ public class ClassType implements IRawType
 		{
 			if (iclass.hasModifier(Modifiers.DEPRECATED))
 			{
-				markers.add(I18n.createMarker(this.getPosition(), "type.access.deprecated", iclass.getName()));
+				Deprecation.checkDeprecation(markers, this.getPosition(), iclass, "type");
 			}
 			
 			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)

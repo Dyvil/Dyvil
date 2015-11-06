@@ -9,7 +9,9 @@ public @interface Deprecated
 		UNSPECIFIED, DANGEROUS, CONDEMNED, SUPERSEDED, UNIMPLEMENTED;
 	}
 	
-	public String description() default "";
+	public String value() default "";
+	
+	public String marker() default "The {member} is deprecated";
 	
 	public String since() default "";
 	

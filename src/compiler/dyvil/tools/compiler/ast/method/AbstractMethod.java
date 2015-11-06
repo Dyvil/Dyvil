@@ -36,6 +36,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
@@ -273,9 +274,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;
-		case "java/lang/Deprecated":
+		case Deprecation.JAVA_INTERNAL:
+		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
+			return true;
 		case "java/lang/Override":
 			this.modifiers |= Modifiers.OVERRIDE;
 			return false;
@@ -829,7 +831,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{
-			markers.add(I18n.createMarker(position, "method.access.deprecated", this.name));
+			Deprecation.checkDeprecation(markers, position, this, "method");
 		}
 		
 		switch (IContext.getVisibility(context, this))

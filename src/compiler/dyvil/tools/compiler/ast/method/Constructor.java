@@ -35,6 +35,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
@@ -159,9 +160,10 @@ public class Constructor extends Member implements IConstructor
 		case "dyvil/annotation/internal":
 			this.modifiers |= Modifiers.INTERNAL;
 			return false;
-		case "java/lang/Deprecated":
+		case Deprecation.JAVA_INTERNAL:
+		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
+			return true;
 		}
 		return true;
 	}
@@ -691,7 +693,7 @@ public class Constructor extends Member implements IConstructor
 	{
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{
-			markers.add(I18n.createMarker(position, "constructor.access.deprecated", this.theClass.getName()));
+			Deprecation.checkDeprecation(markers, position, this, "constructor");
 		}
 		
 		switch (IContext.getVisibility(context, this))
@@ -793,9 +795,9 @@ public class Constructor extends Member implements IConstructor
 		{
 			mw.visitAnnotation("Ldyvil/annotation/inline;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{

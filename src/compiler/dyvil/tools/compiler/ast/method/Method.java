@@ -23,6 +23,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
@@ -532,9 +533,9 @@ public class Method extends AbstractMethod
 		{
 			mw.visitAnnotation("Ldyvil/annotation/prefix;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{

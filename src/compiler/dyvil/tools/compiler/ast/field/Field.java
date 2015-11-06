@@ -19,6 +19,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
@@ -122,9 +123,10 @@ public class Field extends Member implements IField
 		case "dyvil/annotation/Volatile":
 			this.modifiers |= Modifiers.VOLATILE;
 			return false;
-		case "java/lang/Deprecated":
+		case Deprecation.JAVA_INTERNAL:
+		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
+			return true;
 		}
 		return true;
 	}
@@ -180,7 +182,7 @@ public class Field extends Member implements IField
 		
 		if (this.hasModifier(Modifiers.DEPRECATED))
 		{
-			markers.add(I18n.createMarker(position, "field.access.deprecated", this.name));
+			Deprecation.checkDeprecation(markers, position, this, "field");
 		}
 		
 		switch (IContext.getVisibility(context, this))

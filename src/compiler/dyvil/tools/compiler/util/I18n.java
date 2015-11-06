@@ -44,7 +44,7 @@ public class I18n
 	
 	static final Map<String, MarkerLevel> map = new HashMap();
 	
-	public static MarkerLevel getMarkerType(String key)
+	private static MarkerLevel getMarkerLevel(String key)
 	{
 		MarkerLevel m = map.get(key);
 		if (m == null)
@@ -69,45 +69,48 @@ public class I18n
 		return m;
 	}
 	
-	public static Marker createMarker(ICodePosition position, String key)
+	public static Marker createTextMarker(ICodePosition position, MarkerLevel level, String text)
 	{
-		MarkerLevel type = getMarkerType(key);
-		switch (type)
+		switch (level)
 		{
 		case ERROR:
-			return new SemanticError(position, I18n.getString(key));
+			return new SemanticError(position, text);
 		case INFO:
-			return new Info(position, I18n.getString(key));
+			return new Info(position, text);
 		case WARNING:
-			return new Warning(position, I18n.getString(key));
+			return new Warning(position, text);
 		default:
 			return null;
 		}
+	}
+	
+	public static Marker createMarker(ICodePosition position, String key)
+	{
+		return createTextMarker(position, getMarkerLevel(key), getString(key));
+	}
+	
+	public static Marker createMarker(ICodePosition position, MarkerLevel level, String key)
+	{
+		return createTextMarker(position, level, getString(key));
 	}
 	
 	public static Marker createMarker(ICodePosition position, String key, Object... args)
 	{
-		MarkerLevel type = getMarkerType(key);
-		switch (type)
-		{
-		case ERROR:
-			return new SemanticError(position, I18n.getString(key, args));
-		case INFO:
-			return new Info(position, I18n.getString(key, args));
-		case WARNING:
-			return new Warning(position, I18n.getString(key, args));
-		default:
-			return null;
-		}
+		return createTextMarker(position, getMarkerLevel(key), getString(key, args));
+	}
+	
+	public static Marker createMarker(ICodePosition position, MarkerLevel level, String key, Object... args)
+	{
+		return createTextMarker(position, level, getString(key, args));
 	}
 	
 	public static Marker createError(ICodePosition position, String key)
 	{
-		return new SemanticError(position, I18n.getString(key));
+		return new SemanticError(position, getString(key));
 	}
 	
 	public static Marker createError(ICodePosition position, String key, Object... args)
 	{
-		return new SemanticError(position, I18n.getString(key, args));
+		return new SemanticError(position, getString(key, args));
 	}
 }

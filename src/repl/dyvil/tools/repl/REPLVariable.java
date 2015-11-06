@@ -181,12 +181,6 @@ public class REPLVariable extends Field
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
-	{
-		return null;
-	}
-	
-	@Override
 	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (this.isConstant())
