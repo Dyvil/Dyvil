@@ -59,49 +59,49 @@ public class Long implements Integer, Serializable
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2B })
+	@Intrinsic({ LOAD_0, L2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2S })
+	@Intrinsic({ LOAD_0, L2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2C })
+	@Intrinsic({ LOAD_0, L2C })
 	public char charValue()
 	{
 		return (char) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2I })
+	@Intrinsic({ LOAD_0, L2I })
 	public int intValue()
 	{
 		return (int) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE })
+	@Intrinsic({ LOAD_0 })
 	public long longValue()
 	{
 		return this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F })
+	@Intrinsic({ LOAD_0, L2F })
 	public float floatValue()
 	{
 		return this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D })
+	@Intrinsic({ LOAD_0, L2D })
 	public double doubleValue()
 	{
 		return this.value;
@@ -110,21 +110,21 @@ public class Long implements Integer, Serializable
 	// Unary operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS })
+	@Intrinsic({ LOAD_0, LOAD_1 })
 	public @prefix Long $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LNEG })
+	@Intrinsic({ LOAD_0, LOAD_1, LNEG })
 	public @prefix Long $minus()
 	{
 		return Long.apply(-this.value);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LCONST_M1, LXOR })
+	@Intrinsic({ LOAD_0, LOAD_1, LCONST_M1, LXOR })
 	public @prefix Long $tilde()
 	{
 		return Long.apply(~this.value);
@@ -133,126 +133,126 @@ public class Long implements Integer, Serializable
 	// byte operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPEQ })
 	public boolean $eq$eq(byte v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPNE })
 	public boolean $bang$eq(byte v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLT })
 	public boolean $lt(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLE })
 	public boolean $lt$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGT })
 	public boolean $gt(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGE })
 	public boolean $gt$eq(byte v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LADD })
 	public Long $plus(byte v)
 	{
 		return Long.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSUB })
 	public Long $minus(byte v)
 	{
 		return Long.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LMUL })
 	public Long $times(byte v)
 	{
 		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, I2D, DDIV })
 	public Double $div(byte v)
 	{
 		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LREM })
 	public Long $percent(byte v)
 	{
 		return Long.apply(this.value % v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LDIV })
 	public Long $bslash(byte v)
 	{
 		return Long.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LAND })
 	public Long $amp(byte v)
 	{
 		return Long.apply(this.value & v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LOR })
 	public Long $bar(byte v)
 	{
 		return Long.apply(this.value | v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LXOR })
 	public Long $up(byte v)
 	{
 		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSHL })
 	public Long $lt$lt(byte v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSHR })
 	public Long $gt$gt(byte v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LUSHR })
 	public Long $gt$gt$gt(byte v)
 	{
 		return Long.apply(this.value >>> v);
@@ -261,126 +261,126 @@ public class Long implements Integer, Serializable
 	// short operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPEQ })
 	public boolean $eq$eq(short v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPNE })
 	public boolean $bang$eq(short v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLT })
 	public boolean $lt(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLE })
 	public boolean $lt$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGT })
 	public boolean $gt(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGE })
 	public boolean $gt$eq(short v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LADD })
 	public Long $plus(short v)
 	{
 		return Long.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSUB })
 	public Long $minus(short v)
 	{
 		return Long.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LMUL })
 	public Long $times(short v)
 	{
 		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, I2D, DDIV })
 	public Double $div(short v)
 	{
 		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LREM })
 	public Long $percent(short v)
 	{
 		return Long.apply(this.value % v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LDIV })
 	public Long $bslash(short v)
 	{
 		return Long.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LAND })
 	public Long $amp(short v)
 	{
 		return Long.apply(this.value & v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LOR })
 	public Long $bar(short v)
 	{
 		return Long.apply(this.value | v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LXOR })
 	public Long $up(short v)
 	{
 		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSHL })
 	public Long $lt$lt(short v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSHR })
 	public Long $gt$gt(short v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LUSHR })
 	public Long $gt$gt$gt(short v)
 	{
 		return Long.apply(this.value >>> v);
@@ -389,126 +389,126 @@ public class Long implements Integer, Serializable
 	// char operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPEQ })
 	public boolean $eq$eq(char v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPNE })
 	public boolean $bang$eq(char v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLT })
 	public boolean $lt(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLE })
 	public boolean $lt$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGT })
 	public boolean $gt(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGE })
 	public boolean $gt$eq(char v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LADD })
 	public Long $plus(char v)
 	{
 		return Long.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSUB })
 	public Long $minus(char v)
 	{
 		return Long.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LMUL })
 	public Long $times(char v)
 	{
 		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, I2D, DDIV })
 	public Double $div(char v)
 	{
 		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LREM })
 	public Long $percent(char v)
 	{
 		return Long.apply(this.value % v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LDIV })
 	public Long $bslash(char v)
 	{
 		return Long.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LAND })
 	public Long $amp(char v)
 	{
 		return Long.apply(this.value & v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LOR })
 	public Long $bar(char v)
 	{
 		return Long.apply(this.value | v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LXOR })
 	public Long $up(char v)
 	{
 		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSHL })
 	public Long $lt$lt(char v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSHR })
 	public Long $gt$gt(char v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LUSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LUSHR })
 	public Long $gt$gt$gt(char v)
 	{
 		return Long.apply(this.value >>> v);
@@ -517,126 +517,126 @@ public class Long implements Integer, Serializable
 	// int operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPEQ })
 	public boolean $eq$eq(int v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPNE })
 	public boolean $bang$eq(int v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLT })
 	public boolean $lt(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPLE })
 	public boolean $lt$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGT })
 	public boolean $gt(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, IF_LCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, IF_LCMPGE })
 	public boolean $gt$eq(int v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LADD })
 	public Long $plus(int v)
 	{
 		return Long.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LSUB })
 	public Long $minus(int v)
 	{
 		return Long.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LMUL })
 	public Long $times(int v)
 	{
 		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, I2D, DDIV })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, I2D, DDIV })
 	public Double $div(int v)
 	{
 		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LREM })
 	public Long $percent(int v)
 	{
 		return Long.apply(this.value % v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LDIV })
 	public Long $bslash(int v)
 	{
 		return Long.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LAND })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LAND })
 	public Long $amp(int v)
 	{
 		return Long.apply(this.value & v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LOR })
 	public Long $bar(int v)
 	{
 		return Long.apply(this.value | v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2L, LXOR })
+	@Intrinsic({ LOAD_0, LOAD_1, I2L, LXOR })
 	public Long $up(int v)
 	{
 		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LSHL })
+	@Intrinsic({ LOAD_0, LOAD_1, LSHL })
 	public Long $lt$lt(int v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, LSHR })
 	public Long $gt$gt(int v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LUSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, LUSHR })
 	public Long $gt$gt$gt(int v)
 	{
 		return Long.apply(this.value >>> v);
@@ -645,126 +645,126 @@ public class Long implements Integer, Serializable
 	// long operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_LCMPEQ })
 	public boolean $eq$eq(long v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_LCMPNE })
 	public boolean $bang$eq(long v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_LCMPLT })
 	public boolean $lt(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_LCMPLE })
 	public boolean $lt$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_LCMPGT })
 	public boolean $gt(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_LCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_LCMPGE })
 	public boolean $gt$eq(long v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LADD })
+	@Intrinsic({ LOAD_0, LOAD_1, LADD })
 	public Long $plus(long v)
 	{
 		return Long.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, LSUB })
 	public Long $minus(long v)
 	{
 		return Long.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, LMUL })
 	public Long $times(long v)
 	{
 		return Long.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, L2D, DDIV })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, L2D, DDIV })
 	public Double $div(long v)
 	{
 		return Double.apply((double) this.value / (double) v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LREM })
+	@Intrinsic({ LOAD_0, LOAD_1, LREM })
 	public Long $percent(long v)
 	{
 		return Long.apply(this.value % v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, LDIV })
 	public Long $bslash(long v)
 	{
 		return Long.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LAND })
+	@Intrinsic({ LOAD_0, LOAD_1, LAND })
 	public Long $amp(long v)
 	{
 		return Long.apply(this.value & v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LOR })
+	@Intrinsic({ LOAD_0, LOAD_1, LOR })
 	public Long $bar(long v)
 	{
 		return Long.apply(this.value | v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, LXOR })
+	@Intrinsic({ LOAD_0, LOAD_1, LXOR })
 	public Long $up(long v)
 	{
 		return Long.apply(this.value ^ v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, LSHL })
+	@Intrinsic({ LOAD_0, LOAD_1, L2I, LSHL })
 	public Long $lt$lt(long v)
 	{
 		return Long.apply(this.value << v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, LSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, L2I, LSHR })
 	public Long $gt$gt(long v)
 	{
 		return Long.apply(this.value >> v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2I, LUSHR })
+	@Intrinsic({ LOAD_0, LOAD_1, L2I, LUSHR })
 	public Long $gt$gt$gt(long v)
 	{
 		return Long.apply(this.value >>> v);
@@ -773,77 +773,77 @@ public class Long implements Integer, Serializable
 	// float operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, IF_FCMPEQ })
 	public boolean $eq$eq(float v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, IF_FCMPNE })
 	public boolean $bang$eq(float v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, IF_FCMPLT })
 	public boolean $lt(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, IF_FCMPLE })
 	public boolean $lt$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, IF_FCMPGT })
 	public boolean $gt(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, IF_FCMPGE })
 	public boolean $gt$eq(float v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FADD })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, FADD })
 	public Float $plus(float v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FSUB })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, FSUB })
 	public Float $minus(float v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FMUL })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, FMUL })
 	public Float $times(float v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FDIV })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, FDIV })
 	public Float $div(float v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2F, ARGUMENTS, FREM })
+	@Intrinsic({ LOAD_0, L2F, LOAD_1, FREM })
 	public Float $percent(float v)
 	{
 		return Float.apply(this.value % v);
@@ -852,77 +852,77 @@ public class Long implements Integer, Serializable
 	// double operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPEQ })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, IF_DCMPEQ })
 	public boolean $eq$eq(double v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPNE })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, IF_DCMPNE })
 	public boolean $bang$eq(double v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPLT })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, IF_DCMPLT })
 	public boolean $lt(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPLE })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, IF_DCMPLE })
 	public boolean $lt$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPGT })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, IF_DCMPGT })
 	public boolean $gt(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, IF_DCMPGE })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, IF_DCMPGE })
 	public boolean $gt$eq(double v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DADD })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, DADD })
 	public Double $plus(double v)
 	{
 		return Double.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DSUB })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, DSUB })
 	public Double $minus(double v)
 	{
 		return Double.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DMUL })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, DMUL })
 	public Double $times(double v)
 	{
 		return Double.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DDIV })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, DDIV })
 	public Double $div(double v)
 	{
 		return Double.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, L2D, ARGUMENTS, DREM })
+	@Intrinsic({ LOAD_0, L2D, LOAD_1, DREM })
 	public Double $percent(double v)
 	{
 		return Double.apply(this.value % v);

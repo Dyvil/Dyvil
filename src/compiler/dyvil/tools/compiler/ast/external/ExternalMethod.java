@@ -138,7 +138,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		{
 			this.resolveAnnotations();
 		}
-		return this.intrinsicOpcodes != null;
+		return this.intrinsicData != null;
 	}
 	
 	@Override

@@ -73,25 +73,25 @@ public interface CharArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix int length(char[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, CALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, CALOAD })
 	public static @infix char subscript(char[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, CASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, CASTORE })
 	public static @infix void subscript_$eq(char[] array, int i, char v)
 	{
 		array[i] = v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(char[] array)
 	{
 		return array.length == 0;

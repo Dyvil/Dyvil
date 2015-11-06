@@ -58,6 +58,12 @@ public final class BooleanValue implements IConstantValue
 	}
 	
 	@Override
+	public boolean booleanValue()
+	{
+		return this.value;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;

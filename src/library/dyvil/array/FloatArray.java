@@ -84,25 +84,25 @@ public interface FloatArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix int length(float[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, FALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, FALOAD })
 	public static @infix float subscript(float[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, FASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, FASTORE })
 	public static @infix void subscript_$eq(float[] array, int i, float v)
 	{
 		array[i] = v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;

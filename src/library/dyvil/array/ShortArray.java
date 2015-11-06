@@ -84,25 +84,25 @@ public interface ShortArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix int length(short[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, SALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, SALOAD })
 	public static @infix short subscript(short[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, SASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, SASTORE })
 	public static @infix void subscript_$eq(short[] array, int i, short v)
 	{
 		array[i] = v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;

@@ -36,55 +36,55 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		this.value = value;
 	}
 	
-	@Intrinsic({ INSTANCE })
+	@Intrinsic({ LOAD_0 })
 	public boolean booleanValue()
 	{
 		return this.value;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, BINV })
+	@Intrinsic({ LOAD_0, LOAD_1, BNOT })
 	public @prefix Boolean $bang()
 	{
 		return apply(!this.value);
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPEQ })
 	public boolean $eq$eq(boolean v)
 	{
 		return this.value == v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPNE })
 	public boolean $bang$eq(boolean v)
 	{
 		return this.value != v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IAND, IFNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IAND, IFNE })
 	public Boolean $amp(boolean v)
 	{
 		return apply(v && this.value);
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IOR, IFNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IOR, IFNE })
 	public Boolean $bar(boolean v)
 	{
 		return apply(v || this.value);
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IXOR, IFNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IXOR, IFNE })
 	public Boolean $up(boolean v)
 	{
 		return apply(v != this.value);
 	}
 	
-	@Intrinsic({ INSTANCE, BINV, ARGUMENTS, IOR, IFEQ })
+	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR, IFEQ })
 	public Boolean $eq$eq$gt(boolean v)
 	{
 		return apply(v || !this.value);
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_ICMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPEQ })
 	public Boolean $lt$eq$gt(boolean v)
 	{
 		return apply(v == this.value);

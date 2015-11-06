@@ -362,22 +362,15 @@ public final class MethodWriterImpl implements MethodWriter
 				this.frame.push(ClassFormat.LONG);
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
 				return;
-			case Opcodes.BINV:
-			{
-				Label label1 = new Label();
-				Label label2 = new Label();
-				this.mv.visitJumpInsn(Opcodes.IFEQ, label1);
-				this.mv.visitInsn(Opcodes.ICONST_0);
-				this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-				this.mv.visitLabel(label1);
-				this.mv.visitInsn(Opcodes.ICONST_1);
-				this.mv.visitLabel(label2);
-			}
-			case Opcodes.IINV:
+			case Opcodes.BNOT:
+				this.frame.pop();
+				this.writeBoolJump(Opcodes.IFEQ);
+				return;
+			case Opcodes.INOT:
 				this.mv.visitInsn(Opcodes.ICONST_M1);
 				this.mv.visitInsn(Opcodes.IXOR);
 				return;
-			case Opcodes.LINV:
+			case Opcodes.LNOT:
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
 				this.mv.visitInsn(Opcodes.IXOR);
 				return;
@@ -426,11 +419,26 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitInsn(Opcodes.D2I);
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
+			case ACMPEQ:
+				this.frame.pop();
+				this.frame.pop();
+				this.writeBoolJump(Opcodes.IF_ACMPEQ);
+				return;
+			case ACMPNE:
+				this.frame.pop();
+				this.frame.pop();
+				this.writeBoolJump(Opcodes.IF_ACMPNE);
+				return;
 			case Opcodes.OBJECT_EQUALS:
 				this.frame.pop();
 				this.frame.pop();
-				this.frame.push(ClassFormat.INT);
 				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+				this.frame.push(ClassFormat.BOOLEAN);
+				return;
+			case SWAP2:
+				this.frame.reserve(2);
+				this.mv.visitInsn(Opcodes.DUP2_X2);
+				this.mv.visitInsn(Opcodes.POP2);
 				return;
 			case Opcodes.AUTO_SWAP:
 				BackendUtil.swap(this);
@@ -451,16 +459,8 @@ public final class MethodWriterImpl implements MethodWriter
 			
 			if (opcode >= ICMPEQ && opcode <= ICMPLE)
 			{
-				opcode -= ICMPEQ;
-				
-				Label label1 = new Label();
-				Label label2 = new Label();
-				this.mv.visitJumpInsn(Opcodes.IF_ICMPEQ + opcode, label1);
-				this.mv.visitInsn(Opcodes.ICONST_0);
-				this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-				this.mv.visitLabel(label1);
-				this.mv.visitInsn(Opcodes.ICONST_1);
-				this.mv.visitLabel(label2);
+				this.writeBoolJump(Opcodes.IF_ICMPEQ + opcode - ICMPEQ);
+				return;
 			}
 			return;
 		}
@@ -483,6 +483,26 @@ public final class MethodWriterImpl implements MethodWriter
 			this.hasReturn = true;
 		}
 		this.mv.visitInsn(opcode);
+	}
+	
+	private void writeBoolJump(int jump)
+	{
+		Label label1 = new Label();
+		Label label2 = new Label();
+		
+		this.mv.visitJumpInsn(jump, label1);
+		this.mv.visitInsn(Opcodes.ICONST_0);
+		this.mv.visitJumpInsn(Opcodes.GOTO, label2);
+		this.mv.visitLabel(label1);
+		
+		this.frame.visitFrame(this.mv);
+		
+		this.mv.visitInsn(Opcodes.ICONST_1);
+		this.mv.visitLabel(label2);
+		
+		this.frame.push(ClassFormat.BOOLEAN);
+		
+		this.frame.visitFrame(this.mv);
 	}
 	
 	@Override

@@ -43,49 +43,49 @@ public class Float implements Number, Serializable
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2B })
+	@Intrinsic({ LOAD_0, F2B })
 	public byte byteValue()
 	{
 		return (byte) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2S })
+	@Intrinsic({ LOAD_0, F2S })
 	public short shortValue()
 	{
 		return (short) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2C })
+	@Intrinsic({ LOAD_0, F2C })
 	public char charValue()
 	{
 		return (char) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2I })
+	@Intrinsic({ LOAD_0, F2I })
 	public int intValue()
 	{
 		return (int) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2L })
+	@Intrinsic({ LOAD_0, F2L })
 	public long longValue()
 	{
 		return (long) this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE })
+	@Intrinsic({ LOAD_0 })
 	public float floatValue()
 	{
 		return this.value;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D })
+	@Intrinsic({ LOAD_0, F2D })
 	public double doubleValue()
 	{
 		return this.value;
@@ -94,14 +94,14 @@ public class Float implements Number, Serializable
 	// Unary operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS })
+	@Intrinsic({ LOAD_0, LOAD_1 })
 	public @prefix Float $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, FNEG })
+	@Intrinsic({ LOAD_0, LOAD_1, FNEG })
 	public @prefix Float $minus()
 	{
 		return Float.apply(-this.value);
@@ -110,77 +110,77 @@ public class Float implements Number, Serializable
 	// byte operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(byte v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPNE })
 	public boolean $bang$eq(byte v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLT })
 	public boolean $lt(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLE })
 	public boolean $lt$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGT })
 	public boolean $gt(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGE })
 	public boolean $gt$eq(byte v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FADD })
 	public Float $plus(byte v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FSUB })
 	public Float $minus(byte v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FMUL })
 	public Float $times(byte v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FDIV })
 	public Float $div(byte v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FREM })
 	public Float $percent(byte v)
 	{
 		return Float.apply(this.value % v);
@@ -189,77 +189,77 @@ public class Float implements Number, Serializable
 	// short operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(short v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPNE })
 	public boolean $bang$eq(short v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLT })
 	public boolean $lt(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLE })
 	public boolean $lt$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGT })
 	public boolean $gt(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGE })
 	public boolean $gt$eq(short v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FADD })
 	public Float $plus(short v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FSUB })
 	public Float $minus(short v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FMUL })
 	public Float $times(short v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FDIV })
 	public Float $div(short v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FREM })
 	public Float $percent(short v)
 	{
 		return Float.apply(this.value % v);
@@ -268,77 +268,77 @@ public class Float implements Number, Serializable
 	// char operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(char v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPNE })
 	public boolean $bang$eq(char v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLT })
 	public boolean $lt(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLE })
 	public boolean $lt$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGT })
 	public boolean $gt(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGE })
 	public boolean $gt$eq(char v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FADD })
 	public Float $plus(char v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FSUB })
 	public Float $minus(char v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FMUL })
 	public Float $times(char v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FDIV })
 	public Float $div(char v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FREM })
 	public Float $percent(char v)
 	{
 		return Float.apply(this.value % v);
@@ -347,77 +347,77 @@ public class Float implements Number, Serializable
 	// int operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPEQ })
 	public boolean $eq$eq(int v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPNE })
 	public boolean $bang$eq(int v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLT })
 	public boolean $lt(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPLE })
 	public boolean $lt$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGT })
 	public boolean $gt(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, IF_FCMPGE })
 	public boolean $gt$eq(int v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FADD })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FADD })
 	public Float $plus(int v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FSUB })
 	public Float $minus(int v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FMUL })
 	public Float $times(int v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FDIV })
 	public Float $div(int v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, I2F, FREM })
+	@Intrinsic({ LOAD_0, LOAD_1, I2F, FREM })
 	public Float $percent(int v)
 	{
 		return Float.apply(this.value % v);
@@ -426,77 +426,77 @@ public class Float implements Number, Serializable
 	// long operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, IF_FCMPEQ })
 	public boolean $eq$eq(long v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, IF_FCMPNE })
 	public boolean $bang$eq(long v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, IF_FCMPLT })
 	public boolean $lt(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, IF_FCMPLE })
 	public boolean $lt$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, IF_FCMPGT })
 	public boolean $gt(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, IF_FCMPGE })
 	public boolean $gt$eq(long v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FADD })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, FADD })
 	public Float $plus(long v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, FSUB })
 	public Float $minus(long v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, FMUL })
 	public Float $times(long v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, FDIV })
 	public Float $div(long v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, L2F, FREM })
+	@Intrinsic({ LOAD_0, LOAD_1, L2F, FREM })
 	public Float $percent(long v)
 	{
 		return Float.apply(this.value % v);
@@ -505,77 +505,77 @@ public class Float implements Number, Serializable
 	// float operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_FCMPEQ })
 	public boolean $eq$eq(float v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_FCMPNE })
 	public boolean $bang$eq(float v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_FCMPLT })
 	public boolean $lt(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_FCMPLE })
 	public boolean $lt$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_FCMPGT })
 	public boolean $gt(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, IF_FCMPGE })
 	public boolean $gt$eq(float v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, FADD })
+	@Intrinsic({ LOAD_0, LOAD_1, FADD })
 	public Float $plus(float v)
 	{
 		return Float.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, FSUB })
+	@Intrinsic({ LOAD_0, LOAD_1, FSUB })
 	public Float $minus(float v)
 	{
 		return Float.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, FMUL })
+	@Intrinsic({ LOAD_0, LOAD_1, FMUL })
 	public Float $times(float v)
 	{
 		return Float.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, FDIV })
+	@Intrinsic({ LOAD_0, LOAD_1, FDIV })
 	public Float $div(float v)
 	{
 		return Float.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, ARGUMENTS, FREM })
+	@Intrinsic({ LOAD_0, LOAD_1, FREM })
 	public Float $percent(float v)
 	{
 		return Float.apply(this.value % v);
@@ -584,77 +584,77 @@ public class Float implements Number, Serializable
 	// double operators
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPEQ })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, IF_DCMPEQ })
 	public boolean $eq$eq(double v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPNE })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, IF_DCMPNE })
 	public boolean $bang$eq(double v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPLT })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, IF_DCMPLT })
 	public boolean $lt(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPLE })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, IF_DCMPLE })
 	public boolean $lt$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPGT })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, IF_DCMPGT })
 	public boolean $gt(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, IF_DCMPGE })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, IF_DCMPGE })
 	public boolean $gt$eq(double v)
 	{
 		return this.value >= v;
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DADD })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, DADD })
 	public Double $plus(double v)
 	{
 		return Double.apply(this.value + v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DSUB })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, DSUB })
 	public Double $minus(double v)
 	{
 		return Double.apply(this.value - v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DMUL })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, DMUL })
 	public Double $times(double v)
 	{
 		return Double.apply(this.value * v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DDIV })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, DDIV })
 	public Double $div(double v)
 	{
 		return Double.apply(this.value / v);
 	}
 	
 	@Override
-	@Intrinsic({ INSTANCE, F2D, ARGUMENTS, DREM })
+	@Intrinsic({ LOAD_0, F2D, LOAD_1, DREM })
 	public Double $percent(double v)
 	{
 		return Double.apply(this.value % v);

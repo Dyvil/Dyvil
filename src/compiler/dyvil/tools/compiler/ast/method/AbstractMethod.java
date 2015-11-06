@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
-import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
@@ -24,6 +23,8 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
+import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -47,10 +48,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
 
-import static dyvil.reflect.Opcodes.ARGUMENTS;
 import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
-import static dyvil.reflect.Opcodes.INSTANCE;
 
 public abstract class AbstractMethod extends Member implements IMethod, ILabelContext
 {
@@ -71,7 +70,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	// Metadata
 	protected IClass	theClass;
 	protected String	descriptor;
-	protected int[]		intrinsicOpcodes;
+	protected IntrinsicData intrinsicData;
 	
 	public AbstractMethod(IClass iclass)
 	{
@@ -285,7 +284,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		case "dyvil/annotation/Intrinsic":
 			if (annotation != null)
 			{
-				this.readIntrinsicAnnotation(annotation);
+				this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
 				return this.getClass() != ExternalMethod.class;
 			}
 		}
@@ -347,25 +346,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public IValue getValue()
 	{
 		return this.value;
-	}
-	
-	protected final void readIntrinsicAnnotation(IAnnotation annotation)
-	{
-		IValue value = annotation.getArguments().getValue(0, Annotation.VALUE);
-		if (value.valueTag() != IValue.ARRAY)
-		{
-			return;
-		}
-		
-		Array array = (Array) value;
-		
-		int len = array.valueCount();
-		int[] opcodes = new int[len];
-		for (int i = 0; i < len; i++)
-		{
-			opcodes[i] = array.getValue(i).intValue();
-		}
-		this.intrinsicOpcodes = opcodes;
 	}
 	
 	@Override
@@ -724,7 +704,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(I18n.createMarker(position, "method.access.instance", this.name.unqualified));
 				}
 			}
-			else if (this.intrinsicOpcodes == null || !instance.isPrimitive())
+			else if (this.intrinsicData == null || !instance.isPrimitive())
 			{
 				IValue instance1 = IType.convertValue(instance, this.theClass.getType(), typeContext, markers, context);
 				if (instance1 == null)
@@ -936,7 +916,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isIntrinsic()
 	{
-		return this.intrinsicOpcodes != null;
+		return this.intrinsicData != null;
 	}
 	
 	@Override
@@ -1025,16 +1005,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
-			if (this.intrinsicOpcodes != null)
+			if (this.intrinsicData != null)
 			{
-				this.writeIntrinsic(writer, instance, arguments, lineNumber);
+				this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
+		else if (this.intrinsicData != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeIntrinsic(writer, instance, arguments, lineNumber);
+			this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
 			return;
 		}
 		
@@ -1061,18 +1041,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
-			if (this.intrinsicOpcodes != null)
+			if (this.intrinsicData != null)
 			{
-				this.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
+				this.intrinsicData.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
+		else if (this.intrinsicData != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
+			this.intrinsicData.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
 		}
+		
 		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
 		writer.writeJumpInsn(IFNE, dest);
 	}
@@ -1083,21 +1064,20 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if ((this.modifiers & Modifiers.STATIC) != 0)
 		{
 			// Intrinsic Case 1: Static (infix) Method, Instance not null
-			if (this.intrinsicOpcodes != null)
+			if (this.intrinsicData != null)
 			{
-				this.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
+				this.intrinsicData.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 				return;
 			}
 		}
 		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicOpcodes != null && (instance == null || instance.isPrimitive()))
+		else if (this.intrinsicData != null && (instance == null || instance.isPrimitive()))
 		{
-			this.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
+			this.intrinsicData.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
 		}
 		
 		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
-		
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
@@ -1111,7 +1091,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return;
 			}
 			
-			if (instance.isPrimitive() && this.intrinsicOpcodes != null)
+			if (instance.isPrimitive() && this.intrinsicData != null)
 			{
 				instance.writeExpression(writer);
 				return;
@@ -1154,109 +1134,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			IParameter param = this.parameters[i + parIndex];
 			arguments.writeValue(i, param, writer);
-		}
-	}
-	
-	private void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
-	{
-		if (this.type.getTheClass() == Types.BOOLEAN_CLASS)
-		{
-			int len = this.intrinsicOpcodes.length - 1;
-			if (this.intrinsicOpcodes[len] == IFNE)
-			{
-				for (int i = 0; i < len; i++)
-				{
-					int insn = this.intrinsicOpcodes[i];
-					if (insn == INSTANCE)
-					{
-						this.writeInstance(writer, instance);
-					}
-					else if (insn == ARGUMENTS)
-					{
-						this.writeArguments(writer, instance, arguments);
-					}
-					else
-					{
-						writer.writeInsn(insn, lineNumber);
-					}
-				}
-				return;
-			}
-			
-			Label ifEnd = new Label();
-			Label elseEnd = new Label();
-			this.writeIntrinsic(writer, ifEnd, instance, arguments, lineNumber);
-			
-			// If Block
-			writer.writeLDC(0);
-			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.writeLabel(ifEnd);
-			// Else Block
-			writer.writeLDC(1);
-			writer.writeLabel(elseEnd);
-			return;
-		}
-		
-		for (int i : this.intrinsicOpcodes)
-		{
-			if (i == INSTANCE)
-			{
-				this.writeInstance(writer, instance);
-			}
-			else if (i == ARGUMENTS)
-			{
-				this.writeArguments(writer, instance, arguments);
-			}
-			else
-			{
-				writer.writeInsn(i, lineNumber);
-			}
-		}
-	}
-	
-	private void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
-	{
-		for (int i : this.intrinsicOpcodes)
-		{
-			if (i == INSTANCE)
-			{
-				this.writeInstance(writer, instance);
-			}
-			else if (i == ARGUMENTS)
-			{
-				this.writeArguments(writer, instance, arguments);
-			}
-			else if (Opcodes.isJumpOpcode(i))
-			{
-				writer.writeJumpInsn(i, dest);
-			}
-			else
-			{
-				writer.writeInsn(i, lineNumber);
-			}
-		}
-	}
-	
-	private void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
-	{
-		for (int i : this.intrinsicOpcodes)
-		{
-			if (i == INSTANCE)
-			{
-				this.writeInstance(writer, instance);
-			}
-			else if (i == ARGUMENTS)
-			{
-				this.writeArguments(writer, instance, arguments);
-			}
-			else if (Opcodes.isJumpOpcode(i))
-			{
-				writer.writeJumpInsn(Opcodes.getInverseOpcode(i), dest);
-			}
-			else
-			{
-				writer.writeInsn(i, lineNumber);
-			}
 		}
 	}
 	

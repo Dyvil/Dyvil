@@ -73,25 +73,25 @@ public interface LongArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
 	public static @infix int length(long[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, LALOAD })
+	@Intrinsic({ LOAD_0, LOAD_1, LALOAD })
 	public static @infix long subscript(long[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, LASTORE })
+	@Intrinsic({ LOAD_0, LOAD_1, LASTORE })
 	public static @infix void subscript_$eq(long[] array, int i, long v)
 	{
 		array[i] = v;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	public static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
