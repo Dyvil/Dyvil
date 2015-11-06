@@ -248,7 +248,11 @@ public final class Annotation implements IAnnotation
 		for (int i = 0; i < count; i++)
 		{
 			IParameter param = iclass.getParameter(i);
-			visitValue(visitor, param.getName().qualified, this.arguments.getValue(i, param));
+			IValue v = this.arguments.getValue(i, param);
+			if (v != null)
+			{
+				visitValue(visitor, param.getName().qualified, v);
+			}
 		}
 		visitor.visitEnd();
 	}

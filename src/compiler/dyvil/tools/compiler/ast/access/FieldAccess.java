@@ -136,6 +136,11 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (this.field == null)
+		{
+			return this; // dont create an extra type error
+		}
+		
 		return type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
@@ -172,6 +177,11 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public IValue toConstant(MarkerList markers)
 	{
+		if (this.field == null)
+		{
+			return this; // do not create an extra error
+		}
+		
 		int depth = DyvilCompiler.maxConstantDepth;
 		IValue v = this;
 		
