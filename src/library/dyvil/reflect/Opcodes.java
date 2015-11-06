@@ -863,19 +863,19 @@ public interface Opcodes
 	 * Removes a {@code boolean} value from the stack, inverts it and pushes the
 	 * result back onto the stack.
 	 */
-	public static final int BINV = 270;
+	public static final int BNOT = 270;
 	
 	/**
 	 * Removes an {@code int} value from the stack, bitwise-inverts it and
 	 * pushes the result back onto the stack.
 	 */
-	public static final int IINV = 271;
+	public static final int INOT = 271;
 	
 	/**
 	 * Removes a {@code long} value from the stack, bitwise-inverts it and
 	 * pushes the result back onto the stack.
 	 */
-	public static final int LINV = 272;
+	public static final int LNOT = 272;
 	
 	public static final int	L2B	= 280;
 	public static final int	L2S	= 281;
@@ -893,6 +893,9 @@ public interface Opcodes
 	public static final int	ICMPGE	= 293;
 	public static final int	ICMPGT	= 294;
 	public static final int	ICMPLE	= 295;
+	
+	public static final int	ACMPEQ	= 296;
+	public static final int	ACMPNE	= 297;
 	
 	public static final int	IF_LCMPEQ	= 300;
 	public static final int	IF_LCMPNE	= 301;
@@ -1109,6 +1112,24 @@ public interface Opcodes
 			return IF_DCMPLE;
 		case IF_DCMPLE:
 			return IF_DCMPGT;
+			
+		case ICMPEQ:
+			return ICMPNE;
+		case ICMPNE:
+			return ICMPEQ;
+		case ICMPGE:
+			return ICMPLT;
+		case ICMPLT:
+			return ICMPGE;
+		case ICMPLE:
+			return ICMPGT;
+		case ICMPGT:
+			return ICMPLE;
+			
+		case ACMPEQ:
+			return ACMPNE;
+		case ACMPNE:
+			return ACMPEQ;
 		}
 		return 0;
 	}

@@ -42,7 +42,7 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return this.value;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, BINV })
+	@Intrinsic({ LOAD_0, LOAD_1, BNOT })
 	public @prefix Boolean $bang()
 	{
 		return apply(!this.value);
@@ -78,7 +78,7 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return apply(v != this.value);
 	}
 	
-	@Intrinsic({ LOAD_0, BINV, LOAD_1, IOR, IFEQ })
+	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR, IFEQ })
 	public Boolean $eq$eq$gt(boolean v)
 	{
 		return apply(v || !this.value);

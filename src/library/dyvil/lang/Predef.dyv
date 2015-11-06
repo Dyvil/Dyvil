@@ -15,16 +15,16 @@ public final class Predef
 	
 	// Object Operators
 	
-	@Intrinsic([ INSTANCE, ARGUMENTS, OBJECT_EQUALS, IFNE ])
+	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS ])
 	public infix boolean ==(Object o1, Object o2) = o1 equals o2
 	
-	@Intrinsic([ INSTANCE, ARGUMENTS, IF_ACMPEQ ])
+	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
 	public infix boolean ===(Object o1, Object o2) = o1 === o2
 	
-	@Intrinsic([ INSTANCE, ARGUMENTS, OBJECT_EQUALS, IFEQ ])
+	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS, BNOT ])
 	public infix boolean !=(Object o1, Object o2) = !(o1 equals o2)
 	
-	@Intrinsic([ INSTANCE, ARGUMENTS, IF_ACMPNE ])
+	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
 	public infix boolean !==(Object o1, Object o2) = o1 !== o2
 	
 	// Lists
@@ -55,7 +55,7 @@ public final class Predef
 	
 	// Strings
 	
-	@Intrinsic([ ARGUMENTS ])
+	@Intrinsic([ LOAD_0 ])
 	public static char $(char c) = c
 	
 	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
@@ -78,7 +78,7 @@ public final class Predef
 	
 	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
 	
-	@Intrinsic([ INSTANCE, ARGUMENTS ])
+	@Intrinsic([ LOAD_0, LOAD_1 ])
 	public infix int ##(int i) = i
 	
 	public infix int ##(long l) = (l ^ l >>> 32) as int
