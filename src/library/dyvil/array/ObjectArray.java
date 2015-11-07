@@ -20,6 +20,7 @@ import dyvil.lang.Rangeable;
 import dyvil.lang.Short;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.Reified;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
 import dyvil.collection.Range;
@@ -36,12 +37,12 @@ public interface ObjectArray
 		return (T[]) EMPTY;
 	}
 	
-	public static <T> T[] apply(Class<T> type, int count)
+	public static <@Reified T> T[] apply(int count, Class<T> type)
 	{
 		return (T[]) Array.newInstance(type, count);
 	}
 	
-	public static <T> T[] repeat(Class<T> type, int count, T repeatedValue)
+	public static <@Reified T> T[] repeat(int count, T repeatedValue, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -51,7 +52,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <T> T[] generate(Class<T> type, int count, IntFunction<T> generator)
+	public static <@Reified T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -61,26 +62,26 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <T extends Rangeable<T>> T[] range(T start, T end)
+	public static <@Reified T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
 	{
 		int i = 0;
-		Rangeable[] array = new Rangeable[start.distanceTo(end) + 1];
+		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end) + 1);
 		for (T current = start; current.$lt$eq(end); current = current.next())
 		{
 			array[i++] = current;
 		}
-		return (T[]) array;
+		return array;
 	}
 	
-	public static <T extends Rangeable<T>> T[] rangeOpen(T start, T end)
+	public static <@Reified T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
 	{
 		int i = 0;
-		Rangeable[] array = new Rangeable[start.distanceTo(end)];
+		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end));
 		for (T current = start; current.$lt(end); current = current.next())
 		{
 			array[i++] = current;
 		}
-		return (T[]) array;
+		return array;
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
@@ -237,11 +238,10 @@ public interface ObjectArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix <T, U> U[] mapped(T[] array, Function<T, U> mapper)
+	public static @infix <T, @Reified U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
 	{
 		int len = array.length;
-		// We can safely use clone here because no data will be leaked
-		U[] res = (U[]) new Object[len];
+		U[] res = (U[]) Array.newInstance(type, len);
 		for (int i = 0; i < len; i++)
 		{
 			res[i] = mapper.apply(array[i]);
@@ -249,7 +249,7 @@ public interface ObjectArray
 		return res;
 	}
 	
-	public static @infix <T, U> U[] flatMapped(T[] array, Function<T, U[]> mapper)
+	public static @infix <T, @Reified U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
 	{
 		int len = array.length;
 		int size = 0;
@@ -261,7 +261,7 @@ public interface ObjectArray
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
-				U[] newRes = (U[]) new Object[size + alen];
+				U[] newRes = (U[]) Array.newInstance(type, size + alen);
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
@@ -390,12 +390,14 @@ public interface ObjectArray
 	
 	public static @infix <T> T[] copy(T[] array, int newLength)
 	{
-		return (T[]) java.util.Arrays.copyOf(array, newLength, array.getClass());
+		return copy(array, newLength, (Class<T>) array.getClass().getComponentType());
 	}
 	
-	public static @infix <T, N> N[] copy(T[] array, int newLength, Class<? extends N[]> newType)
+	public static @infix <T, N> N[] copy(T[] array, int newLength, Class<N> type)
 	{
-		return java.util.Arrays.<N, T> copyOf(array, newLength, newType);
+		N[] newArray = (N[]) Array.newInstance(type, newLength);
+		System.arraycopy(array, 0, newArray, 0, newLength);
+		return newArray;
 	}
 	
 	public static @infix boolean[] unboxed(Boolean[] array)

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -267,21 +268,30 @@ public class RangeOperator implements IValue
 		// -- Array --
 		String method = this.halfOpen ? "rangeOpen" : "range";
 		
-		this.firstValue.writeExpression(writer);
-		this.lastValue.writeExpression(writer);
+		this.firstValue.writeExpression(writer, this.elementType);
+		this.lastValue.writeExpression(writer, this.elementType);
 		
 		// Reference array
 		if (!this.elementType.isPrimitive())
 		{
-			// TODO Proper return type
-			// This is currently [Rangeable] instead of [T]
+			// Write the class instance to be able to reify the type in the
+			// method
+			String extended = this.elementType.getExtendedName();
+			writer.writeLDC(Type.getType(extended));
+			
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
-					"(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)[Ldyvil/lang/Rangeable;", false);
+					"(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;Ljava/lang/Class;)[Ldyvil/lang/Rangeable;", false);
+			
+			// CheckCast so the verifier doesn't complain about mismatching types
+			writer.writeTypeInsn(Opcodes.CHECKCAST, '[' + extended);
 		}
 		
 		// Primitive array
 		switch (this.elementType.getTypecode())
 		{
+		case PrimitiveType.BOOLEAN_CODE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", method, "(ZZ)[Z", false);
+			return;
 		case PrimitiveType.BYTE_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
 			return;

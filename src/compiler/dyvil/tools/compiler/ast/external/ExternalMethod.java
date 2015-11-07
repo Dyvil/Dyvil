@@ -295,11 +295,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
 		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
-		int length = typePath.getLength();
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.METHOD_RETURN:
-			this.type = IType.withAnnotation(this.type, annotation, typePath, 0, length);
+			this.type = IType.withAnnotation(this.type, annotation, typePath, 0, typePath.getLength());
+			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
 			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
@@ -320,14 +320,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0, length);
+			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
 			int index = TypeReference.getFormalParameterIndex(typeRef);
 			IParameter param = this.parameters[index];
-			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, length));
+			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
+			break;
 		}
 		}
 		return new AnnotationVisitorImpl(null, annotation);
