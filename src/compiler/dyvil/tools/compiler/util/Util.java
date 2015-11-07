@@ -193,19 +193,19 @@ public class Util
 		{
 			l = nanos / 60_000_000_000L;
 			builder.append(l).append(" min ");
-			nanos -= l;
+			nanos -= l * 60_000_000_000L;
 		}
 		if (nanos >= 1_000_000_000L) // seconds
 		{
 			l = nanos / 1_000_000_000L;
 			builder.append(l).append(" s ");
-			nanos -= l;
+			nanos -= l * 1_000_000_000L;
 		}
 		if (nanos >= 1_000_000L)
 		{
 			l = nanos / 1_000_000L;
 			builder.append(l).append(" ms ");
-			nanos -= l;
+			nanos -= l * 1_000_000L;
 		}
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}

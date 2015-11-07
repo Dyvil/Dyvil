@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.structure;
 
+import dyvil.collection.Map;
+import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.imports.PackageDeclaration;
@@ -11,6 +13,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
+	private final Map<String, IClass> internalClass = new HashMap<String, IClass>();
+	
 	public RootPackage()
 	{
 		this.setInternalName(this.fullName = ""); // Assignment intentional
@@ -61,6 +65,20 @@ public final class RootPackage extends Package
 	}
 	
 	public IClass resolveInternalClass(String internal)
+	{
+		IClass iclass = this.internalClass.get(internal);
+		if (iclass != null)
+		{
+			return iclass;
+		}
+		
+		iclass = this.resolveInternalClass_(internal);
+		this.internalClass.put(internal, iclass);
+		
+		return iclass;
+	}
+	
+	private IClass resolveInternalClass_(String internal)
 	{
 		int index = internal.lastIndexOf('/');
 		if (index == -1)
