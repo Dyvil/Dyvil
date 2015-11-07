@@ -363,7 +363,6 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
 				return;
 			case Opcodes.BNOT:
-				this.frame.pop();
 				this.writeBoolJump(Opcodes.IFEQ);
 				return;
 			case Opcodes.INOT:
@@ -420,13 +419,9 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
 			case ACMPEQ:
-				this.frame.pop();
-				this.frame.pop();
 				this.writeBoolJump(Opcodes.IF_ACMPEQ);
 				return;
 			case ACMPNE:
-				this.frame.pop();
-				this.frame.pop();
 				this.writeBoolJump(Opcodes.IF_ACMPNE);
 				return;
 			case Opcodes.OBJECT_EQUALS:
@@ -462,6 +457,11 @@ public final class MethodWriterImpl implements MethodWriter
 				this.writeBoolJump(Opcodes.IF_ICMPEQ + opcode - ICMPEQ);
 				return;
 			}
+			if (opcode >= LCMPEQ && opcode <= DCMPLE)
+			{
+				this.writeBoolJump(Opcodes.IF_LCMPEQ + opcode - LCMPEQ);
+				return;
+			}
 			return;
 		}
 		
@@ -485,24 +485,18 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitInsn(opcode);
 	}
 	
-	private void writeBoolJump(int jump)
+	private void writeBoolJump(int jump) throws BytecodeException
 	{
 		Label label1 = new Label();
 		Label label2 = new Label();
 		
-		this.mv.visitJumpInsn(jump, label1);
-		this.mv.visitInsn(Opcodes.ICONST_0);
-		this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-		this.mv.visitLabel(label1);
+		this.writeJumpInsn(jump, label1);
 		
-		this.frame.visitFrame(this.mv);
-		
-		this.mv.visitInsn(Opcodes.ICONST_1);
-		this.mv.visitLabel(label2);
-		
-		this.frame.push(ClassFormat.BOOLEAN);
-		
-		this.frame.visitFrame(this.mv);
+		this.writeInsn(Opcodes.ICONST_0);
+		this.writeJumpInsn(Opcodes.GOTO, label2);
+		this.writeTargetLabel(label1);
+		this.writeInsn(Opcodes.ICONST_1);
+		this.writeTargetLabel(label2);
 	}
 	
 	@Override

@@ -241,7 +241,7 @@ public abstract class AbstractCall implements ICall, IValued
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.method.writeCall(writer, this.instance, this.arguments, this.type, this.getLineNumber());
-		this.type.writeCast(writer, type, this.getLineNumber());
+		this.getType().writeCast(writer, type, this.getLineNumber());
 	}
 	
 	@Override

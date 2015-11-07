@@ -894,39 +894,60 @@ public interface Opcodes
 	public static final int	ICMPGT	= 294;
 	public static final int	ICMPLE	= 295;
 	
-	public static final int	ACMPEQ	= 296;
-	public static final int	ACMPNE	= 297;
+	public static final int	LCMPEQ	= 296;
+	public static final int	LCMPNE	= 297;
+	public static final int	LCMPLT	= 298;
+	public static final int	LCMPGE	= 299;
+	public static final int	LCMPGT	= 300;
+	public static final int	LCMPLE	= 301;
 	
-	public static final int	IF_LCMPEQ	= 300;
-	public static final int	IF_LCMPNE	= 301;
-	public static final int	IF_LCMPLT	= 302;
-	public static final int	IF_LCMPGE	= 303;
-	public static final int	IF_LCMPGT	= 304;
-	public static final int	IF_LCMPLE	= 305;
+	public static final int	FCMPEQ	= 302;
+	public static final int	FCMPNE	= 303;
+	public static final int	FCMPLT	= 304;
+	public static final int	FCMPGE	= 305;
+	public static final int	FCMPGT	= 306;
+	public static final int	FCMPLE	= 307;
 	
-	public static final int	IF_FCMPEQ	= 306;
-	public static final int	IF_FCMPNE	= 307;
-	public static final int	IF_FCMPLT	= 308;
-	public static final int	IF_FCMPGE	= 309;
-	public static final int	IF_FCMPGT	= 310;
-	public static final int	IF_FCMPLE	= 311;
+	public static final int	DCMPEQ	= 308;
+	public static final int	DCMPNE	= 309;
+	public static final int	DCMPLT	= 310;
+	public static final int	DCMPGE	= 311;
+	public static final int	DCMPGT	= 312;
+	public static final int	DCMPLE	= 313;
 	
-	public static final int	IF_DCMPEQ	= 312;
-	public static final int	IF_DCMPNE	= 313;
-	public static final int	IF_DCMPLT	= 314;
-	public static final int	IF_DCMPGE	= 315;
-	public static final int	IF_DCMPGT	= 316;
-	public static final int	IF_DCMPLE	= 317;
+	public static final int	ACMPEQ	= 314;
+	public static final int	ACMPNE	= 315;
 	
-	public static final int OBJECT_EQUALS = 318;
+	public static final int	IF_LCMPEQ	= 330;
+	public static final int	IF_LCMPNE	= 331;
+	public static final int	IF_LCMPLT	= 332;
+	public static final int	IF_LCMPGE	= 333;
+	public static final int	IF_LCMPGT	= 334;
+	public static final int	IF_LCMPLE	= 335;
 	
-	public static final int SWAP2 = 330;
+	public static final int	IF_FCMPEQ	= 336;
+	public static final int	IF_FCMPNE	= 337;
+	public static final int	IF_FCMPLT	= 338;
+	public static final int	IF_FCMPGE	= 339;
+	public static final int	IF_FCMPGT	= 340;
+	public static final int	IF_FCMPLE	= 341;
 	
-	public static final int	AUTO_SWAP	= 350;
-	public static final int	AUTO_POP	= 351;
-	public static final int	AUTO_POP2	= 352;
-	public static final int	AUTO_DUP	= 353;
-	public static final int	AUTO_DUP_X1	= 354;
+	public static final int	IF_DCMPEQ	= 342;
+	public static final int	IF_DCMPNE	= 343;
+	public static final int	IF_DCMPLT	= 344;
+	public static final int	IF_DCMPGE	= 345;
+	public static final int	IF_DCMPGT	= 346;
+	public static final int	IF_DCMPLE	= 347;
+	
+	public static final int SWAP2 = 400;
+	
+	public static final int	AUTO_SWAP	= 411;
+	public static final int	AUTO_POP	= 412;
+	public static final int	AUTO_POP2	= 413;
+	public static final int	AUTO_DUP	= 414;
+	public static final int	AUTO_DUP_X1	= 415;
+	
+	public static final int OBJECT_EQUALS = 450;
 	
 	public static String toString(int op)
 	{
@@ -1053,68 +1074,7 @@ public interface Opcodes
 			return IFLE;
 		case IFLE:
 			return IFGT;
-			
-		case IF_ICMPEQ:
-			return IF_ICMPNE;
-		case IF_ICMPNE:
-			return IF_ICMPEQ;
-		case IF_ICMPLT:
-			return IF_ICMPGE;
-		case IF_ICMPGE:
-			return IF_ICMPLT;
-		case IF_ICMPGT:
-			return IF_ICMPLE;
-		case IF_ICMPLE:
-			return IF_ICMPGT;
-			
-		case IF_ACMPEQ:
-			return IF_ACMPNE;
-		case IF_ACMPNE:
-			return IF_ACMPEQ;
-		case IFNULL:
-			return IFNONNULL;
-		case IFNONNULL:
-			return IFNULL;
-			
-		case IF_LCMPEQ:
-			return IF_LCMPNE;
-		case IF_LCMPNE:
-			return IF_LCMPEQ;
-		case IF_LCMPLT:
-			return IF_LCMPGE;
-		case IF_LCMPGE:
-			return IF_LCMPLT;
-		case IF_LCMPGT:
-			return IF_LCMPLE;
-		case IF_LCMPLE:
-			return IF_LCMPGT;
-			
-		case IF_FCMPEQ:
-			return IF_FCMPNE;
-		case IF_FCMPNE:
-			return IF_FCMPEQ;
-		case IF_FCMPLT:
-			return IF_FCMPGE;
-		case IF_FCMPGE:
-			return IF_FCMPLT;
-		case IF_FCMPGT:
-			return IF_FCMPLE;
-		case IF_FCMPLE:
-			return IF_FCMPGT;
-			
-		case IF_DCMPEQ:
-			return IF_DCMPNE;
-		case IF_DCMPNE:
-			return IF_DCMPEQ;
-		case IF_DCMPLT:
-			return IF_DCMPGE;
-		case IF_DCMPGE:
-			return IF_DCMPLT;
-		case IF_DCMPGT:
-			return IF_DCMPLE;
-		case IF_DCMPLE:
-			return IF_DCMPGT;
-			
+		
 		case ICMPEQ:
 			return ICMPNE;
 		case ICMPNE:
@@ -1127,11 +1087,107 @@ public interface Opcodes
 			return ICMPGT;
 		case ICMPGT:
 			return ICMPLE;
-			
+		case IF_ICMPEQ:
+			return IF_ICMPNE;
+		case IF_ICMPNE:
+			return IF_ICMPEQ;
+		case IF_ICMPLT:
+			return IF_ICMPGE;
+		case IF_ICMPGE:
+			return IF_ICMPLT;
+		case IF_ICMPGT:
+			return IF_ICMPLE;
+		case IF_ICMPLE:
+			return IF_ICMPGT;
+		
+		case LCMPEQ:
+			return LCMPNE;
+		case LCMPNE:
+			return LCMPEQ;
+		case LCMPLT:
+			return LCMPGE;
+		case LCMPGE:
+			return LCMPLT;
+		case LCMPGT:
+			return LCMPLE;
+		case LCMPLE:
+			return LCMPGT;
+		case IF_LCMPEQ:
+			return IF_LCMPNE;
+		case IF_LCMPNE:
+			return IF_LCMPEQ;
+		case IF_LCMPLT:
+			return IF_LCMPGE;
+		case IF_LCMPGE:
+			return IF_LCMPLT;
+		case IF_LCMPGT:
+			return IF_LCMPLE;
+		case IF_LCMPLE:
+			return IF_LCMPGT;
+		
+		case FCMPEQ:
+			return FCMPNE;
+		case FCMPNE:
+			return FCMPEQ;
+		case FCMPLT:
+			return FCMPGE;
+		case FCMPGE:
+			return FCMPLT;
+		case FCMPGT:
+			return FCMPLE;
+		case FCMPLE:
+			return FCMPGT;
+		case IF_FCMPEQ:
+			return IF_FCMPNE;
+		case IF_FCMPNE:
+			return IF_FCMPEQ;
+		case IF_FCMPLT:
+			return IF_FCMPGE;
+		case IF_FCMPGE:
+			return IF_FCMPLT;
+		case IF_FCMPGT:
+			return IF_FCMPLE;
+		case IF_FCMPLE:
+			return IF_FCMPGT;
+		
+		case DCMPEQ:
+			return DCMPNE;
+		case DCMPNE:
+			return DCMPEQ;
+		case DCMPLT:
+			return DCMPGE;
+		case DCMPGE:
+			return DCMPLT;
+		case DCMPGT:
+			return DCMPLE;
+		case DCMPLE:
+			return DCMPGT;
+		case IF_DCMPEQ:
+			return IF_DCMPNE;
+		case IF_DCMPNE:
+			return IF_DCMPEQ;
+		case IF_DCMPLT:
+			return IF_DCMPGE;
+		case IF_DCMPGE:
+			return IF_DCMPLT;
+		case IF_DCMPGT:
+			return IF_DCMPLE;
+		case IF_DCMPLE:
+			return IF_DCMPGT;
+		
 		case ACMPEQ:
 			return ACMPNE;
 		case ACMPNE:
 			return ACMPEQ;
+		case IF_ACMPEQ:
+			return IF_ACMPNE;
+		case IF_ACMPNE:
+			return IF_ACMPEQ;
+		
+		case IFNULL:
+			return IFNONNULL;
+		case IFNONNULL:
+			return IFNULL;
 		}
 		return 0;
 	}

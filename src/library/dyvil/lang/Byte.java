@@ -107,21 +107,21 @@ public class Byte implements Integer, Serializable
 	// Unary operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1 })
+	@Intrinsic({ LOAD_0 })
 	public @prefix Int $plus()
 	{
 		return Int.apply(this.value);
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, INEG })
+	@Intrinsic({ LOAD_0, INEG })
 	public @prefix Int $minus()
 	{
 		return Int.apply((byte) -this.value);
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, ICONST_M1, IXOR })
+	@Intrinsic({ LOAD_0, ICONST_M1, IXOR })
 	public @prefix Int $tilde()
 	{
 		return Int.apply((byte) ~this.value);
@@ -130,42 +130,42 @@ public class Byte implements Integer, Serializable
 	// byte operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
 	public boolean $eq$eq(byte v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
 	public boolean $bang$eq(byte v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
 	public boolean $lt(byte v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
 	public boolean $lt$eq(byte v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
 	public boolean $gt(byte v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
 	public boolean $gt$eq(byte v)
 	{
 		return this.value >= v;
@@ -258,42 +258,42 @@ public class Byte implements Integer, Serializable
 	// short operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
 	public boolean $eq$eq(short v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
 	public boolean $bang$eq(short v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
 	public boolean $lt(short v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
 	public boolean $lt$eq(short v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
 	public boolean $gt(short v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
 	public boolean $gt$eq(short v)
 	{
 		return this.value >= v;
@@ -386,42 +386,42 @@ public class Byte implements Integer, Serializable
 	// char operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
 	public boolean $eq$eq(char v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
 	public boolean $bang$eq(char v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
 	public boolean $lt(char v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
 	public boolean $lt$eq(char v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
 	public boolean $gt(char v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
 	public boolean $gt$eq(char v)
 	{
 		return this.value >= v;
@@ -514,42 +514,42 @@ public class Byte implements Integer, Serializable
 	// int operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPEQ })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
 	public boolean $eq$eq(int v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPNE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
 	public boolean $bang$eq(int v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
 	public boolean $lt(int v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPLE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
 	public boolean $lt$eq(int v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGT })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
 	public boolean $gt(int v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, LOAD_1, IF_ICMPGE })
+	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
 	public boolean $gt$eq(int v)
 	{
 		return this.value >= v;
@@ -642,42 +642,42 @@ public class Byte implements Integer, Serializable
 	// long operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2L, LOAD_1, IF_LCMPEQ })
+	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPEQ })
 	public boolean $eq$eq(long v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2L, LOAD_1, IF_LCMPNE })
+	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPNE })
 	public boolean $bang$eq(long v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2L, LOAD_1, IF_LCMPLT })
+	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPLT })
 	public boolean $lt(long v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2L, LOAD_1, IF_LCMPLE })
+	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPLE })
 	public boolean $lt$eq(long v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2L, LOAD_1, IF_LCMPGT })
+	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPGT })
 	public boolean $gt(long v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2L, LOAD_1, IF_LCMPGE })
+	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPGE })
 	public boolean $gt$eq(long v)
 	{
 		return this.value >= v;
@@ -770,42 +770,42 @@ public class Byte implements Integer, Serializable
 	// float operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2F, LOAD_1, IF_FCMPEQ })
+	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPEQ })
 	public boolean $eq$eq(float v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2F, LOAD_1, IF_FCMPNE })
+	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPNE })
 	public boolean $bang$eq(float v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2F, LOAD_1, IF_FCMPLT })
+	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPLT })
 	public boolean $lt(float v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2F, LOAD_1, IF_FCMPLE })
+	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPLE })
 	public boolean $lt$eq(float v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2F, LOAD_1, IF_FCMPGT })
+	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPGT })
 	public boolean $gt(float v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2F, LOAD_1, IF_FCMPGE })
+	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPGE })
 	public boolean $gt$eq(float v)
 	{
 		return this.value >= v;
@@ -849,42 +849,42 @@ public class Byte implements Integer, Serializable
 	// double operators
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2D, LOAD_1, IF_DCMPEQ })
+	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPEQ })
 	public boolean $eq$eq(double v)
 	{
 		return this.value == v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2D, LOAD_1, IF_DCMPNE })
+	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPNE })
 	public boolean $bang$eq(double v)
 	{
 		return this.value != v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2D, LOAD_1, IF_DCMPLT })
+	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPLT })
 	public boolean $lt(double v)
 	{
 		return this.value < v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2D, LOAD_1, IF_DCMPLE })
+	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPLE })
 	public boolean $lt$eq(double v)
 	{
 		return this.value <= v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2D, LOAD_1, IF_DCMPGT })
+	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPGT })
 	public boolean $gt(double v)
 	{
 		return this.value > v;
 	}
 	
 	@Override
-	@Intrinsic({ LOAD_0, I2D, LOAD_1, IF_DCMPGE })
+	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPGE })
 	public boolean $gt$eq(double v)
 	{
 		return this.value >= v;

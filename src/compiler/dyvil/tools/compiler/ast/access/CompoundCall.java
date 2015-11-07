@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -213,17 +212,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			return;
 		}
 		
-		IValue instance = access.instance;
-		if (instance != null)
-		{
-			instance.writeExpression(writer);
-			writer.writeInsn(Opcodes.AUTO_DUP);
-		}
-		
-		int lineNumber = this.instance.getLineNumber();
-		f.writeGet(writer, null, lineNumber);
-		this.method.writeCall(writer, null, this.arguments, null, lineNumber);
-		f.writeSet(writer, null, null, lineNumber);
+		f.writeSet(writer, access.instance, new MethodCall(this.position, access, this.method, this.arguments), this.getLineNumber());
 	}
 	
 	private boolean writeIINC(MethodWriter writer, IDataMember f) throws BytecodeException
