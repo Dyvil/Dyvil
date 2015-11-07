@@ -346,20 +346,60 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			return;
 		case TYPE_ARGUMENTS_END:
-			MethodCall mc = (MethodCall) this.value;
-			IToken next = token.next();
-			if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				pm.skip();
-				mc.setArguments(this.parseArguments(pm, next.next()));
-			}
-			
-			this.mode = ACCESS;
+		{
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.report(token, "Invalid Method Type Parameter List - ']' expected");
 			}
+			
+			MethodCall mc = (MethodCall) this.value;
+			GenericData genericData = mc.getGenericData();
+			
+			IToken next = token.next();
+			int nextType = next.type();
+			
+			if (nextType == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				pm.skip();
+				IArguments arguments = this.parseArguments(pm, next.next());
+				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getValue(), arguments);
+				amc.setGenericData(genericData);
+				
+				this.value = amc;
+				this.mode = PARAMETERS_END;
+				return;
+			}
+			if (ParserUtil.isIdentifier(nextType))
+			{
+				pm.skip();
+				this.value = ((MethodCall) this.value).getValue();
+				this.parseAccess(pm, token.next(), token.next().type(), token.next().nameValue(), null);
+				
+				if (this.value instanceof AbstractCall)
+				{
+					((AbstractCall) this.value).setGenericData(genericData);
+				}
+				return;
+			}
+			if (ParserUtil.isExpressionTerminator(nextType))
+			{
+				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getValue(), EmptyArguments.INSTANCE);
+				amc.setGenericData(genericData);
+				this.value = amc;
+				this.mode = ACCESS;
+				return;
+			}
+			
+			SingleArgument argument = new SingleArgument();
+			ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getValue(), argument);
+			amc.setGenericData(genericData);
+			this.value = amc;
+			
+			this.parseApply(pm, next, argument, Operators.DEFAULT);
+			this.mode = ACCESS;
+			
 			return;
+		}
 		case PARAMETERIZED_THIS_END:
 			this.mode = ACCESS;
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
@@ -469,6 +509,15 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.parseIdentifierAccess(pm, token, type);
+				return;
+			}
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
+			{
+				// IDENTIFIER . [
+				MethodCall call = new MethodCall(token, this.value, null);
+				pm.pushParser(new TypeListParser(call.getGenericData()));
+				this.mode = TYPE_ARGUMENTS_END;
+				this.value = call;
 				return;
 			}
 			
@@ -626,16 +675,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = lv;
 				pm.pushParser(pm.newExpressionParser(lv));
 				pm.skip();
-				return;
-			case DyvilSymbols.GENERIC_CALL:
-				MethodCall mc = new MethodCall(token.raw(), this.value, token.nameValue());
-				GenericData gd = new GenericData();
-				mc.setGenericData(gd);
-				mc.setDotless(!this.explicitDot);
-				this.value = mc;
-				this.mode = TYPE_ARGUMENTS_END;
-				pm.skip();
-				pm.pushParser(new TypeListParser(gd));
 				return;
 			}
 			

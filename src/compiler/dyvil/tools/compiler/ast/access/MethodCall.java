@@ -282,18 +282,18 @@ public final class MethodCall extends AbstractCall implements INamed
 			{
 				buffer.append(Formatting.Method.dotlessSeperator);
 			}
-			else
+			else if (this.genericData == null)
 			{
 				buffer.append('.');
 			}
 		}
 		
-		buffer.append(this.name);
-		
 		if (this.genericData != null)
 		{
 			this.genericData.toString(prefix, buffer);
 		}
+		
+		buffer.append(this.name);
 		
 		this.arguments.toString(prefix, buffer);
 	}

@@ -157,7 +157,7 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 1 : 0; // TODO Fix this implementation
+		return 0;
 	}
 	
 	public void addCatchBlock(CatchBlock block)

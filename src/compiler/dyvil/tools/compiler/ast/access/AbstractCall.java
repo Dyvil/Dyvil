@@ -71,11 +71,15 @@ public abstract class AbstractCall implements ICall, IValued
 		this.genericData = data;
 	}
 	
-	protected GenericData getGenericData()
+	public GenericData getGenericData()
 	{
-		if (this.method == null || this.genericData != null && this.genericData.method != null)
+		if (this.genericData != null)
 		{
 			return this.genericData;
+		}
+		if (this.method == null)
+		{
+			return this.genericData = new GenericData();
 		}
 		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
 	}
@@ -145,6 +149,11 @@ public abstract class AbstractCall implements ICall, IValued
 		{
 			this.arguments.resolveTypes(markers, context);
 		}
+		
+		if (this.genericData != null)
+		{
+			this.genericData.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -170,7 +179,17 @@ public abstract class AbstractCall implements ICall, IValued
 	{
 		if (this.method != null)
 		{
-			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
+			GenericData data;
+			if (this.genericData != null)
+			{
+				data = this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
+			}
+			else
+			{
+				data = this.getGenericData();
+			}
+			
+			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, data);
 		}
 		
 		this.type = null;

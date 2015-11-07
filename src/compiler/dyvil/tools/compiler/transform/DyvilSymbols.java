@@ -4,7 +4,6 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Symbols;
 import dyvil.tools.parsing.lexer.Tokens;
 
-// TODO Re-add #[ or something similar
 public final class DyvilSymbols implements Symbols
 {
 	public static final int	HASH			= Tokens.SYMBOL | 0x00060000;
