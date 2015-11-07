@@ -23,6 +23,10 @@ public interface IParameter extends IVariable, IClassMember
 	{
 	}
 	
+	public int getIndex();
+	
+	public void setIndex(int index);
+	
 	@Override
 	public boolean isField();
 	

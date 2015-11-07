@@ -106,7 +106,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		return null;
+		return this;
 	}
 	
 	@Override

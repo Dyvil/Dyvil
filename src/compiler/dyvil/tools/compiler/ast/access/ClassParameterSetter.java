@@ -29,7 +29,7 @@ public final class ClassParameterSetter implements IValue
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getIndex());
+		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified, this.parameter.getDescription());
 	}
 	

@@ -602,7 +602,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			for (int i = 0; i < this.capturedFieldCount; i++)
 			{
 				CaptureVariable var = this.capturedFields[i];
-				writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
+				writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getLocalIndex());
 			}
 		}
 		else
@@ -736,7 +736,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			param.setIndex(index);
+			param.setLocalIndex(index);
 			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
 		}
 		

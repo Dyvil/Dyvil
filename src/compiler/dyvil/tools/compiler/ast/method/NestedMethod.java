@@ -175,7 +175,7 @@ public class NestedMethod extends Method
 		{
 			IParameter param = this.parameters[i];
 			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
-			param.setIndex(index);
+			param.setLocalIndex(index);
 		}
 		
 		Label start = new Label();
@@ -198,7 +198,7 @@ public class NestedMethod extends Method
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 	}
 	
@@ -207,7 +207,7 @@ public class NestedMethod extends Method
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getIndex());
+			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getLocalIndex());
 		}
 	}
 	

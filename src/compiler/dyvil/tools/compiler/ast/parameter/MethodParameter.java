@@ -175,7 +175,8 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.registerParameter(this.index, this.name.qualified, this.type, 0);
+		this.localIndex = writer.localCount();
+		writer.registerParameter(this.localIndex, this.name.qualified, this.type, 0);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
@@ -188,7 +189,7 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 	
 	@Override
@@ -198,6 +199,6 @@ public final class MethodParameter extends Parameter
 		{
 			value.writeExpression(writer, this.type);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 }

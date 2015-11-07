@@ -99,7 +99,7 @@ public interface CaseClasses
 				writer.writeJumpInsn(IF_FCMPEQ, label);
 				break;
 			case PrimitiveType.DOUBLE_CODE:
-				writer.writeJumpInsn(IF_FCMPEQ, label);
+				writer.writeJumpInsn(IF_DCMPEQ, label);
 				break;
 			}
 			writer.writeLDC(0);
@@ -261,7 +261,7 @@ public interface CaseClasses
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
 				writer.writeLineNumber(0);
-				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)J", false);
 				writer.writeInsn(DUP2);
 				writer.writeLDC(32);
 				writer.writeInsn(LUSHR);

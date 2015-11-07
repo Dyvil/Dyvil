@@ -78,22 +78,11 @@ public class Method extends AbstractMethod
 			this.generics[i].resolveTypes(markers, this);
 		}
 		
-		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, this);
-			param.setIndex(index);
-			
-			IType type = param.getType();
-			if (type == Types.LONG || type == Types.DOUBLE)
-			{
-				index += 2;
-			}
-			else
-			{
-				index++;
-			}
+			param.setIndex(i);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
@@ -440,7 +429,7 @@ public class Method extends AbstractMethod
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) != 0)

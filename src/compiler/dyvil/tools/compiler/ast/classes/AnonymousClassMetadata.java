@@ -150,7 +150,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 		for (int i = 0; i < params; i++)
 		{
 			IParameter param = this.constructor.getParameter(i);
-			mw.writeVarInsn(param.getType().getLoadOpcode(), param.getIndex());
+			mw.writeVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
 		}
 		this.constructor.writeInvoke(mw, 0);
 		

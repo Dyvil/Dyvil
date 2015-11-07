@@ -17,9 +17,9 @@ public interface IVariable extends IDataMember
 		return true;
 	}
 	
-	public void setIndex(int index);
+	public int getLocalIndex();
 	
-	public int getIndex();
+	public void setLocalIndex(int index);
 	
 	public default boolean isCapturable()
 	{

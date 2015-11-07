@@ -145,13 +145,13 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public void setIndex(int index)
+	public void setLocalIndex(int index)
 	{
 		this.index = index;
 	}
 	
 	@Override
-	public int getIndex()
+	public int getLocalIndex()
 	{
 		return this.index;
 	}
@@ -247,19 +247,19 @@ public class CaptureVariable implements IVariable
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
-		int index = this.variable.getIndex();
-		this.variable.setIndex(this.index);
+		int index = this.variable.getLocalIndex();
+		this.variable.setLocalIndex(this.index);
 		this.variable.writeGet(writer, instance, lineNumber);
-		this.variable.setIndex(index);
+		this.variable.setLocalIndex(index);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
-		int index = this.variable.getIndex();
-		this.variable.setIndex(this.index);
+		int index = this.variable.getLocalIndex();
+		this.variable.setLocalIndex(this.index);
 		this.variable.writeSet(writer, instance, value, lineNumber);
-		this.variable.setIndex(index);
+		this.variable.setLocalIndex(index);
 	}
 	
 	@Override

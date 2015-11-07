@@ -59,6 +59,8 @@ public final class CaseClassMetadata extends ClassMetadata
 			{
 				m.setVarargs();
 			}
+			
+			m.resolveTypes(markers, context);
 			this.applyMethod = m;
 		}
 	}
@@ -94,7 +96,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			{
 				IParameter param = this.theClass.getParameter(i);
 				param.write(mw);
-				mw.writeVarInsn(param.getType().getLoadOpcode(), i);
+				mw.writeVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
 			}
 			this.constructor.writeInvoke(mw, 0);
 			mw.writeInsn(Opcodes.ARETURN);

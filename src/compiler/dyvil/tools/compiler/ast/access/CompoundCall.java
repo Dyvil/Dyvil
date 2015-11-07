@@ -231,7 +231,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 				if (IValue.isNumeric(value1.valueTag()))
 				{
 					int count = value1.intValue();
-					writer.writeIINC(((IVariable) f).getIndex(), minus ? -count : count);
+					writer.writeIINC(((IVariable) f).getLocalIndex(), minus ? -count : count);
 					return true;
 				}
 			}

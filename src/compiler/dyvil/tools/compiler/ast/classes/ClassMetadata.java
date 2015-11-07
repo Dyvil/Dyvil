@@ -160,6 +160,7 @@ public class ClassMetadata implements IClassMetadata
 			constructor.setVarargs();
 		}
 		
+		constructor.resolveTypes(markers, context);
 		this.constructor = constructor;
 	}
 	

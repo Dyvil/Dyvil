@@ -101,7 +101,7 @@ public class StringForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increment index
-		writer.writeIINC(indexVar.getIndex(), 1);
+		writer.writeIINC(indexVar.getLocalIndex(), 1);
 		// Boundary Check
 		indexVar.writeGet(writer, null, lineNumber);
 		lengthVar.writeGet(writer, null, lineNumber);

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypePath;
@@ -20,7 +19,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -93,22 +91,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		}
 		this.parametersResolved = true;
 		
-		int index = (this.modifiers & Modifiers.STATIC) == 0 ? 1 : 0;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(null, this);
-			param.setIndex(index);
-			
-			IType type = param.getType();
-			if (type == Types.LONG || type == Types.DOUBLE)
-			{
-				index += 2;
-			}
-			else
-			{
-				index++;
-			}
+			param.setIndex(i);
 		}
 	}
 	

@@ -18,6 +18,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 public abstract class Parameter extends Member implements IParameter
 {
 	protected int		index;
+	protected int localIndex;
 	protected boolean	varargs;
 	
 	protected IValue defaultValue;
@@ -59,6 +60,18 @@ public abstract class Parameter extends Member implements IParameter
 	public int getIndex()
 	{
 		return this.index;
+	}
+	
+	@Override
+	public void setLocalIndex(int index)
+	{
+		this.localIndex = index;
+	}
+	
+	@Override
+	public int getLocalIndex()
+	{
+		return this.localIndex;
 	}
 	
 	@Override

@@ -94,8 +94,8 @@ public class IterableForStatement extends ForEachStatement
 		
 		// Local Variables
 		int locals = writer.localCount();
-		iteratorVar.setIndex(locals);
-		var.setIndex(locals + 1);
+		iteratorVar.setLocalIndex(locals);
+		var.setLocalIndex(locals + 1);
 		
 		// Store Iterator
 		writer.writeVarInsn(Opcodes.ASTORE, locals);

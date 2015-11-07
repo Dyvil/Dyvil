@@ -224,7 +224,8 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.registerParameter(this.index, this.name.qualified, this.type, 0);
+		this.localIndex = writer.localCount();
+		writer.registerParameter(this.localIndex, this.name.qualified, this.type, 0);
 		this.writeAnnotations(writer);
 	}
 	

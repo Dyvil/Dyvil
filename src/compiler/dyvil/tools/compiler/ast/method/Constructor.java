@@ -238,22 +238,11 @@ public class Constructor extends Member implements IConstructor
 			this.exceptions[i] = this.exceptions[i].resolveType(markers, this);
 		}
 		
-		int index = 1;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, this);
-			param.setIndex(index);
-			
-			IType type = param.getType();
-			if (type == Types.LONG || type == Types.DOUBLE)
-			{
-				index += 2;
-			}
-			else
-			{
-				index++;
-			}
+			param.setIndex(i);
 		}
 		
 		if (this.value != null)
@@ -835,7 +824,7 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 	}
 	

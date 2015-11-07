@@ -127,8 +127,8 @@ public class RangeForStatement extends ForEachStatement
 		
 		writer.writeTargetLabel(startLabel);
 		
-		int varIndex = var.getIndex();
-		int endIndex = endVar.getIndex();
+		int varIndex = var.getLocalIndex();
+		int endIndex = endVar.getLocalIndex();
 		
 		// Check the condition
 		switch (type)

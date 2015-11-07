@@ -26,7 +26,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class Variable extends Member implements IVariable
 {
-	protected int		index;
+	protected int		localIndex;
 	protected IValue	value;
 	
 	// Metadata
@@ -73,15 +73,15 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void setIndex(int index)
+	public void setLocalIndex(int index)
 	{
-		this.index = index;
+		this.localIndex = index;
 	}
 	
 	@Override
-	public int getIndex()
+	public int getLocalIndex()
 	{
-		return this.index;
+		return this.localIndex;
 	}
 	
 	@Override
@@ -263,7 +263,7 @@ public final class Variable extends Member implements IVariable
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		IType type = this.refType != null ? this.refType : this.type;
-		writer.writeLocal(this.index, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+		writer.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
 	}
 	
 	public void writeInit(MethodWriter writer) throws BytecodeException
@@ -289,10 +289,10 @@ public final class Variable extends Member implements IVariable
 			}
 			c.writeInvoke(writer, this.getLineNumber());
 			
-			this.index = writer.localCount();
+			this.localIndex = writer.localCount();
 			
-			writer.setLocalType(this.index, this.refType.getInternalName());
-			writer.writeVarInsn(Opcodes.ASTORE, this.index);
+			writer.setLocalType(this.localIndex, this.refType.getInternalName());
+			writer.writeVarInsn(Opcodes.ASTORE, this.localIndex);
 			return;
 		}
 		
@@ -300,9 +300,9 @@ public final class Variable extends Member implements IVariable
 		{
 			value.writeExpression(writer, this.type);
 		}
-		this.index = writer.localCount();
-		writer.setLocalType(this.index, this.type.getFrameType());
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		this.localIndex = writer.localCount();
+		writer.setLocalType(this.localIndex, this.type.getFrameType());
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 	
 	@Override
@@ -310,7 +310,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.index);
+			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
 			
 			IClass c = this.refType.getTheClass();
 			IDataMember f = c.getBody().getField(0);
@@ -327,7 +327,7 @@ public final class Variable extends Member implements IVariable
 			return;
 		}
 		
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 	
 	@Override
@@ -335,7 +335,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			ReferenceType.writeGetRef(writer, value, this.index);
+			ReferenceType.writeGetRef(writer, value, this.localIndex);
 			
 			IDataMember f = this.refType.getTheClass().getBody().getField(0);
 			f.writeSet(writer, null, null, lineNumber);
@@ -347,7 +347,7 @@ public final class Variable extends Member implements IVariable
 			value.writeExpression(writer, this.type);
 		}
 		
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 	
 	@Override

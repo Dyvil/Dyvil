@@ -134,20 +134,20 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolveTypes(markers, context, this);
 		}
 		
-		int index = 1;
+		int localIndex = 1;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			IType type = param.getType();
 			param.resolveTypes(markers, this);
-			param.setIndex(index);
+			param.setLocalIndex(localIndex);
 			if (type == Types.LONG || type == Types.DOUBLE)
 			{
-				index += 2;
+				localIndex += 2;
 			}
 			else
 			{
-				index++;
+				localIndex++;
 			}
 		}
 		
