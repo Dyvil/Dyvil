@@ -45,7 +45,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLMemberClass implements IClass
 {
-	private static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
+	protected static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
 	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
 	
 	private REPLContext		context;

@@ -329,6 +329,19 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		iclass.setHeader(this);
 		
+		// Check if the class is already defined
+		try
+		{
+			Class.forName(iclass.getFullName(), false, REPLMemberClass.CLASS_LOADER);
+			System.err.println("The class '" + iclass.getName() + "' cannot be re-defined");
+			return;
+		}
+		catch (ClassNotFoundException ex)
+		{
+		
+		}
+		
+		// Run the usual phases
 		iclass.resolveTypes(this.markers, this);
 		iclass.resolve(this.markers, this);
 		iclass.checkTypes(this.markers, this);
@@ -344,6 +357,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			iclass.foldConstants();
 		}
 		iclass.cleanup(this, this);
+		
+		// Compile and load the class
+		
 		this.compileClass(iclass);
 		
 		this.classes.put(iclass.getName(), iclass);
