@@ -38,7 +38,7 @@ public class HalfOpenRange<T extends Rangeable<T>> implements Range<T>
 	@Override
 	public T last()
 	{
-		return this.last;
+		return this.last.previous();
 	}
 	
 	@Override

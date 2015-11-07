@@ -1053,7 +1053,7 @@ public class Int implements Integer, Serializable
 	@Override
 	public Int previous()
 	{
-		return Int.apply(this.value + 1);
+		return Int.apply(this.value - 1);
 	}
 	
 	// Object methods
