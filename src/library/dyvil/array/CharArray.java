@@ -7,10 +7,12 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
 import dyvil.lang.Char;
+import dyvil.lang.Int;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface CharArray
 		return new char[count];
 	}
 	
-	public static char[] apply(int count, char repeatedValue)
+	public static char[] repeat(int count, char repeatedValue)
 	{
 		char[] array = new char[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface CharArray
 		return array;
 	}
 	
-	public static char[] apply(int count, IntUnaryOperator generator)
+	public static char[] generate(int count, IntUnaryOperator generator)
 	{
 		char[] array = new char[count];
 		for (int i = 0; i < count; i++)
@@ -85,10 +87,32 @@ public interface CharArray
 		return array[i];
 	}
 	
+	public static @infix char[] subscript(char[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		char[] slice = new char[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, CASTORE })
 	public static @infix void subscript_$eq(char[] array, int i, char v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(char[] array, Range<Int> range, char[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

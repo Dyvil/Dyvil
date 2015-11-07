@@ -22,6 +22,7 @@ import dyvil.lang.Short;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -40,7 +41,7 @@ public interface ObjectArray
 		return (T[]) Array.newInstance(type, count);
 	}
 	
-	public static <T> T[] apply(Class<T> type, int count, T repeatedValue)
+	public static <T> T[] repeat(Class<T> type, int count, T repeatedValue)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -50,7 +51,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <T> T[] apply(Class<T> type, int count, IntFunction<T> generator)
+	public static <T> T[] generate(Class<T> type, int count, IntFunction<T> generator)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -94,10 +95,32 @@ public interface ObjectArray
 		return array[i];
 	}
 	
+	public static @infix <T> T[] subscript(T[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		T[] slice = (T[]) Array.newInstance(array.getClass().getComponentType(), count);
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, AASTORE })
 	public static @infix <T> void subscript_$eq(T[] array, int i, T v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix <T> void subscript_$eq(T[] array, Range<Int> range, T[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

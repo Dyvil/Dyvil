@@ -6,11 +6,13 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+import dyvil.lang.Int;
 import dyvil.lang.Short;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface ShortArray
 		return new short[count];
 	}
 	
-	public static short[] apply(int count, short repeatedValue)
+	public static short[] repeat(int count, short repeatedValue)
 	{
 		short[] array = new short[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface ShortArray
 		return array;
 	}
 	
-	public static short[] apply(int count, IntUnaryOperator generator)
+	public static short[] generate(int count, IntUnaryOperator generator)
 	{
 		short[] array = new short[count];
 		for (int i = 0; i < count; i++)
@@ -96,10 +98,32 @@ public interface ShortArray
 		return array[i];
 	}
 	
+	public static @infix short[] subscript(short[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		short[] slice = new short[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, SASTORE })
 	public static @infix void subscript_$eq(short[] array, int i, short v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(short[] array, Range<Int> range, short[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

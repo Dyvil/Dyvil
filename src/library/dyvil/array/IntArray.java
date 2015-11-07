@@ -11,6 +11,7 @@ import dyvil.lang.Int;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +30,7 @@ public interface IntArray
 		return new int[count];
 	}
 	
-	public static int[] apply(int count, int repeatedValue)
+	public static int[] repeat(int count, int repeatedValue)
 	{
 		int[] array = new int[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +40,7 @@ public interface IntArray
 		return array;
 	}
 	
-	public static int[] apply(int count, IntUnaryOperator generator)
+	public static int[] generate(int count, IntUnaryOperator generator)
 	{
 		int[] array = new int[count];
 		for (int i = 0; i < count; i++)
@@ -85,10 +86,32 @@ public interface IntArray
 		return array[i];
 	}
 	
+	public static @infix int[] subscript(int[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		int[] slice = new int[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, IASTORE })
 	public static @infix void subscript_$eq(int[] array, int i, int v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(int[] array, Range<Int> range, int[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

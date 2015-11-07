@@ -7,10 +7,12 @@ import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import dyvil.lang.Boolean;
+import dyvil.lang.Int;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface BooleanArray
 		return new boolean[count];
 	}
 	
-	public static boolean[] apply(int count, boolean repeatedValue)
+	public static boolean[] repeat(int count, boolean repeatedValue)
 	{
 		boolean[] array = new boolean[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface BooleanArray
 		return array;
 	}
 	
-	public static boolean[] apply(int count, IntPredicate generator)
+	public static boolean[] generate(int count, IntPredicate generator)
 	{
 		boolean[] array = new boolean[count];
 		for (int i = 0; i < count; i++)
@@ -63,10 +65,32 @@ public interface BooleanArray
 		return array[i];
 	}
 	
+	public static @infix boolean[] subscript(boolean[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		boolean[] slice = new boolean[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, BASTORE })
 	public static @infix void subscript_$eq(boolean[] array, int i, boolean v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

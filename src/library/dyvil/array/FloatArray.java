@@ -7,10 +7,12 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.IntConsumer;
 
 import dyvil.lang.Float;
+import dyvil.lang.Int;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface FloatArray
 		return new float[count];
 	}
 	
-	public static float[] apply(int count, int repeatedValue)
+	public static float[] repeat(int count, float repeatedValue)
 	{
 		float[] array = new float[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface FloatArray
 		return array;
 	}
 	
-	public static float[] apply(int count, DoubleUnaryOperator generator)
+	public static float[] generate(int count, DoubleUnaryOperator generator)
 	{
 		float[] array = new float[count];
 		for (int i = 0; i < count; i++)
@@ -96,10 +98,32 @@ public interface FloatArray
 		return array[i];
 	}
 	
+	public static @infix float[] subscript(float[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		float[] slice = new float[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, FASTORE })
 	public static @infix void subscript_$eq(float[] array, int i, float v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(float[] array, Range<Int> range, float[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

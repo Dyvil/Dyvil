@@ -7,10 +7,12 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.IntConsumer;
 
 import dyvil.lang.Double;
+import dyvil.lang.Int;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface DoubleArray
 		return new double[count];
 	}
 	
-	public static double[] apply(int count, double repeatedValue)
+	public static double[] repeat(int count, double repeatedValue)
 	{
 		double[] array = new double[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface DoubleArray
 		return array;
 	}
 	
-	public static double[] apply(int count, DoubleUnaryOperator generator)
+	public static double[] generate(int count, DoubleUnaryOperator generator)
 	{
 		double[] array = new double[count];
 		for (int i = 0; i < count; i++)
@@ -85,10 +87,32 @@ public interface DoubleArray
 		return array[i];
 	}
 	
+	public static @infix double[] subscript(double[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		double[] slice = new double[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, DASTORE })
 	public static @infix void subscript_$eq(double[] array, int i, double v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(double[] array, Range<Int> range, double[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

@@ -6,11 +6,13 @@ import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
 
+import dyvil.lang.Int;
 import dyvil.lang.Long;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface LongArray
 		return new long[count];
 	}
 	
-	public static long[] apply(int count, long repeatedValue)
+	public static long[] repeat(int count, long repeatedValue)
 	{
 		long[] array = new long[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface LongArray
 		return array;
 	}
 	
-	public static long[] apply(int count, LongUnaryOperator generator)
+	public static long[] generate(int count, LongUnaryOperator generator)
 	{
 		long[] array = new long[count];
 		for (int i = 0; i < count; i++)
@@ -85,10 +87,32 @@ public interface LongArray
 		return array[i];
 	}
 	
+	public static @infix long[] subscript(long[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		long[] slice = new long[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, LASTORE })
 	public static @infix void subscript_$eq(long[] array, int i, long v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(long[] array, Range<Int> range, long[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })

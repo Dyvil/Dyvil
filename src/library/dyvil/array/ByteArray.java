@@ -7,10 +7,12 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
 import dyvil.lang.Byte;
+import dyvil.lang.Int;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.infix;
 import dyvil.annotation.inline;
+import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
@@ -29,7 +31,7 @@ public interface ByteArray
 		return new byte[count];
 	}
 	
-	public static byte[] apply(int count, byte repeatedValue)
+	public static byte[] repeat(int count, byte repeatedValue)
 	{
 		byte[] array = new byte[count];
 		for (int i = 0; i < count; i++)
@@ -39,7 +41,7 @@ public interface ByteArray
 		return array;
 	}
 	
-	public static byte[] apply(int count, IntUnaryOperator generator)
+	public static byte[] generate(int count, IntUnaryOperator generator)
 	{
 		byte[] array = new byte[count];
 		for (int i = 0; i < count; i++)
@@ -85,10 +87,32 @@ public interface ByteArray
 		return array[i];
 	}
 	
+	public static @infix byte[] subscript(byte[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		byte[] slice = new byte[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
 	@Intrinsic({ LOAD_0, LOAD_1, BASTORE })
 	public static @infix void subscript_$eq(byte[] array, int i, byte v)
 	{
 		array[i] = v;
+	}
+	
+	public static @infix void subscript_$eq(byte[] array, Range<Int> range, byte[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
 	}
 	
 	// Operators
