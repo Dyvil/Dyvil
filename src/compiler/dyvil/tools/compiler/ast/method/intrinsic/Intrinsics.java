@@ -47,7 +47,7 @@ public class Intrinsics
 				ints[i + 3] = values.getValue(i + 3).intValue();
 				i += 3;
 			}
-			else if (Opcodes.isJumpOpcode(opcode))
+			else if (Opcodes.isJumpOpcode(opcode) || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH)
 			{
 				ints[i + 1] = values.getValue(i + 1).intValue();
 				i += 1;

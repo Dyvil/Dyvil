@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.method.intrinsic;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -81,12 +82,22 @@ public class SpecialIntrinsicData implements IntrinsicData
 			case Opcodes.LOAD_2:
 				IntrinsicData.writeArgument(writer, this.method, 2, instance, arguments);
 				continue;
+			case Opcodes.BIPUSH:
+			case Opcodes.SIPUSH:
+				writer.writeLDC(ints[i + 1]);
+				i++;
+				continue;
+			case Opcodes.LDC:
+				String constant = strings[ints[i + 1]];
+				writeLDC(writer, constant);
+				i++;
+				continue;
 			}
 			
 			writer.writeInsn(opcode, lineNumber);
 		}
 	}
-
+	
 	@Override
 	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
@@ -95,5 +106,32 @@ public class SpecialIntrinsicData implements IntrinsicData
 	@Override
 	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
+	}
+	
+	private static void writeLDC(MethodWriter writer, String constant)
+	{
+		switch (constant.charAt(0))
+		{
+		case 'I':
+			writer.writeLDC(Integer.parseInt(constant.substring(1)));
+			return;
+		case 'L':
+			writer.writeLDC(Long.parseLong(constant.substring(1)));
+			return;
+		case 'F':
+			writer.writeLDC(Float.parseFloat(constant.substring(1)));
+			return;
+		case 'D':
+			writer.writeLDC(Double.parseDouble(constant.substring(1)));
+			return;
+		case 'S':
+		case '"':
+		case '\'':
+			writer.writeLDC(constant.substring(1));
+			return;
+		case 'C':
+			writer.writeLDC(Type.getType(constant.substring(1)));
+			return;
+		}
 	}
 }

@@ -27,6 +27,8 @@ public class IntrinsicTest
 		
 		print "Hello "
 		println "World"
+		
+		greet
 	}
 	
 	@Intrinsic([ LOAD_0, LOAD_1, INEG, IADD ])
@@ -34,4 +36,7 @@ public class IntrinsicTest
 	
 	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "print", "(Ljava/lang/String;)V" ])
 	public static void print(String s) = throw new RuntimeException("Not Intrinsic!")
+	
+	@Intrinsic(value: [ LDC, 0 ], strings: [ "'Hello World" ])
+	public static void greet() = throw new RuntimeException("Not Intrinsic!")
 }
