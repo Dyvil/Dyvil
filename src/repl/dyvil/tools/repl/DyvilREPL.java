@@ -112,7 +112,13 @@ public class DyvilREPL
 			
 			if (s == null)
 			{
-				continue;
+				if (buffer.length() > 0)
+				{
+					continue;
+				}
+				
+				exit();
+				return null;
 			}
 			
 			outer:
@@ -197,6 +203,12 @@ public class DyvilREPL
 		}
 		
 		return buffer.toString();
+	}
+	
+	private static void exit()
+	{
+		System.err.println("Shutting down...");
+		System.exit(0);
 	}
 	
 	private static synchronized void loop()
