@@ -514,6 +514,7 @@ public class Byte implements Integer, Serializable
 	
 	// Object methods
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString", "(I)Ljava/lang/String;" })
 	public static @infix @inline String toString(byte value)
 	{
 		return java.lang.Integer.toString(value);
@@ -553,7 +554,7 @@ public class Byte implements Integer, Serializable
 	@Override
 	public String toString()
 	{
-		return java.lang.Byte.toString(this.value);
+		return java.lang.Integer.toString(this.value);
 	}
 	
 	@Intrinsic({ LOAD_0 })

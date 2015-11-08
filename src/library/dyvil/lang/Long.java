@@ -517,6 +517,7 @@ public class Long implements Integer, Serializable
 	
 	// Object methods
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Long", "toString", "(J)Ljava/lang/String;" })
 	public static @infix @inline String toString(long value)
 	{
 		return java.lang.Long.toString(value);

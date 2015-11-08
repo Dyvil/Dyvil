@@ -369,6 +369,7 @@ public class Double implements Number, Serializable
 	
 	// Object methods
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Double", "toString", "(D)Ljava/lang/String;" })
 	public static @infix @inline String toString(double value)
 	{
 		return FloatingDecimal.toJavaFormatString(value);

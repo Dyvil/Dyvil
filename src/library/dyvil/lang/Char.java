@@ -517,11 +517,13 @@ public class Char implements Integer, Serializable
 	
 	// Object methods
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/String", "valueOf", "(C)Ljava/lang/String;" })
 	public static @infix @inline String toString(char value)
 	{
 		return String.valueOf(value);
 	}
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString", "(I)Ljava/lang/String;" })
 	public static @infix @inline String toDecimalString(char value)
 	{
 		return java.lang.Integer.toString(value);

@@ -369,6 +369,7 @@ public class Float implements Number, Serializable
 	
 	// Object methods
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Float", "toString", "(F)Ljava/lang/String;" })
 	public static @infix @inline String toString(float value)
 	{
 		return FloatingDecimal.toJavaFormatString(value);
