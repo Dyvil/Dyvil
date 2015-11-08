@@ -918,6 +918,9 @@ public interface Opcodes
 	public static final int	ACMPEQ	= 314;
 	public static final int	ACMPNE	= 315;
 	
+	public static final int	NULL	= 316;
+	public static final int	NONNULL	= 317;
+	
 	public static final int	IF_LCMPEQ	= 330;
 	public static final int	IF_LCMPNE	= 331;
 	public static final int	IF_LCMPLT	= 332;
@@ -1060,135 +1063,169 @@ public interface Opcodes
 	
 	public static int getInverseOpcode(int opcode)
 	{
+		// @formatter:off
 		switch (opcode)
 		{
-		case IFEQ:
-			return IFNE;
-		case IFNE:
-			return IFEQ;
-		case IFLT:
-			return IFGE;
-		case IFGE:
-			return IFLT;
-		case IFGT:
-			return IFLE;
-		case IFLE:
-			return IFGT;
-		
-		case ICMPEQ:
-			return ICMPNE;
-		case ICMPNE:
-			return ICMPEQ;
-		case ICMPGE:
-			return ICMPLT;
-		case ICMPLT:
-			return ICMPGE;
-		case ICMPLE:
-			return ICMPGT;
-		case ICMPGT:
-			return ICMPLE;
-		case IF_ICMPEQ:
-			return IF_ICMPNE;
-		case IF_ICMPNE:
-			return IF_ICMPEQ;
-		case IF_ICMPLT:
-			return IF_ICMPGE;
-		case IF_ICMPGE:
-			return IF_ICMPLT;
-		case IF_ICMPGT:
-			return IF_ICMPLE;
-		case IF_ICMPLE:
-			return IF_ICMPGT;
-		
-		case LCMPEQ:
-			return LCMPNE;
-		case LCMPNE:
-			return LCMPEQ;
-		case LCMPLT:
-			return LCMPGE;
-		case LCMPGE:
-			return LCMPLT;
-		case LCMPGT:
-			return LCMPLE;
-		case LCMPLE:
-			return LCMPGT;
-		case IF_LCMPEQ:
-			return IF_LCMPNE;
-		case IF_LCMPNE:
-			return IF_LCMPEQ;
-		case IF_LCMPLT:
-			return IF_LCMPGE;
-		case IF_LCMPGE:
-			return IF_LCMPLT;
-		case IF_LCMPGT:
-			return IF_LCMPLE;
-		case IF_LCMPLE:
-			return IF_LCMPGT;
-		
-		case FCMPEQ:
-			return FCMPNE;
-		case FCMPNE:
-			return FCMPEQ;
-		case FCMPLT:
-			return FCMPGE;
-		case FCMPGE:
-			return FCMPLT;
-		case FCMPGT:
-			return FCMPLE;
-		case FCMPLE:
-			return FCMPGT;
-		case IF_FCMPEQ:
-			return IF_FCMPNE;
-		case IF_FCMPNE:
-			return IF_FCMPEQ;
-		case IF_FCMPLT:
-			return IF_FCMPGE;
-		case IF_FCMPGE:
-			return IF_FCMPLT;
-		case IF_FCMPGT:
-			return IF_FCMPLE;
-		case IF_FCMPLE:
-			return IF_FCMPGT;
-		
-		case DCMPEQ:
-			return DCMPNE;
-		case DCMPNE:
-			return DCMPEQ;
-		case DCMPLT:
-			return DCMPGE;
-		case DCMPGE:
-			return DCMPLT;
-		case DCMPGT:
-			return DCMPLE;
-		case DCMPLE:
-			return DCMPGT;
-		case IF_DCMPEQ:
-			return IF_DCMPNE;
-		case IF_DCMPNE:
-			return IF_DCMPEQ;
-		case IF_DCMPLT:
-			return IF_DCMPGE;
-		case IF_DCMPGE:
-			return IF_DCMPLT;
-		case IF_DCMPGT:
-			return IF_DCMPLE;
-		case IF_DCMPLE:
-			return IF_DCMPGT;
-		
-		case ACMPEQ:
-			return ACMPNE;
-		case ACMPNE:
-			return ACMPEQ;
-		case IF_ACMPEQ:
-			return IF_ACMPNE;
-		case IF_ACMPNE:
-			return IF_ACMPEQ;
-		
-		case IFNULL:
-			return IFNONNULL;
-		case IFNONNULL:
-			return IFNULL;
+		case IFEQ: return IFNE;
+		case IFNE: return IFEQ;
+		case IFLT: return IFGE;
+		case IFGE: return IFLT;
+		case IFGT: return IFLE;
+		case IFLE: return IFGT;
+			
+		case ICMPEQ: return ICMPNE;
+		case ICMPNE: return ICMPEQ;
+		case ICMPGE: return ICMPLT;
+		case ICMPLT: return ICMPGE;
+		case ICMPLE: return ICMPGT;
+		case ICMPGT: return ICMPLE;
+		case IF_ICMPEQ: return IF_ICMPNE;
+		case IF_ICMPNE: return IF_ICMPEQ;
+		case IF_ICMPLT: return IF_ICMPGE;
+		case IF_ICMPGE: return IF_ICMPLT;
+		case IF_ICMPGT: return IF_ICMPLE;
+		case IF_ICMPLE: return IF_ICMPGT;
+			
+		case LCMPEQ: return LCMPNE;
+		case LCMPNE: return LCMPEQ;
+		case LCMPLT: return LCMPGE;
+		case LCMPGE: return LCMPLT;
+		case LCMPGT: return LCMPLE;
+		case LCMPLE: return LCMPGT;
+		case IF_LCMPEQ: return IF_LCMPNE;
+		case IF_LCMPNE: return IF_LCMPEQ;
+		case IF_LCMPLT: return IF_LCMPGE;
+		case IF_LCMPGE: return IF_LCMPLT;
+		case IF_LCMPGT: return IF_LCMPLE;
+		case IF_LCMPLE: return IF_LCMPGT;
+			
+		case FCMPEQ: return FCMPNE;
+		case FCMPNE: return FCMPEQ;
+		case FCMPLT: return FCMPGE;
+		case FCMPGE: return FCMPLT;
+		case FCMPGT: return FCMPLE;
+		case FCMPLE: return FCMPGT;
+		case IF_FCMPEQ: return IF_FCMPNE;
+		case IF_FCMPNE: return IF_FCMPEQ;
+		case IF_FCMPLT: return IF_FCMPGE;
+		case IF_FCMPGE: return IF_FCMPLT;
+		case IF_FCMPGT: return IF_FCMPLE;
+		case IF_FCMPLE: return IF_FCMPGT;
+			
+		case DCMPEQ: return DCMPNE;
+		case DCMPNE: return DCMPEQ;
+		case DCMPLT: return DCMPGE;
+		case DCMPGE: return DCMPLT;
+		case DCMPGT: return DCMPLE;
+		case DCMPLE: return DCMPGT;
+		case IF_DCMPEQ: return IF_DCMPNE;
+		case IF_DCMPNE: return IF_DCMPEQ;
+		case IF_DCMPLT: return IF_DCMPGE;
+		case IF_DCMPGE: return IF_DCMPLT;
+		case IF_DCMPGT: return IF_DCMPLE;
+		case IF_DCMPLE: return IF_DCMPGT;
+			
+		case ACMPEQ: return ACMPNE;
+		case ACMPNE: return ACMPEQ;
+		case IF_ACMPEQ: return IF_ACMPNE;
+		case IF_ACMPNE: return IF_ACMPEQ;
+			
+		case NULL: return NONNULL;
+		case NONNULL: return NULL;
+		case IFNULL: return IFNONNULL;
+		case IFNONNULL: return IFNULL;
 		}
-		return 0;
+		// @formatter:on
+		return -1;
+	}
+	
+	public static int getJumpOpcode(int opcode)
+	{
+		// @formatter:off
+		switch (opcode)
+		{
+		case ICMPEQ: return IF_ICMPEQ;
+		case ICMPNE: return IF_ICMPNE;
+		case ICMPGE: return IF_ICMPGE;
+		case ICMPLT: return IF_ICMPLT;
+		case ICMPLE: return IF_ICMPLE;
+		case ICMPGT: return IF_ICMPGT;
+			                         
+		case LCMPEQ: return IF_LCMPEQ;
+		case LCMPNE: return IF_LCMPNE;
+		case LCMPLT: return IF_LCMPLT;
+		case LCMPGE: return IF_LCMPGE;
+		case LCMPGT: return IF_LCMPGT;
+		case LCMPLE: return IF_LCMPLE;
+			                         
+		case FCMPEQ: return IF_FCMPEQ;
+		case FCMPNE: return IF_FCMPNE;
+		case FCMPLT: return IF_FCMPLT;
+		case FCMPGE: return IF_FCMPGE;
+		case FCMPGT: return IF_FCMPGT;
+		case FCMPLE: return IF_FCMPLE;
+			                         
+		case DCMPEQ: return IF_DCMPEQ;
+		case DCMPNE: return IF_DCMPNE;
+		case DCMPLT: return IF_DCMPLT;
+		case DCMPGE: return IF_DCMPGE;
+		case DCMPGT: return IF_DCMPGT;
+		case DCMPLE: return IF_DCMPLE;
+			                         
+		case ACMPEQ: return IF_ACMPEQ;
+		case ACMPNE: return IF_ACMPNE;
+			
+		case NULL: return IFNULL;
+		case NONNULL: return IFNONNULL;
+		
+		case BNOT: return IFEQ;
+		}
+		// @formatter:on
+		return -1;
+	}
+	
+	public static int getInvJumpOpcode(int opcode)
+	{
+		// @formatter:off
+		switch (opcode)
+		{
+		case ICMPEQ: return IF_ICMPNE;
+		case ICMPNE: return IF_ICMPEQ;
+		case ICMPGE: return IF_ICMPLT;
+		case ICMPLT: return IF_ICMPGE;
+		case ICMPLE: return IF_ICMPGT;
+		case ICMPGT: return IF_ICMPLE;
+			
+		case LCMPEQ: return IF_LCMPNE;
+		case LCMPNE: return IF_LCMPEQ;
+		case LCMPLT: return IF_LCMPGE;
+		case LCMPGE: return IF_LCMPLT;
+		case LCMPGT: return IF_LCMPLE;
+		case LCMPLE: return IF_LCMPGT;
+			
+		case FCMPEQ: return IF_FCMPNE;
+		case FCMPNE: return IF_FCMPEQ;
+		case FCMPLT: return IF_FCMPGE;
+		case FCMPGE: return IF_FCMPLT;
+		case FCMPGT: return IF_FCMPLE;
+		case FCMPLE: return IF_FCMPGT;
+			
+		case DCMPEQ: return IF_DCMPNE;
+		case DCMPNE: return IF_DCMPEQ;
+		case DCMPLT: return IF_DCMPGE;
+		case DCMPGE: return IF_DCMPLT;
+		case DCMPGT: return IF_DCMPLE;
+		case DCMPLE: return IF_DCMPGT;
+			
+		case ACMPEQ: return IF_ACMPNE;
+		case ACMPNE: return IF_ACMPEQ;
+			
+		case NULL: return IFNONNULL;
+		case NONNULL: return IFNULL;
+		
+		case BNOT: return IFNE;
+		}
+		// @formatter:on
+		return -1;
 	}
 }

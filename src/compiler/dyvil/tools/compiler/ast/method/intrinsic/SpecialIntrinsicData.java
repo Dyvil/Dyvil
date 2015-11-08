@@ -101,11 +101,15 @@ public class SpecialIntrinsicData implements IntrinsicData
 	@Override
 	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
+		this.writeIntrinsic(writer, instance, arguments, lineNumber);
+		writer.writeJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	@Override
 	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
+		this.writeIntrinsic(writer, instance, arguments, lineNumber);
+		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	private static void writeLDC(MethodWriter writer, String constant)

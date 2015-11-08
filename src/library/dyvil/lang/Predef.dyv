@@ -15,6 +15,12 @@ public final class Predef
 	
 	// Object Operators
 	
+	@Intrinsic([ LOAD_0, NULL ])
+	public infix boolean isNull(Object o) = o.isNull
+	
+	@Intrinsic([ LOAD_0, NONNULL ])
+	public infix boolean isNonNull(Object o) = o.isNonNull
+	
 	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS ])
 	public infix boolean ==(Object o1, Object o2) = o1 equals o2
 	

@@ -418,6 +418,12 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitInsn(Opcodes.D2I);
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
+			case NULL:
+				this.writeBoolJump(IFNULL);
+				return;
+			case NONNULL:
+				this.writeBoolJump(IFNONNULL);
+				return;
 			case ACMPEQ:
 				this.writeBoolJump(Opcodes.IF_ACMPEQ);
 				return;

@@ -157,7 +157,7 @@ public class Frame
 		{
 			return "double";
 		}
-		if (o == NULL)
+		if (o == ClassFormat.NULL)
 		{
 			return "null";
 		}
@@ -313,7 +313,7 @@ public class Frame
 		case NOP:
 			return;
 		case ACONST_NULL:
-			this.push(NULL);
+			this.push(ClassFormat.NULL);
 			return;
 		case ICONST_M1:
 		case ICONST_0:

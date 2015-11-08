@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.method.intrinsic;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -13,17 +12,9 @@ public interface IntrinsicData
 {
 	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public default void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
-	{
-		this.writeIntrinsic(writer, instance, arguments, lineNumber);
-		writer.writeJumpInsn(Opcodes.IFEQ, dest);
-	}
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public default void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
-	{
-		this.writeIntrinsic(writer, instance, arguments, lineNumber);
-		writer.writeJumpInsn(Opcodes.IFNE, dest);
-	}
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
 	public static void writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments) throws BytecodeException
 	{
