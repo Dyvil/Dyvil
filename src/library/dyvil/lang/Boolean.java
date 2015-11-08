@@ -44,28 +44,28 @@ public class Boolean implements Comparable<Boolean>, Serializable
 	public static @prefix boolean $bang(boolean v) { return !v; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static boolean $eq$eq(boolean v1, boolean v2) { return v1 == v2; }
+	public static @infix boolean $eq$eq(boolean v1, boolean v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public static boolean $bang$eq(boolean v1, boolean v2) { return v1 != v2; }
+	public static @infix boolean $bang$eq(boolean v1, boolean v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public static boolean $amp(boolean v1, boolean v2) { return (v1 && v2); }
+	public static @infix boolean $amp(boolean v1, boolean v2) { return (v1 && v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public static boolean $bar(boolean v1, boolean v2) { return (v1 || v2); }
+	public static @infix boolean $bar(boolean v1, boolean v2) { return (v1 || v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public static boolean $up(boolean v1, boolean v2) { return (v1 ^ v2); }
+	public static @infix boolean $up(boolean v1, boolean v2) { return (v1 ^ v2); }
 	
 	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR })
-	public static boolean $eq$eq$gt(boolean v1, boolean v2) { return (!v1 || v2); }
+	public static @infix boolean $eq$eq$gt(boolean v1, boolean v2) { return (!v1 || v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, BNOT, IOR })
-	public static boolean $lt$eq$eq(boolean v1, boolean v2) { return (v1 || !v2); }
+	public static @infix boolean $lt$eq$eq(boolean v1, boolean v2) { return (v1 || !v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static boolean $lt$eq$gt(boolean v1, boolean v2) { return (v1 == v2); }
+	public static @infix boolean $lt$eq$gt(boolean v1, boolean v2) { return (v1 == v2); }
 	
 	public static @infix int compareTo(boolean b1, boolean b2) { return b1 == b2 ? 0 : b1 ? 1 : -1; }
 	
