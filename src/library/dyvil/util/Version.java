@@ -5,12 +5,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dyvil.lang.Ordered;
+import dyvil.lang.literal.StringConvertible;
+import dyvil.lang.literal.TupleConvertible;
 
 /**
  * The <b>Version</b> class represents a {@link Comparable comparable} and
  * {@link Ordered ordered} model for the <a href="http://semver.org">Semantic
  * Versioning</a> format.
  */
+@StringConvertible
+@TupleConvertible
 public final class Version implements Ordered<Version>, Immutable, Serializable
 {
 	public enum Element
@@ -29,12 +33,32 @@ public final class Version implements Ordered<Version>, Immutable, Serializable
 	private final String	prerelease;
 	private final String	build;
 	
+	public static Version apply(String version)
+	{
+		return new Version(version);
+	}
+	
+	public static Version apply(int major, int minor, int patch)
+	{
+		return new Version(major, minor, patch, null, null);
+	}
+	
+	public static Version apply(int major, int minor, int patch, String prerelease)
+	{
+		return new Version(major, minor, patch, prerelease, null);
+	}
+	
+	public static Version apply(int major, int minor, int patch, String prerelease, String build)
+	{
+		return new Version(major, minor, patch, prerelease, build);
+	}
+	
 	public Version(String version)
 	{
 		Matcher matcher = Version.PATTERN.matcher(version);
 		if (!matcher.matches())
 		{
-			throw new IllegalArgumentException("<" + version + "> does not match format " + Version.FORMAT);
+			throw new IllegalArgumentException("'" + version + "' does not match format " + Version.FORMAT);
 		}
 		
 		this.major = Integer.parseInt(matcher.group(1));
@@ -47,6 +71,11 @@ public final class Version implements Ordered<Version>, Immutable, Serializable
 	public Version(int major, int minor, int patch)
 	{
 		this(major, minor, patch, null, null);
+	}
+	
+	public Version(int major, int minor, int patch, String prerelease)
+	{
+		this(major, minor, patch, prerelease, null);
 	}
 	
 	public Version(int major, int minor, int patch, String prerelease, String build)
