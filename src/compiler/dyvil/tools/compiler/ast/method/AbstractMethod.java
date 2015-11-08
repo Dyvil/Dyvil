@@ -571,7 +571,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			else
 			{
-				match += instance.getTypeMatch(this.theClass.getType());
+				float receiverMatch = instance.getTypeMatch(this.theClass.getType());
+				if (receiverMatch <= 0)
+				{
+					return 0;
+				}
+				match += receiverMatch;
 			}
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
@@ -605,15 +610,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		int len = this.parameterCount - parIndex;
 		if (argumentCount > len)
-		
 		{
 			return 0;
 		}
 		
-		for (
-		
-		int i = 0; i < len; i++)
-		
+		for (int i = 0; i < len; i++)
 		{
 			IParameter par = this.parameters[i + parIndex];
 			float m = arguments.getTypeMatch(i, par);
@@ -625,7 +626,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		
 		return match;
-		
 	}
 	
 	@Override
