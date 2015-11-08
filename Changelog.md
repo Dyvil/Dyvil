@@ -1,9 +1,105 @@
+Dyvil v0.9.0
+============
+
+- Added the `where` keyword.
+- Added support for Literal Strings, prefixed with an `@` sign.
+- Added support for negative exponents.
+- Re-added Method Invocation Type Arguments.
+- Trailing dots in number literals are now only interpreted as Floating Point Literals if the next character is a digit.
+- Floating Point Literals without an explicit `F` or `D` suffix are now implicitly of type double.
+
+# Dyvil Library v0.8.0
+
+- Added the `Map.keys()` and `Map.values()` methods to simplify use in For Each Statements.
+- Added the `Map.keyMapped(BiFunction)` and `.mapKeys(BiFunction)` methods.
+- Added the `dyvil.annotation.Deprecated` and `.Experimental` annotations.
+- Added the `dyvil.util.MarkerLevel` enum.
+- Added the `closure(=> any)` method to `Predef`.
+- Added the `$(char)` method to `Predef` to allow easier creation of char literals.
+- Added several new `CMP` instructions.
+- Added the `NULL` and `NONNULL` instructions.
+- Added the `[X].subscript(Range<X>)` and `[X].subscript_=(Range<X>, X)` methods for all array types.
+- Added the `String.subscript(Range<int>)` method.
+- Added the `Predef.isNull(any)` and `.isNonNull(any)` methods.
+- Added Apply Methods for `dyvil.util.Version`.
+- Added the `StringConvertible` and `TupleConvertible` annotation to `dyvil.util.Version`.
+- Added an import for the `dyvil.util.Version` class to the Lang Header.
+- Added an import for the `dyvil.annotation.Intrinsic`, `.Native`, `.Transient` and `.Volatile` annotations to the Lang Header.
+- Added the `ReflectUtils.getEnumConstants(Class)` method.
+- Added the `ReflectUtils.newUnsafeString(char[])` method.
+- Split the `ReflectUtils` class into several new classes, namely `dyvil.reflect.Caller`, `.EnumReflection`, `.MethodReflection`, `.ObjectReflection` and `.FieldReflection`.
+- Updated the `Modifiers.METHOD_MODIFIERS` field.
+- Updated primitive instance Intrinsics to be Infix methods.
+- Updated / Fixed the Intrinsic annotations in the primitive classes.
+- Made all Primitive toString() Methods Intrinsic.
+- Improved the `TupleMap` and `ArrayMap` implementations by adding `.putInternal(K, V)` methods to their abstract base classes.
+- Fixed `AbstractArrayMap.putNew(K, V)` causing an `ArrayIndexOutOfBoundsException`.
+- Fixed `Int.previous()` returning the next integer (+ 1) instead of the previous one (- 1).
+- Fixed `HalfOpenRange.last()` being off by one.
+- Moved the primitive `##` (hash) methods from `Predef` to the respective primitive classes.
+- Renamed `Map.mapped(BiFunction)` and `.map(BiFunction)` to `.valueMapped` and `.mapValues`.
+- Renamed `ReflectUtils.unsafe` to `UNSAFE`.
+- Renamed `List.apply(int, Object)` and `List.apply(int, IntFunction<Object>)` as well as their `ImmutableList` counterparts to `.repeat` and `.generate` for clarity.
+- Renamed the `[X].apply(int, X)` and `[X].apply(int, => X)` methods to `repeat` and `generate`, respectively.
+
+# Dyvil Compiler v0.9.0
+
+- Overhauled the Intrinsic System.
+- Added support for `INVOKE*`, `GET*`, and `PUT*` instructions in Intrinsic Annotations.
+- Added support for `LDC`, `BIPUSH` and `SIPUSH` instructions in Intrinsic Annotations.
+- Added Simple Intrinsic branch optimizations
+- Added various checks for invalid modifiers and invalid combinations thereof for Classes, Fields, Methods and Properties.
+- Added a cache to speed up `RootPackage.resolveInternalClass(String)`.
+- Added `FieldAssign.toString()` implementation.
+- Added `IfStatement.toString()` implementation.
+- Added compiler support for the `dyvil.annotation.Deprecated` annotation.
+- Implemented Bytecode Generation for Annotation values by introducing a new dynamic bootstrap method.
+- Updated the MethodMatch / ConstructorMatch system to use dedicated MethodMatchList / ConstructorMatchList classes instead of Lists of MethodMatch and ConstructorMatch wrappers.
+- Updated the Parameter Index System by separating local variable index and method signature index.
+- Improved Lambda and Tuple Type inference and type conversion.
+- Improved Overload Method Resolution for Varargs Methods, Constructors and Primitive Types.
+- Fixed Compound Operators being parsed as if they were left-associative.
+- Fixed String += Operator working incorrectly and being marked as an unresolvable method.
+- Fixed `DyvilSymbols.toString(int)` working incorrectly for keywords.
+- Fixed the Range Operator return type for `Rangeable` values.
+- Fixed the Method Resolution System allowing for matches where the receiver type does not match the receiver value.
+- Fixed the Method Receiver Type Mismatch error message.
+- Fixed Annotation Parameter Access generating invalid bytecode output.
+- Fixed Annotation Parameters being assignable without a compiler error.
+- Fixed inner class resolution for external classes creating multiple IClass objects for the same class.
+- Fixed Enum Annotation Values being decompiled incorrectly.
+- Fixed NPE caused by Single-Quoted Strings in String Concatenation chains.
+- Fixed empty Double-Quoted Strings being parsed incorrectly.
+- Fixed Annotations with unresolved types creating two errors, one for the unchecked type and one for the type not being an annotation type.
+- Fixed incorrect compilation for special / custom bytecode instructions.
+- Fixed Compound Calls working incorrectly with Intrinsics.
+- Fixed the generated code for `equals` and `hashCode` in Case Classes working incorrectly for doubles.
+- Fixed `Util.toTime(long)` working incorrectly for long timespans.
+
+# Dyvil REPL v0.5.0
+
+- Added a check if a class has already been defined.
+- Added the :debug command.
+- Added the :variables command.
+- Added the :methods command.
+- Improved CTRL-D support.
+- Improved method re-definition.
+- Improved the REPL so that multiple REPL instances can be operated on separately.
+- Fixed variables being printed with incorrect values when directly referenced from within the REPL.
+- Fixed strange visibility errors in the REPL.
+- Fixed If Statements without an action causing errors in the REPL.
+- Fixed semantic error markers not being reported in the REPL.
+- Fixed strange formatting in IDE consoles by using stdout and stderr within very short periods of time.
+
+# Dyvil Propery Format v0.2.1
+
+- Made commas in DPF Maps optional.
+
 Dyvil v0.8.0
 ============
 
-- Remove minus signs `-` as part of number literals.
-
 ## Dyvil Library v0.7.0
+
 - The primitive wrapper classes are now `Serializable`.
 - The Option, Some and None classes are now `Serializable`.
 - The Tuple2 and Tuple3 classes are now `Serializable`.
