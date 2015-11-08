@@ -4,10 +4,7 @@ import java.io.Serializable;
 
 import dyvil.lang.literal.DoubleConvertible;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -388,11 +385,16 @@ public class Double implements Number, Serializable
 		return FloatingDecimal.toJavaFormatString(this.value);
 	}
 	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Double", "hashCode", "(D)I" })
+	public static @postfix int $hash$hash(double d)
+	{
+		return java.lang.Double.hashCode(d);
+	}
+	
 	@Override
 	public int hashCode()
 	{
-		long bits = java.lang.Double.doubleToLongBits(this.value);
-		return (int) (bits ^ bits >>> 32);
+		return java.lang.Double.hashCode(this.value);
 	}
 	
 	@Override

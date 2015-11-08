@@ -4,10 +4,7 @@ import java.io.Serializable;
 
 import dyvil.lang.literal.BooleanConvertible;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -103,6 +100,11 @@ public class Boolean implements Comparable<Boolean>, Serializable
 	public String toString()
 	{
 		return this.value ? "true" : "false";
+	}
+	
+	public static @postfix int $hash$hash(boolean v)
+	{
+		return v ? 1231 : 1237;
 	}
 	
 	@Override

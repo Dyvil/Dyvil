@@ -4,10 +4,7 @@ import java.io.Serializable;
 
 import dyvil.lang.literal.IntConvertible;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -562,6 +559,16 @@ public class Int implements Integer, Serializable
 		return java.lang.Integer.toString(this.value);
 	}
 	
+	// @formatter:on
+	
+	// Object methods
+	
+	@Intrinsic({ LOAD_0 })
+	public static @postfix int $hash$hash(int v)
+	{
+		return v;
+	}
+
 	@Override
 	public int hashCode()
 	{

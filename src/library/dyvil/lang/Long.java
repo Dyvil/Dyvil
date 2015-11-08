@@ -4,10 +4,7 @@ import java.io.Serializable;
 
 import dyvil.lang.literal.LongConvertible;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -560,6 +557,12 @@ public class Long implements Integer, Serializable
 	public String toString()
 	{
 		return java.lang.Long.toString(this.value);
+	}
+	
+	@Intrinsic({ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I })
+	public static @postfix int $hash$hash(long v)
+	{
+		return (int) (v >>> 32 ^ v);
 	}
 	
 	@Override

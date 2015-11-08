@@ -2,10 +2,7 @@ package dyvil.lang;
 
 import java.io.Serializable;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -557,6 +554,12 @@ public class Short implements Integer, Serializable
 	public String toString()
 	{
 		return java.lang.Short.toString(this.value);
+	}
+	
+	@Intrinsic({ LOAD_0 })
+	public static @postfix int $hash$hash(short v)
+	{
+		return v;
 	}
 	
 	@Override

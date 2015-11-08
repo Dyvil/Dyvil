@@ -4,10 +4,7 @@ import java.io.Serializable;
 
 import dyvil.lang.literal.CharConvertible;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -565,6 +562,12 @@ public class Char implements Integer, Serializable
 	public String toString()
 	{
 		return String.valueOf(this.value);
+	}
+	
+	@Intrinsic({ LOAD_0 })
+	public static @postfix int $hash$hash(char v)
+	{
+		return v;
 	}
 	
 	@Override

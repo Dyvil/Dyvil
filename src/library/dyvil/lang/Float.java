@@ -4,10 +4,7 @@ import java.io.Serializable;
 
 import dyvil.lang.literal.FloatConvertible;
 
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
-import dyvil.annotation.prefix;
+import dyvil.annotation.*;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -386,6 +383,12 @@ public class Float implements Number, Serializable
 	public String toString()
 	{
 		return FloatingDecimal.toJavaFormatString(this.value);
+	}
+	
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Float", "hashCode", "(F)I" })
+	public static @postfix int $hash$hash(float f)
+	{
+		return java.lang.Float.floatToIntBits(f);
 	}
 	
 	@Override
