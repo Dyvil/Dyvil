@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -105,11 +104,6 @@ public abstract class AbstractCall implements ICall, IValued
 		if (this.type == null)
 		{
 			this.type = this.method.getType().getConcreteType(this.getGenericData()).getReturnType();
-			
-			if (this.method.isIntrinsic() && (this.instance == null || this.instance.getType().isPrimitive()))
-			{
-				this.type = PrimitiveType.getPrimitiveType(this.type);
-			}
 		}
 		return this.type;
 	}

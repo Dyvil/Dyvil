@@ -111,477 +111,56 @@ public class Complex implements Number, Serializable
 		return apply(Math.sqrt((r + m) / 2), Math.copySign((-r + m) / 2, i));
 	}
 	
-	// byte operators
-	
-	@Override
-	public boolean $eq$eq(byte v)
-	{
-		return this.imag == 0D && this.real == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(byte v)
-	{
-		return this.imag != 0D || this.real != v;
-	}
-	
-	@Override
-	public boolean $lt(byte v)
-	{
-		return this.imag == 0D && this.real < v;
-	}
-	
-	@Override
-	public boolean $lt$eq(byte v)
-	{
-		return this.imag == 0D && this.real <= v;
-	}
-	
-	@Override
-	public boolean $gt(byte v)
-	{
-		return this.imag == 0D && this.real > v;
-	}
-	
-	@Override
-	public boolean $gt$eq(byte v)
-	{
-		return this.imag == 0D && this.real >= v;
-	}
-	
-	@Override
-	public Complex $plus(byte v)
-	{
-		return apply(this.real + v, this.imag);
-	}
-	
-	@Override
-	public Complex $minus(byte v)
-	{
-		return apply(this.real - v, this.imag);
-	}
-	
-	@Override
-	public Complex $times(byte v)
-	{
-		return apply(this.real * v, this.imag * v);
-	}
-	
-	@Override
-	public Complex $div(byte v)
-	{
-		return apply(this.real / v, this.imag / v);
-	}
-	
-	@Override
-	public Complex $percent(byte v)
-	{
-		return apply(this.real % v, this.imag % v);
-	}
-	
-	// short operators
-	
-	@Override
-	public boolean $eq$eq(short v)
-	{
-		return this.imag == 0D && this.real == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(short v)
-	{
-		return this.imag != 0D || this.real != v;
-	}
-	
-	@Override
-	public boolean $lt(short v)
-	{
-		return this.imag == 0D && this.real < v;
-	}
-	
-	@Override
-	public boolean $lt$eq(short v)
-	{
-		return this.imag == 0D && this.real <= v;
-	}
-	
-	@Override
-	public boolean $gt(short v)
-	{
-		return this.imag == 0D && this.real > v;
-	}
-	
-	@Override
-	public boolean $gt$eq(short v)
-	{
-		return this.imag == 0D && this.real >= v;
-	}
-	
-	@Override
-	public Complex $plus(short v)
-	{
-		return apply(this.real + v, this.imag);
-	}
-	
-	@Override
-	public Complex $minus(short v)
-	{
-		return apply(this.real - v, this.imag);
-	}
-	
-	@Override
-	public Complex $times(short v)
-	{
-		return apply(this.real * v, this.imag * v);
-	}
-	
-	@Override
-	public Complex $div(short v)
-	{
-		return apply(this.real / v, this.imag / v);
-	}
-	
-	@Override
-	public Complex $percent(short v)
-	{
-		return apply(this.real % v, this.imag % v);
-	}
-	
-	// char operators
-	
-	@Override
-	public boolean $eq$eq(char v)
-	{
-		return this.imag == 0D && this.real == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(char v)
-	{
-		return this.imag != 0D || this.real != v;
-	}
-	
-	@Override
-	public boolean $lt(char v)
-	{
-		return this.imag == 0D && this.real < v;
-	}
-	
-	@Override
-	public boolean $lt$eq(char v)
-	{
-		return this.imag == 0D && this.real <= v;
-	}
-	
-	@Override
-	public boolean $gt(char v)
-	{
-		return this.imag == 0D && this.real > v;
-	}
-	
-	@Override
-	public boolean $gt$eq(char v)
-	{
-		return this.imag == 0D && this.real >= v;
-	}
-	
-	@Override
-	public Complex $plus(char v)
-	{
-		return apply(this.real + v, this.imag);
-	}
-	
-	@Override
-	public Complex $minus(char v)
-	{
-		return apply(this.real - v, this.imag);
-	}
-	
-	@Override
-	public Complex $times(char v)
-	{
-		return apply(this.real * v, this.imag * v);
-	}
-	
-	@Override
-	public Complex $div(char v)
-	{
-		return apply(this.real / v, this.imag / v);
-	}
-	
-	@Override
-	public Complex $percent(char v)
-	{
-		return apply(this.real % v, this.imag % v);
-	}
-	
-	// int operators
-	
-	@Override
-	public boolean $eq$eq(int v)
-	{
-		return this.imag == 0D && this.real == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(int v)
-	{
-		return this.imag != 0D || this.real != v;
-	}
-	
-	@Override
-	public boolean $lt(int v)
-	{
-		return this.imag == 0D && this.real < v;
-	}
-	
-	@Override
-	public boolean $lt$eq(int v)
-	{
-		return this.imag == 0D && this.real <= v;
-	}
-	
-	@Override
-	public boolean $gt(int v)
-	{
-		return this.imag == 0D && this.real > v;
-	}
-	
-	@Override
-	public boolean $gt$eq(int v)
-	{
-		return this.imag == 0D && this.real >= v;
-	}
-	
-	@Override
-	public Complex $plus(int v)
-	{
-		return apply(this.real + v, this.imag);
-	}
-	
-	@Override
-	public Complex $minus(int v)
-	{
-		return apply(this.real - v, this.imag);
-	}
-	
-	@Override
-	public Complex $times(int v)
-	{
-		return apply(this.real * v, this.imag * v);
-	}
-	
-	@Override
-	public Complex $div(int v)
-	{
-		return apply(this.real / v, this.imag / v);
-	}
-	
-	@Override
-	public Complex $percent(int v)
-	{
-		return apply(this.real % v, this.imag % v);
-	}
-	
-	// long operators
-	
-	@Override
-	public boolean $eq$eq(long v)
-	{
-		return this.imag == 0D && this.real == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(long v)
-	{
-		return this.imag != 0D || this.real != v;
-	}
-	
-	@Override
-	public boolean $lt(long v)
-	{
-		return this.imag == 0D && this.real < v;
-	}
-	
-	@Override
-	public boolean $lt$eq(long v)
-	{
-		return this.imag == 0D && this.real <= v;
-	}
-	
-	@Override
-	public boolean $gt(long v)
-	{
-		return this.imag == 0D && this.real > v;
-	}
-	
-	@Override
-	public boolean $gt$eq(long v)
-	{
-		return this.imag == 0D && this.real >= v;
-	}
-	
-	@Override
-	public Complex $plus(long v)
-	{
-		return apply(this.real + v, this.imag);
-	}
-	
-	@Override
-	public Complex $minus(long v)
-	{
-		return apply(this.real - v, this.imag);
-	}
-	
-	@Override
-	public Complex $times(long v)
-	{
-		return apply(this.real * v, this.imag * v);
-	}
-	
-	@Override
-	public Complex $div(long v)
-	{
-		return apply(this.real / v, this.imag / v);
-	}
-	
-	@Override
-	public Complex $percent(long v)
-	{
-		return apply(this.real % v, this.imag % v);
-	}
-	
-	// float operators
-	
-	@Override
-	public boolean $eq$eq(float v)
-	{
-		return this.imag == 0D && this.real == v;
-	}
-	
-	@Override
-	public boolean $bang$eq(float v)
-	{
-		return this.imag != 0D || this.real != v;
-	}
-	
-	@Override
-	public boolean $lt(float v)
-	{
-		return this.imag == 0D && this.real < v;
-	}
-	
-	@Override
-	public boolean $lt$eq(float v)
-	{
-		return this.imag == 0D && this.real <= v;
-	}
-	
-	@Override
-	public boolean $gt(float v)
-	{
-		return this.imag == 0D && this.real > v;
-	}
-	
-	@Override
-	public boolean $gt$eq(float v)
-	{
-		return this.imag == 0D && this.real >= v;
-	}
-	
-	@Override
-	public Complex $plus(float v)
-	{
-		return apply(this.real + v, this.imag);
-	}
-	
-	@Override
-	public Complex $minus(float v)
-	{
-		return apply(this.real - v, this.imag);
-	}
-	
-	@Override
-	public Complex $times(float v)
-	{
-		return apply(this.real * v, this.imag * v);
-	}
-	
-	@Override
-	public Complex $div(float v)
-	{
-		return apply(this.real / v, this.imag / v);
-	}
-	
-	@Override
-	public Complex $percent(float v)
-	{
-		return apply(this.real % v, this.imag % v);
-	}
-	
-	// double operators
-	
-	@Override
 	public boolean $eq$eq(double v)
 	{
 		return this.imag == 0D && this.real == v;
 	}
 	
-	@Override
 	public boolean $bang$eq(double v)
 	{
 		return this.imag != 0D || this.real != v;
 	}
 	
-	@Override
 	public boolean $lt(double v)
 	{
 		return this.imag == 0D && this.real < v;
 	}
 	
-	@Override
 	public boolean $lt$eq(double v)
 	{
 		return this.imag == 0D && this.real <= v;
 	}
 	
-	@Override
 	public boolean $gt(double v)
 	{
 		return this.imag == 0D && this.real > v;
 	}
 	
-	@Override
 	public boolean $gt$eq(double v)
 	{
 		return this.imag == 0D && this.real >= v;
 	}
 	
-	@Override
 	public Complex $plus(double v)
 	{
 		return apply(this.real + v, this.imag);
 	}
 	
-	@Override
 	public Complex $minus(double v)
 	{
 		return apply(this.real - v, this.imag);
 	}
 	
-	@Override
 	public Complex $times(double v)
 	{
 		return apply(this.real * v, this.imag * v);
 	}
 	
-	@Override
 	public Complex $div(double v)
 	{
 		return apply(this.real / v, this.imag / v);
 	}
 	
-	@Override
 	public Complex $percent(double v)
 	{
 		return apply(this.real % v, this.imag % v);

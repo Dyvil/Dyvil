@@ -36,76 +36,61 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		this.value = value;
 	}
 	
-	@Intrinsic({ LOAD_0 })
-	public boolean booleanValue()
-	{
-		return this.value;
-	}
+	// @formatter:off
+	
+	public boolean booleanValue() { return this.value; }
 	
 	@Intrinsic({ LOAD_0, BNOT })
-	public @prefix Boolean $bang()
-	{
-		return apply(!this.value);
-	}
+	public static @prefix boolean $bang(boolean v) { return !v; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public boolean $eq$eq(boolean v)
-	{
-		return this.value == v;
-	}
+	public static boolean $eq$eq(boolean v1, boolean v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public boolean $bang$eq(boolean v)
-	{
-		return this.value != v;
-	}
+	public static boolean $bang$eq(boolean v1, boolean v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public Boolean $amp(boolean v)
-	{
-		return apply(v && this.value);
-	}
+	public static boolean $amp(boolean v1, boolean v2) { return (v1 && v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public Boolean $bar(boolean v)
-	{
-		return apply(v || this.value);
-	}
+	public static boolean $bar(boolean v1, boolean v2) { return (v1 || v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public Boolean $up(boolean v)
-	{
-		return apply(v != this.value);
-	}
+	public static boolean $up(boolean v1, boolean v2) { return (v1 ^ v2); }
 	
 	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR })
-	public Boolean $eq$eq$gt(boolean v)
-	{
-		return apply(v || !this.value);
-	}
+	public static boolean $eq$eq$gt(boolean v1, boolean v2) { return (!v1 || v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, BNOT, IOR })
-	public Boolean $lt$eq$eq(boolean v)
-	{
-		return apply(!v || this.value);
-	}
+	public static boolean $lt$eq$eq(boolean v1, boolean v2) { return (v1 || !v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public Boolean $lt$eq$gt(boolean v)
-	{
-		return apply(v == this.value);
-	}
+	public static boolean $lt$eq$gt(boolean v1, boolean v2) { return (v1 == v2); }
 	
-	public static @infix int compareTo(boolean b1, boolean b2)
-	{
-		return b1 == b2 ? 0 : b1 ? 1 : -1;
-	}
+	public static @infix int compareTo(boolean b1, boolean b2) { return b1 == b2 ? 0 : b1 ? 1 : -1; }
+	
+	public @prefix Boolean $bang() { return Boolean.apply(!this.value); }
+	
+	public Boolean $eq$eq(Boolean v) { return Boolean.apply(this.value == v.value); }
+	
+	public Boolean $bang$eq(Boolean v) { return Boolean.apply(this.value != v.value); }
+	
+	public Boolean $amp(Boolean v) { return Boolean.apply(this.value && v.value); }
+	
+	public Boolean $bar(Boolean v) { return Boolean.apply(this.value || v.value); }
+	
+	public Boolean $up(Boolean v) { return Boolean.apply(this.value ^ v.value); }
+	
+	public Boolean $eq$eq$gt(Boolean v) { return Boolean.apply(!this.value || v.value); }
+	
+	public Boolean $lt$eq$eq(Boolean v) { return Boolean.apply(this.value || !v.value); }
+	
+	public Boolean $lt$eq$gt(Boolean v) { return Boolean.apply(this.value == v.value); }
 	
 	@Override
-	public int compareTo(Boolean o)
-	{
-		return compareTo(this.value, o.value);
-	}
+	public int compareTo(Boolean o) { return compareTo(this.value, o.value); }
+	
+	// @formatter:on
 	
 	// Object methods
 	

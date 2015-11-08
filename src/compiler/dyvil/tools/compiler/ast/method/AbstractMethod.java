@@ -57,7 +57,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
 			
 	static final int VARARGS_MATCH = 100;
-
+	
 	protected ITypeVariable[]	generics;
 	protected int				genericCount;
 	
@@ -529,7 +529,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
-		if (name != null && name != this.name)
+		if (name != this.name && name != null)
 		{
 			return 0;
 		}
@@ -563,6 +563,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				match += m;
 				
 				parIndex = 1;
+			}
+			else if (mod == Modifiers.STATIC && instance.valueTag() != IValue.CLASS_ACCESS)
+			{
+				// Disallow non-static access to static method
+				return 0;
 			}
 			else
 			{
@@ -600,11 +605,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		int len = this.parameterCount - parIndex;
 		if (argumentCount > len)
+		
 		{
 			return 0;
 		}
 		
-		for (int i = 0; i < len; i++)
+		for (
+		
+		int i = 0; i < len; i++)
+		
 		{
 			IParameter par = this.parameters[i + parIndex];
 			float m = arguments.getTypeMatch(i, par);
@@ -616,6 +625,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		
 		return match;
+		
 	}
 	
 	@Override
@@ -648,7 +658,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		int len = arguments.size();
 		
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX && !this.isStatic())
 		{
 			IValue argument = arguments.getFirstValue();
 			arguments.setFirstValue(instance);
@@ -712,7 +722,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(I18n.createMarker(position, "method.access.instance", this.name.unqualified));
 				}
 			}
-			else if (this.intrinsicData == null || !instance.isPrimitive())
+			else
 			{
 				IValue instance1 = IType.convertValue(instance, this.theClass.getType(), typeContext, markers, context);
 				if (instance1 == null)
@@ -1010,17 +1020,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.STATIC) != 0)
-		{
-			// Intrinsic Case 1: Static (infix) Method, Instance not null
-			if (this.intrinsicData != null)
-			{
-				this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
-				return;
-			}
-		}
-		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicData != null && (instance == null || instance.isPrimitive()))
+		if (this.intrinsicData != null)
 		{
 			this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
 			return;
@@ -1046,17 +1046,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.STATIC) != 0)
-		{
-			// Intrinsic Case 1: Static (infix) Method, Instance not null
-			if (this.intrinsicData != null)
-			{
-				this.intrinsicData.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
-				return;
-			}
-		}
-		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicData != null && (instance == null || instance.isPrimitive()))
+		if (this.intrinsicData != null)
 		{
 			this.intrinsicData.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;
@@ -1069,17 +1059,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.STATIC) != 0)
-		{
-			// Intrinsic Case 1: Static (infix) Method, Instance not null
-			if (this.intrinsicData != null)
-			{
-				this.intrinsicData.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
-				return;
-			}
-		}
-		// Intrinsic Case 2: Member Method, Instance is Primitive
-		else if (this.intrinsicData != null && (instance == null || instance.isPrimitive()))
+		if (this.intrinsicData != null)
 		{
 			this.intrinsicData.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
 			return;

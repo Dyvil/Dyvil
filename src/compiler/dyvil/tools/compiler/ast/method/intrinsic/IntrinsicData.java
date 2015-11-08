@@ -32,12 +32,6 @@ public interface IntrinsicData
 				return;
 			}
 			
-			if (instance.isPrimitive())
-			{
-				instance.writeExpression(writer);
-				return;
-			}
-			
 			instance.writeExpression(writer, method.getTheClass().getType());
 			return;
 		}
