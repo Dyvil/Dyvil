@@ -60,28 +60,34 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return this.value != v;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, IAND, IFNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IAND })
 	public Boolean $amp(boolean v)
 	{
 		return apply(v && this.value);
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, IOR, IFNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IOR })
 	public Boolean $bar(boolean v)
 	{
 		return apply(v || this.value);
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, IXOR, IFNE })
+	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
 	public Boolean $up(boolean v)
 	{
 		return apply(v != this.value);
 	}
 	
-	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR, IFEQ })
+	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR })
 	public Boolean $eq$eq$gt(boolean v)
 	{
 		return apply(v || !this.value);
+	}
+	
+	@Intrinsic({ LOAD_0, LOAD_1, BNOT, IOR })
+	public Boolean $lt$eq$eq(boolean v)
+	{
+		return apply(!v || this.value);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
