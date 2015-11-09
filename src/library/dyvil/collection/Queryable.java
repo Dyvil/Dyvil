@@ -144,6 +144,30 @@ public interface Queryable<E> extends Iterable<E>
 		return first;
 	}
 	
+	public default boolean allMatch(Predicate<? super E> condition)
+	{
+		for (E element : this)
+		{
+			if (!condition.test(element))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public default boolean exists(Predicate<? super E> condition)
+	{
+		for (E element : this)
+		{
+			if (condition.test(element))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Returns true if and if only this query contains the given {@code element}
 	 * . By default, 'contains' in defined such that any element in this query

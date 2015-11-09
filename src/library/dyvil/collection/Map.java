@@ -242,6 +242,30 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
+	public default boolean allMatch(BiPredicate<? super K, ? super V> condition)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			if (!condition.test(entry.getKey(), entry.getValue()))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public default boolean exists(BiPredicate<? super K, ? super V> condition)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			if (condition.test(entry.getKey(), entry.getValue()))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Returns true if and if only this map contains a mapping for the given
 	 * {@code key}.
