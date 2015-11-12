@@ -87,32 +87,14 @@ public class AppliedStatementList extends StatementList
 			{
 			case 0:
 			{
-				IValue resolved = super.resolve(markers, context1);
-				this.resolved = true;
-				
-				IValue typed;
-				if (resolved == this)
-				{
-					typed = super.withType(returnType, typeContext, markers, context1);
-				}
-				else
-				{
-					typed = resolved.withType(returnType, typeContext, markers, context1);
-				}
+				IValue typed = this.typed(returnType, typeContext, markers, context1);
 				
 				return lt.wrapLambda(typed, typeContext);
 			}
 			case 1:
 			{
 				this.implicitParameter = new MethodParameter(Names.$it, lt.getType(0));
-				IValue resolved = super.resolve(markers, context1);
-				this.resolved = true;
-				
-				IValue typed = resolved.withType(returnType, typeContext, markers, context1);
-				if (typed == null)
-				{
-					return null; // TODO Better error
-				}
+				IValue typed = this.typed(returnType, typeContext, markers, context1);
 				
 				returnType = typed.getType();
 				LambdaExpression le = new LambdaExpression(null, this.implicitParameter);
@@ -132,6 +114,24 @@ public class AppliedStatementList extends StatementList
 		this.resolved = true;
 		
 		return super.withType(type, typeContext, markers, context1);
+	}
+
+	private IValue typed(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		IValue resolved = super.resolve(markers, context);
+		this.resolved = true;
+		
+		IValue typed;
+		if (resolved == this)
+		{
+			this.returnType = null;
+			typed = super.withType(type, typeContext, markers, context);
+		}
+		else
+		{
+			typed = resolved.withType(type, typeContext, markers, context);
+		}
+		return typed;
 	}
 	
 	@Override

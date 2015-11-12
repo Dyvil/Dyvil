@@ -39,7 +39,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	
 	// Metadata
 	private Map<Name, Variable>	variables;
-	private IType				returnType;
+	protected IType				returnType;
 	
 	public StatementList()
 	{

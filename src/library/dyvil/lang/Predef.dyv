@@ -46,15 +46,15 @@ public final class Predef
 	@Intrinsic([ LOAD_0 ])
 	public static => T closure[T](=> T closure) = closure
 	
-	public static R run[R](=> R closure) = closure()
+	public static R run[R](=> R f) = f()
 
-	public static infix R run[T, R](T self, T => R closure) = closure(self)
+	public static infix R run[T, R](T self, T => R f) = f(self)
 
-	public static infix T use[T](T self, T => void closure) { closure(self); return self }
+	public static infix T use[T](T self, T => void f) { f(self); return self }
 	
-	public static R with[T, R](T receiver, T => R closure) = closure(receiver)
+	public static R with[T, R](T receiver, T => R f) = f(receiver)
 	
-	public static void repeat(int n, => void closure) = for (int i : 0 ..< n) closure()
+	public static void repeat(int n, => void f) = for (int i : 0 ..< n) f()
 	
 	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ]
 				, strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
