@@ -53,7 +53,7 @@ sourceSets {
 			srcDir 'src/parsing'
 		}
 		resources {
-			srcDir 'build/dyvilbin'
+			srcDir "${buildDir}/dyvilbin"
 			
 			include '**/*.dyo'
 		}
@@ -85,6 +85,10 @@ sourceSets {
 			runtimeClasspath += compiler.runtimeClasspath
 		}
 	}
+}
+
+processResources {
+	include '**/*.dyo'
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
@@ -226,7 +230,7 @@ task buildREPL(type: Jar, dependsOn: 'replClasses') {
 /**
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
-task buildAll(type: Jar, dependsOn: 'classes') {
+task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses', 'dpfClasses' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	from sourceSets.compiler.output
@@ -234,6 +238,8 @@ task buildAll(type: Jar, dependsOn: 'classes') {
 	from sourceSets.repl.output
 	from sourceSets.dpf.output
 	
+	include '**/*.*'
+
 	archiveName = "dyvil-${version}.jar"
 	
 	manifest.attributes.put("Main-Class", replMainClass)
