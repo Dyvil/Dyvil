@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -44,6 +45,12 @@ public class FieldThis implements IAccessible
 	public String getDescription()
 	{
 		return this.desc;
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return this.theClass.getType();
 	}
 	
 	public void writeField(ClassWriter writer)

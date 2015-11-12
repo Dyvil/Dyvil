@@ -589,6 +589,12 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
 	public boolean isMember(IVariable variable)
 	{
 		return variable == this.setterParameter;

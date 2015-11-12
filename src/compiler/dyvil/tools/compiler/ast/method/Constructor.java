@@ -533,6 +533,12 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
 	public boolean isMember(IVariable variable)
 	{
 		for (int i = 0; i < this.parameterCount; i++)

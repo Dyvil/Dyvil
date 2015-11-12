@@ -15,6 +15,7 @@ public final class Names
 	public static final Name	equals			= new Name("equals");
 	public static final Name	hashCode		= new Name("hashCode");
 	public static final Name	toString		= new Name("toString");
+	public static final Name	$it				= Name.getQualified("$it");
 	
 	public static final Name	writeReplace	= new Name("writeReplace");
 	public static final Name	readResolve		= new Name("readResolve");

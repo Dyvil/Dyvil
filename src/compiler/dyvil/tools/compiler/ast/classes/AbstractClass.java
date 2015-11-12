@@ -928,6 +928,12 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
 	public boolean isMember(IClassMember member)
 	{
 		return this == member.getTheClass();

@@ -230,14 +230,20 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		IValue value1 = value.withType(this.returnType.getConcreteType(typeContext), typeContext, markers, context);
 		if (value1 != null)
 		{
-			LambdaExpression le = new LambdaExpression(value1.getPosition(), null, 0);
-			le.setMethod(this.getFunctionalMethod());
-			le.setReturnType(this.returnType);
-			le.setValue(value1);
-			le.setType(this);
-			return le;
+			return this.wrapLambda(value, typeContext);
 		}
 		return null;
+	}
+	
+	public LambdaExpression wrapLambda(IValue value, ITypeContext typeContext)
+	{
+		LambdaExpression le = new LambdaExpression(value.getPosition(), null, 0);
+		le.setMethod(this.getFunctionalMethod());
+		le.setReturnType(this.returnType);
+		le.setValue(value);
+		le.setType(this);
+		le.inferReturnType(this, typeContext, this.returnType);
+		return le;
 	}
 	
 	@Override

@@ -504,6 +504,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
 	public boolean isMember(IVariable variable)
 	{
 		for (int i = 0; i < this.parameterCount; i++)

@@ -54,6 +54,8 @@ public interface IContext
 	
 	public IAccessible getAccessibleThis(IClass type);
 	
+	public IAccessible getAccessibleImplicit();
+	
 	public static void addCompilable(IContext context, IClassCompilable compilable)
 	{
 		IClass iclass = context.getThisClass();

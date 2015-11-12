@@ -495,6 +495,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar, IType concrete)
 	{
 		return null;

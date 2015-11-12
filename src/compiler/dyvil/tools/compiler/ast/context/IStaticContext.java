@@ -81,4 +81,10 @@ public interface IStaticContext extends IContext
 	{
 		return null;
 	}
+	
+	@Override
+	public default IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
 }
