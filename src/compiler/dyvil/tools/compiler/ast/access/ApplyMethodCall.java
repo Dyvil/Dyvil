@@ -4,6 +4,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.statement.AppliedStatementList;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -29,7 +31,7 @@ public class ApplyMethodCall extends AbstractCall
 	}
 	
 	@Override
-	protected IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		IMethod method = ICall.resolveMethod(context, this.instance, Names.apply, this.arguments);
 		if (method != null)

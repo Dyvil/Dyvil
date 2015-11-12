@@ -47,7 +47,7 @@ public class SubscriptGetter extends AbstractCall
 	}
 	
 	@Override
-	protected IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		return null;
 	}

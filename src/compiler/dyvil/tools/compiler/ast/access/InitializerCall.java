@@ -97,10 +97,14 @@ public class InitializerCall implements ICall
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public void checkArguments(MarkerList markers, IContext context)
 	{
-		this.arguments.resolve(markers, context);
-		
+		this.constructor.checkArguments(markers, position, context, this.constructor.getTheClass().getType(), arguments);
+	}
+
+	@Override
+	public IValue resolveCall(MarkerList markers, IContext context)
+	{
 		if (this.constructor != null)
 		{
 			return this;
@@ -127,7 +131,14 @@ public class InitializerCall implements ICall
 		}
 		
 		this.constructor = match;
+		this.checkArguments(markers, context);
 		return this;
+	}
+
+	@Override
+	public void resolveArguments(MarkerList markers, IContext context)
+	{
+		this.arguments.resolve(markers, context);
 	}
 	
 	@Override

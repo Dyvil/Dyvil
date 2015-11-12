@@ -99,7 +99,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	protected IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		int type = this.instance.valueTag();
 		if (type == APPLY_CALL)

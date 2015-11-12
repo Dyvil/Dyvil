@@ -22,6 +22,19 @@ public interface ICall extends IValue
 	
 	public IArguments getArguments();
 	
+	@Override
+	public default IValue resolve(MarkerList markers, IContext context)
+	{
+		this.resolveArguments(markers, context);
+		return this.resolveCall(markers, context);
+	}
+	
+	public void checkArguments(MarkerList markers, IContext context);
+
+	public IValue resolveCall(MarkerList markers, IContext context);
+
+	public void resolveArguments(MarkerList markers, IContext context);
+
 	public static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		if (arguments == EmptyArguments.INSTANCE)

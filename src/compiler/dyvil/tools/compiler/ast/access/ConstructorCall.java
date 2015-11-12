@@ -154,11 +154,15 @@ public class ConstructorCall implements ICall
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public void resolveArguments(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
-		this.arguments.resolve(markers, context);
-		
+		this.arguments.resolve(markers, context);		
+	}
+
+	@Override
+	public IValue resolveCall(MarkerList markers, IContext context)
+	{
 		if (!this.type.isResolved())
 		{
 			return this;
@@ -201,6 +205,7 @@ public class ConstructorCall implements ICall
 				}
 			}
 			
+			this.checkArguments(markers, context);
 			return this;
 		}
 		
@@ -216,10 +221,16 @@ public class ConstructorCall implements ICall
 			this.type = this.constructor.checkGenericType(markers, this.position, context, this.type, this.arguments);
 		}
 		
-		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
+		this.checkArguments(markers, context);
 		return this;
 	}
-	
+
+	@Override
+	public void checkArguments(MarkerList markers, IContext context)
+	{
+		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
+	}
+
 	protected void reportResolve(MarkerList markers)
 	{
 		if (!this.type.isResolved())

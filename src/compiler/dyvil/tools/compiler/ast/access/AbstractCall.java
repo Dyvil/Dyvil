@@ -157,7 +157,8 @@ public abstract class AbstractCall implements ICall, IValued
 		return this.resolveCall(markers, context);
 	}
 	
-	protected void resolveArguments(MarkerList markers, IContext context)
+	@Override
+	public void resolveArguments(MarkerList markers, IContext context)
 	{
 		if (this.instance != null)
 		{
@@ -167,9 +168,11 @@ public abstract class AbstractCall implements ICall, IValued
 		this.arguments.resolve(markers, context);
 	}
 	
-	protected abstract IValue resolveCall(MarkerList markers, IContext context);
+	@Override
+	public abstract IValue resolveCall(MarkerList markers, IContext context);
 	
-	protected void checkArguments(MarkerList markers, IContext context)
+	@Override
+	public void checkArguments(MarkerList markers, IContext context)
 	{
 		if (this.method != null)
 		{

@@ -111,7 +111,7 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	protected IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		int args = this.arguments.size();
 		if (args == 1)

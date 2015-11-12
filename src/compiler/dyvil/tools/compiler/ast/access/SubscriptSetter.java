@@ -38,7 +38,7 @@ public class SubscriptSetter extends AbstractCall
 	}
 	
 	@Override
-	protected IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		IMethod m = ICall.resolveMethod(context, this.instance, Names.subscript_$eq, this.arguments);
 		if (m != null)
