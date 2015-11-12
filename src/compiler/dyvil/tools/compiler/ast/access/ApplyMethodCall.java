@@ -31,6 +31,39 @@ public class ApplyMethodCall extends AbstractCall
 	}
 	
 	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		if (this.arguments.getClass() == SingleArgument.class && this.instance instanceof AbstractCall)
+		{
+			ICall ac = (ICall) this.instance;
+			IValue argument = this.arguments.getFirstValue();
+			
+			if (argument instanceof AppliedStatementList)
+			{
+				argument = argument.resolve(markers, context);
+				
+				IArguments oldArgs = ac.getArguments();
+				ac.resolveArguments(markers, context);
+				
+				ac.setArguments(oldArgs.withLastValue(Names.apply, argument));
+				
+				IValue call = ac.resolveCall(markers, context);
+				if (call != null)
+				{
+					return call;
+				}
+				
+				ac.setArguments(oldArgs);
+				
+				this.instance = ac.resolveCall(markers, context);
+				return this.resolveCall(markers, context);
+			}
+		}
+		
+		return super.resolve(markers, context);
+	}
+	
+	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		IMethod method = ICall.resolveMethod(context, this.instance, Names.apply, this.arguments);
