@@ -222,7 +222,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.parameterCount != 0 || value.isType(this))
+		if (this.parameterCount != 0 || IObjectType.super.isSuperClassOf(value.getType()))
 		{
 			return value.withType(this, typeContext, markers, context);
 		}

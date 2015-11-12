@@ -382,12 +382,17 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
+		int len = this.valueCount - 1;
+		if (len < 0)
+		{
+			return;
+		}
+		
 		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		
 		writer.writeLabel(start);
 		int count = writer.localCount();
-		int len = this.valueCount - 1;
 		
 		if (this.labels == null)
 		{
