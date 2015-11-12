@@ -43,7 +43,7 @@ public final class Predef
 	
 	// Closures
 	
-	@Intrinsic(value: [ LOAD_0 ])
+	@Intrinsic([ LOAD_0 ])
 	public static => T closure[T](=> T closure) = closure
 	
 	public static R run[R](=> R closure) = closure()

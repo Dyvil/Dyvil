@@ -222,7 +222,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.parameterCount != 0 || IObjectType.super.isSuperTypeOf(value.getType()))
+		if (this.parameterCount != 0 || value.isType(this))
 		{
 			return value.withType(this, typeContext, markers, context);
 		}
@@ -230,19 +230,21 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		IValue value1 = value.withType(this.returnType.getConcreteType(typeContext), typeContext, markers, context);
 		if (value1 != null)
 		{
-			return this.wrapLambda(value, typeContext);
+			return this.wrapLambda(value1, typeContext);
 		}
 		return null;
 	}
 	
 	public LambdaExpression wrapLambda(IValue value, ITypeContext typeContext)
 	{
+		IType returnType = value.getType();
+		
 		LambdaExpression le = new LambdaExpression(value.getPosition(), null, 0);
 		le.setMethod(this.getFunctionalMethod());
-		le.setReturnType(this.returnType);
+		le.setReturnType(returnType);
 		le.setValue(value);
 		le.setType(this);
-		le.inferReturnType(this, typeContext, this.returnType);
+		le.inferReturnType(this, typeContext, returnType);
 		return le;
 	}
 	
@@ -297,11 +299,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (this.parameterCount == 0 && this.returnType.isSuperTypeOf(concrete))
-		{
-			this.returnType.inferTypes(concrete, typeContext);
-			return;
-		}
+		boolean found = false;
 		
 		ITypeVariable typeVar;
 		IType concreteType;
@@ -313,6 +311,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			if (concreteType != null)
 			{
 				this.parameterTypes[i].inferTypes(concreteType, typeContext);
+				found = true;
 			}
 		}
 		
@@ -321,6 +320,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		if (concreteType != null)
 		{
 			this.returnType.inferTypes(concreteType, typeContext);
+			found = true;
+		}
+		
+		if (!found && this.parameterCount == 0 && this.returnType.isSuperTypeOf(concrete))
+		{
+			this.returnType.inferTypes(concrete, typeContext);
 		}
 	}
 	

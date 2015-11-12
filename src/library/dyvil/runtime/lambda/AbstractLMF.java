@@ -278,7 +278,7 @@ public abstract class AbstractLMF
 	
 	private static boolean isAdaptableToAsReturn(Class<?> fromType, Class<?> toType)
 	{
-		return toType.equals(void.class) || !fromType.equals(void.class) && isAdaptableTo(fromType, toType, false);
+		return toType.equals(void.class) || isAdaptableTo(fromType, toType, false);
 	}
 	
 	private static boolean isAdaptableToAsReturnStrict(Class<?> fromType, Class<?> toType)

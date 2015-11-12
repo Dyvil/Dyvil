@@ -70,6 +70,11 @@ public class AppliedStatementList extends StatementList
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (this.resolved)
+		{
+			return this;
+		}
+		
 		IContext context1 = new CombiningContext(this, context);
 		
 		if (type.typeTag() == IType.LAMBDA)
@@ -81,28 +86,43 @@ public class AppliedStatementList extends StatementList
 			switch (parameterCount)
 			{
 			case 0:
-				super.resolve(markers, context1);
-				this.resolved = true;
-				return lt.wrapLambda(super.withType(returnType, typeContext, markers, context1), typeContext);
-			case 1:
-				this.implicitParameter = new MethodParameter(Names.$it, lt.getType(0));
-				super.resolve(markers, context1);
+			{
+				IValue resolved = super.resolve(markers, context1);
 				this.resolved = true;
 				
-				IValue self = super.withType(returnType, typeContext, markers, context1);
-				if (self == null)
+				IValue typed;
+				if (resolved == this)
+				{
+					typed = super.withType(returnType, typeContext, markers, context1);
+				}
+				else
+				{
+					typed = resolved.withType(returnType, typeContext, markers, context1);
+				}
+				
+				return lt.wrapLambda(typed, typeContext);
+			}
+			case 1:
+			{
+				this.implicitParameter = new MethodParameter(Names.$it, lt.getType(0));
+				IValue resolved = super.resolve(markers, context1);
+				this.resolved = true;
+				
+				IValue typed = resolved.withType(returnType, typeContext, markers, context1);
+				if (typed == null)
 				{
 					return null; // TODO Better error
 				}
 				
-				returnType = this.getType();
+				returnType = typed.getType();
 				LambdaExpression le = new LambdaExpression(null, this.implicitParameter);
 				le.setType(type);
 				le.setReturnType(returnType);
 				le.setMethod(lt.getFunctionalMethod());
-				le.setValue(self);
+				le.setValue(typed);
 				le.inferReturnType(type, typeContext, returnType);
 				return le;
+			}
 			}
 			
 			return null;
