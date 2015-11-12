@@ -48,9 +48,9 @@ public final class Predef
 	
 	public static R run[R](=> R closure) = closure()
 
-	public static infix R use[T, R](T self, T => R closure) = closure(self)
+	public static infix R run[T, R](T self, T => R closure) = closure(self)
 
-	public static infix T run[T](T self, T => void closure) { closure(self); return self }
+	public static infix T use[T](T self, T => void closure) { closure(self); return self }
 	
 	public static R with[T, R](T receiver, T => R closure) = closure(receiver)
 	

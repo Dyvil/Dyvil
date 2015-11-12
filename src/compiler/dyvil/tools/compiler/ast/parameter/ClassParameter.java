@@ -10,7 +10,9 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -61,6 +63,24 @@ public final class ClassParameter extends Parameter implements IField
 	public boolean isVariable()
 	{
 		return false;
+	}
+	
+	@Override
+	public boolean isCapturable()
+	{
+		return false;
+	}
+	
+	@Override
+	public IDataMember capture(IContext context)
+	{
+		return this;
+	}
+	
+	@Override
+	public IDataMember capture(IContext context, IVariable variable)
+	{
+		return this;
 	}
 	
 	@Override
