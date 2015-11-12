@@ -1029,10 +1029,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (this.intrinsicData != null)
 		{
 			this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
-			return;
 		}
-		
-		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
+		else
+		{
+			this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
+		}
 		
 		if (type == Types.VOID)
 		{

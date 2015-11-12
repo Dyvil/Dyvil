@@ -46,12 +46,16 @@ public final class Predef
 	@Intrinsic([ LOAD_0 ])
 	public static => T closure[T](=> T closure) = closure
 	
+	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
 	public static R run[R](=> R f) = f()
-
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static infix R run[T, R](T self, T => R f) = f(self)
 
+	@Intrinsic(value: [ LOAD_0, DUP, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2, POP ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static infix T use[T](T self, T => void f) { f(self); return self }
 	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static R with[T, R](T receiver, T => R f) = f(receiver)
 	
 	public static void repeat(int n, => void f) = for (int i : 0 ..< n) f()
