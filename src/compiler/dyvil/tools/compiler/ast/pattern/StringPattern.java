@@ -35,7 +35,7 @@ public final class StringPattern extends Pattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (type == Types.STRING || type.equals(Types.STRING))
+		if (type == Types.STRING || type.isSameType(Types.STRING))
 		{
 			return this;
 		}

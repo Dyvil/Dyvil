@@ -71,7 +71,7 @@ public class ClassMetadata implements IClassMetadata
 		Name name = m.getName();
 		if (name == Names.equals)
 		{
-			if (m.parameterCount() == 1 && m.getParameter(0).getType().equals(Types.OBJECT))
+			if (m.parameterCount() == 1 && m.getParameter(0).getType().isSameType(Types.OBJECT))
 			{
 				this.methods |= EQUALS;
 			}
@@ -102,7 +102,7 @@ public class ClassMetadata implements IClassMetadata
 				{
 					IType t1 = m.getParameter(i).getType();
 					IType t2 = m.getParameter(i).getType();
-					if (!t1.equals(t2))
+					if (!t1.isSameType(t2))
 					{
 						return;
 					}

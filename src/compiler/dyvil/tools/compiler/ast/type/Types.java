@@ -202,7 +202,7 @@ public final class Types
 	
 	public static IType combine(IType type1, IType type2)
 	{
-		if (type1.equals(type2))
+		if (type1.isSameType(type2))
 		{
 			return type1;
 		}

@@ -424,7 +424,7 @@ public class Property extends Member implements IProperty, IContext
 		else
 		{
 			IType type = this.overrideProperty.getType();
-			if (type != this.type && !type.equals(this.type))
+			if (type != this.type && !type.isSameType(this.type))
 			{
 				Marker marker = I18n.createMarker(this.position, "property.override.type", this.name);
 				marker.addInfo("Property Type: " + this.type);

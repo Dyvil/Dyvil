@@ -916,7 +916,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			IType parType = this.parameters[i].getType();
 			IType methodParType = candidate.getParameter(i).getType().getConcreteType(typeContext);
-			if (!parType.equals(methodParType))
+			if (!parType.isSameType(methodParType))
 			{
 				return false;
 			}

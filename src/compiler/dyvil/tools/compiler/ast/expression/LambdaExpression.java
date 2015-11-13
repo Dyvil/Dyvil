@@ -325,7 +325,7 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			{
 				continue;
 			}
-			if (!param.getType().equals(lambdaParamType))
+			if (!param.getType().isSameType(lambdaParamType))
 			{
 				return false;
 			}

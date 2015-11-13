@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
@@ -22,6 +23,12 @@ public interface IObjectType extends IType
 	public default int getTypecode()
 	{
 		return -1;
+	}
+	
+	@Override
+	public default ITypeVariable getTypeVariable()
+	{
+		return null;
 	}
 	
 	@Override

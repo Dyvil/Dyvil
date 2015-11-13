@@ -88,7 +88,7 @@ public class SwapOperator extends Value
 		
 		IType type1 = this.left.getType();
 		IType type2 = this.right.getType();
-		if (!type1.equals(type2))
+		if (!type1.isSameType(type2))
 		{
 			Marker m = I18n.createMarker(this.position, "swap.type");
 			m.addInfo("Left-Hand Type: " + type1);

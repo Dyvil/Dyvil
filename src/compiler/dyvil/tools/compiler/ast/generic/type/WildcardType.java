@@ -121,7 +121,7 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public boolean equals(IType type)
+	public boolean isSameType(IType type)
 	{
 		if (this.bound != null)
 		{
@@ -133,7 +133,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.equals(type);
+		return this.isSameType(type);
 	}
 	
 	@Override
@@ -409,7 +409,9 @@ public final class WildcardType implements IRawType, ITyped
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		this.toString("", sb);
+		sb.append('_');
+		this.variance.appendInfix(sb);
+		sb.append(this.bound);
 		return sb.toString();
 	}
 	

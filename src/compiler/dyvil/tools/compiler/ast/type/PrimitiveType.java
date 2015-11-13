@@ -192,6 +192,12 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
+	public ITypeVariable getTypeVariable()
+	{
+		return null;
+	}
+	
+	@Override
 	public final IType getObjectType()
 	{
 		return new ClassType(this.theClass);
@@ -284,7 +290,7 @@ public final class PrimitiveType implements IType
 		}
 		if (type.typeTag() == WILDCARD_TYPE)
 		{
-			return type.equals(this);
+			return type.isSameType(this);
 		}
 		if (type.isArrayType())
 		{

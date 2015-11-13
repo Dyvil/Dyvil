@@ -59,7 +59,7 @@ public class ClassType implements IRawType
 	// Super Type
 	
 	@Override
-	public boolean equals(IType type)
+	public boolean isSameType(IType type)
 	{
 		return this.theClass == type.getTheClass();
 	}
@@ -205,6 +205,6 @@ public class ClassType implements IRawType
 	@Override
 	public boolean equals(Object obj)
 	{
-		return this.equals((IType) obj);
+		return this.isSameType((IType) obj);
 	}
 }

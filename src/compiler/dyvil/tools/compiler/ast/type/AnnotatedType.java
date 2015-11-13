@@ -157,9 +157,9 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
-	public boolean equals(IType type)
+	public boolean isSameType(IType type)
 	{
-		return this.type.equals(type);
+		return this.type.isSameType(type);
 	}
 	
 	@Override

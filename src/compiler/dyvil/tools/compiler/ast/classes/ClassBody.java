@@ -239,7 +239,7 @@ public class ClassBody implements IClassBody
 			{
 				IType classParamType = parameters[p].getType();
 				IType constructorParamType = c.getParameter(p).getType();
-				if (!classParamType.equals(constructorParamType))
+				if (!classParamType.isSameType(constructorParamType))
 				{
 					continue outer;
 				}
@@ -327,7 +327,7 @@ public class ClassBody implements IClassBody
 			{
 				IType t1 = parameters[p].getType();
 				IType t2 = m.getParameter(p).getType().getConcreteType(concrete);
-				if (!t1.equals(t2))
+				if (!t1.isSameType(t2))
 				{
 					continue outer;
 				}

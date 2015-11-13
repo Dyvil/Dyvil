@@ -96,7 +96,7 @@ public final class CastOperator extends Value
 			this.value = value1;
 			
 			IType valueType = value1.getType();
-			if (!prevType.equals(valueType) && this.type.isSuperClassOf(valueType) && valueType.isPrimitive() == this.type.isPrimitive())
+			if (!prevType.isSameType(valueType) && this.type.isSuperClassOf(valueType) && valueType.isPrimitive() == this.type.isPrimitive())
 			{
 				this.typeHint = true;
 				this.type = valueType;

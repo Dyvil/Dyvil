@@ -72,14 +72,14 @@ public class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public boolean equals(IType type)
+	public boolean isSameType(IType type)
 	{
 		if (this == type)
 		{
 			return true;
 		}
 		
-		if (!super.equals(type))
+		if (!super.isSameType(type))
 		{
 			return false;
 		}

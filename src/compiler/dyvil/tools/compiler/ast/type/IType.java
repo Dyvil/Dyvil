@@ -121,6 +121,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	public boolean isGenericType();
 	
+	public ITypeVariable getTypeVariable();
+	
 	public Name getName();
 	
 	// Container Class
@@ -207,7 +209,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		}
 		if (type.typeTag() == WILDCARD_TYPE)
 		{
-			return type.equals(this);
+			return type.isSameType(this);
 		}
 		if (type.isArrayType())
 		{
@@ -233,7 +235,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return false;
 	}
 	
-	public default boolean equals(IType type)
+	public default boolean isSameType(IType type)
 	{
 		return this.getTheClass() == type.getTheClass();
 	}

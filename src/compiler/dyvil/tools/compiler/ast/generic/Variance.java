@@ -9,7 +9,7 @@ public enum Variance
 		@Override
 		public boolean checkCompatible(IType a, IType b)
 		{
-			return a.equals(b);
+			return a.isSameType(b);
 		}
 	},
 	COVARIANT
