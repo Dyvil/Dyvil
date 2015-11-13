@@ -195,10 +195,14 @@ public final class TupleType implements IObjectType, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		// We don't need supertype checking here because typeVar can only come
-		// from the tuple class or Entry[K, V], in which case it is simply
-		// overridden and Tuple2.K yields exactly the same as Entry.K.
 		int index = typeVar.getIndex();
+		
+		IClass iclass = this.getTheClass();
+		if (iclass.getTypeVariable(index) != typeVar)
+		{
+			return iclass.resolveType(typeVar, this);
+		}
+		
 		if (index >= this.typeCount)
 		{
 			return null;

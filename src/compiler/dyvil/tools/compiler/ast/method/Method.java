@@ -306,7 +306,7 @@ public class Method extends AbstractMethod
 				markers.add(I18n.createMarker(this.position, "method.override.final", this.name));
 			}
 			
-			IType type = m.getType();
+			IType type = m.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
 				Marker marker = I18n.createMarker(this.position, "method.override.type", this.name);

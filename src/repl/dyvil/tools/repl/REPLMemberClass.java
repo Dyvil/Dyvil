@@ -104,6 +104,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
+	public IType getClassType()
+	{
+		return new ClassType(this);
+	}
+	
+	@Override
 	public void setModifiers(int modifiers)
 	{
 	}

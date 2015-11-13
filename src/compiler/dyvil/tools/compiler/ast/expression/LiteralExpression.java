@@ -119,10 +119,11 @@ public final class LiteralExpression implements IValue
 		method.checkArguments(markers, this.literal.getPosition(), context, null, this.arguments, data);
 		this.type = method.getType().getConcreteType(data);
 		
-		if (!type.isSuperTypeOf(this.type))
+		IType concrete = type.getConcreteType(typeContext);
+		if (!concrete.isSuperTypeOf(this.type))
 		{
 			Marker m = I18n.createMarker(this.literal.getPosition(), "literal.type");
-			m.addInfo("Required Type: " + type.getConcreteType(typeContext));
+			m.addInfo("Required Type: " + concrete);
 			m.addInfo("Conversion Type: " + this.type);
 			
 			StringBuilder sb = new StringBuilder("Conversion Method: \n\t\t");

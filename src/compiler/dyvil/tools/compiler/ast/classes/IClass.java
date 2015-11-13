@@ -58,6 +58,11 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	
 	// Super Types
 	
+	@Override
+	public IType getType();
+	
+	public IType getClassType();
+	
 	public void setSuperType(IType type);
 	
 	public IType getSuperType();

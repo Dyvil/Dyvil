@@ -93,6 +93,12 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
+	public IType getClassType()
+	{
+		return new ClassType(this);
+	}
+	
+	@Override
 	public AnnotationList getAnnotations()
 	{
 		return this.annotations;

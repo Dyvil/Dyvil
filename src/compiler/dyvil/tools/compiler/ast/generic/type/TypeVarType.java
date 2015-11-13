@@ -25,7 +25,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class TypeVarType implements IRawType
 {
-	public ITypeVariable typeVar;
+	protected ITypeVariable typeVar;
 	
 	public TypeVarType()
 	{
@@ -46,6 +46,12 @@ public class TypeVarType implements IRawType
 	public Name getName()
 	{
 		return null;
+	}
+	
+	@Override
+	public ITypeVariable getTypeVariable()
+	{
+		return this.typeVar;
 	}
 	
 	@Override

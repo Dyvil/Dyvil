@@ -713,11 +713,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(I18n.createMarker(position, "method.access.static", this.name.unqualified));
+					markers.add(I18n.createMarker(position, "method.access.static", this.name));
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "method.access.static.type", this.name.unqualified, this.theClass.getFullName()));
+					markers.add(I18n.createMarker(position, "method.access.static.type", this.name, this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -725,15 +725,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(I18n.createMarker(position, "method.access.instance", this.name.unqualified));
+					markers.add(I18n.createMarker(position, "method.access.instance", this.name));
 				}
 			}
 			else
 			{
-				IValue instance1 = IType.convertValue(instance, this.theClass.getType(), typeContext, markers, context);
+				IType type = this.theClass.getClassType();
+				IValue instance1 = IType.convertValue(instance, type, typeContext, markers, context);
+				
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, this.theClass.getType(), typeContext, "method.access.receiver_type", this.getName());
+					Util.createTypeError(markers, instance, type, typeContext, "method.access.receiver_type", this.name);
 				}
 				else
 				{
@@ -823,7 +825,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			ITypeVariable typeVar = this.generics[i];
 			IType type = typeContext.resolveType(typeVar);
-			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).typeVar == typeVar)
+			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).getTypeVariable() == typeVar)
 			{
 				markers.add(I18n.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
 				typeContext.addMapping(typeVar, Types.ANY);

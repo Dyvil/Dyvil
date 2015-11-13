@@ -75,6 +75,12 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
+	public ITypeVariable getTypeVariable()
+	{
+		return this.type.getTypeVariable();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;

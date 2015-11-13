@@ -22,6 +22,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -146,11 +147,11 @@ public class Field extends Member implements IField
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(I18n.createMarker(position, "field.access.static", this.name.unqualified));
+					markers.add(I18n.createMarker(position, "field.access.static", this.name));
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "field.access.static.type", this.name.unqualified, this.theClass.getFullName()));
+					markers.add(I18n.createMarker(position, "field.access.static.type", this.name, this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -158,13 +159,22 @@ public class Field extends Member implements IField
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(I18n.createMarker(position, "field.access.instance", this.name.unqualified));
+					markers.add(I18n.createMarker(position, "field.access.instance", this.name));
 				}
 			}
 			else
 			{
-				IType type = this.theClass.getType();
-				instance = IType.convertValue(instance, type, type, markers, context);
+				IType type = this.theClass.getClassType();
+				IValue instance1 = IType.convertValue(instance, type, type, markers, context);
+				
+				if (instance1 == null)
+				{
+					Util.createTypeError(markers, instance, type, type, "field.access.receiver_type", this.name);
+				}
+				else
+				{
+					instance = instance1;
+				}
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
