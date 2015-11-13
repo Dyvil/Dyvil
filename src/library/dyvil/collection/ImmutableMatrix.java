@@ -6,7 +6,7 @@ import java.util.function.UnaryOperator;
 import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 
-import dyvil.annotation.Covariant;
+import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.tuple.Tuple2;
 import dyvil.util.Immutable;

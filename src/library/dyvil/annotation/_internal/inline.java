@@ -1,4 +1,4 @@
-package dyvil.annotation;
+package dyvil.annotation._internal;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

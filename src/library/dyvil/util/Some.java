@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import dyvil.lang.literal.TupleConvertible;
 
-import dyvil.annotation.ClassParameters;
+import dyvil.annotation._internal.ClassParameters;
 
 @TupleConvertible
 @ClassParameters(names = { "value" })

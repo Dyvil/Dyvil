@@ -11,8 +11,8 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;

@@ -6,7 +6,7 @@ import java.io.Serializable;
 import dyvil.lang.Number;
 import dyvil.lang.literal.TupleConvertible;
 
-import dyvil.annotation.prefix;
+import dyvil.annotation._internal.prefix;
 
 @TupleConvertible
 public class Complex implements Number, Serializable

@@ -3,7 +3,7 @@ package dyvil.string;
 import java.util.Random;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 
 /**
  * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for

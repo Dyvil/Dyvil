@@ -10,7 +10,7 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;
 
-import dyvil.annotation.internal;
+import dyvil.annotation._internal.internal;
 import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;

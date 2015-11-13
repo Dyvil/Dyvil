@@ -6,8 +6,8 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.annotation._internal.Covariant;
 import dyvil.util.Immutable;
 import dyvil.util.ImmutableException;
 

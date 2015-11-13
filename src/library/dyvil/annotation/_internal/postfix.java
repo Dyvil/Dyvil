@@ -1,4 +1,4 @@
-package dyvil.annotation;
+package dyvil.annotation._internal;
 
 /**
  * A more expressive alias for the {@link infix @infix} annotation that behaves

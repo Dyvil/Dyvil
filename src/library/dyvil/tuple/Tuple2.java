@@ -2,8 +2,8 @@ package dyvil.tuple;
 
 import java.util.Objects;
 
-import dyvil.annotation.ClassParameters;
-import dyvil.annotation.Covariant;
+import dyvil.annotation._internal.ClassParameters;
+import dyvil.annotation._internal.Covariant;
 import dyvil.collection.Entry;
 
 @ClassParameters(names = { "_1", "_2" })

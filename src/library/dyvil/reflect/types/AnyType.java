@@ -3,7 +3,7 @@ package dyvil.reflect.types;
 import dyvil.lang.Type;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 
 @NilConvertible
 public @object class AnyType implements Type<Object>

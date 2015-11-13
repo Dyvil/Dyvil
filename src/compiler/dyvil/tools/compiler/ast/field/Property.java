@@ -641,7 +641,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.visitAnnotation("Ldyvil/annotation/internal;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
 	}
 	

@@ -3,7 +3,7 @@ package dyvil.reflect;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 

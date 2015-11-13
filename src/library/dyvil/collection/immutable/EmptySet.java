@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 import dyvil.array.ObjectArray;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;

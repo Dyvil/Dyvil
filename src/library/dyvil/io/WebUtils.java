@@ -10,7 +10,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 import dyvil.array.ByteArray;
 
 /**

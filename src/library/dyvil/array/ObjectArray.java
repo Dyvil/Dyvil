@@ -21,8 +21,8 @@ import dyvil.lang.Short;
 
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Reified;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 

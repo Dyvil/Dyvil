@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
 import dyvil.collection.mutable.ArrayList;
 
 public interface JavaCollections

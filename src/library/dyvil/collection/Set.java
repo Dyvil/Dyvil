@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.internal;
+import dyvil.annotation._internal.internal;
 
 @NilConvertible(methodName = "fromNil")
 @ArrayConvertible

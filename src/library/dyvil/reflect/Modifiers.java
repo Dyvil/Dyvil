@@ -1,6 +1,7 @@
 package dyvil.reflect;
 
 import dyvil.annotation.*;
+import dyvil.annotation._internal.*;
 
 /**
  * The <b>Modifiers</b> interface declares all (visible and invisible) modifiers

@@ -2,7 +2,7 @@ package dyvil.lang;
 
 import java.io.Serializable;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 
 public final @object class Void implements Serializable
 {

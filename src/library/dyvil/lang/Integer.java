@@ -3,7 +3,7 @@ package dyvil.lang;
 import dyvil.lang.literal.IntConvertible;
 import dyvil.lang.literal.LongConvertible;
 
-import dyvil.annotation.prefix;
+import dyvil.annotation._internal.prefix;
 
 @IntConvertible
 @LongConvertible

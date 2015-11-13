@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.math.MathUtils;

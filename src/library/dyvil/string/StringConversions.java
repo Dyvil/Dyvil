@@ -1,7 +1,7 @@
 package dyvil.string;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 
 /**
  * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used

@@ -12,7 +12,7 @@ import dyvil.lang.Rangeable;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
-import dyvil.annotation.Covariant;
+import dyvil.annotation._internal.Covariant;
 import dyvil.collection.range.ClosedRange;
 import dyvil.collection.range.EmptyRange;
 import dyvil.collection.range.HalfOpenRange;

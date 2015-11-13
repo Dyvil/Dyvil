@@ -146,10 +146,10 @@ public final class TypeVariable implements ITypeVariable
 	{
 		switch (type)
 		{
-		case "Ldyvil/annotation/Covariant;":
+		case "Ldyvil/annotation/_internal/Covariant;":
 			this.variance = Variance.COVARIANT;
 			return false;
-		case "Ldyvil/annotation/Contravariant;":
+		case "Ldyvil/annotation/_internal/Contravariant;":
 			this.variance = Variance.CONTRAVARIANT;
 			return false;
 		}
@@ -466,7 +466,7 @@ public final class TypeVariable implements ITypeVariable
 		
 		if (this.variance != Variance.INVARIANT)
 		{
-			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/Contravariant;" : "Ldyvil/annotation/Covariant;";
+			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/_internal/Contravariant;" : "Ldyvil/annotation/_internal/Covariant;";
 			visitor.visitTypeAnnotation(typeRef, null, type, true);
 		}
 		

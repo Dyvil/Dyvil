@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 

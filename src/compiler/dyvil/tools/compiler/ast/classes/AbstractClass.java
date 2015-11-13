@@ -125,16 +125,16 @@ public abstract class AbstractClass implements IClass
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/internal":
+		case "dyvil/annotation/_internal/internal":
 			this.modifiers |= Modifiers.INTERNAL;
 			return false;
-		case "dyvil/annotation/sealed":
+		case "dyvil/annotation/_internal/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
 		case "dyvil/annotation/Strict":
 			this.modifiers |= Modifiers.STRICT;
 			return false;
-		case "dyvil/annotation/object":
+		case "dyvil/annotation/_internal/object":
 			this.modifiers |= Modifiers.OBJECT_CLASS;
 			return false;
 		case Deprecation.DYVIL_INTERNAL:
@@ -144,7 +144,7 @@ public abstract class AbstractClass implements IClass
 		case "java/lang/FunctionalInterface":
 			this.modifiers |= Modifiers.FUNCTIONAL;
 			return false;
-		case "dyvil/annotation/ClassParameters":
+		case "dyvil/annotation/_internal/ClassParameters":
 			if (annotation != null)
 			{
 				this.readClassParameters(annotation);

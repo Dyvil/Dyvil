@@ -3,7 +3,7 @@ package dyvil.reflect;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 
 public class ObjectReflection
 {

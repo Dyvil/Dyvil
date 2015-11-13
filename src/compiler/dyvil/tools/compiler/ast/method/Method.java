@@ -509,19 +509,19 @@ public class Method extends AbstractMethod
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.visitAnnotation("Ldyvil/annotation/inline;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/inline;", false);
 		}
 		if ((this.modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			mw.visitAnnotation("Ldyvil/annotation/extension;", true);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/extension;", true);
 		}
 		else if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			mw.visitAnnotation("Ldyvil/annotation/infix;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/infix;", false);
 		}
 		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
-			mw.visitAnnotation("Ldyvil/annotation/prefix;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/prefix;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
@@ -529,7 +529,7 @@ public class Method extends AbstractMethod
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.visitAnnotation("Ldyvil/annotation/internal;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
 		
 		this.type.writeAnnotations(mw, TypeReference.METHOD_RETURN, "");

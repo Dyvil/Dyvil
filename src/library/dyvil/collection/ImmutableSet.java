@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.Covariant;
+import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonSet;

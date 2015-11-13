@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;

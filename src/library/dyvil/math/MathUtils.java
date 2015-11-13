@@ -1,8 +1,8 @@
 package dyvil.math;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
-import dyvil.annotation.postfix;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.postfix;
 
 /**
  * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for

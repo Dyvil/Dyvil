@@ -510,7 +510,7 @@ public class CodeClass extends AbstractClass
 		
 		if (this.parameterCount > 0)
 		{
-			AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/ClassParameters;", false);
+			AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/_internal/ClassParameters;", false);
 			AnnotationVisitor array = av.visitArray("names");
 			
 			for (int i = 0; i < this.parameterCount; i++)
@@ -564,11 +564,11 @@ public class CodeClass extends AbstractClass
 	{
 		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
-			writer.visitAnnotation("Ldyvil/annotation/object;", true);
+			writer.visitAnnotation("Ldyvil/annotation/_internal/object;", true);
 		}
 		if ((this.modifiers & Modifiers.INTERNAL) != 0)
 		{
-			writer.visitAnnotation("Ldyvil/annotation/internal;", false);
+			writer.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

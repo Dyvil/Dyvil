@@ -10,8 +10,8 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.Covariant;
 import dyvil.annotation.mutating;
+import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;

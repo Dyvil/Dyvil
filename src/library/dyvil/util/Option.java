@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
-import dyvil.annotation.sealed;
+import dyvil.annotation._internal.sealed;
 
 @NilConvertible
 @TupleConvertible

@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 
 @NilConvertible
 public final @object class None implements Option

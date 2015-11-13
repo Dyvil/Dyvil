@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;

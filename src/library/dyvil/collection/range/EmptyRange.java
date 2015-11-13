@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
 

@@ -251,23 +251,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/inline":
+		case "dyvil/annotation/_internal/inline":
 			this.modifiers |= Modifiers.INLINE;
 			return false;
-		case "dyvil/annotation/infix":
-		case "dyvil/annotation/postfix":
+		case "dyvil/annotation/_internal/infix":
+		case "dyvil/annotation/_internal/postfix":
 			this.modifiers |= Modifiers.INFIX;
 			return false;
-		case "dyvil/annotation/extension":
+		case "dyvil/annotation/_internal/extension":
 			this.modifiers |= Modifiers.EXTENSION;
 			return false;
-		case "dyvil/annotation/prefix":
+		case "dyvil/annotation/_internal/prefix":
 			this.modifiers |= Modifiers.PREFIX;
 			return false;
-		case "dyvil/annotation/internal":
+		case "dyvil/annotation/_internal/internal":
 			this.modifiers |= Modifiers.INTERNAL;
 			return false;
-		case "dyvil/annotation/sealed":
+		case "dyvil/annotation/_internal/sealed":
 			this.modifiers |= Modifiers.SEALED;
 			return false;
 		case "dyvil/annotation/Native":

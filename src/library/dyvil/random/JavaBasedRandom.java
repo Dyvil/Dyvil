@@ -1,6 +1,6 @@
 package dyvil.random;
 
-import dyvil.annotation.internal;
+import dyvil.annotation._internal.internal;
 
 public final @internal class JavaBasedRandom extends java.util.Random implements Random
 {

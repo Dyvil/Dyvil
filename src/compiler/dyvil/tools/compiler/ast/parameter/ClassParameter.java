@@ -100,10 +100,10 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/var":
+		case "dyvil/annotation/_internal/var":
 			this.modifiers |= Modifiers.VAR;
 			return false;
-		case "dyvil/annotation/lazy":
+		case "dyvil/annotation/_internal/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}

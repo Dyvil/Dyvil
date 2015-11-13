@@ -8,7 +8,7 @@ import java.util.function.BiPredicate;
 import dyvil.lang.Type;
 import dyvil.lang.literal.ArrayConvertible;
 
-import dyvil.annotation.internal;
+import dyvil.annotation._internal.internal;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.reflect.EnumReflection;

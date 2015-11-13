@@ -5,6 +5,10 @@ import java.io.Serializable;
 import dyvil.lang.literal.FloatConvertible;
 
 import dyvil.annotation.*;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
+import dyvil.annotation._internal.postfix;
+import dyvil.annotation._internal.prefix;
 
 import static dyvil.reflect.Opcodes.*;
 
