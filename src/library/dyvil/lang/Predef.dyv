@@ -36,7 +36,7 @@ public final class Predef
 	// Lists
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "$plus", "(Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
-	public infix ImmutableList[E] ::[E](ImmutableList[_ <: E] list, E element) = list + element
+	public infix ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
@@ -156,7 +156,7 @@ public final class Predef
 	public infix (A, B) ->[A, B](A a, B b) = (a, b)
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
-	public infix (A, B) <-[A, B](A a, B b) = (b, a)
+	public infix (B, A) <-[A, B](A a, B b) = (b, a)
 	
 	public static void ???() = throw new UnsupportedOperationException("Not Implemented!")
 }

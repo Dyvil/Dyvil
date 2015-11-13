@@ -10,7 +10,11 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -282,6 +286,32 @@ public final class TypeVariable implements ITypeVariable
 			}
 		}
 		return 2;
+	}
+	
+	@Override
+	public IDataMember resolveField(Name name)
+	{
+		IDataMember field;
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			field = this.upperBounds[i].resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].getMethodMatches(list, instance, name, arguments);
+		}
 	}
 	
 	@Override

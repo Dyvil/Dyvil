@@ -6,9 +6,14 @@ import dyvil.tools.compiler.ast.annotation.IAnnotated;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -55,6 +60,12 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated
 	public boolean isSuperTypeOf(IType type);
 	
 	public int getSuperTypeDistance(IType superType);
+	
+	// Resolution
+	
+	public IDataMember resolveField(Name name);
+	
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	// Phases
 	

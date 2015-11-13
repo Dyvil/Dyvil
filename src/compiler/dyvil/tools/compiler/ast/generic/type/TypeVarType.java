@@ -75,13 +75,13 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return type == this || this.typeVar.isSuperTypeOf(type);
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
-		return type == this || this.typeVar.isSuperTypeOf(type);
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
@@ -93,13 +93,13 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return type == this || this.typeVar.isSuperTypeOf(type);
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return type == this;
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
@@ -127,7 +127,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.typeVar == typeVar ? this : this.typeVar.getDefaultType().resolveType(typeVar);
+		return this.typeVar == typeVar ? this : null;
 	}
 	
 	@Override
@@ -168,13 +168,13 @@ public class TypeVarType implements IRawType
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.typeVar.getDefaultType().resolveField(name);
+		return this.typeVar.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		this.typeVar.getDefaultType().getMethodMatches(list, instance, name, arguments);
+		this.typeVar.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -185,7 +185,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.typeVar.getDefaultType().getFunctionalMethod();
+		return null;
 	}
 	
 	@Override
