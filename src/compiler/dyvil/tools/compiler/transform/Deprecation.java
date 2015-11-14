@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -141,7 +141,7 @@ public class Deprecation
 		}
 		
 		assert value.valueTag() == IValue.ARRAY;
-		Array array = (Array) value;
+		ArrayExpr array = (ArrayExpr) value;
 		int size = array.valueCount();
 		
 		if (size <= 0)
@@ -170,7 +170,7 @@ public class Deprecation
 		}
 		
 		assert value.valueTag() == IValue.ARRAY;
-		Array array = (Array) value;
+		ArrayExpr array = (ArrayExpr) value;
 		int size = array.valueCount();
 		
 		if (size <= 0)

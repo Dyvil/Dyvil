@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.AppliedStatementList;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
-import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -119,7 +119,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				}
 				if (nextType == BaseSymbols.EQUALS)
 				{
-					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
+					FieldAssignment fa = new FieldAssignment(token.raw(), null, token.nameValue());
 					pm.skip();
 					pm.pushParser(pm.newExpressionParser(fa));
 					this.setValue(fa);

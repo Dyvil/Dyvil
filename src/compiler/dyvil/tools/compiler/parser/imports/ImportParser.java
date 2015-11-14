@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.parser.imports;
 
 import dyvil.tools.compiler.ast.consumer.IImportConsumer;
-import dyvil.tools.compiler.ast.imports.IImport;
-import dyvil.tools.compiler.ast.imports.MultiImport;
-import dyvil.tools.compiler.ast.imports.SingleImport;
-import dyvil.tools.compiler.ast.imports.WildcardImport;
+import dyvil.tools.compiler.ast.header.IImport;
+import dyvil.tools.compiler.ast.header.MultiImport;
+import dyvil.tools.compiler.ast.header.SingleImport;
+import dyvil.tools.compiler.ast.header.WildcardImport;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;

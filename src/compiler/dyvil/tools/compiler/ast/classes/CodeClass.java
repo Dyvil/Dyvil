@@ -9,10 +9,10 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -481,7 +481,7 @@ public class CodeClass extends AbstractClass
 			}
 		}
 		
-		ThisValue thisValue = new ThisValue(this.type, VariableThis.DEFAULT);
+		ThisExpr thisValue = new ThisExpr(this.type, VariableThis.DEFAULT);
 		StatementList instanceFields = new StatementList();
 		
 		IField[] staticFields = new IField[fields + 1];
@@ -503,7 +503,7 @@ public class CodeClass extends AbstractClass
 			}
 			else
 			{
-				FieldAssign assign = new FieldAssign(null, thisValue, f, f.getValue());
+				FieldAssignment assign = new FieldAssignment(null, thisValue, f, f.getValue());
 				instanceFields.addValue(assign);
 			}
 		}

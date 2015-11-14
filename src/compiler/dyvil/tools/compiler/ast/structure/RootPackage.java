@@ -4,7 +4,7 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.util.I18n;

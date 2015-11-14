@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.operator;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class CastOperator extends Value
+public final class CastOperator extends AbstractValue
 {
 	protected IValue	value;
 	protected IType		type	= Types.UNKNOWN;

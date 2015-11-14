@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
+import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;

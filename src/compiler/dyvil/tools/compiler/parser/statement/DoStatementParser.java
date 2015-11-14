@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.statement.DoStatement;
+import dyvil.tools.compiler.ast.statement.loop.DoStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;

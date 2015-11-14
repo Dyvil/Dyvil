@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LambdaExpression;
+import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -235,11 +235,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		return null;
 	}
 	
-	public LambdaExpression wrapLambda(IValue value, ITypeContext typeContext)
+	public LambdaExpr wrapLambda(IValue value, ITypeContext typeContext)
 	{
 		IType returnType = value.getType();
 		
-		LambdaExpression le = new LambdaExpression(value.getPosition(), null, 0);
+		LambdaExpr le = new LambdaExpr(value.getPosition(), null, 0);
 		le.setMethod(this.getFunctionalMethod());
 		le.setReturnType(returnType);
 		le.setValue(value);

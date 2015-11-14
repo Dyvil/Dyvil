@@ -15,6 +15,13 @@ import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.statement.*;
+import dyvil.tools.compiler.ast.statement.control.BreakStatement;
+import dyvil.tools.compiler.ast.statement.control.ContinueStatement;
+import dyvil.tools.compiler.ast.statement.control.GoToStatement;
+import dyvil.tools.compiler.ast.statement.exception.ThrowStatement;
+import dyvil.tools.compiler.ast.statement.exception.TryStatement;
+import dyvil.tools.compiler.ast.statement.loop.DoStatement;
+import dyvil.tools.compiler.ast.statement.loop.WhileStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -123,7 +130,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			case Tokens.STRING_START:
 			{
-				StringInterpolation ssv = new StringInterpolation(token);
+				StringInterpolationExpr ssv = new StringInterpolationExpr(token);
 				this.value = ssv;
 				this.mode = ACCESS;
 				pm.pushParser(new StingInterpolationParser(ssv), true);
@@ -162,7 +169,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					// () => ...
 					if (next.next().type() == DyvilSymbols.ARROW_OPERATOR)
 					{
-						LambdaExpression le = new LambdaExpression(next.next().raw());
+						LambdaExpr le = new LambdaExpr(next.next().raw());
 						this.value = le;
 						pm.skip(2);
 						pm.pushParser(pm.newExpressionParser(le));
@@ -205,7 +212,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.mode = END;
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
-				LambdaExpression le = new LambdaExpression(token.raw());
+				LambdaExpr le = new LambdaExpr(token.raw());
 				this.value = le;
 				this.mode = ACCESS;
 				pm.pushParser(pm.newExpressionParser(le));
@@ -460,7 +467,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			case DyvilKeywords.MATCH:
 				// Parse a match expression
 				// e.g. int1 match { ... }, this match { ... }
-				MatchExpression me = new MatchExpression(token.raw(), this.value);
+				MatchExpr me = new MatchExpr(token.raw(), this.value);
 				pm.pushParser(new MatchExpressionParser(me));
 				this.value = me;
 				return;
@@ -670,7 +677,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new ExpressionListParser(getter.getArguments()));
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
-				LambdaExpression lv = new LambdaExpression(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
+				LambdaExpr lv = new LambdaExpr(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
 				this.mode = END;
 				this.value = lv;
 				pm.pushParser(pm.newExpressionParser(lv));
@@ -818,7 +825,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.FIELD_ACCESS:
 		{
 			FieldAccess fa = (FieldAccess) this.value;
-			FieldAssign assign = new FieldAssign(position, fa.getInstance(), fa.getName());
+			FieldAssignment assign = new FieldAssignment(position, fa.getInstance(), fa.getName());
 			this.value = assign;
 			pm.pushParser(pm.newExpressionParser(assign));
 			return;
@@ -863,7 +870,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = ACCESS;
 			return true;
 		case DyvilKeywords.NIL:
-			this.value = new NilValue(token.raw());
+			this.value = new NilExpr(token.raw());
 			this.mode = ACCESS;
 			return true;
 		case DyvilKeywords.TRUE:
@@ -881,7 +888,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 			// this[type]
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
-				ThisValue tv = new ThisValue(token.raw());
+				ThisExpr tv = new ThisExpr(token.raw());
 				this.mode = PARAMETERIZED_THIS_END;
 				this.value = tv;
 				pm.skip();
@@ -898,7 +905,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					return true;
 				}
 			}
-			this.value = new ThisValue(token.raw());
+			this.value = new ThisExpr(token.raw());
 			this.mode = ACCESS;
 			return true;
 		}
@@ -909,7 +916,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 			// super[type]
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
-				SuperValue sv = new SuperValue(token.raw());
+				SuperExpr sv = new SuperExpr(token.raw());
 				this.mode = PARAMETERIZED_SUPER_END;
 				this.value = sv;
 				pm.skip();
@@ -926,7 +933,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					return true;
 				}
 			}
-			this.value = new SuperValue(token.raw());
+			this.value = new SuperExpr(token.raw());
 			this.mode = ACCESS;
 			return true;
 		}

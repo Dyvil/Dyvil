@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;

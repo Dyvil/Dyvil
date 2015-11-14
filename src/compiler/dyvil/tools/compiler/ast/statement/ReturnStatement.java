@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class ReturnStatement extends Value implements IStatement, IValueConsumer
+public class ReturnStatement extends AbstractValue implements IStatement, IValueConsumer
 {
 	protected IValue value;
 	

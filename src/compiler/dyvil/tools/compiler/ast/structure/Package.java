@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;

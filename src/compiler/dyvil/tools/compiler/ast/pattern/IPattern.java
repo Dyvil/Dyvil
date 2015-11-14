@@ -33,7 +33,7 @@ public interface IPattern extends IASTNode, ITyped
 	
 	int	BINDING		= 32;
 	int	WILDCARD	= 33;
-	int	BOXED		= 34;
+	int	UNBOX		= 34;
 	int	TYPECHECK	= 35;
 	
 	public int getPatternType();
@@ -61,11 +61,11 @@ public interface IPattern extends IASTNode, ITyped
 		}
 		if (type.classEquals(primitiveType))
 		{
-			return new BoxPattern(pattern, primitiveType.getUnboxMethod());
+			return new UnboxPattern(pattern, primitiveType.getUnboxMethod());
 		}
 		if (type.isSuperTypeOf(primitiveType))
 		{
-			return new TypeCheckPattern(new BoxPattern(pattern, primitiveType.getUnboxMethod()), primitiveType.getObjectType());
+			return new TypeCheckPattern(new UnboxPattern(pattern, primitiveType.getUnboxMethod()), primitiveType.getObjectType());
 		}
 		return null;
 	}

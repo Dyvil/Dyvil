@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -17,7 +17,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class SwapOperator extends Value
+public class SwapOperator extends AbstractValue
 {
 	public FieldAccess	left;
 	public FieldAccess	right;

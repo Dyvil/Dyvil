@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -137,7 +137,7 @@ public final class ClassParameter extends Parameter implements IField
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			markers.add(I18n.createMarker(position, "classparameter.access.unqualified", this.name.unqualified));
-			return new ThisValue(position, this.theClass.getType(), context, markers);
+			return new ThisExpr(position, this.theClass.getType(), context, markers);
 		}
 		
 		return instance;

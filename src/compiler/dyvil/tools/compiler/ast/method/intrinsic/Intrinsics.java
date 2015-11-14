@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -26,7 +26,7 @@ public class Intrinsics
 			return null;
 		}
 		
-		Array values = (Array) value;
+		ArrayExpr values = (ArrayExpr) value;
 		
 		int length = values.valueCount();
 		int count = 0;
@@ -57,7 +57,7 @@ public class Intrinsics
 		if (length > count)
 		{
 			IValue stringValue = arguments.getValue(1, STRINGS);
-			Array strings = (Array) stringValue;
+			ArrayExpr strings = (ArrayExpr) stringValue;
 			
 			return readComplex(method, count, ints, strings);
 		}
@@ -65,7 +65,7 @@ public class Intrinsics
 		return new SimpleIntrinsicData(method, ints);
 	}
 	
-	private static IntrinsicData readComplex(IMethod method, int count, int[] ints, Array stringArray)
+	private static IntrinsicData readComplex(IMethod method, int count, int[] ints, ArrayExpr stringArray)
 	{
 		String[] strings;
 		

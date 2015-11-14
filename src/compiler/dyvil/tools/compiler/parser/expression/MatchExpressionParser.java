@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MatchCase;
-import dyvil.tools.compiler.ast.expression.MatchExpression;
+import dyvil.tools.compiler.ast.expression.MatchExpr;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
@@ -20,12 +20,12 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 	private static final int	ACTION			= 8;
 	private static final int	SEPARATOR		= 16;
 	
-	protected MatchExpression matchExpression;
+	protected MatchExpr matchExpression;
 	
 	private MatchCase	currentCase;
 	private boolean		singleCase;
 	
-	public MatchExpressionParser(MatchExpression matchExpression)
+	public MatchExpressionParser(MatchExpr matchExpression)
 	{
 		this.matchExpression = matchExpression;
 		this.mode = OPEN_BRACKET;

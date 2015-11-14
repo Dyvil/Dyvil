@@ -10,7 +10,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
@@ -228,7 +228,7 @@ public class Property extends Member implements IProperty, IContext
 			else
 			{
 				markers.add(I18n.createMarker(position, "property.access.unqualified", this.name.unqualified));
-				instance = new ThisValue(position, this.theClass.getType(), context, markers);
+				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		

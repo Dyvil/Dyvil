@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -263,7 +263,7 @@ public final class Annotation implements IAnnotation
 		if (valueType == IValue.ARRAY)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
-			Array array = (Array) value;
+			ArrayExpr array = (ArrayExpr) value;
 			int count = array.valueCount();
 			for (int i = 0; i < count; i++)
 			{

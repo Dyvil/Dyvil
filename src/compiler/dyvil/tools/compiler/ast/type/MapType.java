@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.Map;
+import dyvil.tools.compiler.ast.expression.MapExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -79,21 +79,21 @@ public class MapType implements IObjectType
 	@Override
 	public IClass getTheClass()
 	{
-		return Map.Types.MAP_CLASS;
+		return MapExpr.Types.MAP_CLASS;
 	}
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		if (typeVar == Map.Types.KEY_VARIABLE)
+		if (typeVar == MapExpr.Types.KEY_VARIABLE)
 		{
 			return this.keyType;
 		}
-		if (typeVar == Map.Types.VALUE_VARIABLE)
+		if (typeVar == MapExpr.Types.VALUE_VARIABLE)
 		{
 			return this.valueType;
 		}
-		return Map.Types.MAP_CLASS.resolveType(typeVar, this);
+		return MapExpr.Types.MAP_CLASS.resolveType(typeVar, this);
 	}
 	
 	@Override
@@ -117,8 +117,8 @@ public class MapType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		this.keyType.inferTypes(concrete.resolveType(Map.Types.KEY_VARIABLE), typeContext);
-		this.valueType.inferTypes(concrete.resolveType(Map.Types.VALUE_VARIABLE), typeContext);
+		this.keyType.inferTypes(concrete.resolveType(MapExpr.Types.KEY_VARIABLE), typeContext);
+		this.valueType.inferTypes(concrete.resolveType(MapExpr.Types.VALUE_VARIABLE), typeContext);
 	}
 	
 	@Override
@@ -172,7 +172,7 @@ public class MapType implements IObjectType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		Map.Types.MAP_CLASS.getMethodMatches(list, instance, name, arguments);
+		MapExpr.Types.MAP_CLASS.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -189,7 +189,7 @@ public class MapType implements IObjectType
 	@Override
 	public String getInternalName()
 	{
-		return Map.Types.MAP_CLASS.getInternalName();
+		return MapExpr.Types.MAP_CLASS.getInternalName();
 	}
 	
 	@Override

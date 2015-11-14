@@ -19,7 +19,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 
-public class NestedMethod extends Method
+public class NestedMethod extends CodeMethod
 {
 	private IClass				thisClass;
 	private CaptureVariable[]	capturedFields;

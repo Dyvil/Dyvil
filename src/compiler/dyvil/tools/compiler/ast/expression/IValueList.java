@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.statement.control.Label;
 
 public interface IValueList extends Iterable<IValue>
 {

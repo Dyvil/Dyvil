@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.pattern;
 
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.*;
+import dyvil.tools.compiler.ast.pattern.constant.*;
 import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;

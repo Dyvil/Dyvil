@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.bytecode;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;

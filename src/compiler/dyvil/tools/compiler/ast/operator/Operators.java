@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.StringBuilderExpression;
+import dyvil.tools.compiler.ast.expression.StringConcatExpr;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
@@ -60,13 +60,13 @@ public interface Operators
 		{
 			if (arg1.valueTag() == IValue.STRINGBUILDER)
 			{
-				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
+				StringConcatExpr sbe = (StringConcatExpr) arg1;
 				sbe.addValue(arg2);
 				return sbe;
 			}
 			if (arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL || arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL)
 			{
-				StringBuilderExpression sbe = new StringBuilderExpression();
+				StringConcatExpr sbe = new StringConcatExpr();
 				sbe.addValue(arg1);
 				sbe.addValue(arg2);
 				return sbe;
@@ -80,19 +80,19 @@ public interface Operators
 			}
 			if (arg2.valueTag() == IValue.STRINGBUILDER)
 			{
-				StringBuilderExpression sbe = (StringBuilderExpression) arg2;
+				StringConcatExpr sbe = (StringConcatExpr) arg2;
 				sbe.addFirstValue(arg1);
 			}
 			else
 			{
-				StringBuilderExpression sbe = new StringBuilderExpression();
+				StringConcatExpr sbe = new StringConcatExpr();
 				sbe.addValue(arg1);
 				sbe.addValue(arg2);
 				arg2 = sbe;
 			}
 			
 			FieldAccess fa = (FieldAccess) arg1;
-			return new FieldAssign(null, fa.getInstance(), fa.getField(), arg2);
+			return new FieldAssignment(null, fa.getInstance(), fa.getField(), arg2);
 		}
 		boolean openRange = false;
 		if (name == Names.dotdot || (openRange = name == Names.dotdotlt))

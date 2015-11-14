@@ -5,7 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -48,7 +48,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			Method m = new Method(this.theClass, Names.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
+			CodeMethod m = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
 			IParameter[] parameters = this.theClass.getParameters();
 			int parameterCount = this.theClass.parameterCount();
 			

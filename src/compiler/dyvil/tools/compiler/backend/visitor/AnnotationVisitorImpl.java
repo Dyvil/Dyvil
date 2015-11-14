@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.ast.type.IType;
@@ -60,7 +60,7 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		Array valueList = new Array();
+		ArrayExpr valueList = new ArrayExpr();
 		this.arguments.addValue(Name.getQualified(key), valueList);
 		return new ArrayAnnotationVisitor(valueList);
 	}

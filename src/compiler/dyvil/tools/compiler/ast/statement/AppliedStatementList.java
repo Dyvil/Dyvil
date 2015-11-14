@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LambdaExpression;
+import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -97,7 +97,7 @@ public class AppliedStatementList extends StatementList
 				IValue typed = this.typed(returnType, typeContext, markers, context1);
 				
 				returnType = typed.getType();
-				LambdaExpression le = new LambdaExpression(null, this.implicitParameter);
+				LambdaExpr le = new LambdaExpr(null, this.implicitParameter);
 				le.setType(type);
 				le.setReturnType(returnType);
 				le.setMethod(lt.getFunctionalMethod());

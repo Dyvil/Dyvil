@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;

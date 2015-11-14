@@ -5,8 +5,8 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralExpression;
-import dyvil.tools.compiler.ast.expression.Value;
+import dyvil.tools.compiler.ast.expression.LiteralConversion;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -20,7 +20,7 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class TypeOperator extends Value
+public final class TypeOperator extends AbstractValue
 {
 	public static final class Types
 	{
@@ -80,7 +80,7 @@ public final class TypeOperator extends Value
 		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE);
 		if (annotation != null)
 		{
-			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
+			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;

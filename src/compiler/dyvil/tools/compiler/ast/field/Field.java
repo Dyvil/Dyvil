@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -186,7 +186,7 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(I18n.createMarker(position, "field.access.unqualified", this.name.unqualified));
-				instance = new ThisValue(position, this.theClass.getType(), context, markers);
+				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		

@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralExpression;
+import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -80,7 +80,7 @@ public class LongValue implements IConstantValue
 		IAnnotation annotation = type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
-			return new LiteralExpression(this, annotation).withType(type, typeContext, markers, context);
+			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}

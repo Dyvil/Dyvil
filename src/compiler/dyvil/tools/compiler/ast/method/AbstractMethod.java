@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -28,8 +28,8 @@ import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.statement.ILoop;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -455,7 +455,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public dyvil.tools.compiler.ast.statement.Label resolveLabel(Name name)
+	public dyvil.tools.compiler.ast.statement.control.Label resolveLabel(Name name)
 	{
 		return null;
 	}
@@ -752,7 +752,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				markers.add(I18n.createMarker(position, "method.access.unqualified", this.name.unqualified));
-				instance = new ThisValue(position, this.theClass.getType(), context, markers);
+				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
@@ -787,7 +787,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			genericData.instance = new ThisValue(this.theClass.getType());
+			genericData.instance = new ThisExpr(this.theClass.getType());
 		}
 		
 		int parIndex = 0;

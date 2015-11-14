@@ -2,8 +2,8 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LambdaExpression;
-import dyvil.tools.compiler.ast.expression.Tuple;
+import dyvil.tools.compiler.ast.expression.LambdaExpr;
+import dyvil.tools.compiler.ast.expression.TupleExpr;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -107,7 +107,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 		case TUPLE:
 			if (token.type() == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				Tuple t = new Tuple(token);
+				TupleExpr t = new TupleExpr(token);
 				this.value = t;
 				this.mode = TUPLE_END;
 				pm.pushParser(new ExpressionListParser(t));
@@ -134,7 +134,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			
-			LambdaExpression le = new LambdaExpression(token.raw(), this.params, this.parameterCount);
+			LambdaExpr le = new LambdaExpr(token.raw(), this.params, this.parameterCount);
 			pm.pushParser(pm.newExpressionParser(le));
 			this.value = le;
 			this.mode = END;

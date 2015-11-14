@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend.visitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -45,7 +45,7 @@ public final class ArrayAnnotationVisitor implements AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		Array valueList = new Array(null);
+		ArrayExpr valueList = new ArrayExpr(null);
 		this.array.addValue(valueList);
 		return new ArrayAnnotationVisitor(valueList);
 	}

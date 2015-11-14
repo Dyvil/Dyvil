@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.Map;
+import dyvil.tools.compiler.ast.expression.MapExpr;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -110,12 +110,12 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 	{
 		if (this.map)
 		{
-			Map map = new Map(this.startPosition.to(token), this.values, this.values2, this.valueCount);
+			MapExpr map = new MapExpr(this.startPosition.to(token), this.values, this.values2, this.valueCount);
 			this.consumer.setValue(map);
 			return;
 		}
 		
-		Array array = new Array(this.startPosition.to(token), this.values, this.valueCount);
+		ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.values, this.valueCount);
 		this.consumer.setValue(array);
 	}
 	

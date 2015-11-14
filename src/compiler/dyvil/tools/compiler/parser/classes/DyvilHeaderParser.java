@@ -2,10 +2,10 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.imports.ImportDeclaration;
-import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.structure.HeaderDeclaration;
+import dyvil.tools.compiler.ast.header.HeaderDeclaration;
+import dyvil.tools.compiler.ast.header.ImportDeclaration;
+import dyvil.tools.compiler.ast.header.IncludeDeclaration;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;

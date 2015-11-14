@@ -178,7 +178,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			{
 				this.mode = PARAMETERS;
 				
-				AbstractMethod m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				AbstractMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.annotations);
 				this.member = m;
 				return;
@@ -207,7 +207,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
-				Method m = new Method(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				CodeMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.annotations);
 				this.member = m;
 				

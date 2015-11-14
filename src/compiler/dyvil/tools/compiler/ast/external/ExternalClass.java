@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -259,7 +259,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	protected void readClassParameters(IAnnotation annotation)
 	{
-		Array array = (Array) annotation.getArguments().getFirstValue();
+		ArrayExpr array = (ArrayExpr) annotation.getArguments().getFirstValue();
 		int params = array.valueCount();
 		this.classParameters = new String[params];
 		for (int i = 0; i < params; i++)

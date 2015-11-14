@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -74,7 +74,7 @@ public class SubscriptGetter extends AbstractCall
 				{
 					this.arguments.resolve(markers, context);
 					ICodePosition position = this.arguments.getFirstValue().getPosition().to(this.arguments.getLastValue().getPosition());
-					Array array = new Array(position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
+					ArrayExpr array = new ArrayExpr(position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
 					IArguments arguments = new SingleArgument(array);
 					
 					IMethod m = ICall.resolveMethod(context, fa.receiver, fa.name, arguments);
