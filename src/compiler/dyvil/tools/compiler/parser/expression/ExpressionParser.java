@@ -649,12 +649,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			// e.g. this += that
 			
-			op = pm.getOperator(Util.stripEq(name));
+			Name newName = Util.stripEq(name);
+			op = pm.getOperator(newName);
+			if (op == null)
+			{
+				op = new Operator(newName, 1, Operator.INFIX_RIGHT);
+			}
 			if (op.type == Operator.INFIX_LEFT)
 			{
 				// Compound Operators are always right-associative, so create a
 				// copy
-				op = new Operator(op.name, op.precedence, Operator.INFIX_RIGHT);
+				op = new Operator(newName, op.precedence, Operator.INFIX_RIGHT);
 			}
 		}
 		else
