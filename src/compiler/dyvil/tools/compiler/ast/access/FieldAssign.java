@@ -218,7 +218,10 @@ public final class FieldAssign implements IValue, INamed, IValued
 			this.value = this.field.checkAssign(markers, context, this.position, this.instance, this.value);
 		}
 		
-		this.value.checkTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -228,8 +231,10 @@ public final class FieldAssign implements IValue, INamed, IValued
 		{
 			this.instance.check(markers, context);
 		}
-		
-		this.value.check(markers, context);
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -157,9 +158,9 @@ public class ConstructorCall implements ICall
 	public void resolveArguments(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
-		this.arguments.resolve(markers, context);		
+		this.arguments.resolve(markers, context);
 	}
-
+	
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
@@ -170,6 +171,14 @@ public class ConstructorCall implements ICall
 		
 		if (this.type.isArrayType())
 		{
+			ITypeVariable typeVar = this.type.getElementType().getTypeVariable();
+			if (typeVar != null)
+			{
+				Marker marker = I18n.createError(this.position, "constructor.access.array.typevar", typeVar.getName());
+				marker.addInfo(I18n.getString("typevariable", typeVar));
+				markers.add(marker);
+			}
+			
 			int len = this.arguments.size();
 			int dims = this.type.getArrayDimensions();
 			if (dims != len)
@@ -205,7 +214,6 @@ public class ConstructorCall implements ICall
 				}
 			}
 			
-			this.checkArguments(markers, context);
 			return this;
 		}
 		
@@ -224,13 +232,13 @@ public class ConstructorCall implements ICall
 		this.checkArguments(markers, context);
 		return this;
 	}
-
+	
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
 		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
 	}
-
+	
 	protected void reportResolve(MarkerList markers)
 	{
 		if (!this.type.isResolved())
