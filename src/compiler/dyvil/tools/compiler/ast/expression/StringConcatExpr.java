@@ -10,6 +10,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.CaseClasses;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -122,7 +123,13 @@ public class StringConcatExpr implements IValue
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].check(markers, context);
+			IValue value = this.values[i];
+			value.check(markers, context);
+			
+			if (value.getType() == Types.VOID)
+			{
+				markers.add(I18n.createMarker(value.getPosition(), "string.concat.void"));
+			}
 		}
 	}
 	

@@ -213,7 +213,7 @@ public final class StringInterpolationExpr implements IValue
 			
 			if (v.getType() == dyvil.tools.compiler.ast.type.Types.VOID)
 			{
-				markers.add(I18n.createMarker(v.getPosition(), "formatstring.void"));
+				markers.add(I18n.createMarker(v.getPosition(), "string.interpolation.void"));
 			}
 		}
 	}
