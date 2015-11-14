@@ -176,48 +176,99 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public void resolveReceiver(MarkerList markers, IContext context)
 	{
 		if (this.receiver != null)
 		{
 			this.receiver = this.receiver.resolve(markers, context);
 		}
-		
-		if (!ICall.privateAccess(context, this.receiver))
-		{
-			Name name = Name.getQualified(this.name.qualified + "_$eq");
-			IArguments arg = new SingleArgument(this.value);
-			IMethod m = ICall.resolveMethod(context, this.receiver, name, arg);
-			if (m != null)
-			{
-				MethodCall mc = new MethodCall(this.position, this.receiver, name);
-				mc.arguments = arg;
-				mc.method = m;
-				mc.checkArguments(markers, context);
-				return mc;
-			}
-		}
-		
-		this.field = ICall.resolveField(context, this.receiver, this.name);
-		
-		if (this.field == null)
-		{
-			Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
-			marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
-			if (this.receiver != null)
-			{
-				marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
-			}
-			
-			markers.add(marker);
-		}
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.resolveReceiver(markers, context);
 		
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, context);
 		}
 		
+		IValue v = this.resolveFieldAssignment(markers, context);
+		if (v != null)
+		{
+			return v;
+		}
+		
+		Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
+		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
+		if (this.receiver != null)
+		{
+			marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
+		}
+		
+		markers.add(marker);
 		return this;
+	}
+	
+	protected IValue resolveFieldAssignment(MarkerList markers, IContext context)
+	{
+		if (ICall.privateAccess(context, this.receiver))
+		{
+			IValue value = this.resolveField(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+			value = this.resolveMethod(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+		}
+		else
+		{
+			IValue value = this.resolveMethod(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+			value = this.resolveField(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+		}
+		
+		return null;
+	}
+	
+	private IValue resolveField(MarkerList markers, IContext context)
+	{
+		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		if (field != null)
+		{
+			this.field = field;
+			return this;
+		}
+		return null;
+	}
+	
+	private IValue resolveMethod(MarkerList markers, IContext context)
+	{
+		Name name = Name.getQualified(this.name.qualified + "_$eq");
+		IArguments arg = new SingleArgument(this.value);
+		IMethod m = ICall.resolveMethod(context, this.receiver, name, arg);
+		if (m != null)
+		{
+			MethodCall mc = new MethodCall(this.position, this.receiver, name);
+			mc.arguments = arg;
+			mc.method = m;
+			mc.checkArguments(markers, context);
+			return mc;
+		}
+		
+		return null;
 	}
 	
 	@Override

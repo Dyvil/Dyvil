@@ -158,18 +158,23 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.resolveReceiver(markers, context);
 		this.resolveArguments(markers, context);
 		return this.resolveCall(markers, context);
 	}
 	
 	@Override
-	public void resolveArguments(MarkerList markers, IContext context)
+	public void resolveReceiver(MarkerList markers, IContext context)
 	{
 		if (this.receiver != null)
 		{
 			this.receiver = this.receiver.resolve(markers, context);
 		}
-		
+	}
+	
+	@Override
+	public void resolveArguments(MarkerList markers, IContext context)
+	{
 		this.arguments.resolve(markers, context);
 	}
 	

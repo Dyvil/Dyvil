@@ -214,35 +214,37 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 	}
 	
-	private IValue resolveMethod(MarkerList markers, IContext context)
+	@Override
+	public void resolveReceiver(MarkerList markers, IContext context)
 	{
-		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
+		if (this.receiver != null)
 		{
-			AbstractCall mc = this.toMethodCall(method);
-			mc.checkArguments(markers, context);
-			return mc;
+			this.receiver = this.receiver.resolve(markers, context);
 		}
-		return null;
 	}
-	
-	private IValue resolveField(MarkerList markers, IContext context)
+
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
-		if (field != null)
+		this.resolveReceiver(markers, context);
+		
+		IValue v = this.resolveFieldAccess(markers, context);
+		if (v != null)
 		{
-			if (field.isEnumConstant())
-			{
-				EnumValue enumValue = new EnumValue(field.getType(), this.name);
-				return enumValue;
-			}
-			
-			this.field = field;
-			return this;
+			return v;
 		}
-		return null;
+		
+		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
+		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
+		if (this.receiver != null)
+		{
+			marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
+		}
+		
+		markers.add(marker);
+		return this;
 	}
-	
+
 	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
 		if (ICall.privateAccess(context, this.receiver))
@@ -283,32 +285,36 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		
 		return null;
 	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+
+	private IValue resolveField(MarkerList markers, IContext context)
 	{
-		if (this.receiver != null)
+		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		if (field != null)
 		{
-			this.receiver = this.receiver.resolve(markers, context);
+			if (field.isEnumConstant())
+			{
+				EnumValue enumValue = new EnumValue(field.getType(), this.name);
+				return enumValue;
+			}
+			
+			this.field = field;
+			return this;
 		}
-		
-		IValue v = this.resolveFieldAccess(markers, context);
-		if (v != null)
-		{
-			return v;
-		}
-		
-		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
-		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
-		if (this.receiver != null)
-		{
-			marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
-		}
-		
-		markers.add(marker);
-		return this;
+		return null;
 	}
 	
+	private IValue resolveMethod(MarkerList markers, IContext context)
+	{
+		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, EmptyArguments.INSTANCE);
+		if (method != null)
+		{
+			AbstractCall mc = this.toMethodCall(method);
+			mc.checkArguments(markers, context);
+			return mc;
+		}
+		return null;
+	}
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
