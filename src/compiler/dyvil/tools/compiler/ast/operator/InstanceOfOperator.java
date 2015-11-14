@@ -46,6 +46,12 @@ public final class InstanceOfOperator extends AbstractValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;

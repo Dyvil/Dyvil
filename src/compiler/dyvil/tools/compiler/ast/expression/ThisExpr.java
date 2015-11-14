@@ -73,15 +73,21 @@ public final class ThisExpr implements IValue
 	}
 	
 	@Override
-	public void setType(IType type)
+	public boolean isResolved()
 	{
-		this.type = type;
+		return this.type.isResolved();
 	}
 	
 	@Override
 	public IType getType()
 	{
 		return this.type;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override

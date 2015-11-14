@@ -49,6 +49,12 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.VOID;

@@ -12,6 +12,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IStatement extends IValue
 {
 	@Override
+	public default boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public default IType getType()
 	{
 		return Types.VOID;
@@ -36,7 +42,7 @@ public interface IStatement extends IValue
 	}
 	
 	@Override
-	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.writeStatement(writer);
 		if (type != Types.VOID)

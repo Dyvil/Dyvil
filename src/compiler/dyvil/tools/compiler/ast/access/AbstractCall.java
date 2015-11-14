@@ -82,6 +82,12 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		return this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
 	}
 	
+	@Override
+	public boolean isResolved()
+	{
+		return this.method != null;
+	}
+	
 	public IMethod getMethod()
 	{
 		return this.method;

@@ -60,6 +60,12 @@ public final class ClassParameterSetter implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return null;

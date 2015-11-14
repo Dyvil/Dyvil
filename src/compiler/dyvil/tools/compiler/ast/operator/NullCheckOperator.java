@@ -43,6 +43,12 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;

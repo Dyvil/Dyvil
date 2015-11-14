@@ -49,6 +49,12 @@ public class ReferenceValue implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.value.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.value.getType();

@@ -79,6 +79,12 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.field != null;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.field == null ? Types.UNKNOWN : this.field.getType();

@@ -115,6 +115,12 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.field != null;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.type == null)

@@ -68,6 +68,12 @@ public class StringConcatExpr implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.STRING;

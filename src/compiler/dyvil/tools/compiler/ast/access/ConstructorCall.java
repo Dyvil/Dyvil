@@ -87,15 +87,21 @@ public class ConstructorCall implements ICall
 	}
 	
 	@Override
-	public void setType(IType type)
+	public boolean isResolved()
 	{
-		this.type = type;
+		return this.constructor != null;
 	}
 	
 	@Override
 	public IType getType()
 	{
 		return this.type;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override

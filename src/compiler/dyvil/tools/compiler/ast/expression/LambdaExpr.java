@@ -154,9 +154,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 	
 	@Override
-	public void setType(IType type)
+	public boolean isResolved()
 	{
-		this.type = type;
+		return this.type != null && this.type.isResolved();
 	}
 	
 	@Override
@@ -174,6 +174,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return lt;
 		}
 		return this.type;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override

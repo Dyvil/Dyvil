@@ -68,6 +68,12 @@ public final class ClassAccess implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.type.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;

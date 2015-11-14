@@ -81,13 +81,19 @@ public final class LiteralConversion implements IValue
 	@Override
 	public int valueTag()
 	{
-		return BOXED;
+		return LITERAL_CONVERSION;
 	}
 	
 	@Override
 	public boolean isPrimitive()
 	{
 		return false;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.method != null;
 	}
 	
 	@Override

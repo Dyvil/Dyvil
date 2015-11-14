@@ -57,7 +57,13 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public int valueTag()
 	{
-		return FORMAT_STRING;
+		return STRING_INTERPOLATION;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
 	}
 	
 	@Override

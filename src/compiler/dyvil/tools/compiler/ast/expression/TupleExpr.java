@@ -128,6 +128,12 @@ public final class TupleExpr implements IValue, IValueList
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.tupleType != null;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.tupleType != null)

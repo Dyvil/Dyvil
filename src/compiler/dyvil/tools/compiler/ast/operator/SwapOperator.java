@@ -48,6 +48,12 @@ public class SwapOperator extends AbstractValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.VOID;

@@ -63,6 +63,12 @@ public final class TypeOperator extends AbstractValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.genericType == null)

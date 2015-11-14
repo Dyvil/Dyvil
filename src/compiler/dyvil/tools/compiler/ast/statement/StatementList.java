@@ -79,7 +79,13 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.returnType.isPrimitive();
+		return this.returnType != null && this.returnType.isPrimitive();
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.returnType != null && this.returnType.isResolved();
 	}
 	
 	@Override

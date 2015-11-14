@@ -47,6 +47,12 @@ public final class CastOperator extends AbstractValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.type.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.type;

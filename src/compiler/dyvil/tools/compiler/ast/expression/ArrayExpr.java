@@ -137,6 +137,21 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		if (this.arrayType != null)
+		{
+			return this.arrayType.isResolved();
+		}
+		if (this.elementType != null)
+		{
+			return this.elementType.isResolved();
+		}
+		
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.arrayType != null)

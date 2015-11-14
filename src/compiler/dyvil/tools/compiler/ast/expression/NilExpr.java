@@ -71,6 +71,12 @@ public final class NilExpr implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.requiredType != null && this.requiredType.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.requiredType == null ? dyvil.tools.compiler.ast.type.Types.UNKNOWN : this.requiredType;

@@ -71,6 +71,12 @@ public class IfStatement extends AbstractValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.commonType != null && this.commonType.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.commonType != null)

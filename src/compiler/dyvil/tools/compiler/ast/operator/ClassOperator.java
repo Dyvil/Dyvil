@@ -70,9 +70,9 @@ public final class ClassOperator extends AbstractValue
 	}
 	
 	@Override
-	public void setType(IType type)
+	public boolean isResolved()
 	{
-		this.type = type;
+		return true;
 	}
 	
 	@Override
@@ -85,6 +85,12 @@ public final class ClassOperator extends AbstractValue
 			return this.genericType = generic;
 		}
 		return this.genericType;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override

@@ -63,7 +63,7 @@ public class UnknownType implements IRawType
 	@Override
 	public boolean isResolved()
 	{
-		return true;
+		return false;
 	}
 	
 	@Override

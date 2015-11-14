@@ -8,6 +8,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IConstantValue extends IValue
 {
 	@Override
+	public default boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public default boolean isConstant()
 	{
 		return true;

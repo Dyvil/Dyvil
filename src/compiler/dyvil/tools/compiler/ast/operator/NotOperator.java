@@ -36,6 +36,12 @@ public final class NotOperator extends AbstractValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;

@@ -82,6 +82,12 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return false;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.type == null)

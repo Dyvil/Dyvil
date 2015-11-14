@@ -92,6 +92,12 @@ public class MapExpr implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.type != null && this.type.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.type == null)
@@ -99,6 +105,12 @@ public class MapExpr implements IValue
 			return this.type = new MapType(this.getKeyType(), this.getValueType());
 		}
 		return this.type;
+	}
+	
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 	
 	@Override

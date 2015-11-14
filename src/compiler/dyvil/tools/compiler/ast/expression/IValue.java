@@ -37,7 +37,7 @@ public interface IValue extends IASTNode, ITyped
 	int	FLOAT			= 10;
 	int	DOUBLE			= 11;
 	int	STRING			= 12;
-	int	FORMAT_STRING	= 13;
+	int	STRING_INTERPOLATION	= 13;
 	
 	// Compound Constructs
 	int	STATEMENT_LIST	= 32;
@@ -108,8 +108,8 @@ public interface IValue extends IASTNode, ITyped
 	int	NESTED_METHOD	= 233;
 	
 	// Special Types only used by the compiler
-	int	REFERENCE	= 240;
-	int	BOXED		= 241;
+	int	REFERENCE			= 240;
+	int	LITERAL_CONVERSION	= 241;
 	
 	// --- Other Constants ---
 	
@@ -141,6 +141,8 @@ public interface IValue extends IASTNode, ITyped
 	{
 		return null;
 	}
+	
+	public boolean isResolved();
 	
 	@Override
 	public IType getType();

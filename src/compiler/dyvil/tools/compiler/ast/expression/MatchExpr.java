@@ -91,6 +91,12 @@ public final class MatchExpr implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.type != null && this.type.isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.type != null)

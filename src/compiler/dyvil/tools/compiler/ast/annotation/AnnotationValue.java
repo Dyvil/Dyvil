@@ -65,6 +65,12 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return this.annotation.getType().isResolved();
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return this.annotation.getType();
