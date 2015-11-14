@@ -175,8 +175,8 @@ public class ConstructorCall implements ICall
 			if (dims != len)
 			{
 				Marker marker = I18n.createMarker(this.position, "constructor.access.array.length");
-				marker.addInfo("Type Dimensions: " + dims);
-				marker.addInfo("Number of Length Arguments: " + len);
+				marker.addInfo(I18n.getString("type.dimensions", dims));
+				marker.addInfo(I18n.getString("constructor.access.array.length.count", len));
 				markers.add(marker);
 				return this;
 			}
@@ -196,7 +196,7 @@ public class ConstructorCall implements ICall
 				if (v1 == null)
 				{
 					Marker marker = I18n.createMarker(v.getPosition(), "constructor.access.array.type");
-					marker.addInfo("Value Type: " + v.getType());
+					marker.addInfo(I18n.getString("value.type", v.getType()));
 					markers.add(marker);
 				}
 				else

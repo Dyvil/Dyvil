@@ -146,10 +146,10 @@ public final class MatchExpression implements IValue
 			IValue value = IType.convertValue(action, type, typeContext, markers, context);
 			if (value == null)
 			{
-				Marker m = I18n.createMarker(action.getPosition(), "match.value.type");
-				m.addInfo("Return Type: " + type);
-				m.addInfo("Value Type: " + action.getType());
-				markers.add(m);
+				Marker marker = I18n.createMarker(action.getPosition(), "match.value.type.incompatible");
+				marker.addInfo(I18n.getString("type.expected", type.getConcreteType(typeContext)));
+				marker.addInfo(I18n.getString("value.type", action.getType()));
+				markers.add(marker);
 			}
 			else
 			{

@@ -51,8 +51,8 @@ public class RangeForStatement extends ForEachStatement
 		if (v == null)
 		{
 			Marker marker = I18n.createMarker(this.value1.getPosition(), "for.range.type");
-			marker.addInfo("Value Type: " + this.value1.getType());
-			marker.addInfo("Variable Type: " + rangeType);
+			marker.addInfo(I18n.getString("value.type", this.value1.getType()));
+			marker.addInfo(I18n.getString("variable.type", rangeType));
 			markers.add(marker);
 		}
 		else
@@ -64,8 +64,8 @@ public class RangeForStatement extends ForEachStatement
 		if (v == null)
 		{
 			Marker marker = I18n.createMarker(this.value2.getPosition(), "for.range.type");
-			marker.addInfo("Value Type: " + this.value2.getType());
-			marker.addInfo("Variable Type: " + rangeType);
+			marker.addInfo(I18n.getString("value.type", this.value2.getType()));
+			marker.addInfo(I18n.getString("variable.type", rangeType));
 			markers.add(marker);
 		}
 		else

@@ -210,8 +210,8 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 			if (value1 == null)
 			{
 				Marker marker = I18n.createMarker(this.value.getPosition(), "lambda.type");
-				marker.addInfo("Method Return Type: " + this.returnType);
-				marker.addInfo("Value Type: " + this.value.getType());
+				marker.addInfo(I18n.getString("method.type", this.returnType));
+				marker.addInfo(I18n.getString("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else

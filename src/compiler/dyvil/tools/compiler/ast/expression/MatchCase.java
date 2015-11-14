@@ -97,9 +97,9 @@ public class MatchCase implements ICase, IDefaultContext
 			IPattern pattern1 = this.pattern.withType(type, markers);
 			if (pattern1 == null)
 			{
-				Marker marker = I18n.createMarker(this.pattern.getPosition(), "pattern.type");
-				marker.addInfo("Pattern Type: " + this.pattern.getType());
-				marker.addInfo("Value Type: " + type);
+				Marker marker = I18n.createMarker(this.pattern.getPosition(), "pattern.type.incompatible");
+				marker.addInfo(I18n.getString("pattern.type", this.pattern.getType()));
+				marker.addInfo(I18n.getString("value.type", type));
 				markers.add(marker);
 			}
 			else
@@ -116,9 +116,9 @@ public class MatchCase implements ICase, IDefaultContext
 			IValue value1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context1);
 			if (value1 == null)
 			{
-				Marker m = I18n.createMarker(this.condition.getPosition(), "match.condition.type");
-				m.addInfo("Condition Type: " + this.condition.getType());
-				markers.add(m);
+				Marker marker = I18n.createMarker(this.condition.getPosition(), "match.condition.type");
+				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
+				markers.add(marker);
 			}
 			else
 			{

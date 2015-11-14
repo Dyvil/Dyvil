@@ -220,8 +220,8 @@ public class Field extends Member implements IField
 		if (value1 == null)
 		{
 			Marker marker = I18n.createMarker(newValue.getPosition(), "field.assign.type", this.name.unqualified);
-			marker.addInfo("Field Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			marker.addInfo(I18n.getString("field.type", this.type));
+			marker.addInfo(I18n.getString("field.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -267,9 +267,9 @@ public class Field extends Member implements IField
 			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.value.getPosition(), "field.type", this.name.unqualified);
-				marker.addInfo("Field Type: " + this.type);
-				marker.addInfo("Value Type: " + this.value.getType());
+				Marker marker = I18n.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("field.type", this.type));
+				marker.addInfo(I18n.getString("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else

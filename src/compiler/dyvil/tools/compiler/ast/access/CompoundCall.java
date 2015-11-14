@@ -173,13 +173,13 @@ public final class CompoundCall extends AbstractCall implements INamed
 		
 		if (this.method != null)
 		{
-			IType type1 = this.instance.getType();
-			IType type2 = super.getType();
-			if (!type1.isSuperTypeOf(type2))
+			IType receiverType = this.instance.getType();
+			IType methodReturnType = super.getType();
+			if (!receiverType.isSuperTypeOf(methodReturnType))
 			{
-				Marker marker = I18n.createMarker(this.position, "method.compound.type", this.name, this.instance.toString());
-				marker.addInfo("Callee Type: " + type1);
-				marker.addInfo("Method Type: " + type2);
+				Marker marker = I18n.createMarker(this.position, "method.compound.type.incompatible", this.name, this.instance.toString());
+				marker.addInfo(I18n.getString("receiver.type", receiverType));
+				marker.addInfo(I18n.getString("method.type", methodReturnType));
 				markers.add(marker);
 			}
 			

@@ -141,17 +141,16 @@ public class NamedGenericType extends GenericType
 		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			IType t1 = this.typeArguments[i];
-			IType t2 = t1.resolveType(markers, context);
+			IType resolvedType = this.typeArguments[i].resolveType(markers, context);
 			
-			this.typeArguments[i] = t2;
+			this.typeArguments[i] = resolvedType;
 			
-			ITypeVariable var = iclass.getTypeVariable(i);
-			if (!var.isSuperTypeOf(t2))
+			ITypeVariable typeVariable = iclass.getTypeVariable(i);
+			if (!typeVariable.isSuperTypeOf(resolvedType))
 			{
-				Marker marker = I18n.createMarker(t2.getPosition(), "generic.type", var.getName().qualified);
-				marker.addInfo("Generic Type: " + t2);
-				marker.addInfo("Type Variable: " + var);
+				Marker marker = I18n.createMarker(resolvedType.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified);
+				marker.addInfo(I18n.getString("generic.type", resolvedType));
+				marker.addInfo(I18n.getString("typevariable", typeVariable));
 				markers.add(marker);
 			}
 		}

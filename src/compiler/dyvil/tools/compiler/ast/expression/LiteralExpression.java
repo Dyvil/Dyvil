@@ -122,11 +122,13 @@ public final class LiteralExpression implements IValue
 		IType concrete = type.getConcreteType(typeContext);
 		if (!concrete.isSuperTypeOf(this.type))
 		{
-			Marker m = I18n.createMarker(this.literal.getPosition(), "literal.type");
-			m.addInfo("Required Type: " + concrete);
-			m.addInfo("Conversion Type: " + this.type);
+			Marker m = I18n.createMarker(this.literal.getPosition(), "literal.type.incompatible");
+			m.addInfo(I18n.getString("type.expected", concrete));
+			m.addInfo(I18n.getString("literal.type.conversion", this.type));
 			
-			StringBuilder sb = new StringBuilder("Conversion Method: \n\t\t");
+			m.addInfo(I18n.getString("literal.type.method"));
+			
+			StringBuilder sb = new StringBuilder("\t\t");
 			Util.methodSignatureToString(method, sb);
 			m.addInfo(sb.toString());
 			

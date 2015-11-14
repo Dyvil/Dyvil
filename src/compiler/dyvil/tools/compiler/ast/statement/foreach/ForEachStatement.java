@@ -101,21 +101,6 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			return null;
 		}
 		
-		if (this.action != null)
-		{
-			IValue action1 = this.action.withType(Types.VOID, typeContext, markers, new CombiningContext(this, context));
-			if (action1 == null)
-			{
-				Marker m = I18n.createMarker(this.action.getPosition(), "for.action.type");
-				m.addInfo("Action Type: " + this.action.getType());
-				markers.add(m);
-			}
-			else
-			{
-				this.action = action1;
-			}
-		}
-		
 		return this;
 	}
 	
@@ -224,8 +209,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			else if (!varType.isSuperTypeOf(rangeType))
 			{
 				Marker marker = I18n.createMarker(value1.getPosition(), "for.range.type");
-				marker.addInfo("Range Type: " + rangeType);
-				marker.addInfo("Variable Type: " + varType);
+				marker.addInfo(I18n.getString("range.type", rangeType));
+				marker.addInfo(I18n.getString("Variable Type: ", varType));
 				markers.add(marker);
 			}
 			
@@ -248,8 +233,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			else if (!varType.classEquals(valueType.getElementType()))
 			{
 				Marker marker = I18n.createMarker(value.getPosition(), "for.array.type");
-				marker.addInfo("Array Type: " + valueType);
-				marker.addInfo("Variable Type: " + varType);
+				marker.addInfo(I18n.getString("array.type", valueType));
+				marker.addInfo(I18n.getString("var.type", varType));
 				markers.add(marker);
 			}
 			
@@ -271,8 +256,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			else if (!varType.isSuperTypeOf(iterableType))
 			{
 				Marker m = I18n.createMarker(value.getPosition(), "for.iterable.type");
-				m.addInfo("Iterable Type: " + iterableType);
-				m.addInfo("Variable Type: " + varType);
+				m.addInfo(I18n.getString("iterable.type", iterableType));
+				m.addInfo(I18n.getString("variable.type", varType));
 				markers.add(m);
 			}
 			
@@ -289,7 +274,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			else if (!varType.classEquals(Types.CHAR))
 			{
 				Marker marker = I18n.createMarker(value.getPosition(), "for.string.type");
-				marker.addInfo("Variable Type: " + varType);
+				marker.addInfo(I18n.getString("variable.type", varType));
 				markers.add(marker);
 			}
 			
@@ -298,10 +283,10 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			return sfs;
 		}
 		
-		Marker m = I18n.createMarker(this.variable.getPosition(), "for.invalid");
-		m.addInfo("Variable Type: " + varType);
-		m.addInfo("Value Type: " + valueType);
-		markers.add(m);
+		Marker marker = I18n.createMarker(this.variable.getPosition(), "for.each.invalid");
+		marker.addInfo(I18n.getString("variable.type", varType));
+		marker.addInfo(I18n.getString("value.type", valueType));
+		markers.add(marker);
 		
 		this.resolveAction(this.action, markers, context);
 		
@@ -310,9 +295,24 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	
 	protected void resolveAction(IValue action, MarkerList markers, IContext context)
 	{
-		if (action != null)
+		if (action == null)
 		{
-			this.action = action.resolve(markers, new CombiningContext(this, context));
+			return;
+		}
+		
+		IContext context1 = new CombiningContext(this, context);
+		this.action = action.resolve(markers, context1);
+		
+		IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context1);
+		if (typedAction == null)
+		{
+			Marker marker = I18n.createMarker(this.action.getPosition(), "for.action.type");
+			marker.addInfo(I18n.getString("action.type", this.action.getType()));
+			markers.add(marker);
+		}
+		else
+		{
+			this.action = typedAction;
 		}
 	}
 	

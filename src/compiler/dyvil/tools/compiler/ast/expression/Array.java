@@ -180,19 +180,19 @@ public final class Array implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
+			IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
 			
-			if (value1 == null)
+			if (typedValue == null)
 			{
-				Marker marker = I18n.createMarker(value.getPosition(), "array.element.type");
-				marker.addInfo("Array Type: " + arrayType);
-				marker.addInfo("Element Type: " + value.getType());
+				Marker marker = I18n.createMarker(value.getPosition(), "array.element.type.incompatible");
+				marker.addInfo(I18n.getString("array.type", arrayType.getConcreteType(typeContext)));
+				marker.addInfo(I18n.getString("array.element.type", value.getType()));
 				markers.add(marker);
 			}
 			else
 			{
-				value = value1;
-				this.values[i] = value1;
+				value = typedValue;
+				this.values[i] = typedValue;
 			}
 		}
 		

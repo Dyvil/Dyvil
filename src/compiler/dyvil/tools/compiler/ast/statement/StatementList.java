@@ -302,7 +302,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			if (v1 == null)
 			{
 				Marker marker = I18n.createMarker(v2.getPosition(), "statement.type");
-				marker.addInfo("Returning Type: " + v2.getType());
+				marker.addInfo(I18n.getString("return.type", v2.getType()));
 				markers.add(marker);
 			}
 			else

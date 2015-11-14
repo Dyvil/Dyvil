@@ -63,7 +63,7 @@ public class Deprecation
 		// Since
 		if (!since.isEmpty())
 		{
-			marker.addInfo("Deprecated since: " + since);
+			marker.addInfo(I18n.getString("deprecated.since", since));
 		}
 		
 		// Reasons
@@ -76,18 +76,18 @@ public class Deprecation
 			// more than one reason
 			if (reasonCount > 1)
 			{
-				StringBuilder builder = new StringBuilder("Reasons: ");
+				StringBuilder builder = new StringBuilder();
 				builder.append(reasons[0].name().toLowerCase());
 				for (int i = 1; i < reasonCount; i++)
 				{
 					builder.append(", ").append(reasons[i].name().toLowerCase());
 				}
-				marker.addInfo(builder.toString());
+				marker.addInfo(I18n.getString("deprecated.reasons", builder.toString()));
 			}
 			// one reason that is not UNSPECIFIED
 			else if (reasons[0] != Reason.UNSPECIFIED)
 			{
-				marker.addInfo("Reason: " + reasons[0].name().toLowerCase());
+				marker.addInfo(I18n.getString("deprecated.reason", reasons[0].name().toLowerCase()));
 			}
 		}
 		

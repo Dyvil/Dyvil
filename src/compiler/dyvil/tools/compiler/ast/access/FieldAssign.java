@@ -186,10 +186,10 @@ public final class FieldAssign implements IValue, INamed, IValued
 		if (this.field == null)
 		{
 			Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
-			marker.addInfo("Qualified Name: " + this.name.qualified);
+			marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
 			if (this.instance != null)
 			{
-				marker.addInfo("Instance Type: " + this.instance.getType());
+				marker.addInfo(I18n.getString("receiver.type", this.instance.getType()));
 			}
 			
 			markers.add(marker);

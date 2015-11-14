@@ -262,8 +262,8 @@ public class Property extends Member implements IProperty, IContext
 		if (value1 == null)
 		{
 			Marker marker = I18n.createMarker(newValue.getPosition(), "property.assign.type", this.name.unqualified);
-			marker.addInfo("Property Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			marker.addInfo(I18n.getString("property.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -341,9 +341,9 @@ public class Property extends Member implements IProperty, IContext
 			IValue get1 = this.getter.withType(this.type, this.type, markers, context);
 			if (get1 == null)
 			{
-				Marker marker = I18n.createMarker(this.getter.getPosition(), "property.getter.type", this.name.unqualified);
-				marker.addInfo("Property Type: " + this.type);
-				marker.addInfo("Getter Value Type: " + this.getter.getType());
+				Marker marker = I18n.createMarker(this.getter.getPosition(), "property.getter.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("property.type", this.type));
+				marker.addInfo(I18n.getString("property.getter.type", this.getter.getType()));
 				markers.add(marker);
 			}
 			else
@@ -423,12 +423,12 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else
 		{
-			IType type = this.overrideProperty.getType();
+			IType type = this.overrideProperty.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSameType(this.type))
 			{
-				Marker marker = I18n.createMarker(this.position, "property.override.type", this.name);
-				marker.addInfo("Property Type: " + this.type);
-				marker.addInfo("Overriden Property Type: " + type);
+				Marker marker = I18n.createMarker(this.position, "property.override.type.incompatible", this.name);
+				marker.addInfo(I18n.getString("property.type", this.type));
+				marker.addInfo(I18n.getString("property.override.type", type));
 				markers.add(marker);
 			}
 		}

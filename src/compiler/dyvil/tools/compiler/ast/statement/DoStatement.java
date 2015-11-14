@@ -128,11 +128,11 @@ public final class DoStatement extends Value implements IStatement, ILoop
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
 				Marker marker = I18n.createMarker(this.condition.getPosition(), "do.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
+				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else

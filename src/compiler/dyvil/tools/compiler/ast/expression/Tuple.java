@@ -176,9 +176,9 @@ public final class Tuple implements IValue, IValueList
 			
 			if (value1 == null)
 			{
-				Marker m = I18n.createMarker(value.getPosition(), "tuple.type");
-				m.addInfo("Value Type: " + value.getType());
-				m.addInfo("Tuple Element Type: " + elementType);
+				Marker m = I18n.createMarker(value.getPosition(), "tuple.element.type.incompatible");
+				m.addInfo(I18n.getString("value.type", value.getType()));
+				m.addInfo(I18n.getString("tuple.element.type", elementType.getConcreteType(typeContext)));
 				markers.add(m);
 			}
 			else

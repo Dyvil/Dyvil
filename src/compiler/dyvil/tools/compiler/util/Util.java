@@ -213,8 +213,8 @@ public class Util
 	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
 	{
 		Marker marker = I18n.createMarker(value.getPosition(), key, args);
-		marker.addInfo("Required Type: " + type.getConcreteType(typeContext));
-		marker.addInfo("Value Type: " + value.getType());
+		marker.addInfo(I18n.getString("type.expected", type.getConcreteType(typeContext)));
+		marker.addInfo(I18n.getString("value.type", value.getType()));
 		markers.add(marker);
 	}
 	

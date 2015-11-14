@@ -42,7 +42,7 @@ public interface ICall extends IValue
 			Marker marker = I18n.createMarker(position, "resolve.method_field", name);
 			if (instance != null)
 			{
-				marker.addInfo("Callee Type: " + instance.getType());
+				marker.addInfo(I18n.getString("receiver.type", instance.getType()));
 			}
 			
 			markers.add(marker);
@@ -52,7 +52,7 @@ public interface ICall extends IValue
 		Marker marker = I18n.createMarker(position, "resolve.method", name);
 		if (instance != null)
 		{
-			marker.addInfo("Callee Type: " + instance.getType());
+			marker.addInfo(I18n.getString("receiver.type", instance.getType()));
 		}
 		if (!arguments.isEmpty())
 		{

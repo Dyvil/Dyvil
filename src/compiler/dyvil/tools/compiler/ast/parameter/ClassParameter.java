@@ -159,8 +159,8 @@ public final class ClassParameter extends Parameter implements IField
 		if (value1 == null)
 		{
 			Marker marker = I18n.createMarker(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
-			marker.addInfo("Class Parameter Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			marker.addInfo(I18n.getString("classparameter.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -183,9 +183,9 @@ public final class ClassParameter extends Parameter implements IField
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "classparameter.type", this.name.unqualified);
-				marker.addInfo("Parameter Type: " + this.type);
-				marker.addInfo("Value Type: " + this.defaultValue.getType());
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "classparameter.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("classparameter.type", this.type));
+				marker.addInfo(I18n.getString("value.type", this.defaultValue.getType()));
 				markers.add(marker);
 			}
 			else

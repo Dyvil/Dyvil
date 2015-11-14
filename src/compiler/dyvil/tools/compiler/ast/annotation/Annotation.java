@@ -196,8 +196,8 @@ public final class Annotation implements IAnnotation
 		if (!metadata.isTarget(target))
 		{
 			Marker error = I18n.createMarker(this.position, "annotation.target", this.type.getName());
-			error.addInfo("Element Target: " + target);
-			error.addInfo("Allowed Targets: " + metadata.getTargets());
+			error.addInfo(I18n.getString("annotation.target.element", target));
+			error.addInfo(I18n.getString("annotation.target.allows", metadata.getTargets()));
 			markers.add(error);
 		}
 	}

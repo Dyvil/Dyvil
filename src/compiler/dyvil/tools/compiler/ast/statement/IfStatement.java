@@ -215,7 +215,7 @@ public class IfStatement extends Value
 			if (condition1 == null)
 			{
 				Marker marker = I18n.createMarker(this.condition.getPosition(), "if.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
+				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else

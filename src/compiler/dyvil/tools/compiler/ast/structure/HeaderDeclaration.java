@@ -151,9 +151,9 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		Name headerName = this.header.getName();
 		if (headerName != this.name)
 		{
-			Marker m = I18n.createMarker(this.position, "header.name");
-			m.addInfo("Header Name: " + headerName);
-			m.addInfo("Header Declaration Name: " + this.name);
+			Marker m = I18n.createMarker(this.position, "header.name.mismatch");
+			m.addInfo(I18n.getString("header.name", headerName));
+			m.addInfo(I18n.getString("header.declaration.name", this.name));
 			markers.add(m);
 		}
 	}

@@ -120,8 +120,8 @@ public final class Variable extends Member implements IVariable
 		if (value1 == null)
 		{
 			Marker marker = I18n.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
-			marker.addInfo("Variable Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			marker.addInfo(I18n.getString("variable.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -196,9 +196,9 @@ public final class Variable extends Member implements IVariable
 		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = I18n.createMarker(this.position, "variable.type", this.name.unqualified);
-			marker.addInfo("Variable Type: " + this.type);
-			marker.addInfo("Value Type: " + this.value.getType());
+			Marker marker = I18n.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
+			marker.addInfo(I18n.getString("variable.type", this.type));
+			marker.addInfo(I18n.getString("value.type", this.value.getType()));
 			markers.add(marker);
 		}
 		else

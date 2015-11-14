@@ -64,8 +64,8 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		if (this.patternCount != paramCount)
 		{
 			Marker m = I18n.createMarker(this.position, "pattern.class.count", this.type.toString());
-			m.addInfo("Pattern Count: " + this.patternCount);
-			m.addInfo("Class Parameter Count: " + paramCount);
+			m.addInfo(I18n.getString("pattern.class.count.pattern", this.patternCount));
+			m.addInfo(I18n.getString("pattern.class.count.class", paramCount));
 			markers.add(m);
 			return this;
 		}
@@ -73,19 +73,20 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		for (int i = 0; i < paramCount; i++)
 		{
 			IParameter param = iclass.getParameter(i);
-			IType type1 = param.getType().getConcreteType(this.type);
+			IType paramType = param.getType().getConcreteType(this.type);
 			IPattern pattern = this.patterns[i];
-			IPattern pattern1 = pattern.withType(type1, markers);
-			if (pattern1 == null)
+			IPattern typedPattern = pattern.withType(paramType, markers);
+			
+			if (typedPattern == null)
 			{
 				Marker m = I18n.createMarker(this.position, "pattern.class.type", param.getName());
-				m.addInfo("Pattern Type: " + pattern.getType());
-				m.addInfo("Parameter Type: " + type1);
+				m.addInfo(I18n.getString("pattern.type", pattern.getType()));
+				m.addInfo(I18n.getString("classparameter.type", paramType));
 				markers.add(m);
 			}
 			else
 			{
-				this.patterns[i] = pattern1;
+				this.patterns[i] = typedPattern;
 			}
 		}
 		

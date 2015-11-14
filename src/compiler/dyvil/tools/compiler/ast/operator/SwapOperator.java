@@ -86,14 +86,14 @@ public class SwapOperator extends Value
 		this.left.checkTypes(markers, context);
 		this.right.checkTypes(markers, context);
 		
-		IType type1 = this.left.getType();
-		IType type2 = this.right.getType();
-		if (!type1.isSameType(type2))
+		IType leftType = this.left.getType();
+		IType rightType = this.right.getType();
+		if (!leftType.isSameType(rightType))
 		{
-			Marker m = I18n.createMarker(this.position, "swap.type");
-			m.addInfo("Left-Hand Type: " + type1);
-			m.addInfo("Right-Hand Type: " + type2);
-			markers.add(m);
+			Marker marker = I18n.createMarker(this.position, "swap.type.incompatible");
+			marker.addInfo(I18n.getString("swap.type.left", leftType));
+			marker.addInfo(I18n.getString("swap.type.right", rightType));
+			markers.add(marker);
 		}
 	}
 	

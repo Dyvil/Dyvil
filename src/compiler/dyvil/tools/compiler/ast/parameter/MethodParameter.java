@@ -88,8 +88,8 @@ public final class MethodParameter extends Parameter
 		if (value1 == null)
 		{
 			Marker marker = I18n.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
-			marker.addInfo("Parameter Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			marker.addInfo(I18n.getString("parameter.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -112,9 +112,9 @@ public final class MethodParameter extends Parameter
 			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type", this.name.unqualified);
-				marker.addInfo("Parameter Type: " + this.type);
-				marker.addInfo("Value Type: " + this.defaultValue.getType());
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("parameter.type", this.type));
+				marker.addInfo(I18n.getString("value.type", this.defaultValue.getType()));
 				markers.add(marker);
 			}
 			else

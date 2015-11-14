@@ -93,7 +93,7 @@ public final class ThrowStatement extends Value implements IValued
 		if (value1 == null)
 		{
 			Marker marker = I18n.createMarker(this.value.getPosition(), "throw.type");
-			marker.addInfo("Value Type: " + this.value.getType());
+			marker.addInfo(I18n.getString("value.type", this.value.getType()));
 			markers.add(marker);
 		}
 		else

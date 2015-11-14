@@ -181,7 +181,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			if (condition1 == null)
 			{
 				Marker marker = I18n.createMarker(this.condition.getPosition(), "for.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
+				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else

@@ -280,8 +280,8 @@ public class Constructor extends Member implements IConstructor
 			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.position, "constructor.return");
-				marker.addInfo("Expression Type: " + this.value.getType());
+				Marker marker = I18n.createMarker(this.position, "constructor.return.type");
+				marker.addInfo(I18n.getString("return.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -375,9 +375,9 @@ public class Constructor extends Member implements IConstructor
 			IType t = this.exceptions[i];
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
-				Marker m = I18n.createMarker(t.getPosition(), "method.exception.type");
-				m.addInfo("Exception Type: " + t);
-				markers.add(m);
+				Marker marker = I18n.createMarker(t.getPosition(), "method.exception.type");
+				marker.addInfo(I18n.getString("exception.type", t));
+				markers.add(marker);
 			}
 		}
 		

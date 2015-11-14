@@ -271,7 +271,7 @@ public final class TryStatement extends Value implements IStatement, IDefaultCon
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
 				Marker marker = I18n.createMarker(block.position, "try.catch.type");
-				marker.addInfo("Exception Type: " + block.type);
+				marker.addInfo(I18n.getString("exception.type", block.type));
 				markers.add(marker);
 			}
 			

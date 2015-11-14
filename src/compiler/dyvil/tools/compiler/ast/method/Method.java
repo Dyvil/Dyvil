@@ -143,9 +143,9 @@ public class Method extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.position, "method.type", this.name.unqualified);
-				marker.addInfo("Return Type: " + this.type);
-				marker.addInfo("Value Type: " + this.value.getType());
+				Marker marker = I18n.createMarker(this.position, "method.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("method.type", this.type));
+				marker.addInfo(I18n.getString("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -214,9 +214,9 @@ public class Method extends AbstractMethod
 			
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
-				Marker m = I18n.createMarker(t.getPosition(), "method.exception.type");
-				m.addInfo("Exception Type: " + t);
-				markers.add(m);
+				Marker marker = I18n.createMarker(t.getPosition(), "method.exception.type");
+				marker.addInfo(I18n.getString("exception.type", t));
+				markers.add(marker);
 			}
 		}
 		
@@ -299,19 +299,19 @@ public class Method extends AbstractMethod
 			markers.add(I18n.createMarker(this.position, "method.overrides", this.name));
 		}
 		
-		for (IMethod m : this.overrideMethods)
+		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			if (m.hasModifier(Modifiers.FINAL))
+			if (overrideMethod.hasModifier(Modifiers.FINAL))
 			{
 				markers.add(I18n.createMarker(this.position, "method.override.final", this.name));
 			}
 			
-			IType type = m.getType().getConcreteType(this.theClass.getType());
+			IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = I18n.createMarker(this.position, "method.override.type", this.name);
-				marker.addInfo("Return Type: " + this.type);
-				marker.addInfo("Overriden Return Type: " + type);
+				Marker marker = I18n.createMarker(this.position, "method.override.type.incompatible", this.name);
+				marker.addInfo(I18n.getString("method.type", this.type));
+				marker.addInfo(I18n.getString("method.override.type", type));
 				markers.add(marker);
 			}
 		}

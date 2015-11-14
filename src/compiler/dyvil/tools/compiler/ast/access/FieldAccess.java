@@ -294,10 +294,10 @@ public final class FieldAccess implements IValue, INamed, IValued
 		}
 		
 		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
-		marker.addInfo("Qualified Name: " + this.name.qualified);
+		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
 		if (this.instance != null)
 		{
-			marker.addInfo("Instance Type: " + this.instance.getType());
+			marker.addInfo(I18n.getString("receiver.type", this.instance.getType()));
 		}
 		
 		markers.add(marker);

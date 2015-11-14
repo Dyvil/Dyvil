@@ -125,9 +125,9 @@ public class Map implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(value.getPosition(), "map.key.type");
-				marker.addInfo("Required Type: " + keyType.getConcreteType(typeContext));
-				marker.addInfo("Key Type: " + value.getType());
+				Marker marker = I18n.createMarker(value.getPosition(), "map.key.type.incompatible");
+				marker.addInfo(I18n.getString("type.expected", keyType.getConcreteType(typeContext)));
+				marker.addInfo(I18n.getString("map.key.type", value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -141,9 +141,9 @@ public class Map implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(value.getPosition(), "map.value.type");
-				marker.addInfo("Required Type: " + valueType.getConcreteType(typeContext));
-				marker.addInfo("Value Type: " + value.getType());
+				Marker marker = I18n.createMarker(value.getPosition(), "map.value.type.incompatible");
+				marker.addInfo(I18n.getString("type.expected", valueType.getConcreteType(typeContext)));
+				marker.addInfo(I18n.getString("map.value.type", value.getType()));
 				markers.add(marker);
 			}
 			else

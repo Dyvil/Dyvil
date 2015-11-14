@@ -88,7 +88,7 @@ public final class SuperValue implements IValue
 			if (this.type == null)
 			{
 				Marker marker = I18n.createMarker(this.position, "super.access.type");
-				marker.addInfo("Enclosing Type: " + thisType);
+				marker.addInfo(I18n.getString("type.enclosing", thisType));
 				markers.add(marker);
 			}
 			return;
@@ -107,8 +107,8 @@ public final class SuperValue implements IValue
 		}
 		
 		Marker marker = I18n.createMarker(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
-		marker.addInfo("Enclosing Type: " + thisType);
-		marker.addInfo("Requested Super Type: " + this.type);
+		marker.addInfo(I18n.getString("type.enclosing", thisType));
+		marker.addInfo(I18n.getString("super.type.requested", this.type));
 		markers.add(marker);
 	}
 	
