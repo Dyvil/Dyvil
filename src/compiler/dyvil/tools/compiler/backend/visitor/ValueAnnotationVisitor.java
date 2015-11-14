@@ -4,26 +4,26 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.Array;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.parsing.Name;
 
 public class ValueAnnotationVisitor implements AnnotationVisitor
 {
-	private IValued valued;
+	private IValueConsumer consumer;
 	
-	public ValueAnnotationVisitor(IValued valued)
+	public ValueAnnotationVisitor(IValueConsumer consumer)
 	{
-		this.valued = valued;
+		this.consumer = consumer;
 	}
 	
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.valued.setValue(IValue.fromObject(value));
+		this.consumer.setValue(IValue.fromObject(value));
 	}
 	
 	static IValue getEnumValue(String enumClass, String name)
@@ -38,7 +38,7 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 		IValue enumValue = getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
-			this.valued.setValue(enumValue);
+			this.consumer.setValue(enumValue);
 		}
 	}
 	
@@ -47,7 +47,7 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	{
 		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		AnnotationValue value = new AnnotationValue(annotation);
-		this.valued.setValue(value);
+		this.consumer.setValue(value);
 		return new AnnotationVisitorImpl(value, annotation);
 	}
 	
@@ -55,7 +55,7 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	public AnnotationVisitor visitArray(String key)
 	{
 		Array valueList = new Array();
-		this.valued.setValue(valueList);
+		this.consumer.setValue(valueList);
 		return new ArrayAnnotationVisitor(valueList);
 	}
 	

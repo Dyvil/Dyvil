@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -20,7 +21,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class CompoundCall extends AbstractCall implements INamed
+public final class CompoundCall extends AbstractCall implements INamed, IValueConsumer
 {
 	public Name name;
 	
@@ -32,14 +33,14 @@ public final class CompoundCall extends AbstractCall implements INamed
 	public CompoundCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
 	}
 	
 	public CompoundCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
 		this.arguments = arguments;
 	}
@@ -48,6 +49,12 @@ public final class CompoundCall extends AbstractCall implements INamed
 	public int valueTag()
 	{
 		return COMPOUND_CALL;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		this.arguments = this.arguments.withLastValue(value);
 	}
 	
 	@Override
@@ -87,43 +94,31 @@ public final class CompoundCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public void setValue(IValue value)
-	{
-		this.arguments = this.arguments.withLastValue(Names.update, value);
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.arguments.getLastValue();
-	}
-	
-	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		int type = this.instance.valueTag();
+		int type = this.receiver.valueTag();
 		if (type == APPLY_CALL)
 		{
-			AbstractCall ac = (AbstractCall) this.instance;
+			AbstractCall ac = (AbstractCall) this.receiver;
 			
 			// x(y...) op= z
 			// -> x(y...) = x(y...).op(z)
 			// -> x.update(y..., x.apply(y...).op(z))
 			
 			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
-			IValue update = new UpdateMethodCall(this.position, ac.instance, ac.arguments.withLastValue(Names.update, op)).resolveCall(markers, context);
+			IValue update = new UpdateMethodCall(this.position, ac.receiver, ac.arguments.withLastValue(Names.update, op)).resolveCall(markers, context);
 			return update;
 		}
 		else if (type == SUBSCRIPT_GET)
 		{
-			AbstractCall ac = (AbstractCall) this.instance;
+			AbstractCall ac = (AbstractCall) this.receiver;
 			
 			// x[y...] op= z
 			// -> x[y...] = x[y...].op(z)
 			// -> x.subscript_=(y..., x.subscript(y...).op(z))
 			
 			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
-			IValue subscript_$eq = new SubscriptSetter(this.position, ac.instance, ac.arguments.withLastValue(Names.subscript_$eq, op)).resolveCall(markers,
+			IValue subscript_$eq = new SubscriptSetter(this.position, ac.receiver, ac.arguments.withLastValue(Names.subscript_$eq, op)).resolveCall(markers,
 					context);
 			return subscript_$eq;
 		}
@@ -133,10 +128,10 @@ public final class CompoundCall extends AbstractCall implements INamed
 			throw new Error();
 		}
 		
-		IMethod m = this.method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
+		IMethod m = this.method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
 		if (m == null)
 		{
-			ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
+			ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 		}
 		return this;
 	}
@@ -144,21 +139,21 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.checkTypes(markers, context);
+			this.receiver.checkTypes(markers, context);
 			
-			FieldAccess fa = (FieldAccess) this.instance;
+			FieldAccess fa = (FieldAccess) this.receiver;
 			if (fa.field != null)
 			{
 				fa.field = fa.field.capture(context);
-				this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.instance, this.arguments.getLastValue()));
+				this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.receiver, this.arguments.getLastValue()));
 			}
 		}
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
+			this.method.checkArguments(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -166,24 +161,24 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.check(markers, context);
+			this.receiver.check(markers, context);
 		}
 		
 		if (this.method != null)
 		{
-			IType receiverType = this.instance.getType();
+			IType receiverType = this.receiver.getType();
 			IType methodReturnType = super.getType();
 			if (!receiverType.isSuperTypeOf(methodReturnType))
 			{
-				Marker marker = I18n.createMarker(this.position, "method.compound.type.incompatible", this.name, this.instance.toString());
+				Marker marker = I18n.createMarker(this.position, "method.compound.type.incompatible", this.name, this.receiver.toString());
 				marker.addInfo(I18n.getString("receiver.type", receiverType));
 				marker.addInfo(I18n.getString("method.type", methodReturnType));
 				markers.add(marker);
 			}
 			
-			this.method.checkCall(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
+			this.method.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 		}
 		
 		this.arguments.check(markers, context);
@@ -204,7 +199,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		FieldAccess access = (FieldAccess) this.instance;
+		FieldAccess access = (FieldAccess) this.receiver;
 		IDataMember f = access.field;
 		
 		if (this.writeIINC(writer, f))
@@ -212,7 +207,7 @@ public final class CompoundCall extends AbstractCall implements INamed
 			return;
 		}
 		
-		f.writeSet(writer, access.instance, new MethodCall(this.position, access, this.method, this.arguments), this.getLineNumber());
+		f.writeSet(writer, access.receiver, new MethodCall(this.position, access, this.method, this.arguments), this.getLineNumber());
 	}
 	
 	private boolean writeIINC(MethodWriter writer, IDataMember f) throws BytecodeException
@@ -242,9 +237,9 @@ public final class CompoundCall extends AbstractCall implements INamed
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString(prefix, buffer);
+			this.receiver.toString(prefix, buffer);
 			buffer.append(' ');
 		}
 		

@@ -362,7 +362,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				pm.skip();
 				IArguments arguments = this.parseArguments(pm, next.next());
-				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getValue(), arguments);
+				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), arguments);
 				amc.setGenericData(genericData);
 				
 				this.value = amc;
@@ -372,7 +372,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (ParserUtil.isIdentifier(nextType))
 			{
 				pm.skip();
-				this.value = ((MethodCall) this.value).getValue();
+				this.value = ((MethodCall) this.value).getReceiver();
 				this.parseAccess(pm, token.next(), token.next().type(), token.next().nameValue(), null);
 				
 				if (this.value instanceof AbstractCall)
@@ -383,7 +383,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			if (ParserUtil.isExpressionTerminator(nextType))
 			{
-				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getValue(), EmptyArguments.INSTANCE);
+				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), EmptyArguments.INSTANCE);
 				amc.setGenericData(genericData);
 				this.value = amc;
 				this.mode = ACCESS;
@@ -391,7 +391,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			SingleArgument argument = new SingleArgument();
-			ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getValue(), argument);
+			ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), argument);
 			amc.setGenericData(genericData);
 			this.value = amc;
 			
@@ -826,7 +826,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.APPLY_CALL:
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.value;
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.getValue(), call.getArguments());
+			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.getReceiver(), call.getArguments());
 			this.value = updateCall;
 			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
@@ -834,7 +834,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.METHOD_CALL:
 		{
 			MethodCall call = (MethodCall) this.value;
-			FieldAccess fa = new FieldAccess(position, call.getValue(), call.getName());
+			FieldAccess fa = new FieldAccess(position, call.getReceiver(), call.getName());
 			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.getArguments());
 			this.value = updateCall;
 			pm.pushParser(pm.newExpressionParser(updateCall));
@@ -843,7 +843,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.SUBSCRIPT_GET:
 		{
 			SubscriptGetter getter = (SubscriptGetter) this.value;
-			SubscriptSetter setter = new SubscriptSetter(position, getter.getValue(), getter.getArguments());
+			SubscriptSetter setter = new SubscriptSetter(position, getter.getReceiver(), getter.getArguments());
 			this.value = setter;
 			pm.pushParser(pm.newExpressionParser(setter));
 			return;

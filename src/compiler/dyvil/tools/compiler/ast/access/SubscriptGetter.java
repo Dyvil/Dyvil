@@ -23,14 +23,14 @@ public class SubscriptGetter extends AbstractCall
 	public SubscriptGetter(ICodePosition position, IValue instance)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.arguments = new ArgumentList();
 	}
 	
 	public SubscriptGetter(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.arguments = arguments;
 	}
 	
@@ -55,19 +55,19 @@ public class SubscriptGetter extends AbstractCall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			if (this.instance.valueTag() == FIELD_ACCESS)
+			if (this.receiver.valueTag() == FIELD_ACCESS)
 			{
-				FieldAccess fa = (FieldAccess) this.instance;
-				if (fa.instance != null)
+				FieldAccess fa = (FieldAccess) this.receiver;
+				if (fa.receiver != null)
 				{
-					fa.instance = fa.instance.resolve(markers, context);
+					fa.receiver = fa.receiver.resolve(markers, context);
 				}
 				IValue v1 = fa.resolveFieldAccess(markers, context);
 				if (v1 != null)
 				{
-					this.instance = v1;
+					this.receiver = v1;
 					this.arguments.resolve(markers, context);
 				}
 				else
@@ -77,10 +77,10 @@ public class SubscriptGetter extends AbstractCall
 					Array array = new Array(position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
 					IArguments arguments = new SingleArgument(array);
 					
-					IMethod m = ICall.resolveMethod(context, fa.instance, fa.name, arguments);
+					IMethod m = ICall.resolveMethod(context, fa.receiver, fa.name, arguments);
 					if (m != null)
 					{
-						MethodCall mc = new MethodCall(fa.position, fa.instance, fa.name);
+						MethodCall mc = new MethodCall(fa.position, fa.receiver, fa.name);
 						mc.method = m;
 						mc.arguments = arguments;
 						mc.dotless = fa.dotless;
@@ -88,13 +88,13 @@ public class SubscriptGetter extends AbstractCall
 						return mc;
 					}
 					
-					ICall.addResolveMarker(markers, this.position, fa.instance, fa.name, arguments);
+					ICall.addResolveMarker(markers, this.position, fa.receiver, fa.name, arguments);
 					return this;
 				}
 			}
 			else
 			{
-				this.instance = this.instance.resolve(markers, context);
+				this.receiver = this.receiver.resolve(markers, context);
 				this.arguments.resolve(markers, context);
 			}
 		}
@@ -103,32 +103,24 @@ public class SubscriptGetter extends AbstractCall
 			this.arguments.resolve(markers, context);
 		}
 		
-		int count = this.arguments.size();
-		ArgumentList argumentList = new ArgumentList(count);
-		for (int i = 0; i < count; i++)
-		{
-			argumentList.addValue(this.arguments.getValue(i, null));
-		}
-		
-		IMethod m = ICall.resolveMethod(context, this.instance, Names.subscript, argumentList);
+		IMethod m = ICall.resolveMethod(context, this.receiver, Names.subscript, this.arguments);
 		if (m != null)
 		{
-			this.arguments = argumentList;
 			this.method = m;
 			this.checkArguments(markers, context);
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, this.position, this.instance, Names.subscript, argumentList);
+		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript, this.arguments);
 		return this;
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString(prefix, buffer);
+			this.receiver.toString(prefix, buffer);
 		}
 		
 		buffer.append('[');

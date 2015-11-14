@@ -5,9 +5,9 @@ import java.util.Iterator;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,7 +18,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public final class SingleArgument implements IArguments, IValued
+public final class SingleArgument implements IArguments, IValueConsumer
 {
 	private IValue	value;
 	private boolean	varargs;
@@ -96,12 +96,6 @@ public final class SingleArgument implements IArguments, IValued
 	public void setValue(IValue value)
 	{
 		this.value = value;
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
 	}
 	
 	// Used by Methods

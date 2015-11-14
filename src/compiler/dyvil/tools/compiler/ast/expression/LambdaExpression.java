@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -34,7 +35,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class LambdaExpression implements IValue, IValued, IClassCompilable, IDefaultContext
+public final class LambdaExpression implements IValue, IClassCompilable, IDefaultContext, IValueConsumer
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
 			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodType;"
@@ -127,7 +128,6 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		this.value = value;
 	}
 	
-	@Override
 	public IValue getValue()
 	{
 		return this.value;
@@ -478,10 +478,10 @@ public final class LambdaExpression implements IValue, IValued, IClassCompilable
 		{
 			if (this.value instanceof AbstractCall && this.value.valueTag() != COMPOUND_CALL)
 			{
-				AbstractCall c = (AbstractCall) this.value;
+				AbstractCall call = (AbstractCall) this.value;
 				
-				IMethod method = c.getMethod();
-				if (method != null && this.checkCall(c.getValue(), c.getArguments(), method))
+				IMethod method = call.getMethod();
+				if (method != null && this.checkCall(call.getReceiver(), call.getArguments(), method))
 				{
 					switch (method.getInvokeOpcode())
 					{

@@ -30,14 +30,14 @@ public final class MethodCall extends AbstractCall implements INamed
 	public MethodCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
 	}
 	
 	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
 		this.arguments = arguments;
 	}
@@ -45,7 +45,7 @@ public final class MethodCall extends AbstractCall implements INamed
 	public MethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = method.getName();
 		this.method = method;
 		this.arguments = arguments;
@@ -117,9 +117,9 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (args == 1)
 		{
 			IValue op;
-			if (this.instance != null)
+			if (this.receiver != null)
 			{
-				op = Operators.getPriority(this.instance, this.name, this.arguments.getFirstValue());
+				op = Operators.getPriority(this.receiver, this.name, this.arguments.getFirstValue());
 			}
 			else
 			{
@@ -133,7 +133,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 		}
 		
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -141,9 +141,9 @@ public final class MethodCall extends AbstractCall implements INamed
 			return this;
 		}
 		
-		if (args == 1 && this.instance != null)
+		if (args == 1 && this.receiver != null)
 		{
-			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());
+			IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
 			if (op != null)
 			{
 				op.setPosition(this.position);
@@ -155,13 +155,13 @@ public final class MethodCall extends AbstractCall implements INamed
 			{
 				Name name = Util.stripEq(this.name);
 				
-				CompoundCall cc = new CompoundCall(this.position, this.instance, name, this.arguments);
+				CompoundCall cc = new CompoundCall(this.position, this.receiver, name, this.arguments);
 				return cc.resolveCall(markers, context);
 			}
 		}
 		
 		// Resolve Apply Method
-		if (this.instance == null)
+		if (this.receiver == null)
 		{
 			AbstractCall apply = this.resolveApply(markers, context);
 			if (apply != null)
@@ -171,7 +171,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 		}
 		
-		ICall.addResolveMarker(markers, this.position, this.instance, this.name, this.arguments);
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 		return this;
 	}
 	
@@ -220,7 +220,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		
 		ApplyMethodCall call = new ApplyMethodCall(this.position);
 		call.method = method;
-		call.instance = instance;
+		call.receiver = instance;
 		call.arguments = this.arguments;
 		call.genericData = this.genericData;
 		
@@ -232,14 +232,14 @@ public final class MethodCall extends AbstractCall implements INamed
 	{
 		if (!this.arguments.isEmpty())
 		{
-			if (this.instance != null)
+			if (this.receiver != null)
 			{
-				if (this.instance.isConstant())
+				if (this.receiver.isConstant())
 				{
 					IValue argument;
 					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
 					{
-						IValue folded = ConstantFolder.apply(this.instance, this.name, argument);
+						IValue folded = ConstantFolder.apply(this.receiver, this.name, argument);
 						if (folded != null)
 						{
 							return folded;
@@ -248,26 +248,26 @@ public final class MethodCall extends AbstractCall implements INamed
 				}
 				else
 				{
-					this.instance = this.instance.foldConstants();
+					this.receiver = this.receiver.foldConstants();
 				}
 			}
 			this.arguments.foldConstants();
 			return this;
 		}
 		
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
 			// Prefix methods are transformed to postfix notation
-			if (this.instance.isConstant())
+			if (this.receiver.isConstant())
 			{
-				IValue folded = ConstantFolder.apply(this.name, this.instance);
+				IValue folded = ConstantFolder.apply(this.name, this.receiver);
 				if (folded != null)
 				{
 					return folded;
 				}
 			}
 			
-			this.instance = this.instance.foldConstants();
+			this.receiver = this.receiver.foldConstants();
 		}
 		return this;
 	}
@@ -275,9 +275,9 @@ public final class MethodCall extends AbstractCall implements INamed
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString(prefix, buffer);
+			this.receiver.toString(prefix, buffer);
 			if (this.dotless && !Formatting.Method.useJavaFormat)
 			{
 				buffer.append(Formatting.Method.dotlessSeperator);

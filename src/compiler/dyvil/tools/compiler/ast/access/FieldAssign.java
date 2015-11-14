@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -23,11 +23,11 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class FieldAssign implements IValue, INamed, IValued
+public final class FieldAssign implements IValue, INamed, IReceiverAccess, IValueConsumer
 {
 	protected ICodePosition position;
 	
-	protected IValue	instance;
+	protected IValue	receiver;
 	protected Name		name;
 	protected IValue	value;
 	
@@ -41,14 +41,14 @@ public final class FieldAssign implements IValue, INamed, IValued
 	public FieldAssign(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
 	}
 	
 	public FieldAssign(ICodePosition position, IValue instance, IDataMember field, IValue value)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.field = field;
 		this.name = field.getName();
 		this.value = value;
@@ -126,12 +126,23 @@ public final class FieldAssign implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void setValue(IValue value)
+	public void setReceiver(IValue value)
 	{
 		this.value = value;
 	}
 	
 	@Override
+	public IValue getReceiver()
+	{
+		return this.value;
+	}
+	
+	@Override
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+	
 	public IValue getValue()
 	{
 		return this.value;
@@ -146,9 +157,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 		}
 		else
 		{
-			if (this.instance != null)
+			if (this.receiver != null)
 			{
-				this.instance.resolveTypes(markers, context);
+				this.receiver.resolveTypes(markers, context);
 			}
 			
 			if (this.value != null)
@@ -161,19 +172,19 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.resolve(markers, context);
+			this.receiver = this.receiver.resolve(markers, context);
 		}
 		
-		if (!ICall.privateAccess(context, this.instance))
+		if (!ICall.privateAccess(context, this.receiver))
 		{
 			Name name = Name.getQualified(this.name.qualified + "_$eq");
 			IArguments arg = new SingleArgument(this.value);
-			IMethod m = ICall.resolveMethod(context, this.instance, name, arg);
+			IMethod m = ICall.resolveMethod(context, this.receiver, name, arg);
 			if (m != null)
 			{
-				MethodCall mc = new MethodCall(this.position, this.instance, name);
+				MethodCall mc = new MethodCall(this.position, this.receiver, name);
 				mc.arguments = arg;
 				mc.method = m;
 				mc.checkArguments(markers, context);
@@ -181,15 +192,15 @@ public final class FieldAssign implements IValue, INamed, IValued
 			}
 		}
 		
-		this.field = ICall.resolveField(context, this.instance, this.name);
+		this.field = ICall.resolveField(context, this.receiver, this.name);
 		
 		if (this.field == null)
 		{
 			Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
 			marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
-			if (this.instance != null)
+			if (this.receiver != null)
 			{
-				marker.addInfo(I18n.getString("receiver.type", this.instance.getType()));
+				marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
 			}
 			
 			markers.add(marker);
@@ -206,16 +217,16 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.checkTypes(markers, context);
+			this.receiver.checkTypes(markers, context);
 		}
 		
 		if (this.field != null)
 		{
 			this.field = this.field.capture(context);
-			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
-			this.value = this.field.checkAssign(markers, context, this.position, this.instance, this.value);
+			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
+			this.value = this.field.checkAssign(markers, context, this.position, this.receiver, this.value);
 		}
 		
 		if (this.value != null)
@@ -227,9 +238,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.check(markers, context);
+			this.receiver.check(markers, context);
 		}
 		if (this.value != null)
 		{
@@ -240,9 +251,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.foldConstants();
+			this.receiver = this.receiver.foldConstants();
 		}
 		this.value = this.value.foldConstants();
 		return this;
@@ -251,9 +262,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(context, compilableList);
 		}
 		this.value = this.value.cleanup(context, compilableList);
 		return this;
@@ -262,14 +273,14 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.instance == null)
+		if (this.receiver == null)
 		{
 			this.value.writeExpression(writer, this.field.getType());
 			writer.writeInsn(Opcodes.AUTO_DUP);
 		}
 		else
 		{
-			this.instance.writeExpression(writer);
+			this.receiver.writeExpression(writer);
 			this.value.writeExpression(writer);
 			writer.writeInsn(Opcodes.AUTO_DUP_X1);
 		}
@@ -284,7 +295,7 @@ public final class FieldAssign implements IValue, INamed, IValued
 			return;
 		}
 		
-		this.field.writeSet(writer, this.instance, this.value, this.getLineNumber());
+		this.field.writeSet(writer, this.receiver, this.value, this.getLineNumber());
 	}
 	
 	@Override
@@ -296,9 +307,9 @@ public final class FieldAssign implements IValue, INamed, IValued
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString("", buffer);
+			this.receiver.toString("", buffer);
 			buffer.append('.');
 		}
 		

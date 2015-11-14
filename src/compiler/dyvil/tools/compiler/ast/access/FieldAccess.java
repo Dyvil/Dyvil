@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -25,10 +24,10 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class FieldAccess implements IValue, INamed, IValued
+public final class FieldAccess implements IValue, INamed, IReceiverAccess
 {
 	protected ICodePosition	position;
-	protected IValue		instance;
+	protected IValue		receiver;
 	protected Name			name;
 	
 	protected boolean dotless;
@@ -49,14 +48,14 @@ public final class FieldAccess implements IValue, INamed, IValued
 	public FieldAccess(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
 	}
 	
 	public FieldAccess(ICodePosition position, IValue instance, IDataMember field)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.field = field;
 	}
 	
@@ -75,7 +74,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	public MethodCall toMethodCall(IMethod method)
 	{
 		MethodCall call = new MethodCall(this.position);
-		call.instance = this.instance;
+		call.receiver = this.receiver;
 		call.name = this.name;
 		call.method = method;
 		call.dotless = this.dotless;
@@ -91,7 +90,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	
 	public IValue getInstance()
 	{
-		return this.instance;
+		return this.receiver;
 	}
 	
 	public IDataMember getField()
@@ -124,11 +123,11 @@ public final class FieldAccess implements IValue, INamed, IValued
 			{
 				return Types.UNKNOWN;
 			}
-			if (this.instance == null)
+			if (this.receiver == null)
 			{
 				return this.type = this.field.getType();
 			}
-			return this.type = this.field.getType().getConcreteType(this.instance.getType()).getReturnType();
+			return this.type = this.field.getType().getConcreteType(this.receiver.getType()).getReturnType();
 		}
 		return this.type;
 	}
@@ -163,15 +162,15 @@ public final class FieldAccess implements IValue, INamed, IValued
 	}
 	
 	@Override
-	public void setValue(IValue value)
+	public void setReceiver(IValue value)
 	{
-		this.instance = value;
+		this.receiver = value;
 	}
 	
 	@Override
-	public IValue getValue()
+	public IValue getReceiver()
 	{
-		return this.instance;
+		return this.receiver;
 	}
 	
 	@Override
@@ -203,15 +202,15 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.resolveTypes(markers, context);
+			this.receiver.resolveTypes(markers, context);
 		}
 	}
 	
 	private IValue resolveMethod(MarkerList markers, IContext context)
 	{
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
+		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, EmptyArguments.INSTANCE);
 		if (method != null)
 		{
 			AbstractCall mc = this.toMethodCall(method);
@@ -223,7 +222,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	
 	private IValue resolveField(MarkerList markers, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, this.instance, this.name);
+		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
 		if (field != null)
 		{
 			if (field.isEnumConstant())
@@ -240,7 +239,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	
 	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
-		if (ICall.privateAccess(context, this.instance))
+		if (ICall.privateAccess(context, this.receiver))
 		{
 			IValue value = this.resolveField(markers, context);
 			if (value != null)
@@ -267,7 +266,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 			}
 		}
 		
-		if (this.instance == null)
+		if (this.receiver == null)
 		{
 			IClass iclass = IContext.resolveClass(context, this.name);
 			if (iclass != null)
@@ -282,9 +281,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.resolve(markers, context);
+			this.receiver = this.receiver.resolve(markers, context);
 		}
 		
 		IValue v = this.resolveFieldAccess(markers, context);
@@ -295,9 +294,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 		
 		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
 		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			marker.addInfo(I18n.getString("receiver.type", this.instance.getType()));
+			marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
 		}
 		
 		markers.add(marker);
@@ -307,24 +306,24 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.checkTypes(markers, context);
+			this.receiver.checkTypes(markers, context);
 		}
 		
 		if (this.field != null)
 		{
 			this.field = this.field.capture(context);
-			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
+			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.check(markers, context);
+			this.receiver.check(markers, context);
 		}
 	}
 	
@@ -336,9 +335,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 			IValue v = this.field.getValue();
 			return v != null && v.isConstantOrField() ? v : this;
 		}
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.foldConstants();
+			this.receiver = this.receiver.foldConstants();
 		}
 		return this;
 	}
@@ -346,9 +345,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(context, compilableList);
 		}
 		return this;
 	}
@@ -357,7 +356,7 @@ public final class FieldAccess implements IValue, INamed, IValued
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		int lineNumber = this.getLineNumber();
-		this.field.writeGet(writer, this.instance, lineNumber);
+		this.field.writeGet(writer, this.receiver, lineNumber);
 		
 		if (this.type != null)
 		{
@@ -382,9 +381,9 @@ public final class FieldAccess implements IValue, INamed, IValued
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString("", buffer);
+			this.receiver.toString("", buffer);
 			if (this.dotless && !Formatting.Field.useJavaFormat)
 			{
 				buffer.append(Formatting.Field.dotlessSeperator);

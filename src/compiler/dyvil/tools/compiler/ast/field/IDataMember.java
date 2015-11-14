@@ -2,17 +2,22 @@ package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IDataMember extends IMember, IValued, IAccessible
+public interface IDataMember extends IMember, IAccessible, IValueConsumer
 {
+	public IValue getValue();
+	
+	@Override
+	public void setValue(IValue value);
+	
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
 	
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);

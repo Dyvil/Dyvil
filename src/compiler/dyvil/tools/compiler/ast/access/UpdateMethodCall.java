@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -10,7 +11,7 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class UpdateMethodCall extends AbstractCall
+public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 {
 	public UpdateMethodCall(ICodePosition position)
 	{
@@ -20,7 +21,7 @@ public class UpdateMethodCall extends AbstractCall
 	public UpdateMethodCall(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.arguments = arguments;
 	}
 	
@@ -37,15 +38,9 @@ public class UpdateMethodCall extends AbstractCall
 	}
 	
 	@Override
-	public IValue getValue()
-	{
-		return this.arguments.getLastValue();
-	}
-	
-	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		IMethod method = ICall.resolveMethod(context, this.instance, Names.update, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.receiver, Names.update, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -53,16 +48,16 @@ public class UpdateMethodCall extends AbstractCall
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, this.position, this.instance, Names.update, this.arguments);
+		ICall.addResolveMarker(markers, this.position, this.receiver, Names.update, this.arguments);
 		return this;
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString(prefix, buffer);
+			this.receiver.toString(prefix, buffer);
 		}
 		
 		if (this.arguments instanceof ArgumentList)

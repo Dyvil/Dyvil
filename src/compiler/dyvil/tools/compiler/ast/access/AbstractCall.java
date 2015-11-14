@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -17,11 +16,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public abstract class AbstractCall implements ICall, IValued
+public abstract class AbstractCall implements ICall, IReceiverAccess
 {
 	protected ICodePosition position;
 	
-	protected IValue		instance;
+	protected IValue		receiver;
 	protected IArguments	arguments	= EmptyArguments.INSTANCE;
 	protected GenericData	genericData;
 	
@@ -42,15 +41,15 @@ public abstract class AbstractCall implements ICall, IValued
 	}
 	
 	@Override
-	public void setValue(IValue value)
+	public void setReceiver(IValue value)
 	{
-		this.instance = value;
+		this.receiver = value;
 	}
 	
 	@Override
-	public IValue getValue()
+	public IValue getReceiver()
 	{
-		return this.instance;
+		return this.receiver;
 	}
 	
 	@Override
@@ -80,7 +79,7 @@ public abstract class AbstractCall implements ICall, IValued
 		{
 			return this.genericData = new GenericData();
 		}
-		return this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
+		return this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
 	}
 	
 	public IMethod getMethod()
@@ -131,9 +130,9 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.resolveTypes(markers, context);
+			this.receiver.resolveTypes(markers, context);
 		}
 		if (this.arguments.isEmpty())
 		{
@@ -160,9 +159,9 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public void resolveArguments(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.resolve(markers, context);
+			this.receiver = this.receiver.resolve(markers, context);
 		}
 		
 		this.arguments.resolve(markers, context);
@@ -179,14 +178,14 @@ public abstract class AbstractCall implements ICall, IValued
 			GenericData data;
 			if (this.genericData != null)
 			{
-				data = this.genericData = this.method.getGenericData(this.genericData, this.instance, this.arguments);
+				data = this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
 			}
 			else
 			{
 				data = this.getGenericData();
 			}
 			
-			this.instance = this.method.checkArguments(markers, this.position, context, this.instance, this.arguments, data);
+			this.receiver = this.method.checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
 		}
 		
 		this.type = null;
@@ -196,9 +195,9 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.checkTypes(markers, context);
+			this.receiver.checkTypes(markers, context);
 		}
 		
 		this.arguments.checkTypes(markers, context);
@@ -207,14 +206,14 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.check(markers, context);
+			this.receiver.check(markers, context);
 		}
 		
 		if (this.method != null)
 		{
-			this.method.checkCall(markers, this.position, context, this.instance, this.arguments, this.getGenericData());
+			this.method.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 		}
 		
 		this.arguments.check(markers, context);
@@ -223,9 +222,9 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.foldConstants();
+			this.receiver = this.receiver.foldConstants();
 		}
 		this.arguments.foldConstants();
 		return this;
@@ -234,9 +233,9 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(context, compilableList);
 		}
 		this.arguments.cleanup(context, compilableList);
 		return this;
@@ -256,32 +255,32 @@ public abstract class AbstractCall implements ICall, IValued
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, this.type, this.getLineNumber());
+		this.method.writeCall(writer, this.receiver, this.arguments, this.type, this.getLineNumber());
 		this.getType().writeCast(writer, type, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, this.type, this.getLineNumber());
+		this.method.writeCall(writer, this.receiver, this.arguments, this.type, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.instance, this.arguments, Types.VOID, this.getLineNumber());
+		this.method.writeCall(writer, this.receiver, this.arguments, Types.VOID, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeJump(writer, dest, this.instance, this.arguments, this.getLineNumber());
+		this.method.writeJump(writer, dest, this.receiver, this.arguments, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeInvJump(writer, dest, this.instance, this.arguments, this.getLineNumber());
+		this.method.writeInvJump(writer, dest, this.receiver, this.arguments, this.getLineNumber());
 	}
 	
 	@Override

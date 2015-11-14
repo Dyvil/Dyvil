@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.expression.Value;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -16,7 +16,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ThrowStatement extends Value implements IValued
+public final class ThrowStatement extends Value implements IValueConsumer
 {
 	protected IValue value;
 	
@@ -43,7 +43,6 @@ public final class ThrowStatement extends Value implements IValued
 		this.value = value;
 	}
 	
-	@Override
 	public IValue getValue()
 	{
 		return this.value;
