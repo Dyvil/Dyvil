@@ -2,8 +2,13 @@ package dyvil.random;
 
 import dyvil.annotation._internal.infix;
 
-public interface RandomUtils
+public class RandomUtils
 {
+	private RandomUtils()
+	{
+		// no instances
+	}
+	
 	/**
 	 * Returns true with the given chance of {@code chance}. It does that by
 	 * generating a new random float using the given {@link java.util.Random

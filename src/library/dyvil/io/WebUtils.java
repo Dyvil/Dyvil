@@ -23,8 +23,13 @@ import dyvil.array.ByteArray;
  * @version 1.0
  */
 @Utility(URL.class)
-public interface WebUtils
+public final class WebUtils
 {
+	private WebUtils()
+	{
+		// no instances
+	}
+	
 	/**
 	 * Checks if the website at the given {@link String} {@code url} is
 	 * available using the HTTP request {@code HEAD}. The created

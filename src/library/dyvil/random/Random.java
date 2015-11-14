@@ -20,7 +20,7 @@ public interface Random
 	
 	public default boolean nextBoolean()
 	{
-		return this.next(1) != 0;
+		return this.next(1) > 0;
 	}
 	
 	public default boolean nextBoolean(float f)

@@ -20,8 +20,13 @@ import dyvil.collection.mutable.ArrayList;
  * @version 1.0
  */
 @Utility(File.class)
-public interface FileUtils
+public final class FileUtils
 {
+	private FileUtils()
+	{
+		// no instances
+	}
+	
 	/**
 	 * Ensures that the given {@code file} exists. If the file does not exist in
 	 * terms of it's {@link File#exists() exists()} method, the file will be
