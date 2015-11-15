@@ -32,9 +32,24 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<
 		return new Builder<K, V>();
 	}
 	
+	public static <K, V> Builder<K, V> builder(Comparator<? super K> comparator)
+	{
+		return new Builder<K, V>(comparator);
+	}
+	
 	protected static final class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
-		private TreeMap<K, V> map = new TreeMap<K, V>();
+		private TreeMap<K, V> map;
+		
+		public Builder()
+		{
+			this.map = new TreeMap<K, V>();
+		}
+		
+		public Builder(Comparator<? super K> comparator)
+		{
+			this.map = new TreeMap<K, V>(comparator);
+		}
 		
 		@Override
 		public void put(K key, V value)
@@ -55,8 +70,13 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<
 		}
 	}
 	
-	public TreeMap()
+	protected TreeMap()
 	{
+	}
+	
+	public TreeMap(Comparator<? super K> comparator)
+	{
+		super(comparator);
 	}
 	
 	public TreeMap(Map<? extends K, ? extends V> map)
@@ -64,9 +84,9 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V>implements ImmutableMap<
 		super(map, null);
 	}
 	
-	public TreeMap(Map<? extends K, ? extends V> m, Comparator<? super K> comparator)
+	public TreeMap(Map<? extends K, ? extends V> map, Comparator<? super K> comparator)
 	{
-		super(m, comparator);
+		super(map, comparator);
 	}
 	
 	@Override
