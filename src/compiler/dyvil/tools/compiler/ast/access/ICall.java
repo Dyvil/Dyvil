@@ -25,16 +25,30 @@ public interface ICall extends IValue
 	@Override
 	public default IValue resolve(MarkerList markers, IContext context)
 	{
+		this.resolveReceiver(markers, context);
 		this.resolveArguments(markers, context);
-		return this.resolveCall(markers, context);
+		IValue v = this.resolveCall(markers, context);
+		if (v != null)
+		{
+			return v;
+		}
+		
+		this.reportResolve(markers, context);
+		return this;
 	}
 	
 	public void checkArguments(MarkerList markers, IContext context);
-
+	
 	public IValue resolveCall(MarkerList markers, IContext context);
-
+	
+	public default void resolveReceiver(MarkerList markers, IContext context)
+	{
+	}
+	
 	public void resolveArguments(MarkerList markers, IContext context);
-
+	
+	public void reportResolve(MarkerList markers, IContext context);
+	
 	public static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		if (arguments == EmptyArguments.INSTANCE)

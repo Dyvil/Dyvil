@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -47,62 +46,48 @@ public class SubscriptGetter extends AbstractCall
 	}
 	
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
-		return null;
+		if (this.receiver instanceof ICall && this.arguments instanceof ArgumentList)
+		// false if receiver == null
+		{
+			ICall call = (ICall) this.receiver;
+			
+			// Resolve Receiver if necessary
+			call.resolveReceiver(markers, context);
+			call.resolveArguments(markers, context);
+			
+			IArguments oldArgs = call.getArguments();
+			
+			ArrayExpr array = new ArrayExpr(this.position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
+			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
+			
+			IValue resolvedCall = call.resolveCall(markers, context);
+			if (resolvedCall != null)
+			{
+				return resolvedCall;
+			}
+			
+			// Revert
+			call.setArguments(oldArgs);
+			
+			this.receiver = call.resolveCall(markers, context);
+			resolvedCall = this.resolveCall(markers, context);
+			if (resolvedCall != null)
+			{
+				return resolvedCall;
+			}
+			
+			this.reportResolve(markers, context);
+			return this;
+		}
+		
+		return super.resolve(markers, context);
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		if (this.receiver != null)
-		{
-			if (this.receiver.valueTag() == FIELD_ACCESS)
-			{
-				FieldAccess fa = (FieldAccess) this.receiver;
-				if (fa.receiver != null)
-				{
-					fa.receiver = fa.receiver.resolve(markers, context);
-				}
-				IValue v1 = fa.resolveFieldAccess(markers, context);
-				if (v1 != null)
-				{
-					this.receiver = v1;
-					this.arguments.resolve(markers, context);
-				}
-				else
-				{
-					this.arguments.resolve(markers, context);
-					ICodePosition position = this.arguments.getFirstValue().getPosition().to(this.arguments.getLastValue().getPosition());
-					ArrayExpr array = new ArrayExpr(position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
-					IArguments arguments = new SingleArgument(array);
-					
-					IMethod m = ICall.resolveMethod(context, fa.receiver, fa.name, arguments);
-					if (m != null)
-					{
-						MethodCall mc = new MethodCall(fa.position, fa.receiver, fa.name);
-						mc.method = m;
-						mc.arguments = arguments;
-						mc.dotless = fa.dotless;
-						mc.checkArguments(markers, context);
-						return mc;
-					}
-					
-					ICall.addResolveMarker(markers, this.position, fa.receiver, fa.name, arguments);
-					return this;
-				}
-			}
-			else
-			{
-				this.receiver = this.receiver.resolve(markers, context);
-				this.arguments.resolve(markers, context);
-			}
-		}
-		else
-		{
-			this.arguments.resolve(markers, context);
-		}
-		
 		IMethod m = ICall.resolveMethod(context, this.receiver, Names.subscript, this.arguments);
 		if (m != null)
 		{
@@ -111,8 +96,13 @@ public class SubscriptGetter extends AbstractCall
 			return this;
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript, this.arguments);
-		return this;
 	}
 	
 	@Override

@@ -43,8 +43,13 @@ public class SubscriptSetter extends AbstractCall implements IValueConsumer
 			return this;
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript_$eq, this.arguments);
-		return this;
 	}
 	
 	@Override

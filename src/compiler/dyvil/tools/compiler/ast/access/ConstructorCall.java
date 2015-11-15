@@ -226,8 +226,7 @@ public class ConstructorCall implements ICall
 		this.constructor = IContext.resolveConstructor(this.type, this.arguments);
 		if (this.constructor == null)
 		{
-			this.reportResolve(markers);
-			return this;
+			return null;
 		}
 		
 		if (this.constructor.getTheClass().isGeneric() && !this.type.isGenericType())
@@ -245,7 +244,8 @@ public class ConstructorCall implements ICall
 		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
 	}
 	
-	protected void reportResolve(MarkerList markers)
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
 	{
 		if (!this.type.isResolved())
 		{

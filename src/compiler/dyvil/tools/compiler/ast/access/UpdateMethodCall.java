@@ -48,8 +48,13 @@ public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 			return this;
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, Names.update, this.arguments);
-		return this;
 	}
 	
 	@Override

@@ -105,17 +105,12 @@ public class InitializerCall implements ICall
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
-		this.constructor.checkArguments(markers, position, context, this.constructor.getTheClass().getType(), arguments);
+		this.constructor.checkArguments(markers, this.position, context, this.constructor.getTheClass().getType(), arguments);
 	}
 
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		if (this.constructor != null)
-		{
-			return this;
-		}
-		
 		IClass iclass = context.getThisClass();
 		if (this.isSuper)
 		{
@@ -123,22 +118,29 @@ public class InitializerCall implements ICall
 		}
 		
 		IConstructor match = IContext.resolveConstructor(iclass, this.arguments);
-		if (match == null)
+		if (match != null)
 		{
-			Marker marker = I18n.createMarker(this.position, "resolve.constructor", iclass.getName().qualified);
-			if (!this.arguments.isEmpty())
-			{
-				StringBuilder builder = new StringBuilder("Argument Types: ");
-				this.arguments.typesToString(builder);
-				marker.addInfo(builder.toString());
-			}
-			
-			markers.add(marker);
+			this.constructor = match;
+			this.checkArguments(markers, context);
+			return this;
 		}
 		
-		this.constructor = match;
-		this.checkArguments(markers, context);
-		return this;
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		IClass iclass = context.getThisClass();
+		Marker marker = I18n.createMarker(this.position, "resolve.constructor", iclass.getName().qualified);
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
+		
+		markers.add(marker);
 	}
 
 	@Override

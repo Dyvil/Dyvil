@@ -72,7 +72,7 @@ public class ClassConstructor extends ConstructorCall
 		}
 		if (this.constructor == null)
 		{
-			this.reportResolve(markers);
+			this.reportResolve(markers, context);
 		}
 		
 		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);

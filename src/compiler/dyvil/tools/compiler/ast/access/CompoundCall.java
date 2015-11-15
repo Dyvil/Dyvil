@@ -128,12 +128,20 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			throw new Error();
 		}
 		
-		IMethod m = this.method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
-		if (m == null)
+		IMethod m = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
+		if (m != null)
 		{
-			ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
+			this.method = m;
+			this.checkArguments(markers, context);
+			return this;
 		}
-		return this;
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);		
 	}
 	
 	@Override

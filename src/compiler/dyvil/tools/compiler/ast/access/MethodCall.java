@@ -166,13 +166,11 @@ public final class MethodCall extends AbstractCall implements INamed
 			AbstractCall apply = this.resolveApply(markers, context);
 			if (apply != null)
 			{
-				apply.checkArguments(markers, context);
 				return apply;
 			}
 		}
 		
-		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
-		return this;
+		return null;
 	}
 	
 	private AbstractCall resolveApply(MarkerList markers, IContext context)
@@ -180,8 +178,8 @@ public final class MethodCall extends AbstractCall implements INamed
 		IValue instance;
 		IMethod method;
 		
-		IDataMember field = context.resolveField(this.name);
-		if (field == null)
+		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		if (field == null && this.receiver == null)
 		{
 			// Find a type
 			IType itype = IContext.resolveType(context, this.name);
@@ -203,12 +201,13 @@ public final class MethodCall extends AbstractCall implements INamed
 		else
 		{
 			FieldAccess access = new FieldAccess(this.position);
+			access.receiver = this.receiver;
 			access.field = field;
 			access.name = this.name;
 			access.dotless = this.dotless;
 			
 			// Find the apply method of the field type
-			IMethod match = IContext.resolveMethod(field.getType(), access, Names.apply, this.arguments);
+			IMethod match = ICall.resolveMethod(context, access, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -223,8 +222,15 @@ public final class MethodCall extends AbstractCall implements INamed
 		call.receiver = instance;
 		call.arguments = this.arguments;
 		call.genericData = this.genericData;
+		call.checkArguments(markers, context);
 		
 		return call;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 	}
 	
 	@Override

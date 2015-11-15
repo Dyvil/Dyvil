@@ -33,30 +33,43 @@ public class ApplyMethodCall extends AbstractCall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.arguments.getClass() == SingleArgument.class && this.receiver instanceof AbstractCall)
+		// Merge Applied Statement Lists if a non-curried method version is
+		// available. Doesn't works with multiple applied statement lists.
+		// with(x...) { statements }
+		// -> with(x..., { statements })
+		if (this.arguments.getClass() == SingleArgument.class && this.receiver instanceof ICall)
 		{
-			ICall ac = (ICall) this.receiver;
+			ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirstValue();
 			
 			if (argument instanceof AppliedStatementList)
 			{
 				argument = argument.resolve(markers, context);
 				
-				IArguments oldArgs = ac.getArguments();
-				ac.resolveArguments(markers, context);
+				IArguments oldArgs = call.getArguments();
+				call.resolveReceiver(markers, context);
+				call.resolveArguments(markers, context);
 				
-				ac.setArguments(oldArgs.withLastValue(Names.apply, argument));
+				call.setArguments(oldArgs.withLastValue(Names.apply, argument));
 				
-				IValue call = ac.resolveCall(markers, context);
-				if (call != null)
+				IValue resolvedCall = call.resolveCall(markers, context);
+				if (resolvedCall != null)
 				{
-					return call;
+					return resolvedCall;
 				}
 				
-				ac.setArguments(oldArgs);
+				// Revert
+				call.setArguments(oldArgs);
 				
-				this.receiver = ac.resolveCall(markers, context);
-				return this.resolveCall(markers, context);
+				this.receiver = call.resolveCall(markers, context);
+				resolvedCall = this.resolveCall(markers, context);
+				if (resolvedCall != null)
+				{
+					return resolvedCall;
+				}
+				
+				this.reportResolve(markers, context);
+				return this;
 			}
 		}
 		
@@ -74,8 +87,13 @@ public class ApplyMethodCall extends AbstractCall
 			return this;
 		}
 		
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, Names.apply, this.arguments);
-		return this;
 	}
 	
 	@Override
