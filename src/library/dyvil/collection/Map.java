@@ -2,10 +2,7 @@ package dyvil.collection;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -331,7 +328,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the key
 	 * @return true, if this map contains a mapping for the key
 	 */
-	public boolean containsKey(Object key);
+	public default boolean containsKey(Object key)
+	{
+		for (Iterator<K> keyIterator = this.keyIterator(); keyIterator.hasNext();)
+		{
+			if (Objects.equals(key, keyIterator.next()))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping to the given
@@ -341,7 +349,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return true, if this map contains a mapping to the value
 	 */
-	public boolean containsValue(Object value);
+	public default boolean containsValue(Object value)
+	{
+		for (Iterator<V> valueIterator = this.valueIterator(); valueIterator.hasNext();)
+		{
+			if (Objects.equals(value, valueIterator.next()))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the
@@ -353,7 +372,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return true, if this map contains a mapping for the key and the value
 	 */
-	public boolean contains(Object key, Object value);
+	public default boolean contains(Object key, Object value)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			if (Objects.equals(key, entry.getKey()))
+			{
+				return Objects.equals(value, entry.getValue());
+			}
+		}
+		
+		return false;
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the

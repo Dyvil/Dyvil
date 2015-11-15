@@ -73,12 +73,6 @@ public interface MutableMap<K, V> extends Map<K, V>
 	public Iterator<V> valueIterator();
 	
 	@Override
-	public boolean containsKey(Object key);
-	
-	@Override
-	public boolean containsValue(Object value);
-	
-	@Override
 	public V get(Object key);
 	
 	@Override
@@ -405,4 +399,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	{
 		return new MapView(this);
 	}
+	
+	@Override
+	public java.util.Map<K, V> toJava();
 }

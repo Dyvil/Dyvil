@@ -130,12 +130,6 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	}
 	
 	@Override
-	public boolean containsKey(Object key);
-	
-	@Override
-	public boolean containsValue(Object value);
-	
-	@Override
 	public V get(Object key);
 	
 	@Override
@@ -416,4 +410,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	{
 		return this;
 	}
+	
+	@Override
+	public java.util.Map<K, V> toJava();
 }
