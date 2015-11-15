@@ -5,6 +5,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -17,11 +18,16 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class Util
 {
+	public static void fieldSignatureToString(IField field, StringBuilder buf)
+	{
+		buf.append(ModifierTypes.FIELD.toString(field.getModifiers()));
+		field.getType().toString("", buf);
+		buf.append(' ').append(field.getName());
+	}
+	
 	public static void propertySignatureToString(IProperty property, StringBuilder buf)
 	{
-		buf.append(ModifierTypes.FIELD.toString(property.getModifiers()));
-		property.getType().toString("", buf);
-		buf.append(' ').append(property.getName());
+		fieldSignatureToString(property, buf);
 	}
 	
 	public static void methodSignatureToString(IMethod method, StringBuilder buf)

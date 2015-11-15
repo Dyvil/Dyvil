@@ -41,14 +41,20 @@ public class DyvilREPL
 		ICommand command = new HelpCommand();
 		commands.put("?", command);
 		commands.put("help", command);
-		commands.put("version", new VersionCommand());
+		
 		command = new ExitCommand();
 		commands.put("exit", command);
 		commands.put("shutdown", command);
+		
 		commands.put("dump", new DumpCommand());
+		commands.put("version", new VersionCommand());
 		commands.put("debug", new DebugCommand());
 		commands.put("variables", new VariablesCommand());
 		commands.put("methods", new MethodsCommand());
+		
+		command = new CompleteCommand();
+		commands.put("c", command);
+		commands.put("complete", command);
 	}
 	
 	public static void main(String[] args) throws Exception

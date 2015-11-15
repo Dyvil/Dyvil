@@ -81,6 +81,11 @@ public final class Name
 		return this.qualified.equals(name);
 	}
 	
+	public boolean startWith(String name)
+	{
+		return this.qualified.startsWith(name);
+	}
+	
 	public boolean endsWith(String name)
 	{
 		return this.qualified.endsWith(name);
