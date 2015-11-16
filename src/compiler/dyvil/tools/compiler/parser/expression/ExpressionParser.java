@@ -193,7 +193,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new ArrayLiteralParser(this), true);
 				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
-				this.mode = END;
+				this.mode = ACCESS;
 				pm.pushParser(new StatementListParser(this), true);
 				return;
 			case DyvilSymbols.AT:
