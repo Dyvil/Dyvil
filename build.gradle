@@ -2,6 +2,7 @@
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'application'
 
 // ---------------------------------------- Main Settings ----------------------------------------
@@ -17,11 +18,12 @@ String dpfVersion		= '0.2.1'
 
 boolean nightly			= false
 
-List<String> dyvilFilters	= [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
-List<String> javaFilters	= [ '**/*.java' ]
-
 String replMainClass		= 'dyvil.tools.repl.DyvilREPL'
 String compilerMainClass	= 'dyvil.tools.compiler.DyvilCompiler'
+
+List<String> dyvilFilters	    = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
+List<String> javaFilters        = [ '**/*.java' ]
+List<String> resourceFilters    = [ '**/*.dyo', '**/*.class', '**/*.properties' ]
 
 // ---------------------------------------- Nightly Versioning ----------------------------------------
 
@@ -30,12 +32,12 @@ String droneBuild = env['DRONE_BUILD_NUMBER']
 
 if (droneBuild) {
 	String snapshot = "+nightly." + droneBuild
-    
-    version			+= snapshot
-    libraryVersion	+= snapshot
-    compilerVersion	+= snapshot
-    replVersion		+= snapshot
-    dpfVersion		+= snapshot
+
+	version			+= snapshot
+	libraryVersion	+= snapshot
+	compilerVersion	+= snapshot
+	replVersion		+= snapshot
+	dpfVersion		+= snapshot
     
     nightly = true
 }
@@ -46,22 +48,31 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
+	main {
+		resources {
+			srcDir "${buildDir}/dyvilbin"
+			srcDir "src/resources"
+
+			include resourceFilters
+		}
+		return
+	}
+
 	library {
 		java {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
-		}
-		resources {
-			srcDir "${buildDir}/dyvilbin"
-			
-			include '**/*.dyo'
+
+			compileClasspath += main.resources
+			runtimeClasspath += main.resources
 		}
 	}
 	
 	dpf {
 		java {
 			srcDir 'src/dpf'
+
 			compileClasspath += library.output
 			runtimeClasspath += library.output
 		}
@@ -70,25 +81,34 @@ sourceSets {
 	compiler {
 		java {
 			srcDir 'src/compiler'
+
 			compileClasspath += library.output
-			runtimeClasspath += library.output + compiler.resources
-		}
-		resources {
-			srcDir 'src/resources'
+			runtimeClasspath += library.output + main.resources
 		}
 	}
 	
 	repl {
 		java {
 			srcDir 'src/repl'
+
 			compileClasspath += library.output + compiler.output
-			runtimeClasspath += compiler.runtimeClasspath
+			runtimeClasspath += library.output + compiler.output + main.resources
 		}
 	}
 }
 
 processResources {
-	include '**/*.dyo'
+	include resourceFilters
+}
+
+// ---------------------------------------- Dependencies ----------------------------------------
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testCompile 'junit:junit:4.12'
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
@@ -171,8 +191,8 @@ compileDpfJava.source = "${buildDir}/src/java/dpf"
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) {
 	// Required to make UP-TO-DATE work
-	outputs.upToDateSpec = new org.gradle.api.specs.AndSpec()
-	
+	outputs.upToDateSpec = new AndSpec()
+
 	String src = "src/dyvil/library/"
 	String bin = "dyvilbin"
 	
@@ -192,6 +212,7 @@ task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLi
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
 task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
+	from sourceSets.main.resources
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	
@@ -231,6 +252,7 @@ task buildREPL(type: Jar, dependsOn: 'replClasses') {
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
 task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses', 'dpfClasses' ]) {
+	from sourceSets.main.resources
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	from sourceSets.compiler.output
