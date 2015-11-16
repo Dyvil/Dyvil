@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -130,6 +131,12 @@ public class AppliedStatementList extends StatementList
 		else
 		{
 			typed = resolved.withType(type, typeContext, markers, context);
+		}
+
+		if (typed == null)
+		{
+			Util.createTypeError(markers, resolved, type, typeContext, "closure.type.incompatible");
+			return resolved;
 		}
 		return typed;
 	}
