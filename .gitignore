@@ -1,6 +1,7 @@
 .classpath
 .project
-.settings/**
+.settings/
+.idea/
 bin/
 testbin/
 replbin/
@@ -10,4 +11,5 @@ build/
 *.log*
 *.log
 
-.settings/org.eclipse.jdt.core.prefs
+Dyvil.iml
+Dyvil.eml
