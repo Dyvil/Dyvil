@@ -1,17 +1,17 @@
 package dyvil.tools.compiler.library;
 
+import dyvil.collection.ImmutableMap;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.HashMap;
+import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.structure.Package;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.LinkOption;
-
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
-import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.structure.Package;
 
 public abstract class Library
 {

@@ -4,86 +4,98 @@ import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.ArraySet;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
+import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.transform.Names;
 
 public final class Types
 {
 	public static IDyvilHeader LANG_HEADER;
 	
-	public static final PrimitiveType	VOID	= new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V', Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
+	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V', Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
 			Opcodes.IALOAD, null);
-	public static final PrimitiveType	BOOLEAN	= new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z', Opcodes.ILOAD, Opcodes.BALOAD,
+	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z', Opcodes.ILOAD, Opcodes.BALOAD,
 			ClassFormat.BOOLEAN);
-	public static final PrimitiveType	BYTE	= new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B', Opcodes.ILOAD, Opcodes.BALOAD,
+	public static final PrimitiveType BYTE    = new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B', Opcodes.ILOAD, Opcodes.BALOAD,
 			ClassFormat.BOOLEAN);
-	public static final PrimitiveType	SHORT	= new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S', Opcodes.ILOAD, Opcodes.SALOAD,
+	public static final PrimitiveType SHORT   = new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S', Opcodes.ILOAD, Opcodes.SALOAD,
 			ClassFormat.SHORT);
-	public static final PrimitiveType	CHAR	= new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C', Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
-	public static final PrimitiveType	INT		= new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I', Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
-	public static final PrimitiveType	LONG	= new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J', Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
-	public static final PrimitiveType	FLOAT	= new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F', Opcodes.FLOAD, Opcodes.FALOAD,
+	public static final PrimitiveType CHAR    = new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C', Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
+	public static final PrimitiveType INT     = new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I', Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
+	public static final PrimitiveType LONG    = new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J', Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
+	public static final PrimitiveType FLOAT   = new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F', Opcodes.FLOAD, Opcodes.FALOAD,
 			ClassFormat.FLOAT);
-	public static final PrimitiveType	DOUBLE	= new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D', Opcodes.DLOAD, Opcodes.DALOAD,
+	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D', Opcodes.DLOAD, Opcodes.DALOAD,
 			ClassFormat.DOUBLE);
-			
-	public static final DynamicType	DYNAMIC	= new DynamicType();
-	public static final UnknownType	UNKNOWN	= new UnknownType();
-	public static final NullType	NULL	= new NullType();
-	public static final AnyType		ANY		= new AnyType();
+
+	public static final DynamicType DYNAMIC = new DynamicType();
+	public static final UnknownType UNKNOWN = new UnknownType();
+	public static final NullType    NULL    = new NullType();
+	public static final AnyType     ANY     = new AnyType();
 	
-	public static final ClassType	OBJECT				= new ClassType();
-	public static final ClassType	STRING				= new ClassType();
-	public static final ClassType	ITERABLE			= new ClassType();
-	public static final ClassType	THROWABLE			= new ClassType();
-	public static final ClassType	RUNTIME_EXCEPTION	= new ClassType();
-	public static final ClassType	IMMUTABLE			= new ClassType();
-	public static final ClassType	SERIALIZABLE		= new ClassType();
+	public static final ClassType OBJECT            = new ClassType();
+	public static final ClassType STRING            = new ClassType();
+	public static final ClassType ITERABLE          = new ClassType();
+	public static final ClassType THROWABLE         = new ClassType();
+	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
+	public static final ClassType IMMUTABLE         = new ClassType();
+	public static final ClassType SERIALIZABLE      = new ClassType();
 	
-	public static IClass	VOID_CLASS;
-	public static IClass	BOOLEAN_CLASS;
-	public static IClass	BYTE_CLASS;
-	public static IClass	SHORT_CLASS;
-	public static IClass	CHAR_CLASS;
-	public static IClass	INT_CLASS;
-	public static IClass	LONG_CLASS;
-	public static IClass	FLOAT_CLASS;
-	public static IClass	DOUBLE_CLASS;
+	public static IClass VOID_CLASS;
+	public static IClass BOOLEAN_CLASS;
+	public static IClass BYTE_CLASS;
+	public static IClass SHORT_CLASS;
+	public static IClass CHAR_CLASS;
+	public static IClass INT_CLASS;
+	public static IClass LONG_CLASS;
+	public static IClass FLOAT_CLASS;
+	public static IClass DOUBLE_CLASS;
 	
-	public static IClass	OBJECT_CLASS;
-	public static IClass	STRING_CLASS;
-	public static IClass	NULL_CLASS;
-	public static IClass	ITERABLE_CLASS;
-	public static IClass	THROWABLE_CLASS;
-	public static IClass	RUNTIME_EXCEPTION_CLASS;
-	public static IClass	IMMUTABLE_CLASS;
-	public static IClass	SERIALIZABLE_CLASS;
+	public static IClass OBJECT_CLASS;
+	public static IClass STRING_CLASS;
+	public static IClass NULL_CLASS;
+	public static IClass ITERABLE_CLASS;
+	public static IClass THROWABLE_CLASS;
+	public static IClass RUNTIME_EXCEPTION_CLASS;
+	public static IClass IMMUTABLE_CLASS;
+	public static IClass SERIALIZABLE_CLASS;
 	
-	public static IClass	INTRINSIC_CLASS;
-	public static IClass	OVERRIDE_CLASS;
-	public static IClass	MUTATING_CLASS;
+	public static IClass INTRINSIC_CLASS;
+	public static IClass OVERRIDE_CLASS;
+	public static IClass MUTATING_CLASS;
 	
-	public static IClass	BOOLEAN_CONVERTIBLE_CLASS;
-	public static IClass	CHAR_CONVERTIBLE_CLASS;
-	public static IClass	INT_CONVERTIBLE_CLASS;
-	public static IClass	LONG_CONVERTIBLE_CLASS;
-	public static IClass	FLOAT_CONVERTIBLE_CLASS;
-	public static IClass	DOUBLE_CONVERTIBLE_CLASS;
-	public static IClass	STRING_CONVERTIBLE_CLASS;
+	public static IClass BOOLEAN_CONVERTIBLE_CLASS;
+	public static IClass CHAR_CONVERTIBLE_CLASS;
+	public static IClass INT_CONVERTIBLE_CLASS;
+	public static IClass LONG_CONVERTIBLE_CLASS;
+	public static IClass FLOAT_CONVERTIBLE_CLASS;
+	public static IClass DOUBLE_CONVERTIBLE_CLASS;
+	public static IClass STRING_CONVERTIBLE_CLASS;
 	
-	private static IClass	OBJECT_ARRAY_CLASS;
-	public static IClass	OBJECT_SIMPLE_REF_CLASS;
-	public static IClass	OBJECT_REF_CLASS;
+	private static IClass OBJECT_ARRAY_CLASS;
+	public static  IClass OBJECT_SIMPLE_REF_CLASS;
+	public static  IClass OBJECT_REF_CLASS;
 	
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
+
+		if (LANG_HEADER == null)
+		{
+			DyvilCompiler.log("Warning: The dyvil.Lang header could not be found. This may cause serious compilation problems.");
+			for (Library library : DyvilCompiler.config.libraries) {
+				System.out.println("\tlibrary = " + library);
+			}
+			LANG_HEADER = new DyvilHeader();
+		}
 	}
 	
 	public static void initTypes()
