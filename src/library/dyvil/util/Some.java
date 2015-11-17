@@ -1,14 +1,13 @@
 package dyvil.util;
 
+import dyvil.annotation._internal.ClassParameters;
+import dyvil.lang.literal.TupleConvertible;
+
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import dyvil.lang.literal.TupleConvertible;
-
-import dyvil.annotation._internal.ClassParameters;
 
 @TupleConvertible
 @ClassParameters(names = { "value" })
@@ -74,5 +73,29 @@ public final class Some<T> implements Option<T>
 	public T orElse(Supplier<? extends T> other)
 	{
 		return this.value;
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.value == null ? "null" : this.value.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == null || !(obj instanceof Some))
+		{
+			return false;
+		}
+
+		Object otherValue = ((Some) obj).value;
+		return otherValue == this.value || (this.value != null && this.value.equals(otherValue));
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.value == null ? 0 : 31 * this.value.hashCode();
 	}
 }
