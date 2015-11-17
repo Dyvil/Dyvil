@@ -34,7 +34,9 @@ public class DyvilREPL
 	
 	protected File dumpDir;
 	
-	private static final Map<String, ICommand> commands = new TreeMap();
+	private static final Map<String, ICommand> commands = new TreeMap<String, ICommand>();
+
+	private static boolean running;
 	
 	static
 	{
@@ -44,8 +46,9 @@ public class DyvilREPL
 		
 		command = new ExitCommand();
 		commands.put("exit", command);
-		commands.put("shutdown", command);
-		
+		commands.put("quit", command);
+		commands.put("q", command);
+
 		commands.put("dump", new DumpCommand());
 		commands.put("version", new VersionCommand());
 		commands.put("debug", new DebugCommand());
@@ -59,6 +62,8 @@ public class DyvilREPL
 	
 	public static void main(String[] args) throws Exception
 	{
+		running = true;
+
 		System.out.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
 		
 		Names.init();
@@ -89,7 +94,7 @@ public class DyvilREPL
 		
 		reader = new BufferedReader(new InputStreamReader(System.in));
 		
-		while (true)
+		while (running)
 		{
 			loop();
 		}
@@ -111,7 +116,6 @@ public class DyvilREPL
 		int depth3 = 0;
 		byte mode = 0;
 		
-		mainLoop:
 		while (true)
 		{
 			String s = reader.readLine();
@@ -200,7 +204,7 @@ public class DyvilREPL
 			buffer.append('\n');
 			if (mode == 0 && depth1 + depth2 + depth3 <= 0)
 			{
-				break mainLoop;
+				break;
 			}
 			
 			printIndent(depth1);
@@ -221,7 +225,7 @@ public class DyvilREPL
 	private static void exit()
 	{
 		System.err.println("Shutting down...");
-		System.exit(0);
+		running = false;
 	}
 	
 	private static synchronized void loop()
@@ -232,7 +236,7 @@ public class DyvilREPL
 		{
 			String currentCode = readLine();
 			String trim = currentCode.trim();
-			if (trim.startsWith(":"))
+			if (trim.length() > 1 && trim.charAt(0) == ':' && trim.charAt(1) != ':')
 			{
 				runCommand(trim);
 				return;
