@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -16,6 +13,9 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public final class ArgumentMap implements IArguments, IValueMap
 {
@@ -201,16 +201,16 @@ public final class ArgumentMap implements IArguments, IValueMap
 				continue;
 			}
 			
-			IType type = param.getActualType();
+			IType type = param.getActualType().getParameterType();
 			IValue value = this.values[i];
-			IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
-			if (value1 == null)
+			IValue typed = IType.convertValue(value, type, typeContext, markers, context);
+			if (typed == null)
 			{
 				Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", key);
 			}
 			else
 			{
-				this.values[i] = value1;
+				this.values[i] = typed;
 			}
 			return;
 		}

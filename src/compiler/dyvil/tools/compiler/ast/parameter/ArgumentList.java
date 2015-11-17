@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Iterator;
-
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -15,6 +13,8 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.util.Iterator;
 
 public final class ArgumentList implements IArguments, IValueList
 {
@@ -212,16 +212,16 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType type = param.getActualType();
+		IType type = param.getActualType().getParameterType();
 		IValue value = this.values[index];
-		IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
-		if (value1 == null)
+		IValue typed = IType.convertValue(value, type, typeContext, markers, context);
+		if (typed == null)
 		{
 			Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
-			this.values[index] = value1;
+			this.values[index] = typed;
 		}
 	}
 	

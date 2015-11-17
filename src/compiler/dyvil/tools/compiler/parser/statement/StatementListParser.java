@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.statement.AppliedStatementList;
+import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
@@ -96,7 +96,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		{
 		case OPEN_BRACKET:
 			this.mode = EXPRESSION;
-			this.statementList = this.applied ? new AppliedStatementList(token) : new StatementList(token);
+			this.statementList = this.applied ? new Closure(token) : new StatementList(token);
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.report(token, "Invalid Statement List - '{' expected");

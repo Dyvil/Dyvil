@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -28,6 +24,10 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
@@ -340,9 +340,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context);
+			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).getParameterType();
 		}
-		this.returnType = this.returnType.resolveType(markers, context);
+		this.returnType = this.returnType.resolveType(markers, context).getReturnType();
 		
 		return this;
 	}

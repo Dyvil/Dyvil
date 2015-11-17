@@ -17,16 +17,16 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class AppliedStatementList extends StatementList
+public class Closure extends StatementList
 {
 	private IParameter	implicitParameter;
 	private boolean		resolved;
 	
-	public AppliedStatementList()
+	public Closure()
 	{
 	}
 	
-	public AppliedStatementList(ICodePosition position)
+	public Closure(ICodePosition position)
 	{
 		this.position = position;
 	}
@@ -81,7 +81,7 @@ public class AppliedStatementList extends StatementList
 		if (type.typeTag() == IType.LAMBDA)
 		{
 			LambdaType lt = (LambdaType) type;
-			IType returnType = lt.getType();
+			IType returnType = lt.getType().getParameterType();
 			int parameterCount = lt.typeCount();
 			
 			switch (parameterCount)

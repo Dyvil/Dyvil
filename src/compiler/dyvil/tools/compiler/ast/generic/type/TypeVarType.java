@@ -65,7 +65,13 @@ public class TypeVarType implements IRawType
 	{
 		return this.typeVar.getTheClass();
 	}
-	
+
+	@Override
+	public IType getParameterType()
+	{
+		return this.typeVar.getParameterType();
+	}
+
 	@Override
 	public IType getSuperType()
 	{

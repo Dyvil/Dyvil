@@ -146,7 +146,7 @@ public class NamedGenericType extends GenericType
 			this.typeArguments[i] = resolvedType;
 			
 			ITypeVariable typeVariable = iclass.getTypeVariable(i);
-			if (!typeVariable.isSuperTypeOf(resolvedType))
+			if (!typeVariable.isAssignableFrom(resolvedType))
 			{
 				Marker marker = I18n.createMarker(resolvedType.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified);
 				marker.addInfo(I18n.getString("generic.type", resolvedType));

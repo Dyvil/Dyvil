@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.statement.AppliedStatementList;
+import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -42,7 +42,7 @@ public class ApplyMethodCall extends AbstractCall
 			ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirstValue();
 			
-			if (argument instanceof AppliedStatementList)
+			if (argument instanceof Closure)
 			{
 				argument = argument.resolve(markers, context);
 				

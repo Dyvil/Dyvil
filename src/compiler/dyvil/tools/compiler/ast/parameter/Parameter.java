@@ -37,7 +37,7 @@ public abstract class Parameter extends Member implements IParameter
 		this.name = name;
 		this.type = type;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{

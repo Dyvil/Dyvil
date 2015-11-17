@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Iterator;
-
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
@@ -17,6 +15,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.util.Iterator;
 
 public final class SingleArgument implements IArguments, IValueConsumer
 {
@@ -153,15 +153,15 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getActualType();
-		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
-		if (value1 == null)
+		IType type = param.getActualType().getParameterType();
+		IValue typed = IType.convertValue(this.value, type, typeContext, markers, context);
+		if (typed == null)
 		{
 			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
-			this.value = value1;
+			this.value = typed;
 		}
 	}
 	

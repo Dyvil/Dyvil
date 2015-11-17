@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.generic;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -12,6 +10,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.type.ParameterTypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -24,20 +23,24 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.lang.annotation.ElementType;
+
 public final class TypeVariable implements ITypeVariable
 {
 	protected ICodePosition position;
 	
-	protected Variance	variance	= Variance.INVARIANT;
-	protected Name		name;
-	protected IType[]	upperBounds	= new IType[1];
-	protected int		upperBoundCount;
-	protected IType		lowerBound;
+	protected Variance variance = Variance.INVARIANT;
+	protected Name name;
+	protected IType[] upperBounds = new IType[1];
+	protected int   upperBoundCount;
+	protected IType lowerBound;
 	
-	private int			index;
-	private IGeneric	generic;
+	private int      index;
+	private IGeneric generic;
 	
 	private AnnotationList annotations;
+
+	private IType parameterType = new ParameterTypeVarType(this);
 	
 	public TypeVariable(IGeneric generic)
 	{
@@ -191,7 +194,13 @@ public final class TypeVariable implements ITypeVariable
 		}
 		return Types.ANY;
 	}
-	
+
+	@Override
+	public IType getParameterType()
+	{
+		return this.parameterType;
+	}
+
 	@Override
 	public int upperBoundCount()
 	{
@@ -252,7 +261,7 @@ public final class TypeVariable implements ITypeVariable
 	}
 	
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isAssignableFrom(IType type)
 	{
 		if (this.upperBoundCount > 0)
 		{
@@ -472,8 +481,9 @@ public final class TypeVariable implements ITypeVariable
 		
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			typeRef = TypeReference.newTypeParameterBoundReference(
-					method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND, this.index, i);
+			typeRef = TypeReference
+					.newTypeParameterBoundReference(method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND, this.index,
+							i);
 			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
 		}
 	}
