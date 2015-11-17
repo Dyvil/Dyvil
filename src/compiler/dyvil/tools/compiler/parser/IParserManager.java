@@ -15,62 +15,62 @@ import dyvil.tools.parsing.token.IToken;
 
 public interface IParserManager
 {
-	public void report(IToken token, String message);
+	void report(IToken token, String message);
 	
-	public default void setOperatorMap(IOperatorMap operators)
+	default void setOperatorMap(IOperatorMap operators)
 	{
 	}
 	
-	public default IOperatorMap getOperatorMap()
-	{
-		return null;
-	}
-	
-	public default Operator getOperator(Name name)
+	default IOperatorMap getOperatorMap()
 	{
 		return null;
 	}
 	
-	public void stop();
+	default Operator getOperator(Name name)
+	{
+		return null;
+	}
 	
-	public void skip();
+	void stop();
 	
-	public void skip(int n);
+	void skip();
 	
-	public void reparse();
+	void skip(int n);
 	
-	public void jump(IToken token);
+	void reparse();
 	
-	public void setParser(Parser parser);
+	void jump(IToken token);
 	
-	public Parser getParser();
+	void setParser(Parser parser);
 	
-	public void pushParser(Parser parser);
+	Parser getParser();
 	
-	public void pushParser(Parser parser, boolean reparse);
+	void pushParser(Parser parser);
 	
-	public void popParser();
+	void pushParser(Parser parser, boolean reparse);
 	
-	public void popParser(boolean reparse);
+	void popParser();
+	
+	void popParser(boolean reparse);
 	
 	// Parser Factory Methods
 	
-	public default Parser newExpressionParser(IValueConsumer valueConsumer)
+	default Parser newExpressionParser(IValueConsumer valueConsumer)
 	{
 		return new ExpressionParser(valueConsumer);
 	}
 	
-	public default Parser newTypeParser(ITypeConsumer typeConsumer)
+	default Parser newTypeParser(ITypeConsumer typeConsumer)
 	{
 		return new TypeParser(typeConsumer);
 	}
 	
-	public default Parser newAnnotationParser(IAnnotation annotation)
+	default Parser newAnnotationParser(IAnnotation annotation)
 	{
 		return new AnnotationParser(annotation);
 	}
 	
-	public default Parser newTypeVariableParser(IGeneric generic)
+	default Parser newTypeVariableParser(IGeneric generic)
 	{
 		return new TypeVariableParser(generic);
 	}

@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public interface IObjectCompilable
 {
-	public void write(DataOutput out) throws IOException;
+	void write(DataOutput out) throws IOException;
 	
-	public void read(DataInput in) throws IOException;
+	void read(DataInput in) throws IOException;
 }

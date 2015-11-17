@@ -36,24 +36,24 @@ public interface IPattern extends IASTNode, ITyped
 	int	UNBOX		= 34;
 	int	TYPECHECK	= 35;
 	
-	public int getPatternType();
+	int getPatternType();
 	
-	public default boolean isExhaustive()
+	default boolean isExhaustive()
 	{
 		return false;
 	}
 	
 	@Override
-	public IType getType();
+	IType getType();
 	
 	@Override
-	public default void setType(IType type)
+	default void setType(IType type)
 	{
 	}
 	
-	public IPattern withType(IType type, MarkerList markers);
+	IPattern withType(IType type, MarkerList markers);
 	
-	public static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
+	static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
 	{
 		if (type == primitiveType)
 		{
@@ -71,47 +71,47 @@ public interface IPattern extends IASTNode, ITyped
 	}
 	
 	@Override
-	public boolean isType(IType type);
+	boolean isType(IType type);
 	
-	public default IDataMember resolveField(Name name)
+	default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
 	
-	public default IPattern resolve(MarkerList markers, IContext context)
+	default IPattern resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 	
-	public default boolean isSwitchable()
+	default boolean isSwitchable()
 	{
 		return false;
 	}
 	
-	public default int switchCases()
+	default int switchCases()
 	{
 		return 0;
 	}
 	
-	public default boolean switchCheck()
+	default boolean switchCheck()
 	{
 		return false;
 	}
 	
-	public default int switchValue(int index)
+	default int switchValue(int index)
 	{
 		return -1;
 	}
 	
-	public default int minValue()
+	default int minValue()
 	{
 		return -1;
 	}
 	
-	public default int maxValue()
+	default int maxValue()
 	{
 		return -1;
 	}
 	
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
+	void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
 }

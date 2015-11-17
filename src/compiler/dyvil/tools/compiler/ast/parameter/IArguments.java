@@ -13,7 +13,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
-	public static final float DEFAULT_MATCH = 1000;
+	float DEFAULT_MATCH = 1000;
 	
 	@Override
 	default ICodePosition getPosition()
@@ -26,71 +26,71 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	{
 	}
 	
-	public int size();
+	int size();
 	
-	public boolean isEmpty();
+	boolean isEmpty();
 	
 	// 'Variations'
 	
-	public IArguments dropFirstValue();
+	IArguments dropFirstValue();
 	
-	public IArguments withLastValue(IValue value);
+	IArguments withLastValue(IValue value);
 	
-	public default IArguments withLastValue(Name name, IValue value)
+	default IArguments withLastValue(Name name, IValue value)
 	{
 		return this.withLastValue(value);
 	}
 	
 	// First Values
 	
-	public IValue getFirstValue();
+	IValue getFirstValue();
 	
-	public void setFirstValue(IValue value);
+	void setFirstValue(IValue value);
 	
 	// Last Values
 	
-	public IValue getLastValue();
+	IValue getLastValue();
 	
-	public void setLastValue(IValue value);
+	void setLastValue(IValue value);
 	
 	// Used by Methods
 	
-	public void setValue(int index, IParameter param, IValue value);
+	void setValue(int index, IParameter param, IValue value);
 	
-	public IValue getValue(int index, IParameter param);
+	IValue getValue(int index, IParameter param);
 	
-	public float getTypeMatch(int index, IParameter param);
+	float getTypeMatch(int index, IParameter param);
 	
-	public float getVarargsTypeMatch(int index, IParameter param);
+	float getVarargsTypeMatch(int index, IParameter param);
 	
-	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
+	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	
-	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
+	void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	
-	public void inferType(int index, IParameter param, ITypeContext typeContext);
+	void inferType(int index, IParameter param, ITypeContext typeContext);
 	
-	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext);
+	void inferVarargsType(int index, IParameter param, ITypeContext typeContext);
 	
-	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
+	void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
-	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
+	void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
 	// Phase Methods
 	
-	public void resolveTypes(MarkerList markers, IContext context);
+	void resolveTypes(MarkerList markers, IContext context);
 	
-	public void resolve(MarkerList markers, IContext context);
+	void resolve(MarkerList markers, IContext context);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	void checkTypes(MarkerList markers, IContext context);
 	
-	public void check(MarkerList markers, IContext context);
+	void check(MarkerList markers, IContext context);
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup(IContext context, IClassCompilableList compilableList);
+	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer);
+	void toString(String prefix, StringBuilder buffer);
 	
-	public void typesToString(StringBuilder buffer);
+	void typesToString(StringBuilder buffer);
 }

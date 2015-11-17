@@ -12,9 +12,9 @@ import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
 
 public interface Operators
 {
-	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
+	Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
 	
-	public static IValue getPriority(Name name, IValue arg1)
+	static IValue getPriority(Name name, IValue arg1)
 	{
 		if (name == Names.bang)
 		{
@@ -26,7 +26,7 @@ public interface Operators
 		return null;
 	}
 	
-	public static IValue getPriority(IValue arg1, Name name, IValue arg2)
+	static IValue getPriority(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.eqeq || name == Names.eqeqeq)
 		{
@@ -54,7 +54,7 @@ public interface Operators
 		return null;
 	}
 	
-	public static IValue get(IValue arg1, Name name, IValue arg2)
+	static IValue get(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.plus)
 		{

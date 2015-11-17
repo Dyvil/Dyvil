@@ -11,12 +11,12 @@ import dyvil.lang.literal.NilConvertible;
 @ArrayConvertible
 public interface MutableCollection<E> extends Collection<E>
 {
-	public static <E> MutableCollection<E> apply()
+	static <E> MutableCollection<E> apply()
 	{
 		return MutableList.apply();
 	}
 	
-	public static <E> MutableCollection<E> apply(E... elements)
+	static <E> MutableCollection<E> apply(E... elements)
 	{
 		return MutableList.apply(elements);
 	}
@@ -24,88 +24,88 @@ public interface MutableCollection<E> extends Collection<E>
 	// Accessors
 	
 	@Override
-	public default boolean isImmutable()
+	default boolean isImmutable()
 	{
 		return false;
 	}
 	
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	// Non-mutating Operations
 	
 	@Override
-	public MutableCollection<E> $plus(E element);
+	MutableCollection<E> $plus(E element);
 	
 	@Override
-	public MutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
+	MutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	@Override
-	public MutableCollection<E> $minus(Object element);
+	MutableCollection<E> $minus(Object element);
 	
 	@Override
-	public MutableCollection<? extends E> $minus$minus(Collection<?> collection);
+	MutableCollection<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
-	public MutableCollection<? extends E> $amp(Collection<? extends E> collection);
+	MutableCollection<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public <R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
+	<R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
-	public <R> MutableCollection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+	<R> MutableCollection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
 	
 	@Override
-	public MutableCollection<E> filtered(Predicate<? super E> condition);
+	MutableCollection<E> filtered(Predicate<? super E> condition);
 	
 	// Mutating Operations
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	@Override
-	public boolean add(E element);
+	boolean add(E element);
 	
 	@Override
-	public boolean remove(Object element);
+	boolean remove(Object element);
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	// Copying
 	
 	@Override
-	public MutableCollection<E> copy();
+	MutableCollection<E> copy();
 	
 	@Override
-	public default MutableCollection<E> mutable()
+	default MutableCollection<E> mutable()
 	{
 		return this;
 	}
 	
 	@Override
-	public default MutableCollection<E> mutableCopy()
+	default MutableCollection<E> mutableCopy()
 	{
 		return this.copy();
 	}
 	
-	public <R> MutableCollection<R> emptyCopy();
+	<R> MutableCollection<R> emptyCopy();
 	
 	@Override
-	public ImmutableCollection<E> immutable();
+	ImmutableCollection<E> immutable();
 	
 	@Override
-	public default ImmutableCollection<E> immutableCopy()
+	default ImmutableCollection<E> immutableCopy()
 	{
 		return this.immutable();
 	}
 	
 	@Override
-	public ImmutableCollection<E> view();
+	ImmutableCollection<E> view();
 }

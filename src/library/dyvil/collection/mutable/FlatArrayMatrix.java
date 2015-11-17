@@ -365,7 +365,6 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements Mut
 			
 			for (i = 1; i < size && cycle.get(i); i++)
 			{
-				;
 			}
 		}
 		

@@ -371,11 +371,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				return true;
 			}
-			if (this.name == Names.hashCode)
-			{
-				return true;
-			}
-			return false;
+			return this.name == Names.hashCode;
 		case 1:
 			if (this.name == Names.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
 			{
@@ -825,7 +821,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			ITypeVariable typeVar = this.generics[i];
 			IType type = typeContext.resolveType(typeVar);
-			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && ((TypeVarType) type).getTypeVariable() == typeVar)
+			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
 			{
 				markers.add(I18n.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
 				typeContext.addMapping(typeVar, Types.ANY);

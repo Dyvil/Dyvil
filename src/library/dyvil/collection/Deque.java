@@ -17,7 +17,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	// Collection Methods
 	
 	@Override
-	public default boolean contains(Object o)
+	default boolean contains(Object o)
 	{
 		return Collection.iterableContains(this, o);
 	}
@@ -28,13 +28,13 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * @return ths number of elements in this deque.
 	 */
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	@Override
-	public Iterator<E> reverseIterator();
+	Iterator<E> reverseIterator();
 	
 	// Deque Methods
 	
@@ -42,7 +42,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * Removes all elements form this deque.
 	 */
 	@Override
-	public void clear();
+	void clear();
 	
 	/**
 	 * Adds the given element to the front of this deque.
@@ -50,7 +50,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * @param e
 	 *            the element to add.
 	 */
-	public void addFirst(E e);
+	void addFirst(E e);
 	
 	/**
 	 * Adds the given element to the end of this deque.
@@ -58,35 +58,35 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * @param e
 	 *            the element to add.
 	 */
-	public void addLast(E e);
+	void addLast(E e);
 	
 	/**
 	 * Removes and returns the first element in this deque.
 	 * 
 	 * @return the first element in this deque.
 	 */
-	public E removeFirst();
+	E removeFirst();
 	
 	/**
 	 * Removes and returns the last element in this deque.
 	 * 
 	 * @return the last element in this deque.
 	 */
-	public E removeLast();
+	E removeLast();
 	
 	/**
 	 * Returns, but does not remove, the first element in this deque.
 	 * 
 	 * @return the first element in this deque.
 	 */
-	public E getFirst();
+	E getFirst();
 	
 	/**
 	 * Returns, but does not remove, the last element in this deque.
 	 * 
 	 * @return the last element in this deque.
 	 */
-	public E getLast();
+	E getLast();
 	
 	/**
 	 * Removes the first occurence of the given {@code element} from this deque
@@ -97,7 +97,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 *            the element to remove
 	 * @return true, if the element was removed successfully
 	 */
-	public boolean removeFirst(Object o);
+	boolean removeFirst(Object o);
 	
 	/**
 	 * Removes the last occurence of the given {@code element} from this deque
@@ -108,33 +108,33 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 *            the element to remove
 	 * @return true, if the element was removed successfully
 	 */
-	public boolean removeLast(Object o);
+	boolean removeLast(Object o);
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void filter(Predicate<? super E> condition);
+	void filter(Predicate<? super E> condition);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	// Queue Methods
 	
 	@Override
-	public default void offer(E e)
+	default void offer(E e)
 	{
 		this.addLast(e);
 	}
 	
 	@Override
-	public default E remove()
+	default E remove()
 	{
 		return this.removeLast();
 	}
 	
 	@Override
-	public default E element()
+	default E element()
 	{
 		return this.getLast();
 	}
@@ -142,19 +142,19 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	// Stack Methods
 	
 	@Override
-	public default void push(E e)
+	default void push(E e)
 	{
 		this.addFirst(e);
 	}
 	
 	@Override
-	public default E pop()
+	default E pop()
 	{
 		return this.removeFirst();
 	}
 	
 	@Override
-	public default E peek()
+	default E peek()
 	{
 		return this.getFirst();
 	}
@@ -166,5 +166,5 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * @return a copy of this deque.
 	 */
 	@Override
-	public Deque<E> copy();
+	Deque<E> copy();
 }

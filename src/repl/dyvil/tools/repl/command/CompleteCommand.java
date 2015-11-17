@@ -235,12 +235,7 @@ public class CompleteCommand implements ICommand
 		{
 			return false;
 		}
-		if (!statics && (modifiers & Modifiers.STATIC) != 0)
-		{
-			return false;
-		}
-		
-		return true;
+		return !(!statics && (modifiers & Modifiers.STATIC) != 0);
 	}
 	
 	private static String getSignature(IType type, IField field)

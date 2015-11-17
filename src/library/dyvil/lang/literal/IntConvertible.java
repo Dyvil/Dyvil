@@ -27,5 +27,5 @@ package dyvil.lang.literal;
  */
 public @interface IntConvertible
 {
-	public String methodName() default "apply";
+	String methodName() default "apply";
 }

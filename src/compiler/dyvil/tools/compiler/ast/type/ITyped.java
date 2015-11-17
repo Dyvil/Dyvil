@@ -5,11 +5,11 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 public interface ITyped extends ITypeConsumer
 {
 	@Override
-	public void setType(IType type);
+	void setType(IType type);
 	
-	public IType getType();
+	IType getType();
 	
-	public default boolean isType(IType type)
+	default boolean isType(IType type)
 	{
 		return this.getType() == type;
 	}

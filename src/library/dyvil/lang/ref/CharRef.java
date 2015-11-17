@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface CharRef
 {
-	public char get();
+	char get();
 	
-	public void set(char value);
+	void set(char value);
 }

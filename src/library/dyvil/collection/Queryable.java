@@ -27,7 +27,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * 
 	 * @return the number of elements
 	 */
-	public int size();
+	int size();
 	
 	/**
 	 * Returns true iff this query is empty, i.e. the number of elements as
@@ -35,7 +35,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * 
 	 * @return true, iff this query is empty
 	 */
-	public default boolean isEmpty()
+	default boolean isEmpty()
 	{
 		return this.size() == 0;
 	}
@@ -46,7 +46,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * @return an iterator over the elements of this query
 	 */
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	/**
 	 * Creates and returns a {@link Spliterator} over the elements of this
@@ -55,7 +55,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * @return a spliterator over the elements of this query
 	 */
 	@Override
-	public default Spliterator<E> spliterator()
+	default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
@@ -66,7 +66,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * 
 	 * @return a stream of this query
 	 */
-	public default Stream<E> stream()
+	default Stream<E> stream()
 	{
 		return StreamSupport.stream(this.spliterator(), false);
 	}
@@ -77,13 +77,13 @@ public interface Queryable<E> extends Iterable<E>
 	 * 
 	 * @return a parallel stream of this query
 	 */
-	public default Stream<E> parallelStream()
+	default Stream<E> parallelStream()
 	{
 		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
 	@Override
-	public default void forEach(Consumer<? super E> action)
+	default void forEach(Consumer<? super E> action)
 	{
 		for (E element : this)
 		{
@@ -105,7 +105,7 @@ public interface Queryable<E> extends Iterable<E>
 	 *            the reducer function
 	 * @return the folded value
 	 */
-	public default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (E element : this)
 		{
@@ -127,7 +127,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * lower-bounded type variable 'R' that is used as the return type. Java
 	 * doesn't support this, so we had to introduce a limitation with E.
 	 */
-	public default E reduce(BiFunction<? super E, ? super E, ? extends E> reducer)
+	default E reduce(BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.isEmpty())
 		{
@@ -144,7 +144,7 @@ public interface Queryable<E> extends Iterable<E>
 		return first;
 	}
 	
-	public default boolean allMatch(Predicate<? super E> condition)
+	default boolean allMatch(Predicate<? super E> condition)
 	{
 		for (E element : this)
 		{
@@ -156,7 +156,7 @@ public interface Queryable<E> extends Iterable<E>
 		return true;
 	}
 	
-	public default boolean exists(Predicate<? super E> condition)
+	default boolean exists(Predicate<? super E> condition)
 	{
 		for (E element : this)
 		{
@@ -178,7 +178,7 @@ public interface Queryable<E> extends Iterable<E>
 	 *            the element to find
 	 * @return true, iff this query contains the element
 	 */
-	public default boolean contains(Object element)
+	default boolean contains(Object element)
 	{
 		return Collection.iterableContains(this, element);
 	}
@@ -191,7 +191,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * @param mapper
 	 *            the mapping function
 	 */
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	/**
 	 * Maps all elements in this query using the given {@code mapper} function
@@ -209,7 +209,7 @@ public interface Queryable<E> extends Iterable<E>
 	 * @param mapper
 	 *            the mapping function
 	 */
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	/**
 	 * Removes all elements from the query that do not fulfill the requirement
@@ -219,16 +219,16 @@ public interface Queryable<E> extends Iterable<E>
 	 * @param condition
 	 *            the condition
 	 */
-	public void filter(Predicate<? super E> condition);
+	void filter(Predicate<? super E> condition);
 	
-	public default String toString(String prefix, String separator, String postfix)
+	default String toString(String prefix, String separator, String postfix)
 	{
 		StringBuilder builder = new StringBuilder();
 		this.toString(builder, prefix, separator, postfix);
 		return builder.toString();
 	}
 	
-	public default void toString(StringBuilder builder, String prefix, String separator, String postfix)
+	default void toString(StringBuilder builder, String prefix, String separator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())

@@ -108,14 +108,14 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 */
 	ICompilerPhase TEST = new CompilerPhase(1000, "TEST", units -> DyvilCompiler.test());
 	
-	public String getName();
+	String getName();
 	
-	public int getID();
+	int getID();
 	
-	public void apply(Collection<ICompilationUnit> units);
+	void apply(Collection<ICompilationUnit> units);
 	
 	@Override
-	public default int compareTo(ICompilerPhase o)
+	default int compareTo(ICompilerPhase o)
 	{
 		return Integer.compare(this.getID(), o.getID());
 	}

@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface ShortRef
 {
-	public short get();
+	short get();
 	
-	public void set(short value);
+	void set(short value);
 }

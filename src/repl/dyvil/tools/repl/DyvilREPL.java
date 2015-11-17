@@ -1,10 +1,5 @@
 package dyvil.tools.repl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import dyvil.collection.Map;
 import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
@@ -21,6 +16,11 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.repl.command.*;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class DyvilREPL
 {
@@ -126,9 +126,11 @@ public class DyvilREPL
 				exit();
 				return null;
 			}
+
+			int len = s.length();
 			
 			outer:
-			for (int i = 0, len = s.length(); i < len; i++)
+			for (int i = 0; i < len; i++)
 			{
 				char c = s.charAt(i);
 				
@@ -201,14 +203,19 @@ public class DyvilREPL
 				break mainLoop;
 			}
 			
-			System.out.print("  ");
-			for (int j = 0; j < depth1; j++)
-			{
-				System.out.print("    ");
-			}
+			printIndent(depth1);
 		}
 		
 		return buffer.toString();
+	}
+
+	private static void printIndent(int indent)
+	{
+		System.out.print("  ");
+		for (int j = 0; j < indent; j++)
+		{
+			System.out.print("    ");
+		}
 	}
 	
 	private static void exit()

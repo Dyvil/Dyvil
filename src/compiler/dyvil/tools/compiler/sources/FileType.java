@@ -15,7 +15,7 @@ public class FileType implements IFileType
 	@FunctionalInterface
 	interface HeaderSupplier
 	{
-		public DyvilHeader newHeader(Package pack, CodeFile inputFile, File outputFile);
+		DyvilHeader newHeader(Package pack, CodeFile inputFile, File outputFile);
 	}
 	
 	public static final String	CLASS_EXTENSION		= ".class";

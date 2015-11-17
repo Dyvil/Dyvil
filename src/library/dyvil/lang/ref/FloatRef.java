@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface FloatRef
 {
-	public float get();
+	float get();
 	
-	public void set(float value);
+	void set(float value);
 }

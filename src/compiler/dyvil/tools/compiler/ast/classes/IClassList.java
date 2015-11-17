@@ -4,11 +4,11 @@ import dyvil.tools.parsing.Name;
 
 public interface IClassList
 {
-	public int classCount();
+	int classCount();
 	
-	public void addClass(IClass iclass);
+	void addClass(IClass iclass);
 	
-	public IClass getClass(int index);
+	IClass getClass(int index);
 	
-	public IClass getClass(Name name);
+	IClass getClass(Name name);
 }

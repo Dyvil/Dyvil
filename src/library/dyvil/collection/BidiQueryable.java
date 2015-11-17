@@ -23,7 +23,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 	 * @return an iterator over the elements of this query
 	 */
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	/**
 	 * Creates and returns an {@link Iterator} over the elements of this query,
@@ -31,21 +31,21 @@ public interface BidiQueryable<E> extends Queryable<E>
 	 * 
 	 * @return a reverse iterator over the elements of this query
 	 */
-	public Iterator<E> reverseIterator();
+	Iterator<E> reverseIterator();
 	
 	@Override
-	public default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		return this.foldLeft(initialValue, reducer);
 	}
 	
 	@Override
-	public default E reduce(BiFunction<? super E, ? super E, ? extends E> reducer)
+	default E reduce(BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		return this.reduceLeft(reducer);
 	}
 	
-	public default <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		Iterator<E> iterator = this.iterator();
 		while (iterator.hasNext())
@@ -55,7 +55,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 		return initialValue;
 	}
 	
-	public default <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		Iterator<E> iterator = this.reverseIterator();
 		while (iterator.hasNext())
@@ -65,7 +65,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 		return initialValue;
 	}
 	
-	public default E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	default E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.isEmpty())
 		{
@@ -81,7 +81,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 		return initialValue;
 	}
 	
-	public default E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	default E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.isEmpty())
 		{

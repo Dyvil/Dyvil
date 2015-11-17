@@ -22,41 +22,41 @@ import dyvil.tools.parsing.Name;
 
 public interface IContext
 {
-	public static final byte	VISIBLE		= 0;
-	public static final byte	INVISIBLE	= 1;
-	public static final byte	INTERNAL	= 2;
+	byte	VISIBLE		= 0;
+	byte	INVISIBLE	= 1;
+	byte	INTERNAL	= 2;
 	
-	public boolean isStatic();
+	boolean isStatic();
 	
-	public IDyvilHeader getHeader();
+	IDyvilHeader getHeader();
 	
-	public IClass getThisClass();
+	IClass getThisClass();
 	
-	public Package resolvePackage(Name name);
+	Package resolvePackage(Name name);
 	
-	public IClass resolveClass(Name name);
+	IClass resolveClass(Name name);
 	
-	public IType resolveType(Name name);
+	IType resolveType(Name name);
 	
-	public ITypeVariable resolveTypeVariable(Name name);
+	ITypeVariable resolveTypeVariable(Name name);
 	
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
+	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
-	public boolean handleException(IType type);
+	boolean handleException(IType type);
 	
-	public boolean isMember(IVariable variable);
+	boolean isMember(IVariable variable);
 	
-	public IDataMember capture(IVariable capture);
+	IDataMember capture(IVariable capture);
 	
-	public IAccessible getAccessibleThis(IClass type);
+	IAccessible getAccessibleThis(IClass type);
 	
-	public IAccessible getAccessibleImplicit();
+	IAccessible getAccessibleImplicit();
 	
-	public static void addCompilable(IContext context, IClassCompilable compilable)
+	static void addCompilable(IContext context, IClassCompilable compilable)
 	{
 		IClass iclass = context.getThisClass();
 		if (iclass != null)
@@ -69,7 +69,7 @@ public interface IContext
 		header.addInnerClass(compilable);
 	}
 	
-	public static IClass resolveClass(IContext context, Name name)
+	static IClass resolveClass(IContext context, Name name)
 	{
 		IClass iclass = context.resolveClass(name);
 		if (iclass != null)
@@ -80,7 +80,7 @@ public interface IContext
 		return Types.LANG_HEADER.resolveClass(name);
 	}
 	
-	public static IType resolveType(IContext context, Name name)
+	static IType resolveType(IContext context, Name name)
 	{
 		IType itype = context.resolveType(name);
 		if (itype != null)
@@ -97,21 +97,21 @@ public interface IContext
 		return null;
 	}
 	
-	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
+	static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{
 		ConstructorMatchList matches = new ConstructorMatchList();
 		context.getConstructorMatches(matches, arguments);
 		return matches.getBestConstructor();
 	}
 	
-	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
 		MethodMatchList matches = new MethodMatchList();
 		context.getMethodMatches(matches, instance, name, arguments);
 		return matches.getBestMethod();
 	}
 	
-	public static byte getVisibility(IContext context, IClassMember member)
+	static byte getVisibility(IContext context, IClassMember member)
 	{
 		IClass thisClass = context.getThisClass();
 		if (thisClass != null)

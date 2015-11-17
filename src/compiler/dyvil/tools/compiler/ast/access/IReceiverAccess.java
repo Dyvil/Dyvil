@@ -6,9 +6,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IReceiverAccess
 {
-	public IValue getReceiver();
+	IValue getReceiver();
 	
-	public void setReceiver(IValue receiver);
+	void setReceiver(IValue receiver);
 	
-	public void resolveReceiver(MarkerList markers, IContext context);
+	void resolveReceiver(MarkerList markers, IContext context);
 }

@@ -17,34 +17,34 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface ITypeAlias extends IASTNode, INamed, ITyped, IObjectCompilable
 {
 	@Override
-	public void setName(Name name);
+	void setName(Name name);
 	
 	@Override
-	public Name getName();
+	Name getName();
 	
 	@Override
-	public void setType(IType type);
+	void setType(IType type);
 	
 	@Override
-	public IType getType();
+	IType getType();
 	
 	// Phases
 	
-	public void resolveTypes(MarkerList markers, IContext context);
+	void resolveTypes(MarkerList markers, IContext context);
 	
-	public void resolve(MarkerList markers, IContext context);
+	void resolve(MarkerList markers, IContext context);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	void checkTypes(MarkerList markers, IContext context);
 	
-	public void check(MarkerList markers, IContext context);
+	void check(MarkerList markers, IContext context);
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup(IContext context, IClassCompilableList compilableList);
-	
-	@Override
-	public void write(DataOutput dos) throws IOException;
+	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	@Override
-	public void read(DataInput dis) throws IOException;
+	void write(DataOutput dos) throws IOException;
+	
+	@Override
+	void read(DataInput dis) throws IOException;
 }

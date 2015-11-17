@@ -18,12 +18,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface ICall extends IValue
 {
-	public void setArguments(IArguments arguments);
+	void setArguments(IArguments arguments);
 	
-	public IArguments getArguments();
+	IArguments getArguments();
 	
 	@Override
-	public default IValue resolve(MarkerList markers, IContext context)
+	default IValue resolve(MarkerList markers, IContext context)
 	{
 		this.resolveReceiver(markers, context);
 		this.resolveArguments(markers, context);
@@ -37,19 +37,19 @@ public interface ICall extends IValue
 		return this;
 	}
 	
-	public void checkArguments(MarkerList markers, IContext context);
+	void checkArguments(MarkerList markers, IContext context);
 	
-	public IValue resolveCall(MarkerList markers, IContext context);
+	IValue resolveCall(MarkerList markers, IContext context);
 	
-	public default void resolveReceiver(MarkerList markers, IContext context)
+	default void resolveReceiver(MarkerList markers, IContext context)
 	{
 	}
 	
-	public void resolveArguments(MarkerList markers, IContext context);
+	void resolveArguments(MarkerList markers, IContext context);
 	
-	public void reportResolve(MarkerList markers, IContext context);
+	void reportResolve(MarkerList markers, IContext context);
 	
-	public static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
+	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
@@ -78,12 +78,12 @@ public interface ICall extends IValue
 		markers.add(marker);
 	}
 	
-	public static boolean privateAccess(IContext context, IValue instance)
+	static boolean privateAccess(IContext context, IValue instance)
 	{
 		return instance == null || context.getThisClass() == instance.getType().getTheClass();
 	}
 	
-	public static IDataMember resolveField(IContext context, ITyped instance, Name name)
+	static IDataMember resolveField(IContext context, ITyped instance, Name name)
 	{
 		IDataMember match;
 		if (instance != null)
@@ -109,7 +109,7 @@ public interface ICall extends IValue
 		return null;
 	}
 	
-	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
 		MethodMatchList matches = new MethodMatchList();
 		if (instance != null)

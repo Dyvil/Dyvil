@@ -19,19 +19,19 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface LongArray
 {
-	public static final long[] EMPTY = new long[0];
+	long[] EMPTY = new long[0];
 	
-	public static long[] apply()
+	static long[] apply()
 	{
 		return EMPTY;
 	}
 	
-	public static long[] apply(int count)
+	static long[] apply(int count)
 	{
 		return new long[count];
 	}
 	
-	public static long[] repeat(int count, long repeatedValue)
+	static long[] repeat(int count, long repeatedValue)
 	{
 		long[] array = new long[count];
 		for (int i = 0; i < count; i++)
@@ -41,7 +41,7 @@ public interface LongArray
 		return array;
 	}
 	
-	public static long[] generate(int count, LongUnaryOperator generator)
+	static long[] generate(int count, LongUnaryOperator generator)
 	{
 		long[] array = new long[count];
 		for (int i = 0; i < count; i++)
@@ -51,7 +51,7 @@ public interface LongArray
 		return array;
 	}
 	
-	public static long[] range(long start, long end)
+	static long[] range(long start, long end)
 	{
 		int i = 0;
 		long[] array = new long[(int) (end - start + 1)];
@@ -62,7 +62,7 @@ public interface LongArray
 		return array;
 	}
 	
-	public static long[] rangeOpen(long start, long end)
+	static long[] rangeOpen(long start, long end)
 	{
 		int i = 0;
 		long[] array = new long[(int) (end - start)];
@@ -76,18 +76,18 @@ public interface LongArray
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	public static @infix int length(long[] array)
+	static @infix int length(long[] array)
 	{
 		return array.length;
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, LALOAD })
-	public static @infix long subscript(long[] array, int i)
+	static @infix long subscript(long[] array, int i)
 	{
 		return array[i];
 	}
 	
-	public static @infix long[] subscript(long[] array, Range<Int> range)
+	static @infix long[] subscript(long[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -100,12 +100,12 @@ public interface LongArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, LASTORE })
-	public static @infix void subscript_$eq(long[] array, int i, long v)
+	static @infix void subscript_$eq(long[] array, int i, long v)
 	{
 		array[i] = v;
 	}
 	
-	public static @infix void subscript_$eq(long[] array, Range<Int> range, long[] values)
+	static @infix void subscript_$eq(long[] array, Range<Int> range, long[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -116,12 +116,12 @@ public interface LongArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	public static @infix boolean isEmpty(int[] array)
+	static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	public static @infix void forEach(int[] array, IntConsumer action)
+	static @infix void forEach(int[] array, IntConsumer action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
@@ -132,22 +132,22 @@ public interface LongArray
 	
 	// Operators
 	
-	public static @infix @inline boolean $qmark(long[] array, long v)
+	static @infix @inline boolean $qmark(long[] array, long v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean $eq$eq(long[] array1, long[] array2)
+	static @infix @inline boolean $eq$eq(long[] array1, long[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline boolean $bang$eq(long[] array1, long[] array2)
+	static @infix @inline boolean $bang$eq(long[] array1, long[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	public static @infix long[] $plus(long[] array, long v)
+	static @infix long[] $plus(long[] array, long v)
 	{
 		int len = array.length;
 		long[] res = new long[len + 1];
@@ -156,7 +156,7 @@ public interface LongArray
 		return res;
 	}
 	
-	public static @infix long[] $plus$plus(long[] array1, long[] array2)
+	static @infix long[] $plus$plus(long[] array1, long[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -166,7 +166,7 @@ public interface LongArray
 		return res;
 	}
 	
-	public static @infix long[] $minus(long[] array, long v)
+	static @infix long[] $minus(long[] array, long v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -189,7 +189,7 @@ public interface LongArray
 		return res;
 	}
 	
-	public static @infix long[] $minus$minus(long[] array1, long[] array2)
+	static @infix long[] $minus$minus(long[] array1, long[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -208,7 +208,7 @@ public interface LongArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix long[] $amp(long[] array1, long[] array2)
+	static @infix long[] $amp(long[] array1, long[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -227,7 +227,7 @@ public interface LongArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix long[] mapped(long[] array, LongUnaryOperator mapper)
+	static @infix long[] mapped(long[] array, LongUnaryOperator mapper)
 	{
 		int len = array.length;
 		long[] res = new long[len];
@@ -238,7 +238,7 @@ public interface LongArray
 		return res;
 	}
 	
-	public static @infix long[] flatMapped(long[] array, LongFunction<long[]> mapper)
+	static @infix long[] flatMapped(long[] array, LongFunction<long[]> mapper)
 	{
 		int len = array.length;
 		int size = 0;
@@ -262,7 +262,7 @@ public interface LongArray
 		return res;
 	}
 	
-	public static @infix long[] filtered(long[] array, LongPredicate condition)
+	static @infix long[] filtered(long[] array, LongPredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -280,7 +280,7 @@ public interface LongArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix long[] sorted(long[] array)
+	static @infix long[] sorted(long[] array)
 	{
 		long[] res = array.clone();
 		Arrays.sort(res);
@@ -289,12 +289,12 @@ public interface LongArray
 	
 	// Search Operations
 	
-	public static @infix int indexOf(long[] array, long v)
+	static @infix int indexOf(long[] array, long v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	public static @infix int indexOf(long[] array, long v, int start)
+	static @infix int indexOf(long[] array, long v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -306,12 +306,12 @@ public interface LongArray
 		return -1;
 	}
 	
-	public static @infix int lastIndexOf(long[] array, long v)
+	static @infix int lastIndexOf(long[] array, long v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	public static @infix int lastIndexOf(long[] array, long v, int start)
+	static @infix int lastIndexOf(long[] array, long v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -323,24 +323,24 @@ public interface LongArray
 		return -1;
 	}
 	
-	public static @infix @inline boolean contains(long[] array, long v)
+	static @infix @inline boolean contains(long[] array, long v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean in(long v, long[] array)
+	static @infix @inline boolean in(long v, long[] array)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
 	// Copying
 	
-	public static @infix @inline long[] copy(long[] array)
+	static @infix @inline long[] copy(long[] array)
 	{
 		return array.clone();
 	}
 	
-	public static @infix Long[] boxed(long[] array)
+	static @infix Long[] boxed(long[] array)
 	{
 		int len = array.length;
 		Long[] boxed = new Long[len];
@@ -351,24 +351,24 @@ public interface LongArray
 		return boxed;
 	}
 	
-	public static @infix Iterable<Long> toIterable(long[] array)
+	static @infix Iterable<Long> toIterable(long[] array)
 	{
 		return new ArrayList<Long>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	public static @infix @inline boolean equals(long[] array1, long[] array2)
+	static @infix @inline boolean equals(long[] array1, long[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline int hashCode(long[] array)
+	static @infix @inline int hashCode(long[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	public static @infix String toString(long[] array)
+	static @infix String toString(long[] array)
 	{
 		if (array == null)
 		{
@@ -391,7 +391,7 @@ public interface LongArray
 		return buf.append(']').toString();
 	}
 	
-	public static @infix void toString(long[] array, StringBuilder builder)
+	static @infix void toString(long[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

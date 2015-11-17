@@ -6,29 +6,29 @@ public interface IProperty extends IField
 {
 	// Getter
 	
-	public boolean hasGetter();
+	boolean hasGetter();
 	
-	public void setGetterModifiers(int modifiers);
+	void setGetterModifiers(int modifiers);
 	
-	public void addGetterModifier(int modifier);
+	void addGetterModifier(int modifier);
 	
-	public int getGetterModifiers();
+	int getGetterModifiers();
 	
-	public void setGetter(IValue get);
+	void setGetter(IValue get);
 	
-	public IValue getGetter();
+	IValue getGetter();
 	
 	// Setter
 	
-	public boolean hasSetter();
+	boolean hasSetter();
 	
-	public void setSetterModifiers(int modifiers);
+	void setSetterModifiers(int modifiers);
 	
-	public void addSetterModifier(int modifier);
+	void addSetterModifier(int modifier);
 	
-	public int getSetterModifiers();
+	int getSetterModifiers();
 	
-	public void setSetter(IValue set);
+	void setSetter(IValue set);
 	
-	public IValue getSetter();
+	IValue getSetter();
 }

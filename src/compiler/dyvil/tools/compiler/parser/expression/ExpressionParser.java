@@ -1118,7 +1118,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		else
 		{
-			((ITyped) this.value).setType(type);
+			this.value.setType(type);
 		}
 	}
 	

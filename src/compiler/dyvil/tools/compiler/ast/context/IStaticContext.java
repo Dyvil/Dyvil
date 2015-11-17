@@ -17,73 +17,73 @@ import dyvil.tools.parsing.Name;
 public interface IStaticContext extends IContext
 {
 	@Override
-	public default boolean isStatic()
+	default boolean isStatic()
 	{
 		return true;
 	}
 	
 	@Override
-	public IDyvilHeader getHeader();
+	IDyvilHeader getHeader();
 	
 	@Override
-	public default IClass getThisClass()
+	default IClass getThisClass()
 	{
 		return null;
 	}
 	
 	@Override
-	public Package resolvePackage(Name name);
+	Package resolvePackage(Name name);
 	
 	@Override
-	public IClass resolveClass(Name name);
+	IClass resolveClass(Name name);
 	
 	@Override
-	public IType resolveType(Name name);
+	IType resolveType(Name name);
 	
 	@Override
-	public default ITypeVariable resolveTypeVariable(Name name)
+	default ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	@Override
-	public default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	
 	}
 	
 	@Override
-	public default boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public default boolean isMember(IVariable variable)
+	default boolean handleException(IType type)
 	{
 		return false;
 	}
 	
 	@Override
-	public default IDataMember capture(IVariable capture)
+	default boolean isMember(IVariable variable)
+	{
+		return false;
+	}
+	
+	@Override
+	default IDataMember capture(IVariable capture)
 	{
 		return capture;
 	}
 	
 	@Override
-	public default IAccessible getAccessibleThis(IClass type)
+	default IAccessible getAccessibleThis(IClass type)
 	{
 		return null;
 	}
 	
 	@Override
-	public default IAccessible getAccessibleImplicit()
+	default IAccessible getAccessibleImplicit()
 	{
 		return null;
 	}

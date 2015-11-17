@@ -6,7 +6,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IAccessible
 {
-	public IType getType();
+	IType getType();
 	
-	public void writeGet(MethodWriter writer) throws BytecodeException;
+	void writeGet(MethodWriter writer) throws BytecodeException;
 }

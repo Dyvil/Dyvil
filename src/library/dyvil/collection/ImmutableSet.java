@@ -19,33 +19,33 @@ import dyvil.util.ImmutableException;
 @ArrayConvertible
 public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>
 {
-	public static interface Builder<E> extends ImmutableCollection.Builder<E>
+	interface Builder<E> extends ImmutableCollection.Builder<E>
 	{
 		@Override
-		public ImmutableSet<E> build();
+		ImmutableSet<E> build();
 	}
 	
-	public static <E> ImmutableSet<E> apply()
+	static <E> ImmutableSet<E> apply()
 	{
 		return EmptySet.instance;
 	}
 	
-	public static <E> ImmutableSet<E> apply(E element)
+	static <E> ImmutableSet<E> apply(E element)
 	{
 		return new SingletonSet(element);
 	}
 	
-	public static <E> ImmutableSet<E> apply(E... elements)
+	static <E> ImmutableSet<E> apply(E... elements)
 	{
 		return new ArraySet(elements, true);
 	}
 	
-	public static <E> ImmutableSet<E> fromArray(E... elements)
+	static <E> ImmutableSet<E> fromArray(E... elements)
 	{
 		return new ArraySet(elements);
 	}
 	
-	public static <E> Builder<E> builder()
+	static <E> Builder<E> builder()
 	{
 		return new ArraySet.Builder();
 	}
@@ -53,19 +53,19 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	// Accessors
 	
 	@Override
-	public default boolean isImmutable()
+	default boolean isImmutable()
 	{
 		return true;
 	}
 	
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	@Override
-	public default Spliterator<E> spliterator()
+	default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.DISTINCT | Spliterator.IMMUTABLE);
 	}
@@ -73,98 +73,98 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	// Non-mutating Operations
 	
 	@Override
-	public ImmutableSet<E> $plus(E element);
+	ImmutableSet<E> $plus(E element);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation
 	 * and delegates to {@link #$bar(Collection)}.
 	 */
 	@Override
-	public default ImmutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
+	default ImmutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
 		return this.$bar(collection);
 	}
 	
 	@Override
-	public ImmutableSet<E> $minus(Object element);
+	ImmutableSet<E> $minus(Object element);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'subtract' ImmutableSet
 	 * operation.
 	 */
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection);
+	ImmutableSet<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet
 	 * operation.
 	 */
 	@Override
-	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection);
+	ImmutableSet<? extends E> $amp(Collection<? extends E> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'union' ImmutableSet
 	 * operation.
 	 */
 	@Override
-	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection);
+	ImmutableSet<? extends E> $bar(Collection<? extends E> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'exclusive OR' ImmutableSet
 	 * operation.
 	 */
 	@Override
-	public ImmutableSet<? extends E> $up(Collection<? extends E> collection);
+	ImmutableSet<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
-	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper);
+	<R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
-	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+	<R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
 	
 	@Override
-	public ImmutableSet<E> filtered(Predicate<? super E> condition);
+	ImmutableSet<E> filtered(Predicate<? super E> condition);
 	
 	// Mutating Operations
 	
 	@Override
-	public default void $plus$eq(E element)
+	default void $plus$eq(E element)
 	{
 		throw new ImmutableException("+= on Immutable Set");
 	}
 	
 	@Override
-	public default void $plus$plus$eq(Collection<? extends E> collection)
+	default void $plus$plus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("++= on Immutable Set");
 	}
 	
 	@Override
-	public default void $minus$eq(Object element)
+	default void $minus$eq(Object element)
 	{
 		throw new ImmutableException("-= on Immutable Set");
 	}
 	
 	@Override
-	public default void $minus$minus$eq(Collection<?> collection)
+	default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable Set");
 	}
 	
 	@Override
-	public default void $amp$eq(Collection<? extends E> collection)
+	default void $amp$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("&= on Immutable Set");
 	}
 	
 	@Override
-	public default void $bar$eq(Collection<? extends E> collection)
+	default void $bar$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("|= on Immutable Set");
 	}
 	
 	@Override
-	public default void $up$eq(Collection<? extends E> collection)
+	default void $up$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("^= on Immutable Set");
 	}
@@ -172,67 +172,67 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	// Mutating Operations
 	
 	@Override
-	public default void clear()
+	default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean add(E element)
+	default boolean add(E element)
 	{
 		throw new ImmutableException("add() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean addAll(Collection<? extends E> collection)
+	default boolean addAll(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("addAll() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean remove(Object element)
+	default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean removeAll(Collection<?> collection)
+	default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean intersect(Collection<? extends E> collection)
+	default boolean intersect(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("intersect() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean union(Collection<? extends E> collection)
+	default boolean union(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("union() on Immutable Set");
 	}
 	
 	@Override
-	public default boolean exclusiveOr(Collection<? extends E> collection)
+	default boolean exclusiveOr(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("exclusiveOr() on Immutable Set");
 	}
 	
 	@Override
-	public default void map(Function<? super E, ? extends E> mapper)
+	default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable Set");
 	}
 	
 	@Override
-	public default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable Set");
 	}
 	
 	@Override
-	public default void filter(Predicate<? super E> condition)
+	default void filter(Predicate<? super E> condition)
 	{
 		throw new ImmutableException("filter() on Immutable Set");
 	}
@@ -240,31 +240,31 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	// Copying
 	
 	@Override
-	public ImmutableSet<E> copy();
+	ImmutableSet<E> copy();
 	
 	@Override
-	public MutableSet<E> mutable();
+	MutableSet<E> mutable();
 	
 	@Override
-	public default MutableSet<E> mutableCopy()
+	default MutableSet<E> mutableCopy()
 	{
 		return this.mutable();
 	}
 	
 	@Override
-	public default ImmutableSet<E> immutable()
+	default ImmutableSet<E> immutable()
 	{
 		return this;
 	}
 	
 	@Override
-	public default ImmutableSet<E> immutableCopy()
+	default ImmutableSet<E> immutableCopy()
 	{
 		return this.copy();
 	}
 	
 	@Override
-	public default ImmutableSet<E> view()
+	default ImmutableSet<E> view()
 	{
 		return this;
 	}

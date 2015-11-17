@@ -11,85 +11,85 @@ import dyvil.lang.literal.LongConvertible;
 @DoubleConvertible
 public interface Number extends Rangeable<Number>
 {
-	public static Int apply(int v)
+	static Int apply(int v)
 	{
 		return Int.apply(v);
 	}
 	
-	public static Long apply(long v)
+	static Long apply(long v)
 	{
 		return Long.apply(v);
 	}
 	
-	public static Float apply(float v)
+	static Float apply(float v)
 	{
 		return Float.apply(v);
 	}
 	
-	public static Double apply(double v)
+	static Double apply(double v)
 	{
 		return Double.apply(v);
 	}
 	
 	// Primitive value getters
 	
-	public byte byteValue();
+	byte byteValue();
 	
-	public short shortValue();
+	short shortValue();
 	
-	public char charValue();
+	char charValue();
 	
-	public int intValue();
+	int intValue();
 	
-	public long longValue();
+	long longValue();
 	
-	public float floatValue();
+	float floatValue();
 	
-	public double doubleValue();
+	double doubleValue();
 	
-	public Number $plus();
+	Number $plus();
 	
-	public Number $minus();
-	
-	@Override
-	public boolean $eq$eq(Number v);
+	Number $minus();
 	
 	@Override
-	public boolean $bang$eq(Number v);
+	boolean $eq$eq(Number v);
 	
 	@Override
-	public boolean $lt(Number v);
+	boolean $bang$eq(Number v);
 	
 	@Override
-	public boolean $lt$eq(Number v);
+	boolean $lt(Number v);
 	
 	@Override
-	public boolean $gt(Number v);
+	boolean $lt$eq(Number v);
 	
 	@Override
-	public boolean $gt$eq(Number v);
-	
-	public Number $plus(Number v);
-	
-	public Number $minus(Number v);
-	
-	public Number $times(Number v);
-	
-	public Number $div(Number v);
-	
-	public Number $percent(Number v);
+	boolean $gt(Number v);
 	
 	@Override
-	public Number next();
+	boolean $gt$eq(Number v);
+	
+	Number $plus(Number v);
+	
+	Number $minus(Number v);
+	
+	Number $times(Number v);
+	
+	Number $div(Number v);
+	
+	Number $percent(Number v);
 	
 	@Override
-	public Number previous();
+	Number next();
 	
 	@Override
-	public int compareTo(Number o);
+	Number previous();
 	
 	@Override
-	public default int distanceTo(Number o)
+	int compareTo(Number o);
+	
+	@Override
+	default int distanceTo(Number o)
 	{
 		return o.intValue() - this.intValue();
 	}
@@ -97,5 +97,5 @@ public interface Number extends Rangeable<Number>
 	// String representations
 	
 	@Override
-	public java.lang.String toString();
+	java.lang.String toString();
 }

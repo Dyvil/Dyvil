@@ -10,21 +10,21 @@ import dyvil.tools.compiler.ast.type.IType;
 public interface IField extends IClassMember, IDataMember
 {
 	@Override
-	public IClass getTheClass();
+	IClass getTheClass();
 	
 	@Override
-	public default boolean isField()
+	default boolean isField()
 	{
 		return true;
 	}
 	
 	@Override
-	public default boolean isVariable()
+	default boolean isVariable()
 	{
 		return false;
 	}
 	
-	public static void writeAnnotations(FieldVisitor fv, AnnotationList annotations, IType type)
+	static void writeAnnotations(FieldVisitor fv, AnnotationList annotations, IType type)
 	{
 		if (annotations != null)
 		{

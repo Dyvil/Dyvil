@@ -19,19 +19,19 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface FloatArray
 {
-	public static final float[] EMPTY = new float[0];
+	float[] EMPTY = new float[0];
 	
-	public static float[] apply()
+	static float[] apply()
 	{
 		return EMPTY;
 	}
 	
-	public static float[] apply(int count)
+	static float[] apply(int count)
 	{
 		return new float[count];
 	}
 	
-	public static float[] repeat(int count, float repeatedValue)
+	static float[] repeat(int count, float repeatedValue)
 	{
 		float[] array = new float[count];
 		for (int i = 0; i < count; i++)
@@ -41,7 +41,7 @@ public interface FloatArray
 		return array;
 	}
 	
-	public static float[] generate(int count, DoubleUnaryOperator generator)
+	static float[] generate(int count, DoubleUnaryOperator generator)
 	{
 		float[] array = new float[count];
 		for (int i = 0; i < count; i++)
@@ -51,7 +51,7 @@ public interface FloatArray
 		return array;
 	}
 	
-	public static float[] apply(float start, float end)
+	static float[] apply(float start, float end)
 	{
 		int i = 0;
 		float[] array = new float[(int) (end - start + 1)];
@@ -62,7 +62,7 @@ public interface FloatArray
 		return array;
 	}
 	
-	public static float[] range(float start, float end)
+	static float[] range(float start, float end)
 	{
 		int i = 0;
 		float[] array = new float[(int) (end - start + 1)];
@@ -73,7 +73,7 @@ public interface FloatArray
 		return array;
 	}
 	
-	public static float[] rangeOpen(float start, float end)
+	static float[] rangeOpen(float start, float end)
 	{
 		int i = 0;
 		float[] array = new float[(int) (end - start)];
@@ -87,18 +87,18 @@ public interface FloatArray
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	public static @infix int length(float[] array)
+	static @infix int length(float[] array)
 	{
 		return array.length;
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, FALOAD })
-	public static @infix float subscript(float[] array, int i)
+	static @infix float subscript(float[] array, int i)
 	{
 		return array[i];
 	}
 	
-	public static @infix float[] subscript(float[] array, Range<Int> range)
+	static @infix float[] subscript(float[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -111,12 +111,12 @@ public interface FloatArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, FASTORE })
-	public static @infix void subscript_$eq(float[] array, int i, float v)
+	static @infix void subscript_$eq(float[] array, int i, float v)
 	{
 		array[i] = v;
 	}
 	
-	public static @infix void subscript_$eq(float[] array, Range<Int> range, float[] values)
+	static @infix void subscript_$eq(float[] array, Range<Int> range, float[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -127,12 +127,12 @@ public interface FloatArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	public static @infix boolean isEmpty(int[] array)
+	static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	public static @infix void forEach(int[] array, IntConsumer action)
+	static @infix void forEach(int[] array, IntConsumer action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
@@ -143,22 +143,22 @@ public interface FloatArray
 	
 	// Operators
 	
-	public static @infix @inline boolean $qmark(float[] array, float v)
+	static @infix @inline boolean $qmark(float[] array, float v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean $eq$eq(float[] array1, float[] array2)
+	static @infix @inline boolean $eq$eq(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline boolean $bang$eq(float[] array1, float[] array2)
+	static @infix @inline boolean $bang$eq(float[] array1, float[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	public static @infix float[] $plus(float[] array, float v)
+	static @infix float[] $plus(float[] array, float v)
 	{
 		int len = array.length;
 		float[] res = new float[len + 1];
@@ -167,7 +167,7 @@ public interface FloatArray
 		return res;
 	}
 	
-	public static @infix float[] $plus$plus(float[] array1, float[] array2)
+	static @infix float[] $plus$plus(float[] array1, float[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -177,7 +177,7 @@ public interface FloatArray
 		return res;
 	}
 	
-	public static @infix float[] $minus(float[] array, float v)
+	static @infix float[] $minus(float[] array, float v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -200,7 +200,7 @@ public interface FloatArray
 		return res;
 	}
 	
-	public static @infix float[] $minus$minus(float[] array1, float[] array2)
+	static @infix float[] $minus$minus(float[] array1, float[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -219,7 +219,7 @@ public interface FloatArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix float[] $amp(float[] array1, float[] array2)
+	static @infix float[] $amp(float[] array1, float[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -238,7 +238,7 @@ public interface FloatArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix float[] mapped(float[] array, DoubleUnaryOperator mapper)
+	static @infix float[] mapped(float[] array, DoubleUnaryOperator mapper)
 	{
 		int len = array.length;
 		float[] res = new float[len];
@@ -249,7 +249,7 @@ public interface FloatArray
 		return res;
 	}
 	
-	public static @infix float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
+	static @infix float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
 	{
 		int len = array.length;
 		int size = 0;
@@ -273,7 +273,7 @@ public interface FloatArray
 		return res;
 	}
 	
-	public static @infix float[] filtered(float[] array, DoublePredicate condition)
+	static @infix float[] filtered(float[] array, DoublePredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -291,7 +291,7 @@ public interface FloatArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix float[] sorted(float[] array)
+	static @infix float[] sorted(float[] array)
 	{
 		float[] res = array.clone();
 		Arrays.sort(res);
@@ -300,12 +300,12 @@ public interface FloatArray
 	
 	// Search Operations
 	
-	public static @infix int indexOf(float[] array, float v)
+	static @infix int indexOf(float[] array, float v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	public static @infix int indexOf(float[] array, float v, int start)
+	static @infix int indexOf(float[] array, float v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -317,12 +317,12 @@ public interface FloatArray
 		return -1;
 	}
 	
-	public static @infix int lastIndexOf(float[] array, float v)
+	static @infix int lastIndexOf(float[] array, float v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	public static @infix int lastIndexOf(float[] array, float v, int start)
+	static @infix int lastIndexOf(float[] array, float v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -334,24 +334,24 @@ public interface FloatArray
 		return -1;
 	}
 	
-	public static @infix @inline boolean contains(float[] array, float v)
+	static @infix @inline boolean contains(float[] array, float v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean in(float v, float[] array)
+	static @infix @inline boolean in(float v, float[] array)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
 	// Copying
 	
-	public static @infix @inline float[] copy(float[] array)
+	static @infix @inline float[] copy(float[] array)
 	{
 		return array.clone();
 	}
 	
-	public static @infix Float[] boxed(float[] array)
+	static @infix Float[] boxed(float[] array)
 	{
 		int len = array.length;
 		Float[] boxed = new Float[len];
@@ -362,24 +362,24 @@ public interface FloatArray
 		return boxed;
 	}
 	
-	public static @infix Iterable<Float> toIterable(float[] array)
+	static @infix Iterable<Float> toIterable(float[] array)
 	{
 		return new ArrayList<Float>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	public static @infix @inline boolean equals(float[] array1, float[] array2)
+	static @infix @inline boolean equals(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline int hashCode(float[] array)
+	static @infix @inline int hashCode(float[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	public static @infix String toString(float[] array)
+	static @infix String toString(float[] array)
 	{
 		if (array == null)
 		{
@@ -402,7 +402,7 @@ public interface FloatArray
 		return buf.append(']').toString();
 	}
 	
-	public static @infix void toString(float[] array, StringBuilder builder)
+	static @infix void toString(float[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

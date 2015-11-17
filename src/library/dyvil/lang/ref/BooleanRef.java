@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface BooleanRef
 {
-	public boolean get();
+	boolean get();
 	
-	public void set(boolean value);
+	void set(boolean value);
 }

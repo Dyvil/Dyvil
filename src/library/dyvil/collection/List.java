@@ -56,7 +56,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * 
 	 * @return an empty, immutable list
 	 */
-	public static <E> ImmutableList<E> fromNil()
+	static <E> ImmutableList<E> fromNil()
 	{
 		return ImmutableList.apply();
 	}
@@ -67,12 +67,12 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * 
 	 * @return an empty, mutable list
 	 */
-	public static <E> MutableList<E> apply()
+	static <E> MutableList<E> apply()
 	{
 		return MutableList.apply();
 	}
 	
-	public static <E> ImmutableList<E> apply(E element)
+	static <E> ImmutableList<E> apply(E element)
 	{
 		return ImmutableList.apply(element);
 	}
@@ -88,22 +88,22 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the elements of the returned collection
 	 * @return an immutable list containing all of the given elements
 	 */
-	public static <E> ImmutableList<E> apply(E... elements)
+	static <E> ImmutableList<E> apply(E... elements)
 	{
 		return ImmutableList.apply(elements);
 	}
 	
-	public static <E> ImmutableList<E> fromArray(E... elements)
+	static <E> ImmutableList<E> fromArray(E... elements)
 	{
 		return ImmutableList.fromArray(elements);
 	}
 	
-	public static <E> ImmutableList<E> repeat(int count, E repeatedValue)
+	static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
 		return ImmutableList.repeat(count, repeatedValue);
 	}
 	
-	public static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
+	static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
 	{
 		return ImmutableList.generate(count, generator);
 	}
@@ -111,16 +111,16 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	// Simple getters
 	
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	@Override
-	public Iterator<E> reverseIterator();
+	Iterator<E> reverseIterator();
 	
 	@Override
-	public default Spliterator<E> spliterator()
+	default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
@@ -136,7 +136,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public E subscript(int index);
+	E subscript(int index);
 	
 	/**
 	 * Returns the element at the given {@code index}. Unlike
@@ -148,7 +148,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the index
 	 * @return the element at the given index
 	 */
-	public E get(int index);
+	E get(int index);
 	
 	// Non-mutating Operations
 	
@@ -173,13 +173,13 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @return a sub-list with {@code length} elements starting from the
 	 *         {@code startIndex}
 	 */
-	public List<E> subList(int startIndex, int length);
+	List<E> subList(int startIndex, int length);
 	
 	@Override
-	public List<E> $plus(E element);
+	List<E> $plus(E element);
 	
 	@Override
-	public List<? extends E> $plus$plus(Collection<? extends E> collection);
+	List<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	/**
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element
@@ -193,24 +193,24 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * </pre>
 	 */
 	@Override
-	public List<E> $minus(Object element);
+	List<E> $minus(Object element);
 	
 	@Override
-	public List<? extends E> $minus$minus(Collection<?> collection);
+	List<? extends E> $minus$minus(Collection<?> collection);
 	
 	@Override
-	public List<? extends E> $amp(Collection<? extends E> collection);
+	List<? extends E> $amp(Collection<? extends E> collection);
 	
 	@Override
-	public <R> List<R> mapped(Function<? super E, ? extends R> mapper);
+	<R> List<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
-	public <R> List<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+	<R> List<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
 	
 	@Override
-	public List<E> filtered(Predicate<? super E> condition);
+	List<E> filtered(Predicate<? super E> condition);
 	
-	public List<E> reversed();
+	List<E> reversed();
 	
 	/**
 	 * Returns a list that contains the same elements as this list, but in a
@@ -222,7 +222,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * 
 	 * @return a sorted list of this list's elements
 	 */
-	public List<E> sorted();
+	List<E> sorted();
 	
 	/**
 	 * Returns a list that contains the same elements as this list, but in a
@@ -233,19 +233,19 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the comparator that defines the order of the elements
 	 * @return a sorted list of this list's elements using the given comparator
 	 */
-	public List<E> sorted(Comparator<? super E> comparator);
+	List<E> sorted(Comparator<? super E> comparator);
 	
-	public List<E> distinct();
+	List<E> distinct();
 	
-	public List<E> distinct(Comparator<? super E> comparator);
+	List<E> distinct(Comparator<? super E> comparator);
 	
 	// Mutating Operations
 	
 	@Override
-	public void $plus$eq(E element);
+	void $plus$eq(E element);
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	/**
 	 * Ensures the capacity of this list to be at least {@code minSize}. This
@@ -255,7 +255,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @param minSize
 	 *            the minimum size
 	 */
-	public default void ensureCapacity(int minSize)
+	default void ensureCapacity(int minSize)
 	{
 	}
 	
@@ -271,7 +271,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public void subscript_$eq(int index, E element);
+	void subscript_$eq(int index, E element);
 	
 	/**
 	 * Updates the element at the given {@code index} of this list. Unlike
@@ -285,7 +285,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the new element
 	 * @return the old element, if present, {@code null} otherwise
 	 */
-	public E set(int index, E element);
+	E set(int index, E element);
 	
 	/**
 	 * Inserts the element at the given {@code index} of this list. This method
@@ -299,13 +299,13 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of the bounds of this list
 	 */
-	public default void insert(int index, E element)
+	default void insert(int index, E element)
 	{
 		this.add(index, element);
 	}
 	
 	@Override
-	public default boolean add(E element)
+	default boolean add(E element)
 	{
 		this.$plus$eq(element);
 		return true;
@@ -323,7 +323,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the element to be inserted
 	 * @return the old element, if present, {@code null} otherwise
 	 */
-	public E add(int index, E element);
+	E add(int index, E element);
 	
 	/**
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element
@@ -333,9 +333,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * removeFirst} method.
 	 */
 	@Override
-	public boolean remove(Object element);
+	boolean remove(Object element);
 	
-	public default boolean removeFirst(Object element)
+	default boolean removeFirst(Object element)
 	{
 		int index = this.indexOf(element);
 		if (index < 0)
@@ -347,7 +347,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return true;
 	}
 	
-	public default boolean removeLast(Object element)
+	default boolean removeLast(Object element)
 	{
 		int index = this.lastIndexOf(element);
 		if (index < 0)
@@ -368,15 +368,15 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @param index
 	 *            the index of the element to remove from this list
 	 */
-	public void removeAt(int index);
+	void removeAt(int index);
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
-	public void reverse();
+	void reverse();
 	
 	/**
 	 * Sorts the elements of this list. The sorting order is given by the
@@ -385,7 +385,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * Thus, this method will fail if the elements in this collection do not
 	 * implement {@link Comparable} interface.
 	 */
-	public void sort();
+	void sort();
 	
 	/**
 	 * Sorts the elements of this list. The sorting order is specified by the
@@ -394,11 +394,11 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @param comparator
 	 *            the comparator that defines the order of the elements
 	 */
-	public void sort(Comparator<? super E> comparator);
+	void sort(Comparator<? super E> comparator);
 	
-	public void distinguish();
+	void distinguish();
 	
-	public void distinguish(Comparator<? super E> comparator);
+	void distinguish(Comparator<? super E> comparator);
 	
 	// Search Operations
 	
@@ -410,7 +410,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the element to search
 	 * @return the first index of the element
 	 */
-	public int indexOf(Object element);
+	int indexOf(Object element);
 	
 	/**
 	 * Returns the last index of the given {@code element} in this list, and
@@ -420,34 +420,34 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *            the element to search
 	 * @return the last index of the element
 	 */
-	public int lastIndexOf(Object element);
+	int lastIndexOf(Object element);
 	
 	// Copying and Views
 	
 	@Override
-	public List<E> copy();
+	List<E> copy();
 	
 	@Override
-	public MutableList<E> mutable();
+	MutableList<E> mutable();
 	
 	@Override
-	public MutableList<E> mutableCopy();
+	MutableList<E> mutableCopy();
 	
 	@Override
-	public ImmutableList<E> immutable();
+	ImmutableList<E> immutable();
 	
 	@Override
-	public ImmutableList<E> immutableCopy();
+	ImmutableList<E> immutableCopy();
 	
 	@Override
-	public ImmutableList<E> view();
+	ImmutableList<E> view();
 	
 	@Override
-	public java.util.List<E> toJava();
+	java.util.List<E> toJava();
 	
 	// Utility Methods
 	
-	public static <E> boolean listEquals(List<E> list, Object o)
+	static <E> boolean listEquals(List<E> list, Object o)
 	{
 		if (!(o instanceof List))
 		{
@@ -457,7 +457,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return listEquals(list, (List) o);
 	}
 	
-	public static <E> boolean listEquals(List<E> c1, List<E> c2)
+	static <E> boolean listEquals(List<E> c1, List<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{
@@ -467,7 +467,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return Collection.orderedEquals(c1, c2);
 	}
 	
-	public static <E> int listHashCode(List<E> list)
+	static <E> int listHashCode(List<E> list)
 	{
 		int result = 1;
 		for (Object o : list)

@@ -2,5 +2,5 @@ package dyvil.util;
 
 public enum MarkerLevel
 {
-	IGNORE, INFO, WARNING, ERROR;
+	IGNORE, INFO, WARNING, ERROR
 }

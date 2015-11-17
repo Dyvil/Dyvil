@@ -9,9 +9,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IReference
 {
-	public void check(ICodePosition position, MarkerList markers);
+	void check(ICodePosition position, MarkerList markers);
 	
-	public void cleanup(IContext context, IClassCompilableList compilableList);
+	void cleanup(IContext context, IClassCompilableList compilableList);
 	
-	public void writeReference(MethodWriter writer) throws BytecodeException;
+	void writeReference(MethodWriter writer) throws BytecodeException;
 }

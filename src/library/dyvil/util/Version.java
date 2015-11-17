@@ -19,7 +19,7 @@ public final class Version implements Ordered<Version>, Immutable, Serializable
 {
 	public enum Element
 	{
-		MAJOR, MINOR, PATCH, PRERELEASE, BUILD;
+		MAJOR, MINOR, PATCH, PRERELEASE, BUILD
 	}
 	
 	private static final long serialVersionUID = 2514051844985966173L;

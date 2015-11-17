@@ -35,7 +35,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
-	public static enum TypePosition
+	enum TypePosition
 	{
 		/**
 		 * Only allows Class Types.
@@ -66,7 +66,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		PARAMETER_TYPE, /**
 						 * Allows all Types.
 						 */
-		GENERIC_ARGUMENT;
+		GENERIC_ARGUMENT
 	}
 	
 	// Basic Types
@@ -103,78 +103,78 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int ANNOTATED = 192;
 	
 	@Override
-	public default ICodePosition getPosition()
+	default ICodePosition getPosition()
 	{
 		return null;
 	}
 	
 	@Override
-	public default void setPosition(ICodePosition position)
+	default void setPosition(ICodePosition position)
 	{
 	}
 	
-	public int typeTag();
+	int typeTag();
 	
-	public boolean isPrimitive();
+	boolean isPrimitive();
 	
-	public int getTypecode();
+	int getTypecode();
 	
-	public boolean isGenericType();
+	boolean isGenericType();
 	
-	public ITypeVariable getTypeVariable();
+	ITypeVariable getTypeVariable();
 	
-	public Name getName();
+	Name getName();
 	
 	// Container Class
 	
-	public IClass getTheClass();
+	IClass getTheClass();
 	
 	// Type Conversions
 	
-	public IType getObjectType();
+	IType getObjectType();
 	
-	public default IType getReturnType()
+	default IType getReturnType()
 	{
 		return this;
 	}
 	
-	public default IType getParameterType()
+	default IType getParameterType()
 	{
 		return this;
 	}
 	
-	public ReferenceType getRefType();
+	ReferenceType getRefType();
 	
-	public IType getSimpleRefType();
+	IType getSimpleRefType();
 	
 	// Arrays
 	
-	public boolean isArrayType();
+	boolean isArrayType();
 	
-	public int getArrayDimensions();
+	int getArrayDimensions();
 	
-	public IType getElementType();
+	IType getElementType();
 	
-	public IClass getArrayClass();
+	IClass getArrayClass();
 	
 	// Super Type
 	
-	public default int getSuperTypeDistance(IType superType)
+	default int getSuperTypeDistance(IType superType)
 	{
 		return this.getTheClass().getSuperTypeDistance(superType);
 	}
 	
-	public default float getSubTypeDistance(IType subtype)
+	default float getSubTypeDistance(IType subtype)
 	{
 		return subtype.getSuperTypeDistance(this);
 	}
 	
-	public default int getSubClassDistance(IType subtype)
+	default int getSubClassDistance(IType subtype)
 	{
 		return subtype.getSuperTypeDistance(this);
 	}
 	
-	public default IType getSuperType()
+	default IType getSuperType()
 	{
 		IClass iclass = this.getTheClass();
 		if (iclass != null)
@@ -184,7 +184,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return Types.OBJECT;
 	}
 	
-	public default IType combine(IType type)
+	default IType combine(IType type)
 	{
 		return this;
 	}
@@ -195,7 +195,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * @param type
 	 * @return
 	 */
-	public default boolean isSuperTypeOf(IType type)
+	default boolean isSuperTypeOf(IType type)
 	{
 		if (this == type)
 		{
@@ -224,7 +224,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return false;
 	}
 	
-	public default boolean isSuperClassOf(IType type)
+	default boolean isSuperClassOf(IType type)
 	{
 		IClass thisClass = this.getTheClass();
 		IClass thatClass = type.getTheClass();
@@ -235,20 +235,20 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return false;
 	}
 	
-	public default boolean isSameType(IType type)
+	default boolean isSameType(IType type)
 	{
 		return this.getTheClass() == type.getTheClass();
 	}
 	
-	public boolean classEquals(IType type);
+	boolean classEquals(IType type);
 	
 	// Resolve
 	
-	public IMethod getBoxMethod();
+	IMethod getBoxMethod();
 	
-	public IMethod getUnboxMethod();
+	IMethod getUnboxMethod();
 	
-	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type.hasTypeVariables())
 		{
@@ -257,7 +257,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return type.convertValue(value, typeContext, markers, context);
 	}
 	
-	public default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return value.withType(this, typeContext, markers, context);
 	}
@@ -277,9 +277,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * </pre>
 	 */
 	@Override
-	public IType resolveType(ITypeVariable typeVar);
+	IType resolveType(ITypeVariable typeVar);
 	
-	public default IType resolveTypeSafely(ITypeVariable typeVar)
+	default IType resolveTypeSafely(ITypeVariable typeVar)
 	{
 		IType t = this.resolveType(typeVar);
 		return t == null ? Types.ANY : t;
@@ -290,7 +290,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * 
 	 * @return
 	 */
-	public boolean hasTypeVariables();
+	boolean hasTypeVariables();
 	
 	/**
 	 * Returns a copy of this type with all type variables replaced.
@@ -299,109 +299,109 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 *            the type variables
 	 * @return
 	 */
-	public IType getConcreteType(ITypeContext context);
+	IType getConcreteType(ITypeContext context);
 	
-	public void inferTypes(IType concrete, ITypeContext typeContext);
+	void inferTypes(IType concrete, ITypeContext typeContext);
 	
 	// Phases
 	
-	public boolean isResolved();
+	boolean isResolved();
 	
-	public IType resolveType(MarkerList markers, IContext context);
+	IType resolveType(MarkerList markers, IContext context);
 	
-	public default void resolve(MarkerList markers, IContext context)
+	default void resolve(MarkerList markers, IContext context)
 	{
 	}
 	
-	public void checkType(MarkerList markers, IContext context, TypePosition position);
+	void checkType(MarkerList markers, IContext context, TypePosition position);
 	
-	public void check(MarkerList markers, IContext context);
+	void check(MarkerList markers, IContext context);
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup(IContext context, IClassCompilableList compilableList);
+	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// IContext
 	
 	@Override
-	public default IDyvilHeader getHeader()
+	default IDyvilHeader getHeader()
 	{
 		return this.getTheClass().getHeader();
 	}
 	
 	@Override
-	public default IClass getThisClass()
+	default IClass getThisClass()
 	{
 		return this.getTheClass();
 	}
 	
 	@Override
-	public default Package resolvePackage(Name name)
+	default Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public default IClass resolveClass(Name name)
+	default IClass resolveClass(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public default IType resolveType(Name name)
+	default IType resolveType(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
+	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
-	public IMethod getFunctionalMethod();
+	IMethod getFunctionalMethod();
 	
 	// Compilation
 	
-	public String getInternalName();
+	String getInternalName();
 	
-	public default String getExtendedName()
+	default String getExtendedName()
 	{
 		StringBuilder buffer = new StringBuilder();
 		this.appendExtendedName(buffer);
 		return buffer.toString();
 	}
 	
-	public void appendExtendedName(StringBuilder buffer);
+	void appendExtendedName(StringBuilder buffer);
 	
-	public String getSignature();
+	String getSignature();
 	
-	public void appendSignature(StringBuilder buffer);
+	void appendSignature(StringBuilder buffer);
 	
 	// Compilation
 	
-	public int getLoadOpcode();
+	int getLoadOpcode();
 	
-	public int getArrayLoadOpcode();
+	int getArrayLoadOpcode();
 	
-	public int getStoreOpcode();
+	int getStoreOpcode();
 	
-	public int getArrayStoreOpcode();
+	int getArrayStoreOpcode();
 	
-	public int getReturnOpcode();
+	int getReturnOpcode();
 	
-	public Object getFrameType();
+	Object getFrameType();
 	
-	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
+	void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
 	
-	public void writeTypeExpression(MethodWriter writer) throws BytecodeException;
+	void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
-	public void writeDefaultValue(MethodWriter writer) throws BytecodeException;
+	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
 	
-	public static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
+	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath == null || step > steps)
 		{
@@ -412,13 +412,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return type;
 	}
 	
-	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
+	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
 	
-	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
+	void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 	
-	public IConstantValue getDefaultValue();
+	IConstantValue getDefaultValue();
 	
-	public static void writeType(IType type, DataOutput dos) throws IOException
+	static void writeType(IType type, DataOutput dos) throws IOException
 	{
 		if (type == null)
 		{
@@ -430,7 +430,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		type.write(dos);
 	}
 	
-	public static IType readType(DataInput dis) throws IOException
+	static IType readType(DataInput dis) throws IOException
 	{
 		byte tag = dis.readByte();
 		IType type;
@@ -475,24 +475,24 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return type;
 	}
 	
-	public void write(DataOutput out) throws IOException;
+	void write(DataOutput out) throws IOException;
 	
-	public void read(DataInput in) throws IOException;
+	void read(DataInput in) throws IOException;
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer);
+	void toString(String prefix, StringBuilder buffer);
 	
 	// Misc
 	
-	public IType clone();
+	IType clone();
 	
 	@Override
-	public boolean equals(Object obj);
+	boolean equals(Object obj);
 	
 	@Override
-	public int hashCode();
+	int hashCode();
 	
-	public static boolean equals(IType type, Object obj)
+	static boolean equals(IType type, Object obj)
 	{
 		return type.classEquals((IType) obj);
 	}

@@ -13,36 +13,37 @@ import dyvil.annotation._internal.sealed;
 
 @NilConvertible
 @TupleConvertible
-public abstract @sealed interface Option<T> extends Serializable
+public
+@sealed interface Option<T> extends Serializable
 {
-	public static <T> Option<T> of(T t)
+	static <T> Option<T> of(T t)
 	{
 		return t == null ? None.instance : new Some(t);
 	}
 	
-	public static <T> Option<T> apply()
+	static <T> Option<T> apply()
 	{
 		return None.instance;
 	}
 	
-	public static <T> Option<T> apply(T t)
+	static <T> Option<T> apply(T t)
 	{
 		return new Some(t);
 	}
 	
-	public abstract T $bang();
+	T $bang();
 	
-	public abstract boolean $qmark();
+	boolean $qmark();
 	
-	public abstract void forEach(Consumer<? super T> paramConsumer);
+	void forEach(Consumer<? super T> paramConsumer);
 	
-	public abstract Option<T> filter(Predicate<? super T> paramPredicate);
+	Option<T> filter(Predicate<? super T> paramPredicate);
 	
-	public abstract <U> Option<U> map(Function<? super T, ? extends U> paramFunction);
+	<U> Option<U> map(Function<? super T, ? extends U> paramFunction);
 	
-	public abstract <U> Option<U> flatMap(Function<? super T, Option<U>> paramFunction);
+	<U> Option<U> flatMap(Function<? super T, Option<U>> paramFunction);
 	
-	public abstract T orElse(T paramT);
+	T orElse(T paramT);
 	
-	public abstract T orElse(Supplier<? extends T> paramSupplier);
+	T orElse(Supplier<? extends T> paramSupplier);
 }

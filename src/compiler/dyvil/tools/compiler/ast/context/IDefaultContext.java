@@ -13,37 +13,37 @@ import dyvil.tools.parsing.Name;
 public interface IDefaultContext extends IStaticContext
 {
 	@Override
-	public default IDyvilHeader getHeader()
+	default IDyvilHeader getHeader()
 	{
 		return null;
 	}
 	
 	@Override
-	public default Package resolvePackage(Name name)
+	default Package resolvePackage(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public default IClass resolveClass(Name name)
+	default IClass resolveClass(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public default IType resolveType(Name name)
+	default IType resolveType(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public default IDataMember resolveField(Name name)
+	default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 }

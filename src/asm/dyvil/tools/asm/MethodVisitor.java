@@ -31,72 +31,71 @@ package dyvil.tools.asm;
 
 public interface MethodVisitor extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
-	public void visitParameter(String name, int access);
+	void visitParameter(String name, int access);
 	
-	public AnnotationVisitor visitAnnotationDefault();
-	
-	@Override
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible);
+	AnnotationVisitor visitAnnotationDefault();
 	
 	@Override
-	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+	AnnotationVisitor visitAnnotation(String desc, boolean visible);
 	
-	public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible);
+	@Override
+	AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
-	public void visitAttribute(Attribute attr);
+	AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible);
 	
-	public void visitCode();
+	void visitAttribute(Attribute attr);
 	
-	public void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack);
+	void visitCode();
 	
-	public void visitInsn(int opcode);
+	void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack);
 	
-	public void visitIntInsn(int opcode, int operand);
+	void visitInsn(int opcode);
 	
-	public void visitVarInsn(int opcode, int var);
+	void visitIntInsn(int opcode, int operand);
 	
-	public void visitTypeInsn(int opcode, String type);
+	void visitVarInsn(int opcode, int var);
 	
-	public void visitFieldInsn(int opcode, String owner, String name, String desc);
+	void visitTypeInsn(int opcode, String type);
+	
+	void visitFieldInsn(int opcode, String owner, String name, String desc);
 	
 	@Deprecated
-	public default void visitMethodInsn(int opcode, String owner, String name, String desc)
+	default void visitMethodInsn(int opcode, String owner, String name, String desc)
 	{
 		this.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
-	};
+	}
 	
-	public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf);
+	void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf);
 	
-	public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs);
+	void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs);
 	
-	public void visitJumpInsn(int opcode, Label label);
+	void visitJumpInsn(int opcode, Label label);
 	
-	public void visitLabel(Label label);
+	void visitLabel(Label label);
 	
-	public void visitLdcInsn(Object cst);
+	void visitLdcInsn(Object cst);
 	
-	public void visitIincInsn(int var, int increment);
+	void visitIincInsn(int var, int increment);
 	
-	public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels);
+	void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels);
 	
-	public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels);
+	void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels);
 	
-	public void visitMultiANewArrayInsn(String desc, int dims);
+	void visitMultiANewArrayInsn(String desc, int dims);
 	
-	public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+	AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
-	public void visitTryCatchBlock(Label start, Label end, Label handler, String type);
+	void visitTryCatchBlock(Label start, Label end, Label handler, String type);
 	
-	public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+	AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
-	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index);
+	void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index);
 	
-	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc,
-			boolean visible);
+	AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible);
 			
-	public void visitLineNumber(int line, Label start);
+	void visitLineNumber(int line, Label start);
 	
-	public void visitMaxs(int maxStack, int maxLocals);
+	void visitMaxs(int maxStack, int maxLocals);
 	
-	public void visitEnd();
+	void visitEnd();
 }

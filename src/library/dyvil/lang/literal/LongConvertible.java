@@ -26,5 +26,5 @@ package dyvil.lang.literal;
  */
 public @interface LongConvertible
 {
-	public String methodName() default "apply";
+	String methodName() default "apply";
 }

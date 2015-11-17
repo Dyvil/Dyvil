@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface Intrinsic
 {
-	public int[]value();
+	int[]value();
 	
-	public String[] strings() default {};
+	String[] strings() default {};
 }

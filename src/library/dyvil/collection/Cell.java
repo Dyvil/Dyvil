@@ -12,38 +12,38 @@ public interface Cell<R, C, V> extends Serializable
 	 * 
 	 * @return the row
 	 */
-	public R getRow();
+	R getRow();
 	
 	/**
 	 * Returns the column stored by this cell
 	 * 
 	 * @return the column
 	 */
-	public C getColumn();
+	C getColumn();
 	
 	/**
 	 * Returns the value stored by this cell
 	 * 
 	 * @return the value
 	 */
-	public V getValue();
+	V getValue();
 	
 	/**
 	 * Converts this entry to a {@link Tuple3 Tuple}.
 	 * 
 	 * @return a tuple with this cell's row, column and value
 	 */
-	public default Tuple3<R, C, V> toTuple()
+	default Tuple3<R, C, V> toTuple()
 	{
 		return new Tuple3<R, C, V>(this.getRow(), this.getColumn(), this.getValue());
 	}
 	
-	public static String cellToString(Cell<?, ?, ?> cell)
+	static String cellToString(Cell<?, ?, ?> cell)
 	{
 		return "(" + cell.getRow() + ", " + cell.getColumn() + ") -> " + cell.getValue();
 	}
 	
-	public static boolean cellEquals(Cell<?, ?, ?> cell, Object obj)
+	static boolean cellEquals(Cell<?, ?, ?> cell, Object obj)
 	{
 		if (!(obj instanceof Cell))
 		{
@@ -53,13 +53,13 @@ public interface Cell<R, C, V> extends Serializable
 		return cellEquals(cell, (Cell) obj);
 	}
 	
-	public static boolean cellEquals(Cell<?, ?, ?> cell1, Cell<?, ?, ?> cell2)
+	static boolean cellEquals(Cell<?, ?, ?> cell1, Cell<?, ?, ?> cell2)
 	{
 		return Objects.equals(cell1.getRow(), cell2.getRow()) && Objects.equals(cell1.getColumn(), cell2.getColumn())
 				&& Objects.equals(cell1.getValue(), cell2.getValue());
 	}
 	
-	public static int cellHashCode(Cell<?, ?, ?> cell)
+	static int cellHashCode(Cell<?, ?, ?> cell)
 	{
 		Object row = cell.getRow();
 		Object column = cell.getColumn();

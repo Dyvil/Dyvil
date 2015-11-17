@@ -15,32 +15,32 @@ import dyvil.collection.view.ListView;
 @ArrayConvertible
 public interface MutableList<E> extends List<E>, MutableCollection<E>
 {
-	public static <E> MutableList<E> apply()
+	static <E> MutableList<E> apply()
 	{
 		return new ArrayList();
 	}
 	
-	public static <E> MutableList<E> apply(E element)
+	static <E> MutableList<E> apply(E element)
 	{
 		return new ArrayList(new Object[] { element }, 1, true);
 	}
 	
-	public static <E> MutableList<E> apply(E e1, E e2)
+	static <E> MutableList<E> apply(E e1, E e2)
 	{
 		return new ArrayList(new Object[] { e1, e2 }, 2, true);
 	}
 	
-	public static <E> MutableList<E> apply(E e1, E e2, E e3)
+	static <E> MutableList<E> apply(E e1, E e2, E e3)
 	{
 		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
-	public static <E> MutableList<E> apply(E... elements)
+	static <E> MutableList<E> apply(E... elements)
 	{
 		return new ArrayList(elements);
 	}
 	
-	public static <E> MutableList<E> fromArray(E... elements)
+	static <E> MutableList<E> fromArray(E... elements)
 	{
 		return new ArrayList(elements, true);
 	}
@@ -48,32 +48,32 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	// Accessors
 	
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	@Override
-	public Iterator<E> reverseIterator();
+	Iterator<E> reverseIterator();
 	
 	@Override
-	public E subscript(int index);
+	E subscript(int index);
 	
 	@Override
-	public E get(int index);
+	E get(int index);
 	
 	// Non-mutating Operations
 	
 	@Override
-	public MutableList<E> subList(int startIndex, int length);
+	MutableList<E> subList(int startIndex, int length);
 	
-	public default MutableList<E> withCapacity(int newCapacity)
+	default MutableList<E> withCapacity(int newCapacity)
 	{
 		return this.copy();
 	}
 	
 	@Override
-	public default MutableList<E> $plus(E element)
+	default MutableList<E> $plus(E element)
 	{
 		MutableList<E> copy = this.copy();
 		copy.$plus$eq(element);
@@ -81,7 +81,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<E> $minus(Object element)
+	default MutableList<E> $minus(Object element)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		if (element == null)
@@ -108,7 +108,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<? extends E> $minus$minus(Collection<?> collection)
+	default MutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		for (E e : this)
@@ -122,7 +122,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	default MutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
 		MutableList<E> copy = this.withCapacity(this.size() + collection.size());
 		copy.$plus$plus$eq(collection);
@@ -130,7 +130,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<? extends E> $amp(Collection<? extends E> collection)
+	default MutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
 		MutableList<E> copy = this.emptyCopy(Math.min(this.size(), collection.size()));
 		for (E e : this)
@@ -144,7 +144,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default <R> MutableList<R> mapped(Function<? super E, ? extends R> mapper)
+	default <R> MutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
 		MutableList<R> copy = (MutableList<R>) this.copy();
 		copy.map((Function) mapper);
@@ -152,7 +152,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default <R> MutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	default <R> MutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
 		MutableList<R> copy = this.emptyCopy(this.size() << 2);
 		for (E e : this)
@@ -166,7 +166,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<E> filtered(Predicate<? super E> condition)
+	default MutableList<E> filtered(Predicate<? super E> condition)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		for (E e : this)
@@ -184,10 +184,10 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	 * implementors to implement this method.
 	 */
 	@Override
-	public List<E> reversed();
+	List<E> reversed();
 	
 	@Override
-	public default MutableList<E> sorted()
+	default MutableList<E> sorted()
 	{
 		MutableList<E> copy = this.copy();
 		copy.sort();
@@ -195,7 +195,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<E> sorted(Comparator<? super E> comparator)
+	default MutableList<E> sorted(Comparator<? super E> comparator)
 	{
 		MutableList<E> copy = this.copy();
 		copy.sort(comparator);
@@ -203,7 +203,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<E> distinct()
+	default MutableList<E> distinct()
 	{
 		MutableList<E> copy = this.copy();
 		copy.distinguish();
@@ -211,7 +211,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableList<E> distinct(Comparator<? super E> comparator)
+	default MutableList<E> distinct(Comparator<? super E> comparator)
 	{
 		MutableList<E> copy = this.copy();
 		copy.distinct(comparator);
@@ -221,98 +221,98 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public void $plus$eq(E element);
+	void $plus$eq(E element);
 	
 	@Override
-	public void subscript_$eq(int index, E element);
+	void subscript_$eq(int index, E element);
 	
 	@Override
-	public E set(int index, E element);
+	E set(int index, E element);
 	
 	@Override
-	public default boolean add(E element)
+	default boolean add(E element)
 	{
 		this.$plus$eq(element);
 		return true;
 	}
 	
 	@Override
-	public E add(int index, E element);
+	E add(int index, E element);
 	
 	@Override
-	public void removeAt(int index);
+	void removeAt(int index);
 	
 	@Override
-	public boolean remove(Object element);
+	boolean remove(Object element);
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	@Override
-	public void reverse();
+	void reverse();
 	
 	@Override
-	public void sort();
+	void sort();
 	
 	@Override
-	public void sort(Comparator<? super E> comparator);
+	void sort(Comparator<? super E> comparator);
 	
 	@Override
-	public void distinguish();
+	void distinguish();
 	
 	@Override
-	public void distinguish(Comparator<? super E> comparator);
+	void distinguish(Comparator<? super E> comparator);
 	
 	// Search Operations
 	
 	@Override
-	public int indexOf(Object element);
+	int indexOf(Object element);
 	
 	@Override
-	public int lastIndexOf(Object element);
+	int lastIndexOf(Object element);
 	
 	// Copying
 	
 	@Override
-	public MutableList<E> copy();
+	MutableList<E> copy();
 	
 	@Override
-	public default MutableList<E> mutable()
+	default MutableList<E> mutable()
 	{
 		return this;
 	}
 	
 	@Override
-	public default MutableList<E> mutableCopy()
+	default MutableList<E> mutableCopy()
 	{
 		return this.copy();
 	}
 	
 	@Override
-	public <R> MutableList<R> emptyCopy();
+	<R> MutableList<R> emptyCopy();
 	
-	public default <R> MutableList<R> emptyCopy(int newCapacity)
+	default <R> MutableList<R> emptyCopy(int newCapacity)
 	{
 		return this.emptyCopy();
 	}
 	
 	@Override
-	public ImmutableList<E> immutable();
+	ImmutableList<E> immutable();
 	
 	@Override
-	public default ImmutableList<E> immutableCopy()
+	default ImmutableList<E> immutableCopy()
 	{
 		return this.immutable();
 	}
 	
 	@Override
-	public default ImmutableList<E> view()
+	default ImmutableList<E> view()
 	{
 		return new ListView(this);
 	}

@@ -32,12 +32,12 @@ package dyvil.tools.asm;
 public interface FieldVisitor extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
 	@Override
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible);
+	AnnotationVisitor visitAnnotation(String desc, boolean visible);
 	
 	@Override
-	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+	AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
-	public void visitAttribute(Attribute attr);
+	void visitAttribute(Attribute attr);
 	
-	public void visitEnd();
+	void visitEnd();
 }

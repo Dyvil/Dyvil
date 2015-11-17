@@ -2,19 +2,19 @@ package dyvil.tools.compiler.ast.generic;
 
 public interface IGeneric
 {
-	public void setGeneric();
+	void setGeneric();
 	
-	public boolean isGeneric();
+	boolean isGeneric();
 	
-	public int genericCount();
+	int genericCount();
 	
-	public void setTypeVariables(ITypeVariable[] typeVars, int count);
+	void setTypeVariables(ITypeVariable[] typeVars, int count);
 	
-	public void setTypeVariable(int index, ITypeVariable var);
+	void setTypeVariable(int index, ITypeVariable var);
 	
-	public void addTypeVariable(ITypeVariable var);
+	void addTypeVariable(ITypeVariable var);
 	
-	public ITypeVariable[] getTypeVariables();
+	ITypeVariable[] getTypeVariables();
 	
-	public ITypeVariable getTypeVariable(int index);
+	ITypeVariable getTypeVariable(int index);
 }

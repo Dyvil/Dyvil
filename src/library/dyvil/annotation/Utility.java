@@ -22,5 +22,5 @@ public @interface Utility
 	 * 
 	 * @return the classes
 	 */
-	public Class[]value() default {};
+	Class[]value() default {};
 }

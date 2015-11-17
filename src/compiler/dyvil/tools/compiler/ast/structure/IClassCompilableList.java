@@ -4,9 +4,9 @@ import dyvil.tools.compiler.backend.IClassCompilable;
 
 public interface IClassCompilableList
 {
-	public int compilableCount();
+	int compilableCount();
 	
-	public void addCompilable(IClassCompilable compilable);
+	void addCompilable(IClassCompilable compilable);
 	
-	public IClassCompilable getCompilable(int index);
+	IClassCompilable getCompilable(int index);
 }

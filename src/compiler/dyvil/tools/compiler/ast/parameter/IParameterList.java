@@ -2,21 +2,21 @@ package dyvil.tools.compiler.ast.parameter;
 
 public interface IParameterList
 {
-	public int parameterCount();
+	int parameterCount();
 	
-	public void setParameter(int index, IParameter param);
+	void setParameter(int index, IParameter param);
 	
-	public void addParameter(IParameter param);
+	void addParameter(IParameter param);
 	
-	public IParameter getParameter(int index);
+	IParameter getParameter(int index);
 	
-	public IParameter[] getParameters();
+	IParameter[] getParameters();
 	
-	public default void setVarargs()
+	default void setVarargs()
 	{
 	}
 	
-	public default boolean isVarargs()
+	default boolean isVarargs()
 	{
 		return false;
 	}

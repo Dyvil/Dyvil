@@ -31,39 +31,39 @@ package dyvil.tools.asm;
 
 public interface SignatureVisitor
 {
-	public final static char	EXTENDS		= '+';
-	public final static char	SUPER		= '-';
-	public final static char	INSTANCEOF	= '=';
+	char	EXTENDS		= '+';
+	char	SUPER		= '-';
+	char	INSTANCEOF	= '=';
 	
-	public void visitFormalTypeParameter(String name);
+	void visitFormalTypeParameter(String name);
 	
-	public SignatureVisitor visitClassBound();
+	SignatureVisitor visitClassBound();
 	
-	public SignatureVisitor visitInterfaceBound();
+	SignatureVisitor visitInterfaceBound();
 	
-	public SignatureVisitor visitSuperclass();
+	SignatureVisitor visitSuperclass();
 	
-	public SignatureVisitor visitInterface();
+	SignatureVisitor visitInterface();
 	
-	public SignatureVisitor visitParameterType();
+	SignatureVisitor visitParameterType();
 	
-	public SignatureVisitor visitReturnType();
+	SignatureVisitor visitReturnType();
 	
-	public SignatureVisitor visitExceptionType();
+	SignatureVisitor visitExceptionType();
 	
-	public void visitBaseType(char descriptor);
+	void visitBaseType(char descriptor);
 	
-	public void visitTypeVariable(String name);
+	void visitTypeVariable(String name);
 	
-	public SignatureVisitor visitArrayType();
+	SignatureVisitor visitArrayType();
 	
-	public void visitClassType(String name);
+	void visitClassType(String name);
 	
-	public void visitInnerClassType(String name);
+	void visitInnerClassType(String name);
 	
-	public void visitTypeArgument();
+	void visitTypeArgument();
 	
-	public SignatureVisitor visitTypeArgument(char wildcard);
+	SignatureVisitor visitTypeArgument(char wildcard);
 	
-	public void visitEnd();
+	void visitEnd();
 }

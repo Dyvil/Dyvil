@@ -20,85 +20,85 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 {
 	// Associated Class
 	
-	public void setTheClass(IClass iclass);
+	void setTheClass(IClass iclass);
 	
-	public IClass getTheClass();
+	IClass getTheClass();
 	
 	// Fields
 	
-	public int fieldCount();
+	int fieldCount();
 	
 	@Override
-	public void addField(IField field);
+	void addField(IField field);
 	
-	public IField getField(int index);
+	IField getField(int index);
 	
-	public IField getField(Name name);
+	IField getField(Name name);
 	
-	public default IField getInstanceField()
+	default IField getInstanceField()
 	{
 		return null;
 	}
 	
 	// Properties
 	
-	public int propertyCount();
+	int propertyCount();
 	
 	@Override
-	public void addProperty(IProperty property);
+	void addProperty(IProperty property);
 	
-	public IProperty getProperty(int index);
+	IProperty getProperty(int index);
 	
-	public IProperty getProperty(Name name);
+	IProperty getProperty(Name name);
 	
 	// Constructors
 	
-	public int constructorCount();
+	int constructorCount();
 	
 	@Override
-	public void addConstructor(IConstructor constructor);
+	void addConstructor(IConstructor constructor);
 	
-	public IConstructor getConstructor(int index);
+	IConstructor getConstructor(int index);
 	
-	public IConstructor getConstructor(IParameter[] parameters, int parameterCount);
+	IConstructor getConstructor(IParameter[] parameters, int parameterCount);
 	
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
+	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	// Methods
 	
-	public int methodCount();
+	int methodCount();
 	
 	@Override
-	public void addMethod(IMethod method);
+	void addMethod(IMethod method);
 	
-	public IMethod getMethod(int index);
+	IMethod getMethod(int index);
 	
-	public IMethod getMethod(Name name);
+	IMethod getMethod(Name name);
 	
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
+	IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
 	
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
-	public default IMethod getFunctionalMethod()
+	default IMethod getFunctionalMethod()
 	{
 		return null;
 	}
 	
-	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
 	
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
+	void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
 	
 	// Phases
 	
-	public void resolveTypes(MarkerList markers);
+	void resolveTypes(MarkerList markers);
 	
-	public void resolve(MarkerList markers);
+	void resolve(MarkerList markers);
 	
-	public void checkTypes(MarkerList markers);
+	void checkTypes(MarkerList markers);
 	
-	public void check(MarkerList markers);
+	void check(MarkerList markers);
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup();
+	void cleanup();
 }

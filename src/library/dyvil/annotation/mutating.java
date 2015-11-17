@@ -20,7 +20,7 @@ import dyvil.util.Immutable;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface mutating
 {
-	public static final String VALUE_DEFAULT = "Invalid invocation of mutating method {method} on immutable type {type}";
+	String VALUE_DEFAULT = "Invalid invocation of mutating method {method} on immutable type {type}";
 	
 	/**
 	 * Returns the error to be reported by the compiler when a mutating method
@@ -35,5 +35,5 @@ public @interface mutating
 	 * 
 	 * @return the error to be reported by the compiler
 	 */
-	public String value() default VALUE_DEFAULT;
+	String value() default VALUE_DEFAULT;
 }

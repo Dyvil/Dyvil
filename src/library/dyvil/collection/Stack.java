@@ -26,10 +26,10 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @return the number of elements in this Stack.
 	 */
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	/**
 	 * Returns true if and if only this stack contains the given {@code element}
@@ -40,7 +40,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @return true iff this stack contains the element
 	 */
 	@Override
-	public default boolean contains(Object element)
+	default boolean contains(Object element)
 	{
 		return Collection.iterableContains(this, element);
 	}
@@ -48,7 +48,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	/**
 	 * Removes all elements from this stack.
 	 */
-	public void clear();
+	void clear();
 	
 	/**
 	 * Adds the given element to the top of this stack, so that it becomes the
@@ -57,7 +57,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @param element
 	 *            the element to add
 	 */
-	public void push(E e);
+	void push(E e);
 	
 	/**
 	 * Adds all elements in the given collection of {@code elements} to the top
@@ -66,7 +66,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @param elements
 	 *            the elements to add
 	 */
-	public default void pushAll(Iterable<? extends E> elements)
+	default void pushAll(Iterable<? extends E> elements)
 	{
 		for (E e : elements)
 		{
@@ -80,7 +80,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * 
 	 * @return the top element of this stack.
 	 */
-	public E pop();
+	E pop();
 	
 	/**
 	 * Removes the given number of elements from the top of this stack, as if by
@@ -89,7 +89,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @param count
 	 *            the number of elements to remove
 	 */
-	public default void pop(int count)
+	default void pop(int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -103,16 +103,16 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * 
 	 * @return the top element of this stack.
 	 */
-	public E peek();
+	E peek();
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	@Override
-	public void filter(Predicate<? super E> condition);
+	void filter(Predicate<? super E> condition);
 	
 	/**
 	 * Returns a copy of this stack that contains the same elements as this
@@ -120,5 +120,5 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * 
 	 * @return a copy of this stack.
 	 */
-	public Stack<E> copy();
+	Stack<E> copy();
 }

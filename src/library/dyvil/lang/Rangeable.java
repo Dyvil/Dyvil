@@ -2,12 +2,12 @@ package dyvil.lang;
 
 public interface Rangeable<T extends Rangeable<T>> extends Ordered<T>
 {
-	public T next();
+	T next();
 	
-	public T previous();
+	T previous();
 	
-	public int distanceTo(T o);
+	int distanceTo(T o);
 	
 	@Override
-	public int compareTo(T o);
+	int compareTo(T o);
 }

@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.parameter.IParameterized;
 
 public interface ICallableMember extends IMember, IParameterized, IExceptionList, IValueConsumer
 {
-	public IValue getValue();
+	IValue getValue();
 	
 	@Override
-	public void setValue(IValue value);
+	void setValue(IValue value);
 }

@@ -9,19 +9,19 @@ import dyvil.tools.parsing.position.ICodePosition;
 public interface IInstruction extends IASTNode
 {
 	@Override
-	public default ICodePosition getPosition()
+	default ICodePosition getPosition()
 	{
 		return null;
 	}
 	
 	@Override
-	public default void setPosition(ICodePosition position)
+	default void setPosition(ICodePosition position)
 	{
 	}
 	
-	public void resolve(MarkerList markers, Bytecode bytecode);
+	void resolve(MarkerList markers, Bytecode bytecode);
 	
 	// Compilation
 	
-	public void write(MethodWriter writer) throws BytecodeException;
+	void write(MethodWriter writer) throws BytecodeException;
 }

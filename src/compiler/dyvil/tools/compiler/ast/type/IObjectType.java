@@ -14,121 +14,121 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public interface IObjectType extends IType
 {
 	@Override
-	public default boolean isPrimitive()
+	default boolean isPrimitive()
 	{
 		return false;
 	}
 	
 	@Override
-	public default int getTypecode()
+	default int getTypecode()
 	{
 		return -1;
 	}
 	
 	@Override
-	public default ITypeVariable getTypeVariable()
+	default ITypeVariable getTypeVariable()
 	{
 		return null;
 	}
 	
 	@Override
-	public default IType getObjectType()
+	default IType getObjectType()
 	{
 		return this;
 	}
 	
 	@Override
-	public default IType getSimpleRefType()
+	default IType getSimpleRefType()
 	{
 		return Types.getSimpleRef(this);
 	}
 	
 	@Override
-	public default ReferenceType getRefType()
+	default ReferenceType getRefType()
 	{
 		return Types.getRef(this);
 	}
 	
 	@Override
-	public default boolean isArrayType()
+	default boolean isArrayType()
 	{
 		return false;
 	}
 	
 	@Override
-	public default int getArrayDimensions()
+	default int getArrayDimensions()
 	{
 		return 0;
 	}
 	
 	@Override
-	public default IType getElementType()
+	default IType getElementType()
 	{
 		return this;
 	}
 	
 	@Override
-	public default IClass getArrayClass()
+	default IClass getArrayClass()
 	{
 		return Types.getObjectArray();
 	}
 	
 	@Override
-	public default IMethod getBoxMethod()
+	default IMethod getBoxMethod()
 	{
 		return null;
 	}
 	
 	@Override
-	public default IMethod getUnboxMethod()
+	default IMethod getUnboxMethod()
 	{
 		return null;
 	}
 	
 	@Override
-	public default boolean classEquals(IType type)
+	default boolean classEquals(IType type)
 	{
 		return this.getTheClass() == type.getTheClass() && !type.isPrimitive();
 	}
 	
 	@Override
-	public default int getLoadOpcode()
+	default int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;
 	}
 	
 	@Override
-	public default int getArrayLoadOpcode()
+	default int getArrayLoadOpcode()
 	{
 		return Opcodes.AALOAD;
 	}
 	
 	@Override
-	public default int getStoreOpcode()
+	default int getStoreOpcode()
 	{
 		return Opcodes.ASTORE;
 	}
 	
 	@Override
-	public default int getArrayStoreOpcode()
+	default int getArrayStoreOpcode()
 	{
 		return Opcodes.AASTORE;
 	}
 	
 	@Override
-	public default int getReturnOpcode()
+	default int getReturnOpcode()
 	{
 		return Opcodes.ARETURN;
 	}
 	
 	@Override
-	public default Object getFrameType()
+	default Object getFrameType()
 	{
 		return this.getInternalName();
 	}
 	
 	@Override
-	public default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
+	default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
 		if (target == this)
 		{

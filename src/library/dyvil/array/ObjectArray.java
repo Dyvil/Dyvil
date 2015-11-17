@@ -30,19 +30,19 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface ObjectArray
 {
-	public static final Object[] EMPTY = new Object[0];
+	Object[] EMPTY = new Object[0];
 	
-	public static <T> T[] apply()
+	static <T> T[] apply()
 	{
 		return (T[]) EMPTY;
 	}
 	
-	public static <@Reified T> T[] apply(int count, Class<T> type)
+	static <@Reified T> T[] apply(int count, Class<T> type)
 	{
 		return (T[]) Array.newInstance(type, count);
 	}
 	
-	public static <@Reified T> T[] repeat(int count, T repeatedValue, Class<T> type)
+	static <@Reified T> T[] repeat(int count, T repeatedValue, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -52,7 +52,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <@Reified T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
+	static <@Reified T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -62,7 +62,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <@Reified T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
+	static <@Reified T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end) + 1);
@@ -73,7 +73,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	public static <@Reified T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
+	static <@Reified T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end));
@@ -85,18 +85,18 @@ public interface ObjectArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	public static @infix <T> int length(T[] array)
+	static @infix <T> int length(T[] array)
 	{
 		return array.length;
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, AALOAD })
-	public static @infix <T> T subscript(T[] array, int i)
+	static @infix <T> T subscript(T[] array, int i)
 	{
 		return array[i];
 	}
 	
-	public static @infix <T> T[] subscript(T[] array, Range<Int> range)
+	static @infix <T> T[] subscript(T[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -109,12 +109,12 @@ public interface ObjectArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, AASTORE })
-	public static @infix <T> void subscript_$eq(T[] array, int i, T v)
+	static @infix <T> void subscript_$eq(T[] array, int i, T v)
 	{
 		array[i] = v;
 	}
 	
-	public static @infix <T> void subscript_$eq(T[] array, Range<Int> range, T[] values)
+	static @infix <T> void subscript_$eq(T[] array, Range<Int> range, T[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -125,12 +125,12 @@ public interface ObjectArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	public static @infix boolean isEmpty(int[] array)
+	static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	public static @infix <T> void forEach(T[] array, Consumer<? super T> action)
+	static @infix <T> void forEach(T[] array, Consumer<? super T> action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
@@ -141,22 +141,22 @@ public interface ObjectArray
 	
 	// Operators
 	
-	public static @infix @inline <T> boolean $qmark(T[] array, T v)
+	static @infix @inline <T> boolean $qmark(T[] array, T v)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
 	
-	public static @infix @inline <T> boolean $eq$eq(T[] array1, T[] array2)
+	static @infix @inline <T> boolean $eq$eq(T[] array1, T[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline <T> boolean $bang$eq(T[] array1, T[] array2)
+	static @infix @inline <T> boolean $bang$eq(T[] array1, T[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	public static @infix <T> T[] $plus(T[] array, T v)
+	static @infix <T> T[] $plus(T[] array, T v)
 	{
 		int len = array.length;
 		T[] res = (T[]) Array.newInstance(array.getClass().getComponentType(), len + 1);
@@ -165,7 +165,7 @@ public interface ObjectArray
 		return res;
 	}
 	
-	public static @infix <T> T[] $plus$plus(T[] array1, T[] array2)
+	static @infix <T> T[] $plus$plus(T[] array1, T[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -175,7 +175,7 @@ public interface ObjectArray
 		return res;
 	}
 	
-	public static @infix <T> T[] $minus(T[] array, T v)
+	static @infix <T> T[] $minus(T[] array, T v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -198,7 +198,7 @@ public interface ObjectArray
 		return res;
 	}
 	
-	public static @infix <T> T[] $minus$minus(T[] array1, T[] array2)
+	static @infix <T> T[] $minus$minus(T[] array1, T[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -218,7 +218,7 @@ public interface ObjectArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix <T> T[] $amp(T[] array1, T[] array2)
+	static @infix <T> T[] $amp(T[] array1, T[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -238,7 +238,7 @@ public interface ObjectArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix <T, @Reified U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
+	static @infix <T, @Reified U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
 	{
 		int len = array.length;
 		U[] res = (U[]) Array.newInstance(type, len);
@@ -249,7 +249,7 @@ public interface ObjectArray
 		return res;
 	}
 	
-	public static @infix <T, @Reified U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
+	static @infix <T, @Reified U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
 	{
 		int len = array.length;
 		int size = 0;
@@ -273,7 +273,7 @@ public interface ObjectArray
 		return res;
 	}
 	
-	public static @infix <T> T[] filtered(T[] array, Predicate<T> condition)
+	static @infix <T> T[] filtered(T[] array, Predicate<T> condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -292,31 +292,31 @@ public interface ObjectArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix <T> T[] sorted(T[] array)
+	static @infix <T> T[] sorted(T[] array)
 	{
 		T[] res = array.clone();
 		Arrays.sort(res);
 		return res;
 	}
 	
-	public static @infix <T> T[] sorted(T[] array, Comparator<? super T> comparator)
+	static @infix <T> T[] sorted(T[] array, Comparator<? super T> comparator)
 	{
 		T[] res = array.clone();
-		Arrays.<T> sort(array, comparator);
+		Arrays.sort(array, comparator);
 		return res;
 	}
 	
-	public static @infix <T> T[] newArray(Class<T> type, int size)
+	static @infix <T> T[] newArray(Class<T> type, int size)
 	{
 		return (T[]) Array.newInstance(type, size);
 	}
 	
-	public static @infix @inline <T> Class<T> getComponentType(T[] array)
+	static @infix @inline <T> Class<T> getComponentType(T[] array)
 	{
 		return (Class<T>) array.getClass().getComponentType();
 	}
 	
-	public static @infix <T> Class getDeepComponentType(T[] array)
+	static @infix <T> Class getDeepComponentType(T[] array)
 	{
 		Class ret = array.getClass();
 		while (true)
@@ -330,19 +330,19 @@ public interface ObjectArray
 		}
 	}
 	
-	public static @infix <T> Class<T[]> getArrayType(Class<T> componentType)
+	static @infix <T> Class<T[]> getArrayType(Class<T> componentType)
 	{
 		return (Class<T[]>) Array.newInstance(componentType, 0).getClass();
 	}
 	
 	// Search Operations
 	
-	public static @infix <T> int indexOf(T[] array, T v)
+	static @infix <T> int indexOf(T[] array, T v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	public static @infix <T> int indexOf(T[] array, T v, int start)
+	static @infix <T> int indexOf(T[] array, T v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -354,12 +354,12 @@ public interface ObjectArray
 		return -1;
 	}
 	
-	public static @infix <T> int lastIndexOf(T[] array, T v)
+	static @infix <T> int lastIndexOf(T[] array, T v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	public static @infix <T> int lastIndexOf(T[] array, T v, int start)
+	static @infix <T> int lastIndexOf(T[] array, T v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -371,36 +371,36 @@ public interface ObjectArray
 		return -1;
 	}
 	
-	public static @infix @inline <T> boolean contains(T[] array, T v)
+	static @infix @inline <T> boolean contains(T[] array, T v)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
 	
-	public static @infix @inline <T> boolean in(T v, T[] array)
+	static @infix @inline <T> boolean in(T v, T[] array)
 	{
 		return indexOf(array, v, 0) != -1;
 	}
 	
 	// Copying
 	
-	public static @infix <T> T[] copy(T[] array)
+	static @infix <T> T[] copy(T[] array)
 	{
 		return array.clone();
 	}
 	
-	public static @infix <T> T[] copy(T[] array, int newLength)
+	static @infix <T> T[] copy(T[] array, int newLength)
 	{
 		return copy(array, newLength, (Class<T>) array.getClass().getComponentType());
 	}
 	
-	public static @infix <T, N> N[] copy(T[] array, int newLength, Class<N> type)
+	static @infix <T, N> N[] copy(T[] array, int newLength, Class<N> type)
 	{
 		N[] newArray = (N[]) Array.newInstance(type, newLength);
 		System.arraycopy(array, 0, newArray, 0, newLength);
 		return newArray;
 	}
 	
-	public static @infix boolean[] unboxed(Boolean[] array)
+	static @infix boolean[] unboxed(Boolean[] array)
 	{
 		int len = array.length;
 		boolean[] unboxed = new boolean[len];
@@ -411,7 +411,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix byte[] unboxed(Byte[] array)
+	static @infix byte[] unboxed(Byte[] array)
 	{
 		int len = array.length;
 		byte[] unboxed = new byte[len];
@@ -422,7 +422,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix short[] unboxed(Short[] array)
+	static @infix short[] unboxed(Short[] array)
 	{
 		int len = array.length;
 		short[] unboxed = new short[len];
@@ -433,7 +433,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix char[] unboxed(Char[] array)
+	static @infix char[] unboxed(Char[] array)
 	{
 		int len = array.length;
 		char[] unboxed = new char[len];
@@ -444,7 +444,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix int[] unboxed(Int[] array)
+	static @infix int[] unboxed(Int[] array)
 	{
 		int len = array.length;
 		int[] unboxed = new int[len];
@@ -455,7 +455,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix long[] unboxed(Long[] array)
+	static @infix long[] unboxed(Long[] array)
 	{
 		int len = array.length;
 		long[] unboxed = new long[len];
@@ -466,7 +466,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix float[] unboxed(Float[] array)
+	static @infix float[] unboxed(Float[] array)
 	{
 		int len = array.length;
 		float[] unboxed = new float[len];
@@ -477,7 +477,7 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix double[] unboxed(Double[] array)
+	static @infix double[] unboxed(Double[] array)
 	{
 		int len = array.length;
 		double[] unboxed = new double[len];
@@ -488,34 +488,34 @@ public interface ObjectArray
 		return unboxed;
 	}
 	
-	public static @infix <T> Iterable<T> toIterable(T[] array)
+	static @infix <T> Iterable<T> toIterable(T[] array)
 	{
 		return new ArrayList<T>(array, true);
 	}
 	
 	// toString, equals and hashCode
 	
-	public static @infix @inline <T> boolean equals(T[] array1, T[] array2)
+	static @infix @inline <T> boolean equals(T[] array1, T[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline <T> boolean deepEquals(T[] array1, T[] array2)
+	static @infix @inline <T> boolean deepEquals(T[] array1, T[] array2)
 	{
 		return Arrays.deepEquals(array1, array2);
 	}
 	
-	public static @infix @inline <T> int hashCode(T[] array)
+	static @infix @inline <T> int hashCode(T[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	public static @infix @inline <T> int deepHashCode(T[] array)
+	static @infix @inline <T> int deepHashCode(T[] array)
 	{
 		return Arrays.deepHashCode(array);
 	}
 	
-	public static @infix <T> String toString(T[] array)
+	static @infix <T> String toString(T[] array)
 	{
 		if (array == null)
 		{
@@ -538,7 +538,7 @@ public interface ObjectArray
 		return buf.append(']').toString();
 	}
 	
-	public static @infix void toString(Object[] array, StringBuilder builder)
+	static @infix void toString(Object[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
@@ -562,7 +562,7 @@ public interface ObjectArray
 		builder.append(']');
 	}
 	
-	public static @infix String deepToString(Object[] array)
+	static @infix String deepToString(Object[] array)
 	{
 		if (array == null)
 		{
@@ -586,7 +586,7 @@ public interface ObjectArray
 		return buf.append(']').toString();
 	}
 	
-	public static @infix void deepToString(Object[] array, StringBuilder builder)
+	static @infix void deepToString(Object[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
@@ -611,7 +611,7 @@ public interface ObjectArray
 		builder.append(']');
 	}
 	
-	public static @infix void toString(Object o, StringBuilder builder)
+	static @infix void toString(Object o, StringBuilder builder)
 	{
 		if (o == null)
 		{

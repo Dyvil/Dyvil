@@ -16,27 +16,27 @@ public interface Set<E> extends Collection<E>
 	@internal
 	Object VALUE = new Object();
 	
-	public static <E> ImmutableSet<E> fromNil()
+	static <E> ImmutableSet<E> fromNil()
 	{
 		return ImmutableSet.apply();
 	}
 	
-	public static <E> MutableSet<E> apply()
+	static <E> MutableSet<E> apply()
 	{
 		return MutableSet.apply();
 	}
 	
-	public static <E> ImmutableSet<E> apply(E element)
+	static <E> ImmutableSet<E> apply(E element)
 	{
 		return ImmutableSet.apply(element);
 	}
 	
-	public static <E> ImmutableSet<E> apply(E... elements)
+	static <E> ImmutableSet<E> apply(E... elements)
 	{
 		return ImmutableSet.apply(elements);
 	}
 	
-	public static <E> ImmutableSet<E> fromArray(E... elements)
+	static <E> ImmutableSet<E> fromArray(E... elements)
 	{
 		return ImmutableSet.fromArray(elements);
 	}
@@ -44,19 +44,19 @@ public interface Set<E> extends Collection<E>
 	// Accessors
 	
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public default boolean isDistinct()
+	default boolean isDistinct()
 	{
 		return true;
 	}
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	@Override
-	public default Spliterator<E> spliterator()
+	default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.DISTINCT);
 	}
@@ -64,32 +64,32 @@ public interface Set<E> extends Collection<E>
 	// Non-mutating Operations
 	
 	@Override
-	public Set<E> $plus(E element);
+	Set<E> $plus(E element);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'union' Set operation and
 	 * delegates to {@link #$bar(Collection)}.
 	 */
 	@Override
-	public default Set<? extends E> $plus$plus(Collection<? extends E> collection)
+	default Set<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
 		return this.$bar(collection);
 	}
 	
 	@Override
-	public Set<E> $minus(Object element);
+	Set<E> $minus(Object element);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'subtract' Set operation.
 	 */
 	@Override
-	public Set<? extends E> $minus$minus(Collection<?> collection);
+	Set<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' Set operation.
 	 */
 	@Override
-	public Set<? extends E> $amp(Collection<? extends E> collection);
+	Set<? extends E> $amp(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that contains all elements of this collection plus
@@ -103,7 +103,7 @@ public interface Set<E> extends Collection<E>
 	 *         all elements in the given collection that are not present in this
 	 *         collection.
 	 */
-	public Set<? extends E> $bar(Collection<? extends E> collection);
+	Set<? extends E> $bar(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that contains all elements that are present in
@@ -115,16 +115,16 @@ public interface Set<E> extends Collection<E>
 	 * @return a collection that contains all elements that are present in
 	 *         either this or the given collection, but not in both.
 	 */
-	public Set<? extends E> $up(Collection<? extends E> collection);
+	Set<? extends E> $up(Collection<? extends E> collection);
 	
 	@Override
-	public <R> Set<R> mapped(Function<? super E, ? extends R> mapper);
+	<R> Set<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	@Override
-	public <R> Set<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+	<R> Set<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
 	
 	@Override
-	public Set<E> filtered(Predicate<? super E> condition);
+	Set<E> filtered(Predicate<? super E> condition);
 	
 	// Mutating Operations
 	
@@ -135,7 +135,7 @@ public interface Set<E> extends Collection<E>
 	 * @param collection
 	 *            the collection to add
 	 */
-	public default void $bar$eq(Collection<? extends E> collection)
+	default void $bar$eq(Collection<? extends E> collection)
 	{
 		this.addAll(collection);
 	}
@@ -147,26 +147,26 @@ public interface Set<E> extends Collection<E>
 	 * @param collection
 	 *            the collection to XOR with
 	 */
-	public default void $up$eq(Collection<? extends E> collection)
+	default void $up$eq(Collection<? extends E> collection)
 	{
 		this.exclusiveOr(collection);
 	}
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	@Override
-	public boolean add(E element);
+	boolean add(E element);
 	
 	@Override
-	public boolean remove(Object element);
+	boolean remove(Object element);
 	
-	public default boolean union(Collection<? extends E> collection)
+	default boolean union(Collection<? extends E> collection)
 	{
 		return this.addAll(collection);
 	}
 	
-	public default boolean exclusiveOr(Collection<? extends E> collection)
+	default boolean exclusiveOr(Collection<? extends E> collection)
 	{
 		boolean changed = false;
 		for (E element : collection)
@@ -189,37 +189,37 @@ public interface Set<E> extends Collection<E>
 	}
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	// Copying and Views
 	
 	@Override
-	public Set<E> copy();
+	Set<E> copy();
 	
 	@Override
-	public MutableSet<E> mutable();
+	MutableSet<E> mutable();
 	
 	@Override
-	public MutableSet<E> mutableCopy();
+	MutableSet<E> mutableCopy();
 	
 	@Override
-	public ImmutableSet<E> immutable();
+	ImmutableSet<E> immutable();
 	
 	@Override
-	public ImmutableSet<E> immutableCopy();
+	ImmutableSet<E> immutableCopy();
 	
 	@Override
-	public ImmutableSet<E> view();
+	ImmutableSet<E> view();
 	
 	@Override
-	public java.util.Set<E> toJava();
+	java.util.Set<E> toJava();
 	
 	// Utility Methods
 	
-	public static <E> boolean setEquals(Set<E> set, Object o)
+	static <E> boolean setEquals(Set<E> set, Object o)
 	{
 		if (!(o instanceof Set))
 		{
@@ -229,12 +229,12 @@ public interface Set<E> extends Collection<E>
 		return setEquals(set, (Set) o);
 	}
 	
-	public static <E> boolean setEquals(Set<E> c1, Set<E> c2)
+	static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
 		return Collection.unorderedEquals(c1, c2);
 	}
 	
-	public static <E> int setHashCode(Set<E> set)
+	static <E> int setHashCode(Set<E> set)
 	{
 		int sum = 0;
 		int product = 1;
@@ -251,7 +251,7 @@ public interface Set<E> extends Collection<E>
 		return sum * 31 + product;
 	}
 	
-	public static @internal int distinct(Object[] array, int size)
+	static @internal int distinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -271,7 +271,7 @@ public interface Set<E> extends Collection<E>
 		return size;
 	}
 	
-	public static @internal int sortDistinct(Object[] array, int size)
+	static @internal int sortDistinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -282,7 +282,7 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 	
-	public static @internal <T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
+	static @internal <T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
 	{
 		if (size < 2)
 		{
@@ -294,7 +294,7 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 	
-	public static @internal int distinctSorted(Object[] array, int size)
+	static @internal int distinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -319,7 +319,7 @@ public interface Set<E> extends Collection<E>
 		return len + 1;
 	}
 	
-	public static @internal boolean isDistinct(Object[] array, int size)
+	static @internal boolean isDistinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -340,7 +340,7 @@ public interface Set<E> extends Collection<E>
 		return true;
 	}
 	
-	public static @internal boolean isDistinctSorted(Object[] array, int size)
+	static @internal boolean isDistinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{

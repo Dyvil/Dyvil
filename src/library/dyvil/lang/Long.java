@@ -446,7 +446,7 @@ public class Long implements Integer, Serializable
 	// generic operators
 	
 	@Override
-	public @prefix Long $plus() { return this; };
+	public @prefix Long $plus() { return this; }
 	
 	@Override
 	public @prefix Long $minus() { return Long.apply(-this.value); }

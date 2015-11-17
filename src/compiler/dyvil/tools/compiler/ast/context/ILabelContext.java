@@ -6,7 +6,7 @@ import dyvil.tools.parsing.Name;
 
 public interface ILabelContext
 {
-	public Label resolveLabel(Name name);
+	Label resolveLabel(Name name);
 	
-	public ILoop getEnclosingLoop();
+	ILoop getEnclosingLoop();
 }

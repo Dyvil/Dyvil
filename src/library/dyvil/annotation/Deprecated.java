@@ -4,20 +4,20 @@ import dyvil.util.MarkerLevel;
 
 public @interface Deprecated
 {
-	public enum Reason
+	enum Reason
 	{
-		UNSPECIFIED, DANGEROUS, CONDEMNED, SUPERSEDED, UNIMPLEMENTED;
+		UNSPECIFIED, DANGEROUS, CONDEMNED, SUPERSEDED, UNIMPLEMENTED
 	}
 	
-	public String value() default "";
+	String value() default "";
 	
-	public String marker() default "The {member} is deprecated";
+	String marker() default "The {member} is deprecated";
 	
-	public String since() default "";
+	String since() default "";
 	
-	public Reason[]reasons() default { Reason.UNSPECIFIED };
+	Reason[]reasons() default { Reason.UNSPECIFIED };
 	
-	public String[]replacements() default {};
+	String[]replacements() default {};
 	
-	public MarkerLevel level() default MarkerLevel.WARNING;
+	MarkerLevel level() default MarkerLevel.WARNING;
 }

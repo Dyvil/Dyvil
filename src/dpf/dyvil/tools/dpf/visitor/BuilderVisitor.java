@@ -4,9 +4,9 @@ import dyvil.tools.parsing.Name;
 
 public interface BuilderVisitor
 {
-	public ValueVisitor visitParameter(Name name);
+	ValueVisitor visitParameter(Name name);
 	
-	public NodeVisitor visitNode();
+	NodeVisitor visitNode();
 	
-	public void visitEnd();
+	void visitEnd();
 }

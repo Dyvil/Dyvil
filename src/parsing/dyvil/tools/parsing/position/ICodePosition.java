@@ -2,17 +2,17 @@ package dyvil.tools.parsing.position;
 
 public interface ICodePosition
 {
-	public static ICodePosition ORIGIN = new CodePosition(1, 0, 1);
+	ICodePosition ORIGIN = new CodePosition(1, 0, 1);
 	
-	public int startIndex();
+	int startIndex();
 	
-	public int endIndex();
+	int endIndex();
 	
-	public int startLine();
+	int startLine();
 	
-	public int endLine();
+	int endLine();
 	
-	public ICodePosition raw();
+	ICodePosition raw();
 	
-	public ICodePosition to(ICodePosition end);
+	ICodePosition to(ICodePosition end);
 }

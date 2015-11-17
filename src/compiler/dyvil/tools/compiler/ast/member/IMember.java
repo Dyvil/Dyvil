@@ -9,19 +9,19 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotated
 {
-	public int getAccessLevel();
+	int getAccessLevel();
 	
 	// States
 	
-	public void resolveTypes(MarkerList markers, IContext context);
+	void resolveTypes(MarkerList markers, IContext context);
 	
-	public void resolve(MarkerList markers, IContext context);
+	void resolve(MarkerList markers, IContext context);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	void checkTypes(MarkerList markers, IContext context);
 	
-	public void check(MarkerList markers, IContext context);
+	void check(MarkerList markers, IContext context);
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup(IContext context, IClassCompilableList compilableList);
+	void cleanup(IContext context, IClassCompilableList compilableList);
 }

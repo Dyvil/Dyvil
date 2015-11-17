@@ -5,16 +5,16 @@ import dyvil.tools.compiler.ast.expression.IValue;
 
 public interface ICase extends IPatternConsumer
 {
-	public IPattern getPattern();
+	IPattern getPattern();
 	
 	@Override
-	public void setPattern(IPattern pattern);
+	void setPattern(IPattern pattern);
 	
-	public IValue getCondition();
+	IValue getCondition();
 	
-	public void setCondition(IValue condition);
+	void setCondition(IValue condition);
 	
-	public IValue getAction();
+	IValue getAction();
 	
-	public void setAction(IValue action);
+	void setAction(IValue action);
 }

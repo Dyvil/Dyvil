@@ -31,5 +31,5 @@ package dyvil.tools.asm;
 
 public interface AnnotatableVisitor
 {
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible);
+	AnnotationVisitor visitAnnotation(String desc, boolean visible);
 }

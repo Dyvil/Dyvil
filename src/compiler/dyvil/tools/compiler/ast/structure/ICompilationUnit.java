@@ -11,7 +11,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface ICompilationUnit extends IASTNode
 {
-	public static boolean printMarkers(MarkerList markers, String fileType, Name name, CodeFile source)
+	static boolean printMarkers(MarkerList markers, String fileType, Name name, CodeFile source)
 	{
 		int size = markers.size();
 		if (size > 0)
@@ -38,34 +38,34 @@ public interface ICompilationUnit extends IASTNode
 		return false;
 	}
 	
-	public default boolean isHeader()
+	default boolean isHeader()
 	{
 		return false;
 	}
 	
-	public CodeFile getInputFile();
+	CodeFile getInputFile();
 	
-	public File getOutputFile();
+	File getOutputFile();
 	
-	public void tokenize();
+	void tokenize();
 	
-	public void parseHeader();
+	void parseHeader();
 	
-	public void resolveHeader();
+	void resolveHeader();
 	
-	public void parse();
+	void parse();
 	
-	public void resolveTypes();
+	void resolveTypes();
 	
-	public void resolve();
+	void resolve();
 	
-	public void checkTypes();
+	void checkTypes();
 	
-	public void check();
+	void check();
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup();
+	void cleanup();
 	
-	public void compile();
+	void compile();
 }

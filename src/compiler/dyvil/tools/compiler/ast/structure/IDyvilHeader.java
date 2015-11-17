@@ -19,108 +19,108 @@ import dyvil.tools.parsing.Name;
 
 public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassList, IOperatorMap, ITypeAliasMap
 {
-	public default boolean isHeader()
+	default boolean isHeader()
 	{
 		return true;
 	}
 	
-	public void setName(Name name);
+	void setName(Name name);
 	
-	public Name getName();
+	Name getName();
 	
 	// Package
 	
-	public void setPackage(Package pack);
+	void setPackage(Package pack);
 	
-	public Package getPackage();
+	Package getPackage();
 	
 	// Package Declaration
 	
-	public void setPackageDeclaration(PackageDeclaration pack);
+	void setPackageDeclaration(PackageDeclaration pack);
 	
-	public PackageDeclaration getPackageDeclaration();
+	PackageDeclaration getPackageDeclaration();
 	
 	// Header Declaration
 	
-	public void setHeaderDeclaration(HeaderDeclaration declaration);
+	void setHeaderDeclaration(HeaderDeclaration declaration);
 	
-	public HeaderDeclaration getHeaderDeclaration();
+	HeaderDeclaration getHeaderDeclaration();
 	
 	// Import
 	
-	public int importCount();
+	int importCount();
 	
-	public void addImport(ImportDeclaration component);
+	void addImport(ImportDeclaration component);
 	
-	public ImportDeclaration getImport(int index);
+	ImportDeclaration getImport(int index);
 	
 	// Using
 	
-	public boolean hasMemberImports();
+	boolean hasMemberImports();
 	
-	public int usingCount();
+	int usingCount();
 	
-	public void addUsing(ImportDeclaration component);
+	void addUsing(ImportDeclaration component);
 	
-	public ImportDeclaration getUsing(int index);
+	ImportDeclaration getUsing(int index);
 	
 	// Include
 	
-	public int includeCount();
+	int includeCount();
 	
-	public void addInclude(IncludeDeclaration component);
+	void addInclude(IncludeDeclaration component);
 	
-	public IncludeDeclaration getInclude(int index);
+	IncludeDeclaration getInclude(int index);
 	
 	// Operators
 	
-	public Map<Name, Operator> getOperators();
+	Map<Name, Operator> getOperators();
 	
 	@Override
-	public Operator getOperator(Name name);
+	Operator getOperator(Name name);
 	
 	@Override
-	public void addOperator(Operator op);
+	void addOperator(Operator op);
 	
 	// Type Aliases
 	
-	public Map<Name, ITypeAlias> getTypeAliases();
+	Map<Name, ITypeAlias> getTypeAliases();
 	
 	@Override
-	public void addTypeAlias(ITypeAlias typeAlias);
+	void addTypeAlias(ITypeAlias typeAlias);
 	
 	@Override
-	public ITypeAlias getTypeAlias(Name name);
+	ITypeAlias getTypeAlias(Name name);
 	
 	// Classes
 	
 	@Override
-	public int classCount();
+	int classCount();
 	
 	@Override
-	public void addClass(IClass iclass);
+	void addClass(IClass iclass);
 	
 	@Override
-	public IClass getClass(int index);
+	IClass getClass(int index);
 	
 	@Override
-	public IClass getClass(Name name);
+	IClass getClass(Name name);
 	
-	public int innerClassCount();
+	int innerClassCount();
 	
-	public void addInnerClass(IClassCompilable iclass);
+	void addInnerClass(IClassCompilable iclass);
 	
-	public IClassCompilable getInnerClass(int index);
+	IClassCompilable getInnerClass(int index);
 	
-	public byte getVisibility(IClassMember member);
+	byte getVisibility(IClassMember member);
 	
 	// Compilation
 	
-	public String getInternalName();
+	String getInternalName();
 	
-	public String getInternalName(Name subClass);
+	String getInternalName(Name subClass);
 	
-	public String getFullName();
+	String getFullName();
 	
-	public String getFullName(Name subClass);
+	String getFullName(Name subClass);
 }

@@ -26,10 +26,10 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * @return the number of elements in this queue.
 	 */
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
+	Iterator<E> iterator();
 	
 	/**
 	 * Returns true if and if only this queue contains the given {@code element}
@@ -40,7 +40,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * @return true iff this queue contains the element
 	 */
 	@Override
-	public default boolean contains(Object element)
+	default boolean contains(Object element)
 	{
 		return Collection.iterableContains(this, element);
 	}
@@ -48,7 +48,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	/**
 	 * Removes all elements from this queue.
 	 */
-	public void clear();
+	void clear();
 	
 	/**
 	 * Appends the given element to the end of this queue.
@@ -56,7 +56,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * @param element
 	 *            the element to append
 	 */
-	public void offer(E element);
+	void offer(E element);
 	
 	/**
 	 * Appends all elements in the given collection of {@code elements} to the
@@ -65,7 +65,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * @param elements
 	 *            the elements to append
 	 */
-	public default void offerAll(Iterable<? extends E> elements)
+	default void offerAll(Iterable<? extends E> elements)
 	{
 		for (E e : elements)
 		{
@@ -79,7 +79,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * 
 	 * @return the last element in this queue.
 	 */
-	public E remove();
+	E remove();
 	
 	/**
 	 * Removes the given number of elements from the end of this queue, as if by
@@ -88,7 +88,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * @param count
 	 *            the number of elements to remove
 	 */
-	public default void remove(int count)
+	default void remove(int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -102,16 +102,16 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * 
 	 * @return the last element in this queue.
 	 */
-	public E element();
+	E element();
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	@Override
-	public void filter(Predicate<? super E> condition);
+	void filter(Predicate<? super E> condition);
 	
 	/**
 	 * Returns a copy of this queue that contains the same elements as this
@@ -119,5 +119,5 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	 * 
 	 * @return a copy of this queue.
 	 */
-	public Queue<E> copy();
+	Queue<E> copy();
 }

@@ -15,17 +15,17 @@ import dyvil.tuple.Tuple2;
 @ArrayConvertible
 public interface MutableMatrix<E> extends Matrix<E>
 {
-	public static <E> MutableMatrix<E> apply()
+	static <E> MutableMatrix<E> apply()
 	{
 		return new FlatArrayMatrix();
 	}
 	
-	public static <E> MutableMatrix<E> apply(int rows, int columns)
+	static <E> MutableMatrix<E> apply(int rows, int columns)
 	{
 		return new FlatArrayMatrix(rows, columns);
 	}
 	
-	public static <E> MutableMatrix<E> apply(E[]... cells)
+	static <E> MutableMatrix<E> apply(E[]... cells)
 	{
 		return new FlatArrayMatrix(cells);
 	}
@@ -33,139 +33,139 @@ public interface MutableMatrix<E> extends Matrix<E>
 	// Accessors
 	
 	@Override
-	public default boolean isImmutable()
+	default boolean isImmutable()
 	{
 		return false;
 	}
 	
 	@Override
-	public int rows();
+	int rows();
 	
 	@Override
-	public int columns();
+	int columns();
 	
 	@Override
-	public boolean contains(Object element);
+	boolean contains(Object element);
 	
 	@Override
-	public E subscript(int row, int column);
+	E subscript(int row, int column);
 	
 	@Override
-	public E get(int row, int column);
+	E get(int row, int column);
 	
 	// Sub-view Operations
 	
 	@Override
-	public MutableMatrix<E> subMatrix(int row, int rows, int column, int columns);
+	MutableMatrix<E> subMatrix(int row, int rows, int column, int columns);
 	
 	@Override
-	public MutableList<E> row(int row);
+	MutableList<E> row(int row);
 	
 	@Override
-	public MutableList<E> column(int column);
+	MutableList<E> column(int column);
 	
 	// Non-mutating Operations
 	
 	@Override
-	public MutableList<E> flatten();
+	MutableList<E> flatten();
 	
 	@Override
-	public MutableMatrix<E> transposed();
+	MutableMatrix<E> transposed();
 	
 	@Override
-	public <R> MutableMatrix<R> mapped(Function<? super E, ? extends R> mapper);
+	<R> MutableMatrix<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	// Mutating Operations
 	
 	@Override
-	public void resize(int rows, int columns);
+	void resize(int rows, int columns);
 	
 	@Override
-	public void addRow(List<E> row);
+	void addRow(List<E> row);
 	
 	@Override
-	public void addColumn(List<E> column);
+	void addColumn(List<E> column);
 	
 	@Override
-	public void insertRow(int index, List<E> row);
+	void insertRow(int index, List<E> row);
 	
 	@Override
-	public void insertColumn(int index, List<E> column);
+	void insertColumn(int index, List<E> column);
 	
 	@Override
-	public void subscript_$eq(int row, int column, E element);
+	void subscript_$eq(int row, int column, E element);
 	
 	@Override
-	public E set(int row, int column, E element);
+	E set(int row, int column, E element);
 	
 	@Override
-	public void removeRow(int index);
+	void removeRow(int index);
 	
 	@Override
-	public void removeColumn(int column);
+	void removeColumn(int column);
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	@Override
-	public void transpose();
+	void transpose();
 	
 	@Override
-	public void map(UnaryOperator<E> mapper);
+	void map(UnaryOperator<E> mapper);
 	
 	// Search Operations
 	
 	@Override
-	public int rowOf(Object element);
+	int rowOf(Object element);
 	
 	@Override
-	public int columnOf(Object element);
+	int columnOf(Object element);
 	
 	@Override
-	public Tuple2<Int, Int> cellOf(Object element);
+	Tuple2<Int, Int> cellOf(Object element);
 	
 	// toArray
 	
 	@Override
-	public void rowArray(int row, Object[] store);
+	void rowArray(int row, Object[] store);
 	
 	@Override
-	public void columnArray(int column, Object[] store);
+	void columnArray(int column, Object[] store);
 	
 	@Override
-	public void toArray(Object[][] store);
+	void toArray(Object[][] store);
 	
 	@Override
-	public void toCellArray(Object[] store);
+	void toCellArray(Object[] store);
 	
 	// Copying
 	
 	@Override
-	public MutableMatrix<E> copy();
+	MutableMatrix<E> copy();
 	
 	@Override
-	public default MutableMatrix<E> mutable()
+	default MutableMatrix<E> mutable()
 	{
 		return this;
 	}
 	
 	@Override
-	public default MutableMatrix<E> mutableCopy()
+	default MutableMatrix<E> mutableCopy()
 	{
 		return this.copy();
 	}
 	
 	@Override
-	public ImmutableMatrix<E> immutable();
+	ImmutableMatrix<E> immutable();
 	
 	@Override
-	public default ImmutableMatrix<E> immutableCopy()
+	default ImmutableMatrix<E> immutableCopy()
 	{
 		return this.immutable();
 	}
 	
 	@Override
-	public default ImmutableMatrix<E> view()
+	default ImmutableMatrix<E> view()
 	{
 		return new MatrixView(this);
 	}

@@ -4,9 +4,9 @@ import dyvil.tools.repl.DyvilREPL;
 
 public interface ICommand
 {
-	public String getName();
+	String getName();
 	
-	public String getDescription();
+	String getDescription();
 	
-	public void execute(DyvilREPL repl, String... args);
+	void execute(DyvilREPL repl, String... args);
 }

@@ -19,50 +19,50 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IMethod extends IClassMember, ICallableMember, IMethodSignature, IContext
 {
-	public float getSignatureMatch(Name name, IValue instance, IArguments arguments);
+	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
+	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
+	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
 	// Misc
 	
-	public boolean isAbstract();
+	boolean isAbstract();
 	
-	public void setParameters(IParameter[] parameters, int parameterCount);
+	void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
-	public default void addType(IType type)
+	default void addType(IType type)
 	{
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
 	
-	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
 	
 	// Generics
 	
-	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
+	GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
 	
-	public boolean hasTypeVariables();
+	boolean hasTypeVariables();
 	
 	// Compilation
 	
-	public boolean isIntrinsic();
+	boolean isIntrinsic();
 	
-	public int getInvokeOpcode();
+	int getInvokeOpcode();
 	
-	public String getDescriptor();
+	String getDescriptor();
 	
-	public String getSignature();
+	String getSignature();
 	
-	public String[] getExceptions();
+	String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
+	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
 	
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 }

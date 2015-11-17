@@ -31,13 +31,13 @@ package dyvil.tools.asm;
 
 public interface AnnotationVisitor
 {
-	public void visit(String name, Object value);
+	void visit(String name, Object value);
 	
-	public void visitEnum(String name, String desc, String value);
+	void visitEnum(String name, String desc, String value);
 	
-	public AnnotationVisitor visitAnnotation(String name, String desc);
+	AnnotationVisitor visitAnnotation(String name, String desc);
 	
-	public AnnotationVisitor visitArray(String name);
+	AnnotationVisitor visitArray(String name);
 	
-	public void visitEnd();
+	void visitEnd();
 }

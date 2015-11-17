@@ -10,13 +10,13 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IntrinsicData
 {
-	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public static void writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments) throws BytecodeException
+	static void writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		if (instance == null)
 		{

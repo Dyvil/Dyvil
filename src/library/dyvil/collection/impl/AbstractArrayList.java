@@ -78,7 +78,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	@Override
 	public boolean isSorted()
 	{
-		return Collection.isSorted((E[]) this.elements, this.size);
+		return Collection.isSorted(this.elements, this.size);
 	}
 	
 	@Override

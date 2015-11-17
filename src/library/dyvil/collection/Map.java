@@ -24,40 +24,40 @@ import dyvil.util.Some;
 @MapConvertible
 public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 {
-	public static <K, V> ImmutableMap<K, V> fromNil()
+	static <K, V> ImmutableMap<K, V> fromNil()
 	{
 		return ImmutableMap.apply();
 	}
 	
-	public static <K, V> MutableMap<K, V> apply()
+	static <K, V> MutableMap<K, V> apply()
 	{
 		return MutableMap.apply();
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
+	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
 		return ImmutableMap.apply(entry);
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
+	static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
 	}
 	
-	public static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
+	static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
 	{
 		return ImmutableMap.apply(keys, values);
 	}
 	
 	// Simple Getters
 	
-	public boolean isImmutable();
+	boolean isImmutable();
 	
 	/**
 	 * Returns the size of this map, i.e. the number of mappings contained in
 	 * this map.
 	 */
-	public int size();
+	int size();
 	
 	/**
 	 * Returns true if and if only this map contains no mappings. The standard
@@ -66,12 +66,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * 
 	 * @return true, if this map contains no mappings
 	 */
-	public default boolean isEmpty()
+	default boolean isEmpty()
 	{
 		return this.size() == 0;
 	}
 	
-	public default boolean isSorted()
+	default boolean isSorted()
 	{
 		if (this.size() < 2)
 		{
@@ -81,7 +81,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return Collection.iteratorSorted(this.keyIterator());
 	}
 	
-	public default boolean isSorted(Comparator<? super K> comparator)
+	default boolean isSorted(Comparator<? super K> comparator)
 	{
 		if (this.size() < 2)
 		{
@@ -99,7 +99,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
-	public Iterator<Entry<K, V>> iterator();
+	Iterator<Entry<K, V>> iterator();
 	
 	/**
 	 * Creates and returns an {@link Spliterator} over the mappings of this map,
@@ -109,22 +109,22 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
-	public default Spliterator<Entry<K, V>> spliterator()
+	default Spliterator<Entry<K, V>> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
 	
-	public default Stream<Entry<K, V>> stream()
+	default Stream<Entry<K, V>> stream()
 	{
 		return StreamSupport.stream(this.spliterator(), false);
 	}
 	
-	public default Stream<Entry<K, V>> parallelStream()
+	default Stream<Entry<K, V>> parallelStream()
 	{
 		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
-	public default Iterable<K> keys()
+	default Iterable<K> keys()
 	{
 		return new Iterable<K>()
 		{
@@ -148,24 +148,24 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		};
 	}
 	
-	public Iterator<K> keyIterator();
+	Iterator<K> keyIterator();
 	
-	public default Spliterator<K> keySpliterator()
+	default Spliterator<K> keySpliterator()
 	{
 		return Spliterators.spliterator(this.keyIterator(), this.size(), 0);
 	}
 	
-	public default Stream<K> keyStream()
+	default Stream<K> keyStream()
 	{
 		return StreamSupport.stream(this.keySpliterator(), false);
 	}
 	
-	public default Stream<K> parallelKeyStream()
+	default Stream<K> parallelKeyStream()
 	{
 		return StreamSupport.stream(this.keySpliterator(), true);
 	}
 	
-	public default Iterable<V> values()
+	default Iterable<V> values()
 	{
 		return new Iterable<V>()
 		{
@@ -189,25 +189,25 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		};
 	}
 	
-	public Iterator<V> valueIterator();
+	Iterator<V> valueIterator();
 	
-	public default Spliterator<V> valueSpliterator()
+	default Spliterator<V> valueSpliterator()
 	{
 		return Spliterators.spliterator(this.valueIterator(), this.size(), 0);
 	}
 	
-	public default Stream<V> valueStream()
+	default Stream<V> valueStream()
 	{
 		return StreamSupport.stream(this.valueSpliterator(), false);
 	}
 	
-	public default Stream<V> parallelValueStream()
+	default Stream<V> parallelValueStream()
 	{
 		return StreamSupport.stream(this.valueSpliterator(), true);
 	}
 	
 	@Override
-	public default void forEach(Consumer<? super Entry<K, V>> action)
+	default void forEach(Consumer<? super Entry<K, V>> action)
 	{
 		for (Entry<K, V> entry : this)
 		{
@@ -215,7 +215,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default void forEach(BiConsumer<? super K, ? super V> action)
+	default void forEach(BiConsumer<? super K, ? super V> action)
 	{
 		for (Entry<K, V> entry : this)
 		{
@@ -223,7 +223,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default void forEachKey(Consumer<? super K> action)
+	default void forEachKey(Consumer<? super K> action)
 	{
 		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
 		{
@@ -231,7 +231,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default void forEachValue(Consumer<? super V> action)
+	default void forEachValue(Consumer<? super V> action)
 	{
 		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
 		{
@@ -239,7 +239,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default boolean allMatch(BiPredicate<? super K, ? super V> condition)
+	default boolean allMatch(BiPredicate<? super K, ? super V> condition)
 	{
 		for (Entry<K, V> entry : this)
 		{
@@ -251,7 +251,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return true;
 	}
 	
-	public default boolean exists(BiPredicate<? super K, ? super V> condition)
+	default boolean exists(BiPredicate<? super K, ? super V> condition)
 	{
 		for (Entry<K, V> entry : this)
 		{
@@ -271,7 +271,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the key
 	 * @return true, if this map contains a mapping for the key
 	 */
-	public default boolean $qmark$at(Object key)
+	default boolean $qmark$at(Object key)
 	{
 		return this.containsKey(key);
 	}
@@ -286,7 +286,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return true, if this map contains a mapping for the key and the value
 	 */
-	public default boolean $qmark(Object key, Object value)
+	default boolean $qmark(Object key, Object value)
 	{
 		return this.contains(key, value);
 	}
@@ -302,7 +302,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean $qmark(Entry<?, ?> entry)
+	default boolean $qmark(Entry<?, ?> entry)
 	{
 		return this.contains(entry.getKey(), entry.getValue());
 	}
@@ -315,7 +315,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return true, if this map contains a mapping to the value
 	 */
-	public default boolean $qmark$colon(Object value)
+	default boolean $qmark$colon(Object value)
 	{
 		return this.containsValue(value);
 	}
@@ -328,7 +328,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the key
 	 * @return true, if this map contains a mapping for the key
 	 */
-	public default boolean containsKey(Object key)
+	default boolean containsKey(Object key)
 	{
 		for (Iterator<K> keyIterator = this.keyIterator(); keyIterator.hasNext();)
 		{
@@ -349,7 +349,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return true, if this map contains a mapping to the value
 	 */
-	public default boolean containsValue(Object value)
+	default boolean containsValue(Object value)
 	{
 		for (Iterator<V> valueIterator = this.valueIterator(); valueIterator.hasNext();)
 		{
@@ -372,7 +372,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return true, if this map contains a mapping for the key and the value
 	 */
-	public default boolean contains(Object key, Object value)
+	default boolean contains(Object key, Object value)
 	{
 		for (Entry<K, V> entry : this)
 		{
@@ -396,7 +396,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the entry
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
-	public default boolean contains(Entry<?, ?> entry)
+	default boolean contains(Entry<?, ?> entry)
 	{
 		return this.contains(entry.getKey(), entry.getValue());
 	}
@@ -410,7 +410,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the key
 	 * @return the value
 	 */
-	public default V subscript(Object key)
+	default V subscript(Object key)
 	{
 		return this.get(key);
 	}
@@ -423,7 +423,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the key
 	 * @return the value
 	 */
-	public V get(Object key);
+	V get(Object key);
 	
 	/**
 	 * Gets and returns an optional value for the given {@code key}. If no
@@ -435,7 +435,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * @return an option containing the value, or None if not mapping exists for
 	 *         the key
 	 */
-	public Option<V> getOption(Object key);
+	Option<V> getOption(Object key);
 	
 	// Non-mutating Operations
 	
@@ -453,7 +453,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the value
 	 * @return a map that contains all entries of this map plus the new entry
 	 */
-	public Map<K, V> $plus(K key, V value);
+	Map<K, V> $plus(K key, V value);
 	
 	/**
 	 * Returns a map that contains all entries of this map plus the new
@@ -468,7 +468,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 *            the entry
 	 * @return a map that contains all entries of this map plus the new entry
 	 */
-	public Map<K, V> $plus(Entry<? extends K, ? extends V> entry);
+	Map<K, V> $plus(Entry<? extends K, ? extends V> entry);
 	
 	/**
 	 * Returns a map that contains all entries of this map plus all entries of
@@ -480,15 +480,15 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * @param map
 	 * @return
 	 */
-	public Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
+	Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
-	public Map<K, V> $minus$at(Object key);
+	Map<K, V> $minus$at(Object key);
 	
-	public Map<K, V> $minus(Object key, Object value);
+	Map<K, V> $minus(Object key, Object value);
 	
-	public Map<K, V> $minus(Entry<?, ?> entry);
+	Map<K, V> $minus(Entry<?, ?> entry);
 	
-	public Map<K, V> $minus$colon(Object value);
+	Map<K, V> $minus$colon(Object value);
 	
 	/**
 	 * Returns a new map containing all entries of this map minus the entries of
@@ -503,35 +503,35 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * @return a map that contains all entries of this map minus the entries of
 	 *         the given map
 	 */
-	public Map<K, V> $minus$minus(Map<?, ?> map);
+	Map<K, V> $minus$minus(Map<?, ?> map);
 	
-	public Map<K, V> $minus$minus(Collection<?> keys);
+	Map<K, V> $minus$minus(Collection<?> keys);
 	
-	public <NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
+	<NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
 	
-	public <NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
+	<NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
-	public <NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	<NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
 	
-	public <NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
+	<NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 	
-	public Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
+	Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
-	public Map<V, K> inverted();
+	Map<V, K> inverted();
 	
 	// Mutating Operations
 	
-	public default void $plus$eq(K key, V value)
+	default void $plus$eq(K key, V value)
 	{
 		this.put(key, value);
 	}
 	
-	public default void $plus$eq(Entry<? extends K, ? extends V> entry)
+	default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
 		this.put(entry.getKey(), entry.getValue());
 	}
 	
-	public default void $plus$plus$eq(Map<? extends K, ? extends V> map)
+	default void $plus$plus$eq(Map<? extends K, ? extends V> map)
 	{
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
@@ -539,27 +539,27 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default void $minus$at$eq(Object key)
+	default void $minus$at$eq(Object key)
 	{
 		this.removeKey(key);
 	}
 	
-	public default void $minus$eq(Object key, Object value)
+	default void $minus$eq(Object key, Object value)
 	{
 		this.remove(key, value);
 	}
 	
-	public default void $minus$eq(Entry<?, ?> entry)
+	default void $minus$eq(Entry<?, ?> entry)
 	{
 		this.remove(entry.getKey(), entry.getValue());
 	}
 	
-	public default void $minus$colon$eq(Object value)
+	default void $minus$colon$eq(Object value)
 	{
 		this.removeValue(value);
 	}
 	
-	public default void $minus$minus$eq(Collection<?> keys)
+	default void $minus$minus$eq(Collection<?> keys)
 	{
 		for (Object key : keys)
 		{
@@ -567,7 +567,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default void $minus$minus$eq(Map<?, ?> map)
+	default void $minus$minus$eq(Map<?, ?> map)
 	{
 		for (Entry<?, ?> entry : map)
 		{
@@ -575,63 +575,63 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public void clear();
+	void clear();
 	
-	public void subscript_$eq(K key, V value);
+	void subscript_$eq(K key, V value);
 	
-	public V put(K key, V value);
+	V put(K key, V value);
 	
-	public V put(Entry<? extends K, ? extends V> entry);
+	V put(Entry<? extends K, ? extends V> entry);
 	
-	public boolean putIfAbsent(K key, V value);
+	boolean putIfAbsent(K key, V value);
 	
-	public boolean putIfAbsent(Entry<? extends K, ? extends V> entry);
+	boolean putIfAbsent(Entry<? extends K, ? extends V> entry);
 	
-	public void putAll(Map<? extends K, ? extends V> map);
+	void putAll(Map<? extends K, ? extends V> map);
 	
-	public boolean replace(K key, V oldValue, V newValue);
+	boolean replace(K key, V oldValue, V newValue);
 	
-	public V replace(K key, V newValue);
+	V replace(K key, V newValue);
 	
-	public V replace(Entry<? extends K, ? extends V> entry);
+	V replace(Entry<? extends K, ? extends V> entry);
 	
-	public V removeKey(Object key);
+	V removeKey(Object key);
 	
-	public boolean removeValue(Object value);
+	boolean removeValue(Object value);
 	
-	public boolean remove(Object key, Object value);
+	boolean remove(Object key, Object value);
 	
-	public boolean remove(Entry<?, ?> entry);
+	boolean remove(Entry<?, ?> entry);
 	
-	public boolean removeKeys(Collection<?> keys);
+	boolean removeKeys(Collection<?> keys);
 	
-	public boolean removeAll(Map<?, ?> map);
+	boolean removeAll(Map<?, ?> map);
 	
-	public void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper);
+	void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper);
 	
-	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
+	void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
-	public void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
+	void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
 	
-	public void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
+	void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
 	
-	public void filter(BiPredicate<? super K, ? super V> condition);
+	void filter(BiPredicate<? super K, ? super V> condition);
 	
 	// Arrays
 	
-	public default Entry<K, V>[] toArray()
+	default Entry<K, V>[] toArray()
 	{
 		Entry<K, V>[] array = new Entry[this.size()];
 		this.toArray(0, array);
 		return array;
 	}
 	
-	public default void toArray(Entry<K, V>[] store)
+	default void toArray(Entry<K, V>[] store)
 	{
 		this.toArray(0, store);
 	}
 	
-	public default void toArray(int index, Entry<K, V>[] store)
+	default void toArray(int index, Entry<K, V>[] store)
 	{
 		for (Entry<K, V> entry : this)
 		{
@@ -639,26 +639,26 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default Object[] toKeyArray()
+	default Object[] toKeyArray()
 	{
 		Object[] array = new Object[this.size()];
 		this.toKeyArray(0, array);
 		return array;
 	}
 	
-	public default K[] toKeyArray(Class<K> type)
+	default K[] toKeyArray(Class<K> type)
 	{
 		K[] array = (K[]) Array.newInstance(type, this.size());
 		this.toKeyArray(0, array);
 		return array;
 	}
 	
-	public default void toKeyArray(Object[] store)
+	default void toKeyArray(Object[] store)
 	{
 		this.toKeyArray(0, store);
 	}
 	
-	public default void toKeyArray(int index, Object[] store)
+	default void toKeyArray(int index, Object[] store)
 	{
 		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
 		{
@@ -666,26 +666,26 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 	}
 	
-	public default Object[] toValueArray()
+	default Object[] toValueArray()
 	{
 		Object[] array = new Object[this.size()];
 		this.toValueArray(0, array);
 		return array;
 	}
 	
-	public default V[] toValueArray(Class<V> type)
+	default V[] toValueArray(Class<V> type)
 	{
 		V[] array = (V[]) Array.newInstance(type, this.size());
 		this.toValueArray(0, array);
 		return array;
 	}
 	
-	public default void toValueArray(Object[] store)
+	default void toValueArray(Object[] store)
 	{
 		this.toValueArray(0, store);
 	}
 	
-	public default void toValueArray(int index, Object[] store)
+	default void toValueArray(int index, Object[] store)
 	{
 		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
 		{
@@ -695,17 +695,17 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	// Copying and Views
 	
-	public Map<K, V> copy();
+	Map<K, V> copy();
 	
-	public MutableMap<K, V> mutable();
+	MutableMap<K, V> mutable();
 	
-	public MutableMap<K, V> mutableCopy();
+	MutableMap<K, V> mutableCopy();
 	
-	public ImmutableMap<K, V> immutable();
+	ImmutableMap<K, V> immutable();
 	
-	public ImmutableMap<K, V> immutableCopy();
+	ImmutableMap<K, V> immutableCopy();
 	
-	public ImmutableMap<K, V> view();
+	ImmutableMap<K, V> view();
 	
 	/**
 	 * Returns the Java Collection Framework equivalent of this map. The
@@ -717,20 +717,20 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * 
 	 * @return a java collection containing the elements of this collection
 	 */
-	public java.util.Map<K, V> toJava();
+	java.util.Map<K, V> toJava();
 	
 	// toString, equals and hashCode
 	
 	@Override
-	public String toString();
+	String toString();
 	
 	@Override
-	public boolean equals(Object obj);
+	boolean equals(Object obj);
 	
 	@Override
-	public int hashCode();
+	int hashCode();
 	
-	public static <K, V> String mapToString(Map<K, V> map)
+	static <K, V> String mapToString(Map<K, V> map)
 	{
 		if (map.isEmpty())
 		{
@@ -755,7 +755,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return builder.append(" ]").toString();
 	}
 	
-	public static <K, V> boolean mapEquals(Map<K, V> map, Object obj)
+	static <K, V> boolean mapEquals(Map<K, V> map, Object obj)
 	{
 		if (!(obj instanceof Map))
 		{
@@ -765,7 +765,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return mapEquals(map, (Map) obj);
 	}
 	
-	public static <K, V> boolean mapEquals(Map<K, V> map1, Map<K, V> map2)
+	static <K, V> boolean mapEquals(Map<K, V> map1, Map<K, V> map2)
 	{
 		if (map1.size() != map2.size())
 		{
@@ -782,7 +782,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return true;
 	}
 	
-	public static <K, V> int mapHashCode(Map<K, V> map)
+	static <K, V> int mapHashCode(Map<K, V> map)
 	{
 		int sum = 0;
 		int product = 1;
@@ -801,14 +801,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return sum * 31 + product;
 	}
 	
-	public default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
 	{
 		StringBuilder builder = new StringBuilder();
 		this.toString(builder, prefix, entrySeparator, keyValueSeparator, postfix);
 		return builder.toString();
 	}
 	
-	public default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())

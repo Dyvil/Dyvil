@@ -19,71 +19,71 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface ITypeVariable extends IASTNode, INamed, IAnnotated
 {
-	public IGeneric getGeneric();
+	IGeneric getGeneric();
 	
-	public void setIndex(int index);
+	void setIndex(int index);
 	
-	public int getIndex();
+	int getIndex();
 	
 	// Variance
 	
-	public void setVariance(Variance variance);
+	void setVariance(Variance variance);
 	
-	public Variance getVariance();
+	Variance getVariance();
 	
-	public IType getDefaultType();
+	IType getDefaultType();
 	
 	// Upper Bounds
 	
-	public int upperBoundCount();
+	int upperBoundCount();
 	
-	public void setUpperBound(int index, IType bound);
+	void setUpperBound(int index, IType bound);
 	
-	public void addUpperBound(IType bound);
+	void addUpperBound(IType bound);
 	
-	public IType getUpperBound(int index);
+	IType getUpperBound(int index);
 	
-	public IType[] getUpperBounds();
+	IType[] getUpperBounds();
 	
-	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath);
+	void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath);
 	
 	// Lower Bounds
 	
-	public void setLowerBound(IType bound);
+	void setLowerBound(IType bound);
 	
-	public IType getLowerBound();
+	IType getLowerBound();
 	
 	// Super Types
 	
-	public IClass getTheClass();
+	IClass getTheClass();
 	
-	public boolean isSuperTypeOf(IType type);
+	boolean isSuperTypeOf(IType type);
 	
-	public int getSuperTypeDistance(IType superType);
+	int getSuperTypeDistance(IType superType);
 	
 	// Resolution
 	
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	// Phases
 	
-	public void resolveTypes(MarkerList markers, IContext context);
+	void resolveTypes(MarkerList markers, IContext context);
 	
-	public void resolve(MarkerList markers, IContext context);
+	void resolve(MarkerList markers, IContext context);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	void checkTypes(MarkerList markers, IContext context);
 	
-	public void check(MarkerList markers, IContext context);
+	void check(MarkerList markers, IContext context);
 	
-	public void foldConstants();
+	void foldConstants();
 	
-	public void cleanup(IContext context, IClassCompilableList compilableList);
+	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// Compilation
 	
-	public void appendSignature(StringBuilder buffer);
+	void appendSignature(StringBuilder buffer);
 	
-	public void write(TypeAnnotatableVisitor visitor);
+	void write(TypeAnnotatableVisitor visitor);
 }

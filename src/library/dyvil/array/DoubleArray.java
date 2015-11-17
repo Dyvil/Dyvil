@@ -19,19 +19,19 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface DoubleArray
 {
-	public static final double[] EMPTY = new double[0];
+	double[] EMPTY = new double[0];
 	
-	public static double[] apply()
+	static double[] apply()
 	{
 		return EMPTY;
 	}
 	
-	public static double[] apply(int count)
+	static double[] apply(int count)
 	{
 		return new double[count];
 	}
 	
-	public static double[] repeat(int count, double repeatedValue)
+	static double[] repeat(int count, double repeatedValue)
 	{
 		double[] array = new double[count];
 		for (int i = 0; i < count; i++)
@@ -41,7 +41,7 @@ public interface DoubleArray
 		return array;
 	}
 	
-	public static double[] generate(int count, DoubleUnaryOperator generator)
+	static double[] generate(int count, DoubleUnaryOperator generator)
 	{
 		double[] array = new double[count];
 		for (int i = 0; i < count; i++)
@@ -51,7 +51,7 @@ public interface DoubleArray
 		return array;
 	}
 	
-	public static double[] range(double start, double end)
+	static double[] range(double start, double end)
 	{
 		int i = 0;
 		double[] array = new double[(int) (end - start + 1)];
@@ -62,7 +62,7 @@ public interface DoubleArray
 		return array;
 	}
 	
-	public static double[] rangeOpen(double start, double end)
+	static double[] rangeOpen(double start, double end)
 	{
 		int i = 0;
 		double[] array = new double[(int) (end - start)];
@@ -76,18 +76,18 @@ public interface DoubleArray
 	// Basic Array Operations
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	public static @infix int length(double[] array)
+	static @infix int length(double[] array)
 	{
 		return array.length;
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, DALOAD })
-	public static @infix double subscript(double[] array, int i)
+	static @infix double subscript(double[] array, int i)
 	{
 		return array[i];
 	}
 	
-	public static @infix double[] subscript(double[] array, Range<Int> range)
+	static @infix double[] subscript(double[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -100,12 +100,12 @@ public interface DoubleArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, DASTORE })
-	public static @infix void subscript_$eq(double[] array, int i, double v)
+	static @infix void subscript_$eq(double[] array, int i, double v)
 	{
 		array[i] = v;
 	}
 	
-	public static @infix void subscript_$eq(double[] array, Range<Int> range, double[] values)
+	static @infix void subscript_$eq(double[] array, Range<Int> range, double[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = Int.unapply(range.last()) - start + 1;
@@ -116,12 +116,12 @@ public interface DoubleArray
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	public static @infix boolean isEmpty(int[] array)
+	static @infix boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	public static @infix void forEach(int[] array, IntConsumer action)
+	static @infix void forEach(int[] array, IntConsumer action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
@@ -132,22 +132,22 @@ public interface DoubleArray
 	
 	// Operators
 	
-	public static @infix @inline boolean $qmark(double[] array, double v)
+	static @infix @inline boolean $qmark(double[] array, double v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean $eq$eq(double[] array1, double[] array2)
+	static @infix @inline boolean $eq$eq(double[] array1, double[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline boolean $bang$eq(double[] array1, double[] array2)
+	static @infix @inline boolean $bang$eq(double[] array1, double[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	public static @infix double[] $plus(double[] array, double v)
+	static @infix double[] $plus(double[] array, double v)
 	{
 		int len = array.length;
 		double[] res = new double[len + 1];
@@ -156,7 +156,7 @@ public interface DoubleArray
 		return res;
 	}
 	
-	public static @infix double[] $plus$plus(double[] array1, double[] array2)
+	static @infix double[] $plus$plus(double[] array1, double[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -166,7 +166,7 @@ public interface DoubleArray
 		return res;
 	}
 	
-	public static @infix double[] $minus(double[] array, double v)
+	static @infix double[] $minus(double[] array, double v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -189,7 +189,7 @@ public interface DoubleArray
 		return res;
 	}
 	
-	public static @infix double[] $minus$minus(double[] array1, double[] array2)
+	static @infix double[] $minus$minus(double[] array1, double[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -208,7 +208,7 @@ public interface DoubleArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix double[] $amp(double[] array1, double[] array2)
+	static @infix double[] $amp(double[] array1, double[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -227,7 +227,7 @@ public interface DoubleArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix double[] mapped(double[] array, DoubleUnaryOperator mapper)
+	static @infix double[] mapped(double[] array, DoubleUnaryOperator mapper)
 	{
 		int len = array.length;
 		double[] res = new double[len];
@@ -238,7 +238,7 @@ public interface DoubleArray
 		return res;
 	}
 	
-	public static @infix double[] flatMapped(double[] array, DoubleFunction<double[]> mapper)
+	static @infix double[] flatMapped(double[] array, DoubleFunction<double[]> mapper)
 	{
 		int len = array.length;
 		int size = 0;
@@ -262,7 +262,7 @@ public interface DoubleArray
 		return res;
 	}
 	
-	public static @infix double[] filtered(double[] array, DoublePredicate condition)
+	static @infix double[] filtered(double[] array, DoublePredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -280,7 +280,7 @@ public interface DoubleArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix double[] sorted(double[] array)
+	static @infix double[] sorted(double[] array)
 	{
 		double[] res = array.clone();
 		Arrays.sort(res);
@@ -289,12 +289,12 @@ public interface DoubleArray
 	
 	// Search Operations
 	
-	public static @infix int indexOf(double[] array, double v)
+	static @infix int indexOf(double[] array, double v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	public static @infix int indexOf(double[] array, double v, int start)
+	static @infix int indexOf(double[] array, double v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -306,12 +306,12 @@ public interface DoubleArray
 		return -1;
 	}
 	
-	public static @infix int lastIndexOf(double[] array, double v)
+	static @infix int lastIndexOf(double[] array, double v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	public static @infix int lastIndexOf(double[] array, double v, int start)
+	static @infix int lastIndexOf(double[] array, double v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -323,24 +323,24 @@ public interface DoubleArray
 		return -1;
 	}
 	
-	public static @infix @inline boolean contains(double[] array, double v)
+	static @infix @inline boolean contains(double[] array, double v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean in(double v, double[] array)
+	static @infix @inline boolean in(double v, double[] array)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
 	// Copying
 	
-	public static @infix @inline double[] copy(double[] array)
+	static @infix @inline double[] copy(double[] array)
 	{
 		return array.clone();
 	}
 	
-	public static @infix Double[] boxed(double[] array)
+	static @infix Double[] boxed(double[] array)
 	{
 		int len = array.length;
 		Double[] boxed = new Double[len];
@@ -351,24 +351,24 @@ public interface DoubleArray
 		return boxed;
 	}
 	
-	public static @infix Iterable<Double> toIterable(double[] array)
+	static @infix Iterable<Double> toIterable(double[] array)
 	{
 		return new ArrayList<Double>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	public static @infix @inline boolean equals(double[] array1, double[] array2)
+	static @infix @inline boolean equals(double[] array1, double[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline int hashCode(double[] array)
+	static @infix @inline int hashCode(double[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	public static @infix String toString(double[] array)
+	static @infix String toString(double[] array)
 	{
 		if (array == null)
 		{
@@ -391,7 +391,7 @@ public interface DoubleArray
 		return buf.append(']').toString();
 	}
 	
-	public static @infix void toString(double[] array, StringBuilder builder)
+	static @infix void toString(double[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

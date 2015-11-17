@@ -4,13 +4,13 @@ import dyvil.tools.parsing.Name;
 
 public interface NodeVisitor
 {
-	public NodeVisitor visitNode(Name name);
+	NodeVisitor visitNode(Name name);
 	
-	public ValueVisitor visitProperty(Name name);
+	ValueVisitor visitProperty(Name name);
 	
-	public NodeVisitor visitNodeAccess(Name name);
+	NodeVisitor visitNodeAccess(Name name);
 	
-	public default void visitEnd()
+	default void visitEnd()
 	{
 	}
 }

@@ -9,29 +9,29 @@ import dyvil.annotation._internal.prefix;
 @LongConvertible
 public interface Integer extends Number
 {
-	public static Int apply(int v)
+	static Int apply(int v)
 	{
 		return Int.apply(v);
 	}
 	
-	public static Long apply(long v)
+	static Long apply(long v)
 	{
 		return Long.apply(v);
 	}
 	
-	public @prefix Integer $tilde();
+	@prefix Integer $tilde();
 	
-	public Integer $bslash(Integer v);
+	Integer $bslash(Integer v);
 	
-	public Integer $amp(Integer v);
+	Integer $amp(Integer v);
 	
-	public Integer $bar(Integer v);
+	Integer $bar(Integer v);
 	
-	public Integer $up(Integer v);
+	Integer $up(Integer v);
 	
-	public Integer $lt$lt(Integer v);
+	Integer $lt$lt(Integer v);
 	
-	public Integer $gt$gt(Integer v);
+	Integer $gt$gt(Integer v);
 	
-	public Integer $gt$gt$gt(Integer v);
+	Integer $gt$gt$gt(Integer v);
 }

@@ -31,25 +31,25 @@ package dyvil.tools.asm;
 
 public interface ClassVisitor extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
-	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces);
+	void visit(int version, int access, String name, String signature, String superName, String[] interfaces);
 	
-	public void visitSource(String source, String debug);
+	void visitSource(String source, String debug);
 	
-	public void visitOuterClass(String owner, String name, String desc);
-	
-	@Override
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible);
+	void visitOuterClass(String owner, String name, String desc);
 	
 	@Override
-	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+	AnnotationVisitor visitAnnotation(String desc, boolean visible);
 	
-	public void visitAttribute(Attribute attr);
+	@Override
+	AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 	
-	public void visitInnerClass(String name, String outerName, String innerName, int access);
+	void visitAttribute(Attribute attr);
 	
-	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value);
+	void visitInnerClass(String name, String outerName, String innerName, int access);
 	
-	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions);
+	FieldVisitor visitField(int access, String name, String desc, String signature, Object value);
 	
-	public void visitEnd();
+	MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions);
+	
+	void visitEnd();
 }

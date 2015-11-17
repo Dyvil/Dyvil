@@ -14,7 +14,7 @@ import static dyvil.reflect.Opcodes.*;
 
 public interface CaseClasses
 {
-	public static void writeEquals(MethodWriter writer, IClass theClass) throws BytecodeException
+	static void writeEquals(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		Label label;
 		// Write check 'if (this == obj)'
@@ -69,7 +69,7 @@ public interface CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	public static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
+	static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
 	{
 		IType type = field.getType();
 		
@@ -144,7 +144,7 @@ public interface CaseClasses
 		writer.writeLabel(endLabel);
 	}
 	
-	public static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
+	static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{
@@ -187,7 +187,7 @@ public interface CaseClasses
 		}
 	}
 	
-	public static void writeHashCode(MethodWriter writer, IClass theClass) throws BytecodeException
+	static void writeHashCode(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		writer.writeLDC(31);
 		
@@ -210,7 +210,7 @@ public interface CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	public static void writeHashCode(MethodWriter writer, IType type) throws BytecodeException
+	static void writeHashCode(MethodWriter writer, IType type) throws BytecodeException
 	{
 		
 		if (type.isPrimitive())
@@ -297,7 +297,7 @@ public interface CaseClasses
 		writer.writeLabel(endLabel);
 	}
 	
-	public static void writeArrayHashCode(MethodWriter writer, IType type) throws BytecodeException
+	static void writeArrayHashCode(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{
@@ -340,7 +340,7 @@ public interface CaseClasses
 		}
 	}
 	
-	public static void writeToString(MethodWriter writer, IClass theClass) throws BytecodeException
+	static void writeToString(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		// ----- StringBuilder Constructor -----
 		writer.writeTypeInsn(NEW, "java/lang/StringBuilder");
@@ -382,7 +382,7 @@ public interface CaseClasses
 		writer.writeInsn(ARETURN);
 	}
 	
-	public static void writeStringAppend(MethodWriter writer, String string) throws BytecodeException
+	static void writeStringAppend(MethodWriter writer, String string) throws BytecodeException
 	{
 		switch (string.length())
 		{
@@ -399,7 +399,7 @@ public interface CaseClasses
 		}
 	}
 	
-	public static void writeStringAppend(MethodWriter writer, IType type) throws BytecodeException
+	static void writeStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
@@ -433,7 +433,7 @@ public interface CaseClasses
 		return;
 	}
 	
-	public static void writeArrayStringAppend(MethodWriter writer, IType type) throws BytecodeException
+	static void writeArrayStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{

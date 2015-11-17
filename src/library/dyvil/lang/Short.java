@@ -443,7 +443,7 @@ public class Short implements Integer, Serializable
 	// generic operators
 	
 	@Override
-	public @prefix Int $plus() { return Int.apply(this.value); };
+	public @prefix Int $plus() { return Int.apply(this.value); }
 	
 	@Override
 	public @prefix Int $minus() { return Int.apply(-this.value); }

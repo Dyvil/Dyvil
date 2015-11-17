@@ -23,21 +23,21 @@ public interface Entry<K, V> extends Serializable
 	 * 
 	 * @return the key
 	 */
-	public K getKey();
+	K getKey();
 	
 	/**
 	 * Returns the value stored by this entry
 	 * 
 	 * @return the value
 	 */
-	public V getValue();
+	V getValue();
 	
 	/**
 	 * Converts this entry to a {@link Tuple2 Tuple}.
 	 * 
 	 * @return a tuple with this entry's key and value
 	 */
-	public default Tuple2<K, V> toTuple()
+	default Tuple2<K, V> toTuple()
 	{
 		return new Tuple2<K, V>(this.getKey(), this.getValue());
 	}
@@ -49,7 +49,7 @@ public interface Entry<K, V> extends Serializable
 	 * 
 	 * @return a comparator that compares entries by key.
 	 */
-	public static <K extends Comparable<? super K>, V> Comparator<Entry<K, V>> comparingByKey()
+	static <K extends Comparable<? super K>, V> Comparator<Entry<K, V>> comparingByKey()
 	{
 		return (c1, c2) -> c1.getKey().compareTo(c2.getKey());
 	}
@@ -61,7 +61,7 @@ public interface Entry<K, V> extends Serializable
 	 * 
 	 * @return a comparator that compares entries by value.
 	 */
-	public static <K, V extends Comparable<? super V>> Comparator<Entry<K, V>> comparingByValue()
+	static <K, V extends Comparable<? super V>> Comparator<Entry<K, V>> comparingByValue()
 	{
 		return (c1, c2) -> c1.getValue().compareTo(c2.getValue());
 	}
@@ -74,7 +74,7 @@ public interface Entry<K, V> extends Serializable
 	 *            the comparator the defines the ordering of the keys
 	 * @return a comparator that compares entries by key.
 	 */
-	public static <K, V> Comparator<Entry<K, V>> comparingByKey(Comparator<? super K> cmp)
+	static <K, V> Comparator<Entry<K, V>> comparingByKey(Comparator<? super K> cmp)
 	{
 		return (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
 	}
@@ -87,17 +87,17 @@ public interface Entry<K, V> extends Serializable
 	 *            the comparator the defines the ordering of the values
 	 * @return a comparator that compares entries by value.
 	 */
-	public static <K, V> Comparator<Entry<K, V>> comparingByValue(Comparator<? super V> cmp)
+	static <K, V> Comparator<Entry<K, V>> comparingByValue(Comparator<? super V> cmp)
 	{
 		return (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());
 	}
 	
-	public static String entryToString(Entry<?, ?> entry)
+	static String entryToString(Entry<?, ?> entry)
 	{
 		return entry.getKey() + " -> " + entry.getValue();
 	}
 	
-	public static boolean entryEquals(Entry<?, ?> entry, Object o)
+	static boolean entryEquals(Entry<?, ?> entry, Object o)
 	{
 		if (!(o instanceof Entry))
 		{
@@ -107,12 +107,12 @@ public interface Entry<K, V> extends Serializable
 		return entryEquals(entry, (Entry) o);
 	}
 	
-	public static boolean entryEquals(Entry<?, ?> entry1, Entry<?, ?> entry2)
+	static boolean entryEquals(Entry<?, ?> entry1, Entry<?, ?> entry2)
 	{
 		return Objects.equals(entry1.getKey(), entry2.getKey()) && Objects.equals(entry1.getValue(), entry2.getValue());
 	}
 	
-	public static int entryHashCode(Entry<?, ?> entry)
+	static int entryHashCode(Entry<?, ?> entry)
 	{
 		Object key = entry.getKey();
 		Object value = entry.getValue();

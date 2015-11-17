@@ -12,30 +12,30 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IRawType extends IObjectType
 {
 	@Override
-	public default IType getConcreteType(ITypeContext context)
+	default IType getConcreteType(ITypeContext context)
 	{
 		return this;
 	}
 	
 	@Override
-	public default boolean isGenericType()
+	default boolean isGenericType()
 	{
 		return false;
 	}
 	
 	@Override
-	public default boolean hasTypeVariables()
+	default boolean hasTypeVariables()
 	{
 		return false;
 	}
 	
 	@Override
-	public default void inferTypes(IType concrete, ITypeContext typeContext)
+	default void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 	}
 	
 	@Override
-	public default IType resolveType(ITypeVariable typeVar)
+	default IType resolveType(ITypeVariable typeVar)
 	{
 		return null;
 	}
@@ -73,18 +73,18 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	public default String getSignature()
+	default String getSignature()
 	{
 		return null;
 	}
 	
 	@Override
-	public default void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	default void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 	}
 	
 	@Override
-	public default void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	default void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
 	}
 }

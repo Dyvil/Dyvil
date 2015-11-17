@@ -8,59 +8,59 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IConstantValue extends IValue
 {
 	@Override
-	public default boolean isResolved()
+	default boolean isResolved()
 	{
 		return true;
 	}
 	
 	@Override
-	public default boolean isConstant()
+	default boolean isConstant()
 	{
 		return true;
 	}
 	
 	@Override
-	public default void resolveTypes(MarkerList markers, IContext context)
+	default void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public default IValue resolve(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
-	public default void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public default void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public default IValue foldConstants()
+	default IValue resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 	
 	@Override
-	public default IValue cleanup(IContext context, IClassCompilableList compilableList)
+	default void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	default void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	default IValue foldConstants()
 	{
 		return this;
 	}
 	
 	@Override
-	public default IValue toConstant(MarkerList markers)
+	default IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}
 	
 	@Override
-	public int stringSize();
+	default IValue toConstant(MarkerList markers)
+	{
+		return this;
+	}
 	
 	@Override
-	public boolean toStringBuilder(StringBuilder builder);
+	int stringSize();
+	
+	@Override
+	boolean toStringBuilder(StringBuilder builder);
 }

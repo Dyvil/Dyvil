@@ -8,7 +8,7 @@ import dyvil.tools.parsing.CodeFile;
 
 public interface IFileType
 {
-	public String getExtension();
+	String getExtension();
 	
-	public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile);
+	ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile);
 }

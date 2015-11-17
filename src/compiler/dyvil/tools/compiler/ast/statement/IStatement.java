@@ -12,37 +12,37 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IStatement extends IValue
 {
 	@Override
-	public default boolean isResolved()
+	default boolean isResolved()
 	{
 		return true;
 	}
 	
 	@Override
-	public default IType getType()
+	default IType getType()
 	{
 		return Types.VOID;
 	}
 	
 	@Override
-	public default IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	default IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
-	public default boolean isType(IType type)
+	default boolean isType(IType type)
 	{
 		return type == Types.VOID;
 	}
 	
 	@Override
-	public default float getTypeMatch(IType type)
+	default float getTypeMatch(IType type)
 	{
 		return 0;
 	}
 	
 	@Override
-	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.writeStatement(writer);
 		if (type != Types.VOID)

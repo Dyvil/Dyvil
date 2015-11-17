@@ -115,47 +115,47 @@ public interface IValue extends IASTNode, ITyped
 	
 	float CONVERSION_MATCH = 1000F;
 	
-	public int valueTag();
+	int valueTag();
 	
-	public static boolean isNumeric(int tag)
+	static boolean isNumeric(int tag)
 	{
 		return tag >= BYTE && tag <= DOUBLE;
 	}
 	
-	public default boolean isConstant()
+	default boolean isConstant()
 	{
 		return false;
 	}
 	
-	public default boolean isConstantOrField()
+	default boolean isConstantOrField()
 	{
 		return this.isConstant();
 	}
 	
-	public default boolean isPrimitive()
+	default boolean isPrimitive()
 	{
 		return this.getType().isPrimitive();
 	}
 	
-	public default IReference toReference()
+	default IReference toReference()
 	{
 		return null;
 	}
 	
-	public boolean isResolved();
+	boolean isResolved();
 	
 	@Override
-	public IType getType();
+	IType getType();
 	
 	@Override
-	public default void setType(IType type)
+	default void setType(IType type)
 	{
 	}
 	
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
+	IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
 	
 	@Override
-	public default boolean isType(IType type)
+	default boolean isType(IType type)
 	{
 		return type.isSuperTypeOf(this.getType());
 	}
@@ -169,44 +169,44 @@ public interface IValue extends IASTNode, ITyped
 	 *            the type to match
 	 * @return the subtyping distance
 	 */
-	public default float getTypeMatch(IType type)
+	default float getTypeMatch(IType type)
 	{
 		return type.getSubTypeDistance(this.getType());
 	}
 	
-	public void resolveTypes(MarkerList markers, IContext context);
+	void resolveTypes(MarkerList markers, IContext context);
 	
-	public default void resolveStatement(ILabelContext context, MarkerList markers)
+	default void resolveStatement(ILabelContext context, MarkerList markers)
 	{
 	
 	}
 	
-	public IValue resolve(MarkerList markers, IContext context);
+	IValue resolve(MarkerList markers, IContext context);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	void checkTypes(MarkerList markers, IContext context);
 	
-	public void check(MarkerList markers, IContext context);
+	void check(MarkerList markers, IContext context);
 	
-	public IValue foldConstants();
+	IValue foldConstants();
 	
-	public IValue cleanup(IContext context, IClassCompilableList compilableList);
+	IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
-	public default IValue toConstant(MarkerList markers)
+	default IValue toConstant(MarkerList markers)
 	{
 		return null;
 	}
 	
-	public default int stringSize()
+	default int stringSize()
 	{
 		return 20;
 	}
 	
-	public default boolean toStringBuilder(StringBuilder builder)
+	default boolean toStringBuilder(StringBuilder builder)
 	{
 		return false;
 	}
 	
-	public static IValue fromObject(Object o)
+	static IValue fromObject(Object o)
 	{
 		if (o == null)
 		{
@@ -289,47 +289,47 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 	
-	public default Object toObject()
+	default Object toObject()
 	{
 		return null;
 	}
 	
-	public default boolean booleanValue()
+	default boolean booleanValue()
 	{
 		return false;
 	}
 	
-	public default int intValue()
+	default int intValue()
 	{
 		return 0;
 	}
 	
-	public default long longValue()
+	default long longValue()
 	{
 		return 0L;
 	}
 	
-	public default float floatValue()
+	default float floatValue()
 	{
 		return 0F;
 	}
 	
-	public default double doubleValue()
+	default double doubleValue()
 	{
 		return 0D;
 	}
 	
-	public default String stringValue()
+	default String stringValue()
 	{
 		return null;
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer);
+	void toString(String prefix, StringBuilder buffer);
 	
 	// Compilation
 	
-	public default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		this.getType().writeCast(writer, type, this.getLineNumber());
@@ -343,7 +343,7 @@ public interface IValue extends IASTNode, ITyped
 	 * @param visitor
 	 * @throws BytecodeException
 	 */
-	public void writeExpression(MethodWriter writer) throws BytecodeException;
+	void writeExpression(MethodWriter writer) throws BytecodeException;
 	
 	/**
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
@@ -353,9 +353,9 @@ public interface IValue extends IASTNode, ITyped
 	 * @param writer
 	 * @throws BytecodeException
 	 */
-	public void writeStatement(MethodWriter writer) throws BytecodeException;
+	void writeStatement(MethodWriter writer) throws BytecodeException;
 	
-	public default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
+	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeJumpInsn(Opcodes.IFNE, dest);
@@ -374,13 +374,13 @@ public interface IValue extends IASTNode, ITyped
 	 * @param dest
 	 * @throws BytecodeException
 	 */
-	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
+	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer);
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
-	public default void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	default void writeAnnotationValue(AnnotationVisitor visitor, String key)
 	{
 		visitor.visit(key, this.toObject());
 	}

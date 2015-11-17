@@ -4,5 +4,5 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface ITypeConsumer
 {
-	public void setType(IType type);
+	void setType(IType type);
 }

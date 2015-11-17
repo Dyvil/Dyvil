@@ -181,7 +181,6 @@ public final class Variable extends Member implements IVariable
 		}
 		
 		boolean inferType = false;
-		;
 		if (this.type == Types.UNKNOWN)
 		{
 			inferType = true;

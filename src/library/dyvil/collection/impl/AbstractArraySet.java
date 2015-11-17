@@ -75,7 +75,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	@Override
 	public boolean isSorted()
 	{
-		return Collection.isSorted((E[]) this.elements, this.size);
+		return Collection.isSorted(this.elements, this.size);
 	}
 	
 	@Override

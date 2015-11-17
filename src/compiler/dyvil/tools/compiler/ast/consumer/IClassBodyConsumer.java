@@ -7,11 +7,11 @@ import dyvil.tools.compiler.ast.method.IMethod;
 
 public interface IClassBodyConsumer
 {
-	public void addField(IField field);
+	void addField(IField field);
 	
-	public void addProperty(IProperty property);
+	void addProperty(IProperty property);
 	
-	public void addConstructor(IConstructor constructor);
+	void addConstructor(IConstructor constructor);
 	
-	public void addMethod(IMethod method);
+	void addMethod(IMethod method);
 }

@@ -32,5 +32,5 @@ public class Warning extends Marker
 	public boolean isWarning()
 	{
 		return true;
-	};
+	}
 }

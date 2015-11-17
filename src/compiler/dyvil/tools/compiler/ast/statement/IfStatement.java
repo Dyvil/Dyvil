@@ -141,11 +141,7 @@ public class IfStatement extends AbstractValue
 		{
 			return false;
 		}
-		if (this.elseThen != null && !this.elseThen.isType(type))
-		{
-			return false;
-		}
-		return true;
+		return !(this.elseThen != null && !this.elseThen.isType(type));
 	}
 	
 	@Override

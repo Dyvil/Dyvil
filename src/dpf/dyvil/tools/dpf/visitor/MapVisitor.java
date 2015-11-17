@@ -2,11 +2,11 @@ package dyvil.tools.dpf.visitor;
 
 public interface MapVisitor
 {
-	public ValueVisitor visitKey();
+	ValueVisitor visitKey();
 	
-	public ValueVisitor visitValue();
+	ValueVisitor visitValue();
 	
-	public default void visitEnd()
+	default void visitEnd()
 	{
 	}
 }

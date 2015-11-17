@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -16,13 +12,17 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public interface IImport extends IASTNode
 {
-	public static final int	SINGLE		= 1;
-	public static final int	WILDCARD	= 2;
-	public static final int	MULTI		= 3;
+	int	SINGLE		= 1;
+	int	WILDCARD	= 2;
+	int	MULTI		= 3;
 	
-	public static IImport fromTag(int tag)
+	static IImport fromTag(int tag)
 	{
 		switch (tag)
 		{
@@ -37,41 +37,41 @@ public interface IImport extends IASTNode
 	}
 	
 	@Override
-	public default ICodePosition getPosition()
+	default ICodePosition getPosition()
 	{
 		return null;
 	}
 	
-	public int importTag();
+	int importTag();
 	
-	public void resolveTypes(MarkerList markers, IContext context, boolean using);
+	void resolveTypes(MarkerList markers, IContext context, boolean using);
 	
-	public void setParent(IImport parent);
+	void setParent(IImport parent);
 	
-	public IImport getParent();
+	IImport getParent();
 	
-	public default void setAlias(Name alias)
+	default void setAlias(Name alias)
 	{
 	}
 	
-	public default Name getAlias()
+	default Name getAlias()
 	{
 		return null;
 	}
 	
-	public IContext getContext();
+	IContext getContext();
 	
-	public Package resolvePackage(Name name);
+	Package resolvePackage(Name name);
 	
-	public IClass resolveClass(Name name);
+	IClass resolveClass(Name name);
 	
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	// Compilation
 	
-	public static void writeImport(IImport iimport, DataOutput dos) throws IOException
+	static void writeImport(IImport iimport, DataOutput dos) throws IOException
 	{
 		if (iimport == null)
 		{
@@ -83,7 +83,7 @@ public interface IImport extends IASTNode
 		iimport.write(dos);
 	}
 	
-	public static IImport readImport(DataInput dis) throws IOException
+	static IImport readImport(DataInput dis) throws IOException
 	{
 		byte type = dis.readByte();
 		if (type == 0)
@@ -95,7 +95,7 @@ public interface IImport extends IASTNode
 		return iimport;
 	}
 	
-	public void write(DataOutput out) throws IOException;
+	void write(DataOutput out) throws IOException;
 	
-	public void read(DataInput in) throws IOException;
+	void read(DataInput in) throws IOException;
 }

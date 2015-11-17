@@ -13,51 +13,51 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IDataMember extends IMember, IAccessible, IValueConsumer
 {
-	public IValue getValue();
+	IValue getValue();
 	
 	@Override
-	public void setValue(IValue value);
+	void setValue(IValue value);
 	
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
+	IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
 	
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);
+	IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);
 	
-	public default boolean isEnumConstant()
+	default boolean isEnumConstant()
 	{
 		return (this.getModifiers() & Modifiers.ENUM) != 0;
 	}
 	
-	public default IClass getTheClass()
+	default IClass getTheClass()
 	{
 		return null;
 	}
 	
-	public boolean isField();
+	boolean isField();
 	
-	public boolean isVariable();
+	boolean isVariable();
 	
 	// Compilation
 	
 	@Override
-	public default void writeGet(MethodWriter writer) throws BytecodeException
+	default void writeGet(MethodWriter writer) throws BytecodeException
 	{
 		this.writeGet(writer, null, 0);
 	}
 	
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException;
+	void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException;
 	
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException;
+	void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException;
 	
-	public String getDescription();
+	String getDescription();
 	
-	public String getSignature();
+	String getSignature();
 	
-	public default IDataMember capture(IContext context)
+	default IDataMember capture(IContext context)
 	{
 		return this;
 	}
 	
-	public default IDataMember capture(IContext context, IVariable variable)
+	default IDataMember capture(IContext context, IVariable variable)
 	{
 		return this;
 	}

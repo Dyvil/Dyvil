@@ -17,58 +17,58 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IConstructor extends IClassMember, ICallableMember, ITypeList, IContext
 {
-	public float getSignatureMatch(IArguments arguments);
+	float getSignatureMatch(IArguments arguments);
 	
-	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
+	IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
+	void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
+	void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	
 	// Misc
 	
-	public void setParameters(IParameter[] parameters, int parameterCount);
+	void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
-	public default int typeCount()
+	default int typeCount()
 	{
 		return 0;
 	}
 	
 	@Override
-	public default void setType(int index, IType type)
+	default void setType(int index, IType type)
 	{
 	}
 	
 	@Override
-	public default void addType(IType type)
+	default void addType(IType type)
 	{
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
 	
 	@Override
-	public default IType getType(int index)
+	default IType getType(int index)
 	{
 		return null;
 	}
 	
 	@Override
-	public void setType(IType type);
+	void setType(IType type);
 	
 	// Compilation
 	
-	public String getDescriptor();
+	String getDescriptor();
 	
-	public String getSignature();
+	String getSignature();
 	
-	public String[] getExceptions();
+	String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
+	void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
 	
-	public void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException;
+	void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException;
 	
-	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException;
+	void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException;
 	
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
+	void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

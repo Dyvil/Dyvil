@@ -331,11 +331,7 @@ public class Complex implements Number, Serializable
 		{
 			return false;
 		}
-		if (Double.doubleToLongBits(this.real) != Double.doubleToLongBits(other.real))
-		{
-			return false;
-		}
-		return true;
+		return Double.doubleToLongBits(this.real) == Double.doubleToLongBits(other.real);
 	}
 	
 	@Override

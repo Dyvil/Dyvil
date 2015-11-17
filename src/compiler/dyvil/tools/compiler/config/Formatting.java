@@ -2,12 +2,12 @@ package dyvil.tools.compiler.config;
 
 public interface Formatting
 {
-	public static class Package
+	class Package
 	{
 		public static boolean newLine = true;
 	}
 	
-	public static class Import
+	class Import
 	{
 		public static String aliasSeperator = " => ";
 		
@@ -20,7 +20,7 @@ public interface Formatting
 		public static boolean newLine = true;
 	}
 	
-	public static class Class
+	class Class
 	{
 		public static String	superClassesSeperator	= ", ";
 		public static String	bodyStart				= "{";
@@ -30,7 +30,7 @@ public interface Formatting
 		public static boolean newLine = true;
 	}
 	
-	public static class Type
+	class Type
 	{
 		public static String	genericSeperator		= ", ";
 		public static String	genericUpperBound		= " <: ";
@@ -38,7 +38,7 @@ public interface Formatting
 		public static String	genericLowerBound		= " >: ";
 	}
 	
-	public static class Field
+	class Field
 	{
 		public static String keyValueSeperator = " = ";
 		
@@ -50,7 +50,7 @@ public interface Formatting
 		public static String	propertySet	= "set: ";
 	}
 	
-	public static class Method
+	class Method
 	{
 		public static String	emptyParameters		= "()";
 		public static String	parametersStart		= "(";
@@ -70,7 +70,7 @@ public interface Formatting
 		public static String	indent						= "\t";
 	}
 	
-	public static class Statements
+	class Statements
 	{
 		public static String	ifStart	= "if (";
 		public static String	ifEnd	= ") ";
@@ -96,7 +96,7 @@ public interface Formatting
 		public static String	catchEnd	= ") ";
 	}
 	
-	public static class Expression
+	class Expression
 	{
 		public static String	emptyExpression	= "{ }";
 		public static String	labelSeperator	= ": \n";

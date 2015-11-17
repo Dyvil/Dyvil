@@ -19,33 +19,33 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClassMetadata
 {
-	public default void setInstanceField(IDataMember field)
+	default void setInstanceField(IDataMember field)
 	{
 	}
 	
-	public default IDataMember getInstanceField()
+	default IDataMember getInstanceField()
 	{
 		return null;
 	}
 	
-	public default IConstructor getConstructor()
+	default IConstructor getConstructor()
 	{
 		return null;
 	}
 	
 	// Annotations
 	
-	public default RetentionPolicy getRetention()
+	default RetentionPolicy getRetention()
 	{
 		return null;
 	}
 	
-	public default boolean isTarget(ElementType target)
+	default boolean isTarget(ElementType target)
 	{
 		return false;
 	}
 	
-	public default Set<ElementType> getTargets()
+	default Set<ElementType> getTargets()
 	{
 		return null;
 	}
@@ -56,35 +56,35 @@ public interface IClassMetadata
 	 * Called before the class body goes through RESOLVE_TYPES. Super-types and
 	 * -interfaces and generics have already been resolved.
 	 */
-	public void resolveTypes(MarkerList markers, IContext context);
+	void resolveTypes(MarkerList markers, IContext context);
 	
 	/**
 	 * Called after the class body went through RESOLVE_TYPES.
 	 */
-	public void resolveTypesBody(MarkerList markers, IContext context);
+	void resolveTypesBody(MarkerList markers, IContext context);
 	
-	public void resolve(MarkerList markers, IContext context);
+	void resolve(MarkerList markers, IContext context);
 	
-	public void checkTypes(MarkerList markers, IContext context);
+	void checkTypes(MarkerList markers, IContext context);
 	
-	public default IDataMember resolveField(Name name)
+	default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
 	
-	public default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
-	public default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
 	// Compilation
 	
-	public default void writeStaticInit(MethodWriter writer) throws BytecodeException
+	default void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
 	}
 	
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
+	void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

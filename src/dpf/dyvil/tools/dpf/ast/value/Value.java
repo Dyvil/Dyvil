@@ -23,7 +23,7 @@ public interface Value extends IASTNode
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer);
+	void toString(String prefix, StringBuilder buffer);
 	
-	public void accept(ValueVisitor visitor);
+	void accept(ValueVisitor visitor);
 }

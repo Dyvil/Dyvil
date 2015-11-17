@@ -5,56 +5,56 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IToken extends ICodePosition
 {
-	public int type();
+	int type();
 	
-	public default Name nameValue()
+	default Name nameValue()
 	{
 		return null;
 	}
 	
-	public default String stringValue()
+	default String stringValue()
 	{
 		return null;
 	}
 	
-	public default int intValue()
+	default int intValue()
 	{
 		return 0;
 	}
 	
-	public default long longValue()
+	default long longValue()
 	{
 		return 0L;
 	}
 	
-	public default void setLong(long value)
+	default void setLong(long value)
 	{
 	}
 	
-	public default float floatValue()
+	default float floatValue()
 	{
 		return 0F;
 	}
 	
-	public default double doubleValue()
+	default double doubleValue()
 	{
 		return 0D;
 	}
 	
-	public default boolean isInferred()
+	default boolean isInferred()
 	{
 		return false;
 	}
 	
-	public IToken prev();
+	IToken prev();
 	
-	public IToken next();
+	IToken next();
 	
-	public void setPrev(IToken prev);
+	void setPrev(IToken prev);
 	
-	public void setNext(IToken next);
+	void setNext(IToken next);
 	
-	public boolean hasPrev();
+	boolean hasPrev();
 	
-	public boolean hasNext();
+	boolean hasNext();
 }
