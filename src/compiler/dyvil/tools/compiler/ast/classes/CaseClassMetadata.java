@@ -1,35 +1,27 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Method;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.CodeMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.transform.CaseClasses;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	private static final int	APPLY		= 1;
-	private static final int	EQUALS		= 2;
-	private static final int	HASHCODE	= 4;
-	private static final int	TOSTRING	= 8;
-	
-	protected IMethod			applyMethod;
-	private byte				methods;
+	protected IMethod applyMethod;
 	
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -37,27 +29,29 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		super.resolveTypes(markers, context);
 		
-		IClassBody body = this.theClass.getBody();
-		if (body != null)
+		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
 		{
-			int count = body.methodCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.checkMethod(body.getMethod(i));
-			}
+			this.theClass.addInterface(Types.SERIALIZABLE);
 		}
+	}
+	
+	@Override
+	public void resolveTypesBody(MarkerList markers, IContext context)
+	{
+		super.resolveTypesBody(markers, context);
+		
+		this.checkMethods();
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			Method m = new Method(this.theClass, Name.apply, this.theClass.getType());
+			CodeMethod m = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
 			IParameter[] parameters = this.theClass.getParameters();
 			int parameterCount = this.theClass.parameterCount();
 			
-			m.modifiers = Modifiers.PUBLIC | Modifiers.STATIC;
 			m.setParameters(parameters, parameterCount);
 			m.setTypeVariables(this.theClass.getTypeVariables(), this.theClass.genericCount());
 			
@@ -65,67 +59,21 @@ public final class CaseClassMetadata extends ClassMetadata
 			{
 				m.setVarargs();
 			}
+			
+			m.resolveTypes(markers, context);
 			this.applyMethod = m;
 		}
 	}
 	
-	private void checkMethod(IMethod m)
-	{
-		Name name = m.getName();
-		if (name == Name.equals)
-		{
-			if (m.parameterCount() == 1 && m.getParameter(0).getType().equals(Types.OBJECT))
-			{
-				this.methods |= EQUALS;
-			}
-			return;
-		}
-		if (name == Name.hashCode)
-		{
-			if (m.parameterCount() == 0)
-			{
-				this.methods |= HASHCODE;
-			}
-			return;
-		}
-		if (name == Name.toString)
-		{
-			if (m.parameterCount() == 0)
-			{
-				this.methods |= TOSTRING;
-			}
-			return;
-		}
-		if (name == Name.apply)
-		{
-			if (m.parameterCount() == this.theClass.parameterCount())
-			{
-				int len = this.theClass.parameterCount();
-				for (int i = 0; i < len; i++)
-				{
-					IType t1 = m.getParameter(i).getType();
-					IType t2 = m.getParameter(i).getType();
-					if (!t1.classEquals(t2) || t1.getArrayDimensions() != t2.getArrayDimensions())
-					{
-						return;
-					}
-				}
-				
-				this.methods |= APPLY;
-			}
-			return;
-		}
-	}
-	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		if (name == Name.apply && this.applyMethod != null)
+		if (name == Names.apply && this.applyMethod != null)
 		{
-			int match = this.applyMethod.getSignatureMatch(name, instance, arguments);
+			float match = this.applyMethod.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(this.applyMethod, match));
+				list.add(this.applyMethod, match);
 			}
 		}
 	}
@@ -138,8 +86,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(),
-					this.applyMethod.getSignature(), null));
+			mw = new MethodWriterImpl(writer,
+					writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(), this.applyMethod.getSignature(), null));
 			mw.begin();
 			mw.writeTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
 			mw.writeInsn(Opcodes.DUP);
@@ -148,9 +96,9 @@ public final class CaseClassMetadata extends ClassMetadata
 			{
 				IParameter param = this.theClass.getParameter(i);
 				param.write(mw);
-				mw.writeVarInsn(param.getType().getLoadOpcode(), i);
+				mw.writeVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
 			}
-			this.constructor.writeInvoke(mw);
+			this.constructor.writeInvoke(mw, 0);
 			mw.writeInsn(Opcodes.ARETURN);
 			mw.end(this.theClass.getType());
 		}

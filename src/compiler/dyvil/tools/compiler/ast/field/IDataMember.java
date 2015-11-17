@@ -1,37 +1,64 @@
 package dyvil.tools.compiler.ast.field;
 
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IDataMember extends IASTNode, IMember, IValued
+public interface IDataMember extends IMember, IAccessible, IValueConsumer
 {
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
+	IValue getValue();
 	
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);
+	@Override
+	void setValue(IValue value);
 	
-	public default boolean isEnumConstant()
+	IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
+	
+	IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);
+	
+	default boolean isEnumConstant()
 	{
-		return false;
+		return (this.getModifiers() & Modifiers.ENUM) != 0;
 	}
 	
-	public boolean isField();
+	default IClass getTheClass()
+	{
+		return null;
+	}
 	
-	public boolean isVariable();
+	boolean isField();
+	
+	boolean isVariable();
 	
 	// Compilation
 	
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException;
+	@Override
+	default void writeGet(MethodWriter writer) throws BytecodeException
+	{
+		this.writeGet(writer, null, 0);
+	}
 	
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException;
+	void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException;
 	
-	public String getDescription();
+	void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException;
 	
-	public String getSignature();
+	String getDescription();
+	
+	String getSignature();
+	
+	default IDataMember capture(IContext context)
+	{
+		return this;
+	}
+	
+	default IDataMember capture(IContext context, IVariable variable)
+	{
+		return this;
+	}
 }

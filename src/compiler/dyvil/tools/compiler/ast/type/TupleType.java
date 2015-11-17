@@ -1,37 +1,40 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
-public final class TupleType implements IType, ITypeList
+public final class TupleType implements IObjectType, ITypeList
 {
 	public static final IClass[]	tupleClasses	= new IClass[22];
 	public static final String[]	descriptors		= new String[22];
 	
-	protected IType[]				types;
-	protected int					typeCount;
+	protected IType[]	types;
+	protected int		typeCount;
 	
 	public TupleType()
 	{
@@ -94,7 +97,7 @@ public final class TupleType implements IType, ITypeList
 		for (int i = 0; i < count; i++)
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
-			IType type1 = type.resolveType(typeVar);
+			IType type1 = type.resolveTypeSafely(typeVar);
 			if (!typedArray[i].isType(type1))
 			{
 				return false;
@@ -107,6 +110,12 @@ public final class TupleType implements IType, ITypeList
 	public int typeTag()
 	{
 		return TUPLE;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return true;
 	}
 	
 	@Override
@@ -166,7 +175,7 @@ public final class TupleType implements IType, ITypeList
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
-			IType type1 = type.resolveType(typeVar);
+			IType type1 = type.resolveTypeSafely(typeVar);
 			
 			// Covariance
 			if (!this.types[i].isSuperTypeOf(type1))
@@ -186,10 +195,19 @@ public final class TupleType implements IType, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		// We don't need supertype checking here because typeVar can only come
-		// from the tuple class or Entry[K, V], in which case it is simply
-		// overridden and Tuple2.K yields exactly the same as Entry.K.
-		return this.types[typeVar.getIndex()];
+		int index = typeVar.getIndex();
+		
+		IClass iclass = this.getTheClass();
+		if (iclass.getTypeVariable(index) != typeVar)
+		{
+			return iclass.resolveType(typeVar, this);
+		}
+		
+		if (index >= this.typeCount)
+		{
+			return null;
+		}
+		return this.types[index];
 	}
 	
 	@Override
@@ -224,8 +242,11 @@ public final class TupleType implements IType, ITypeList
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			ITypeVariable typeVar = iclass.getTypeVariable(i);
-			IType concreteType = concrete.resolveType(typeVar);
-			this.types[i].inferTypes(concreteType, typeContext);
+			IType concreteType = concrete.resolveTypeSafely(typeVar);
+			if (concreteType != null)
+			{
+				this.types[i].inferTypes(concreteType, typeContext);
+			}
 		}
 	}
 	
@@ -236,7 +257,7 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		if (this.typeCount == 0)
 		{
@@ -244,19 +265,65 @@ public final class TupleType implements IType, ITypeList
 		}
 		if (this.typeCount == 1)
 		{
-			return this.types[0].resolve(markers, context, position);
+			return this.types[0].resolveType(markers, context);
 		}
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i] = this.types[i].resolve(markers, context, TypePosition.GENERIC_ARGUMENT);
+			this.types[i] = this.types[i].resolveType(markers, context);
 		}
 		
+		return this;
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(this.types[0].getPosition(), "type.class.tuple");
+			markers.add(I18n.createMarker(this.types[0].getPosition(), "type.class.tuple"));
 		}
-		return this;
+		
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].checkType(markers, context, TypePosition.GENERIC_ARGUMENT);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].check(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			this.types[i].cleanup(context, compilableList);
+		}
 	}
 	
 	@Override
@@ -266,13 +333,13 @@ public final class TupleType implements IType, ITypeList
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.getTheClass().getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.getTheClass().getConstructorMatches(list, arguments);
 	}
@@ -328,30 +395,51 @@ public final class TupleType implements IType, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TupleType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/type/TupleType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/types/TupleType;", false);
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		dos.writeByte(this.typeCount);
+		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
+		{
+			return;
+		}
+		
+		int index = typePath.getStepArgument(step);
+		this.types[index] = IType.withAnnotation(this.types[index], annotation, typePath, step + 1, steps);
+	}
+	
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			IType.writeType(this.types[i], dos);
+			this.types[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
 		}
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		int len = this.typeCount = dis.readByte();
+		out.writeByte(this.typeCount);
+		for (int i = 0; i < this.typeCount; i++)
+		{
+			IType.writeType(this.types[i], out);
+		}
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		int len = this.typeCount = in.readByte();
 		if (len > this.types.length)
 		{
 			this.types = new IType[len];
 		}
 		for (int i = 0; i < len; i++)
 		{
-			this.types[i] = IType.readType(dis);
+			this.types[i] = IType.readType(in);
 		}
 	}
 	
@@ -385,5 +473,17 @@ public final class TupleType implements IType, ITypeList
 		tt.typeCount = this.typeCount;
 		System.arraycopy(this.types, 0, tt.types, 0, this.typeCount);
 		return tt;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return IType.equals(this, obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return System.identityHashCode(getTupleClass(this.typeCount));
 	}
 }

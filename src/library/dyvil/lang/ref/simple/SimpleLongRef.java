@@ -6,7 +6,7 @@ import dyvil.lang.ref.LongRef;
 @LongConvertible
 public class SimpleLongRef implements LongRef
 {
-	public long	value;
+	public long value;
 	
 	public static SimpleLongRef apply(long value)
 	{

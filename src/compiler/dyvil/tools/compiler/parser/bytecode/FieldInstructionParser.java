@@ -2,12 +2,11 @@ package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.FieldInstruction;
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class FieldInstructionParser extends Parser implements IInternalTyped
 {
@@ -15,7 +14,7 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	private static final int	DOT		= 2;
 	private static final int	COLON	= 8;
 	
-	protected FieldInstruction	fieldInstruction;
+	protected FieldInstruction fieldInstruction;
 	
 	public FieldInstructionParser(FieldInstruction fi)
 	{
@@ -24,51 +23,43 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = OWNER;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
 		}
 		
-		if (this.mode == OWNER)
+		switch (this.mode)
 		{
+		case OWNER:
 			pm.pushParser(new InternalTypeParser(this), true);
 			this.mode = DOT;
 			return;
-		}
-		if (this.mode == DOT)
-		{
-			if (type != Symbols.DOT)
+		case DOT:
+			if (type != BaseSymbols.DOT)
 			{
-				throw new SyntaxError(token, "Invalid Field Instruction - '.' expected");
+				pm.report(token, "Invalid Field Instruction - '.' expected");
+				return;
 			}
 			this.mode = COLON;
-			
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				throw new SyntaxError(next, "Invalid Field Instruction - Field Name expected");
+				pm.report(next, "Invalid Field Instruction - Field Name expected");
+				return;
 			}
 			pm.skip();
 			this.fieldInstruction.setFieldName(next.nameValue().qualified);
 			return;
-		}
-		if (this.mode == COLON)
-		{
-			if (type != Symbols.COLON)
+		case COLON:
+			if (type != BaseSymbols.COLON)
 			{
-				throw new SyntaxError(token, "Invalid Field Instruction - ':' expected");
+				pm.report(token, "Invalid Field Instruction - ':' expected");
+				return;
 			}
-			
 			pm.pushParser(new InternalTypeParser(this));
 			return;
 		}

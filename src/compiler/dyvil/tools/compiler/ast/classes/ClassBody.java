@@ -1,30 +1,30 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.lang.List;
-
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class ClassBody extends ASTNode implements IClassBody
+public class ClassBody implements IClassBody
 {
-	public IClass			theClass;
+	public IClass theClass;
 	
-	public IClass[]			classes;
-	public int				classCount;
+	public IClass[]	classes;
+	public int		classCount;
 	
 	private IField[]		fields			= new IField[3];
 	private int				fieldCount;
@@ -35,11 +35,22 @@ public class ClassBody extends ASTNode implements IClassBody
 	private IProperty[]		properties		= new IProperty[3];
 	private int				propertyCount;
 	
-	protected IMethod		functionalMethod;
+	protected IMethod functionalMethod;
 	
 	public ClassBody(IClass iclass)
 	{
 		this.theClass = iclass;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
 	}
 	
 	@Override
@@ -213,15 +224,43 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public IConstructor getConstructor(IParameter[] parameters, int parameterCount)
 	{
+		outer:
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			IConstructor c = this.constructors[i];
-			int m = c.getSignatureMatch(arguments);
-			if (m > 0)
+			if (c.parameterCount() != parameterCount)
 			{
-				list.add(new ConstructorMatch(c, m));
+				continue;
+			}
+			
+			for (int p = 0; p < parameterCount; p++)
+			{
+				IType classParamType = parameters[p].getType();
+				IType constructorParamType = c.getParameter(p).getType();
+				if (!classParamType.isSameType(constructorParamType))
+				{
+					continue outer;
+				}
+			}
+			
+			return c;
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	{
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			IConstructor ctor = this.constructors[i];
+			float match = ctor.getSignatureMatch(arguments);
+			if (match > 0)
+			{
+				list.add(ctor, match);
 			}
 		}
 	}
@@ -288,7 +327,7 @@ public class ClassBody extends ASTNode implements IClassBody
 			{
 				IType t1 = parameters[p].getType();
 				IType t2 = m.getParameter(p).getType().getConcreteType(concrete);
-				if (!t1.equals(t2))
+				if (!t1.isSameType(t2))
 				{
 					continue outer;
 				}
@@ -299,15 +338,15 @@ public class ClassBody extends ASTNode implements IClassBody
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod m = this.methods[i];
-			int match = m.getSignatureMatch(name, instance, arguments);
+			IMethod method = this.methods[i];
+			float match = method.getSignatureMatch(name, instance, arguments);
 			if (match > 0)
 			{
-				list.add(new MethodMatch(m, match));
+				list.add(method, match);
 			}
 		}
 	}
@@ -320,16 +359,23 @@ public class ClassBody extends ASTNode implements IClassBody
 			return this.functionalMethod;
 		}
 		
+		boolean found = false;
+		IMethod match = null;
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			IMethod m = this.methods[i];
-			if (m.hasModifier(Modifiers.ABSTRACT))
+			if (m.isAbstract())
 			{
-				this.functionalMethod = m;
-				return m;
+				if (found)
+				{
+					return null;
+				}
+				
+				found = true;
+				match = m;
 			}
 		}
-		return null;
+		return this.functionalMethod = match;
 	}
 	
 	@Override
@@ -404,9 +450,41 @@ public class ClassBody extends ASTNode implements IClassBody
 		{
 			this.constructors[i].checkTypes(markers, context);
 		}
+		
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			this.methods[i].checkTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			if (this.methods[i].checkOverride(markers, iclass, candidate, typeContext))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IMethod candidate = this.methods[i];
+			if (iclass.checkImplements(markers, iclass, candidate, typeContext))
+			{
+				continue;
+			}
+			
+			if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
+			{
+				markers.add(I18n.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(), candidate.getName(), this.theClass.getName()));
+			}
 		}
 	}
 	
@@ -512,7 +590,7 @@ public class ClassBody extends ASTNode implements IClassBody
 			for (int i = 0; i < this.fieldCount; i++)
 			{
 				this.fields[i].toString(prefix1, buffer);
-				buffer.append('\n');
+				buffer.append(';').append('\n');
 			}
 			buffer.append('\n');
 		}

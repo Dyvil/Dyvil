@@ -1,29 +1,34 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CaptureField implements IField
 {
-	public IClass	theClass;
-	public String	name;
+	public IClass		theClass;
+	public String		name;
 	public IDataMember	field;
-	private IType	type;
+	private IType		type;
 	
 	public CaptureField(IClass iclass)
 	{
@@ -40,6 +45,17 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.field.getPosition();
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public boolean isField()
 	{
 		return this.field.isField();
@@ -50,7 +66,7 @@ public final class CaptureField implements IField
 	{
 		return this.field.isVariable();
 	}
-
+	
 	@Override
 	public void setTheClass(IClass iclass)
 	{
@@ -125,63 +141,31 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public int annotationCount()
-	{
-		return this.field.annotationCount();
-	}
-	
-	@Override
-	public void setAnnotations(Annotation[] annotations, int count)
-	{
-		this.field.setAnnotations(annotations, count);
-	}
-	
-	@Override
-	public void setAnnotation(int index, Annotation annotation)
-	{
-		this.field.setAnnotation(index, annotation);
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		this.field.addAnnotation(annotation);
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
-	{
-		return this.field.addRawAnnotation(type);
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-		this.field.removeAnnotation(index);
-	}
-	
-	@Override
-	public Annotation[] getAnnotations()
+	public AnnotationList getAnnotations()
 	{
 		return this.field.getAnnotations();
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public void setAnnotations(AnnotationList annotations)
 	{
-		return this.field.getAnnotation(index);
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.field.getAnnotation(type);
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public void addAnnotation(IAnnotation annotation)
 	{
-		return this.field.getAnnotationType();
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.FIELD;
 	}
 	
 	@Override
@@ -201,8 +185,8 @@ public final class CaptureField implements IField
 	{
 		if (instance == null)
 		{
-			markers.add(position, "field.access.unqualified", this.name);
-			return new ThisValue(position, this.theClass.getType());
+			markers.add(I18n.createMarker(position, "field.access.unqualified", this.name));
+			return new ThisExpr(position, context.getThisClass().getType(), context, markers);
 		}
 		
 		return instance;
@@ -263,7 +247,7 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		String owner = this.theClass.getInternalName();
@@ -273,17 +257,27 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		String owner = this.theClass.getInternalName();
 		String name = this.name;
 		String desc = this.type.getExtendedName();
 		writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
 	}
 	
 	@Override

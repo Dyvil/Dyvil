@@ -1,53 +1,71 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.AnnotatableVisitor;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.NamedType;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.FieldVisitor;
-
-public final class Annotation extends ASTNode implements ITyped
+public final class Annotation implements IAnnotation
 {
-	public static final MethodParameter	VALUE		= new MethodParameter();
-	
-	static
+	public static final class Types
 	{
-		VALUE.name = Name.getQualified("value");
+		public static final IClass	RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
+		public static final IClass	TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
+		
+		public static final IClass		ANNOTATION_CLASS	= Package.javaLangAnnotation.resolveClass("Annotation");
+		public static final ClassType	ANNOTATION			= new ClassType(ANNOTATION_CLASS);
+		
+		private Types()
+		{
+			// no instances
+		}
 	}
 	
-	public Name							name;
-	public IType						type;
-	public IArguments					arguments	= EmptyArguments.INSTANCE;
+	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
+	
+	protected ICodePosition	position;
+	protected IArguments	arguments	= EmptyArguments.INSTANCE;
+	
+	// Metadata
+	protected IType type;
+	
+	public Annotation()
+	{
+	}
 	
 	public Annotation(IType type)
 	{
 		this.type = type;
-		this.name = type.getName();
 	}
 	
 	public Annotation(ICodePosition position)
@@ -58,15 +76,25 @@ public final class Annotation extends ASTNode implements ITyped
 	public Annotation(ICodePosition position, IType type)
 	{
 		this.position = position;
-		this.name = type.getName();
 		this.type = type;
 	}
 	
-	public Annotation(ICodePosition position, Name name)
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
-		this.name = name;
-		this.type = new NamedType(position, name);
+	}
+	
+	@Override
+	public IType getType()
+	{
+		return this.type;
 	}
 	
 	@Override
@@ -76,17 +104,26 @@ public final class Annotation extends ASTNode implements ITyped
 	}
 	
 	@Override
-	public IType getType()
+	public IArguments getArguments()
 	{
-		return this.type;
+		return this.arguments;
 	}
 	
+	@Override
+	public void setArguments(IArguments arguments)
+	{
+		this.arguments = arguments;
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+		this.type = this.type.resolveType(markers, context);
+		
 		this.arguments.resolveTypes(markers, context);
 	}
 	
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
@@ -103,13 +140,19 @@ public final class Annotation extends ASTNode implements ITyped
 			IParameter param = theClass.getParameter(i);
 			IType type = param.getType();
 			IValue value = this.arguments.getValue(i, param);
-			IValue value1 = value.withType(type, null, markers, context);
+			if (value == null)
+			{
+				if (param.getValue() == null)
+				{
+					markers.add(I18n.createMarker(this.position, "annotation.parameter.missing", this.type, param.getName()));
+				}
+				continue;
+			}
 			
+			IValue value1 = value.withType(type, type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "annotation.type", param.getName().qualified);
-				marker.addInfo("Required Type: " + type);
-				marker.addInfo("Value Type: " + value.getType());
+				Util.createTypeError(markers, value, type, type, "annotation.parameter.type", param.getName());
 				continue;
 			}
 			
@@ -121,40 +164,51 @@ public final class Annotation extends ASTNode implements ITyped
 		}
 	}
 	
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.CLASS);
+		
 		this.arguments.checkTypes(markers, context);
 	}
 	
+	@Override
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		IClass theClass = this.type.getTheClass();
-		if (theClass == null)
+		if (this.type == null || !this.type.isResolved())
 		{
 			return;
 		}
 		
+		IClass theClass = this.type.getTheClass();
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(this.position, "annotation.type", this.name);
+			markers.add(I18n.createMarker(this.position, "annotation.type", this.type.getName()));
+			return;
+		}
+		
+		if (target == null)
+		{
 			return;
 		}
 		
 		IClassMetadata metadata = theClass.getMetadata();
 		if (!metadata.isTarget(target))
 		{
-			Marker error = markers.create(this.position, "annotation.target", this.name);
-			error.addInfo("Element Target: " + target);
-			error.addInfo("Allowed Targets: " + metadata.getTargets());
+			Marker error = I18n.createMarker(this.position, "annotation.target", this.type.getName());
+			error.addInfo(I18n.getString("annotation.target.element", target));
+			error.addInfo(I18n.getString("annotation.target.allows", metadata.getTargets()));
 			markers.add(error);
 		}
 	}
 	
+	@Override
 	public void foldConstants()
 	{
 		this.arguments.foldConstants();
 	}
 	
+	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.arguments.cleanup(context, compilableList);
@@ -165,68 +219,68 @@ public final class Annotation extends ASTNode implements ITyped
 		return this.type.getTheClass().getMetadata().getRetention();
 	}
 	
-	public void write(ClassWriter writer)
+	@Override
+	public void write(AnnotatableVisitor writer)
 	{
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitAnnotation(this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitAnnotation(ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
-	public void write(MethodWriter writer)
+	@Override
+	public void write(TypeAnnotatableVisitor writer, int typeRef, TypePath typePath)
 	{
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.addAnnotation(this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitTypeAnnotation(typeRef, typePath, ClassFormat.internalToExtended(this.type.getInternalName()),
+					retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
-	public void write(FieldVisitor writer)
-	{
-		RetentionPolicy retention = this.getRetention();
-		if (retention != RetentionPolicy.SOURCE)
-		{
-			this.write(writer.visitAnnotation(this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
-		}
-	}
-	
-	public void write(MethodWriter writer, int index)
-	{
-		RetentionPolicy retention = this.getRetention();
-		if (retention != RetentionPolicy.SOURCE)
-		{
-			this.write(writer.addParameterAnnotation(index, this.type.getExtendedName(), retention == RetentionPolicy.RUNTIME));
-		}
-	}
-	
-	private void write(AnnotationVisitor visitor)
+	@Override
+	public void write(AnnotationVisitor visitor)
 	{
 		IClass iclass = this.type.getTheClass();
 		int count = iclass.parameterCount();
 		for (int i = 0; i < count; i++)
 		{
 			IParameter param = iclass.getParameter(i);
-			visitValue(visitor, param.getName().qualified, this.arguments.getValue(i, param));
+			IValue v = this.arguments.getValue(i, param);
+			if (v != null)
+			{
+				visitValue(visitor, param.getName().qualified, v);
+			}
 		}
+		visitor.visitEnd();
 	}
 	
-	private static void visitValue(AnnotationVisitor visitor, String key, IValue value)
+	public static void visitValue(AnnotationVisitor visitor, String key, IValue value)
 	{
 		int valueType = value.valueTag();
 		if (valueType == IValue.ARRAY)
 		{
 			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
-			for (IValue v : (IValueList) value)
+			ArrayExpr array = (ArrayExpr) value;
+			int count = array.valueCount();
+			for (int i = 0; i < count; i++)
 			{
-				visitValue(arrayVisitor, null, v);
+				visitValue(arrayVisitor, null, array.getValue(i));
 			}
+			arrayVisitor.visitEnd();
 		}
-		else if (valueType == IValue.ENUM)
+		else if (valueType == IValue.ENUM_ACCESS)
 		{
 			EnumValue enumValue = (EnumValue) value;
 			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name.qualified);
+		}
+		else if (valueType == IValue.ANNOTATION)
+		{
+			IAnnotation annotation = ((AnnotationValue) value).annotation;
+			AnnotationVisitor av = visitor.visitAnnotation(key, annotation.getType().getExtendedName());
+			annotation.write(av);
 		}
 		else if (value.isConstant())
 		{
@@ -235,9 +289,28 @@ public final class Annotation extends ASTNode implements ITyped
 	}
 	
 	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		// TODO
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		// TODO
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('@').append(this.name);
+		buffer.append('@');
+		this.type.toString(prefix, buffer);
 		this.arguments.toString(prefix, buffer);
 	}
 }

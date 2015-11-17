@@ -1,7 +1,8 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -11,49 +12,42 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.Constructor;
-import dyvil.tools.compiler.ast.method.IExceptionList;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.Method;
+import dyvil.tools.compiler.ast.method.*;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class ClassBodyParser extends Parser implements ITypeConsumer
 {
-	public static final int			TYPE			= 1;
-	public static final int			NAME			= 2;
-	public static final int			GENERICS_END	= 4;
-	public static final int			PARAMETERS		= 8;
-	public static final int			PARAMETERS_END	= 16;
-	public static final int			FIELD_END		= 32;
-	public static final int			PROPERTY_END	= 64;
-	public static final int			METHOD_VALUE	= 128;
-	public static final int			METHOD_END		= 256;
+	public static final int	TYPE			= 1;
+	public static final int	NAME			= 2;
+	public static final int	GENERICS_END	= 4;
+	public static final int	PARAMETERS		= 8;
+	public static final int	PARAMETERS_END	= 16;
+	public static final int	FIELD_END		= 32;
+	public static final int	PROPERTY_END	= 64;
+	public static final int	METHOD_VALUE	= 128;
+	public static final int	METHOD_END		= 256;
 	
 	protected IClass				theClass;
 	protected IClassBodyConsumer	consumer;
 	
-	private IType					type;
-	private int						modifiers;
-	private Annotation[]			annotations		= new Annotation[2];
-	private int						annotationCount;
+	private IType			type;
+	private int				modifiers;
+	private AnnotationList	annotations;
 	
-	private IMember					member;
+	private IMember member;
 	
 	public ClassBodyParser(IClass theClass, IClassBodyConsumer consumer)
 	{
@@ -68,55 +62,49 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		this.mode = TYPE;
 	}
 	
-	@Override
-	public void reset()
+	private void reset()
 	{
 		this.mode = TYPE;
 		this.modifiers = 0;
-		this.annotationCount = 0;
+		this.annotations = null;
 		this.type = null;
 		this.member = null;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
-		{
-			pm.popParser(true);
-			return;
-		}
 		
 		switch (this.mode)
 		{
 		case TYPE:
-			if (type == Symbols.SEMICOLON)
+			switch (type)
 			{
+			case 0:
+				// no error
+				pm.popParser();
+				return;
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				pm.popParser(true);
+				return;
+			case BaseSymbols.SEMICOLON:
 				if (token.isInferred())
 				{
 					return;
 				}
-				
 				this.reset();
 				return;
-			}
-			if (type == Keywords.NEW)
-			{
+			case DyvilKeywords.NEW:
 				if (this.theClass == null)
 				{
-					this.mode = 0;
-					throw new SyntaxError(token, "Cannot define a constructor in this context");
+					this.mode = TYPE;
+					pm.report(token, "Cannot define a constructor in this context");
+					return;
 				}
-				
-				Constructor c = new Constructor(this.theClass);
-				this.consumer.addConstructor(c);
-				c.position = token.raw();
-				c.modifiers = this.modifiers;
-				c.setAnnotations(this.annotations, this.annotationCount);
+				Constructor c = new Constructor(token.raw(), this.theClass, this.modifiers);
+				c.setAnnotations(this.annotations);
 				this.member = c;
-				
 				this.mode = PARAMETERS;
 				return;
 			}
@@ -130,67 +118,75 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			{
 				if (this.theClass == null)
 				{
-					this.mode = 0;
-					throw new SyntaxError(token, "Cannot define a class in this context");
+					this.reset();
+					pm.report(token, "Cannot define a class in this context");
+					return;
 				}
 				
-				CodeClass codeClass = new CodeClass(null, this.theClass.getUnit(), this.modifiers);
-				codeClass.setAnnotations(this.getAnnotations(), this.annotationCount);
-				codeClass.setOuterClass(this.theClass);
-				codeClass.setModifiers(this.modifiers);
-				
-				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass.getBody(), codeClass);
-				pm.pushParser(parser, true);
+				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass, this.modifiers | i, this.annotations);
+				pm.pushParser(parser);
 				this.reset();
 				return;
 			}
-			if (token.nameValue() == Name.at)
+			if (type == DyvilSymbols.AT)
 			{
+				if (token.next().type() == DyvilKeywords.INTERFACE)
+				{
+					this.modifiers |= Modifiers.ANNOTATION;
+					return;
+				}
+				
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+				
 				Annotation annotation = new Annotation(token.raw());
-				this.addAnnotation(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
+				this.annotations.addAnnotation(annotation);
+				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
-			pm.pushParser(new TypeParser(this), true);
+			pm.pushParser(pm.newTypeParser(this), true);
 			this.mode = NAME;
 			return;
 		case NAME:
 			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
-				throw new SyntaxError(token, "Invalid Member Declaration - Name expected", true);
+				pm.report(token, "Invalid Member Declaration - Name expected");
+				return;
 			}
 			IToken next = token.next();
 			type = next.type();
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
-				Field f = new Field(this.theClass, token.nameValue(), this.type);
-				f.position = token.raw();
-				f.modifiers = this.modifiers;
-				f.setAnnotations(this.getAnnotations(), this.annotationCount);
+				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				f.setAnnotations(this.annotations);
 				this.consumer.addField(f);
+				
+				if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+				{
+					pm.popParser(true);
+					return;
+				}
 				
 				pm.skip();
 				this.reset();
 				return;
 			}
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = PARAMETERS;
 				
-				Method m = new Method(this.theClass, token.nameValue(), this.type);
-				m.modifiers = this.modifiers;
-				m.position = token.raw();
-				m.setAnnotations(this.getAnnotations(), this.annotationCount);
+				AbstractMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				m.setAnnotations(this.annotations);
 				this.member = m;
 				return;
 			}
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				Property p = new Property(this.theClass, token.nameValue(), this.type);
-				p.position = token.raw();
-				p.modifiers = this.modifiers;
-				p.setAnnotations(this.getAnnotations(), this.annotationCount);
+				Property p = new Property(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				p.setAnnotations(this.annotations);
 				this.member = p;
 				this.mode = FIELD_END;
 				
@@ -198,25 +194,21 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.pushParser(new PropertyParser(p));
 				return;
 			}
-			if (type == Symbols.EQUALS)
+			if (type == BaseSymbols.EQUALS)
 			{
-				Field f = new Field(this.theClass, token.nameValue(), this.type);
-				f.position = token.raw();
-				f.modifiers = this.modifiers;
-				f.setAnnotations(this.getAnnotations(), this.annotationCount);
+				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				f.setAnnotations(this.annotations);
 				this.member = f;
 				this.mode = FIELD_END;
 				
 				pm.skip();
-				pm.pushParser(new ExpressionParser(f));
+				pm.pushParser(pm.newExpressionParser(f));
 				return;
 			}
-			if (type == Symbols.OPEN_SQUARE_BRACKET)
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
-				Method m = new Method(this.theClass, token.nameValue(), this.type);
-				m.modifiers = this.modifiers;
-				m.position = token.raw();
-				m.setAnnotations(this.getAnnotations(), this.annotationCount);
+				CodeMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				m.setAnnotations(this.annotations);
 				this.member = m;
 				
 				this.mode = GENERICS_END;
@@ -226,57 +218,79 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			throw new SyntaxError(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected");
+			pm.report(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected");
+			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
-			if (type == Symbols.CLOSE_SQUARE_BRACKET)
+			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Generic Type Parameter List - ']' expected", true);
+			pm.reparse();
+			pm.report(token, "Invalid Generic Type Parameter List - ']' expected");
+			return;
 		case PARAMETERS:
 			this.mode = PARAMETERS_END;
-			if (type == Symbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.pushParser(new ParameterListParser((IParameterList) this.member));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Parameter List - '(' expected", true);
+			pm.reparse();
+			pm.report(token, "Invalid Parameter List - '(' expected");
+			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_VALUE;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Parameter List - ')' expected", true);
+			
+			pm.reparse();
+			pm.report(token, "Invalid Parameter List - ')' expected");
+			return;
 		case METHOD_VALUE:
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				this.consumer.addMethod((IMethod) this.member);
+				pm.popParser(true);
+				return;
+			}
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				this.consumer.addMethod((IMethod) this.member);
 				this.reset();
 				return;
 			}
 			this.mode = METHOD_END;
-			if (type == Symbols.OPEN_CURLY_BRACKET)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.pushParser(new ExpressionParser((IValueConsumer) this.member), true);
+				pm.pushParser(new StatementListParser((IValueConsumer) this.member), true);
 				return;
 			}
-			if (type == Symbols.EQUALS)
+			if (type == BaseSymbols.EQUALS)
 			{
-				pm.pushParser(new ExpressionParser((IValueConsumer) this.member));
+				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
 				return;
 			}
-			if (type == Keywords.THROWS)
+			if (type == DyvilKeywords.THROWS)
 			{
 				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
 				return;
 			}
 			
 			this.mode = TYPE;
-			throw new SyntaxError(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
+			pm.report(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
+			return;
 		case METHOD_END:
-			this.consumer.addMethod((IMethod) this.member);
+			if (this.member instanceof IMethod)
+			{
+				this.consumer.addMethod((IMethod) this.member);
+			}
+			else
+			{
+				this.consumer.addConstructor((IConstructor) this.member);
+			}
 			pm.reparse();
 			this.reset();
 			return;
@@ -297,29 +311,5 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-	
-	public int annotationCount()
-	{
-		return this.annotationCount;
-	}
-	
-	public Annotation[] getAnnotations()
-	{
-		Annotation[] a = new Annotation[this.annotationCount];
-		System.arraycopy(this.annotations, 0, a, 0, this.annotationCount);
-		return a;
-	}
-	
-	public void addAnnotation(Annotation annotation)
-	{
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
-		{
-			Annotation[] temp = new Annotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
-			this.annotations = temp;
-		}
-		this.annotations[index] = annotation;
 	}
 }

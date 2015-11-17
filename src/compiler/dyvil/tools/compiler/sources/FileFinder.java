@@ -2,38 +2,51 @@ package dyvil.tools.compiler.sources;
 
 import java.io.File;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.lexer.CodeFile;
+import dyvil.tools.parsing.CodeFile;
 
 public class FileFinder
 {
 	public final List<File>				files	= new ArrayList();
 	public final List<ICompilationUnit>	units	= new ArrayList();
 	
-	public void findUnits(File source, File output, Package pack)
+	public void process(File source, File output, Package pack)
 	{
 		if (source.isDirectory())
 		{
-			String name = source.getName();
-			for (String s : source.list())
-			{
-				this.findUnits(new CodeFile(source, s), new File(output, s), pack == null ? Package.rootPackage : pack.createSubPackage(name));
-			}
-			return;
+			this.processDirectory(source, output, pack);
 		}
-		
-		String fileName = source.getPath();
-		if (!DyvilCompiler.config.compileFile(fileName))
+		else
 		{
-			return;
+			this.processFile((CodeFile) source, output, pack);
 		}
-		
-		if (fileName.endsWith("Thumbs.db") || fileName.endsWith(".DS_Store"))
+	}
+	
+	private void processDirectory(File source, File output, Package pack)
+	{
+		for (String s : source.list())
+		{
+			CodeFile source1 = new CodeFile(source, s);
+			File output1 = new File(output, s);
+			if (source1.isDirectory())
+			{
+				this.processDirectory(source1, output1, pack.createSubPackage(s));
+			}
+			else
+			{
+				this.processFile(source1, output1, pack);
+			}
+		}
+	}
+	
+	private void processFile(CodeFile source, File output, Package pack)
+	{
+		String fileName = source.getPath();
+		if (!DyvilCompiler.config.isExcluded(fileName))
 		{
 			return;
 		}
@@ -41,13 +54,13 @@ public class FileFinder
 		this.files.add(output);
 		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		
-		IFileType fileType = FileTypes.fileTypes.get(extension);
+		IFileType fileType = FileType.fileTypes.get(extension);
 		if (fileType == null)
 		{
 			return; // Skip: Unknown File Type
 		}
 		
-		ICompilationUnit unit = fileType.createUnit(pack, (CodeFile) source, output);
+		ICompilationUnit unit = fileType.createUnit(pack, source, output);
 		if (unit == null)
 		{
 			return; // Skip: Not a compilation unit

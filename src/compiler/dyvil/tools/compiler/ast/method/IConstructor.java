@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.tools.compiler.ast.IASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -13,58 +11,64 @@ import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IConstructor extends IASTNode, IClassMember, ICallableMember, ITypeList, IContext
+public interface IConstructor extends IClassMember, ICallableMember, ITypeList, IContext
 {
-	public int getSignatureMatch(IArguments arguments);
+	float getSignatureMatch(IArguments arguments);
 	
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
+	IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
+	void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
+	
+	void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 	
 	// Misc
 	
-	public void setParameters(IParameter[] parameters, int parameterCount);
+	void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
-	public default int typeCount()
+	default int typeCount()
 	{
 		return 0;
 	}
 	
 	@Override
-	public default void setType(int index, IType type)
+	default void setType(int index, IType type)
 	{
 	}
 	
 	@Override
-	public default void addType(IType type)
+	default void addType(IType type)
 	{
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
 	
 	@Override
-	public default IType getType(int index)
+	default IType getType(int index)
 	{
 		return null;
 	}
 	
+	@Override
+	void setType(IType type);
+	
 	// Compilation
 	
-	public String getDescriptor();
+	String getDescriptor();
 	
-	public String getSignature();
+	String getSignature();
 	
-	public String[] getExceptions();
+	String[] getExceptions();
 	
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type) throws BytecodeException;
+	void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
 	
-	public void writeInvoke(MethodWriter writer) throws BytecodeException;
+	void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException;
 	
-	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException;
+	void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException;
 	
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
+	void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

@@ -1,13 +1,11 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -15,15 +13,18 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ClassAccess extends ASTNode implements IValue
+public final class ClassAccess implements IValue
 {
 	private static final byte	OBJECT_ACCESS	= 1;
 	private static final byte	APPLY_CALL		= 2;
 	
-	public IType				type;
+	protected ICodePosition	position;
+	protected IType			type;
 	
 	public ClassAccess(IType type)
 	{
@@ -34,6 +35,18 @@ public final class ClassAccess extends ASTNode implements IValue
 	{
 		this.position = position;
 		this.type = type;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
 	}
 	
 	@Override
@@ -52,6 +65,12 @@ public final class ClassAccess extends ASTNode implements IValue
 	public boolean isPrimitive()
 	{
 		return false;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.type.isResolved();
 	}
 	
 	@Override
@@ -77,23 +96,9 @@ public final class ClassAccess extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(this.type))
-		{
-			return 2;
-		}
-		return 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(null, context, TypePosition.TYPE);
+		this.type = this.type.resolveType(null, context);
 	}
 	
 	@Override
@@ -122,7 +127,7 @@ public final class ClassAccess extends ASTNode implements IValue
 		
 		if (!this.type.isResolved())
 		{
-			markers.add(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString());
+			markers.add(I18n.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString()));
 		}
 		
 		return this;
@@ -131,19 +136,7 @@ public final class ClassAccess extends ASTNode implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IClass iclass = this.type.getTheClass();
-		if (iclass != null)
-		{
-			if (iclass.hasModifier(Modifiers.DEPRECATED))
-			{
-				markers.add(this.position, "type.access.deprecated", iclass.getName());
-			}
-			
-			if (context.getVisibility(iclass) == IContext.SEALED)
-			{
-				markers.add(this.position, "type.access.sealed", iclass.getName());
-			}
-		}
+		this.type.checkType(markers, context, TypePosition.TYPE);
 	}
 	
 	@Override
@@ -162,7 +155,7 @@ public final class ClassAccess extends ASTNode implements IValue
 			return;
 		}
 		
-		markers.add(this.position, "type.access.invalid", this.type.toString());
+		markers.add(I18n.createMarker(this.position, "type.access.invalid", this.type.toString()));
 	}
 	
 	@Override
@@ -186,7 +179,7 @@ public final class ClassAccess extends ASTNode implements IValue
 			IDataMember field = iclass.getMetadata().getInstanceField();
 			if (field != null)
 			{
-				field.writeGet(writer, null);
+				field.writeGet(writer, null, this.getLineNumber());
 			}
 		}
 	}

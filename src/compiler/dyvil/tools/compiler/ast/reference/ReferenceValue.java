@@ -2,15 +2,15 @@ package dyvil.tools.compiler.ast.reference;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class ReferenceValue implements IValue, IValued
+public class ReferenceValue implements IValue
 {
 	protected IValue			value;
 	protected final IReference	reference;
@@ -22,21 +22,36 @@ public class ReferenceValue implements IValue, IValued
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.value.getPosition();
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return REFERENCE;
 	}
 	
-	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
 	
-	@Override
 	public IValue getValue()
 	{
 		return this.value;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.value.isResolved();
 	}
 	
 	@Override
@@ -59,7 +74,7 @@ public class ReferenceValue implements IValue, IValued
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		return this.value.getTypeMatch(type);
 	}

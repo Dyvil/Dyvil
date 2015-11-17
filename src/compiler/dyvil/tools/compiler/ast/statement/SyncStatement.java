@@ -1,27 +1,33 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class SyncStatement extends ASTNode implements IStatement
+public final class SyncStatement extends AbstractValue implements IStatement
 {
-	public IValue	lock;
-	public IValue	block;
+	protected IValue	lock;
+	protected IValue	action;
 	
 	public SyncStatement(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	public SyncStatement(ICodePosition position, IValue lock, IValue block)
+	{
+		this.lock = lock;
+		this.action = block;
 	}
 	
 	@Override
@@ -30,60 +36,63 @@ public final class SyncStatement extends ASTNode implements IStatement
 		return SYNCHRONIZED;
 	}
 	
-	@Override
-	public void setParent(IStatement parent)
+	public IValue getLock()
 	{
+		return this.lock;
 	}
 	
-	@Override
-	public IStatement getParent()
+	public void setLock(IValue lock)
 	{
-		return null;
+		this.lock = lock;
+	}
+	
+	public IValue getAction()
+	{
+		return this.action;
+	}
+	
+	public void setAction(IValue action)
+	{
+		this.action = action;
 	}
 	
 	@Override
 	public IType getType()
 	{
-		return this.block.getType();
+		return this.action.getType();
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		this.block = this.block.withType(type, typeContext, markers, context);
+		this.action = this.action.withType(type, typeContext, markers, context);
 		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.block.isType(type);
+		return this.action.isType(type);
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.block.getTypeMatch(type);
+		return this.action.getTypeMatch(type);
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.lock.resolveTypes(markers, context);
-		
-		if (this.block.isStatement())
-		{
-			((IStatement) this.block).setParent(this);
-		}
-		
-		this.block.resolveTypes(markers, context);
+		this.action.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.lock.resolve(markers, context);
-		this.block.resolve(markers, context);
+		this.action.resolve(markers, context);
 		return this;
 	}
 	
@@ -91,21 +100,21 @@ public final class SyncStatement extends ASTNode implements IStatement
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.lock.checkTypes(markers, context);
-		this.block.checkTypes(markers, context);
+		this.action.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.lock.check(markers, context);
-		this.block.check(markers, context);
+		this.action.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
 		this.lock = this.lock.foldConstants();
-		this.block = this.block.foldConstants();
+		this.action = this.action.foldConstants();
 		return this;
 	}
 	
@@ -113,14 +122,8 @@ public final class SyncStatement extends ASTNode implements IStatement
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.lock = this.lock.cleanup(context, compilableList);
-		this.block = this.block.cleanup(context, compilableList);
+		this.action = this.action.cleanup(context, compilableList);
 		return this;
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		return null;
 	}
 	
 	@Override
@@ -137,13 +140,13 @@ public final class SyncStatement extends ASTNode implements IStatement
 	
 	private void write(MethodWriter writer, boolean expression) throws BytecodeException
 	{
-		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label handlerStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label throwLabel = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label handlerEnd = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label handlerStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label throwLabel = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label handlerEnd = new dyvil.tools.asm.Label();
 		
-		this.lock.writeExpression(writer);
+		this.lock.writeExpression(writer, Types.OBJECT);
 		writer.writeInsn(Opcodes.DUP);
 		
 		int varIndex = writer.startSync();
@@ -153,11 +156,11 @@ public final class SyncStatement extends ASTNode implements IStatement
 		writer.writeLabel(start);
 		if (expression)
 		{
-			this.block.writeExpression(writer);
+			this.action.writeExpression(writer);
 		}
 		else
 		{
-			this.block.writeStatement(writer);
+			this.action.writeStatement(writer);
 		}
 		writer.endSync();
 		
@@ -174,7 +177,7 @@ public final class SyncStatement extends ASTNode implements IStatement
 		writer.writeInsn(Opcodes.ATHROW);
 		if (expression)
 		{
-			this.block.getType().writeDefaultValue(writer);
+			this.action.getType().writeDefaultValue(writer);
 		}
 		
 		writer.resetLocals(varIndex);
@@ -193,6 +196,6 @@ public final class SyncStatement extends ASTNode implements IStatement
 			this.lock.toString(prefix, buffer);
 		}
 		buffer.append(Formatting.Statements.syncEnd);
-		this.block.toString(prefix, buffer);
+		this.action.toString(prefix, buffer);
 	}
 }

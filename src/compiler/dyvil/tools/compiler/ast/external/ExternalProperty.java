@@ -1,14 +1,13 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalProperty extends Property
 {
@@ -28,16 +27,16 @@ public final class ExternalProperty extends Property
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(null, Package.rootPackage);
+			this.annotations.resolveTypes(null, Package.rootPackage, this);
 		}
 	}
 	
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, this.theClass, TypePosition.TYPE);
+		this.type = this.type.resolveType(null, this.theClass);
 	}
 	
 	@Override
@@ -51,7 +50,7 @@ public final class ExternalProperty extends Property
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -62,22 +61,7 @@ public final class ExternalProperty extends Property
 		{
 			this.resolveAnnotations();
 		}
-		return this.annotations[index];
-	}
-	
-	@Override
-	public Annotation getAnnotation(IClass type)
-	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		
-		if (!this.annotationsResolved)
-		{
-			this.resolveAnnotations();
-		}
-		return super.getAnnotation(type);
+		return this.annotations.getAnnotation(type);
 	}
 	
 	@Override

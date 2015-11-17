@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.reference.IReference;
@@ -14,222 +16,197 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-
-import org.objectweb.asm.Label;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IValue extends IASTNode, ITyped
 {
-	int	VOID				= 0;
-	int	NULL				= 1;
-	int	NIL					= 2;
-	int	WILDCARD			= 3;
-	int	BOOLEAN				= 4;
-	int	BYTE				= 5;
-	int	SHORT				= 6;
-	int	CHAR				= 7;
-	int	INT					= 8;
-	int	LONG				= 9;
-	int	FLOAT				= 10;
-	int	DOUBLE				= 11;
-	int	STRING				= 12;
-	int	FORMAT_STRING		= 13;
-	int	STRINGBUILDER		= 14;
+	// --- Expression IDs ---
 	
-	int	THIS				= 16;
-	int	SUPER				= 17;
+	// Literals
+	int	VOID			= 0;
+	int	NULL			= 1;
+	int	NIL				= 2;
+	int	WILDCARD		= 3;
+	int	BOOLEAN			= 4;
+	int	BYTE			= 5;
+	int	SHORT			= 6;
+	int	CHAR			= 7;
+	int	INT				= 8;
+	int	LONG			= 9;
+	int	FLOAT			= 10;
+	int	DOUBLE			= 11;
+	int	STRING			= 12;
+	int	STRING_INTERPOLATION	= 13;
 	
-	int	STATEMENT_LIST		= 24;
-	int	ARRAY				= 25;
-	int	TUPLE				= 26;
-	int	CASE_STATEMENT		= 27;
-	int	MATCH				= 28;
-	int	LAMBDA				= 29;
-	int	PARTIAL_FUNCTION	= 30;
-	int	BYTECODE			= 31;
+	// Compound Constructs
+	int	STATEMENT_LIST	= 32;
+	int	BYTECODE		= 33;
+	int	TUPLE			= 34;
+	int	ARRAY			= 35;
+	int	MAP				= 36;
+	int	ANNOTATION		= 37;
 	
-	int	CLASS_ACCESS		= 32;
-	int	ENUM				= 33;
-	int	FIELD_ACCESS		= 34;
-	int	FIELD_ASSIGN		= 35;
-	int	METHOD_CALL			= 36;
-	int	APPLY_CALL			= 37;
-	int	UPDATE_CALL			= 38;
-	int	SUBSCRIPT_GET		= 39;
-	int	SUBSCRIPT_SET		= 40;
-	int	CONSTRUCTOR_CALL	= 41;
-	int	INITIALIZER_CALL	= 42;
+	// Basic Language Constructs
+	int	THIS	= 64;
+	int	SUPER	= 65;
 	
-	int	VARIABLE			= 43;
-	int	NESTED_METHOD		= 44;
+	int	CAST_OPERATOR		= 66;
+	int	ISOF_OPERATOR		= 67;
+	int	CASE_STATEMENT		= 68;
+	int	MATCH				= 69;
+	int	LAMBDA				= 70;
+	int	PARTIAL_FUNCTION	= 71;
 	
-	int	CAST_OPERATOR		= 48;
-	int	ISOF_OPERATOR		= 49;
-	int	SWAP_OPERATOR		= 50;
-	int	BOOLEAN_AND			= 51;
-	int	BOOLEAN_OR			= 52;
-	int	BOOLEAN_NOT			= 53;
-	int	CLASS_OPERATOR		= 54;
-	int	TYPE_OPERATOR		= 55;
-	int	NULLCHECK			= 56;
-	int	RANGE_OPERATOR		= 57;
+	// Access and Invocation
+	int	CLASS_ACCESS	= 96;
+	int	FIELD_ACCESS	= 97;
+	int	ENUM_ACCESS		= 98;
+	int	METHOD_CALL		= 99;
+	int	APPLY_CALL		= 100;
+	int	UPDATE_CALL		= 101;
+	int	SUBSCRIPT_GET	= 102;
+	int	SUBSCRIPT_SET	= 103;
 	
-	int	RETURN				= 70;
-	int	IF					= 71;
-	int	SWITCH				= 72;
-	int	FOR					= 73;
-	int	WHILE				= 74;
-	int	DO_WHILE			= 75;
-	int	TRY					= 76;
-	int	THROW				= 77;
-	int	SYNCHRONIZED		= 78;
+	// Special Invocation
+	int	CONSTRUCTOR_CALL	= 112;
+	int	INITIALIZER_CALL	= 113;
 	
-	int	BREAK				= 79;
-	int	CONTINUE			= 80;
-	int	GOTO				= 81;
+	// Assignments
+	int	FIELD_ASSIGN	= 120;
+	int	COMPOUND_CALL	= 121;
+	
+	// Special Operators and Intrinsics
+	int	SWAP_OPERATOR	= 128;
+	int	BOOLEAN_AND		= 129;
+	int	BOOLEAN_OR		= 130;
+	int	BOOLEAN_NOT		= 131;
+	int	CLASS_OPERATOR	= 132;
+	int	TYPE_OPERATOR	= 133;
+	int	NULLCHECK		= 134;
+	int	RANGE_OPERATOR	= 135;
+	int	STRINGBUILDER	= 136;
+	
+	// Basic Control Statements
+	int	RETURN			= 192;
+	int	IF				= 193;
+	int	SWITCH			= 194;
+	int	FOR				= 195;
+	int	WHILE			= 196;
+	int	DO_WHILE		= 197;
+	int	TRY				= 198;
+	int	THROW			= 199;
+	int	SYNCHRONIZED	= 200;
+	
+	// Jump Statements
+	int	BREAK		= 214;
+	int	CONTINUE	= 215;
+	int	GOTO		= 216;
+	
+	// Pseudo-Expressions
+	int	VARIABLE		= 232;
+	int	NESTED_METHOD	= 233;
 	
 	// Special Types only used by the compiler
-	int	REFERENCE			= 128;
-	int	BOXED				= 129;
+	int	REFERENCE			= 240;
+	int	LITERAL_CONVERSION	= 241;
 	
-	public int valueTag();
+	// --- Other Constants ---
 	
-	public static boolean isNumeric(int tag)
+	float CONVERSION_MATCH = 1000F;
+	
+	int valueTag();
+	
+	static boolean isNumeric(int tag)
 	{
 		return tag >= BYTE && tag <= DOUBLE;
 	}
 	
-	public default boolean isConstant()
+	default boolean isConstant()
 	{
 		return false;
 	}
 	
-	public default boolean isStatement()
+	default boolean isConstantOrField()
 	{
-		return false;
+		return this.isConstant();
 	}
 	
-	public default boolean isPrimitive()
+	default boolean isPrimitive()
 	{
 		return this.getType().isPrimitive();
 	}
 	
-	public default IReference toReference()
+	default IReference toReference()
 	{
 		return null;
 	}
 	
-	@Override
-	public IType getType();
+	boolean isResolved();
 	
 	@Override
-	public default void setType(IType type)
+	IType getType();
+	
+	@Override
+	default void setType(IType type)
 	{
 	}
 	
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
-	
-	public static IValue autoBox(IValue value, IType valueType, IType targetType)
-	{
-		if (!targetType.isSuperTypeOf(valueType))
-		{
-			return null;
-		}
-		
-		boolean primitive = valueType.isPrimitive();
-		if (primitive != targetType.isPrimitive())
-		{
-			// Box Primitive -> Object
-			if (primitive)
-			{
-				return new BoxedValue(value, valueType.getBoxMethod());
-			}
-			// Unbox Object -> Primitive
-			return new BoxedValue(value, targetType.getUnboxMethod());
-		}
-		return value;
-	}
+	IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
 	
 	@Override
-	public boolean isType(IType type);
-	
-	public int getTypeMatch(IType type);
-	
-	public void resolveTypes(MarkerList markers, IContext context);
-	
-	public IValue resolve(MarkerList markers, IContext context);
-	
-	public void checkTypes(MarkerList markers, IContext context);
-	
-	public void check(MarkerList markers, IContext context);
-	
-	public IValue foldConstants();
-	
-	public IValue cleanup(IContext context, IClassCompilableList compilableList);
-	
-	// Compilation
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as an expression. That means that this element remains as
-	 * the first element of the stack.
-	 * 
-	 * @param visitor
-	 * @throws BytecodeException
-	 */
-	public void writeExpression(MethodWriter writer) throws BytecodeException;
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as a statement. That means that this element is removed
-	 * from the stack.
-	 * 
-	 * @param writer
-	 * @throws BytecodeException
-	 */
-	public void writeStatement(MethodWriter writer) throws BytecodeException;
-	
-	public default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
+	default boolean isType(IType type)
 	{
-		this.writeExpression(writer);
-		writer.writeJumpInsn(Opcodes.IFNE, dest);
+		return type.isSuperTypeOf(this.getType());
 	}
 	
 	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as a jump expression to the given {@link Label}
-	 * {@code dest}. By default, this calls
-	 * {@link #writeExpression(MethodWriter)} and then writes an
-	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
-	 * means the JVM would jump to {@code dest} if the current value on the
-	 * stack equals {@code 0}.
+	 * Returns how much the type of this value 'matches' the given type.
+	 * {@code 1} indicates a perfect match, while {@code 0} marks incompatible
+	 * types. A higher value means that the value is less suitable for the type.
 	 * 
-	 * @param writer
-	 * @param dest
-	 * @throws BytecodeException
+	 * @param type
+	 *            the type to match
+	 * @return the subtyping distance
 	 */
-	public default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
+	default float getTypeMatch(IType type)
 	{
-		this.writeExpression(writer);
-		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+		return type.getSubTypeDistance(this.getType());
 	}
 	
-	public default int stringSize()
+	void resolveTypes(MarkerList markers, IContext context);
+	
+	default void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+	
+	}
+	
+	IValue resolve(MarkerList markers, IContext context);
+	
+	void checkTypes(MarkerList markers, IContext context);
+	
+	void check(MarkerList markers, IContext context);
+	
+	IValue foldConstants();
+	
+	IValue cleanup(IContext context, IClassCompilableList compilableList);
+	
+	default IValue toConstant(MarkerList markers)
+	{
+		return null;
+	}
+	
+	default int stringSize()
 	{
 		return 20;
 	}
 	
-	public default boolean toStringBuilder(StringBuilder builder)
+	default boolean toStringBuilder(StringBuilder builder)
 	{
 		return false;
 	}
 	
-	public default Object toObject()
-	{
-		return null;
-	}
-	
-	public static IValue fromObject(Object o)
+	static IValue fromObject(Object o)
 	{
 		if (o == null)
 		{
@@ -238,7 +215,7 @@ public interface IValue extends IASTNode, ITyped
 		Class c = o.getClass();
 		if (c == Character.class)
 		{
-			return new CharValue((Character) o);
+			return new CharValue(null, o.toString(), true);
 		}
 		else if (c == Integer.class)
 		{
@@ -262,8 +239,8 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == int[].class)
 		{
-			Array valueList = new Array(null);
-			valueList.requiredType = new ArrayType(Types.INT);
+			ArrayExpr valueList = new ArrayExpr(null);
+			valueList.arrayType = new ArrayType(Types.INT);
 			valueList.elementType = Types.INT;
 			for (int i : (int[]) o)
 			{
@@ -273,8 +250,8 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == long[].class)
 		{
-			Array valueList = new Array();
-			valueList.requiredType = new ArrayType(Types.LONG);
+			ArrayExpr valueList = new ArrayExpr();
+			valueList.arrayType = new ArrayType(Types.LONG);
 			valueList.elementType = Types.LONG;
 			for (long l : (long[]) o)
 			{
@@ -284,8 +261,8 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == float[].class)
 		{
-			Array valueList = new Array();
-			valueList.requiredType = new ArrayType(Types.FLOAT);
+			ArrayExpr valueList = new ArrayExpr();
+			valueList.arrayType = new ArrayType(Types.FLOAT);
 			valueList.elementType = Types.FLOAT;
 			for (float f : (float[]) o)
 			{
@@ -295,8 +272,8 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == double[].class)
 		{
-			Array valueList = new Array();
-			valueList.requiredType = new ArrayType(Types.DOUBLE);
+			ArrayExpr valueList = new ArrayExpr();
+			valueList.arrayType = new ArrayType(Types.DOUBLE);
 			valueList.elementType = Types.DOUBLE;
 			for (double d : (double[]) o)
 			{
@@ -304,14 +281,107 @@ public interface IValue extends IASTNode, ITyped
 			}
 			return valueList;
 		}
-		else if (c == org.objectweb.asm.Type.class)
+		else if (c == dyvil.tools.asm.Type.class)
 		{
-			org.objectweb.asm.Type type = (org.objectweb.asm.Type) o;
+			dyvil.tools.asm.Type type = (dyvil.tools.asm.Type) o;
 			return new ClassOperator(Types.fromASMType(type));
 		}
 		return null;
 	}
 	
+	default Object toObject()
+	{
+		return null;
+	}
+	
+	default boolean booleanValue()
+	{
+		return false;
+	}
+	
+	default int intValue()
+	{
+		return 0;
+	}
+	
+	default long longValue()
+	{
+		return 0L;
+	}
+	
+	default float floatValue()
+	{
+		return 0F;
+	}
+	
+	default double doubleValue()
+	{
+		return 0D;
+	}
+	
+	default String stringValue()
+	{
+		return null;
+	}
+	
 	@Override
-	public void toString(String prefix, StringBuilder buffer);
+	void toString(String prefix, StringBuilder buffer);
+	
+	// Compilation
+	
+	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		this.getType().writeCast(writer, type, this.getLineNumber());
+	}
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as an expression. That means that this element remains as
+	 * the first element of the stack.
+	 * 
+	 * @param visitor
+	 * @throws BytecodeException
+	 */
+	void writeExpression(MethodWriter writer) throws BytecodeException;
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as a statement. That means that this element is removed
+	 * from the stack.
+	 * 
+	 * @param writer
+	 * @throws BytecodeException
+	 */
+	void writeStatement(MethodWriter writer) throws BytecodeException;
+	
+	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		writer.writeJumpInsn(Opcodes.IFNE, dest);
+	}
+	
+	/**
+	 * Writes this {@link IValue} to the given {@link MethodWriter}
+	 * {@code writer} as a jump expression to the given {@link Label}
+	 * {@code dest}. By default, this calls
+	 * {@link #writeExpression(MethodWriter)} and then writes an
+	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
+	 * means the JVM would jump to {@code dest} if the current value on the
+	 * stack equals {@code 0}.
+	 * 
+	 * @param writer
+	 * @param dest
+	 * @throws BytecodeException
+	 */
+	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
+	{
+		this.writeExpression(writer);
+		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+	}
+	
+	default void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		visitor.visit(key, this.toObject());
+	}
 }

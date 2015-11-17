@@ -5,13 +5,14 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassParameterSetter implements IValue
 {
@@ -28,7 +29,7 @@ public final class ClassParameterSetter implements IValue
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getIndex());
+		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified, this.parameter.getDescription());
 	}
 	
@@ -48,6 +49,23 @@ public final class ClassParameterSetter implements IValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return null;
@@ -63,12 +81,6 @@ public final class ClassParameterSetter implements IValue
 	public boolean isType(IType type)
 	{
 		return false;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
 	}
 	
 	@Override

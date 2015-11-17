@@ -1,24 +1,22 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements ITypeList, ITypeContext
 {
 	public IMethod	method;
 	public IType[]	generics;
 	public int		genericCount;
-	public IType	instanceType;
-	
-	public int		computedGenerics	= -1;
+	public IValue	instance;
 	
 	public GenericData()
 	{
@@ -28,7 +26,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	{
 		this.method = method;
 		this.generics = new IType[count];
-		this.computedGenerics = count;
 	}
 	
 	@Override
@@ -39,8 +36,6 @@ public final class GenericData implements ITypeList, ITypeContext
 	
 	public void setTypeCount(int count)
 	{
-		this.computedGenerics = count - this.genericCount;
-		
 		if (this.generics == null)
 		{
 			this.generics = new IType[count];
@@ -100,16 +95,16 @@ public final class GenericData implements ITypeList, ITypeContext
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		int index = typeVar.getIndex();
 		if (this.isMethodTypeVariable(typeVar))
 		{
-			if (index > this.genericCount)
+			int index = typeVar.getIndex();
+			if (index >= this.genericCount)
 			{
 				return new TypeVarType(typeVar);
 			}
 			return this.generics[index];
 		}
-		return this.instanceType.resolveType(typeVar);
+		return this.instance.getType().resolveType(typeVar);
 	}
 	
 	@Override
@@ -128,7 +123,12 @@ public final class GenericData implements ITypeList, ITypeContext
 		
 		if (index < this.genericCount)
 		{
-			this.generics[index] = this.generics[index].combine(type);
+			if (this.generics[index] == null)
+			{
+				this.generics[index] = type;
+				return;
+			}
+			this.generics[index] = Types.combine(this.generics[index], type);
 			return;
 		}
 		
@@ -146,7 +146,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{
-			this.generics[i] = this.generics[i].resolve(markers, context, TypePosition.TYPE);
+			this.generics[i] = this.generics[i].resolveType(markers, context);
 		}
 	}
 	
@@ -161,14 +161,9 @@ public final class GenericData implements ITypeList, ITypeContext
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int len = this.genericCount;
-		if (this.computedGenerics != -1)
-		{
-			len -= this.computedGenerics;
-		}
-		
 		if (len > 0)
 		{
-			buffer.append('#').append('[');
+			buffer.append('.').append('[');
 			Util.astToString(prefix, this.generics, len, Formatting.Type.genericSeperator, buffer);
 			buffer.append(']');
 		}

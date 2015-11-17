@@ -3,18 +3,17 @@ package dyvil.tools.compiler.parser.pattern;
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.IPatternList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class PatternListParser extends Parser implements IPatternConsumer
 {
-	protected IPatternList	patternList;
+	protected IPatternList patternList;
 	
-	private IPattern		pattern;
+	private IPattern pattern;
 	
 	public PatternListParser(IPatternList list)
 	{
@@ -22,14 +21,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-		this.pattern = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		if (ParserUtil.isCloseBracket(type))
@@ -42,21 +34,21 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 			return;
 		}
 		
-		if (this.mode == 0)
+		switch (this.mode)
 		{
+		case 0:
 			this.mode = 1;
 			pm.pushParser(new PatternParser(this), true);
 			return;
-		}
-		if (this.mode == 1)
-		{
+		case 1:
 			this.mode = 0;
-			if (type == Symbols.COMMA)
+			if (type == BaseSymbols.COMMA)
 			{
 				this.patternList.addPattern(this.pattern);
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Pattern List - ',' expected");
+			pm.report(token, "Invalid Pattern List - ',' expected");
+			return;
 		}
 	}
 	

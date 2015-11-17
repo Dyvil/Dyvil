@@ -4,18 +4,14 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableMap;
-import dyvil.collection.MutableSet;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 
-public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements MutableSet<E>
 {
-	protected MutableMap<E, Object>	map;
+	private static final long serialVersionUID = 3329100687699880194L;
+	
+	protected MutableMap<E, Object> map;
 	
 	public MapBasedSet(MutableMap<E, ? extends Object> map)
 	{
@@ -37,7 +33,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	@Override
 	public MutableSet<E> $minus(Object element)
 	{
-		return new MapBasedSet(this.map.$minus(element));
+		return new MapBasedSet(this.map.$minus$at(element));
 	}
 	
 	@Override
@@ -232,22 +228,15 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 	
 	@Override
-	public void filter(Predicate<? super E> condition)
-	{
-		Iterator<Entry<E, Object>> iterator = this.map.iterator();
-		while (iterator.hasNext())
-		{
-			if (!condition.test(iterator.next().getKey()))
-			{
-				iterator.remove();
-			}
-		}
-	}
-	
-	@Override
 	public MutableSet<E> copy()
 	{
 		return new MapBasedSet(this.map.copy());
+	}
+	
+	@Override
+	public MutableSet<E> emptyCopy()
+	{
+		return new MapBasedSet(this.map.emptyCopy());
 	}
 	
 	@Override

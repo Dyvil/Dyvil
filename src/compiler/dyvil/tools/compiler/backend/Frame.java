@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.exception.StackUnderflowException;
-
-import org.objectweb.asm.MethodVisitor;
 
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.tools.compiler.backend.ClassFormat.*;
@@ -158,7 +157,7 @@ public class Frame
 		{
 			return "double";
 		}
-		if (o == NULL)
+		if (o == ClassFormat.NULL)
 		{
 			return "null";
 		}
@@ -228,6 +227,11 @@ public class Frame
 		}
 	}
 	
+	public int stackCount()
+	{
+		return this.stackCount;
+	}
+	
 	public void set(Object type)
 	{
 		if (type == LONG || type == DOUBLE)
@@ -255,6 +259,14 @@ public class Frame
 		
 		this.ensureStack(this.stackCount + 1);
 		this.stack[this.stackCount++] = type;
+	}
+	
+	public void reserve(int stackSlots)
+	{
+		if (this.actualStackCount + stackSlots > this.maxStack)
+		{
+			this.maxStack = this.actualStackCount + stackSlots;
+		}
 	}
 	
 	public void pop() throws StackUnderflowException
@@ -301,7 +313,7 @@ public class Frame
 		case NOP:
 			return;
 		case ACONST_NULL:
-			this.push(NULL);
+			this.push(ClassFormat.NULL);
 			return;
 		case ICONST_M1:
 		case ICONST_0:
@@ -580,7 +592,7 @@ public class Frame
 		case FRETURN:
 		case DRETURN:
 		case ARETURN:
-			this.pop();
+			this.stackCount = this.actualStackCount = 0;
 			return;
 		case RETURN:
 			return;
@@ -805,7 +817,7 @@ public class Frame
 			stack--;
 		}
 		
-		mv.visitFrame(org.objectweb.asm.Opcodes.F_NEW, localIndex, locals, stack, this.stack);
+		mv.visitFrame(dyvil.tools.asm.Opcodes.F_NEW, localIndex, locals, stack, this.stack);
 	}
 	
 	public Frame copy()

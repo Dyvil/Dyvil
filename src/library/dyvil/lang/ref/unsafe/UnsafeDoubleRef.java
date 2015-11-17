@@ -13,14 +13,14 @@ public final class UnsafeDoubleRef implements DoubleRef
 	
 	public UnsafeDoubleRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeDoubleRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeDoubleRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeDoubleRef implements DoubleRef
 	@Override
 	public double get()
 	{
-		return ReflectUtils.unsafe.getDouble(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getDouble(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(double value)
 	{
-		ReflectUtils.unsafe.putDouble(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putDouble(this.base, this.offset, value);
 	}
 }

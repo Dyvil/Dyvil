@@ -2,17 +2,14 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.statement.CatchBlock;
-import dyvil.tools.compiler.ast.statement.TryStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.ast.statement.exception.CatchBlock;
+import dyvil.tools.compiler.ast.statement.exception.TryStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class TryStatementParser extends Parser implements IValueConsumer
 {
@@ -22,8 +19,8 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	private static final int	CATCH_VAR	= 16;
 	private static final int	CATCH_CLOSE	= 32;
 	
-	protected TryStatement		statement;
-	private CatchBlock			catchBlock;
+	protected TryStatement	statement;
+	private CatchBlock		catchBlock;
 	
 	public TryStatementParser(TryStatement statement)
 	{
@@ -32,91 +29,87 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
+	public void parse(IParserManager pm, IToken token)
 	{
-		this.mode = ACTION;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
-	{
-		if (this.mode == ACTION)
+		int type = token.type();
+		switch (this.mode)
 		{
+		case ACTION:
 			// TODO Try-With-Resource
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = CATCH;
 			return;
-		}
-		int type = token.type();
-		if (this.mode == CATCH)
-		{
-			if (type == Keywords.CATCH)
+		case CATCH:
+			if (type == DyvilKeywords.CATCH)
 			{
 				this.statement.addCatchBlock(this.catchBlock = new CatchBlock(token.raw()));
 				this.mode = CATCH_OPEN;
 				return;
 			}
-			if (type == Keywords.FINALLY)
+			if (type == DyvilKeywords.FINALLY)
 			{
-				pm.popParser();
-				pm.pushParser(new ExpressionParser(this));
-				this.mode = 0;
+				pm.pushParser(pm.newExpressionParser(this));
+				this.mode = END;
 				return;
 			}
 			if (ParserUtil.isTerminator(type))
 			{
-				int next = token.next().type();
-				if (next != Keywords.CATCH && next != Keywords.FINALLY)
+				IToken next = token.next();
+				if (next == null)
 				{
 					pm.popParser(true);
+					return;
 				}
-				return;
+				
+				int nextType = token.next().type();
+				if (nextType == DyvilKeywords.CATCH || nextType == DyvilKeywords.FINALLY)
+				{
+					return;
+				}
 			}
 			pm.popParser(true);
-		}
-		if (this.mode == CATCH_OPEN)
-		{
+			return;
+		case CATCH_OPEN:
 			this.mode = CATCH_VAR;
-			pm.pushParser(new TypeParser(this.catchBlock));
-			if (type == Symbols.OPEN_PARENTHESIS)
+			pm.pushParser(pm.newTypeParser(this.catchBlock));
+			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Catch Expression - '(' expected");
 			}
-			throw new SyntaxError(token, "Invalid Catch Expression - '(' expected", true);
-		}
-		if (this.mode == CATCH_VAR)
-		{
+			return;
+		case CATCH_VAR:
 			this.mode = CATCH_CLOSE;
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.catchBlock.varName = token.nameValue();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Catch Expression - Name expected", true);
-		}
-		if (this.mode == CATCH_CLOSE)
-		{
+			pm.reparse();
+			pm.report(token, "Invalid Catch Expression - Name expected");
+			return;
+		case CATCH_CLOSE:
 			this.mode = CATCH;
-			pm.pushParser(new ExpressionParser(this.catchBlock));
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			pm.pushParser(pm.newExpressionParser(this.catchBlock));
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.report(token, "Invalid Catch Expression - ')' expected");
 			}
-			throw new SyntaxError(token, "Invalid Catch Expression - ')' expected");
+			return;
 		}
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == CATCH)
+		switch (this.mode)
 		{
-			this.statement.action = value;
+		case CATCH:
+			this.statement.setAction(value);
 			return;
-		}
-		if (this.mode == 0)
-		{
-			this.statement.finallyBlock = value;
+		case END:
+			this.statement.setFinallyBlock(value);
+			break;
 		}
 	}
 }

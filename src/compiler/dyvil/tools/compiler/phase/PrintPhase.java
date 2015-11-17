@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.lang.Collection;
-
+import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class PrintPhase implements ICompilerPhase
 {
-	private final int	id;
+	private final ICompilerPhase predecessor;
 	
-	public PrintPhase(int id)
+	public PrintPhase(ICompilerPhase predecessor)
 	{
-		this.id = id;
+		this.predecessor = predecessor;
 	}
 	
 	@Override
@@ -23,22 +22,22 @@ public class PrintPhase implements ICompilerPhase
 	@Override
 	public int getID()
 	{
-		return this.id;
+		return this.predecessor.getID() + 1;
 	}
 	
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		DyvilCompiler.logger.info("--- Syntax Trees at the end of PARSER ---");
+		DyvilCompiler.log("--- Syntax Trees at the end of " + this.predecessor.getName() + " ---");
 		for (ICompilationUnit unit : units)
 		{
-			DyvilCompiler.logger.info(unit.getInputFile() + ":\n" + unit.toString());
+			DyvilCompiler.log(unit.getInputFile() + ":\n" + unit.toString());
 		}
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "PRINT";
+		return "PRINT[" + this.predecessor.getName() + "]";
 	}
 }

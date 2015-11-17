@@ -1,23 +1,26 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MatchExpression;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
 import dyvil.tools.compiler.transform.ConstantFolder;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class MethodCall extends AbstractCall implements INamed
 {
-	public boolean	dotless;
-	public Name		name;
+	protected Name		name;
+	protected boolean	dotless;
 	
 	public MethodCall(ICodePosition position)
 	{
@@ -27,9 +30,25 @@ public final class MethodCall extends AbstractCall implements INamed
 	public MethodCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
-		this.instance = instance;
-		
+		this.receiver = instance;
 		this.name = name;
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
+	{
+		this.position = position;
+		this.receiver = instance;
+		this.name = name;
+		this.arguments = arguments;
+	}
+	
+	public MethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
+	{
+		this.position = position;
+		this.receiver = instance;
+		this.name = method.getName();
+		this.method = method;
+		this.arguments = arguments;
 	}
 	
 	@Override
@@ -50,6 +69,36 @@ public final class MethodCall extends AbstractCall implements INamed
 		return this.name;
 	}
 	
+	public boolean isDotless()
+	{
+		return this.dotless;
+	}
+	
+	public void setDotless(boolean dotless)
+	{
+		this.dotless = dotless;
+	}
+	
+	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+		IValue v = this;
+		
+		do
+		{
+			if (depth-- < 0)
+			{
+				return null;
+			}
+			
+			v = v.foldConstants();
+		}
+		while (!v.isConstant());
+		
+		return v.toConstant(markers);
+	}
+	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -62,33 +111,15 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		int args = this.arguments.size();
-		
-		if (this.instance != null)
-		{
-			this.instance = this.instance.resolve(markers, context);
-		}
-		
-		if (args == 1 && this.name == Name.match)
-		{
-			MatchExpression me = Operators.getMatchExpression(this.instance, this.arguments.getFirstValue());
-			if (me != null)
-			{
-				me.position = this.position;
-				return me.resolve(markers, context);
-			}
-		}
-		
-		this.arguments.resolve(markers, context);
-		
 		if (args == 1)
 		{
 			IValue op;
-			if (this.instance != null)
+			if (this.receiver != null)
 			{
-				op = Operators.getPriority(this.instance, this.name, this.arguments.getFirstValue());
+				op = Operators.getPriority(this.receiver, this.name, this.arguments.getFirstValue());
 			}
 			else
 			{
@@ -102,7 +133,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 		}
 		
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, this.arguments);
+		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -110,46 +141,36 @@ public final class MethodCall extends AbstractCall implements INamed
 			return this;
 		}
 		
-		if (args == 1 && this.instance != null)
+		if (args == 1 && this.receiver != null)
 		{
-			String qualified = this.name.qualified;
-			if (qualified.endsWith("$eq"))
-			{
-				String unqualified = this.name.unqualified;
-				Name name = Name.get(qualified.substring(0, qualified.length() - 3), unqualified.substring(0, unqualified.length() - 1));
-				IMethod method1 = IContext.resolveMethod(this.instance.getType(), null, name, this.arguments);
-				if (method1 != null)
-				{
-					CompoundCall call = new CompoundCall(this.position);
-					call.method = method1;
-					call.instance = this.instance;
-					call.arguments = this.arguments;
-					call.name = name;
-					return call;
-				}
-			}
-			
-			IValue op = Operators.get(this.instance, this.name, this.arguments.getFirstValue());
+			IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
 			if (op != null)
 			{
 				op.setPosition(this.position);
 				return op;
 			}
+			
+			String qualified = this.name.qualified;
+			if (qualified.endsWith("$eq"))
+			{
+				Name name = Util.stripEq(this.name);
+				
+				CompoundCall cc = new CompoundCall(this.position, this.receiver, name, this.arguments);
+				return cc.resolveCall(markers, context);
+			}
 		}
 		
 		// Resolve Apply Method
-		if (this.instance == null)
+		if (this.receiver == null)
 		{
 			AbstractCall apply = this.resolveApply(markers, context);
 			if (apply != null)
 			{
-				apply.checkArguments(markers, context);
 				return apply;
 			}
 		}
 		
-		ICall.addResolveMarker(markers, position, instance, name, arguments);
-		return this;
+		return null;
 	}
 	
 	private AbstractCall resolveApply(MarkerList markers, IContext context)
@@ -157,8 +178,8 @@ public final class MethodCall extends AbstractCall implements INamed
 		IValue instance;
 		IMethod method;
 		
-		IDataMember field = context.resolveField(this.name);
-		if (field == null)
+		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		if (field == null && this.receiver == null)
 		{
 			// Find a type
 			IType itype = IContext.resolveType(context, this.name);
@@ -168,7 +189,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 			
 			// Find the apply method of the type
-			IMethod match = IContext.resolveMethod(itype, null, Name.apply, this.arguments);
+			IMethod match = IContext.resolveMethod(itype, null, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -180,12 +201,13 @@ public final class MethodCall extends AbstractCall implements INamed
 		else
 		{
 			FieldAccess access = new FieldAccess(this.position);
+			access.receiver = this.receiver;
 			access.field = field;
 			access.name = this.name;
 			access.dotless = this.dotless;
 			
 			// Find the apply method of the field type
-			IMethod match = IContext.resolveMethod(field.getType(), access, Name.apply, this.arguments);
+			IMethod match = ICall.resolveMethod(context, access, Names.apply, this.arguments);
 			if (match == null)
 			{
 				// No apply method found -> Not an apply method call
@@ -197,51 +219,61 @@ public final class MethodCall extends AbstractCall implements INamed
 		
 		ApplyMethodCall call = new ApplyMethodCall(this.position);
 		call.method = method;
-		call.instance = instance;
+		call.receiver = instance;
 		call.arguments = this.arguments;
 		call.genericData = this.genericData;
+		call.checkArguments(markers, context);
 		
 		return call;
 	}
 	
 	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
+	}
+	
+	@Override
 	public IValue foldConstants()
 	{
-		this.arguments.foldConstants();
-		if (this.arguments.size() == 1)
+		if (!this.arguments.isEmpty())
 		{
-			IValue argument = this.arguments.getFirstValue();
-			if (argument.isConstant())
+			if (this.receiver != null)
 			{
-				if (this.instance != null)
+				if (this.receiver.isConstant())
 				{
-					if (this.instance.isConstant())
+					IValue argument;
+					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
 					{
-						IValue v1 = ConstantFolder.apply(this.instance, this.name, argument);
-						return v1 == null ? this : v1;
+						IValue folded = ConstantFolder.apply(this.receiver, this.name, argument);
+						if (folded != null)
+						{
+							return folded;
+						}
 					}
-					
-					this.instance = this.instance.foldConstants();
-					return this;
 				}
-				
-				IValue v1 = ConstantFolder.apply(this.name, argument);
-				if (v1 != null)
+				else
 				{
-					return v1;
+					this.receiver = this.receiver.foldConstants();
 				}
 			}
-			
-			if (this.instance != null)
-			{
-				this.instance = this.instance.foldConstants();
-			}
+			this.arguments.foldConstants();
 			return this;
 		}
 		
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.foldConstants();
+			// Prefix methods are transformed to postfix notation
+			if (this.receiver.isConstant())
+			{
+				IValue folded = ConstantFolder.apply(this.name, this.receiver);
+				if (folded != null)
+				{
+					return folded;
+				}
+			}
+			
+			this.receiver = this.receiver.foldConstants();
 		}
 		return this;
 	}
@@ -249,25 +281,25 @@ public final class MethodCall extends AbstractCall implements INamed
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString(prefix, buffer);
+			this.receiver.toString(prefix, buffer);
 			if (this.dotless && !Formatting.Method.useJavaFormat)
 			{
 				buffer.append(Formatting.Method.dotlessSeperator);
 			}
-			else
+			else if (this.genericData == null)
 			{
 				buffer.append('.');
 			}
 		}
 		
-		buffer.append(this.name);
-		
 		if (this.genericData != null)
 		{
 			this.genericData.toString(prefix, buffer);
 		}
+		
+		buffer.append(this.name);
 		
 		this.arguments.toString(prefix, buffer);
 	}

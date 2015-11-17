@@ -8,12 +8,12 @@ import static dyvil.tools.compiler.backend.ClassFormat.LONG;
 
 public interface BackendUtil
 {
-	public static boolean twoWord(Object type)
+	static boolean twoWord(Object type)
 	{
 		return type == LONG || type == DOUBLE;
 	}
 	
-	public static void swap(MethodWriterImpl writer) throws BytecodeException
+	static void swap(MethodWriterImpl writer) throws BytecodeException
 	{
 		Object t1 = writer.frame.popAndGet();
 		Object t2 = writer.frame.popAndGet();
@@ -55,7 +55,7 @@ public interface BackendUtil
 		}
 	}
 	
-	public static void pop(MethodWriterImpl writer) throws BytecodeException
+	static void pop(MethodWriterImpl writer) throws BytecodeException
 	{
 		Object t = writer.frame.popAndGet();
 		
@@ -71,7 +71,7 @@ public interface BackendUtil
 		}
 	}
 	
-	public static void pop2(MethodWriterImpl writer) throws BytecodeException
+	static void pop2(MethodWriterImpl writer) throws BytecodeException
 	{
 		Object t1 = writer.frame.popAndGet();
 		Object t2 = writer.frame.popAndGet();
@@ -107,7 +107,7 @@ public interface BackendUtil
 		}
 	}
 	
-	public static void dup(MethodWriterImpl writer)
+	static void dup(MethodWriterImpl writer)
 	{
 		Object t = writer.frame.peek();
 		writer.frame.push(t);
@@ -123,7 +123,7 @@ public interface BackendUtil
 		}
 	}
 	
-	public static void dupX1(MethodWriterImpl writer) throws BytecodeException
+	static void dupX1(MethodWriterImpl writer) throws BytecodeException
 	{
 		Object t1 = writer.frame.popAndGet();
 		Object t2 = writer.frame.popAndGet();

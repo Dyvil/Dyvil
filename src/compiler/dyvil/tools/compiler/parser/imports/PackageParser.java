@@ -1,13 +1,11 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.token.IToken;
 
 public class PackageParser extends Parser
 {
@@ -20,43 +18,26 @@ public class PackageParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.packageDeclaration = null;
-		this.buffer.delete(0, this.buffer.length());
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
+		switch (type)
 		{
+		case BaseSymbols.SEMICOLON:
 			this.packageDeclaration.setPackage(this.buffer.toString());
-			
 			pm.popParser();
 			return;
-		}
-		if (type == Keywords.TYPE)
-		{
-			this.buffer.append("type");
-			return;
-		}
-		if (type == Keywords.ANNOTATION)
-		{
-			this.buffer.append("annotation");
-			return;
-		}
-		if (type == Symbols.DOT)
-		{
+		case BaseSymbols.DOT:
 			this.buffer.append('.');
 			return;
-		}
-		if (ParserUtil.isIdentifier(type))
-		{
+		case Tokens.IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
+		case Tokens.SYMBOL_IDENTIFIER:
+		case Tokens.SPECIAL_IDENTIFIER:
 			this.buffer.append(token.nameValue().qualified);
 			return;
 		}
-		throw new SyntaxError(token, "Invalid Package Declaration - Invalid " + token);
+		pm.report(token, "Invalid Package Declaration - Invalid " + token);
+		return;
 	}
 }

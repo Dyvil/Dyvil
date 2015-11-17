@@ -1,52 +1,59 @@
 package dyvil.tools.compiler.ast.dynamic;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-import dyvil.lang.List;
-
 import dyvil.array.ObjectArray;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Handle;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-
-public class DynamicMethod extends ASTNode implements IMethod
+public class DynamicMethod implements IMethod, IDefaultContext
 {
-	public static final Handle	BOOTSTRAP	= new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/dyn/DynamicLinker", "linkMethod",
-													"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
-	
-	public Name					name;
+	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker", "linkMethod",
+			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+			
+	public Name name;
 	
 	public DynamicMethod(Name name)
 	{
 		this.name = name;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
 	}
 	
 	@Override
@@ -148,128 +155,6 @@ public class DynamicMethod extends ASTNode implements IMethod
 		return null;
 	}
 	
-	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return true;
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return IContext.VISIBLE;
-	}
-	
-	@Override
-	public void write(ClassWriter writer) throws BytecodeException
-	{
-	}
-	
-	@Override
-	public void setAnnotations(Annotation[] annotations, int count)
-	{
-	}
-	
-	@Override
-	public ElementType getAnnotationType()
-	{
-		return null;
-	}
-	
-	@Override
-	public int getAccessLevel()
-	{
-		return 0;
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void foldConstants()
-	{
-	}
-	
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-	}
-	
 	// Name
 	
 	@Override
@@ -315,40 +200,41 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public int annotationCount()
+	public boolean isAbstract()
+	{
+		return false;
+	}
+	
+	@Override
+	public int getAccessLevel()
 	{
 		return 0;
 	}
 	
 	@Override
-	public void setAnnotation(int index, Annotation annotation)
-	{
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-	}
-	
-	@Override
-	public Annotation[] getAnnotations()
+	public AnnotationList getAnnotations()
 	{
 		return null;
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public void setAnnotations(AnnotationList annotations)
 	{
-		return null;
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public void addAnnotation(IAnnotation annotation)
+	{
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.METHOD;
+	}
+	
+	@Override
+	public IAnnotation getAnnotation(IClass type)
 	{
 		return null;
 	}
@@ -387,8 +273,9 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void exceptionCount()
+	public int exceptionCount()
 	{
+		return 0;
 	}
 	
 	@Override
@@ -408,7 +295,43 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		return false;
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+	}
+	
+	@Override
+	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
 	{
 		return 0;
 	}
@@ -443,6 +366,12 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
+	public int getInvokeOpcode()
+	{
+		return Opcodes.INVOKEDYNAMIC;
+	}
+	
+	@Override
 	public String getDescriptor()
 	{
 		return null;
@@ -461,20 +390,25 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+	}
+	
+	@Override
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		StringBuilder desc = new StringBuilder();
 		desc.append('(');
 		
-		if (instance != null && instance.valueTag() != IValue.CLASS_ACCESS)
+		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, Types.OBJECT);
 			instance.getType().appendExtendedName(desc);
 		}
 		
 		for (IValue v : arguments)
 		{
-			v.writeExpression(writer);
+			v.writeExpression(writer, Types.OBJECT);
 			v.getType().appendExtendedName(desc);
 		}
 		desc.append(')');
@@ -484,17 +418,27 @@ public class DynamicMethod extends ASTNode implements IMethod
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	{
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
 	{
 	}
 	

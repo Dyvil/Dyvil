@@ -1,0 +1,328 @@
+// ---------------------------------------- Plugins ----------------------------------------
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'application'
+
+// ---------------------------------------- Main Settings ----------------------------------------
+
+group					= 'dyvil-team'
+
+version					= '0.9.0'
+
+String libraryVersion	= '0.8.0'
+String compilerVersion	= '0.9.0'
+String replVersion		= '0.5.0'
+String dpfVersion		= '0.2.1'
+
+boolean nightly			= false
+
+String replMainClass		= 'dyvil.tools.repl.DyvilREPL'
+String compilerMainClass	= 'dyvil.tools.compiler.DyvilCompiler'
+
+List<String> dyvilFilters	    = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
+List<String> javaFilters        = [ '**/*.java' ]
+List<String> resourceFilters    = [ '**/*.dyo', '**/*.class', '**/*.properties' ]
+
+// ---------------------------------------- Nightly Versioning ----------------------------------------
+
+Map<String, String> env = System.getenv()
+String droneBuild = env['DRONE_BUILD_NUMBER']
+
+if (droneBuild) {
+	String snapshot = "+nightly." + droneBuild
+
+	version			+= snapshot
+	libraryVersion	+= snapshot
+	compilerVersion	+= snapshot
+	replVersion		+= snapshot
+	dpfVersion		+= snapshot
+    
+    nightly = true
+}
+
+// ---------------------------------------- Source Settings ----------------------------------------
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+sourceSets {
+	main {
+		resources {
+			srcDir "${buildDir}/dyvilbin"
+			srcDir "src/resources"
+
+			include resourceFilters
+		}
+		return
+	}
+
+	library {
+		java {
+			srcDir 'src/library'
+			srcDir 'src/asm'
+			srcDir 'src/parsing'
+
+			compileClasspath += main.resources
+			runtimeClasspath += main.resources
+		}
+	}
+	
+	dpf {
+		java {
+			srcDir 'src/dpf'
+
+			compileClasspath += library.output
+			runtimeClasspath += library.output
+		}
+	}
+	
+	compiler {
+		java {
+			srcDir 'src/compiler'
+
+			compileClasspath += library.output
+			runtimeClasspath += library.output + main.resources
+		}
+	}
+	
+	repl {
+		java {
+			srcDir 'src/repl'
+
+			compileClasspath += library.output + compiler.output
+			runtimeClasspath += library.output + compiler.output + main.resources
+		}
+	}
+}
+
+processResources {
+	include resourceFilters
+}
+
+// ---------------------------------------- Dependencies ----------------------------------------
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	testCompile 'junit:junit:4.12'
+}
+
+// ---------------------------------------- Copy Tasks ----------------------------------------
+
+task clearCopyDir(type: Delete) {
+	delete fileTree("${buildDir}/src/")
+}
+
+// Library
+
+task copyLibraryJava(type: Copy, dependsOn: clearCopyDir) {
+	from sourceSets.library.java
+	into "${buildDir}/src/java/library"
+	
+	include javaFilters
+}
+
+compileLibraryJava.dependsOn(copyLibraryJava)
+compileLibraryJava.source = "${buildDir}/src/java/library"
+
+task copyLibraryDyvil(type: Copy, dependsOn: clearCopyDir) {
+	from 'src/library'
+	into "${buildDir}/src/dyvil/library"
+	
+	includeEmptyDirs = false
+	
+	include dyvilFilters
+}
+
+// Compiler
+
+task copyCompilerJava(type: Copy, dependsOn: clearCopyDir) {
+	from sourceSets.compiler.java
+	into "${buildDir}/src/java/compiler"
+	
+	include javaFilters
+	
+	filter {
+		it.replace('$$version$$', version)
+		  .replace('$$libraryVersion$$', libraryVersion)
+		  .replace('$$compilerVersion$$', compilerVersion)
+	}
+}
+
+compileCompilerJava.dependsOn(copyCompilerJava)
+compileCompilerJava.source = "${buildDir}/src/java/compiler"
+
+// REPL
+
+task copyReplJava(type: Copy, dependsOn: clearCopyDir) {
+	from sourceSets.repl.java
+	into "${buildDir}/src/java/repl"
+	
+	include javaFilters
+	
+	filter {
+		it.replace('$$replVersion$$', replVersion)
+	}
+}
+
+compileReplJava.dependsOn(copyReplJava)
+compileReplJava.source = "${buildDir}/src/java/repl"
+
+// DPF
+
+task copyDpfJava(type: Copy, dependsOn: clearCopyDir) {
+	from sourceSets.dpf.java
+	into "${buildDir}/src/java/dpf"
+	
+	include javaFilters
+}
+
+compileDpfJava.dependsOn(copyDpfJava)
+compileDpfJava.source = "${buildDir}/src/java/dpf"
+
+// ---------------------------------------- Compilation Tasks ----------------------------------------
+
+/**
+ * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
+ */
+task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) {
+	// Required to make UP-TO-DATE work
+	outputs.upToDateSpec = new AndSpec()
+
+	String src = "src/dyvil/library/"
+	String bin = "dyvilbin"
+	
+	// All Dyvil Class and Header files
+	inputs.dir "${buildDir}/${src}"
+	// All possible Output Files (.class, .dyo)
+	outputs.dir "${buildDir}/${bin}"
+	
+	main = 'dyvil.tools.compiler.DyvilCompiler'
+	classpath = sourceSets.compiler.runtimeClasspath
+	args = [ "source_dir=build/${src}", "output_dir=build/${bin}", 'compile' ]
+}
+
+// ---------------------------------------- Build Tasks ----------------------------------------
+
+/**
+ * Creates a Jar file that contains all library classes (from src/library), including ASM
+ */
+task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
+	from sourceSets.main.resources
+	from sourceSets.library.output
+	from sourceSets.library.resources
+	
+	archiveName = "dyvil-library-${libraryVersion}.jar"
+}
+
+task buildDPF(type: Jar, dependsOn: 'buildLibrary') {
+	from sourceSets.dpf.output
+	
+	archiveName = "dyvil-property-format-${dpfVersion}.jar"
+}
+
+/**
+ * Creates a Jar file that contains all compiler classes (from src/compiler)
+ */
+task buildCompiler(type: Jar, dependsOn: 'compilerClasses') {
+	from sourceSets.compiler.output
+	from sourceSets.compiler.resources
+	
+	archiveName = "dyvil-compiler-${compilerVersion}.jar"
+	
+	manifest.attributes.put("Main-Class", compilerMainClass)
+}
+
+/**
+ * Creates a Jar file that contains all REPL classes (from src/repl)
+ */
+task buildREPL(type: Jar, dependsOn: 'replClasses') {
+	from sourceSets.repl.output
+	
+	archiveName = "dyvil-repl-${replVersion}.jar"
+	
+	manifest.attributes.put("Main-Class", replMainClass)
+}
+
+/**
+ * Creates a Jar file that combines all classes from library, compiler and REPL.
+ */
+task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses', 'dpfClasses' ]) {
+	from sourceSets.main.resources
+	from sourceSets.library.output
+	from sourceSets.library.resources
+	from sourceSets.compiler.output
+	from sourceSets.compiler.resources
+	from sourceSets.repl.output
+	from sourceSets.dpf.output
+	
+	include '**/*.*'
+
+	archiveName = "dyvil-${version}.jar"
+	
+	manifest.attributes.put("Main-Class", replMainClass)
+}
+
+build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF' ])
+
+// ---------------------------------------- Version Files ----------------------------------------
+
+task prepareRelease(type: Copy) {
+	from 'versions/'
+	
+	if (nightly) {
+		into 'versions'
+		include 'nightly-template.dyp'
+		rename 'nightly\\-template\\.dyp', 'nightly.dyp'
+	}
+	else {
+		into 'versions/pre'
+		include 'template.dyp'
+		rename 'template\\.dyp', "v${version}.dyp"
+	}
+	
+	filter {
+		it.replace('$$version$$',			version)
+		  .replace('$$libraryVersion$$',	libraryVersion)
+		  .replace('$$compilerVersion$$',	compilerVersion)
+		  .replace('$$replVersion$$',		replVersion)
+		  .replace('$$dpfVersion$$',		dpfVersion)
+	}
+}
+
+if (nightly) {
+	build.dependsOn prepareRelease
+}
+
+// ---------------------------------------- Misc. Tasks ----------------------------------------
+
+/**
+ * Creates the Gradle Wrapper (gradlew)
+ */
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.7'
+}
+
+/**
+ * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
+ */
+clean.doLast {
+	println "Re-recreating build/dyilbin"
+	file('build/dyvilbin').mkdirs()
+}
+
+/**
+ * Removes temporary folders from the build dir, leaving only the 'build/libs' folder.
+ */
+task cleanTemps(type: Delete) {
+	delete file("${buildDir}/src/")
+	delete file("${buildDir}/classes/")
+	delete file("${buildDir}/dependency-cache/")
+	delete file("${buildDir}/tmp/")
+	delete file("${buildDir}/resources/")
+	delete fileTree("${buildDir}/dyvilbin/")
+}

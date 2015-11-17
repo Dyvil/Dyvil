@@ -4,11 +4,11 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface IExceptionList
 {
-	public void exceptionCount();
+	int exceptionCount();
 	
-	public void setException(int index, IType exception);
+	void setException(int index, IType exception);
 	
-	public void addException(IType exception);
+	void addException(IType exception);
 	
-	public IType getException(int index);
+	IType getException(int index);
 }

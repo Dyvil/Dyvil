@@ -4,17 +4,19 @@ import java.util.BitSet;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import dyvil.lang.List;
 import dyvil.lang.literal.NilConvertible;
 
 import dyvil.collection.ImmutableMatrix;
+import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
 
 @NilConvertible
-public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
+public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements MutableMatrix<E>
 {
+	private static final long serialVersionUID = -2034131178592900520L;
+	
 	public static <E> FlatArrayMatrix<E> apply()
 	{
 		return new FlatArrayMatrix();
@@ -363,7 +365,6 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 			
 			for (i = 1; i < size && cycle.get(i); i++)
 			{
-				;
 			}
 		}
 		

@@ -1,26 +1,89 @@
 package dyvil.collection.immutable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
-import dyvil.collection.iterator.ArrayIterator;
 
 @ArrayConvertible
-public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
+public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E>
 {
+	private static final long serialVersionUID = 1107932890158514157L;
+	
 	public static <E> ArrayList<E> apply(E... elements)
 	{
 		return new ArrayList(elements, true);
+	}
+	
+	public static <E> ArrayList<E> fromArray(E... elements)
+	{
+		return new ArrayList(elements);
+	}
+	
+	public static <E> Builder<E> builder()
+	{
+		return new Builder();
+	}
+	
+	public static <E> Builder<E> builder(int capacity)
+	{
+		return new Builder(capacity);
+	}
+	
+	public static class Builder<E> implements ImmutableList.Builder<E>
+	{
+		private Object[]	elements;
+		private int			size;
+		
+		public Builder()
+		{
+			this.elements = new Object[DEFAULT_CAPACITY];
+		}
+		
+		public Builder(int capacity)
+		{
+			this.elements = new Object[capacity];
+		}
+		
+		@Override
+		public void add(E element)
+		{
+			if (this.size < 0)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			
+			int index = this.size++;
+			if (index >= this.elements.length)
+			{
+				Object[] temp = new Object[(int) (this.size * 1.1F)];
+				System.arraycopy(this.elements, 0, temp, 0, index);
+				this.elements = temp;
+			}
+			this.elements[index] = element;
+		}
+		
+		@Override
+		public ArrayList<E> build()
+		{
+			if (this.size < 0)
+			{
+				return null;
+			}
+			
+			ArrayList<E> list = new ArrayList(this.elements, this.size, true);
+			this.size = -1;
+			return list;
+		}
 	}
 	
 	public ArrayList()
@@ -28,27 +91,22 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		super();
 	}
 	
-	public ArrayList(int size)
-	{
-		super(size);
-	}
-	
-	public ArrayList(Object... elements)
+	public ArrayList(E... elements)
 	{
 		super(elements);
 	}
 	
-	public ArrayList(Object[] elements, boolean trusted)
+	public ArrayList(E[] elements, boolean trusted)
 	{
-		super(elements, trusted);
+		super(elements, elements.length, trusted);
 	}
 	
-	public ArrayList(Object[] elements, int size)
+	public ArrayList(E[] elements, int size)
 	{
 		super(elements, size);
 	}
 	
-	public ArrayList(Object[] elements, int size, boolean trusted)
+	public ArrayList(E[] elements, int size, boolean trusted)
 	{
 		super(elements, size, trusted);
 	}
@@ -56,12 +114,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	public ArrayList(Collection<E> collection)
 	{
 		super(collection);
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new ArrayIterator(this.elements, this.size);
 	}
 	
 	@Override
@@ -198,12 +250,24 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
+	public ImmutableList<E> reversed()
+	{
+		Object[] newArray = new Object[this.size];
+		int index = this.size;
+		for (Object o : this.elements)
+		{
+			newArray[--index] = o;
+		}
+		return new ArrayList(newArray, this.size, true);
+	}
+	
+	@Override
 	public ImmutableList<E> sorted()
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort(array, 0, this.size);
-		return new SortedArrayList(array, this.size, true);
+		return new SortedArrayList(array, this.size, true, null);
 	}
 	
 	@Override
@@ -212,7 +276,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		Arrays.sort((E[]) array, 0, this.size, comparator);
-		return new SortedArrayList(array, this.size, true);
+		return new SortedArrayList(array, this.size, true, comparator);
 	}
 	
 	@Override
@@ -229,8 +293,8 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = Set.distinct((E[]) array, this.size, comparator);
-		return new SortedArrayList(array, size, true);
+		int size = Set.sortDistinct((E[]) array, this.size, comparator);
+		return new SortedArrayList(array, size, true, comparator);
 	}
 	
 	@Override
@@ -243,5 +307,11 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	public MutableList<E> mutable()
 	{
 		return new dyvil.collection.mutable.ArrayList(this.elements, this.size);
+	}
+	
+	@Override
+	public java.util.List<E> toJava()
+	{
+		return Collections.unmodifiableList(super.toJava());
 	}
 }

@@ -1,50 +1,47 @@
 package dyvil.tools.compiler.ast.statement;
 
-import java.util.Iterator;
-
-import dyvil.lang.Entry;
-import dyvil.lang.List;
-import dyvil.lang.Map;
-
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.IdentityHashMap;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.statement.control.Label;
+import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class StatementList extends ASTNode implements IStatement, IValueList, IContext
+import java.util.Iterator;
+
+public class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
-	private IValue[]			values	= new IValue[3];
-	private int					valueCount;
+	protected ICodePosition position;
 	
-	private Label[]				labels;
-	private Map<Name, Variable>	variables;
-	private IType				requiredType;
+	protected IValue[] values = new IValue[3];
+	protected int     valueCount;
+	protected Label[] labels;
 	
-	private IContext			context;
-	private IStatement			parent;
+	// Metadata
+	private   Map<Name, Variable> variables;
+	protected IType               returnType;
 	
 	public StatementList()
 	{
@@ -56,79 +53,84 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
+	public void expandPosition(ICodePosition position)
+	{
+		this.position = this.position.to(position);
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return STATEMENT_LIST;
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
-	}
-	
-	@Override
 	public boolean isPrimitive()
 	{
-		return this.requiredType.isPrimitive();
+		return this.returnType != null && this.returnType.isPrimitive();
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.returnType != null && this.returnType.isResolved();
 	}
 	
 	@Override
 	public IType getType()
 	{
-		if (this.requiredType != null)
+		if (this.returnType != null)
 		{
-			return this.requiredType;
+			return this.returnType;
 		}
 		if (this.valueCount == 0)
 		{
-			return this.requiredType = Types.VOID;
+			return this.returnType = Types.VOID;
 		}
-		return this.requiredType = this.values[this.valueCount - 1].getType();
+		return this.returnType = this.values[this.valueCount - 1].getType();
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.VOID || type == Types.UNKNOWN)
-		{
-			this.requiredType = Types.VOID;
-			return this;
-		}
-		
 		if (this.valueCount > 0)
 		{
-			IValue v = this.values[this.valueCount - 1].withType(type, typeContext, markers, context);
-			if (v != null)
+			IValue typed = this.values[this.valueCount - 1].withType(type, typeContext, markers, new CombiningContext(this, context));
+			if (typed != null)
 			{
-				this.values[this.valueCount - 1] = v;
-				this.requiredType = type;
+				this.values[this.valueCount - 1] = typed;
+				this.returnType = typed.getType();
 				return this;
 			}
 		}
 		
-		return null;
+		return type == Types.VOID ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID || type == Types.UNKNOWN)
+		if (this.valueCount > 0)
 		{
-			return true;
+			return this.values[this.valueCount - 1].isType(type);
 		}
-		
-		return this.valueCount > 0 && this.values[this.valueCount - 1].isType(type);
+		return type == Types.VOID;
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.valueCount > 0)
 		{
@@ -140,7 +142,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values, this.valueCount);
+		return new ArrayIterator<>(this.values, this.valueCount);
 	}
 	
 	@Override
@@ -204,189 +206,17 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	@Override
 	public void addValue(int index, IValue value)
 	{
-		int i = this.valueCount++;
-		System.arraycopy(this.values, index, this.values, index + 1, i - index + 1);
-		this.values[index] = value;
+		IValue[] temp = new IValue[++this.valueCount];
+		System.arraycopy(this.values, 0, temp, 0, index);
+		temp[index] = value;
+		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
+		this.values = temp;
 	}
 	
 	@Override
 	public IValue getValue(int index)
 	{
 		return this.values[index];
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		this.context = context;
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			IValue v = this.values[i];
-			if (v.isStatement())
-			{
-				((IStatement) v).setParent(this);
-			}
-			
-			v.resolveTypes(markers, this);
-		}
-		this.context = null;
-	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.context = context;
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			IValue v1 = this.values[i];
-			IValue v2 = v1.resolve(markers, this);
-			if (v1 != v2)
-			{
-				this.values[i] = v2;
-			}
-			
-			if (v2.valueTag() == IValue.VARIABLE)
-			{
-				if (this.variables == null)
-				{
-					this.variables = new IdentityHashMap();
-				}
-				
-				FieldInitializer fi = (FieldInitializer) v2;
-				Variable var = fi.variable;
-				this.variables.put(var.name, var);
-			}
-		}
-		this.context = null;
-		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.valueCount == 0)
-		{
-			return;
-		}
-		
-		this.context = context;
-		int len = this.valueCount - 1;
-		for (int i = 0; i < len; i++)
-		{
-			IValue v = this.values[i];
-			IValue v1 = v.withType(Types.VOID, null, markers, context);
-			if (v1 == null)
-			{
-				Marker marker = markers.create(v.getPosition(), "statement.type");
-				marker.addInfo("Returning Type: " + v.getType());
-			}
-			else
-			{
-				v = this.values[i] = v1;
-			}
-			
-			v.checkTypes(markers, this);
-		}
-		
-		IValue lastValue = this.values[len];
-		if (this.requiredType != null)
-		{
-			if (!lastValue.isType(this.requiredType))
-			{
-				Marker marker = markers.create(lastValue.getPosition(), "block.type");
-				marker.addInfo("Block Type: " + this.requiredType);
-				marker.addInfo("Returning Type: " + lastValue.getType());
-			}
-		}
-		else
-		{
-			this.requiredType = lastValue.getType();
-		}
-		lastValue.checkTypes(markers, this);
-		
-		this.context = null;
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		this.context = context;
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].check(markers, context);
-		}
-	}
-	
-	@Override
-	public IValue foldConstants()
-	{
-		if (this.valueCount == 1 && this.requiredType != Types.VOID)
-		{
-			return this.values[0].foldConstants();
-		}
-		
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].foldConstants();
-		}
-		return this;
-	}
-	
-	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		if (this.valueCount == 1 && this.requiredType != Types.VOID)
-		{
-			return this.values[0].cleanup(context, compilableList);
-		}
-		
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].cleanup(context, compilableList);
-		}
-		return this;
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return this.context.isStatic();
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.context.getHeader();
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this.context.getThisClass();
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.context.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return this.context.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -401,31 +231,7 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			}
 		}
 		
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		this.context.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		this.context.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return this.context.handleException(type);
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return this.context.getVisibility(member);
+		return null;
 	}
 	
 	@Override
@@ -442,56 +248,193 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 			}
 		}
 		
-		return this.parent == null ? null : this.parent.resolveLabel(name);
+		return null;
+	}
+	
+	@Override
+	public ILoop getEnclosingLoop()
+	{
+		return null;
+	}
+	
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return this.variables.containsValue(variable);
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].resolveStatement(context, markers);
+		}
+	}
+	
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		if (this.valueCount <= 0)
+		{
+			return this;
+		}
+		
+		IContext combinedContext = new CombiningContext(this, context);
+
+		// Resolve and check all values except the last one
+		int len = this.valueCount - 1;
+		for (int i = 0; i < len; i++)
+		{
+			IValue resolved = this.values[i] = this.values[i].resolve(markers, combinedContext);
+			
+			if (resolved.valueTag() == IValue.VARIABLE)
+			{
+				this.addVariable(resolved);
+			}
+			
+			IValue typed = resolved.withType(Types.VOID, Types.VOID, markers, combinedContext);
+			if (typed == null)
+			{
+				Marker marker = I18n.createMarker(resolved.getPosition(), "statementlist.statement");
+				marker.addInfo(I18n.getString("return.type", resolved.getType()));
+				markers.add(marker);
+			}
+			else
+			{
+				this.values[i] = typed;
+			}
+		}
+
+		// Resolved the last value
+		this.values[len] = this.values[len].resolve(markers, combinedContext);
+		
+		return this;
+	}
+	
+	protected void addVariable(IValue value)
+	{
+		if (this.variables == null)
+		{
+			this.variables = new IdentityHashMap<>();
+		}
+		
+		Variable var = ((FieldInitializer) value).variable;
+		this.variables.put(var.getName(), var);
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		IContext combinedContext = this.variables == null ? context : new CombiningContext(this, context);
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].checkTypes(markers, combinedContext);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		IContext context1 = this.variables == null ? context : new CombiningContext(this, context);
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].check(markers, context1);
+		}
+	}
+	
+	@Override
+	public IValue foldConstants()
+	{
+		if (this.valueCount == 1)
+		{
+			return this.values[0].foldConstants();
+		}
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].foldConstants();
+		}
+		return this;
+	}
+	
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.valueCount == 1)
+		{
+			return this.values[0].cleanup(context, compilableList);
+		}
+		
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i] = this.values[i].cleanup(context, compilableList);
+		}
+		return this;
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.requiredType == Types.VOID)
+		int statementCount = this.valueCount - 1;
+		if (statementCount < 0)
 		{
-			this.writeStatement(writer);
 			return;
 		}
 		
-		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = writer.localCount();
-		int len = this.valueCount - 1;
+		int localCount = writer.localCount();
 		
 		if (this.labels == null)
 		{
-			for (int i = 0; i < len; i++)
+			// Write all statements except the last one
+			for (int i = 0; i < statementCount; i++)
 			{
 				this.values[i].writeStatement(writer);
 			}
-			this.values[len].writeExpression(writer);
+
+			// Write the last expression
+			this.values[statementCount].writeExpression(writer, this.returnType);
 		}
 		else
 		{
-			for (int i = 0; i < len; i++)
+			// Write all statements except the last one
+			for (int i = 0; i < statementCount; i++)
 			{
-				Label l = this.labels[i];
-				if (l != null)
+				Label label = this.labels[i];
+				if (label != null)
 				{
-					writer.writeLabel(l.target);
+					writer.writeLabel(label.target);
 				}
 				
 				this.values[i].writeStatement(writer);
 			}
-			
-			Label l = this.labels[len];
-			if (l != null)
+
+			// Write last expression (and label)
+			Label label = this.labels[statementCount];
+			if (label != null)
 			{
-				writer.writeLabel(l.target);
+				writer.writeLabel(label.target);
 			}
 			
-			this.values[len].writeExpression(writer);
+			this.values[statementCount].writeExpression(writer);
 		}
 		
-		writer.resetLocals(count);
+		writer.resetLocals(localCount);
 		writer.writeLabel(end);
 		
 		if (this.variables == null)
@@ -502,18 +445,18 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		for (Entry<Name, Variable> entry : this.variables)
 		{
 			Variable var = entry.getValue();
-			writer.writeLocal(var.index, var.name.qualified, var.type.getExtendedName(), var.type.getSignature(), start, end);
+			var.writeLocal(writer, start, end);
 		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label start = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label end = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		
 		writer.writeLabel(start);
-		int count = writer.localCount();
+		int localCount = writer.localCount();
 		
 		if (this.labels == null)
 		{
@@ -526,17 +469,17 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 		{
 			for (int i = 0; i < this.valueCount; i++)
 			{
-				Label l = this.labels[i];
-				if (l != null)
+				Label label = this.labels[i];
+				if (label != null)
 				{
-					writer.writeLabel(l.target);
+					writer.writeLabel(label.target);
 				}
 				
 				this.values[i].writeStatement(writer);
 			}
 		}
 		
-		writer.resetLocals(count);
+		writer.resetLocals(localCount);
 		writer.writeLabel(end);
 		
 		if (this.variables == null)
@@ -551,46 +494,52 @@ public final class StatementList extends ASTNode implements IStatement, IValueLi
 	}
 	
 	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.valueCount == 0)
 		{
 			buffer.append(Formatting.Expression.emptyExpression);
+			return;
 		}
-		else
+		
+		buffer.append('\n').append(prefix).append('{').append('\n');
+
+		String indentedPrefix = prefix + Formatting.Method.indent;
+		int prevLine = 0;
+		
+		for (int i = 0; i < this.valueCount; i++)
 		{
-			buffer.append('\n').append(prefix).append('{').append('\n');
-			String prefix1 = prefix + Formatting.Method.indent;
-			ICodePosition prevPos = null;
-			
-			for (int i = 0; i < this.valueCount; i++)
+			IValue value = this.values[i];
+			ICodePosition pos = value.getPosition();
+			buffer.append(indentedPrefix);
+
+			if (pos != null)
 			{
-				IValue value = this.values[i];
-				buffer.append(prefix1);
-				
-				if (prevPos != null)
+				if (pos.startLine() - prevLine > 1)
 				{
-					ICodePosition pos = value.getPosition();
-					if (pos != null && pos.startLine() - prevPos.endLine() > 1)
-					{
-						buffer.append('\n').append(prefix1);
-					}
-					prevPos = pos;
+					buffer.append('\n').append(indentedPrefix);
 				}
-				
-				if (this.labels != null)
-				{
-					Label l = this.labels[i];
-					if (l != null)
-					{
-						buffer.append(l.name).append(Formatting.Expression.labelSeperator);
-					}
-				}
-				
-				value.toString(prefix1, buffer);
-				buffer.append(";\n");
+				prevLine = pos.endLine();
 			}
-			buffer.append(prefix).append('}');
+			
+			if (this.labels != null)
+			{
+				Label l = this.labels[i];
+				if (l != null)
+				{
+					buffer.append(l.name).append(Formatting.Expression.labelSeperator);
+				}
+			}
+			
+			value.toString(indentedPrefix, buffer);
+			buffer.append(";\n");
 		}
+		buffer.append(prefix).append('}');
 	}
 }

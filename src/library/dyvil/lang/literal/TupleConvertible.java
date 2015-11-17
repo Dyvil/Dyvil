@@ -27,4 +27,5 @@ package dyvil.lang.literal;
  */
 public @interface TupleConvertible
 {
+	String methodName() default "apply";
 }

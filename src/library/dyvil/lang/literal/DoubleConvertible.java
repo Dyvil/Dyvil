@@ -29,4 +29,5 @@ package dyvil.lang.literal;
  */
 public @interface DoubleConvertible
 {
+	String methodName() default "apply";
 }

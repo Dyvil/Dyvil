@@ -1,6 +1,13 @@
 package dyvil.annotation
 
-public annotation specialized([Class] values = COMMONS)
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
+import java.lang.annotation.ElementType
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target([ ElementType.TYPE_PARAMETER ])
+public @interface Specialized([Class] value = COMMONS)
 {
-	public static [Class] COMMONS = [ class[int], class[long], class[float], class[double] ];
+	public static final [Class] COMMONS = [ class int, class long, class float, class double ];
 }

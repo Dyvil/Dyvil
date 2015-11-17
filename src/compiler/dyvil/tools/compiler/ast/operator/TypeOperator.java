@@ -1,30 +1,44 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralExpression;
+import dyvil.tools.compiler.ast.expression.LiteralConversion;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class TypeOperator extends ASTNode implements IValue
+public final class TypeOperator extends AbstractValue
 {
-	public static final IClass	TYPE_CONVERTIBLE	= Package.dyvilLangLiteral.resolveClass("TypeConvertible");
+	public static final class Types
+	{
+		public static final IClass		TYPE_CLASS	= Package.dyvilLang.resolveClass("Type");
+		public static final ClassType	TYPE		= new ClassType();
+		
+		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
+		
+		private Types()
+		{
+			// no instances
+		}
+	}
 	
-	private IType				type;
-	private IType				genericType;
-	public boolean				dotless;
+	protected IType type;
+	
+	// Metadata
+	private IType genericType;
 	
 	public TypeOperator(ICodePosition position)
 	{
@@ -49,6 +63,12 @@ public final class TypeOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		if (this.genericType == null)
@@ -63,9 +83,10 @@ public final class TypeOperator extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.getTheClass().getAnnotation(TYPE_CONVERTIBLE) != null)
+		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE);
+		if (annotation != null)
 		{
-			return new LiteralExpression(this).withType(type, typeContext, markers, context);
+			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
 		return type.isSuperTypeOf(this.getType()) ? this : null;
@@ -74,7 +95,7 @@ public final class TypeOperator extends ASTNode implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.getTheClass().getAnnotation(TYPE_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null)
 		{
 			return true;
 		}
@@ -83,23 +104,14 @@ public final class TypeOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(TYPE_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null)
 		{
-			return 2;
+			return CONVERSION_MATCH;
 		}
 		
-		IType thisType = this.getType();
-		if (type.equals(thisType))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(thisType))
-		{
-			return 2;
-		}
-		return 0;
+		return type.getSubTypeDistance(this.getType());
 	}
 	
 	@Override
@@ -107,12 +119,12 @@ public final class TypeOperator extends ASTNode implements IValue
 	{
 		if (this.type == null)
 		{
-			this.type = Types.UNKNOWN;
-			markers.add(this.position, "typeoperator.invalid");
+			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
+			markers.add(I18n.createMarker(this.position, "typeoperator.invalid"));
 			return;
 		}
 		
-		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+		this.type = this.type.resolveType(markers, context);
 		ClassGenericType generic = new ClassGenericType(Types.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
@@ -121,28 +133,33 @@ public final class TypeOperator extends ASTNode implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		this.type.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		this.type.checkType(markers, context, TypePosition.TYPE);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.type.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
+		this.type.foldConstants();
 		return this;
 	}
 	
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		this.type.cleanup(context, compilableList);
 		return this;
 	}
 	
@@ -160,10 +177,16 @@ public final class TypeOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "type(" + this.type + ")";
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("type[");
+		buffer.append("type(");
 		this.type.toString(prefix, buffer);
-		buffer.append(']');
+		buffer.append(')');
 	}
 }

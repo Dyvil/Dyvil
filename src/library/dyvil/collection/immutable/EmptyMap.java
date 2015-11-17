@@ -1,24 +1,27 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
+import dyvil.annotation._internal.object;
+import dyvil.array.ObjectArray;
+import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
+import dyvil.util.None;
+import dyvil.util.Option;
 
 @NilConvertible
 public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
-	public static final EmptyMap	instance	= new EmptyMap();
+	private static final long serialVersionUID = 4719096668028950933L;
+	
+	public static final EmptyMap instance = new EmptyMap();
 	
 	public static <K, V> EmptyMap<K, V> apply()
 	{
@@ -44,19 +47,19 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
@@ -94,6 +97,12 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public Option<V> getOption(Object key)
+	{
+		return None.instance;
+	}
+	
+	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
 		return ImmutableMap.apply(key, value);
@@ -106,7 +115,7 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		return this;
 	}
@@ -124,21 +133,84 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
 		return this;
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
-		return (ImmutableMap<K, U>) this;
+		return this;
+	}
+	
+	@Override
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	{
+		return (ImmutableMap<NK, V>) this;
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	{
+		return (ImmutableMap<K, NV>) this;
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	{
+		return (ImmutableMap<NK, NV>) this;
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	{
+		return (ImmutableMap<NK, NV>) this;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
 		return this;
+	}
+	
+	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		return (ImmutableMap) this;
+	}
+	
+	@Override
+	public Entry<K, V>[] toArray()
+	{
+		return new Entry[0];
+	}
+	
+	@Override
+	public void toArray(int index, Entry<K, V>[] store)
+	{
+	}
+	
+	@Override
+	public Object[] toKeyArray()
+	{
+		return ObjectArray.EMPTY;
+	}
+	
+	@Override
+	public void toKeyArray(int index, Object[] store)
+	{
+	}
+	
+	@Override
+	public Object[] toValueArray()
+	{
+		return ObjectArray.EMPTY;
+	}
+	
+	@Override
+	public void toValueArray(int index, Object[] store)
+	{
 	}
 	
 	@Override
@@ -151,6 +223,12 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public MutableMap<K, V> mutable()
 	{
 		return MutableMap.apply();
+	}
+	
+	@Override
+	public java.util.Map<K, V> toJava()
+	{
+		return Collections.EMPTY_MAP;
 	}
 	
 	@Override
@@ -169,5 +247,15 @@ public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

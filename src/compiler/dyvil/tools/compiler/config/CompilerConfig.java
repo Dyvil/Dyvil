@@ -2,37 +2,126 @@ package dyvil.tools.compiler.config;
 
 import java.io.File;
 
-import dyvil.lang.List;
-
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.sources.FileFinder;
 
 public class CompilerConfig
 {
-	public String			jarName;
-	public String			jarVendor;
-	public String			jarVersion;
-	public String			jarNameFormat	= "%1$s-%2$s.jar";
+	private String directory = ".";
 	
-	public File				sourceDir;
-	public File				outputDir;
-	public List<Library>	libraries		= new ArrayList();
+	private String	jarName;
+	private String	jarVendor;
+	private String	jarVersion;
+	private String	jarNameFormat	= "%1$s-%2$s.jar";
 	
-	public List<String>		includedFiles	= new ArrayList();
-	public List<String>		excludedFiles	= new ArrayList();
+	private File				logFile;
+	private File				sourceDir;
+	private File				outputDir;
+	public final List<Library>	libraries	= new ArrayList();
 	
-	public String			mainType;
-	public List<String>		mainArgs		= new ArrayList();
+	public final List<String>	includedFiles	= new ArrayList();
+	public final List<String>	excludedFiles	= new ArrayList();
+	
+	private String				mainType;
+	public final List<String>	mainArgs	= new ArrayList();
 	
 	public CompilerConfig()
 	{
-		this.addLibrary(Library.dyvilLibrary);
-		this.addLibrary(Library.javaLibrary);
+		this.libraries.add(Library.dyvilLibrary);
+		this.libraries.add(Library.javaLibrary);
 		
 		if (Library.dyvilBinLibrary != null)
 		{
-			this.addLibrary(Library.dyvilBinLibrary);
+			this.libraries.add(Library.dyvilBinLibrary);
 		}
+	}
+	
+	public void setDirectory(String directory)
+	{
+		this.directory = directory;
+	}
+	
+	public void setConfigFile(File configFile)
+	{
+		this.directory = configFile.getParent();
+	}
+	
+	public void setJarName(String jarName)
+	{
+		this.jarName = jarName;
+	}
+	
+	public String getJarVendor()
+	{
+		return this.jarVendor;
+	}
+	
+	public void setJarVendor(String jarVendor)
+	{
+		this.jarVendor = jarVendor;
+	}
+	
+	public String getJarVersion()
+	{
+		return this.jarVersion;
+	}
+	
+	public void setJarVersion(String jarVersion)
+	{
+		this.jarVersion = jarVersion;
+	}
+	
+	public String getJarNameFormat()
+	{
+		return this.jarNameFormat;
+	}
+	
+	public void setJarNameFormat(String jarNameFormat)
+	{
+		this.jarNameFormat = jarNameFormat;
+	}
+	
+	public String getMainType()
+	{
+		return this.mainType;
+	}
+	
+	public void setMainType(String mainType)
+	{
+		this.mainType = mainType;
+	}
+	
+	public File getOutputDir()
+	{
+		return this.outputDir;
+	}
+	
+	public void setOutputDir(String outputDir)
+	{
+		this.outputDir = new File(this.directory, outputDir);
+	}
+	
+	public File getSourceDir()
+	{
+		return this.sourceDir;
+	}
+	
+	public void setSourceDir(String sourceDir)
+	{
+		this.sourceDir = new File(this.directory, sourceDir);
+	}
+	
+	public File getLogFile()
+	{
+		return this.logFile;
+	}
+	
+	public void setLogFile(String logFile)
+	{
+		this.logFile = new File(this.directory, logFile);
 	}
 	
 	public void addLibraryFile(File file)
@@ -55,7 +144,7 @@ public class CompilerConfig
 		this.excludedFiles.add(fileName);
 	}
 	
-	public boolean compileFile(String name)
+	public boolean isExcluded(String name)
 	{
 		for (String s : this.excludedFiles)
 		{
@@ -65,15 +154,45 @@ public class CompilerConfig
 			}
 		}
 		
-		for (String s : this.includedFiles)
+		return true;
+	}
+	
+	public void findUnits(FileFinder fileFinder)
+	{
+		if (!this.includedFiles.isEmpty())
 		{
-			if (name.endsWith(s))
+			for (String s : this.includedFiles)
 			{
-				return true;
+				File source = new File(this.sourceDir, s);
+				File output = new File(this.outputDir, s);
+				Package pack = packageFromFile(s, source.isDirectory());
+				
+				fileFinder.process(source, output, pack);
 			}
+			return;
 		}
 		
-		return true;
+		fileFinder.process(this.sourceDir, this.outputDir, Package.rootPackage);
+	}
+	
+	private static Package packageFromFile(String file, boolean isDirectory)
+	{
+		int index = 0;
+		Package pack = Package.rootPackage;
+		do
+		{
+			int nextIndex = file.indexOf('/', index + 1);
+			if (nextIndex < 0)
+			{
+				return isDirectory ? pack.resolvePackage(file.substring(index)) : pack;
+			}
+			
+			pack = pack.createSubPackage(file.substring(index, nextIndex));
+			index = nextIndex + 1;
+		}
+		while (index < file.length());
+		
+		return pack;
 	}
 	
 	public String getJarName()

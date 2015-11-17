@@ -1,61 +1,74 @@
 package dyvil.collection;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
 
 public interface JavaMaps
 {
 	// Accessors
 	
 	/**
-	 * @see Map#containsKey(Object)
+	 * @see Map#$qmark$at(Object)
 	 */
-	public static @infix @inline boolean $qmark(java.util.Map map, Object key)
+	static @infix @inline boolean $qmark$at(java.util.Map<?, ?> map, Object key)
 	{
 		return map.containsKey(key);
 	}
 	
 	/**
-	 * @see Map#contains(Object, Object)
+	 * @see Map#$qmark(Object, Object)
 	 */
-	public static @infix boolean $qmark(java.util.Map map, Object key, Object value)
+	static @infix boolean $qmark(java.util.Map<?, ?> map, Object key, Object value)
 	{
 		return value == null ? map.get(key) == null : value.equals(map.get(key));
 	}
 	
 	/**
-	 * @see Map#contains(Entry)
+	 * @see Map#$qmark(Entry)
 	 */
-	public static @infix boolean $qmark(java.util.Map map, Tuple2 entry)
+	static @infix boolean $qmark(java.util.Map<?, ?> map, Entry<?, ?> entry)
 	{
-		return $qmark(map, entry._1, entry._2);
+		return $qmark(map, entry.getKey(), entry.getValue());
 	}
 	
 	/**
-	 * @see Map#containsValue(Object)
+	 * @see Map#$qmark(Object)
 	 */
-	public static @infix @inline boolean $qmark$colon(java.util.Map map, Object value)
+	static @infix @inline boolean $qmark$colon(java.util.Map<?, ?> map, Object value)
 	{
 		return map.containsValue(value);
 	}
 	
 	/**
-	 * @see Map#get(Object)
+	 * @see Map#subscript(Object)
 	 */
-	public static @infix @inline <K, V> V apply(java.util.Map<K, V> map, K key)
+	static @infix @inline <K, V> V subscript(java.util.Map<K, V> map, Object key)
 	{
 		return map.get(key);
+	}
+	
+	/**
+	 * @see Map#subscript(Object)
+	 */
+	static @infix @inline <K, V> Option<V> getOption(java.util.Map<K, V> map, Object key)
+	{
+		if (!map.containsKey(key))
+		{
+			return None.instance;
+		}
+		return new Some(map.get(key));
 	}
 	
 	// Mutating Operations
@@ -63,7 +76,7 @@ public interface JavaMaps
 	/**
 	 * @see Map#subscript_$eq(Object, Object)
 	 */
-	public static @infix @inline <K, V> void update(java.util.Map<K, V> map, K key, V value)
+	static @infix @inline <K, V> void subscript_$eq(java.util.Map<K, V> map, K key, V value)
 	{
 		map.put(key, value);
 	}
@@ -71,31 +84,39 @@ public interface JavaMaps
 	/**
 	 * @see Map#$plus$eq(Tuple2)
 	 */
-	public static @infix @inline <K, V> void $plus$eq(java.util.Map<K, V> map, Tuple2<? extends K, ? extends V> entry)
+	static @infix @inline <K, V> void $plus$eq(java.util.Map<K, V> map, Entry<? extends K, ? extends V> entry)
 	{
-		map.put(entry._1, entry._2);
+		map.put(entry.getKey(), entry.getValue());
 	}
 	
 	/**
 	 * @see Map#$plus$plus$eq(Map)
 	 */
-	public static @infix @inline <K, V> void $plus$plus$eq(java.util.Map<K, V> map1, java.util.Map<K, V> map2)
+	static @infix @inline <K, V> void $plus$plus$eq(java.util.Map<K, V> map1, java.util.Map<K, V> map2)
 	{
 		map1.putAll(map2);
 	}
 	
 	/**
+	 * @see Map#$minus$at$eq(Entry)
+	 */
+	static @infix @inline <K, V> void $minus$at$eq(java.util.Map<K, V> map, Object key)
+	{
+		map.remove(key);
+	}
+	
+	/**
 	 * @see Map#$minus$eq(Entry)
 	 */
-	public static @infix @inline <K, V> void $minus$eq(java.util.Map<K, V> map, Tuple2<? super K, ? super V> entry)
+	static @infix @inline <K, V> void $minus$eq(java.util.Map<K, V> map, Entry<?, ?> entry)
 	{
-		map.remove(entry._1, entry._2);
+		map.remove(entry.getKey(), entry.getKey());
 	}
 	
 	/**
 	 * @see Map#$minus$colon$eq(Object)
 	 */
-	public static @infix <K, V> void $minus$colon$eq(java.util.Map<K, V> map, Object value)
+	static @infix <K, V> void $minus$colon$eq(java.util.Map<K, V> map, Object value)
 	{
 		map.values().remove(value);
 	}
@@ -103,26 +124,75 @@ public interface JavaMaps
 	/**
 	 * @see Map#$minus$minus$eq(Map)
 	 */
-	public static @infix <K, V> void $minus$minus$eq(java.util.Map<K, V> map1, java.util.Map<? super K, ? super V> map2)
+	static @infix <K, V> void $minus$minus$eq(java.util.Map<K, V> map, java.util.Map<?, ?> remove)
 	{
-		for (java.util.Map.Entry<? super K, ? super V> e : map2.entrySet())
+		for (java.util.Map.Entry<?, ?> e : remove.entrySet())
 		{
-			map1.remove(e.getKey(), e.getValue());
+			remove.remove(e.getKey(), e.getValue());
 		}
 	}
 	
 	/**
-	 * @see Map#map(BiFunction)
+	 * @see Map#$minus$minus$eq(Collection)
 	 */
-	public static @infix @inline <K, V> void map(java.util.Map<K, V> map, BiFunction<? super K, ? super V, ? extends V> mapper)
+	static @infix <K, V> void $minus$minus$eq(java.util.Map<K, V> map, java.util.Collection<?> remove)
+	{
+		for (Object e : remove)
+		{
+			map.remove(e);
+		}
+	}
+	
+	/**
+	 * @see Map#mapValues(BiFunction)
+	 */
+	static @infix @inline <K, V> void map(java.util.Map<K, V> map, BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		map.replaceAll(mapper);
 	}
 	
 	/**
+	 * @see Map#mapEntries(BiFunction)
+	 */
+	static @infix @inline <K, V> void mapEntries(java.util.Map<K, V> map, BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+	{
+		java.util.Map<K, V> temp = new LinkedHashMap<>(map.size() << 2);
+		for (java.util.Map.Entry<K, V> entry : map.entrySet())
+		{
+			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			if (newEntry != null)
+			{
+				temp.put(newEntry.getKey(), newEntry.getValue());
+			}
+		}
+		
+		map.clear();
+		map.putAll(temp);
+	}
+	
+	/**
+	 * @see Map#flatMap(BiFunction)
+	 */
+	static @infix @inline <K, V> void flatMap(java.util.Map<K, V> map,
+			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+	{
+		java.util.Map<K, V> temp = new LinkedHashMap<>(map.size() << 2);
+		for (java.util.Map.Entry<K, V> entry : map.entrySet())
+		{
+			for (Entry<? extends K, ? extends V> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
+			{
+				temp.put(newEntry.getKey(), newEntry.getValue());
+			}
+		}
+		
+		map.clear();
+		map.putAll(temp);
+	}
+	
+	/**
 	 * @see Map#filter(BiPredicate)
 	 */
-	public static @infix <K, V> void filter(java.util.Map<K, V> map, BiPredicate<? super K, ? super V> condition)
+	static @infix <K, V> void filter(java.util.Map<K, V> map, BiPredicate<? super K, ? super V> condition)
 	{
 		Iterator<java.util.Map.Entry<K, V>> iterator = map.entrySet().iterator();
 		while (iterator.hasNext())
@@ -138,12 +208,12 @@ public interface JavaMaps
 	/**
 	 * @see Map#mutable()
 	 */
-	public static @infix <K, V> MutableMap<K, V> mutable(java.util.Map<K, V> map)
+	static @infix <K, V> MutableMap<K, V> mutable(java.util.Map<K, V> map)
 	{
 		MutableMap<K, V> newMap = new dyvil.collection.mutable.HashMap();
 		for (java.util.Map.Entry<K, V> entry : map.entrySet())
 		{
-			newMap.subscript_$eq(entry.getKey(), entry.getValue());
+			newMap.put(entry.getKey(), entry.getValue());
 		}
 		return newMap;
 	}
@@ -151,7 +221,7 @@ public interface JavaMaps
 	/**
 	 * @see Map#immutable()
 	 */
-	public static @infix <K, V> ImmutableMap<K, V> immutable(java.util.Map<K, V> map)
+	static @infix <K, V> ImmutableMap<K, V> immutable(java.util.Map<K, V> map)
 	{
 		int len = map.size();
 		switch (len)

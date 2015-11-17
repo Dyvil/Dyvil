@@ -1,22 +1,20 @@
 package dyvil.tools.compiler.ast.field;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
-
-import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -29,20 +27,28 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Property extends Member implements IProperty, IContext
 {
-	protected IClass			theClass;
+	private static final byte	GETTER	= 1;
+	private static final byte	SETTER	= 2;
 	
-	public IValue				get;
-	public IValue				set;
+	protected IClass theClass;
+	
+	protected IValue	getter;
+	protected IValue	setter;
+	protected int		getterModifiers;
+	protected int		setterModifiers;
 	
 	protected MethodParameter	setterParameter;
-	private IProperty			overrideProperty;
+	protected IProperty			overrideProperty;
 	
 	public Property(IClass iclass)
 	{
@@ -59,6 +65,21 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super(name, type);
 		this.theClass = iclass;
+	}
+	
+	public Property(IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.theClass = iclass;
+		this.modifiers = modifiers;
+	}
+	
+	public Property(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	{
+		super(name, type);
+		this.position = position;
+		this.theClass = iclass;
+		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -80,7 +101,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.FIELD;
 	}
@@ -97,27 +118,75 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public boolean hasGetter()
+	{
+		return this.getter != null || this.getterModifiers != 0;
+	}
+	
+	@Override
+	public void setGetterModifiers(int modifiers)
+	{
+		this.getterModifiers = modifiers;
+	}
+	
+	@Override
+	public void addGetterModifier(int modifier)
+	{
+		this.getterModifiers |= modifier;
+	}
+	
+	@Override
+	public int getGetterModifiers()
+	{
+		return this.getterModifiers;
+	}
+	
+	@Override
 	public void setGetter(IValue get)
 	{
-		this.get = get;
+		this.getter = get;
 	}
 	
 	@Override
 	public IValue getGetter()
 	{
-		return this.get;
+		return this.getter;
+	}
+	
+	@Override
+	public boolean hasSetter()
+	{
+		return this.setter != null || this.setterModifiers != 0;
+	}
+	
+	@Override
+	public void setSetterModifiers(int modifiers)
+	{
+		this.setterModifiers = modifiers;
+	}
+	
+	@Override
+	public void addSetterModifier(int modifier)
+	{
+		this.setterModifiers |= modifier;
+	}
+	
+	@Override
+	public int getSetterModifiers()
+	{
+		return this.setterModifiers;
 	}
 	
 	@Override
 	public void setSetter(IValue set)
 	{
-		this.set = set;
+		this.setter = set;
 	}
 	
 	@Override
 	public IValue getSetter()
 	{
-		return this.set;
+		return this.setter;
 	}
 	
 	@Override
@@ -129,40 +198,52 @@ public class Property extends Member implements IProperty, IContext
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(position, "property.access.static", this.name.unqualified);
+					markers.add(I18n.createMarker(position, "property.access.static", this.name.unqualified));
+				}
+				else if (instance.getType().getTheClass() != this.theClass)
+				{
+					markers.add(I18n.createMarker(position, "property.access.static.type", this.name.unqualified, this.theClass.getFullName()));
 				}
 				instance = null;
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(position, "property.access.instance", this.name.unqualified);
+				if (!instance.getType().getTheClass().isObject())
+				{
+					markers.add(I18n.createMarker(position, "property.access.instance", this.name.unqualified));
+				}
+			}
+			else
+			{
+				IType type = this.theClass.getType();
+				instance = type.convertValue(instance, type, markers, context);
 			}
 		}
 		else if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			if (context.isStatic())
 			{
-				markers.add(position, "property.access.instance", this.name.unqualified);
+				markers.add(I18n.createMarker(position, "property.access.instance", this.name.unqualified));
 			}
 			else
 			{
-				markers.add(position, "property.access.unqualified", this.name.unqualified);
-				instance = new ThisValue(position, this.theClass.getType());
+				markers.add(I18n.createMarker(position, "property.access.unqualified", this.name.unqualified));
+				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
 		if (this.hasModifier(Modifiers.DEPRECATED))
 		{
-			markers.add(position, "property.access.deprecated", this.name);
+			Deprecation.checkDeprecation(markers, position, this, "property");
 		}
 		
-		switch (context.getVisibility(this))
+		switch (IContext.getVisibility(context, this))
 		{
-		case IContext.SEALED:
-			markers.add(position, "property.access.sealed", this.name);
+		case IContext.INTERNAL:
+			markers.add(I18n.createMarker(position, "property.access.sealed", this.name));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(position, "property.access.invisible", this.name);
+			markers.add(I18n.createMarker(position, "property.access.invisible", this.name));
 			break;
 		}
 		
@@ -172,17 +253,18 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if (this.set == null)
+		if (this.setter == null)
 		{
-			markers.add(position, "property.assign.readonly", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "property.assign.readonly", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "property.assign.type", this.name.unqualified);
-			marker.addInfo("Property Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			Marker marker = I18n.createMarker(newValue.getPosition(), "property.assign.type", this.name.unqualified);
+			marker.addInfo(I18n.getString("property.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
+			markers.add(marker);
 		}
 		else
 		{
@@ -197,13 +279,21 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.resolveTypes(markers, context);
 		
-		if (this.get != null)
+		if (this.getter != null)
 		{
-			this.get.resolveTypes(markers, this);
+			this.getter.resolveTypes(markers, this);
 		}
-		if (this.set != null)
+		else if (this.getterModifiers != 0)
 		{
-			this.set.resolveTypes(markers, this);
+			this.getterModifiers |= Modifiers.ABSTRACT;
+		}
+		if (this.setter != null)
+		{
+			this.setter.resolveTypes(markers, this);
+		}
+		else if (this.setterModifiers != 0)
+		{
+			this.setterModifiers |= Modifiers.ABSTRACT;
 		}
 	}
 	
@@ -212,48 +302,53 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.resolve(markers, context);
 		
-		if (this.set != null)
+		if (this.setter != null || this.setterModifiers != 0)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.setterParameter.setIndex(1);
-			this.set = this.set.resolve(markers, this);
+		}
+		
+		if (this.setter != null)
+		{
+			this.setter = this.setter.resolve(markers, this);
 			
-			IValue set1 = this.set.withType(Types.VOID, Types.VOID, markers, context);
+			IValue set1 = this.setter.withType(Types.VOID, Types.VOID, markers, context);
 			if (set1 == null)
 			{
-				markers.add(this.set.getPosition(), "property.setter.type", this.name);
+				markers.add(I18n.createMarker(this.setter.getPosition(), "property.setter.type", this.name));
 			}
 			else
 			{
-				this.set = set1;
+				this.setter = set1;
 			}
 		}
-		if (this.get != null)
+		if (this.getter != null)
 		{
-			this.get = this.get.resolve(markers, this);
+			this.getter = this.getter.resolve(markers, this);
 			
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
 				inferType = true;
-				this.type = this.get.getType();
+				this.type = this.getter.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(this.position, "property.type.infer", this.name.unqualified);
+					markers.add(I18n.createMarker(this.position, "property.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
 			
-			IValue get1 = this.get.withType(this.type, this.type, markers, context);
+			IValue get1 = this.getter.withType(this.type, this.type, markers, context);
 			if (get1 == null)
 			{
-				Marker marker = markers.create(this.get.getPosition(), "property.getter.type", this.name.unqualified);
-				marker.addInfo("Property Type: " + this.type);
-				marker.addInfo("Getter Value Type: " + this.get.getType());
+				Marker marker = I18n.createMarker(this.getter.getPosition(), "property.getter.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("property.type", this.type));
+				marker.addInfo(I18n.getString("property.getter.type", this.getter.getType()));
+				markers.add(marker);
 			}
 			else
 			{
-				this.get = get1;
+				this.getter = get1;
 				if (inferType)
 				{
 					this.type = get1.getType();
@@ -264,7 +359,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(this.position, "property.type.infer.writeonly", this.name.unqualified);
+			markers.add(I18n.createMarker(this.position, "property.type.infer.writeonly", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -274,29 +369,39 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.checkTypes(markers, context);
 		
-		if (this.get != null)
+		boolean getter = this.getter != null;
+		boolean setter = this.setter != null;
+		if (getter)
 		{
-			this.get.checkTypes(markers, context);
+			this.getter.checkTypes(markers, context);
 		}
-		if (this.set != null)
+		if (setter)
 		{
-			this.set.checkTypes(markers, context);
+			this.setter.checkTypes(markers, context);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			this.checkOverride(markers);
 		}
+		
+		if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+		{
+			if (!setter && !getter)
+			{
+				this.modifiers |= Modifiers.ABSTRACT;
+			}
+		}
 	}
 	
 	private void checkOverride(MarkerList markers)
 	{
-		IDataMember f = this.theClass.getSuperType().resolveField(this.name);
+		IDataMember f = this.theClass.getSuperField(this.name);
 		if (f == null)
 		{
 			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
 			{
-				markers.add(this.position, "property.override", this.name);
+				markers.add(I18n.createMarker(this.position, "property.override", this.name));
 			}
 			return;
 		}
@@ -310,20 +415,34 @@ public class Property extends Member implements IProperty, IContext
 		
 		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
 		{
-			markers.add(this.position, "property.overrides", this.name);
+			markers.add(I18n.createMarker(this.position, "property.overrides", this.name));
 		}
 		else if (this.overrideProperty.hasModifier(Modifiers.FINAL))
 		{
-			markers.add(this.position, "property.override.final", this.name);
+			markers.add(I18n.createMarker(this.position, "property.override.final", this.name));
 		}
 		else
 		{
-			IType type = this.overrideProperty.getType();
-			if (type != this.type && !type.equals(this.type))
+			IType type = this.overrideProperty.getType().getConcreteType(this.theClass.getType());
+			if (type != this.type && !type.isSameType(this.type))
 			{
-				Marker marker = markers.create(this.position, "property.override.type", this.name);
-				marker.addInfo("Property Type: " + this.type);
-				marker.addInfo("Overriden Property Type: " + type);
+				Marker marker = I18n.createMarker(this.position, "property.override.type.incompatible", this.name);
+				marker.addInfo(I18n.getString("property.type", this.type));
+				marker.addInfo(I18n.getString("property.override.type", type));
+				markers.add(marker);
+			}
+		}
+		
+		if (!this.theClass.isAbstract())
+		{
+			if ((this.overrideProperty.getGetterModifiers() & Modifiers.ABSTRACT) != 0 && this.getter == null)
+			{
+				markers.add(I18n.createMarker(this.position, "property.getter.abstract", this.name));
+			}
+			
+			if ((this.overrideProperty.getSetterModifiers() & Modifiers.ABSTRACT) != 0 && this.setter == null)
+			{
+				markers.add(I18n.createMarker(this.position, "property.setter.abstract", this.name));
 			}
 		}
 	}
@@ -333,23 +452,33 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.check(markers, context);
 		
-		if (this.get != null)
+		if (this.getter != null)
 		{
-			this.get.check(markers, context);
+			this.getter.check(markers, context);
 		}
-		if (this.set != null)
+		if (this.getterModifiers != 0)
 		{
-			this.set.check(markers, context);
+			ModifierTypes.checkMethodModifiers(markers, this, this.getterModifiers | this.modifiers, this.getter != null, "property.getter");
+		}
+		if (this.setter != null)
+		{
+			this.setter.check(markers, context);
 			
 			if (this.type == Types.VOID)
 			{
-				markers.add(this.position, "property.type.void");
+				markers.add(I18n.createMarker(this.position, "property.type.void"));
 			}
+			
 		}
-		// If both are null
-		else if (this.get == null)
+		if (this.setterModifiers != 0)
 		{
-			markers.add(this.position, "property.empty", this.name);
+			ModifierTypes.checkMethodModifiers(markers, this, this.setterModifiers | this.modifiers, this.setter != null, "property.setter");
+		}
+		
+		// No setter and no getter
+		if (this.getter == null && this.setter == null && this.getterModifiers == 0 && this.setterModifiers == 0)
+		{
+			markers.add(I18n.createMarker(this.position, "property.empty", this.name));
 		}
 	}
 	
@@ -358,13 +487,13 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.foldConstants();
 		
-		if (this.get != null)
+		if (this.getter != null)
 		{
-			this.get = this.get.foldConstants();
+			this.getter = this.getter.foldConstants();
 		}
-		if (this.set != null)
+		if (this.setter != null)
 		{
-			this.set = this.set.foldConstants();
+			this.setter = this.setter.foldConstants();
 		}
 	}
 	
@@ -373,13 +502,13 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.cleanup(context, compilableList);
 		
-		if (this.get != null)
+		if (this.getter != null)
 		{
-			this.get = this.get.cleanup(this, compilableList);
+			this.getter = this.getter.cleanup(this, compilableList);
 		}
-		if (this.set != null)
+		if (this.setter != null)
 		{
-			this.set = this.set.cleanup(this, compilableList);
+			this.setter = this.setter.cleanup(this, compilableList);
 		}
 	}
 	
@@ -424,7 +553,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		return this.theClass.resolveTypeVariable(name);
 	}
-
+	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -436,13 +565,13 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}
@@ -454,9 +583,31 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public byte getVisibility(IClassMember member)
+	public IAccessible getAccessibleThis(IClass type)
 	{
-		return this.theClass.getVisibility(member);
+		return this.theClass.getAccessibleThis(type);
+	}
+	
+	@Override
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.setterParameter;
+	}
+	
+	@Override
+	public IDataMember capture(IVariable variable)
+	{
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
+		return this.theClass.capture(variable);
 	}
 	
 	// Compilation
@@ -473,77 +624,83 @@ public class Property extends Member implements IProperty, IContext
 		return null;
 	}
 	
+	protected void writeAnnotations(MethodWriter mw, int modifiers)
+	{
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(mw);
+			}
+		}
+		
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		{
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+		}
+		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		{
+			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
+		}
+	}
+	
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String extended = this.type.getExtendedName();
 		String signature = this.type.getSignature();
-		if (this.get != null)
+		if (this.getter != null || this.getterModifiers != 0)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified, "()" + extended, signature == null ? null
-					: "()" + signature, null));
+			int modifiers = this.modifiers | this.getterModifiers;
 			
+			MethodWriter mw = new MethodWriterImpl(writer,
+					writer.visitMethod(modifiers, this.name.qualified, "()" + extended, signature == null ? null : "()" + signature, null));
+					
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
 			}
 			
-			for (int i = 0; i < this.annotationCount; i++)
-			{
-				this.annotations[i].write(writer);
-			}
+			this.writeAnnotations(mw, modifiers);
 			
-			if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+			if (this.getter != null)
 			{
-				mw.addAnnotation("Ljava/lang/Deprecated;", true);
+				mw.begin();
+				this.getter.writeExpression(mw, this.type);
+				mw.end(this.type);
 			}
-			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
-			{
-				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
-			}
-			
-			mw.begin();
-			this.get.writeExpression(mw);
-			mw.end(this.type);
 		}
-		if (this.set != null)
+		if (this.setter != null || this.setterModifiers != 0)
 		{
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(this.modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
-					signature == null ? null : "(" + signature + ")V", null));
+			int modifiers = this.modifiers | this.setterModifiers;
 			
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
+					signature == null ? null : "(" + signature + ")V", null));
+					
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
 			}
 			
-			for (int i = 0; i < this.annotationCount; i++)
-			{
-				this.annotations[i].write(writer);
-			}
-			
-			if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
-			{
-				mw.addAnnotation("Ljava/lang/Deprecated;", true);
-			}
-			if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
-			{
-				mw.addAnnotation("Ldyvil/annotation/sealed;", false);
-			}
-			
+			this.writeAnnotations(mw, modifiers);
 			this.setterParameter.write(mw);
 			
-			mw.begin();
-			this.set.writeStatement(mw);
-			mw.end(Types.VOID);
+			if (this.setter != null)
+			{
+				mw.begin();
+				this.setter.writeStatement(mw);
+				mw.end(Types.VOID);
+			}
 		}
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		
 		int opcode;
@@ -553,6 +710,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		
@@ -563,15 +721,15 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (instance != null)
 		{
-			instance.writeExpression(writer);
+			instance.writeExpression(writer, this.theClass.getType());
 		}
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
 		int opcode;
@@ -581,6 +739,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		else
 		{
+			writer.writeLineNumber(lineNumber);
 			opcode = Opcodes.INVOKEVIRTUAL;
 		}
 		
@@ -591,40 +750,53 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
+	}
+	
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (Annotation annotation : this.annotations)
-		{
-			buffer.append(prefix);
-			annotation.toString(prefix, buffer);
-			buffer.append('\n');
-		}
+		super.toString(prefix, buffer);
 		
-		buffer.append(prefix);
 		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
 		this.type.toString("", buffer);
 		buffer.append(' ');
 		buffer.append(this.name);
 		
 		buffer.append('\n').append(prefix).append('{');
-		if (this.get != null)
+		if (this.getter != null || this.getterModifiers != 0)
 		{
 			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
-			if (this.set == null)
+			buffer.append(ModifierTypes.FIELD.toString(this.getterModifiers));
+			buffer.append(Formatting.Field.propertyGet);
+			if (this.getter != null)
 			{
-				this.get.toString(prefix + Formatting.Method.indent, buffer);
+				this.getter.toString(prefix + Formatting.Method.indent, buffer);
+			}
+			
+			if (this.setter == null && this.setterModifiers == 0)
+			{
 				buffer.append('\n').append(prefix).append('}');
 				return;
 			}
 			
-			buffer.append(Formatting.Field.propertyGet);
-			this.get.toString(prefix + Formatting.Method.indent, buffer);
 			buffer.append(';');
 		}
-		if (this.set != null)
+		if (this.setter != null || this.setterModifiers != 0)
 		{
-			buffer.append('\n').append(prefix).append(Formatting.Method.indent).append(Formatting.Field.propertySet);
-			this.set.toString(prefix + Formatting.Method.indent, buffer);
+			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
+			buffer.append(ModifierTypes.FIELD.toString(this.setterModifiers));
+			buffer.append(Formatting.Field.propertySet);
+			if (this.setter != null)
+			{
+				this.setter.toString(prefix + Formatting.Method.indent, buffer);
+			}
 			buffer.append(';');
 		}
 		buffer.append('\n').append(prefix).append('}');

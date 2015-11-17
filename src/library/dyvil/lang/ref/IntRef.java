@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface IntRef
 {
-	public int get();
+	int get();
 	
-	public void set(int value);
+	void set(int value);
 }

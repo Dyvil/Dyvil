@@ -1,39 +1,62 @@
 package dyvil.tools.compiler.ast.type.alias;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class TypeAlias implements ITypeAlias
 {
-	protected Name name;
-	protected IType type;
+	protected Name	name;
+	protected IType	type;
+	
+	public TypeAlias()
+	{
+	}
+	
+	public TypeAlias(Name name, IType type)
+	{
+		this.name = name;
+		this.type = type;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return null;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
 	
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-
+	
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-
+	
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-
+	
 	@Override
 	public IType getType()
 	{
@@ -41,20 +64,50 @@ public class TypeAlias implements ITypeAlias
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolve(markers, context, TypePosition.TYPE);
+		this.type = this.type.resolveType(markers, context);
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void resolve(MarkerList markers, IContext context)
+	{
+		this.type.resolve(markers, context);
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.type.checkType(markers, context, TypePosition.TYPE);
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		this.type.check(markers, context);
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		this.type.foldConstants();
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.type.cleanup(context, compilableList);
+	}
+	
+	@Override
+	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeUTF(this.name.qualified);
 		this.type.write(dos);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput dis) throws IOException
 	{
 		this.name = Name.getQualified(dis.readUTF());
 		this.type = IType.readType(dis);

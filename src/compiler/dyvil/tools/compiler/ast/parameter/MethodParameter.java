@@ -3,27 +3,39 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
+
+import java.lang.annotation.ElementType;
 
 public final class MethodParameter extends Parameter
 {
-	public ICallableMember	method;
+	public ICallableMember method;
 	
 	protected ReferenceType	refType;
 	
 	public MethodParameter()
 	{
+	}
+	
+	public MethodParameter(ICodePosition position, Name name)
+	{
+		this.position = position;
+		this.name = name;
+		this.type = Types.UNKNOWN;
 	}
 	
 	public MethodParameter(Name name)
@@ -47,6 +59,12 @@ public final class MethodParameter extends Parameter
 	public boolean isVariable()
 	{
 		return true;
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.PARAMETER;
 	}
 	
 	@Override
@@ -84,15 +102,16 @@ public final class MethodParameter extends Parameter
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
-			markers.add(position, "parameter.assign.final", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "parameter.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
-			marker.addInfo("Parameter Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			Marker marker = I18n.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
+			marker.addInfo(I18n.getString("parameter.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
+			markers.add(marker);
 		}
 		else
 		{
@@ -122,17 +141,20 @@ public final class MethodParameter extends Parameter
 		{
 			this.defaultValue = this.defaultValue.resolve(markers, context);
 			
-			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
+			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.defaultValue.getPosition(), "parameter.type", this.name.unqualified);
-				marker.addInfo("Parameter Type: " + this.type);
-				marker.addInfo("Value Type: " + this.defaultValue.getType());
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type.incompatible", this.name.unqualified);
+				marker.addInfo(I18n.getString("parameter.type", this.type));
+				marker.addInfo(I18n.getString("value.type", this.defaultValue.getType()));
+				markers.add(marker);
 			}
 			else
 			{
 				this.defaultValue = value1;
 			}
+			
+			this.defaultValue = Util.constant(this.defaultValue, markers);
 			return;
 		}
 	}
@@ -149,7 +171,18 @@ public final class MethodParameter extends Parameter
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "parameter.type.void");
+			markers.add(I18n.createMarker(this.position, "parameter.type.void"));
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+		
+		if (this.defaultValue != null)
+		{
+			compilableList.addCompilable(this);
 		}
 	}
 	
@@ -167,28 +200,26 @@ public final class MethodParameter extends Parameter
 		String desc = "()" + this.type.getExtendedName();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
 		mw.begin();
-		this.defaultValue.writeExpression(mw);
+		this.defaultValue.writeExpression(mw, this.type);
 		mw.end(this.type);
 	}
 	
 	@Override
 	public void write(MethodWriter writer)
 	{
-		writer.registerParameter(this.index, this.name.qualified, this.getActualType(), 0);
+		this.localIndex = writer.localCount();
+		writer.registerParameter(this.localIndex, this.name.qualified, this.getActualType(), 0);
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
-			writer.addParameterAnnotation(this.index, "Ldyvil/annotation/var;", true);
+			writer.visitParameterAnnotation(this.index, "Ldyvil/annotation/_internal/var;", true);
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(writer, this.index);
-		}
+		this.writeAnnotations(writer);
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
@@ -196,11 +227,11 @@ public final class MethodParameter extends Parameter
 			return;
 		}
 		
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
@@ -210,8 +241,8 @@ public final class MethodParameter extends Parameter
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 }

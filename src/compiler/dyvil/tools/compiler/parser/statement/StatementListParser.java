@@ -1,113 +1,166 @@
 package dyvil.tools.compiler.parser.statement;
 
-import dyvil.tools.compiler.ast.access.FieldAssign;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.statement.AppliedStatementList;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
-import dyvil.tools.compiler.ast.statement.Label;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
 {
-	private static final int	EXPRESSION	= 1;
-	private static final int	TYPE		= 2;
-	private static final int	SEPARATOR	= 4;
+	private static final int	OPEN_BRACKET	= 1;
+	private static final int	EXPRESSION		= 2;
+	private static final int	TYPE			= 4;
+	private static final int	SEPARATOR		= 8;
 	
-	protected StatementList		statementList;
+	protected IValueConsumer consumer;
 	
-	private Name				label;
+	private boolean			applied;
+	private StatementList	statementList;
 	
-	private IType				type;
+	private Name			label;
+	private IType			type;
+	private int				modifiers;
+	private AnnotationList	annotations;
 	
-	public StatementListParser(StatementList valueList)
+	public StatementListParser(IValueConsumer consumer)
 	{
-		this.statementList = valueList;
-		this.mode = EXPRESSION;
+		this.consumer = consumer;
+		this.mode = OPEN_BRACKET;
+	}
+	
+	public void setApplied(boolean applied)
+	{
+		this.applied = applied;
 	}
 	
 	@Override
-	public void reset()
+	protected void reset()
 	{
+		super.reset();
+		
 		this.mode = EXPRESSION;
 		this.label = null;
-		this.firstToken = null;
-		this.tryParser = null;
-		this.pm = null;
 		this.type = null;
-		this.parser = null;
+		
+		this.modifiers = 0;
+		this.annotations = null;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void report(IToken token, String message)
+	{
+		this.pm.jump(this.firstToken);
+		this.pm.pushParser(this.pm.newExpressionParser(this));
+		this.reset();
+		this.mode = SEPARATOR;
+	}
+	
+	@Override
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
 		
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			if (this.firstToken != null)
 			{
 				pm.jump(this.firstToken);
 				this.reset();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = 0;
 				return;
 			}
 			
-			pm.popParser(true);
+			this.consumer.setValue(this.statementList);
+			pm.popParser();
 			return;
 		}
 		
-		if (this.mode == EXPRESSION)
+		switch (this.mode)
 		{
-			if (type == Symbols.SEMICOLON)
+		case OPEN_BRACKET:
+			this.mode = EXPRESSION;
+			this.statementList = this.applied ? new AppliedStatementList(token) : new StatementList(token);
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				pm.report(token, "Invalid Statement List - '{' expected");
+				pm.reparse();
+			}
+			return;
+		case EXPRESSION:
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				int nextType = token.next().type();
-				if (nextType == Symbols.COLON)
+				if (nextType == BaseSymbols.COLON)
 				{
 					this.label = token.nameValue();
 					pm.skip();
 					return;
 				}
-				if (nextType == Symbols.EQUALS)
+				if (nextType == BaseSymbols.EQUALS)
 				{
-					FieldAssign fa = new FieldAssign(token.raw(), null, token.nameValue());
-					pm.pushParser(new ExpressionParser(fa));
-					this.statementList.addValue(fa);
+					FieldAssignment fa = new FieldAssignment(token.raw(), null, token.nameValue());
 					pm.skip();
+					pm.pushParser(pm.newExpressionParser(fa));
+					this.setValue(fa);
 					this.mode = SEPARATOR;
 					return;
 				}
 			}
+			int i;
+			if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
+			{
+				this.modifiers |= i;
+				return;
+			}
+			if (type == DyvilSymbols.AT)
+			{
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+				
+				Annotation a = new Annotation(token.raw());
+				pm.pushParser(pm.newAnnotationParser(a));
+				this.annotations.addAnnotation(a);
+				return;
+			}
 			
-			this.firstToken = token;
-			this.parser = this.tryParser = new TypeParser(this);
-			this.pm = pm;
+			this.tryParser(pm, token, pm.newTypeParser(this));
 			this.mode = TYPE;
-		}
-		if (this.mode == TYPE)
-		{
-			if (ParserUtil.isIdentifier(type) && token.next().type() == Symbols.EQUALS)
+			//$FALL-THROUGH$
+		case TYPE:
+			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.EQUALS)
 			{
 				if (this.type != null)
 				{
-					FieldInitializer fi = new FieldInitializer(token.raw(), token.nameValue(), this.type);
-					pm.pushParser(new ExpressionParser(fi));
-					this.statementList.addValue(fi);
+					Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
+					variable.setModifiers(this.modifiers);
+					variable.setAnnotations(this.annotations);
+					
+					FieldInitializer fi = new FieldInitializer(variable);
+					pm.pushParser(pm.newExpressionParser(variable));
+					this.setValue(fi);
 				}
 				else if (token != this.firstToken)
 				{
@@ -121,43 +174,37 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				pm.skip();
 				return;
 			}
-			else if (this.tryParser == null)
+			else if (this.parser == null)
 			{
 				pm.jump(this.firstToken);
 				this.reset();
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = SEPARATOR;
 				return;
 			}
-			
-			try
-			{
-				this.parser.parse(this, token);
-			}
-			catch (Throwable ex)
-			{
-				pm.jump(this.firstToken);
-				this.reset();
-				pm.pushParser(new ExpressionParser(this));
-				this.mode = SEPARATOR;
-			}
-			
+			this.parser.parse(this, token);
 			return;
-		}
-		if (this.mode == SEPARATOR)
-		{
-			if (type == Symbols.SEMICOLON)
+		case SEPARATOR:
+			this.mode = EXPRESSION;
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				this.mode = EXPRESSION;
 				return;
 			}
-			this.mode = EXPRESSION;
-			if (token.prev().type() == Symbols.CLOSE_CURLY_BRACKET)
+			if (token.prev().type() == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Statement List - ';' expected");
+			
+			if (type == 0)
+			{
+				this.consumer.setValue(this.statementList);
+				pm.popParser();
+				pm.report(token, "Invalid Statement List - '}' expected");
+				return;
+			}
+			pm.report(token, "Invalid Statement List - ';' expected");
+			return;
 		}
 	}
 	

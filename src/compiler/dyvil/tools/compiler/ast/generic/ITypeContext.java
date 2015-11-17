@@ -4,9 +4,9 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface ITypeContext
 {
-	public IType resolveType(ITypeVariable typeVar);
+	IType resolveType(ITypeVariable typeVar);
 	
-	public default void addMapping(ITypeVariable typeVar, IType type)
+	default void addMapping(ITypeVariable typeVar, IType type)
 	{
 	}
 }

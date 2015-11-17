@@ -3,14 +3,15 @@ package dyvil.tools.compiler.ast.structure;
 import java.io.File;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.IASTNode;
-import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface ICompilationUnit extends IASTNode
 {
-	public static boolean printMarkers(MarkerList markers, String fileType, String name, CodeFile source)
+	static boolean printMarkers(MarkerList markers, String fileType, Name name, CodeFile source)
 	{
 		int size = markers.size();
 		if (size > 0)
@@ -26,40 +27,45 @@ public interface ICompilationUnit extends IASTNode
 				marker.log(code, buf);
 			}
 			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.logger.info(buf.toString());
+			DyvilCompiler.log(buf.toString());
 			if (errors > 0)
 			{
-				DyvilCompiler.logger.warning(name + " was not compiled due to errors in the Compilation Unit\n");
+				DyvilCompiler.compilationFailed = true;
+				DyvilCompiler.warn(name + " was not compiled due to errors in the Compilation Unit\n");
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public default boolean isHeader()
+	default boolean isHeader()
 	{
 		return false;
 	}
 	
-	public CodeFile getInputFile();
+	CodeFile getInputFile();
 	
-	public File getOutputFile();
+	File getOutputFile();
 	
-	public void tokenize();
+	void tokenize();
 	
-	public void parse();
+	void parseHeader();
 	
-	public void resolveTypes();
+	void resolveHeader();
 	
-	public void resolve();
+	void parse();
 	
-	public void checkTypes();
+	void resolveTypes();
 	
-	public void check();
+	void resolve();
 	
-	public void foldConstants();
+	void checkTypes();
 	
-	public void cleanup();
+	void check();
 	
-	public void compile();
+	void foldConstants();
+	
+	void cleanup();
+	
+	void compile();
 }

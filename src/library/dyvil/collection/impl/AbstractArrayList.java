@@ -1,48 +1,39 @@
 package dyvil.collection.impl;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import dyvil.lang.Collection;
-import dyvil.lang.List;
+import dyvil.collection.Collection;
+import dyvil.collection.List;
+import dyvil.collection.Set;
 
 public abstract class AbstractArrayList<E> implements List<E>
 {
-	protected static final int	INITIAL_CAPACITY	= 10;
+	private static final long serialVersionUID = 5613951730812933112L;
 	
-	protected Object[]			elements;
-	protected int				size;
+	protected static final int DEFAULT_CAPACITY = 10;
 	
-	public AbstractArrayList()
-	{
-		this.elements = new Object[INITIAL_CAPACITY];
-	}
+	protected transient Object[]	elements;
+	protected transient int			size;
 	
-	public AbstractArrayList(int size)
-	{
-		this.elements = new Object[size];
-	}
-	
-	public AbstractArrayList(Object... elements)
+	public AbstractArrayList(E... elements)
 	{
 		this.elements = elements.clone();
 		this.size = elements.length;
 	}
 	
-	public AbstractArrayList(Object[] elements, int size)
+	public AbstractArrayList(E[] elements, int size)
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
 		this.size = size;
 	}
 	
-	public AbstractArrayList(Object[] elements, boolean trusted)
-	{
-		this.elements = elements;
-		this.size = elements.length;
-	}
-	
-	public AbstractArrayList(Object[] elements, int size, boolean trusted)
+	public AbstractArrayList(E[] elements, int size, boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;
@@ -85,12 +76,156 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 	
 	@Override
+	public boolean isSorted()
+	{
+		return Collection.isSorted(this.elements, this.size);
+	}
+	
+	@Override
+	public boolean isSorted(Comparator<? super E> comparator)
+	{
+		return Collection.isSorted((E[]) this.elements, this.size, comparator);
+	}
+	
+	@Override
+	public boolean isDistinct()
+	{
+		return Set.isDistinct(this.elements, this.size);
+	}
+	
+	@Override
 	public void forEach(Consumer<? super E> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
 			action.accept((E) this.elements[i]);
 		}
+	}
+	
+	@Override
+	public Iterator<E> iterator()
+	{
+		return new Iterator<E>()
+		{
+			int index;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index < AbstractArrayList.this.size;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArrayList.this.elements[this.index++];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index <= 0)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArrayList.this.removeAt(--this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ListIterator(" + AbstractArrayList.this + ")";
+			}
+		};
+	}
+	
+	@Override
+	public Iterator<E> reverseIterator()
+	{
+		return new Iterator<E>()
+		{
+			int index = AbstractArrayList.this.size - 1;
+			
+			@Override
+			public boolean hasNext()
+			{
+				return this.index >= 0;
+			}
+			
+			@Override
+			public E next()
+			{
+				return (E) AbstractArrayList.this.elements[this.index--];
+			}
+			
+			@Override
+			public void remove()
+			{
+				if (this.index >= AbstractArrayList.this.size - 1)
+				{
+					throw new IllegalStateException();
+				}
+				AbstractArrayList.this.removeAt(++this.index);
+			}
+			
+			@Override
+			public String toString()
+			{
+				return "ReverseListIterator(" + AbstractArrayList.this + ")";
+			}
+		};
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		for (int i = this.size - 1; i >= 0; i--)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		E initialValue = (E) this.elements[0];
+		for (int i = 1; i < this.size; i++)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.size == 0)
+		{
+			return null;
+		}
+		
+		E initialValue = (E) this.elements[this.size - 1];
+		for (int i = this.size - 2; i >= 0; i--)
+		{
+			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+		}
+		return initialValue;
 	}
 	
 	@Override
@@ -211,6 +346,17 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 	
 	@Override
+	public java.util.List<E> toJava()
+	{
+		java.util.ArrayList<E> list = new java.util.ArrayList<E>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			list.add((E) this.elements[i]);
+		}
+		return list;
+	}
+	
+	@Override
 	public String toString()
 	{
 		if (this.size == 0)
@@ -239,5 +385,28 @@ public abstract class AbstractArrayList<E> implements List<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject();
+		
+		out.writeInt(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			out.writeObject(this.elements[i]);
+		}
+	}
+	
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject();
+		
+		this.size = in.readInt();
+		this.elements = new Object[this.size];
+		for (int i = 0; i < this.size; i++)
+		{
+			this.elements[i] = in.readObject();
+		}
 	}
 }

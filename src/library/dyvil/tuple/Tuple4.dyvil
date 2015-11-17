@@ -6,5 +6,5 @@ public case class Tuple4[+A, +B, +C, +D] (
 		public final C _3
 		public final D _4)
 {
-	public override String toString() = @"(\(this), \(this._2), \(this._3), \(this._4))"
+	public override String toString() = "(\(this._1), \(this._2), \(this._3), \(this._4))"
 }

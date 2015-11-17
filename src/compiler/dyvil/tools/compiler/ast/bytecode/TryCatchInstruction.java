@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class TryCatchInstruction implements IInstruction
 {

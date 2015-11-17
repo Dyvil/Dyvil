@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class FieldInstruction implements IInstruction
 {
@@ -12,7 +12,7 @@ public final class FieldInstruction implements IInstruction
 	private String	owner;
 	private String	fieldName;
 	
-	private String	desc;
+	private String desc;
 	
 	public FieldInstruction(int opcode)
 	{

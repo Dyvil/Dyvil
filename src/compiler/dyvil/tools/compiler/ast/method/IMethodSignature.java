@@ -8,19 +8,22 @@ import dyvil.tools.compiler.ast.type.ITyped;
 public interface IMethodSignature extends ITyped, ITypeList, IExceptionList, IGeneric
 {
 	@Override
-	public default int typeCount()
+	default int typeCount()
 	{
 		return 0;
 	}
 	
 	@Override
-	public default void setType(int index, IType type)
+	default void setType(int index, IType type)
 	{
 	}
 	
 	@Override
-	public default IType getType(int index)
+	default IType getType(int index)
 	{
 		return null;
 	}
+	
+	@Override
+	void setType(IType type);
 }

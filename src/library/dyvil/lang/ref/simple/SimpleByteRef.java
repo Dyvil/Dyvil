@@ -6,7 +6,7 @@ import dyvil.lang.ref.ByteRef;
 @IntConvertible
 public class SimpleByteRef implements ByteRef
 {
-	public byte	value;
+	public byte value;
 	
 	public static SimpleByteRef apply(byte value)
 	{

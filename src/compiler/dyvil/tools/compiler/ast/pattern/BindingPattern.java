@@ -1,18 +1,17 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-
-public final class BindingPattern extends ASTNode implements IPattern
+public final class BindingPattern extends Pattern
 {
 	private Name		name;
 	private Variable	variable;
@@ -33,7 +32,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	@Override
 	public boolean isExhaustive()
 	{
-		return this.type == Types.ANY || this.type == Types.UNKNOWN;
+		return true;
 	}
 	
 	@Override
@@ -43,7 +42,7 @@ public final class BindingPattern extends ASTNode implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		if (this.type == Types.ANY || this.type == Types.UNKNOWN)
 		{
@@ -72,19 +71,20 @@ public final class BindingPattern extends ASTNode implements IPattern
 			return this.variable;
 		}
 		
-		this.variable = new Variable(this.position);
-		this.variable.name = this.name;
-		this.variable.type = this.type;
+		this.variable = new Variable(this.position, this.name, this.type);
 		return this.variable;
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public boolean isSwitchable()
 	{
-		if (this.variable != null)
-		{
-			this.writeVar(writer, varIndex);
-		}
+		return true;
+	}
+	
+	@Override
+	public boolean switchCheck()
+	{
+		return true;
 	}
 	
 	@Override
@@ -92,18 +92,13 @@ public final class BindingPattern extends ASTNode implements IPattern
 	{
 		if (this.variable != null)
 		{
-			this.writeVar(writer, varIndex);
+			this.variable.setType(this.type);
+			if (varIndex >= 0)
+			{
+				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
+			}
+			this.variable.writeInit(writer, null);
 		}
-	}
-	
-	private void writeVar(MethodWriter writer, int varIndex) throws BytecodeException
-	{
-		this.variable.type = this.type;
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.variable.index = writer.localCount());
 	}
 	
 	@Override

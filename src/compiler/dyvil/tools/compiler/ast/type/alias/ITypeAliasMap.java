@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.type.alias;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 public interface ITypeAliasMap
 {
-	public void addTypeAlias(ITypeAlias typeAlias);
+	void addTypeAlias(ITypeAlias typeAlias);
 	
-	public ITypeAlias getTypeAlias(Name name);
+	ITypeAlias getTypeAlias(Name name);
 }

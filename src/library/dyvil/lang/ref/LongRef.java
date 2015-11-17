@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface LongRef
 {
-	public long get();
+	long get();
 	
-	public void set(long value);
+	void set(long value);
 }

@@ -3,7 +3,7 @@ package dyvil.string;
 import java.util.Random;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
 
 /**
  * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for
@@ -17,28 +17,31 @@ import dyvil.annotation.infix;
 @Utility(char.class)
 public final class CharUtils
 {
-	private static final char[]		LOWER_ALPHABET		= { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-			'u', 'v', 'w', 'x', 'y', 'z'				};
-	private static final char[]		UPPER_ALPHABET		= { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-			'U', 'V', 'W', 'X', 'Y', 'Z'				};
-	private static final char[]		LOWER_VOWELS		= { 'a', 'e', 'i', 'o', 'u' };
-	private static final char[]		UPPER_VOWELS		= { 'A', 'E', 'I', 'O', 'U' };
+	private static final char[]	LOWER_ALPHABET	= { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+			'v', 'w', 'x', 'y', 'z' };
+	private static final char[]	UPPER_ALPHABET	= { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+			'V', 'W', 'X', 'Y', 'Z' };
+	private static final char[]	LOWER_VOWELS	= { 'a', 'e', 'i', 'o', 'u' };
+	private static final char[]	UPPER_VOWELS	= { 'A', 'E', 'I', 'O', 'U' };
 	
-	private static final char[]		LOWER_CONSONANTS	= { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y',
-			'z'										};
+	private static final char[] LOWER_CONSONANTS = { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
 	
-	private static final char[]		UPPER_CONSONANTS	= { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y',
-			'Z'										};
+	private static final char[] UPPER_CONSONANTS = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
 	
-	private static final String[]	CONSONANTS			= { "bl", "br", "bs", "by", "ch", "ck", "cl", "cr", "ct", "db", "dl", "dn", "dr", "ds", "dt", "dy",
-			"fl", "fr", "ft", "gh", "gl", "gn", "gr", "gs", "hd", "hl", "hr", "ht", "hy", "kl", "kn", "ks", "lc", "ld", "lf", "lk", "ls", "lt", "ly", "mb",
-			"mn", "mp", "ms", "nc", "nd", "ng", "nk", "nl", "ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp",
-			"rs", "rt", "rw", "ry", "sh", "sk", "sl", "sn", "sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl", "wn", "wt", "xc", "xp",
-			"yh", "yn", "ys", "yt"						};
-	
+	private static final String[] CONSONANTS = { "bl", "br", "bs", "by", "ch", "ck", "cl", "cr", "ct", "db", "dl", "dn", "dr", "ds", "dt", "dy", "fl", "fr",
+			"ft", "gh", "gl", "gn", "gr", "gs", "hd", "hl", "hr", "ht", "hy", "kl", "kn", "ks", "lc", "ld", "lf", "lk", "ls", "lt", "ly", "mb", "mn", "mp",
+			"ms", "nc", "nd", "ng", "nk", "nl", "ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp", "rs", "rt",
+			"rw", "ry", "sh", "sk", "sl", "sn", "sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl", "wn", "wt", "xc", "xp", "yh", "yn",
+			"ys", "yt" };
+			
 	private CharUtils()
 	{
 		// no instances
+	}
+	
+	public static @infix boolean isAsciiDigit(char c)
+	{
+		return c >= '0' && c <= '9';
 	}
 	
 	/**
@@ -51,11 +54,16 @@ public final class CharUtils
 	 */
 	public static @infix boolean isDigit(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c >= '0' && c <= '9';
+			return isAsciiDigit(c);
 		}
 		return Character.isDigit((int) c);
+	}
+	
+	public static @infix boolean isAsciiLetter(char c)
+	{
+		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
 	}
 	
 	/**
@@ -68,9 +76,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isLetter(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+			return isAsciiLetter(c);
 		}
 		return Character.isLetter((int) c);
 	}
@@ -100,9 +108,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isWhitespace(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c <= ' ';
+			return c >= 0x9 && c <= 0xD || c >= 0x1C && c <= 0x20;
 		}
 		return Character.isWhitespace((int) c);
 	}
@@ -117,9 +125,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isLowerCase(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7;
+			return c >= 'a' && c <= 'z';
 		}
 		return Character.isLowerCase(c);
 	}
@@ -134,9 +142,9 @@ public final class CharUtils
 	 */
 	public static @infix boolean isUpperCase(char c)
 	{
-		if (c <= 256)
+		if (c < 128)
 		{
-			return c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7;
+			return c >= 'A' && c <= 'Z';
 		}
 		return Character.isUpperCase(c);
 	}
@@ -151,11 +159,11 @@ public final class CharUtils
 	 */
 	public static @infix char toLowerCase(char c)
 	{
-		if (c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7)
+		if (c >= 'A' && c <= 'Z')
 		{
 			return (char) (c + 32);
 		}
-		if (c <= 256)
+		if (c < 128)
 		{
 			return c;
 		}
@@ -172,11 +180,11 @@ public final class CharUtils
 	 */
 	public static @infix char toUpperCase(char c)
 	{
-		if (c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7)
+		if (c >= 'a' && c <= 'z')
 		{
 			return (char) (c - 32);
 		}
-		if (c <= 256)
+		if (c < 128)
 		{
 			return c;
 		}
@@ -201,15 +209,15 @@ public final class CharUtils
 	 */
 	public static @infix char invertCase(char c)
 	{
-		if (c >= 'a' && c <= 'z' || c >= 0xE0 && c <= 0xFE && c != 0xF7)
+		if (c >= 'a' && c <= 'z')
 		{
 			return (char) (c - 32);
 		}
-		if (c >= 'A' && c <= 'Z' || c >= 0xC0 && c <= 0xDE && c != 0xD7)
+		if (c >= 'A' && c <= 'Z')
 		{
 			return (char) (c + 32);
 		}
-		if (c <= 256)
+		if (c < 256)
 		{
 			return c;
 		}

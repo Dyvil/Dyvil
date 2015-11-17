@@ -1,27 +1,24 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class EnumValue extends ASTNode implements IConstantValue, INamed
+public class EnumValue implements IConstantValue, INamed
 {
 	public IType	type;
 	public Name		name;
 	
-	public EnumValue(ICodePosition position)
+	public EnumValue()
 	{
-		this.position = position;
 	}
 	
 	public EnumValue(IType type, Name name)
@@ -30,17 +27,21 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 		this.name = name;
 	}
 	
-	public EnumValue(ICodePosition position, ClassType type, Name name)
+	@Override
+	public ICodePosition getPosition()
 	{
-		this.position = position;
-		this.type = type;
-		this.name = name;
+		return null;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
 	}
 	
 	@Override
 	public int valueTag()
 	{
-		return ENUM;
+		return ENUM_ACCESS;
 	}
 	
 	@Override
@@ -64,6 +65,10 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (!this.type.isResolved())
+		{
+			this.type = this.type.resolveType(markers, context);
+		}
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
@@ -71,20 +76,6 @@ public class EnumValue extends ASTNode implements IConstantValue, INamed
 	public boolean isType(IType type)
 	{
 		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.type.equals(type))
-		{
-			return 3;
-		}
-		else if (this.type.getTheClass().isSubTypeOf(type))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override

@@ -1,0 +1,162 @@
+package dyvil.lang
+
+import dyvil.annotation.Intrinsic
+import dyvil.array._
+import dyvil.collection.{ List, ImmutableList }
+import java.lang.{ Float => JFloat, Double => JDouble }
+
+using dyvil.reflect.Opcodes._
+
+public final class Predef
+{
+	private new() {}
+	
+	public static void main([String] args) {}
+	
+	// Object Operators
+	
+	@Intrinsic([ LOAD_0, NULL ])
+	public infix boolean isNull(Object o) = o.isNull
+	
+	@Intrinsic([ LOAD_0, NONNULL ])
+	public infix boolean isNonNull(Object o) = o.isNonNull
+	
+	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS ])
+	public infix boolean ==(Object o1, Object o2) = o1 equals o2
+	
+	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
+	public infix boolean ===(Object o1, Object o2) = o1 === o2
+	
+	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS, BNOT ])
+	public infix boolean !=(Object o1, Object o2) = !(o1 equals o2)
+	
+	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
+	public infix boolean !==(Object o1, Object o2) = o1 !== o2
+	
+	// Lists
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "$plus", "(Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
+	public infix ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
+	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	
+	// Closures
+	
+	@Intrinsic([ LOAD_0 ])
+	public static => T closure[T](=> T closure) = closure
+	
+	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+	public static R run[R](=> R f) = f()
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
+	public static infix R run[T, R](T self, T => R f) = f(self)
+
+	@Intrinsic(value: [ LOAD_0, DUP, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2, POP ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
+	public static infix T use[T](T self, T => void f) { f(self); return self }
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
+	public static R with[T, R](T receiver, T => R f) = f(receiver)
+	
+	public static void repeat(int n, => void f) = for (int i : 0 ..< n) f()
+	
+	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ]
+				, strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+	public static long measureMillis(=> void closure)
+	{
+		long millis = System.currentTimeMillis
+		closure()
+		return System.currentTimeMillis - millis
+	}
+	
+	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ]
+			, strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+	public static long measureNanos(=> void closure)
+	{
+		long nanos = System.nanoTime
+		closure()
+		return System.nanoTime - nanos
+	}
+	
+	// Strings
+	
+	@Intrinsic([ LOAD_0 ])
+	public static char $(char c) = c
+	
+	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/String", "charAt", "(I)C" ])
+	public infix char subscript(String s, int index) = s charAt index
+	
+	public infix String subscript(String s, Range[int] range) = s.substring(range.first, range.last + 1)
+	
+	// Hashing
+	
+	public static int hash(Object... args)
+	{
+		if (args == null) return 0
+		
+		auto result = 1
+		for (auto element : args)
+		{
+			result = 31 * result + if (element == null) 0 else element.hashCode
+		}
+		return result;
+	}
+	
+	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
+	
+	// Print
+	
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "()V" ])
+	public static void println() = System.out.println()
+	
+	public static void println(boolean v) = System.out.println(if (v) "true" else "false")
+	
+	public static void println(byte v) = System.out.println(v.toString)
+	
+	public static void println(short v) = System.out.println(v.toString)
+	
+	public static void println(char v) = System.out.println(v.toString)
+	
+	public static void println(int v) = System.out.println(v.toString)
+	
+	public static void println(long v) = System.out.println(v.toString)
+	
+	public static void println(float v) = System.out.println(v.toString)
+	
+	public static void println(double v) = System.out.println(v.toString)
+	
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "(Ljava/lang/String;)V" ])
+	public static void println(String s) = System.out.println(s)
+	
+	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
+	
+	public static void println(boolean... v) = System.out.println(v.toString);
+	
+	public static void println(byte... v) = System.out.println(v.toString);
+	
+	public static void println(short... v) = System.out.println(v.toString);
+	
+	public static void println(char... v) = System.out.println(v.toString);
+	
+	public static void println(int... v) = System.out.println(v.toString);
+	
+	public static void println(long... v) = System.out.println(v.toString);
+	
+	public static void println(float... v) = System.out.println(v.toString);
+	
+	public static void println(double... v) = System.out.println(v.toString);
+	
+	public static void println(Object... v) = System.out.println(v.toString);
+	
+	// Tuples
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
+	public infix (A, B) ->[A, B](A a, B b) = (a, b)
+	
+	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
+	public infix (B, A) <-[A, B](A a, B b) = (b, a)
+	
+	public static void ???() = throw new UnsupportedOperationException("Not Implemented!")
+}

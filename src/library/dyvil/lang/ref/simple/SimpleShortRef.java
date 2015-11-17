@@ -6,7 +6,7 @@ import dyvil.lang.ref.ShortRef;
 @IntConvertible
 public class SimpleShortRef implements ShortRef
 {
-	public short	value;
+	public short value;
 	
 	public static SimpleShortRef apply(short value)
 	{

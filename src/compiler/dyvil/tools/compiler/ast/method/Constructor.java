@@ -1,21 +1,24 @@
 package dyvil.tools.compiler.ast.method;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
-
-import dyvil.lang.List;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.access.ApplyMethodCall;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -25,37 +28,52 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
-
-import org.objectweb.asm.Label;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class Constructor extends Member implements IConstructor
 {
-	protected IClass		theClass;
+	protected IClass theClass;
 	
 	protected IParameter[]	parameters	= new MethodParameter[3];
 	protected int			parameterCount;
 	protected IType[]		exceptions;
 	protected int			exceptionCount;
 	
-	public IValue			value;
-	
-	protected IMethod		overrideMethod;
+	protected IValue value;
 	
 	public Constructor(IClass iclass)
 	{
 		this.theClass = iclass;
+		this.type = iclass.getType();
+	}
+	
+	public Constructor(IClass iclass, int modifiers)
+	{
+		this.theClass = iclass;
+		this.type = iclass.getType();
+		this.modifiers = modifiers;
+	}
+	
+	public Constructor(ICodePosition position, IClass iclass, int modifiers)
+	{
+		this.position = position;
+		this.theClass = iclass;
+		this.type = iclass.getType();
+		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -132,37 +150,40 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/inline":
+		case "dyvil/annotation/_internal/inline":
 			this.modifiers |= Modifiers.INLINE;
 			return false;
-		case "dyvil/annotation/sealed":
-			this.modifiers |= Modifiers.SEALED;
+		case "dyvil/annotation/_internal/internal":
+			this.modifiers |= Modifiers.INTERNAL;
 			return false;
-		case "java/lang/Deprecated":
+		case Deprecation.JAVA_INTERNAL:
+		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
+			return true;
 		}
 		return true;
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.METHOD;
 	}
 	
 	@Override
-	public void exceptionCount()
+	public int exceptionCount()
 	{
+		return this.exceptionCount;
 	}
 	
 	@Override
 	public void setException(int index, IType exception)
 	{
+		this.exceptions[index] = exception;
 	}
 	
 	@Override
@@ -207,32 +228,21 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.annotations.resolveTypes(markers, context, this);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolve(markers, this, TypePosition.TYPE);
+			this.exceptions[i] = this.exceptions[i].resolveType(markers, this);
 		}
 		
-		int index = 1;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, this);
-			param.setIndex(index);
-			
-			IType type = param.getType();
-			if (type == Types.LONG || type == Types.DOUBLE)
-			{
-				index += 2;
-			}
-			else
-			{
-				index++;
-			}
+			param.setIndex(i);
 		}
 		
 		if (this.value != null)
@@ -246,11 +256,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, context);
+		if (this.annotations != null)
+		{
+			this.annotations.resolve(markers, context);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolve(markers, context);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].resolve(markers, this);
 		}
 		
 		this.resolveSuperConstructors(markers, context);
@@ -262,8 +280,9 @@ public class Constructor extends Member implements IConstructor
 			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(this.position, "constructor.return");
-				marker.addInfo("Expression Type: " + this.value.getType());
+				Marker marker = I18n.createMarker(this.position, "constructor.return.type");
+				marker.addInfo(I18n.getString("return.type", this.value.getType()));
+				markers.add(marker);
 			}
 			else
 			{
@@ -274,28 +293,18 @@ public class Constructor extends Member implements IConstructor
 	
 	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
-		if (this.value.valueTag() != IValue.STATEMENT_LIST)
+		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
 		{
-			markers.add(this.position, "constructor.expression");
+			return;
 		}
-		
-		StatementList sl = (StatementList) this.value;
-		if (sl.valueCount() > 0)
+		if (this.value.valueTag() == IValue.STATEMENT_LIST)
 		{
-			IValue first = sl.getValue(0);
-			if (first.valueTag() == IValue.APPLY_CALL)
+			StatementList sl = (StatementList) this.value;
+			int count = sl.valueCount();
+			for (int i = 0; i < count; i++)
 			{
-				ApplyMethodCall amc = (ApplyMethodCall) first;
-				int valueType = amc.instance.valueTag();
-				if (valueType == IValue.SUPER)
+				if (sl.getValue(i).valueTag() == IValue.INITIALIZER_CALL)
 				{
-					IClass iclass = this.theClass.getSuperType().getTheClass();
-					sl.setValue(0, this.initializer(amc.instance.getPosition(), markers, iclass, amc.arguments, true));
-					return;
-				}
-				else if (valueType == IValue.THIS)
-				{
-					sl.setValue(0, this.initializer(amc.instance.getPosition(), markers, this.theClass, amc.arguments, false));
 					return;
 				}
 			}
@@ -305,39 +314,29 @@ public class Constructor extends Member implements IConstructor
 		IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(this.position, "constructor.super");
+			markers.add(I18n.createMarker(this.position, "constructor.super"));
 			return;
 		}
 		
-		sl.addValue(0, new InitializerCall(this.position, match, EmptyArguments.INSTANCE));
-	}
-	
-	private IValue initializer(ICodePosition position, MarkerList markers, IClass iclass, IArguments arguments, boolean isSuper)
-	{
-		IConstructor match = IContext.resolveConstructor(iclass, arguments);
-		if (match == null)
-		{
-			Marker marker = markers.create(this.position, "resolve.constructor", iclass.getName().qualified);
-			if (!arguments.isEmpty())
-			{
-				StringBuilder builder = new StringBuilder("Argument Types: ");
-				arguments.typesToString(builder);
-				marker.addInfo(builder.toString());
-			}
-			return new InitializerCall(position, null, arguments, isSuper);
-		}
-		
-		return new InitializerCall(position, match, arguments, isSuper);
+		this.value = Util.prependValue(new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true), this.value);
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.checkTypes(markers, context);
+		if (this.annotations != null)
+		{
+			this.annotations.checkTypes(markers, context);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].checkTypes(markers, context);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].checkType(markers, this, TypePosition.RETURN_TYPE);
 		}
 		
 		if (this.value == null)
@@ -356,7 +355,10 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		super.check(markers, context);
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, ElementType.CONSTRUCTOR);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -365,11 +367,17 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
+			this.exceptions[i].check(markers, this);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
 			IType t = this.exceptions[i];
 			if (!Types.THROWABLE.isSuperTypeOf(t))
 			{
-				Marker m = markers.create(t.getPosition(), "method.exception.type");
-				m.addInfo("Exception Type: " + t);
+				Marker marker = I18n.createMarker(t.getPosition(), "method.exception.type");
+				marker.addInfo(I18n.getString("exception.type", t));
+				markers.add(marker);
 			}
 		}
 		
@@ -379,23 +387,31 @@ public class Constructor extends Member implements IConstructor
 		}
 		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
 		{
-			markers.add(this.position, "constructor.unimplemented", this.name);
+			markers.add(I18n.createMarker(this.position, "constructor.unimplemented", this.name));
 		}
 		
 		if (this.isStatic())
 		{
-			markers.add(this.position, "constructor.static", this.name);
+			markers.add(I18n.createMarker(this.position, "constructor.static", this.name));
 		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
-		super.foldConstants();
+		if (this.annotations != null)
+		{
+			this.annotations.foldConstants();
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].foldConstants();
 		}
 		
 		if (this.value != null)
@@ -407,11 +423,19 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		super.cleanup(context, compilableList);
+		if (this.annotations != null)
+		{
+			this.annotations.cleanup(context, compilableList);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(this, compilableList);
+		}
+		
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i].cleanup(this, compilableList);
 		}
 		
 		if (this.value != null)
@@ -478,13 +502,13 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.theClass.getConstructorMatches(list, arguments);
 	}
@@ -503,27 +527,55 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public byte getVisibility(IClassMember member)
+	public IAccessible getAccessibleThis(IClass type)
 	{
-		return this.theClass.getVisibility(member);
+		return this.theClass.getAccessibleThis(type);
 	}
 	
 	@Override
-	public int getSignatureMatch(IArguments arguments)
+	public IAccessible getAccessibleImplicit()
+	{
+		return null;
+	}
+	
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameters[i] == variable)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public IDataMember capture(IVariable variable)
+	{
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
+		return this.theClass.capture(variable);
+	}
+	
+	@Override
+	public float getSignatureMatch(IArguments arguments)
 	{
 		int match = 1;
-		int len = arguments.size();
+		int argumentCount = arguments.size();
 		
-		// infix modifier implementation
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			int parCount = this.parameterCount - 1;
-			if (len <= parCount)
+			if (argumentCount <= parCount)
 			{
 				return 0;
 			}
 			
-			int m;
+			float m;
 			IParameter varParam = this.parameters[parCount];
 			for (int i = 0; i < parCount; i++)
 			{
@@ -535,7 +587,7 @@ public class Constructor extends Member implements IConstructor
 				}
 				match += m;
 			}
-			for (int i = parCount; i < len; i++)
+			for (int i = parCount; i < argumentCount; i++)
 			{
 				m = arguments.getVarargsTypeMatch(i, varParam);
 				if (m == 0)
@@ -544,9 +596,9 @@ public class Constructor extends Member implements IConstructor
 				}
 				match += m;
 			}
-			return match;
+			return match + AbstractMethod.VARARGS_MATCH;
 		}
-		else if (len > this.parameterCount)
+		else if (argumentCount > this.parameterCount)
 		{
 			return 0;
 		}
@@ -554,7 +606,7 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter par = this.parameters[i];
-			int m = arguments.getTypeMatch(i, par);
+			float m = arguments.getTypeMatch(i, par);
 			if (m == 0)
 			{
 				return 0;
@@ -566,24 +618,68 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
+	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
+	{
+		int typeVarCount = this.theClass.genericCount();
+		ClassGenericType gt = new ClassGenericType(this.theClass, new IType[typeVarCount], typeVarCount)
+		{
+			@Override
+			public void addMapping(ITypeVariable typeVar, IType type)
+			{
+				int index = typeVar.getIndex();
+				this.typeArguments[index] = type;
+			}
+		};
+		
+		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		{
+			int index = this.parameterCount - 1;
+			for (int i = 0; i < index; i++)
+			{
+				arguments.inferType(i, this.parameters[i], gt);
+			}
+			arguments.inferVarargsType(index, this.parameters[index], gt);
+		}
+		else
+		{
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				arguments.inferType(i, this.parameters[i], gt);
+			}
+		}
+		
+		for (int i = 0; i < typeVarCount; i++)
+		{
+			if (gt.getType(i) == null)
+			{
+				gt.setType(i, Types.ANY);
+				
+				markers.add(I18n.createMarker(position, "constructor.typevar.infer", this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
+			}
+		}
+		
+		return gt;
+	}
+	
+	@Override
+	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
 		int len = arguments.size();
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
 			len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], this.type, markers, context);
+			arguments.checkVarargsValue(len, this.parameters[len], type, markers, context);
 			
 			for (int i = 0; i < len; i++)
 			{
-				arguments.checkValue(i, this.parameters[i], this.type, markers, context);
+				arguments.checkValue(i, this.parameters[i], type, markers, context);
 			}
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], this.type, markers, context);
+			arguments.checkValue(i, this.parameters[i], type, markers, context);
 		}
 	}
 	
@@ -592,16 +688,16 @@ public class Constructor extends Member implements IConstructor
 	{
 		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
 		{
-			markers.add(position, "constructor.access.deprecated", this.theClass.getName());
+			Deprecation.checkDeprecation(markers, position, this, "constructor");
 		}
 		
-		switch (context.getVisibility(this))
+		switch (IContext.getVisibility(context, this))
 		{
-		case IContext.SEALED:
-			markers.add(position, "constructor.access.sealed", this.theClass.getName());
+		case IContext.INTERNAL:
+			markers.add(I18n.createMarker(position, "constructor.access.internal", this.theClass.getName()));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(position, "constructor.access.invisible", this.theClass.getName());
+			markers.add(I18n.createMarker(position, "constructor.access.invisible", this.theClass.getName()));
 			break;
 		}
 		
@@ -610,7 +706,7 @@ public class Constructor extends Member implements IConstructor
 			IType type = this.exceptions[i];
 			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
 			{
-				markers.add(position, "method.access.exception", type.toString());
+				markers.add(I18n.createMarker(position, "method.access.exception", type.toString()));
 			}
 		}
 	}
@@ -676,26 +772,31 @@ public class Constructor extends Member implements IConstructor
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
-		
+		MethodWriter mw = new MethodWriterImpl(writer,
+				writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
+				
 		mw.setThisType(this.theClass.getInternalName());
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].write(mw);
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(mw);
+			}
 		}
 		
 		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
-			mw.addAnnotation("Ldyvil/annotation/inline;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/inline;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) == Modifiers.DEPRECATED)
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.addAnnotation("Ljava/lang/Deprecated;", true);
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
-		if ((this.modifiers & Modifiers.SEALED) == Modifiers.SEALED)
+		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
-			mw.addAnnotation("Ldyvil/annotation/sealed;", false);
+			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -729,12 +830,12 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
 		}
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type) throws BytecodeException
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException
 	{
 		writer.writeTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
 		if (type != Types.VOID)
@@ -743,12 +844,14 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		this.writeArguments(writer, arguments);
-		this.writeInvoke(writer);
+		this.writeInvoke(writer, lineNumber);
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
+		writer.writeLineNumber(lineNumber);
+		
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();
@@ -765,17 +868,75 @@ public class Constructor extends Member implements IConstructor
 			for (int i = 0; i < len; i++)
 			{
 				param = this.parameters[i];
-				arguments.writeValue(i, param.getName(), param.getValue(), writer);
+				arguments.writeValue(i, param, writer);
 			}
 			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param.getName(), param.getType(), writer);
+			arguments.writeVarargsValue(len, param, writer);
 			return;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			arguments.writeValue(i, param.getName(), param.getValue(), writer);
+			arguments.writeValue(i, param, writer);
+		}
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+		out.writeByte(this.parameterCount);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IType.writeType(this.parameters[i].getType(), out);
+		}
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		this.writeAnnotations(out);
+		
+		out.writeByte(this.parameterCount);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].write(out);
+		}
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
+		int parameterCount = in.readByte();
+		if (this.parameterCount != 0)
+		{
+			for (int i = 0; i < parameterCount; i++)
+			{
+				this.parameters[i].setType(IType.readType(in));
+			}
+			this.parameterCount = parameterCount;
+			return;
+		}
+		
+		this.parameters = new IParameter[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			this.parameters[i] = new MethodParameter(Name.getQualified("par" + i), IType.readType(in));
+		}
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.readAnnotations(in);
+		
+		int parameterCount = in.readByte();
+		this.parameters = new IParameter[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			MethodParameter param = new MethodParameter();
+			param.read(in);
+			this.parameters[i] = param;
 		}
 	}
 	

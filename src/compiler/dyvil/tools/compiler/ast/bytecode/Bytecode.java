@@ -1,22 +1,23 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class Bytecode extends ASTNode implements IValue
+public final class Bytecode implements IValue
 {
+	protected ICodePosition position;
+	
 	private IInstruction[]	instructions	= new IInstruction[3];
 	private int				instructionCount;
 	private Label[]			labels;
@@ -27,9 +28,27 @@ public final class Bytecode extends ASTNode implements IValue
 	}
 	
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int valueTag()
 	{
 		return BYTECODE;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
 	}
 	
 	@Override
@@ -48,12 +67,6 @@ public final class Bytecode extends ASTNode implements IValue
 	public boolean isType(IType type)
 	{
 		return true;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 3;
 	}
 	
 	public void addInstruction(IInstruction insn)
@@ -194,7 +207,7 @@ public final class Bytecode extends ASTNode implements IValue
 		{
 			if (label != null)
 			{
-				label.target = new org.objectweb.asm.Label();
+				label.target = new dyvil.tools.asm.Label();
 			}
 		}
 		

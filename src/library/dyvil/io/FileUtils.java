@@ -6,10 +6,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import dyvil.lang.List;
-
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
+import dyvil.annotation._internal.infix;
+import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
 /**
@@ -21,8 +20,13 @@ import dyvil.collection.mutable.ArrayList;
  * @version 1.0
  */
 @Utility(File.class)
-public interface FileUtils
+public final class FileUtils
 {
+	private FileUtils()
+	{
+		// no instances
+	}
+	
 	/**
 	 * Ensures that the given {@code file} exists. If the file does not exist in
 	 * terms of it's {@link File#exists() exists()} method, the file will be
@@ -38,7 +42,7 @@ public interface FileUtils
 	 * @return true if the file exists or has been created successfully, false
 	 *         otherwise
 	 */
-	public static boolean createFile(File file)
+	public static @infix boolean create(File file)
 	{
 		try
 		{
@@ -49,7 +53,7 @@ public interface FileUtils
 				{
 					parent.mkdirs();
 				}
-				file.createNewFile();
+				return file.createNewFile();
 			}
 			return true;
 		}
@@ -82,11 +86,7 @@ public interface FileUtils
 	{
 		try
 		{
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-			
+			create(file);
 			Files.write(file.toPath(), bytes);
 			return true;
 		}
@@ -237,9 +237,13 @@ public interface FileUtils
 	{
 		if (maxDepth > 0 && file.isDirectory())
 		{
-			for (File f : file.listFiles())
+			File[] files = file.listFiles();
+			if (files != null)
 			{
-				delete(f, maxDepth - 1);
+				for (File f : files)
+				{
+					delete(f, maxDepth - 1);
+				}
 			}
 		}
 		file.delete();

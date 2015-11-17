@@ -1,15 +1,14 @@
 package dyvil.tools.compiler.parser.imports;
 
-import dyvil.tools.compiler.ast.imports.IImportList;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.ast.header.IImportList;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class ImportListParser extends Parser
 {
-	protected IImportList	theImport;
+	protected IImportList theImport;
 	
 	public ImportListParser(IImportList list)
 	{
@@ -17,16 +16,10 @@ public class ImportListParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.CLOSE_CURLY_BRACKET || type == Symbols.SEMICOLON)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET || type == BaseSymbols.SEMICOLON)
 		{
 			pm.popParser(true);
 			return;
@@ -41,11 +34,12 @@ public class ImportListParser extends Parser
 		if (this.mode == 1)
 		{
 			this.mode = 0;
-			if (type == Symbols.COMMA)
+			if (type != BaseSymbols.COMMA)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Import List - ',' expected");
 			}
-			throw new SyntaxError(token, "Invalid Import List - ',' expected", true);
+			return;
 		}
 	}
 }

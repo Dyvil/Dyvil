@@ -2,17 +2,19 @@ package dyvil.tools.compiler.ast.field;
 
 import java.lang.annotation.ElementType;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class CaptureVariable implements IVariable
 {
@@ -28,6 +30,17 @@ public class CaptureVariable implements IVariable
 	{
 		this.variable = variable;
 		this.type = variable.getType();
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.variable.getPosition();
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
 	}
 	
 	@Override
@@ -91,63 +104,32 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public int annotationCount()
-	{
-		return this.annotationCount();
-	}
-	
-	@Override
-	public void setAnnotations(Annotation[] annotations, int count)
-	{
-		this.variable.setAnnotations(annotations, count);
-	}
-	
-	@Override
-	public void setAnnotation(int index, Annotation annotation)
-	{
-		this.variable.setAnnotation(index, annotation);
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		this.variable.addAnnotation(annotation);
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
-	{
-		return this.variable.addRawAnnotation(type);
-	}
-	
-	@Override
-	public void removeAnnotation(int index)
-	{
-		this.variable.removeAnnotation(index);
-	}
-	
-	@Override
-	public Annotation[] getAnnotations()
+	public AnnotationList getAnnotations()
 	{
 		return this.variable.getAnnotations();
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public void setAnnotations(AnnotationList annotations)
 	{
-		return this.variable.getAnnotation(index);
 	}
 	
 	@Override
-	public Annotation getAnnotation(IClass type)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.variable.getAnnotation(type);
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public void addAnnotation(IAnnotation annotation)
 	{
-		return this.variable.getAnnotationType();
+		this.variable.addAnnotation(annotation);
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.LOCAL_VARIABLE;
 	}
 	
 	@Override
@@ -163,13 +145,13 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public void setIndex(int index)
+	public void setLocalIndex(int index)
 	{
 		this.index = index;
 	}
 	
 	@Override
-	public int getIndex()
+	public int getLocalIndex()
 	{
 		return this.index;
 	}
@@ -193,6 +175,12 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
+	public boolean isCapturable()
+	{
+		return true;
+	}
+	
+	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return this.variable.checkAccess(markers, position, instance, context);
@@ -203,7 +191,7 @@ public class CaptureVariable implements IVariable
 	{
 		if (!this.variable.isCapturable())
 		{
-			markers.add(position, "capture.variable", this.variable.getName());
+			markers.add(I18n.createMarker(position, "capture.variable", this.variable.getName()));
 		}
 		else
 		{
@@ -257,21 +245,27 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
-		int index = this.variable.getIndex();
-		this.variable.setIndex(this.index);
-		this.variable.writeGet(writer, instance);
-		this.variable.setIndex(index);
+		int index = this.variable.getLocalIndex();
+		this.variable.setLocalIndex(this.index);
+		this.variable.writeGet(writer, instance, lineNumber);
+		this.variable.setLocalIndex(index);
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
-		int index = this.variable.getIndex();
-		this.variable.setIndex(this.index);
-		this.variable.writeSet(writer, instance, value);
-		this.variable.setIndex(index);
+		int index = this.variable.getLocalIndex();
+		this.variable.setLocalIndex(this.index);
+		this.variable.writeSet(writer, instance, value, lineNumber);
+		this.variable.setLocalIndex(index);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "#" + this.variable.toString();
 	}
 	
 	@Override

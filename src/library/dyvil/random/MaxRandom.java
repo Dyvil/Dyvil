@@ -1,7 +1,5 @@
 package dyvil.random;
 
-import dyvil.lang.Random;
-
 import dyvil.math.MathUtils;
 
 /**
@@ -11,9 +9,9 @@ import dyvil.math.MathUtils;
  */
 public final class MaxRandom implements Random
 {
-	private static final long		serialVersionUID	= -6067026546099361014L;
+	private static final long serialVersionUID = -6067026546099361014L;
 	
-	public static final MaxRandom	instance			= new MaxRandom();
+	public static final MaxRandom instance = new MaxRandom();
 	
 	private MaxRandom()
 	{

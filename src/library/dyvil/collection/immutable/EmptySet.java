@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -7,20 +8,22 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 import dyvil.array.ObjectArray;
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.EmptyIterator;
 
 @NilConvertible
 public @object class EmptySet<E> implements ImmutableSet<E>
 {
-	public static final EmptySet	instance	= new EmptySet();
+	private static final long serialVersionUID = -6445525479912514756L;
+	
+	public static final EmptySet instance = new EmptySet();
 	
 	public static <E> EmptySet<E> apply()
 	{
@@ -46,7 +49,7 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
 	}
 	
 	@Override
@@ -150,6 +153,12 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
+	public java.util.Set<E> toJava()
+	{
+		return Collections.EMPTY_SET;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return "[]";
@@ -165,5 +174,15 @@ public @object class EmptySet<E> implements ImmutableSet<E>
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

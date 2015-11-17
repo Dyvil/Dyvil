@@ -1,87 +1,99 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.transform.Symbols;
-import dyvil.tools.compiler.transform.Tokens;
+import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.token.IToken;
 
-public class PropertyParser extends Parser implements IValued
+public class PropertyParser extends Parser implements IValueConsumer
 {
-	public static final int		GET	= 1;
-	public static final int		SET	= 2;
+	private static final int	GET_OR_SET	= 1;
+	private static final int	GET			= 2;
+	private static final int	SET			= 4;
 	
 	public static final Name	get	= Name.getQualified("get");
 	public static final Name	set	= Name.getQualified("set");
 	
-	protected Property			property;
+	protected Property	property;
+	private int			modifiers;
 	
 	public PropertyParser(Property property)
 	{
 		this.property = property;
+		this.mode = GET_OR_SET;
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = 0;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == Symbols.SEMICOLON)
-		{
-			this.mode = 0;
-			return;
-		}
-		if (type == Symbols.CLOSE_CURLY_BRACKET)
+		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			pm.popParser();
 			return;
 		}
 		
-		if (this.mode == 0)
+		switch (this.mode)
 		{
-			if (token.next().type() == Symbols.COLON)
+		case GET_OR_SET:
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				if (type == Tokens.LETTER_IDENTIFIER)
+				return;
+			}
+			
+			int mod;
+			if ((mod = ModifierTypes.METHOD.parse(type)) >= 0)
+			{
+				this.modifiers |= mod;
+				return;
+			}
+			
+			if (type == Tokens.LETTER_IDENTIFIER)
+			{
+				int nextType = token.next().type();
+				if (nextType == BaseSymbols.COLON || nextType == BaseSymbols.CLOSE_CURLY_BRACKET || nextType == BaseSymbols.SEMICOLON)
 				{
 					Name name = token.nameValue();
 					if (name == get)
 					{
+						this.property.setGetterModifiers(this.modifiers);
 						this.mode = GET;
 						return;
 					}
 					if (name == set)
 					{
+						this.property.setSetterModifiers(this.modifiers);
 						this.mode = SET;
 						return;
 					}
 				}
-				throw new SyntaxError(token, "Invalid Property Declaration - 'get' or 'set' expected", false);
 			}
 			
 			// No 'get:' or 'set:' tag -> Read-Only Property
+			this.property.setGetterModifiers(this.modifiers);
 			this.mode = GET;
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
-		}
-		if (this.mode > 0) // SET or GET
-		{
-			if (type == Symbols.COLON)
+		case GET:
+		case SET:
+			if (type == BaseSymbols.COLON)
 			{
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Property Declaration - ':' expected");
+			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				this.mode = GET_OR_SET;
+				return;
+			}
+			pm.report(token, "Invalid Property Declaration - ':' expected");
+			return;
 		}
 	}
 	
@@ -90,17 +102,11 @@ public class PropertyParser extends Parser implements IValued
 	{
 		if (this.mode == GET)
 		{
-			this.property.get = value;
+			this.property.setGetter(value);
 		}
 		else if (this.mode == SET)
 		{
-			this.property.set = value;
+			this.property.setSetter(value);
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

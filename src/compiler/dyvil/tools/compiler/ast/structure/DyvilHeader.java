@@ -1,65 +1,81 @@
 package dyvil.tools.compiler.ast.structure;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.File;
+import java.io.IOException;
 
-import dyvil.lang.Entry;
-import dyvil.lang.List;
-import dyvil.lang.Map;
-
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.ImportDeclaration;
-import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
+import dyvil.tools.compiler.ast.header.HeaderDeclaration;
+import dyvil.tools.compiler.ast.header.ImportDeclaration;
+import dyvil.tools.compiler.ast.header.IncludeDeclaration;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvil.tools.compiler.backend.HeaderFile;
+import dyvil.tools.compiler.ast.type.alias.TypeAlias;
+import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.Dlex;
-import dyvil.tools.compiler.lexer.TokenIterator;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
+import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.SemicolonInference;
+import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.DyvilLexer;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
-	public final CodeFile			inputFile;
-	public final File				outputDirectory;
-	public final File				outputFile;
+	public final CodeFile	inputFile;
+	public final File		outputDirectory;
+	public final File		outputFile;
 	
-	public final String				name;
-	public Package					pack;
+	protected Name		name;
+	protected Package	pack;
 	
-	protected TokenIterator			tokens;
-	protected MarkerList			markers		= new MarkerList();
+	protected TokenIterator	tokens;
+	protected MarkerList	markers	= new MarkerList();
 	
-	protected PackageDeclaration	packageDeclaration;
+	protected PackageDeclaration packageDeclaration;
 	
-	protected ImportDeclaration[]	imports		= new ImportDeclaration[5];
+	protected ImportDeclaration[]	imports	= new ImportDeclaration[5];
 	protected int					importCount;
-	protected ImportDeclaration[]	usings		= new ImportDeclaration[1];
+	protected ImportDeclaration[]	usings	= new ImportDeclaration[1];
 	protected int					usingCount;
 	protected IncludeDeclaration[]	includes;
 	protected int					includeCount;
 	
 	protected Map<Name, Operator>	operators	= new IdentityHashMap();
-	protected Map<Name, Operator>	inheritedOperators;
-	
 	protected Map<Name, ITypeAlias>	typeAliases	= new IdentityHashMap();
 	
-	public DyvilHeader(String name)
+	protected HeaderDeclaration headerDeclaration;
+	
+	public DyvilHeader()
+	{
+		this.inputFile = null;
+		this.outputDirectory = null;
+		this.outputFile = null;
+	}
+	
+	public DyvilHeader(Name name)
 	{
 		this.inputFile = null;
 		this.outputDirectory = null;
@@ -73,15 +89,15 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.inputFile = input;
 		
 		String name = input.getAbsolutePath();
-		int start = name.lastIndexOf('/');
+		int start = name.lastIndexOf(File.separatorChar);
 		int end = name.lastIndexOf('.');
-		this.name = name.substring(start + 1, end);
+		this.name = Name.get(name.substring(start + 1, end));
 		
 		name = output.getPath();
-		start = name.lastIndexOf('/');
+		start = name.lastIndexOf(File.separatorChar);
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + ".dyhbin");
+		this.outputFile = new File(name.substring(0, end) + FileType.OBJECT_EXTENSION);
 	}
 	
 	@Override
@@ -91,7 +107,24 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public String getName()
+	public ICodePosition getPosition()
+	{
+		return ICodePosition.ORIGIN;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+	
+	@Override
+	public void setName(Name name)
+	{
+		this.name = name;
+	}
+	
+	@Override
+	public Name getName()
 	{
 		return this.name;
 	}
@@ -130,6 +163,18 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public PackageDeclaration getPackageDeclaration()
 	{
 		return this.packageDeclaration;
+	}
+	
+	@Override
+	public HeaderDeclaration getHeaderDeclaration()
+	{
+		return this.headerDeclaration;
+	}
+	
+	@Override
+	public void setHeaderDeclaration(HeaderDeclaration declaration)
+	{
+		this.headerDeclaration = declaration;
 	}
 	
 	@Override
@@ -188,47 +233,25 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		return this.includeCount;
 	}
 	
-	protected void addIncludeToArray(IncludeDeclaration component)
+	@Override
+	public void addInclude(IncludeDeclaration component)
 	{
 		if (this.includes == null)
 		{
 			this.includes = new IncludeDeclaration[2];
 			this.includes[0] = component;
 			this.includeCount = 1;
-			
-			if (!this.isHeader())
-			{
-				this.inheritedOperators = new IdentityHashMap();
-			}
-		}
-		else
-		{
-			int index = this.includeCount++;
-			if (index >= this.includes.length)
-			{
-				IncludeDeclaration[] temp = new IncludeDeclaration[index + 1];
-				System.arraycopy(this.includes, 0, temp, 0, this.includes.length);
-				this.includes = temp;
-			}
-			this.includes[index] = component;
-		}
-	}
-	
-	@Override
-	public void addInclude(IncludeDeclaration component)
-	{
-		this.addIncludeToArray(component);
-		
-		if (this.isHeader())
-		{
-			this.markers.add(component.getPosition(), "header.include");
 			return;
 		}
 		
-		// Resolve the header
-		
-		component.resolve(this.markers);
-		component.addOperators(this.inheritedOperators);
+		int index = this.includeCount++;
+		if (index >= this.includes.length)
+		{
+			IncludeDeclaration[] temp = new IncludeDeclaration[index + 1];
+			System.arraycopy(this.includes, 0, temp, 0, this.includes.length);
+			this.includes = temp;
+		}
+		this.includes[index] = component;
 	}
 	
 	@Override
@@ -258,16 +281,20 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public Operator getOperator(Name name)
 	{
-		Operator op1 = this.operators.get(name);
-		if (op1 != null)
+		Operator op = this.operators.get(name);
+		if (op != null)
 		{
-			return op1;
+			return op;
 		}
-		if (this.inheritedOperators == null)
+		for (int i = 0; i < this.includeCount; i++)
 		{
-			return null;
+			op = this.includes[i].getHeader().getOperator(name);
+			if (op != null)
+			{
+				return op;
+			}
 		}
-		return this.inheritedOperators.get(name);
+		return null;
 	}
 	
 	@Override
@@ -331,17 +358,30 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void tokenize()
 	{
-		this.tokens = Dlex.tokenIterator(this.inputFile.getCode());
-		this.tokens.inferSemicolons();
+		this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.inputFile.getCode());
+		SemicolonInference.inferSemicolons(this.tokens.first());
+	}
+	
+	@Override
+	public void parseHeader()
+	{
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this, false), this.markers, this);
+		manager.parse(this.tokens);
+	}
+	
+	@Override
+	public void resolveHeader()
+	{
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			IncludeDeclaration include = this.includes[i];
+			include.resolve(this.markers);
+		}
 	}
 	
 	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DyvilHeaderParser(this));
-		manager.setOperatorMap(this);
-		manager.parse(this.markers, this.tokens);
-		this.tokens = null;
 	}
 	
 	@Override
@@ -366,6 +406,10 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void resolve()
 	{
+		if (this.headerDeclaration == null)
+		{
+			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, Modifiers.PUBLIC, null);
+		}
 	}
 	
 	@Override
@@ -376,7 +420,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void check()
 	{
-		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
+		this.pack.check(this.packageDeclaration, this.markers);
+		
+		if (this.headerDeclaration != null)
+		{
+			this.headerDeclaration.check(this.markers);
+		}
 	}
 	
 	@Override
@@ -389,33 +438,26 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 	}
 	
+	protected boolean printMarkers()
+	{
+		return ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile);
+	}
+	
 	@Override
 	public void compile()
 	{
-		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile))
+		if (this.printMarkers())
 		{
 			return;
 		}
 		
-		HeaderFile.write(this.outputFile, this);
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return true;
+		ObjectFormat.write(this.outputFile, this);
 	}
 	
 	@Override
 	public IDyvilHeader getHeader()
 	{
 		return this;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
 	}
 	
 	@Override
@@ -442,7 +484,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		// Included Headers
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			iclass = this.includes[i].getHeader().resolveClass(name);
+			iclass = this.includes[i].resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
@@ -473,18 +515,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IType t = this.includes[i].getHeader().resolveType(name);
+			IType t = this.includes[i].resolveType(name);
 			if (t != null)
 			{
 				return t;
 			}
 		}
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
 		return null;
 	}
 	
@@ -502,7 +538,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IDataMember field = this.includes[i].getHeader().resolveField(name);
+			IDataMember field = this.includes[i].resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -512,7 +548,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
@@ -521,25 +557,44 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			this.includes[i].getHeader().getMethodMatches(list, instance, name, arguments);
+			this.includes[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
 	}
 	
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		return 0;
+		IClass iclass = member.getTheClass();
+		
+		int access = member.getAccessLevel();
+		if ((access & Modifiers.INTERNAL) != 0)
+		{
+			if (iclass instanceof ExternalClass)
+			{
+				return INTERNAL;
+			}
+			// Clear the INTERNAL bit by ANDing with 0b1111
+			access &= 0b1111;
+		}
+		
+		if (access == Modifiers.PUBLIC)
+		{
+			return VISIBLE;
+		}
+		if (access == Modifiers.PROTECTED || access == Modifiers.PACKAGE)
+		{
+			IDyvilHeader header = iclass.getHeader();
+			if (header == this || this.pack == header.getPackage())
+			{
+				return VISIBLE;
+			}
+		}
+		return INVISIBLE;
 	}
 	
 	@Override
@@ -549,37 +604,135 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public String getFullName(String name)
+	public String getFullName(Name name)
 	{
-		if (!name.equals(this.name))
+		if (name != this.name)
 		{
-			name = this.name + '.' + name;
+			return this.pack.fullName + '.' + this.name.qualified + '.' + name.qualified;
 		}
-		return this.pack.fullName + '.' + name;
+		return this.pack.fullName + '.' + name.qualified;
 	}
 	
 	@Override
 	public String getInternalName()
 	{
-		return this.pack.internalName + this.name;
+		return this.pack.getInternalName() + this.name;
 	}
 	
 	@Override
-	public String getInternalName(String name)
+	public String getInternalName(Name name)
 	{
-		if (!name.equals(this.name))
+		if (name != this.name)
 		{
-			name = this.name + '$' + name;
+			return this.pack.getInternalName() + this.name.qualified + '$' + name;
 		}
-		return this.pack.internalName + name;
+		return this.pack.getInternalName() + name.qualified;
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		// Header Name
+		this.headerDeclaration.write(out);
+		
+		// Include Declarations
+		int includes = this.includeCount;
+		out.writeShort(includes);
+		for (int i = 0; i < includes; i++)
+		{
+			this.includes[i].write(out);
+		}
+		
+		// Import Declarations
+		int imports = this.importCount;
+		out.writeShort(imports);
+		for (int i = 0; i < imports; i++)
+		{
+			this.imports[i].write(out);
+		}
+		
+		// Using Declarations
+		int staticImports = this.usingCount;
+		out.writeShort(staticImports);
+		for (int i = 0; i < staticImports; i++)
+		{
+			this.usings[i].write(out);
+		}
+		
+		// Operators Definitions
+		Map<Name, Operator> operators = this.operators;
+		out.writeShort(operators.size());
+		for (Entry<Name, Operator> entry : operators)
+		{
+			entry.getValue().write(out);
+		}
+		
+		// Type Aliases
+		Map<Name, ITypeAlias> typeAliases = this.typeAliases;
+		out.writeShort(typeAliases.size());
+		for (Entry<Name, ITypeAlias> entry : typeAliases)
+		{
+			entry.getValue().write(out);
+		}
+		
+		// Classes
+		out.writeShort(0);
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.headerDeclaration = new HeaderDeclaration(this);
+		this.headerDeclaration.read(in);
+		
+		this.name = this.headerDeclaration.getName();
+		
+		// Include Declarations
+		int includes = in.readShort();
+		for (int i = 0; i < includes; i++)
+		{
+			IncludeDeclaration id = new IncludeDeclaration(null);
+			id.read(in);
+			this.addInclude(id);
+		}
+		
+		// Import Declarations
+		int imports = in.readShort();
+		for (int i = 0; i < imports; i++)
+		{
+			ImportDeclaration id = new ImportDeclaration(null);
+			id.read(in);
+			this.addImport(id);
+		}
+		
+		int staticImports = in.readShort();
+		for (int i = 0; i < staticImports; i++)
+		{
+			ImportDeclaration id = new ImportDeclaration(null, true);
+			id.read(in);
+			this.addUsing(id);
+		}
+		
+		int operators = in.readShort();
+		for (int i = 0; i < operators; i++)
+		{
+			Operator op = Operator.read(in);
+			this.addOperator(op);
+		}
+		
+		int typeAliases = in.readShort();
+		for (int i = 0; i < typeAliases; i++)
+		{
+			TypeAlias ta = new TypeAlias();
+			ta.read(in);
+			this.addTypeAlias(ta);
+		}
 	}
 	
 	@Override
 	public String toString()
 	{
-		StringBuilder buf = new StringBuilder();
-		this.toString("", buf);
-		return buf.toString();
+		return IASTNode.toString(this);
 	}
 	
 	@Override
@@ -661,6 +814,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			{
 				buffer.append('\n');
 			}
+		}
+		
+		if (this.headerDeclaration != null)
+		{
+			this.headerDeclaration.toString(prefix, buffer);
+			buffer.append('\n');
+			buffer.append('\n');
 		}
 	}
 }

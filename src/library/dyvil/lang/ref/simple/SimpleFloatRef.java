@@ -6,7 +6,7 @@ import dyvil.lang.ref.FloatRef;
 @FloatConvertible
 public class SimpleFloatRef implements FloatRef
 {
-	public float	value;
+	public float value;
 	
 	public static SimpleFloatRef apply(float value)
 	{

@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.tools.compiler.ast.member.IClassCompilable;
+import dyvil.tools.compiler.backend.IClassCompilable;
 
 public interface IClassCompilableList
 {
-	public int compilableCount();
+	int compilableCount();
 	
-	public void addCompilable(IClassCompilable compilable);
+	void addCompilable(IClassCompilable compilable);
 	
-	public IClassCompilable getCompilable(int index);
+	IClassCompilable getCompilable(int index);
 }

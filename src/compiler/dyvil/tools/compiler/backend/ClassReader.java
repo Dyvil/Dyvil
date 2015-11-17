@@ -2,21 +2,17 @@ package dyvil.tools.compiler.backend;
 
 import java.io.InputStream;
 
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
 
-import org.objectweb.asm.*;
-
-public class ClassReader extends ClassVisitor
+public class ClassReader implements ClassVisitor
 {
-	protected ExternalClass	theClass;
+	protected ExternalClass theClass;
 	
 	public ClassReader(ExternalClass theClass)
 	{
-		super(DyvilCompiler.asmVersion);
 		this.theClass = theClass;
 	}
 	
@@ -24,15 +20,15 @@ public class ClassReader extends ClassVisitor
 	{
 		try
 		{
-			org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(is);
+			dyvil.tools.asm.ClassReader reader = new dyvil.tools.asm.ClassReader(is);
 			ClassReader visitor = new ClassReader(bclass);
-			reader.accept(visitor, org.objectweb.asm.ClassReader.SKIP_CODE | org.objectweb.asm.ClassReader.SKIP_FRAMES);
+			reader.accept(visitor, dyvil.tools.asm.ClassReader.SKIP_CODE | dyvil.tools.asm.ClassReader.SKIP_FRAMES);
 			
 			return bclass;
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.logger.throwing("ClassReader", "loadClass", ex);
+			DyvilCompiler.error("ClassReader", "loadClass", ex);
 		}
 		
 		return null;
@@ -55,15 +51,9 @@ public class ClassReader extends ClassVisitor
 	}
 	
 	@Override
-	public AnnotationVisitor visitAnnotation(String name, boolean visible)
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		String internal = ClassFormat.extendedToInternal(name);
-		if (this.theClass.addRawAnnotation(internal))
-		{
-			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
-			return new AnnotationVisitorImpl(this.theClass, annotation);
-		}
-		return null;
+		return this.theClass.visitAnnotation(type, visible);
 	}
 	
 	@Override
@@ -98,5 +88,6 @@ public class ClassReader extends ClassVisitor
 	@Override
 	public void visitEnd()
 	{
+		this.theClass.visitEnd();
 	}
 }

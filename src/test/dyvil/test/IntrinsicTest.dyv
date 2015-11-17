@@ -1,0 +1,42 @@
+package dyvil.test
+
+import	dyvil.annotation.Intrinsic
+using	dyvil.reflect.Opcodes._
+
+infix operator +- { right, 120 }
+
+public header IntrinsicTest
+
+/**
+ * A test for annotations and intrinsic methods
+ */
+public class IntrinsicTest
+{
+	@interface NonNull
+	
+	public static void main((@NonNull [@NonNull String]) args)
+	{
+		auto i1 = 1 +- 2
+		auto i2 = 2 +- 4
+		auto i3 = -1 +- 3
+		auto i4 = -7 +- 5
+		println("Expected: -1, Actual: " + i1)
+		println("Expected: -2, Actual: " + i2)
+		println("Expected: -4, Actual: " + i3)
+		println("Expected: -12, Actual: " + i4)
+		
+		print "Hello "
+		println "World"
+		
+		greet
+	}
+	
+	@Intrinsic([ LOAD_0, LOAD_1, INEG, IADD ])
+	public infix (@NonNull int) +-(int i, int j) = throw new RuntimeException("Not Intrinsic!")
+	
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "print", "(Ljava/lang/String;)V" ])
+	public static void print(String s) = throw new RuntimeException("Not Intrinsic!")
+	
+	@Intrinsic(value: [ LDC, 0 ], strings: [ "'Hello World" ])
+	public static void greet() = throw new RuntimeException("Not Intrinsic!")
+}

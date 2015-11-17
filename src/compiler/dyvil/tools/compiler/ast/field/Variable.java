@@ -4,11 +4,12 @@ import java.lang.annotation.ElementType;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -17,17 +18,19 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class Variable extends Member implements IVariable
 {
-	public int		index;
-	public IValue	value;
-	private IType	refType;
+	protected int		localIndex;
+	protected IValue	value;
+	
+	// Metadata
+	private IType refType;
 	
 	public Variable()
 	{
@@ -46,9 +49,15 @@ public final class Variable extends Member implements IVariable
 	
 	public Variable(ICodePosition position, Name name, IType type)
 	{
+		this.position = position;
 		this.name = name;
 		this.type = type;
-		this.position = position;
+	}
+	
+	public Variable(Name name, IType type)
+	{
+		this.name = name;
+		this.type = type;
 	}
 	
 	@Override
@@ -64,23 +73,23 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public void setIndex(int index)
+	public void setLocalIndex(int index)
 	{
-		this.index = index;
+		this.localIndex = index;
 	}
 	
 	@Override
-	public int getIndex()
+	public int getLocalIndex()
 	{
-		return this.index;
+		return this.localIndex;
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/lazy":
+		case "dyvil/annotation/_internal/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}
@@ -88,7 +97,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public ElementType getAnnotationType()
+	public ElementType getElementType()
 	{
 		return ElementType.LOCAL_VARIABLE;
 	}
@@ -104,15 +113,16 @@ public final class Variable extends Member implements IVariable
 	{
 		if ((this.modifiers & Modifiers.FINAL) != 0)
 		{
-			markers.add(position, "variable.assign.final", this.name.unqualified);
+			markers.add(I18n.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
 		
-		IValue value1 = newValue.withType(this.type, null, markers, context);
+		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
-			marker.addInfo("Variable Type: " + this.type);
-			marker.addInfo("Value Type: " + newValue.getType());
+			Marker marker = I18n.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+			marker.addInfo(I18n.getString("variable.type", this.type));
+			marker.addInfo(I18n.getString("value.type", newValue.getType()));
+			markers.add(marker);
 		}
 		else
 		{
@@ -139,7 +149,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType == null)
 		{
-			this.refType = Types.getSimpleRef(this.type);
+			this.refType = this.type.getSimpleRefType();
 		}
 	}
 	
@@ -171,24 +181,24 @@ public final class Variable extends Member implements IVariable
 		}
 		
 		boolean inferType = false;
-		;
 		if (this.type == Types.UNKNOWN)
 		{
 			inferType = true;
 			this.type = this.value.getType();
 			if (this.type == Types.UNKNOWN)
 			{
-				markers.add(this.position, "variable.type.infer", this.name.unqualified);
+				markers.add(I18n.createMarker(this.position, "variable.type.infer", this.name.unqualified));
 				this.type = Types.ANY;
 			}
 		}
 		
-		IValue value1 = this.value.withType(this.type, this.type, markers, context);
+		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(this.position, "variable.type", this.name.unqualified);
-			marker.addInfo("Variable Type: " + this.type);
-			marker.addInfo("Value Type: " + this.value.getType());
+			Marker marker = I18n.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
+			marker.addInfo(I18n.getString("variable.type", this.type));
+			marker.addInfo(I18n.getString("value.type", this.value.getType()));
+			markers.add(marker);
 		}
 		else
 		{
@@ -217,7 +227,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(this.position, "variable.type.void");
+			markers.add(I18n.createMarker(this.position, "variable.type.void"));
 		}
 	}
 	
@@ -252,7 +262,12 @@ public final class Variable extends Member implements IVariable
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		IType type = this.refType != null ? this.refType : this.type;
-		writer.writeLocal(this.index, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+		writer.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+	}
+	
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		this.writeInit(writer, this.value);
 	}
 	
 	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
@@ -265,40 +280,40 @@ public final class Variable extends Member implements IVariable
 			
 			if (value != null)
 			{
-				value.writeExpression(writer);
+				value.writeExpression(writer, this.type);
 			}
 			else
 			{
 				writer.writeInsn(Opcodes.AUTO_DUP_X1);
 			}
-			c.writeInvoke(writer);
+			c.writeInvoke(writer, this.getLineNumber());
 			
-			this.index = writer.localCount();
+			this.localIndex = writer.localCount();
 			
-			writer.setLocalType(this.index, this.refType.getInternalName());
-			writer.writeVarInsn(Opcodes.ASTORE, this.index);
+			writer.setLocalType(this.localIndex, this.refType.getInternalName());
+			writer.writeVarInsn(Opcodes.ASTORE, this.localIndex);
 			return;
 		}
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
-		this.index = writer.localCount();
-		writer.setLocalType(this.index, this.type.getFrameType());
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		this.localIndex = writer.localCount();
+		writer.setLocalType(this.localIndex, this.type.getFrameType());
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.index);
+			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
 			
 			IClass c = this.refType.getTheClass();
 			IDataMember f = c.getBody().getField(0);
-			f.writeGet(writer, null);
+			f.writeGet(writer, null, lineNumber);
 			
 			if (c == Types.OBJECT_REF_CLASS)
 			{
@@ -311,27 +326,27 @@ public final class Variable extends Member implements IVariable
 			return;
 		}
 		
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.index);
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
-			ReferenceType.writeGetRef(writer, value, this.index);
+			ReferenceType.writeGetRef(writer, value, this.localIndex);
 			
 			IDataMember f = this.refType.getTheClass().getBody().getField(0);
-			f.writeSet(writer, null, null);
+			f.writeSet(writer, null, null, lineNumber);
 			return;
 		}
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, this.type);
 		}
 		
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.index);
+		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 	
 	@Override

@@ -1,23 +1,21 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.BoxedValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-
-public final class AndOperator extends ASTNode implements IValue
+public final class AndOperator extends AbstractValue
 {
 	public IValue	left;
 	public IValue	right;
@@ -48,6 +46,12 @@ public final class AndOperator extends ASTNode implements IValue
 	}
 	
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+	
+	@Override
 	public IType getType()
 	{
 		return Types.BOOLEAN;
@@ -56,31 +60,17 @@ public final class AndOperator extends ASTNode implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.BOOLEAN)
+		if (type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN))
 		{
 			return this;
 		}
-		return type.isSuperTypeOf(Types.BOOLEAN) ? new BoxedValue(this, Types.BOOLEAN.boxMethod) : null;
+		return null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
 		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (type == Types.BOOLEAN)
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(Types.BOOLEAN))
-		{
-			return 2;
-		}
-		return 0;
 	}
 	
 	@Override
@@ -115,10 +105,13 @@ public final class AndOperator extends ASTNode implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		// Left value is false
-		if (this.left.valueTag() == BOOLEAN && !((BooleanValue) this.left).value)
+		if (this.left.valueTag() == BOOLEAN && !this.left.booleanValue())
 		{
 			return BooleanValue.FALSE;
+		}
+		if (this.bothTrue())
+		{
+			return BooleanValue.TRUE;
 		}
 		
 		this.left = this.left.foldConstants();
@@ -127,11 +120,21 @@ public final class AndOperator extends ASTNode implements IValue
 		return this;
 	}
 	
+	private boolean bothTrue()
+	{
+		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN && this.right.booleanValue();
+	}
+	
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.left = this.left.cleanup(context, compilableList);
 		this.right = this.right.cleanup(context, compilableList);
+		
+		if (this.bothTrue())
+		{
+			return BooleanValue.TRUE;
+		}
 		
 		return this;
 	}
@@ -153,7 +156,7 @@ public final class AndOperator extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer);
+		this.writeExpression(writer, Types.BOOLEAN);
 		writer.writeInsn(Opcodes.IRETURN);
 	}
 	

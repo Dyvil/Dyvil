@@ -1,21 +1,21 @@
 package dyvil.tools.compiler.parser.bytecode;
 
 import dyvil.tools.compiler.ast.bytecode.IInternalTyped;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.token.IToken;
 
 public final class InternalTypeParser extends Parser
 {
 	private static final int	NAME	= 1;
 	private static final int	SLASH	= 2;
 	
-	protected IInternalTyped	typed;
+	protected IInternalTyped typed;
 	
-	private StringBuilder		builder;
+	private StringBuilder builder;
 	
 	public InternalTypeParser(IInternalTyped typed)
 	{
@@ -24,17 +24,12 @@ public final class InternalTypeParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = NAME;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == NAME)
+		switch (this.mode)
 		{
+		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
@@ -56,21 +51,19 @@ public final class InternalTypeParser extends Parser
 				this.mode = SLASH;
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type - Identifier expected");
-		}
-		if (this.mode == SLASH)
-		{
+			pm.report(token, "Invalid Type - Identifier expected");
+			return;
+		case SLASH:
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				if (name == Name.div)
+				if (name == Names.div)
 				{
 					this.builder.append('/');
 					this.mode = NAME;
 					return;
 				}
 			}
-			
 			String s = this.builder.toString();
 			this.typed.setInternalType(s);
 			pm.popParser(true);
@@ -80,7 +73,7 @@ public final class InternalTypeParser extends Parser
 	
 	private static boolean isPrimitiveName(Name name)
 	{
-		return name == Name._void || name == Name._boolean || name == Name._byte || name == Name._short || name == Name._char || name == Name._int
-				|| name == Name._long || name == Name._float || name == Name._double;
+		return name == Names._void || name == Names._boolean || name == Names._byte || name == Names._short || name == Names._char || name == Names._int
+				|| name == Names._long || name == Names._float || name == Names._double;
 	}
 }

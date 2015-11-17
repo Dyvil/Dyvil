@@ -4,15 +4,18 @@ import java.io.File;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.CodeFile;
 import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
+import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.parsing.Name;
 
-public final class DyvilUnit extends DyvilHeader
+public class DyvilUnit extends DyvilHeader
 {
 	private IClass[]			classes			= new IClass[1];
 	private int					classCount;
@@ -27,7 +30,7 @@ public final class DyvilUnit extends DyvilHeader
 	@Override
 	public boolean isHeader()
 	{
-		return false;
+		return this.headerDeclaration != null;
 	}
 	
 	@Override
@@ -87,7 +90,7 @@ public final class DyvilUnit extends DyvilHeader
 		}
 		this.innerClasses[index] = iclass;
 		
-		iclass.setInnerIndex(null, index);
+		iclass.setInnerIndex(this.getInternalName(), index);
 	}
 	
 	@Override
@@ -97,11 +100,17 @@ public final class DyvilUnit extends DyvilHeader
 	}
 	
 	@Override
+	public void parseHeader()
+	{
+		ParserManager manager = new ParserManager(new DyvilHeaderParser(this, true), this.markers, this);
+		manager.parse(this.tokens);
+	}
+	
+	@Override
 	public void parse()
 	{
-		ParserManager manager = new ParserManager(new DyvilUnitParser(this));
-		manager.setOperatorMap(this);
-		manager.parse(this.markers, this.tokens);
+		ParserManager manager = new ParserManager(new DyvilUnitParser(this, true), this.markers, this);
+		manager.parse(this.tokens);
 		this.tokens = null;
 	}
 	
@@ -144,7 +153,11 @@ public final class DyvilUnit extends DyvilHeader
 	@Override
 	public void check()
 	{
-		this.pack.check(this.packageDeclaration, this.inputFile, this.markers);
+		this.pack.check(this.packageDeclaration, this.markers);
+		if (this.headerDeclaration != null)
+		{
+			this.headerDeclaration.check(this.markers);
+		}
 		
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -171,26 +184,39 @@ public final class DyvilUnit extends DyvilHeader
 	}
 	
 	@Override
+	protected boolean printMarkers()
+	{
+		return ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile);
+	}
+	
+	@Override
 	public void compile()
 	{
-		if (ICompilationUnit.printMarkers(this.markers, "Dyvil Unit", this.name, this.inputFile))
+		if (this.printMarkers())
 		{
 			return;
+		}
+		
+		if (this.headerDeclaration != null)
+		{
+			ObjectFormat.write(new File(this.outputDirectory, this.name.qualified + ".dyo"), this);
 		}
 		
 		for (int i = 0; i < this.classCount; i++)
 		{
 			IClass iclass = this.classes[i];
-			String name = iclass.getName().qualified;
-			if (!name.equals(this.name))
+			Name name = iclass.getName();
+			String name1;
+			if (name != this.name)
 			{
-				name = this.name + "$" + name + ".class";
+				name1 = this.name.qualified + "$" + name.qualified + FileType.CLASS_EXTENSION;
 			}
 			else
 			{
-				name += ".class";
+				name1 = name.qualified + FileType.CLASS_EXTENSION;
 			}
-			File file = new File(this.outputDirectory, name);
+			
+			File file = new File(this.outputDirectory, name1);
 			ClassWriter.compile(file, iclass);
 			
 			IClassBody body = iclass.getBody();
@@ -200,8 +226,8 @@ public final class DyvilUnit extends DyvilHeader
 				for (int j = 0; j < len; j++)
 				{
 					IClass iclass1 = body.getClass(j);
-					name = this.name + "$" + iclass1.getName().qualified + ".class";
-					file = new File(this.outputDirectory, name);
+					name1 = this.name.qualified + "$" + iclass1.getName().qualified + FileType.CLASS_EXTENSION;
+					file = new File(this.outputDirectory, name1);
 					ClassWriter.compile(file, iclass1);
 				}
 			}
@@ -210,7 +236,7 @@ public final class DyvilUnit extends DyvilHeader
 		for (int i = 0; i < this.innerClassCount; i++)
 		{
 			IClassCompilable iclass = this.innerClasses[i];
-			String name = iclass.getFileName() + ".class";
+			String name = iclass.getFileName() + FileType.CLASS_EXTENSION;
 			File file = new File(this.outputDirectory, name);
 			ClassWriter.compile(file, iclass);
 		}

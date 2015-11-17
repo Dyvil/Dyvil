@@ -1,18 +1,19 @@
 package dyvil.tools.compiler.backend.visitor;
 
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationValue;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.backend.ClassFormat;
 
-import org.objectweb.asm.AnnotationVisitor;
-
-public final class ArrayAnnotationVisitor extends AnnotationVisitor
+public final class ArrayAnnotationVisitor implements AnnotationVisitor
 {
-	private IValueList	array;
+	private IValueList array;
 	
-	public ArrayAnnotationVisitor(int api, IValueList array)
+	public ArrayAnnotationVisitor(IValueList array)
 	{
-		super(api);
 		this.array = array;
 	}
 	
@@ -33,10 +34,24 @@ public final class ArrayAnnotationVisitor extends AnnotationVisitor
 	}
 	
 	@Override
+	public AnnotationVisitor visitAnnotation(String key, String desc)
+	{
+		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		AnnotationValue value = new AnnotationValue(annotation);
+		this.array.addValue(value);
+		return new AnnotationVisitorImpl(value, annotation);
+	}
+	
+	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		Array valueList = new Array(null);
+		ArrayExpr valueList = new ArrayExpr(null);
 		this.array.addValue(valueList);
-		return new ArrayAnnotationVisitor(this.api, valueList);
+		return new ArrayAnnotationVisitor(valueList);
+	}
+	
+	@Override
+	public void visitEnd()
+	{
 	}
 }

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 import static dyvil.tools.compiler.ast.expression.IValue.*;
 
@@ -37,231 +37,231 @@ public class ConstantFolder
 			{
 			case CHAR:
 			case INT:
-				return applyInt((INumericValue) v1, op, (INumericValue) v2);
+				return applyInt(v1, op, v2);
 			case LONG:
-				return applyLong((INumericValue) v1, op, (INumericValue) v2);
+				return applyLong(v1, op, v2);
 			case FLOAT:
-				return applyFloat((INumericValue) v1, op, (INumericValue) v2);
+				return applyFloat(v1, op, v2);
 			case DOUBLE:
-				return applyDouble((INumericValue) v1, op, (INumericValue) v2);
+				return applyDouble(v1, op, v2);
 			}
 		}
-		if (t1 == STRING && t2 == STRING && Name.plus.equals(op))
+		if (t1 == STRING && t2 == STRING && Names.plus.equals(op))
 		{
-			return new StringValue(((StringValue) v1).value + ((StringValue) v2).value);
+			return new StringValue(v1.stringValue() + v2.stringValue());
 		}
 		return null;
 	}
 	
 	private static IValue applyBoolean(BooleanValue v, Name op)
 	{
-		if (op == Name.bang)
+		if (op == Names.bang)
 		{
-			return new BooleanValue(!v.value);
+			return new BooleanValue(!v.booleanValue());
 		}
 		return null;
 	}
 	
 	private static IValue applyInt(IntValue v, Name op)
 	{
-		if (op == Name.tilde)
+		if (op == Names.tilde)
 		{
-			return new IntValue(~v.value);
+			return new IntValue(~v.intValue());
 		}
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
-			return new IntValue(-v.value);
+			return new IntValue(-v.intValue());
 		}
 		return null;
 	}
 	
 	private static IValue applyLong(LongValue v, Name op)
 	{
-		if (op == Name.tilde)
+		if (op == Names.tilde)
 		{
-			return new LongValue(~v.value);
+			return new LongValue(~v.longValue());
 		}
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
-			return new LongValue(-v.value);
+			return new LongValue(-v.longValue());
 		}
 		return null;
 	}
 	
 	private static IValue applyFloat(FloatValue v, Name op)
 	{
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
-			return new FloatValue(-v.value);
+			return new FloatValue(-v.floatValue());
 		}
 		return null;
 	}
 	
 	private static IValue applyDouble(DoubleValue v, Name op)
 	{
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
-			return new DoubleValue(-v.value);
+			return new DoubleValue(-v.doubleValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyInt(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyInt(IValue v1, Name op, IValue v2)
 	{
-		if (op == Name.plus)
+		if (op == Names.plus)
 		{
 			return new IntValue(v1.intValue() + v2.intValue());
 		}
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
 			return new IntValue(v1.intValue() - v2.intValue());
 		}
-		if (op == Name.times)
+		if (op == Names.times)
 		{
 			return new IntValue(v1.intValue() * v2.intValue());
 		}
-		if (op == Name.div)
+		if (op == Names.div)
 		{
 			float i2 = v2.floatValue();
 			return i2 == 0F ? null : new FloatValue(v1.floatValue() / i2);
 		}
-		if (op == Name.bslash)
+		if (op == Names.bslash)
 		{
 			int i2 = v2.intValue();
 			return i2 == 0 ? null : new IntValue(v1.intValue() / i2);
 		}
-		if (op == Name.percent)
+		if (op == Names.percent)
 		{
 			int i2 = v2.intValue();
 			return i2 == 0 ? null : new IntValue(v1.intValue() % i2);
 		}
-		if (op == Name.amp)
+		if (op == Names.amp)
 		{
 			return new IntValue(v1.intValue() & v2.intValue());
 		}
-		if (op == Name.bar)
+		if (op == Names.bar)
 		{
 			return new IntValue(v1.intValue() | v2.intValue());
 		}
-		if (op == Name.up)
+		if (op == Names.up)
 		{
 			return new IntValue(v1.intValue() ^ v2.intValue());
 		}
-		if (op == Name.ltlt)
+		if (op == Names.ltlt)
 		{
 			return new IntValue(v1.intValue() << v2.intValue());
 		}
-		if (op == Name.gtgt)
+		if (op == Names.gtgt)
 		{
 			return new IntValue(v1.intValue() >> v2.intValue());
 		}
-		if (op == Name.gtgtgt)
+		if (op == Names.gtgtgt)
 		{
 			return new IntValue(v1.intValue() >>> v2.intValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyLong(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyLong(IValue v1, Name op, IValue v2)
 	{
-		if (op == Name.plus)
+		if (op == Names.plus)
 		{
 			return new LongValue(v1.longValue() + v2.longValue());
 		}
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
 			return new LongValue(v1.longValue() - v2.longValue());
 		}
-		if (op == Name.times)
+		if (op == Names.times)
 		{
 			return new LongValue(v1.longValue() * v2.longValue());
 		}
-		if (op == Name.div)
+		if (op == Names.div)
 		{
 			double l2 = v2.doubleValue();
 			return l2 == 0D ? null : new DoubleValue(v1.longValue() / l2);
 		}
-		if (op == Name.bslash)
+		if (op == Names.bslash)
 		{
 			long l2 = v2.longValue();
 			return l2 == 0L ? null : new LongValue(v1.longValue() / l2);
 		}
-		if (op == Name.percent)
+		if (op == Names.percent)
 		{
 			long l2 = v2.longValue();
 			return l2 == 0L ? null : new LongValue(v1.longValue() % l2);
 		}
-		if (op == Name.amp)
+		if (op == Names.amp)
 		{
 			return new LongValue(v1.longValue() & v2.longValue());
 		}
-		if (op == Name.bar)
+		if (op == Names.bar)
 		{
 			return new LongValue(v1.longValue() | v2.longValue());
 		}
-		if (op == Name.up)
+		if (op == Names.up)
 		{
 			return new LongValue(v1.longValue() ^ v2.longValue());
 		}
-		if (op == Name.ltlt)
+		if (op == Names.ltlt)
 		{
 			return new LongValue(v1.longValue() << v2.longValue());
 		}
-		if (op == Name.gtgt)
+		if (op == Names.gtgt)
 		{
 			return new LongValue(v1.longValue() >> v2.longValue());
 		}
-		if (op == Name.gtgtgt)
+		if (op == Names.gtgtgt)
 		{
 			return new LongValue(v1.longValue() >>> v2.longValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyFloat(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyFloat(IValue v1, Name op, IValue v2)
 	{
-		if (op == Name.plus)
+		if (op == Names.plus)
 		{
 			return new FloatValue(v1.floatValue() + v2.floatValue());
 		}
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
 			return new FloatValue(v1.floatValue() - v2.floatValue());
 		}
-		if (op == Name.times)
+		if (op == Names.times)
 		{
 			return new FloatValue(v1.floatValue() * v2.floatValue());
 		}
-		if (op == Name.div)
+		if (op == Names.div)
 		{
 			return new FloatValue(v1.floatValue() / v2.floatValue());
 		}
-		if (op == Name.percent)
+		if (op == Names.percent)
 		{
 			return new FloatValue(v1.floatValue() % v2.floatValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyDouble(INumericValue v1, Name op, INumericValue v2)
+	private static IValue applyDouble(IValue v1, Name op, IValue v2)
 	{
-		if (op == Name.plus)
+		if (op == Names.plus)
 		{
 			return new DoubleValue(v1.doubleValue() + v2.doubleValue());
 		}
-		if (op == Name.minus)
+		if (op == Names.minus)
 		{
 			return new DoubleValue(v1.doubleValue() - v2.doubleValue());
 		}
-		if (op == Name.times)
+		if (op == Names.times)
 		{
 			return new DoubleValue(v1.doubleValue() * v2.doubleValue());
 		}
-		if (op == Name.div)
+		if (op == Names.div)
 		{
 			return new DoubleValue(v1.doubleValue() / v2.doubleValue());
 		}
-		if (op == Name.percent)
+		if (op == Names.percent)
 		{
 			return new DoubleValue(v1.doubleValue() % v2.doubleValue());
 		}

@@ -1,9 +1,0 @@
-package dyvil.lang
-
-using	dyvil.string.CharUtils._
-using	dyvil.string.StringUtils._
-using	dyvil.string.StringConversions._
-using	dyvil.math.MathUtils._
-using	dyvil.random.RandomUtils._
-using	dyvil.io.FileUtils._
-using	dyvil.io.WebUtils._

@@ -6,20 +6,18 @@ import java.util.Iterator;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class EmptyArguments implements IArguments
 {
 	public static final EmptyArguments	VISIBLE		= new EmptyArguments(true);
 	public static final EmptyArguments	INSTANCE	= new EmptyArguments(false);
 	
-	private boolean						visible;
+	private boolean visible;
 	
 	private EmptyArguments()
 	{
@@ -55,7 +53,7 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public IArguments addLastValue(IValue value)
+	public IArguments withLastValue(IValue value)
 	{
 		return new SingleArgument(value);
 	}
@@ -94,37 +92,38 @@ public final class EmptyArguments implements IArguments
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		return null;
+		param.getValue().writeExpression(writer, param.getType());
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
-	{
-		if (defaultValue != null)
-		{
-			defaultValue.writeExpression(writer);
-		}
-	}
-	
-	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(0);
-		writer.writeNewArray(type, 1);
+		writer.writeNewArray(param.getType().getElementType(), 1);
 	}
 	
 	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		return param.getValue() != null ? 3 : 0;
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
 	{
-		return 3;
+	}
+	
+	@Override
+	public float getTypeMatch(int index, IParameter param)
+	{
+		return param.getValue() != null ? DEFAULT_MATCH : 0;
+	}
+	
+	@Override
+	public float getVarargsTypeMatch(int index, IParameter param)
+	{
+		return DEFAULT_MATCH;
 	}
 	
 	@Override

@@ -1,32 +1,33 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class IfStatement extends ASTNode implements IStatement
+public class IfStatement extends AbstractValue
 {
-	public IValue		condition;
-	public IValue		then;
-	public IValue		elseThen;
+	protected IValue	condition;
+	protected IValue	then;
+	protected IValue	elseThen;
 	
-	private IType		commonType;
-	
-	private IStatement	parent;
+	// Metadata
+	private IType commonType;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -70,15 +71,9 @@ public final class IfStatement extends ASTNode implements IStatement
 	}
 	
 	@Override
-	public void setParent(IStatement parent)
+	public boolean isResolved()
 	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
+		return this.commonType != null && this.commonType.isResolved();
 	}
 	
 	@Override
@@ -93,7 +88,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.elseThen != null)
 			{
-				return this.commonType = Types.findCommonSuperType(this.then.getType(), this.elseThen.getType());
+				return this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
 			}
 			return this.commonType = this.then.getType();
 		}
@@ -105,27 +100,33 @@ public final class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.then == null)
 		{
-			return null;
-		}
-		
-		IValue then1 = this.then.withType(type, typeContext, markers, context);
-		if (then1 == null)
-		{
-			return null;
-		}
-		this.then = then1;
-		
-		if (this.elseThen != null)
-		{
-			then1 = this.elseThen.withType(type, typeContext, markers, context);
-			if (then1 == null)
-			{
-				return null;
-			}
-			this.elseThen = then1;
+			return this;
 		}
 		
 		this.commonType = type;
+		IValue value = IType.convertValue(this.then, type, typeContext, markers, context);
+		if (value == null)
+		{
+			Util.createTypeError(markers, this.then, type, typeContext, "if.then.type");
+		}
+		else
+		{
+			this.then = value;
+		}
+		
+		if (this.elseThen != null)
+		{
+			value = IType.convertValue(this.elseThen, type, typeContext, markers, context);
+			if (value == null)
+			{
+				Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
+			}
+			else
+			{
+				this.elseThen = value;
+			}
+		}
+		
 		return this;
 	}
 	
@@ -140,17 +141,20 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			return false;
 		}
-		if (this.elseThen != null && !this.elseThen.isType(type))
-		{
-			return false;
-		}
-		return true;
+		return !(this.elseThen != null && !this.elseThen.isType(type));
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
-		return this.isType(type) ? 3 : 0;
+		if (this.elseThen == null)
+		{
+			return this.then.getTypeMatch(type);
+		}
+		
+		float f1 = this.then.getTypeMatch(type);
+		float f2 = this.elseThen.getTypeMatch(type);
+		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
 	}
 	
 	@Override
@@ -163,21 +167,26 @@ public final class IfStatement extends ASTNode implements IStatement
 		
 		if (this.then != null)
 		{
-			if (this.then.isStatement())
-			{
-				((IStatement) this.then).setParent(this);
-			}
 			this.then.resolveTypes(markers, context);
 		}
 		
 		if (this.elseThen != null)
 		{
-			if (this.elseThen.isStatement())
-			{
-				((IStatement) this.elseThen).setParent(this);
-			}
-			
 			this.elseThen.resolveTypes(markers, context);
+		}
+	}
+	
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.then != null)
+		{
+			this.then.resolveStatement(context, markers);
+		}
+		
+		if (this.elseThen != null)
+		{
+			this.elseThen.resolveStatement(context, markers);
 		}
 	}
 	
@@ -204,11 +213,12 @@ public final class IfStatement extends ASTNode implements IStatement
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, null, markers, context);
+			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = markers.create(this.condition.getPosition(), "if.condition.type");
-				marker.addInfo("Condition Type: " + this.condition.getType());
+				Marker marker = I18n.createMarker(this.condition.getPosition(), "if.condition.type");
+				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
+				markers.add(marker);
 			}
 			else
 			{
@@ -232,7 +242,7 @@ public final class IfStatement extends ASTNode implements IStatement
 		}
 		else
 		{
-			markers.add(this.position, "if.condition.invalid");
+			markers.add(I18n.createMarker(this.position, "if.condition.invalid"));
 		}
 		if (this.then != null)
 		{
@@ -251,19 +261,21 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			if (this.condition.valueTag() == BOOLEAN)
 			{
-				if (((BooleanValue) this.condition).value)
+				if (this.condition.booleanValue())
 				{
 					// Condition is true -> Return the action
 					return this.then.foldConstants();
 				}
 				else if (this.elseThen != null)
 				{
-					// Condition is false, else clause exists -> Return else clause
+					// Condition is false, else clause exists -> Return else
+					// clause
 					return this.elseThen.foldConstants();
 				}
 				else
 				{
-					// Condition is false, no else clause -> Return empty statement (VoidValue)
+					// Condition is false, no else clause -> Return empty
+					// statement (VoidValue)
 					return new VoidValue(this.position);
 				}
 			}
@@ -297,29 +309,34 @@ public final class IfStatement extends ASTNode implements IStatement
 		{
 			this.elseThen = this.elseThen.cleanup(context, compilableList);
 		}
+		
+		if (this.condition.valueTag() == BOOLEAN)
+		{
+			return this.condition.booleanValue() ? this.then : this.elseThen;
+		}
 		return this;
-	}
-	
-	@Override
-	public Label resolveLabel(Name name)
-	{
-		return this.parent == null ? null : this.parent.resolveLabel(name);
 	}
 	
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
-		org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 		Object commonFrameType = this.commonType.getFrameType();
 		
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
-		this.then.writeExpression(writer);
-		writer.getFrame().set(commonFrameType);
-		writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-		writer.writeLabel(elseStart);
+		this.then.writeExpression(writer, this.commonType);
+		
+		if (!writer.hasReturn())
+		{
+			writer.getFrame().set(commonFrameType);
+			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
+		}
+		
+		writer.writeTargetLabel(elseStart);
+		
 		// Else Block
 		if (this.elseThen == null)
 		{
@@ -327,10 +344,15 @@ public final class IfStatement extends ASTNode implements IStatement
 		}
 		else
 		{
-			this.elseThen.writeExpression(writer);
+			this.elseThen.writeExpression(writer, this.commonType);
 		}
-		writer.getFrame().set(commonFrameType);
-		writer.writeLabel(elseEnd);
+		
+		if (!writer.hasReturn())
+		{
+			writer.getFrame().set(commonFrameType);
+		}
+		
+		writer.writeTargetLabel(elseEnd);
 	}
 	
 	@Override
@@ -343,20 +365,20 @@ public final class IfStatement extends ASTNode implements IStatement
 			return;
 		}
 		
-		org.objectweb.asm.Label elseStart = new org.objectweb.asm.Label();
+		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 		
 		if (this.elseThen != null)
 		{
-			org.objectweb.asm.Label elseEnd = new org.objectweb.asm.Label();
+			dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
 			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.writeLabel(elseStart);
+			writer.writeTargetLabel(elseStart);
 			// Else Block
 			this.elseThen.writeStatement(writer);
-			writer.writeLabel(elseEnd);
+			writer.writeTargetLabel(elseEnd);
 		}
 		else
 		{
@@ -364,8 +386,14 @@ public final class IfStatement extends ASTNode implements IStatement
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeStatement(writer);
-			writer.writeLabel(elseStart);
+			writer.writeTargetLabel(elseStart);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override
@@ -384,15 +412,6 @@ public final class IfStatement extends ASTNode implements IStatement
 			
 			if (this.elseThen != null)
 			{
-				if (this.then.isStatement())
-				{
-					buffer.append('\n').append(prefix);
-				}
-				else
-				{
-					buffer.append(' ');
-				}
-				
 				buffer.append(Formatting.Statements.ifElse);
 				this.elseThen.toString(prefix, buffer);
 			}

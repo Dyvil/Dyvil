@@ -1,16 +1,15 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.Array;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class SubscriptGetter extends AbstractCall
 {
@@ -23,8 +22,15 @@ public class SubscriptGetter extends AbstractCall
 	public SubscriptGetter(ICodePosition position, IValue instance)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.arguments = new ArgumentList();
+	}
+	
+	public SubscriptGetter(ICodePosition position, IValue instance, IArguments arguments)
+	{
+		this.position = position;
+		this.receiver = instance;
+		this.arguments = arguments;
 	}
 	
 	@Override
@@ -42,80 +48,69 @@ public class SubscriptGetter extends AbstractCall
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver instanceof ICall && this.arguments instanceof ArgumentList)
+		// false if receiver == null
 		{
-			if (this.instance.valueTag() == FIELD_ACCESS)
+			ICall call = (ICall) this.receiver;
+			
+			// Resolve Receiver if necessary
+			call.resolveReceiver(markers, context);
+			call.resolveArguments(markers, context);
+			
+			IArguments oldArgs = call.getArguments();
+			
+			ArrayExpr array = new ArrayExpr(this.position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
+			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
+			
+			IValue resolvedCall = call.resolveCall(markers, context);
+			if (resolvedCall != null)
 			{
-				FieldAccess fa = (FieldAccess) this.instance;
-				if (fa.instance != null)
-				{
-					fa.instance = fa.instance.resolve(markers, context);
-				}
-				IValue v1 = fa.resolveFieldAccess(markers, context);
-				if (v1 != null)
-				{
-					this.instance = v1;
-					this.arguments.resolve(markers, context);
-				}
-				else
-				{
-					this.arguments.resolve(markers, context);
-					Array array = new Array(((ArgumentList) this.arguments).getValues(), this.arguments.size());
-					array.position = this.arguments.getFirstValue().getPosition().to(this.arguments.getLastValue().getPosition());
-					IArguments arguments = new SingleArgument(array);
-					
-					IMethod m = ICall.resolveMethod(context, fa.instance, fa.name, arguments);
-					if (m != null)
-					{
-						MethodCall mc = new MethodCall(fa.position, fa.instance, fa.name);
-						mc.method = m;
-						mc.arguments = arguments;
-						mc.dotless = fa.dotless;
-						mc.checkArguments(markers, context);
-						return mc;
-					}
-					
-					ICall.addResolveMarker(markers, this.position, fa.instance, fa.name, arguments);
-					return this;
-				}
+				return resolvedCall;
 			}
-			else
+			
+			// Revert
+			call.setArguments(oldArgs);
+			
+			this.receiver = call.resolveCall(markers, context);
+			resolvedCall = this.resolveCall(markers, context);
+			if (resolvedCall != null)
 			{
-				this.instance = this.instance.resolve(markers, context);
-				this.arguments.resolve(markers, context);
+				return resolvedCall;
 			}
-		}
-		else
-		{
-			this.arguments.resolve(markers, context);
+			
+			this.reportResolve(markers, context);
+			return this;
 		}
 		
-		int count = this.arguments.size();
-		ArgumentList argumentList = new ArgumentList(count);
-		for (int i = 0; i < count; i++)
-		{
-			argumentList.addValue(this.arguments.getValue(i, null));
-		}
-		
-		IMethod m = ICall.resolveMethod(context, this.instance, Name.subscript, argumentList);
+		return super.resolve(markers, context);
+	}
+	
+	@Override
+	public IValue resolveCall(MarkerList markers, IContext context)
+	{
+		IMethod m = ICall.resolveMethod(context, this.receiver, Names.subscript, this.arguments);
 		if (m != null)
 		{
-			this.arguments = argumentList;
 			this.method = m;
 			this.checkArguments(markers, context);
 			return this;
 		}
 		
-		ICall.addResolveMarker(markers, position, this.instance, Name.subscript, argumentList);
-		return this;
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript, this.arguments);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString(prefix, buffer);
+			this.receiver.toString(prefix, buffer);
 		}
 		
 		buffer.append('[');

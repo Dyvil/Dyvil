@@ -4,48 +4,44 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.collection.mutable.HashMap;
-import dyvil.collection.mutable.MapBasedSet;
+import dyvil.collection.mutable.ArraySet;
+import dyvil.collection.mutable.HashSet;
+import dyvil.collection.view.SetView;
 
 @NilConvertible
 @ArrayConvertible
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
-	public static <E> MutableSet<E> apply()
+	static <E> MutableSet<E> apply()
 	{
-		return new MapBasedSet<E>(new HashMap<E, Object>());
+		return new HashSet<E>();
 	}
 	
-	public static <E> MutableSet<E> apply(E... elements)
+	static <E> MutableSet<E> apply(E... elements)
 	{
-		HashMap<E, Object> hashMap = new HashMap(elements.length);
-		for (E element : elements)
-		{
-			hashMap.put(element, VALUE);
-		}
-		return new MapBasedSet<E>(hashMap);
+		return new ArraySet(elements, true);
+	}
+	
+	static <E> MutableSet<E> fromArray(E... elements)
+	{
+		return new ArraySet(elements);
 	}
 	
 	// Accessors
 	
 	@Override
-	public int size();
+	int size();
 	
 	@Override
-	public Iterator<E> iterator();
-	
-	@Override
-	public boolean contains(Object element);
+	Iterator<E> iterator();
 	
 	// Non-mutating Operations
 	
 	@Override
-	public default MutableSet<E> $plus(E element)
+	default MutableSet<E> $plus(E element)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$plus$eq(element);
@@ -53,7 +49,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<E> $minus(Object element)
+	default MutableSet<E> $minus(Object element)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$minus$eq(element);
@@ -61,7 +57,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<? extends E> $minus$minus(Collection<?> collection)
+	default MutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$minus$minus$eq(collection);
@@ -69,7 +65,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
+	default MutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$bar$eq(collection);
@@ -77,7 +73,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<? extends E> $amp(Collection<? extends E> collection)
+	default MutableSet<? extends E> $amp(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$amp$eq(collection);
@@ -85,7 +81,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<? extends E> $bar(Collection<? extends E> collection)
+	default MutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$bar$eq(collection);
@@ -93,7 +89,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<? extends E> $up(Collection<? extends E> collection)
+	default MutableSet<? extends E> $up(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.$up$eq(collection);
@@ -101,14 +97,15 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper) {
+	default <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	{
 		MutableSet<R> copy = (MutableSet<R>) this.copy();
 		copy.map((Function) mapper);
 		return copy;
 	}
 	
 	@Override
-	public default <R> MutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	default <R> MutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
 		MutableSet<R> copy = (MutableSet<R>) this.copy();
 		copy.flatMap((Function) mapper);
@@ -116,7 +113,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	public default MutableSet<E> filtered(Predicate<? super E> condition)
+	default MutableSet<E> filtered(Predicate<? super E> condition)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.filter(condition);
@@ -126,51 +123,52 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	@Override
-	public boolean add(E element);
+	boolean add(E element);
 	
 	@Override
-	public boolean remove(Object element);
+	boolean remove(Object element);
 	
 	@Override
-	public void map(Function<? super E, ? extends E> mapper);
+	void map(Function<? super E, ? extends E> mapper);
 	
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
-	@Override
-	public void filter(Predicate<? super E> condition);
-	
-	// toArray
-	
-	@Override
-	public void toArray(int index, Object[] store);
+	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	// Copying
 	
 	@Override
-	public MutableSet<E> copy();
+	MutableSet<E> copy();
 	
 	@Override
-	public default MutableSet<E> mutable()
+	default MutableSet<E> mutable()
 	{
 		return this;
 	}
 	
 	@Override
-	public default MutableSet<E> mutableCopy()
+	default MutableSet<E> mutableCopy()
 	{
 		return this.copy();
 	}
 	
 	@Override
-	public ImmutableSet<E> immutable();
+	<R> MutableSet<R> emptyCopy();
 	
 	@Override
-	public default ImmutableSet<E> immutableCopy()
+	ImmutableSet<E> immutable();
+	
+	@Override
+	default ImmutableSet<E> immutableCopy()
 	{
 		return this.immutable();
+	}
+	
+	@Override
+	default ImmutableSet<E> view()
+	{
+		return new SetView(this);
 	}
 }

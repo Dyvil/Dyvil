@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-
-import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -14,20 +12,23 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IRawType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class WildcardType implements IType, ITyped
+public final class WildcardType implements IRawType, ITyped
 {
 	public ICodePosition	position;
 	protected IType			bound;
@@ -76,6 +77,12 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public Name getName()
 	{
 		return null;
@@ -114,7 +121,7 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
-	public boolean equals(IType type)
+	public boolean isSameType(IType type)
 	{
 		if (this.bound != null)
 		{
@@ -126,7 +133,21 @@ public final class WildcardType implements IType, ITyped
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.equals(type);
+		return this.isSameType(type);
+	}
+	
+	@Override
+	public int getSubClassDistance(IType subtype)
+	{
+		int i = subtype.getTheClass().getSuperTypeDistance(this);
+		return i == 0 ? 0 : i + 100;
+	}
+	
+	@Override
+	public float getSubTypeDistance(IType subtype)
+	{
+		int i = subtype.getTheClass().getSuperTypeDistance(this);
+		return i == 0 ? 0 : i + 100;
 	}
 	
 	@Override
@@ -136,20 +157,64 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		if (this.bound != null)
 		{
-			this.bound = this.bound.resolve(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+			this.bound = this.bound.resolveType(markers, context);
+		}
+		
+		return this;
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		if (this.bound != null)
+		{
+			this.bound.resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+		if (this.bound != null)
+		{
+			this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 		
 		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
-			markers.add(this.position, "type.invalid.wildcard");
-			return this.bound == null ? Types.ANY : this.bound;
+			markers.add(I18n.createMarker(this.position, "type.invalid.wildcard"));
 		}
-		
-		return this;
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.bound != null)
+		{
+			this.bound.check(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		if (this.bound != null)
+		{
+			this.bound.foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.bound != null)
+		{
+			this.bound.cleanup(context, compilableList);
+		}
 	}
 	
 	@Override
@@ -159,7 +224,7 @@ public final class WildcardType implements IType, ITyped
 		{
 			return this.bound.resolveType(typeVar);
 		}
-		return Types.ANY;
+		return null;
 	}
 	
 	@Override
@@ -202,7 +267,7 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
@@ -211,7 +276,7 @@ public final class WildcardType implements IType, ITyped
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
@@ -295,27 +360,27 @@ public final class WildcardType implements IType, ITyped
 			writer.writeInsn(Opcodes.ACONST_NULL);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/WildcardType", "apply",
-				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/type/WildcardType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/WildcardType", "apply",
+				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/types/WildcardType;", false);
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
 		if (this.bound == null)
 		{
-			dos.writeByte(0);
+			out.writeByte(0);
 			return;
 		}
 		
-		dos.writeByte(this.variance.ordinal());
-		IType.writeType(this.bound, dos);
+		out.writeByte(this.variance.ordinal());
+		IType.writeType(this.bound, out);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		byte b = dis.readByte();
+		byte b = in.readByte();
 		switch (b)
 		{
 		case 0:
@@ -328,7 +393,7 @@ public final class WildcardType implements IType, ITyped
 			break;
 		}
 		
-		this.bound = IType.readType(dis);
+		this.bound = IType.readType(in);
 	}
 	
 	@Override
@@ -344,7 +409,9 @@ public final class WildcardType implements IType, ITyped
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		this.toString("", sb);
+		sb.append('_');
+		this.variance.appendInfix(sb);
+		sb.append(this.bound);
 		return sb.toString();
 	}
 	
@@ -357,5 +424,17 @@ public final class WildcardType implements IType, ITyped
 			this.variance.appendInfix(buffer);
 			this.bound.toString(prefix, buffer);
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this.bound == null ? false : this.bound.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.bound == null ? 0 : 31 * this.bound.hashCode();
 	}
 }

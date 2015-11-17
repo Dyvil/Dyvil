@@ -6,19 +6,21 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import dyvil.lang.Int;
-import dyvil.lang.Matrix;
 
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
+import dyvil.collection.Matrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.tuple.Tuple2;
 
 public class ArrayMatrix<E> implements ImmutableMatrix<E>
 {
-	private int			rows;
-	private int			columns;
+	private static final long serialVersionUID = 7258516530768096953L;
 	
-	private Object[][]	cells;
+	private int	rows;
+	private int	columns;
+	
+	private Object[][] cells;
 	
 	public ArrayMatrix(E[]... cells)
 	{
@@ -124,8 +126,8 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	{
 		return new Iterator<E>()
 		{
-			private int	row;
-			private int	column;
+			private int row;
+			private int column;
 			
 			@Override
 			public boolean hasNext()

@@ -6,7 +6,7 @@ import dyvil.lang.ref.IntRef;
 @IntConvertible
 public class SimpleIntRef implements IntRef
 {
-	public int	value;
+	public int value;
 	
 	public static SimpleIntRef apply(int value)
 	{

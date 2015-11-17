@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.IGeneric;
@@ -9,36 +10,37 @@ import dyvil.tools.compiler.ast.generic.type.GenericType;
 import dyvil.tools.compiler.ast.generic.type.InternalGenericType;
 import dyvil.tools.compiler.ast.generic.type.InternalTypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
-import dyvil.tools.compiler.ast.type.*;
-
-import org.objectweb.asm.Opcodes;
+import dyvil.tools.compiler.ast.type.ArrayType;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.parsing.Name;
 
 public final class ClassFormat
 {
-	public static final int		H_GETFIELD			= Opcodes.H_GETFIELD;
-	public static final int		H_GETSTATIC			= Opcodes.H_GETSTATIC;
-	public static final int		H_PUTFIELD			= Opcodes.H_PUTFIELD;
-	public static final int		H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
-	public static final int		H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
-	public static final int		H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
-	public static final int		H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
-	public static final int		H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
-	public static final int		H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
+	public static final int	H_GETFIELD			= Opcodes.H_GETFIELD;
+	public static final int	H_GETSTATIC			= Opcodes.H_GETSTATIC;
+	public static final int	H_PUTFIELD			= Opcodes.H_PUTFIELD;
+	public static final int	H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
+	public static final int	H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
+	public static final int	H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
+	public static final int	H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
+	public static final int	H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
+	public static final int	H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
 	
-	public static final int		T_BOOLEAN			= 4;
-	public static final int		T_CHAR				= 5;
-	public static final int		T_FLOAT				= 6;
-	public static final int		T_DOUBLE			= 7;
-	public static final int		T_BYTE				= 8;
-	public static final int		T_SHORT				= 9;
-	public static final int		T_INT				= 10;
-	public static final int		T_LONG				= 11;
+	public static final int	T_BOOLEAN	= 4;
+	public static final int	T_CHAR		= 5;
+	public static final int	T_FLOAT		= 6;
+	public static final int	T_DOUBLE	= 7;
+	public static final int	T_BYTE		= 8;
+	public static final int	T_SHORT		= 9;
+	public static final int	T_INT		= 10;
+	public static final int	T_LONG		= 11;
 	
-	public static final int		ACC_SUPER			= Opcodes.ACC_SUPER;
+	public static final int ACC_SUPER = Opcodes.ACC_SUPER;
 	
 	public static final Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
 	public static final Integer	NULL				= Opcodes.NULL;
@@ -60,6 +62,11 @@ public final class ClassFormat
 	public static String internalToPackage(String internal)
 	{
 		return internal.replace('/', '.');
+	}
+	
+	public static String internalToExtended(String internal)
+	{
+		return 'L' + internal + ';';
 	}
 	
 	public static String extendedToInternal(String extended)
@@ -126,7 +133,7 @@ public final class ClassFormat
 	
 	public static IType readReturnType(String desc)
 	{
-		return readType(desc, desc.lastIndexOf(')') + 1, desc.length());
+		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1);
 	}
 	
 	public static void readClassSignature(String desc, IClass iclass)
@@ -143,10 +150,10 @@ public final class ClassFormat
 		}
 		
 		int len = desc.length();
-		i = readTyped(desc, i, iclass);
+		i = readTyped(desc, i, iclass::setSuperType);
 		while (i < len)
 		{
-			i = readTyped(desc, i, t -> iclass.addInterface(t));
+			i = readTyped(desc, i, iclass::addInterface);
 		}
 	}
 	
@@ -163,7 +170,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTypeList(desc, i, method);
+			i = readTyped(desc, i, method::addType);
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -181,7 +188,7 @@ public final class ClassFormat
 		int i = 1;
 		while (desc.charAt(i) != ')')
 		{
-			i = readTypeList(desc, i, constructor);
+			i = readTyped(desc, i, constructor::addType);
 		}
 		i += 2;
 		
@@ -192,35 +199,41 @@ public final class ClassFormat
 		}
 	}
 	
+	public static void readExceptions(String[] exceptions, IExceptionList exceptionList)
+	{
+		for (String s : exceptions)
+		{
+			exceptionList.addException(internalToType(s));
+		}
+	}
+	
 	private static IType readType(String desc, int start, int end)
 	{
-		int array = 0;
-		while (desc.charAt(start) == '[')
+		if (desc.charAt(start) == '[')
 		{
-			array++;
-			start++;
+			return new ArrayType(readType(desc, start + 1, end));
 		}
 		
 		switch (desc.charAt(start))
 		{
 		case 'V':
-			return ArrayType.getArrayType(Types.VOID, array);
+			return Types.VOID;
 		case 'Z':
-			return ArrayType.getArrayType(Types.BOOLEAN, array);
+			return Types.BOOLEAN;
 		case 'B':
-			return ArrayType.getArrayType(Types.BYTE, array);
+			return Types.BYTE;
 		case 'S':
-			return ArrayType.getArrayType(Types.SHORT, array);
+			return Types.SHORT;
 		case 'C':
-			return ArrayType.getArrayType(Types.CHAR, array);
+			return Types.CHAR;
 		case 'I':
-			return ArrayType.getArrayType(Types.INT, array);
+			return Types.INT;
 		case 'J':
-			return ArrayType.getArrayType(Types.LONG, array);
+			return Types.LONG;
 		case 'F':
-			return ArrayType.getArrayType(Types.FLOAT, array);
+			return Types.FLOAT;
 		case 'D':
-			return ArrayType.getArrayType(Types.DOUBLE, array);
+			return Types.DOUBLE;
 		case 'T':
 			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case 'L':
@@ -239,7 +252,7 @@ public final class ClassFormat
 			
 			while (desc.charAt(index) != '>')
 			{
-				index = readTypeList(desc, index, type);
+				index = readTyped(desc, index, type);
 			}
 			return type;
 		}
@@ -331,90 +344,6 @@ public final class ClassFormat
 		return start;
 	}
 	
-	private static int readTypeList(String desc, int start, ITypeList list)
-	{
-		int array = 0;
-		char c;
-		while ((c = desc.charAt(start)) == '[')
-		{
-			array++;
-			start++;
-		}
-		
-		switch (c)
-		{
-		case 'V':
-			list.addType(ArrayType.getArrayType(Types.VOID, array));
-			return start + 1;
-		case 'Z':
-			list.addType(ArrayType.getArrayType(Types.BOOLEAN, array));
-			return start + 1;
-		case 'B':
-			list.addType(ArrayType.getArrayType(Types.BYTE, array));
-			return start + 1;
-		case 'C':
-			list.addType(ArrayType.getArrayType(Types.CHAR, array));
-			return start + 1;
-		case 'S':
-			list.addType(ArrayType.getArrayType(Types.SHORT, array));
-			return start + 1;
-		case 'I':
-			list.addType(ArrayType.getArrayType(Types.INT, array));
-			return start + 1;
-		case 'J':
-			list.addType(ArrayType.getArrayType(Types.LONG, array));
-			return start + 1;
-		case 'F':
-			list.addType(ArrayType.getArrayType(Types.FLOAT, array));
-			return start + 1;
-		case 'D':
-			list.addType(ArrayType.getArrayType(Types.DOUBLE, array));
-			return start + 1;
-		case 'L':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			IType type = readReferenceType(desc, start + 1, end1);
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			list.addType(type);
-			return end1 + 1;
-		}
-		case 'T':
-		{
-			int end1 = desc.indexOf(';', start);
-			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			list.addType(type);
-			return end1 + 1;
-		}
-		case '*':
-			list.addType(new WildcardType(Variance.INVARIANT));
-			return start + 1;
-		case '+':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType(Variance.COVARIANT);
-			var.setType(readType(desc, start + 1, end1));
-			list.addType(var);
-			return end1 + 1;
-		}
-		case '-':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			var.setType(readType(desc, start + 1, end1));
-			list.addType(var);
-			return end1 + 1;
-		}
-		}
-		return start;
-	}
-	
 	private static int readGeneric(String desc, int start, IGeneric generic)
 	{
 		int index = desc.indexOf(':', start);
@@ -427,7 +356,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(index) == ':')
 		{
-			index = readTypeList(desc, index + 1, typeVar);
+			index = readTyped(desc, index + 1, typeVar::addUpperBound);
 		}
 		generic.addTypeVariable(typeVar);
 		return index;

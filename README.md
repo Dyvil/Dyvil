@@ -1,53 +1,30 @@
 The Dyvil programming language
 ==============================
 
-Dyvil (Dynamic Visual / Virtual Language) is a programming language that is based on Java and the JVM, but extends the language with several new language features including operator overloading, function types, tuples and many more.
+[![Build Status](https://drone.io/github.com/Dyvil/Dyvil/status.png)](https://drone.io/github.com/Dyvil/Dyvil/latest)
+[![Join the chat at https://gitter.im/Clashsoft/Dyvil](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Clashsoft/Dyvil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![In Progress](https://badge.waffle.io/Dyvil/Dyvil.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/Dyvil/Dyvil)
+[![Ready](https://badge.waffle.io/Dyvil/Dyvil.svg?label=ready&title=Ready)](http://waffle.io/Dyvil/Dyvil)
 
-### General
+Dyvil is a multi-paradigm, general purpose programming language that is based on Java and the JVM. It extends the language with several new features including operator overloading, function types, tuples and many more.
 
-- Semicolon Inference
-- Headers for include declarations and operator definitions
+Dyvil is a C-descendant object-oriented programming language with functional and imperative elements. Some of the language's aims are:
 
-### Import Declarations
+- to **enhance** Java with modern programming language elements
+- to **avoid** common boilerplate code
+- to **give** the programmer full **control** over the syntax and semantics of his or her code
+- to be fully **compatible** and **inter-operable** with Java and other JVM languages (e.g. Scala, Groovy, etc.)
 
-- Multi-Imports: `import java.util.{ Math, Random }`
-- Import aliases: `import java.lang.String => jString` ... `jString s = "..."`
-- 'Using' for static imports: `using java.util.Math.PI`
-- 'Include' for headers
+[![Throughput Graph](https://graphs.waffle.io/Dyvil/Dyvil/throughput.svg)](https://waffle.io/Dyvil/Dyvil/metrics)
 
-### Class Structure
+###▶ [Feature Overview](https://github.com/Dyvil/Dyvil/wiki/Language-Features)
 
-- Local Type Inference: `var i = 10` -> `int i = 10`, `String s = if (...) "a" else "b"`
-- Operator overloading: `3 + 3` -> `3.+(3)` ... `this.add(that)` -> `this.+(that)` -> `this + that`
-- Custom Operators: `infix operator +- { left, 130 }`
-- Postfix Methods: `postfix void print(String s) = println s` ... `"test" print`
-- Infix Methods: `infix int +-(int i, int j) = i + -j` ... `int i = 10 +- 1`
-- Prefix Methods: `class Int { prefix int -() = ... }`
-- Properties: `private String s_; private String s { get: return s_; set: s_ = s; }` ... `this.s = "Hello World"` -> `this.set$s("Hello World")`
-- More modifiers:
- - `lazy int i = notStored()` (lazily evaluated variables)
- - `public void foo(ref int i)` (call-by-reference)
- - `derived float f;` (sub-classes, but not package)
- - `inline void l()` (force inline)
- - `sealed class Utils` (private to library)
- - `functional interface IInterface` (@FunctionalInterface for lambda expressions)
- - `override void toString()`(@Override shortcut)
+###▶ [Language Reference](https://dyvil.gitbooks.io/dyvil-language-reference/content/)
 
-### Expressions
+###▶ [Tutorials](https://github.com/Dyvil/Dyvil/wiki#tutorials)
 
-- 'Everything is an expression'
-- Omitting the dot when accessing a field: `this.x = 5` -> `this x = 5`
-- Omitting the dot and parenthesis when calling a method: `System.out.println(i)` -> `System out println i`
-- Apply and Update methods: `[int] x = ...; x(y)` -> `x.apply(y)`, `x(y) = z` -> `x.update(y, z)`
-- Format Strings: `var s = "Strings"; @"Format \(s)"`
-- Tuples: `new Tuple2("hello", "world")` -> `("hello", "world")`
-- Sugar Function Types: `Function<String, Integer>` -> `(String) => Integer`
-- Lambda Expressions: `Strings => String fun = s => s toUpperCase`
-- More ways to control your loops: `for (int i : array) { ... /* what's the index? */ }` -> `for (int i : array) { println $index }`
-- Ranges: `for (var i : 1 .. 10) println i` prints all numbers from 1 to 10 (inclusive)
+###▶ [Contribution](https://github.com/Dyvil/Dyvil/wiki#contribution)
 
-### Special Language Constructs
+###▶ [Dyvil Installer](https://github.com/Dyvil/Dyvil-Installer)
 
-- Method Invocation Bytecode Substitutes: `3.+(3)` does not get translated to a method call to `dyvil.lang.Int.$plus(int)`, but to the direct `iadd` bytecode instruction
-- Bytecode Expressions: `return 1 + 2` -> `@ { iconst_1; iconst_2; iadd; ireturn; }`
-- Literal Convertibles: Classes with special Annotations that can be instantiated with literals (numbers, Strings, Arrays, Tuples, `nil`, Booleans)
+###▶ [Dyvil on Reddit](https://www.reddit.com/r/Dyvil/)

@@ -2,33 +2,33 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.statement.ForStatement;
-import dyvil.tools.compiler.ast.statement.foreach.ForEachStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.ast.statement.loop.ForEachStatement;
+import dyvil.tools.compiler.ast.statement.loop.ForStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.token.IToken;
 
-public class ForStatementParser extends Parser implements IValued
+public class ForStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	FOR				= 1;
-	public static final int	TYPE			= 2;
-	public static final int	VARIABLE		= 4;
-	public static final int	SEPERATOR		= 8;
-	public static final int	VARIABLE_END	= 16;
-	public static final int	CONDITION_END	= 32;
-	public static final int	FOR_END			= 64;
-	public static final int	STATEMENT		= 128;
-	public static final int	STATEMENT_END	= 256;
+	private static final int	FOR				= 1;
+	private static final int	FOR_START		= 2;
+	private static final int	TYPE			= 4;
+	private static final int	VARIABLE		= 8;
+	private static final int	SEPERATOR		= 16;
+	private static final int	VARIABLE_END	= 32;
+	private static final int	CONDITION_END	= 64;
+	private static final int	FOR_END			= 128;
+	private static final int	STATEMENT		= 256;
+	private static final int	STATEMENT_END	= 512;
 	
-	public IValueConsumer	field;
+	protected IValueConsumer field;
 	
+	private ICodePosition	position;
 	private Variable		variable;
 	private IValue			update;
 	private IValue			condition;
@@ -41,133 +41,138 @@ public class ForStatementParser extends Parser implements IValued
 		this.mode = FOR;
 	}
 	
-	@Override
-	public void reset()
+	public ForStatementParser(IValueConsumer field, ICodePosition position)
 	{
-		this.mode = FOR;
+		this.field = field;
+		this.position = position;
+		this.mode = FOR_START;
 	}
 	
 	private IValue makeForStatement()
 	{
+		if (this.variable != null && this.variable.getType() == null)
+		{
+			this.variable = null;
+		}
+		
 		if (this.forEach)
 		{
-			return new ForEachStatement(this.variable, this.action);
+			return new ForEachStatement(this.position, this.variable, this.action);
 		}
-		return new ForStatement(this.variable, this.condition, this.update, this.action);
+		return new ForStatement(this.position, this.variable, this.condition, this.update, this.action);
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == FOR)
+		switch (this.mode)
 		{
-			this.mode = TYPE;
-			if (type == Symbols.OPEN_PARENTHESIS)
+		case FOR:
+			this.mode = FOR_START;
+			if (type != DyvilKeywords.FOR)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid For Statement - 'for' expected");
 			}
-			throw new SyntaxError(token, "Invalid For Statement - '(' expected", true);
-		}
-		if (this.mode == TYPE)
-		{
-			if (type == Symbols.SEMICOLON)
+			return;
+		case FOR_START:
+			this.mode = TYPE;
+			if (type != BaseSymbols.OPEN_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "Invalid For Statement - '(' expected");
+			}
+			return;
+		case TYPE:
+			if (type == BaseSymbols.SEMICOLON)
 			{
 				// Condition
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = CONDITION_END;
 				return;
 			}
-			
 			this.variable = new Variable();
-			pm.pushParser(new TypeParser(this.variable), true);
+			pm.pushParser(pm.newTypeParser(this.variable), true);
 			this.mode = VARIABLE;
 			return;
-		}
-		if (this.mode == VARIABLE)
-		{
+		case VARIABLE:
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.variable.name = token.nameValue();
-				this.variable.position = token.raw();
+				this.variable.setName(token.nameValue());
+				this.variable.setPosition(token.raw());
 				return;
 			}
-			
-			throw new SyntaxError(token, "Invalid For statement - Variable Name expected", true);
-		}
-		if (this.mode == SEPERATOR)
-		{
-			if (type == Symbols.COLON)
+			pm.reparse();
+			pm.report(token, "Invalid For statement - Variable Name expected");
+			return;
+		case SEPERATOR:
+			if (type == BaseSymbols.COLON)
 			{
 				this.mode = FOR_END;
 				this.forEach = true;
-				pm.pushParser(new ExpressionParser(this.variable));
+				pm.pushParser(pm.newExpressionParser(this.variable));
+				return;
+			}
+			this.mode = VARIABLE_END;
+			if (type == BaseSymbols.EQUALS)
+			{
+				pm.pushParser(pm.newExpressionParser(this.variable));
+				return;
+			}
+			pm.reparse();
+			pm.report(token, "Invalid For Statement - ';' or ':' expected");
+			return;
+		case VARIABLE_END:
+			this.mode = CONDITION_END;
+			if (type == BaseSymbols.SEMICOLON)
+			{
+				if (token.next().type() == BaseSymbols.SEMICOLON)
+				{
+					return;
+				}
+				
+				pm.pushParser(pm.newExpressionParser(this));
+				return;
+			}
+			pm.reparse();
+			pm.report(token, "Invalid for statement - ';' expected");
+			return;
+		case CONDITION_END:
+			this.mode = FOR_END;
+			if (type != BaseSymbols.SEMICOLON)
+			{
+				pm.reparse();
+				pm.report(token, "Invalid for statement - ';' expected");
 				return;
 			}
 			
-			this.mode = VARIABLE_END;
-			if (type == Symbols.EQUALS)
+			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
-				pm.pushParser(new ExpressionParser(this.variable));
-				return;
+				pm.pushParser(pm.newExpressionParser(this));
 			}
-			throw new SyntaxError(token, "Invalid For Statement - ';' or ':' expected", true);
-		}
-		if (this.mode == VARIABLE_END)
-		{
-			this.mode = CONDITION_END;
-			if (type == Symbols.SEMICOLON)
-			{
-				if (token.next().type() == Symbols.SEMICOLON)
-				{
-					return;
-				}
-				
-				pm.pushParser(new ExpressionParser(this));
-				return;
-			}
-			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
-		}
-		if (this.mode == CONDITION_END)
-		{
-			this.mode = FOR_END;
-			if (type == Symbols.SEMICOLON)
-			{
-				if (token.next().type() == Symbols.SEMICOLON)
-				{
-					return;
-				}
-				
-				pm.pushParser(new ExpressionParser(this));
-				return;
-			}
-			throw new SyntaxError(token, "Invalid for statement - ';' expected", true);
-		}
-		if (this.mode == FOR_END)
-		{
+			
+			return;
+		case FOR_END:
 			this.mode = STATEMENT;
-			if (type == Symbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid for statement - ')' expected");
 			}
-			throw new SyntaxError(token, "Invalid for statement - ')' expected", true);
-		}
-		if (this.mode == STATEMENT)
-		{
+			return;
+		case STATEMENT:
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
 			{
 				pm.popParser(true);
 				this.field.setValue(this.makeForStatement());
 				return;
 			}
-			
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = STATEMENT_END;
 			return;
-		}
-		if (this.mode == STATEMENT_END)
-		{
+		case STATEMENT_END:
 			pm.popParser(true);
 			this.field.setValue(this.makeForStatement());
 			return;
@@ -177,34 +182,27 @@ public class ForStatementParser extends Parser implements IValued
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == VARIABLE_END)
+		switch (this.mode)
 		{
-			this.variable.value = value;
-		}
-		else if (this.mode == CONDITION_END)
-		{
+		case VARIABLE_END:
+			this.variable.setValue(value);
+			return;
+		case CONDITION_END:
 			this.condition = value;
-		}
-		else if (this.mode == FOR_END)
-		{
+			return;
+		case FOR_END:
 			if (this.forEach)
 			{
-				this.variable.value = value;
+				this.variable.setValue(value);
 			}
 			else
 			{
 				this.update = value;
 			}
-		}
-		else if (this.mode == STATEMENT_END)
-		{
+			return;
+		case STATEMENT_END:
 			this.action = value;
+			return;
 		}
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
 	}
 }

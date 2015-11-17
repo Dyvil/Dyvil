@@ -1,67 +1,22 @@
 package dyvil.tools.compiler.ast.operator;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.expression.*;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.StringConcatExpr;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 
-import static dyvil.tools.compiler.ast.member.Name.*;
 import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_NONE;
 
 public interface Operators
 {
-	public static final int					PREFIX			= 1000;
+	Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
 	
-	public static final Map<Name, Operator>	map				= new IdentityHashMap();
-	
-	public static final Operator			PREFIX_MINUS	= new Operator(Name.minus, PREFIX);
-	public static final Operator			PREFIX_TILDE	= new Operator(Name.tilde, PREFIX);
-	public static final Operator			PREFIX_BANG		= new Operator(Name.bang, PREFIX);
-	
-	public static final Operator			BOOL_OR			= new Operator(Name.barbar, 10, INFIX_LEFT);
-	public static final Operator			BOOL_AND		= new Operator(Name.ampamp, 20, INFIX_LEFT);
-	public static final Operator			OR				= new Operator(Name.bar, 30, INFIX_LEFT);
-	public static final Operator			XOR				= new Operator(Name.up, 40, INFIX_LEFT);
-	public static final Operator			AND				= new Operator(Name.amp, 50, INFIX_LEFT);
-	
-	public static final Operator			EQ				= new Operator(Name.eqeq, 60, INFIX_LEFT);
-	public static final Operator			NE				= new Operator(Name.bangeq, 60, INFIX_LEFT);
-	public static final Operator			IS				= new Operator(Name.eqeqeq, 60, INFIX_LEFT);
-	public static final Operator			ISNOT			= new Operator(Name.bangeqeq, 60, INFIX_LEFT);
-	public static final Operator			SWAP			= new Operator(Name.coloneqcolon, 60, INFIX_LEFT);
-	
-	public static final Operator			LESS			= new Operator(Name.lt, 70, INFIX_LEFT);
-	public static final Operator			LESSEQ			= new Operator(Name.lteq, 70, INFIX_LEFT);
-	public static final Operator			GREATER			= new Operator(Name.gt, 70, INFIX_LEFT);
-	public static final Operator			GREATEREQ		= new Operator(Name.gteq, 70, INFIX_LEFT);
-	
-	public static final Operator			LSHIFT			= new Operator(Name.ltlt, 100, INFIX_LEFT);
-	public static final Operator			RSHIFT			= new Operator(Name.gtgt, 100, INFIX_LEFT);
-	public static final Operator			URSHIFT			= new Operator(Name.gtgtgt, 100, INFIX_LEFT);
-	
-	public static final Operator			PLUS			= new Operator(Name.plus, 90, INFIX_LEFT);
-	public static final Operator			MINUS			= new Operator(Name.minus, 90, INFIX_LEFT);
-	public static final Operator			TIMES			= new Operator(Name.times, 100, INFIX_LEFT);
-	public static final Operator			DIV				= new Operator(Name.div, 100, INFIX_LEFT);
-	public static final Operator			MOD				= new Operator(Name.percent, 100, INFIX_LEFT);
-	public static final Operator			BSLASH			= new Operator(Name.bslash, 100, INFIX_LEFT);
-	
-	public static final Operator			RARROW			= new Operator(Name.minusgt, 200, INFIX_LEFT);
-	public static final Operator			LARROW			= new Operator(Name.ltminus, 200, INFIX_LEFT);
-	public static final Operator			DOTDOT			= new Operator(Name.dotdot, 200, INFIX_NONE);
-	
-	public static int index(Name name)
+	static IValue getPriority(Name name, IValue arg1)
 	{
-		return 0;
-	}
-	
-	public static IValue getPriority(Name name, IValue arg1)
-	{
-		if (name == bang)
+		if (name == Names.bang)
 		{
 			if (arg1.isType(Types.BOOLEAN))
 			{
@@ -71,9 +26,9 @@ public interface Operators
 		return null;
 	}
 	
-	public static IValue getPriority(IValue arg1, Name name, IValue arg2)
+	static IValue getPriority(IValue arg1, Name name, IValue arg2)
 	{
-		if (name == eqeq || name == eqeqeq)
+		if (name == Names.eqeq || name == Names.eqeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
 			{
@@ -85,7 +40,7 @@ public interface Operators
 			}
 			return null;
 		}
-		if (name == bangeq || name == bangeqeq)
+		if (name == Names.bangeq || name == Names.bangeqeq)
 		{
 			if (arg2.valueTag() == IValue.NULL)
 			{
@@ -99,38 +54,59 @@ public interface Operators
 		return null;
 	}
 	
-	public static IValue get(IValue arg1, Name name, IValue arg2)
+	static IValue get(IValue arg1, Name name, IValue arg2)
 	{
-		if (name == plus)
+		if (name == Names.plus)
 		{
 			if (arg1.valueTag() == IValue.STRINGBUILDER)
 			{
-				StringBuilderExpression sbe = (StringBuilderExpression) arg1;
+				StringConcatExpr sbe = (StringConcatExpr) arg1;
 				sbe.addValue(arg2);
 				return sbe;
 			}
 			if (arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL || arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL)
 			{
-				StringBuilderExpression sbe = new StringBuilderExpression();
+				StringConcatExpr sbe = new StringConcatExpr();
 				sbe.addValue(arg1);
 				sbe.addValue(arg2);
 				return sbe;
 			}
 		}
-		if (name == dotdot)
+		if (name == Names.pluseq)
 		{
-			if (arg1.isType(RangeOperator.ORDERED) && arg2.isType(RangeOperator.ORDERED))
+			if (arg1.valueTag() != IValue.FIELD_ACCESS || !arg1.isType(Types.STRING))
 			{
-				return new RangeOperator(arg1, arg2);
+				return null;
 			}
-			if (arg1.isType(Types.STRING) && arg2.isType(Types.STRING))
+			if (arg2.valueTag() == IValue.STRINGBUILDER)
 			{
-				return new RangeOperator(arg1, arg2, Types.STRING);
+				StringConcatExpr sbe = (StringConcatExpr) arg2;
+				sbe.addFirstValue(arg1);
 			}
-			return null;
+			else
+			{
+				StringConcatExpr sbe = new StringConcatExpr();
+				sbe.addValue(arg1);
+				sbe.addValue(arg2);
+				arg2 = sbe;
+			}
+			
+			FieldAccess fa = (FieldAccess) arg1;
+			return new FieldAssignment(null, fa.getInstance(), fa.getField(), arg2);
+		}
+		boolean openRange = false;
+		if (name == Names.dotdot || (openRange = name == Names.dotdotlt))
+		{
+			RangeOperator rangeOperator = null;
+			if (arg1.isType(RangeOperator.LazyFields.RANGEABLE) && arg2.isType(RangeOperator.LazyFields.RANGEABLE))
+			{
+				rangeOperator = new RangeOperator(arg1, arg2);
+				rangeOperator.setHalfOpen(openRange);
+			}
+			return rangeOperator;
 		}
 		// Swap Operator
-		if (name == coloneqcolon)
+		if (name == Names.coloneqcolon)
 		{
 			if (arg1.valueTag() == IValue.FIELD_ACCESS && arg2.valueTag() == IValue.FIELD_ACCESS)
 			{
@@ -138,7 +114,7 @@ public interface Operators
 			}
 			return null;
 		}
-		if (name == ampamp)
+		if (name == Names.ampamp)
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
@@ -146,44 +122,13 @@ public interface Operators
 			}
 			return null;
 		}
-		if (name == barbar)
+		if (name == Names.barbar)
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
 			{
 				return new OrOperator(arg1, arg2);
 			}
 			return null;
-		}
-		return null;
-	}
-	
-	public static MatchExpression getMatchExpression(IValue arg1, IValue arg2)
-	{
-		if (arg2.valueTag() == IValue.STATEMENT_LIST)
-		{
-			IValueList list = (IValueList) arg2;
-			int len = list.valueCount();
-			CaseExpression[] cases = new CaseExpression[len];
-			for (int i = 0; i < len; i++)
-			{
-				IValue v = list.getValue(i);
-				if (v.valueTag() != IValue.CASE_STATEMENT)
-				{
-					// All values have to be patterns.
-					return null;
-				}
-				
-				cases[i] = (CaseExpression) v;
-				cases[i].setMatchCase();
-			}
-			
-			return new MatchExpression(arg1, cases);
-		}
-		if (arg2.valueTag() == IValue.CASE_STATEMENT)
-		{
-			CaseExpression cs = (CaseExpression) arg2;
-			cs.setMatchCase();
-			return new MatchExpression(arg1, new CaseExpression[] { cs });
 		}
 		return null;
 	}

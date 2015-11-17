@@ -4,11 +4,31 @@ import dyvil.tools.compiler.ast.expression.IValue;
 
 public interface IProperty extends IField
 {
-	public void setGetter(IValue get);
+	// Getter
 	
-	public IValue getGetter();
+	boolean hasGetter();
 	
-	public void setSetter(IValue set);
+	void setGetterModifiers(int modifiers);
 	
-	public IValue getSetter();
+	void addGetterModifier(int modifier);
+	
+	int getGetterModifiers();
+	
+	void setGetter(IValue get);
+	
+	IValue getGetter();
+	
+	// Setter
+	
+	boolean hasSetter();
+	
+	void setSetterModifiers(int modifiers);
+	
+	void addSetterModifier(int modifier);
+	
+	int getSetterModifiers();
+	
+	void setSetter(IValue set);
+	
+	IValue getSetter();
 }

@@ -8,14 +8,14 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NullValue implements IConstantValue
 {
-	private static NullValue	NULL;
+	private static NullValue NULL;
 	
-	private ICodePosition		position;
+	private ICodePosition position;
 	
 	public NullValue()
 	{
@@ -48,6 +48,12 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public boolean isPrimitive()
 	{
 		return false;
@@ -72,8 +78,12 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
+		if (type == Types.NULL)
+		{
+			return 1;
+		}
 		return type.isPrimitive() ? 0 : 2;
 	}
 	

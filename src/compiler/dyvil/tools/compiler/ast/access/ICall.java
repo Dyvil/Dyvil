@@ -1,45 +1,72 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.lang.List;
-
-import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface ICall extends IValue
 {
-	public void setArguments(IArguments arguments);
+	void setArguments(IArguments arguments);
 	
-	public IArguments getArguments();
+	IArguments getArguments();
 	
-	public static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
+	@Override
+	default IValue resolve(MarkerList markers, IContext context)
+	{
+		this.resolveReceiver(markers, context);
+		this.resolveArguments(markers, context);
+		IValue v = this.resolveCall(markers, context);
+		if (v != null)
+		{
+			return v;
+		}
+		
+		this.reportResolve(markers, context);
+		return this;
+	}
+	
+	void checkArguments(MarkerList markers, IContext context);
+	
+	IValue resolveCall(MarkerList markers, IContext context);
+	
+	default void resolveReceiver(MarkerList markers, IContext context)
+	{
+	}
+	
+	void resolveArguments(MarkerList markers, IContext context);
+	
+	void reportResolve(MarkerList markers, IContext context);
+	
+	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
-			Marker marker = markers.create(position, "resolve.method_field", name);
+			Marker marker = I18n.createMarker(position, "resolve.method_field", name);
 			if (instance != null)
 			{
-				marker.addInfo("Callee Type: " + instance.getType());
+				marker.addInfo(I18n.getString("receiver.type", instance.getType()));
 			}
+			
+			markers.add(marker);
 			return;
 		}
 		
-		Marker marker = markers.create(position, "resolve.method", name);
+		Marker marker = I18n.createMarker(position, "resolve.method", name);
 		if (instance != null)
 		{
-			marker.addInfo("Callee Type: " + instance.getType());
+			marker.addInfo(I18n.getString("receiver.type", instance.getType()));
 		}
 		if (!arguments.isEmpty())
 		{
@@ -47,9 +74,16 @@ public interface ICall extends IValue
 			arguments.typesToString(builder);
 			marker.addInfo(builder.toString());
 		}
+		
+		markers.add(marker);
 	}
 	
-	public static IDataMember resolveField(IContext context, ITyped instance, Name name)
+	static boolean privateAccess(IContext context, IValue instance)
+	{
+		return instance == null || context.getThisClass() == instance.getType().getTheClass();
+	}
+	
+	static IDataMember resolveField(IContext context, ITyped instance, Name name)
 	{
 		IDataMember match;
 		if (instance != null)
@@ -75,9 +109,9 @@ public interface ICall extends IValue
 		return null;
 	}
 	
-	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		List<MethodMatch> matches = new ArrayList();
+		MethodMatchList matches = new MethodMatchList();
 		if (instance != null)
 		{
 			IType type = instance.getType();
@@ -87,7 +121,7 @@ public interface ICall extends IValue
 				
 				if (!matches.isEmpty())
 				{
-					return IContext.getBestMethod(matches);
+					return matches.getBestMethod();
 				}
 			}
 		}
@@ -95,28 +129,29 @@ public interface ICall extends IValue
 		context.getMethodMatches(matches, instance, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return IContext.getBestMethod(matches);
+			return matches.getBestMethod();
 		}
 		
-		Types.PREDEF_CLASS.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return IContext.getBestMethod(matches);
-		}
-		
-		if (instance == null && arguments.size() == 1)
+		// Prefix Methods
+		if (arguments.size() == 1)
 		{
 			IValue v = arguments.getFirstValue();
 			IType type = v.getType();
 			if (type != null)
 			{
-				type.getMethodMatches(matches, instance, name, EmptyArguments.INSTANCE);
+				type.getMethodMatches(matches, instance, name, arguments);
 				
 				if (!matches.isEmpty())
 				{
-					return IContext.getBestMethod(matches);
+					return matches.getBestMethod();
 				}
 			}
+		}
+		
+		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return matches.getBestMethod();
 		}
 		
 		return null;

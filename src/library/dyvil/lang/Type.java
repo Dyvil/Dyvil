@@ -4,32 +4,32 @@ import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.StringConvertible;
 
-import dyvil.reflect.type.GenericType;
-import dyvil.reflect.type.NamedType;
-import dyvil.reflect.type.PrimitiveType;
-import dyvil.reflect.type.UnknownType;
+import dyvil.reflect.types.GenericType;
+import dyvil.reflect.types.NamedType;
+import dyvil.reflect.types.PrimitiveType;
+import dyvil.reflect.types.UnknownType;
 
 @NilConvertible
 @StringConvertible
 @ClassConvertible
 public interface Type<T>
 {
-	public static <T> Type<T> apply()
+	static <T> Type<T> apply()
 	{
 		return UnknownType.instance;
 	}
 	
-	public static <T> Type<T> apply(String className)
+	static <T> Type<T> apply(String className)
 	{
 		return new NamedType(className);
 	}
 	
-	public static <T> Type<T> apply(String className, Type... generics)
+	static <T> Type<T> apply(String className, Type... generics)
 	{
 		return new GenericType(className, generics);
 	}
 	
-	public static <T> Type<T> apply(Class<T> c)
+	static <T> Type<T> apply(Class<T> c)
 	{
 		if (c.isPrimitive())
 		{
@@ -38,42 +38,42 @@ public interface Type<T>
 		return new NamedType(c);
 	}
 	
-	public static <T> Type<T> apply(Class<T> c, Type... generics)
+	static <T> Type<T> apply(Class<T> c, Type... generics)
 	{
 		return new GenericType(c, generics);
 	}
 	
-	public Class<T> getTheClass();
+	Class<T> getTheClass();
 	
-	public String getName();
+	String getName();
 	
-	public String getQualifiedName();
+	String getQualifiedName();
 	
 	@Override
-	public String toString();
+	String toString();
 	
-	public default void toString(StringBuilder builder)
+	default void toString(StringBuilder builder)
 	{
 		builder.append(this.toString());
 	}
 	
-	public default String getSignature()
+	default String getSignature()
 	{
 		StringBuilder builder = new StringBuilder();
 		this.appendSignature(builder);
 		return builder.toString();
 	}
 	
-	public void appendSignature(StringBuilder builder);
+	void appendSignature(StringBuilder builder);
 	
-	public default String getGenericSignature()
+	default String getGenericSignature()
 	{
 		StringBuilder builder = new StringBuilder();
 		this.appendGenericSignature(builder);
 		return builder.toString();
 	}
 	
-	public default void appendGenericSignature(StringBuilder builder)
+	default void appendGenericSignature(StringBuilder builder)
 	{
 		this.appendSignature(builder);
 	}

@@ -13,14 +13,14 @@ public final class UnsafeFloatRef implements FloatRef
 	
 	public UnsafeFloatRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeFloatRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeFloatRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeFloatRef implements FloatRef
 	@Override
 	public float get()
 	{
-		return ReflectUtils.unsafe.getFloat(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getFloat(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(float value)
 	{
-		ReflectUtils.unsafe.putFloat(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putFloat(this.base, this.offset, value);
 	}
 }

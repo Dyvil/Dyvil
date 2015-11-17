@@ -2,22 +2,19 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.statement.DoStatement;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.ast.statement.loop.DoStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class DoStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	DO				= 1;
-	public static final int	WHILE			= 2;
-	public static final int END = 4;
+	public static final int	DO		= 1;
+	public static final int	WHILE	= 2;
 	
-	public DoStatement		statement;
+	public DoStatement statement;
 	
 	public DoStatementParser(DoStatement statement)
 	{
@@ -26,46 +23,34 @@ public class DoStatementParser extends Parser implements IValueConsumer
 	}
 	
 	@Override
-	public void reset()
+	public void parse(IParserManager pm, IToken token)
 	{
-		this.mode = DO;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
-	{
-		if (this.mode == DO)
+		switch (this.mode)
 		{
-			pm.pushParser(new ExpressionParser(this), true);
+		case DO:
+			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = WHILE;
 			return;
-		}
-		int type = token.type();
-		if (this.mode == WHILE)
-		{
-			if (type == Keywords.WHILE)
+		case WHILE:
+			int type = token.type();
+			if (type == DyvilKeywords.WHILE)
 			{
 				this.mode = END;
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			
-			if (type == Symbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				if (token.next().type() == Keywords.WHILE)
+				if (token.next().type() == DyvilKeywords.WHILE)
 				{
 					this.mode = END;
 					pm.skip(1);
-					pm.pushParser(new ExpressionParser(this));
+					pm.pushParser(pm.newExpressionParser(this));
 					return;
 				}
 			}
-			
-			pm.popParser(true);
-			return;
-		}
-		if (this.mode == END)
-		{
+			// fallthrough
+		case END:
 			pm.popParser(true);
 			return;
 		}
@@ -74,13 +59,14 @@ public class DoStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == WHILE)
+		switch (this.mode)
 		{
-			this.statement.action = value;
-		}
-		else if (this.mode == END)
-		{
-			this.statement.condition = value;
+		case WHILE:
+			this.statement.setAction(value);
+			break;
+		case END:
+			this.statement.setCondition(value);
+			break;
 		}
 	}
 }

@@ -1,8 +1,8 @@
 package dyvil.math;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation.infix;
-import dyvil.annotation.postfix;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.postfix;
 
 /**
  * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for
@@ -23,50 +23,53 @@ import dyvil.annotation.postfix;
 @Utility({ byte.class, short.class, int.class, long.class, float.class, double.class })
 public final class MathUtils
 {
-	/**
-	 * Used to calculate the index of a sin value in the {@link #sinTable}.
-	 * <p>
-	 * Value:<br>
-	 * <b>3.141592653589793D * 2D / 65536D</b>
-	 */
-	private static final double		sinFactor		= 0.00009587379924285257D;
-	
-	/**
-	 * Used to calculate the index of a sin value in the {@link #sinTable}.
-	 * <p>
-	 * Value:<br>
-	 * <b>1 / sinFactor<br>
-	 * 65536D / 3.141592653589793D * 2D</b>
-	 */
-	private static final double		sinFactor2		= 10430.378350470453D;
-	
-	/**
-	 * A table of sin values storing 65536 values between {@code 0} and
-	 * {@code PI}.
-	 */
-	private static final float[]	sinTable		= new float[65536];
-	
-	private static final int[]		deBruijnBits	= new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26,
-			12, 18, 6, 11, 5, 10, 9				};
-	
-	private static final int[]		sqrtTable		= new int[] { 0, 16, 22, 27, 32, 35, 39, 42, 45, 48, 50, 53, 55, 57, 59, 61, 64, 65, 67, 69, 71, 73, 75,
-			76, 78, 80, 81, 83, 84, 86, 87, 89, 90, 91, 93, 94, 96, 97, 98, 99, 101, 102, 103, 104, 106, 107, 108, 109, 110, 112, 113, 114, 115, 116, 117, 118,
-			119, 120, 121, 122, 123, 124, 125, 126, 128, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 144, 145, 146,
-			147, 148, 149, 150, 150, 151, 152, 153, 154, 155, 155, 156, 157, 158, 159, 160, 160, 161, 162, 163, 163, 164, 165, 166, 167, 167, 168, 169, 170,
-			170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 178, 179, 180, 181, 181, 182, 183, 183, 184, 185, 185, 186, 187, 187, 188, 189, 189, 190,
-			191, 192, 192, 193, 193, 194, 195, 195, 196, 197, 197, 198, 199, 199, 200, 201, 201, 202, 203, 203, 204, 204, 205, 206, 206, 207, 208, 208, 209,
-			209, 210, 211, 211, 212, 212, 213, 214, 214, 215, 215, 216, 217, 217, 218, 218, 219, 219, 220, 221, 221, 222, 222, 223, 224, 224, 225, 225, 226,
-			226, 227, 227, 228, 229, 229, 230, 230, 231, 231, 232, 232, 233, 234, 234, 235, 235, 236, 236, 237, 237, 238, 238, 239, 240, 240, 241, 241, 242,
-			242, 243, 243, 244, 244, 245, 245, 246, 246, 247, 247, 248, 248, 249, 249, 250, 250, 251, 251, 252, 252, 253, 253, 254, 254, 255 };
-	
-	static
+	private static final class SinHolder
 	{
-		for (int i = 0; i < 65536; ++i)
+		/**
+		 * Used to calculate the index of a sin value in the {@link #sinTable}.
+		 * <p>
+		 * Value:<br>
+		 * <b>3.141592653589793D * 2D / 65536D</b>
+		 */
+		private static final double sinFactor = 0.00009587379924285257D;
+		
+		/**
+		 * Used to calculate the index of a sin value in the {@link #sinTable}.
+		 * <p>
+		 * Value:<br>
+		 * <b>1 / sinFactor<br>
+		 * 65536D / 3.141592653589793D * 2D</b>
+		 */
+		private static final double sinFactor2 = 10430.378350470453D;
+		
+		/**
+		 * A table of sin values storing 65536 values between {@code 0} and
+		 * {@code PI}.
+		 */
+		private static final float[] sinTable = new float[65536];
+		
+		static
 		{
-			sinTable[i] = (float) Math.sin(i * sinFactor);
+			for (int i = 0; i < 65536; ++i)
+			{
+				sinTable[i] = (float) Math.sin(i * sinFactor);
+			}
 		}
 	}
 	
+	private static final int[] deBruijnBits = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18,
+			6, 11, 5, 10, 9 };
+			
+	private static final int[] sqrtTable = new int[] { 0, 16, 22, 27, 32, 35, 39, 42, 45, 48, 50, 53, 55, 57, 59, 61, 64, 65, 67, 69, 71, 73, 75, 76, 78, 80,
+			81, 83, 84, 86, 87, 89, 90, 91, 93, 94, 96, 97, 98, 99, 101, 102, 103, 104, 106, 107, 108, 109, 110, 112, 113, 114, 115, 116, 117, 118, 119, 120,
+			121, 122, 123, 124, 125, 126, 128, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 144, 145, 146, 147, 148,
+			149, 150, 150, 151, 152, 153, 154, 155, 155, 156, 157, 158, 159, 160, 160, 161, 162, 163, 163, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171,
+			172, 173, 173, 174, 175, 176, 176, 177, 178, 178, 179, 180, 181, 181, 182, 183, 183, 184, 185, 185, 186, 187, 187, 188, 189, 189, 190, 191, 192,
+			192, 193, 193, 194, 195, 195, 196, 197, 197, 198, 199, 199, 200, 201, 201, 202, 203, 203, 204, 204, 205, 206, 206, 207, 208, 208, 209, 209, 210,
+			211, 211, 212, 212, 213, 214, 214, 215, 215, 216, 217, 217, 218, 218, 219, 219, 220, 221, 221, 222, 222, 223, 224, 224, 225, 225, 226, 226, 227,
+			227, 228, 229, 229, 230, 230, 231, 231, 232, 232, 233, 234, 234, 235, 235, 236, 236, 237, 237, 238, 238, 239, 240, 240, 241, 241, 242, 242, 243,
+			243, 244, 244, 245, 245, 246, 246, 247, 247, 248, 248, 249, 249, 250, 250, 251, 251, 252, 252, 253, 253, 254, 254, 255 };
+			
 	private MathUtils()
 	{
 	}
@@ -313,12 +316,12 @@ public final class MathUtils
 	
 	public static @infix float sin(float f)
 	{
-		return sinTable[(int) (f * sinFactor2) & 0xFFFF];
+		return SinHolder.sinTable[(int) (f * SinHolder.sinFactor2) & 0xFFFF];
 	}
 	
 	public static @infix float cos(float f)
 	{
-		return sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
+		return SinHolder.sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
 	public static @infix float tan(float f)
@@ -405,7 +408,7 @@ public final class MathUtils
 						xn = sqrtTable[i >> 22] << 7;
 					}
 				}
-				if (i >= 0x4000000)
+				else if (i >= 0x4000000)
 				{
 					xn = sqrtTable[i >> 20] << 6;
 				}
@@ -701,7 +704,7 @@ public final class MathUtils
 		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
-	public static @infix int sum(int[] ints)
+	public static @infix int sum(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -711,7 +714,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix long sum(long[] longs)
+	public static @infix long sum(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -721,7 +724,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix float sum(float[] floats)
+	public static @infix float sum(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -731,7 +734,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix double sum(double[] doubles)
+	public static @infix double sum(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -741,7 +744,7 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix float average(int[] ints)
+	public static @infix float average(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -751,7 +754,7 @@ public final class MathUtils
 		return total / (float) ints.length;
 	}
 	
-	public static @infix double average(long[] longs)
+	public static @infix double average(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -761,7 +764,7 @@ public final class MathUtils
 		return total / (double) longs.length;
 	}
 	
-	public static @infix float average(float[] floats)
+	public static @infix float average(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -771,7 +774,7 @@ public final class MathUtils
 		return total / floats.length;
 	}
 	
-	public static @infix double average(double[] doubles)
+	public static @infix double average(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -851,7 +854,7 @@ public final class MathUtils
 	
 	public static @infix int clearBit(int i, byte bit)
 	{
-		return i ^ ~(1 << bit);
+		return i & ~(1 << bit);
 	}
 	
 	public static @infix boolean apply(long l, byte bit)
@@ -871,6 +874,6 @@ public final class MathUtils
 	
 	public static @infix long clearBit(long l, byte bit)
 	{
-		return l ^ ~(1 << bit);
+		return l & ~(1 << bit);
 	}
 }

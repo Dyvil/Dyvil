@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-
-import dyvil.lang.List;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -12,18 +10,19 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import static dyvil.reflect.Opcodes.*;
 
-public class UnknownType implements IType
+public class UnknownType implements IRawType
 {
 	@Override
 	public int typeTag()
@@ -34,27 +33,13 @@ public class UnknownType implements IType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified("var");
+		return Names.auto;
 	}
-	
-	// IContext
 	
 	@Override
 	public IClass getTheClass()
 	{
 		return Types.OBJECT_CLASS;
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		return this;
 	}
 	
 	@Override
@@ -64,15 +49,32 @@ public class UnknownType implements IType
 	}
 	
 	@Override
-	public boolean isResolved()
+	public boolean hasTypeVariables()
 	{
 		return true;
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType getConcreteType(ITypeContext context)
+	{
+		return Types.ANY;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return false;
+	}
+	
+	@Override
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	// IContext
@@ -84,12 +86,12 @@ public class UnknownType implements IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
@@ -151,16 +153,16 @@ public class UnknownType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/type/UnknownType", "instance", "Ldyvil/reflect/type/UnknownType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/UnknownType", "instance", "Ldyvil/reflect/types/UnknownType;", false);
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
 	}
 	
@@ -173,12 +175,24 @@ public class UnknownType implements IType
 	@Override
 	public String toString()
 	{
-		return "var";
+		return "auto";
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("var");
+		buffer.append("auto");
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return UNKNOWN;
 	}
 }

@@ -1,27 +1,32 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class ReturnStatement extends ASTNode implements IStatement, IValued
+public class ReturnStatement extends AbstractValue implements IStatement, IValueConsumer
 {
-	public IValue		value;
-	private IStatement	parent;
+	protected IValue value;
 	
 	public ReturnStatement(ICodePosition position)
 	{
 		this.position = position;
+	}
+	
+	public ReturnStatement(ICodePosition position, IValue value)
+	{
+		this.position = position;
+		this.value = value;
 	}
 	
 	@Override
@@ -42,7 +47,6 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 		this.value = value;
 	}
 	
-	@Override
 	public IValue getValue()
 	{
 		return this.value;
@@ -57,9 +61,13 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (type == Types.VOID)
+		{
+			return this;
+		}
 		if (this.value == null)
 		{
-			return type == Types.UNKNOWN || type == Types.VOID ? this : null;
+			return null;
 		}
 		IValue value1 = this.value.withType(type, typeContext, markers, context);
 		if (value1 == null)
@@ -73,11 +81,15 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.value == null ? type == Types.UNKNOWN || type == Types.VOID : this.value.isType(type);
+		if (type == Types.VOID)
+		{
+			return true;
+		}
+		return this.value != null && this.value.isType(type);
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.value == null)
 		{
@@ -85,18 +97,6 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 		}
 		
 		return this.value.getTypeMatch(type);
-	}
-	
-	@Override
-	public void setParent(IStatement parent)
-	{
-		this.parent = parent;
-	}
-	
-	@Override
-	public IStatement getParent()
-	{
-		return this.parent;
 	}
 	
 	@Override
@@ -171,9 +171,17 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 	}
 	
 	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.value.writeExpression(writer, type);
+		writer.writeInsn(type.getReturnOpcode());
+	}
+	
+	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.value.writeExpression(writer);
+		writer.writeInsn(this.value.getType().getReturnOpcode());
 	}
 	
 	@Override
@@ -182,8 +190,7 @@ public class ReturnStatement extends ASTNode implements IStatement, IValued
 		if (this.value != null)
 		{
 			this.value.writeExpression(writer);
-			IType type = this.value.getType();
-			writer.writeInsn(type.getReturnOpcode());
+			writer.writeInsn(this.value.getType().getReturnOpcode());
 			return;
 		}
 		writer.writeInsn(Opcodes.RETURN);

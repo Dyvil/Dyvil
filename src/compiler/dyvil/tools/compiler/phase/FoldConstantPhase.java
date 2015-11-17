@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.lang.Collection;
-
+import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class FoldConstantPhase implements ICompilerPhase
 {
-	private int	id;
+	private int id;
 	
 	public FoldConstantPhase(int id)
 	{
@@ -47,6 +46,6 @@ public class FoldConstantPhase implements ICompilerPhase
 	@Override
 	public String toString()
 	{
-		return "FOLD_CONSTANTS (" + DyvilCompiler.constantFolding + "x)";
+		return "FOLD_CONSTANTS (x" + DyvilCompiler.constantFolding + ")";
 	}
 }

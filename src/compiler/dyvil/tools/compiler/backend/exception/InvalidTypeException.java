@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 
 public class InvalidTypeException extends BytecodeException
 {
-	private static final long	serialVersionUID	= -3066382947566741703L;
+	private static final long serialVersionUID = -3066382947566741703L;
 	
 	public InvalidTypeException()
 	{

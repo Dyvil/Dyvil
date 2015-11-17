@@ -1,49 +1,36 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.token.IToken;
 
 public abstract class Parser
 {
-	public static final Parser	rootParser	= new Parser()
-											{
-												@Override
-												public void reset()
-												{
-												};
-												
-												@Override
-												public void parse(IParserManager pm, IToken token) throws SyntaxError
-												{
-													if (!ParserUtil.isTerminator(token.type()))
-													{
-														throw new SyntaxError(token, "Root Parser");
-													}
-												}
-											};
+	public static final Parser rootParser = new Parser()
+	{
+		@Override
+		public void parse(IParserManager pm, IToken token)
+		{
+			if (!ParserUtil.isTerminator(token.type()))
+			{
+				pm.report(token, "Root Parser");
+				return;
+			}
+		}
+	};
 	
-	protected int				mode;
+	protected static final int END = -1;
 	
-	protected Parser			parent;
-	protected String			name;
+	protected int mode;
+	
+	protected Parser parent;
 	
 	public Parser()
 	{
-		if (DyvilCompiler.parseStack)
-		{
-			this.name = this.computeName();
-		}
 	}
 	
 	public Parser(Parser parent)
 	{
 		this.parent = parent;
-		if (DyvilCompiler.parseStack)
-		{
-			this.name = parent.name + "." + this.computeName();
-		}
 	}
 	
 	protected String computeName()
@@ -55,11 +42,6 @@ public abstract class Parser
 			s = s.substring(0, index);
 		}
 		return s.toLowerCase();
-	}
-	
-	public String getName()
-	{
-		return this.name;
 	}
 	
 	public int getMode()
@@ -81,10 +63,6 @@ public abstract class Parser
 		if (parent != null)
 		{
 			this.parent = parent;
-			if (DyvilCompiler.parseStack)
-			{
-				this.name = parent.name + "." + this.computeName();
-			}
 		}
 	}
 	
@@ -93,7 +71,5 @@ public abstract class Parser
 		return this.parent;
 	}
 	
-	public abstract void reset();
-	
-	public abstract void parse(IParserManager pm, IToken token) throws SyntaxError;
+	public abstract void parse(IParserManager pm, IToken token);
 }

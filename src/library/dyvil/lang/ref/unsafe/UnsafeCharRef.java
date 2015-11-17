@@ -13,14 +13,14 @@ public final class UnsafeCharRef implements CharRef
 	
 	public UnsafeCharRef(Field staticField)
 	{
-		this.base = ReflectUtils.unsafe.staticFieldBase(staticField);
-		this.offset = ReflectUtils.unsafe.staticFieldOffset(staticField);
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 	
 	public UnsafeCharRef(Object instance, Field field)
 	{
 		this.base = instance;
-		this.offset = ReflectUtils.unsafe.objectFieldOffset(field);
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 	
 	public UnsafeCharRef(Object base, long offset)
@@ -32,12 +32,12 @@ public final class UnsafeCharRef implements CharRef
 	@Override
 	public char get()
 	{
-		return ReflectUtils.unsafe.getChar(this.base, this.offset);
+		return ReflectUtils.UNSAFE.getChar(this.base, this.offset);
 	}
 	
 	@Override
 	public void set(char value)
 	{
-		ReflectUtils.unsafe.putChar(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.putChar(this.base, this.offset, value);
 	}
 }

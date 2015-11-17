@@ -1,73 +1,90 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.lang.List;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.parsing.Name;
 
 public interface IStaticContext extends IContext
 {
 	@Override
-	public default boolean isStatic()
+	default boolean isStatic()
 	{
 		return true;
 	}
 	
 	@Override
-	public IDyvilHeader getHeader();
+	IDyvilHeader getHeader();
 	
 	@Override
-	public default IClass getThisClass()
+	default IClass getThisClass()
 	{
 		return null;
 	}
 	
 	@Override
-	public Package resolvePackage(Name name);
+	Package resolvePackage(Name name);
 	
 	@Override
-	public IClass resolveClass(Name name);
+	IClass resolveClass(Name name);
 	
 	@Override
-	public IType resolveType(Name name);
+	IType resolveType(Name name);
 	
 	@Override
-	public default ITypeVariable resolveTypeVariable(Name name)
+	default ITypeVariable resolveTypeVariable(Name name)
 	{
 		return null;
 	}
 	
 	@Override
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	@Override
-	public default void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		
+	
 	}
 	
 	@Override
-	public default byte getVisibility(IClassMember member)
-	{
-		return 0;
-	}
-	
-	@Override
-	public default boolean handleException(IType type)
+	default boolean handleException(IType type)
 	{
 		return false;
+	}
+	
+	@Override
+	default boolean isMember(IVariable variable)
+	{
+		return false;
+	}
+	
+	@Override
+	default IDataMember capture(IVariable capture)
+	{
+		return capture;
+	}
+	
+	@Override
+	default IAccessible getAccessibleThis(IClass type)
+	{
+		return null;
+	}
+	
+	@Override
+	default IAccessible getAccessibleImplicit()
+	{
+		return null;
 	}
 }

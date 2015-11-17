@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -12,11 +12,12 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class SwapOperator extends ASTNode implements IValue
+public class SwapOperator extends AbstractValue
 {
 	public FieldAccess	left;
 	public FieldAccess	right;
@@ -47,15 +48,15 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public IType getType()
+	public boolean isResolved()
 	{
-		return Types.UNKNOWN;
+		return true;
 	}
 	
 	@Override
-	public boolean isType(IType type)
+	public IType getType()
 	{
-		return type == Types.VOID;
+		return Types.VOID;
 	}
 	
 	@Override
@@ -65,9 +66,9 @@ public class SwapOperator extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public boolean isType(IType type)
 	{
-		return 0;
+		return type == Types.VOID;
 	}
 	
 	@Override
@@ -91,13 +92,14 @@ public class SwapOperator extends ASTNode implements IValue
 		this.left.checkTypes(markers, context);
 		this.right.checkTypes(markers, context);
 		
-		IType type1 = this.left.getType();
-		IType type2 = this.right.getType();
-		if (!type1.equals(type2))
+		IType leftType = this.left.getType();
+		IType rightType = this.right.getType();
+		if (!leftType.isSameType(rightType))
 		{
-			Marker m = markers.create(this.position, "swap.type");
-			m.addInfo("Left-Hand Type: " + type1);
-			m.addInfo("Right-Hand Type: " + type2);
+			Marker marker = I18n.createMarker(this.position, "swap.type.incompatible");
+			marker.addInfo(I18n.getString("swap.type.left", leftType));
+			marker.addInfo(I18n.getString("swap.type.right", rightType));
+			markers.add(marker);
 		}
 	}
 	
@@ -130,34 +132,35 @@ public class SwapOperator extends ASTNode implements IValue
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		IValue leftInstance = this.left.instance;
-		IDataMember leftField = this.left.field;
-		IValue rightInstance = this.right.instance;
-		IDataMember rightField = this.right.field;
+		int lineNumber = this.getLineNumber();
+		IValue leftInstance = this.left.getInstance();
+		IDataMember leftField = this.left.getField();
+		IValue rightInstance = this.right.getInstance();
+		IDataMember rightField = this.right.getField();
 		
 		if (leftInstance != null)
 		{
-			leftInstance.writeExpression(writer);
+			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
-		leftField.writeGet(writer, null);
+		leftField.writeGet(writer, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
-			rightInstance.writeExpression(writer);
+			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
-		rightField.writeGet(writer, null);
+		rightField.writeGet(writer, null, lineNumber);
 		
 		if (leftInstance != null)
 		{
-			leftInstance.writeExpression(writer);
+			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
-		leftField.writeSet(writer, null, null);
+		leftField.writeSet(writer, null, null, lineNumber);
 		
 		if (rightInstance != null)
 		{
-			rightInstance.writeExpression(writer);
+			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
-		rightField.writeSet(writer, null, null);
+		rightField.writeSet(writer, null, null, lineNumber);
 	}
 	
 	@Override

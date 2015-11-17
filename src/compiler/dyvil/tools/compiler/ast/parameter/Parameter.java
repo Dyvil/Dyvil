@@ -1,24 +1,27 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotatableVisitor;
+import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
 import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public abstract class Parameter extends Member implements IParameter
 {
 	protected int		index;
+	protected int localIndex;
 	protected boolean	varargs;
 	
-	protected IValue	defaultValue;
+	protected IValue defaultValue;
 	
 	public Parameter()
 	{
@@ -33,12 +36,6 @@ public abstract class Parameter extends Member implements IParameter
 	{
 		this.name = name;
 		this.type = type;
-	}
-	
-	@Override
-	public ElementType getAnnotationType()
-	{
-		return ElementType.PARAMETER;
 	}
 	
 	@Override
@@ -66,6 +63,18 @@ public abstract class Parameter extends Member implements IParameter
 	}
 	
 	@Override
+	public void setLocalIndex(int index)
+	{
+		this.localIndex = index;
+	}
+	
+	@Override
+	public int getLocalIndex()
+	{
+		return this.localIndex;
+	}
+	
+	@Override
 	public void setVarargs(boolean varargs)
 	{
 		this.varargs = varargs;
@@ -90,14 +99,14 @@ public abstract class Parameter extends Member implements IParameter
 	}
 	
 	@Override
-	public boolean addRawAnnotation(String type)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/var":
+		case "dyvil/annotation/_internal/var":
 			this.modifiers |= Modifiers.VAR;
 			return false;
-		case "dyvil/annotation/lazy":
+		case "dyvil/annotation/_internal/lazy":
 			this.modifiers |= Modifiers.LAZY;
 			return false;
 		}
@@ -144,19 +153,37 @@ public abstract class Parameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			compilableList.addCompilable(this);
-			
 			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
 		}
+	}
+	
+	protected void writeAnnotations(MethodWriter writer)
+	{
+		if (this.annotations != null)
+		{
+			AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(Parameter.this.index, desc, visible);
+			
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(visitor);
+			}
+		}
+		
+		this.type.writeAnnotations(writer, TypeReference.newFormalParameterReference(this.index), "");
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append(' ');
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).toString(prefix, buffer);
+				buffer.append(' ');
+			}
 		}
 		
 		buffer.append(ModifierTypes.PARAMETER.toString(this.modifiers));

@@ -1,45 +1,77 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.operator.Operators;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.parser.type.TypeVariableParser;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.token.IToken;
 
 public interface IParserManager
 {
-	public default void setOperatorMap(IOperatorMap operators)
+	void report(IToken token, String message);
+	
+	default void setOperatorMap(IOperatorMap operators)
 	{
 	}
 	
-	public default IOperatorMap getOperatorMap()
+	default IOperatorMap getOperatorMap()
 	{
 		return null;
 	}
 	
-	public default Operator getOperator(Name name)
+	default Operator getOperator(Name name)
 	{
-		return Operators.map.get(name);
+		return null;
 	}
 	
-	public void skip();
+	void stop();
 	
-	public void skip(int n);
+	void skip();
 	
-	public void reparse();
+	void skip(int n);
 	
-	public void jump(IToken token);
+	void reparse();
 	
-	public void setParser(Parser parser);
+	void jump(IToken token);
 	
-	public Parser getParser();
+	void setParser(Parser parser);
 	
-	public void pushParser(Parser parser);
+	Parser getParser();
 	
-	public void pushParser(Parser parser, boolean reparse);
+	void pushParser(Parser parser);
 	
-	public void popParser();
+	void pushParser(Parser parser, boolean reparse);
 	
-	public void popParser(boolean reparse) throws SyntaxError;
+	void popParser();
+	
+	void popParser(boolean reparse);
+	
+	// Parser Factory Methods
+	
+	default Parser newExpressionParser(IValueConsumer valueConsumer)
+	{
+		return new ExpressionParser(valueConsumer);
+	}
+	
+	default Parser newTypeParser(ITypeConsumer typeConsumer)
+	{
+		return new TypeParser(typeConsumer);
+	}
+	
+	default Parser newAnnotationParser(IAnnotation annotation)
+	{
+		return new AnnotationParser(annotation);
+	}
+	
+	default Parser newTypeVariableParser(IGeneric generic)
+	{
+		return new TypeVariableParser(generic);
+	}
 }

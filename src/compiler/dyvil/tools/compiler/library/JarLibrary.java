@@ -8,10 +8,11 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 
 public final class JarLibrary extends Library
 {
-	private FileSystem							jarFileSystem;
+	private FileSystem jarFileSystem;
 	
 	public JarLibrary(File file)
 	{
@@ -21,13 +22,17 @@ public final class JarLibrary extends Library
 	@Override
 	public void loadLibrary()
 	{
+		URI fileURI = this.file.toURI();
 		try
 		{
-			URI uri = URI.create("jar:file:" + this.file.getAbsolutePath());
-			this.jarFileSystem = FileSystems.newFileSystem(uri, packages);
+			URI uri = new URI("jar:" + fileURI);
+			this.jarFileSystem = FileSystems.newFileSystem(uri, Collections.EMPTY_MAP);
 		}
-		catch (IOException ex)
+		catch (Exception ex)
 		{
+			System.err.println("Failed to initialize JAR library " + this.file);
+			System.err.println("URI: " + fileURI);
+			ex.printStackTrace();
 		}
 	}
 	

@@ -2,7 +2,7 @@ package dyvil.lang.ref;
 
 public interface ByteRef
 {
-	public byte get();
+	byte get();
 	
-	public void set(byte value);
+	void set(byte value);
 }

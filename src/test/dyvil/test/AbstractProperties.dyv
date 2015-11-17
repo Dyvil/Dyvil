@@ -1,0 +1,26 @@
+package dyvil.test
+
+public class AbstractProperties
+{
+	interface A {
+		public int myProp {
+			abstract get
+			abstract set
+		}
+	}
+	
+	class C implements A
+	{
+	    public override int myProp {
+	    	set : println myProp
+	    	get : 1
+	    }
+	}
+	
+	public static void main([String] args)
+	{
+		auto c = new C
+		println c.myProp
+		c.myProp = 10
+	}
+}

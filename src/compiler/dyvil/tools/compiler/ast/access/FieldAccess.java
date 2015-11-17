@@ -1,18 +1,15 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValued;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
@@ -23,19 +20,28 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class FieldAccess extends ASTNode implements IValue, INamed, IValued
+public final class FieldAccess implements IValue, INamed, IReceiverAccess
 {
-	public IValue		instance;
-	public Name			name;
+	protected ICodePosition	position;
+	protected IValue		receiver;
+	protected Name			name;
 	
-	public boolean		dotless;
+	protected boolean dotless;
 	
-	public IDataMember	field;
-	protected IType		type;
+	// Metadata
+	protected IDataMember	field;
+	protected IType			type;
+	
+	public FieldAccess()
+	{
+	}
 	
 	public FieldAccess(ICodePosition position)
 	{
@@ -45,14 +51,33 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	public FieldAccess(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
-		this.instance = instance;
+		this.receiver = instance;
 		this.name = name;
+	}
+	
+	public FieldAccess(ICodePosition position, IValue instance, IDataMember field)
+	{
+		this.position = position;
+		this.receiver = instance;
+		this.field = field;
+	}
+	
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
 	}
 	
 	public MethodCall toMethodCall(IMethod method)
 	{
 		MethodCall call = new MethodCall(this.position);
-		call.instance = this.instance;
+		call.receiver = this.receiver;
 		call.name = this.name;
 		call.method = method;
 		call.dotless = this.dotless;
@@ -66,6 +91,38 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		return FIELD_ACCESS;
 	}
 	
+	public IValue getInstance()
+	{
+		return this.receiver;
+	}
+	
+	public IDataMember getField()
+	{
+		return this.field;
+	}
+	
+	public boolean isDotless()
+	{
+		return this.dotless;
+	}
+	
+	public void setDotless(boolean dotless)
+	{
+		this.dotless = dotless;
+	}
+	
+	@Override
+	public boolean isConstantOrField()
+	{
+		return this.field != null && this.field.hasModifier(Modifiers.CONST);
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return this.field != null;
+	}
+	
 	@Override
 	public IType getType()
 	{
@@ -75,11 +132,11 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 			{
 				return Types.UNKNOWN;
 			}
-			if (this.instance == null)
+			if (this.receiver == null)
 			{
 				return this.type = this.field.getType();
 			}
-			return this.type = this.field.getType().getConcreteType(this.instance.getType()).getReturnType();
+			return this.type = this.field.getType().getConcreteType(this.receiver.getType()).getReturnType();
 		}
 		return this.type;
 	}
@@ -87,7 +144,12 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return IValue.autoBox(this, this.getType(), type);
+		if (this.field == null)
+		{
+			return this; // dont create an extra type error
+		}
+		
+		return type.isSuperTypeOf(this.getType()) ? this : null;
 	}
 	
 	@Override
@@ -97,7 +159,7 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public float getTypeMatch(IType type)
 	{
 		if (this.field == null)
 		{
@@ -142,52 +204,113 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	}
 	
 	@Override
-	public void setValue(IValue value)
+	public void setReceiver(IValue value)
 	{
-		this.instance = value;
+		this.receiver = value;
 	}
 	
 	@Override
-	public IValue getValue()
+	public IValue getReceiver()
 	{
-		return this.instance;
+		return this.receiver;
+	}
+	
+	@Override
+	public IValue toConstant(MarkerList markers)
+	{
+		if (this.field == null)
+		{
+			return this; // do not create an extra error
+		}
+		
+		int depth = DyvilCompiler.maxConstantDepth;
+		IValue v = this;
+		
+		do
+		{
+			if (depth-- < 0)
+			{
+				markers.add(I18n.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
+				return this;
+			}
+			
+			v = v.foldConstants();
+		}
+		while (!v.isConstantOrField());
+		
+		return v.toConstant(markers);
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.resolveTypes(markers, context);
+			this.receiver.resolveTypes(markers, context);
 		}
 	}
 	
+	@Override
+	public void resolveReceiver(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver = this.receiver.resolve(markers, context);
+		}
+	}
+
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.resolveReceiver(markers, context);
+		
+		IValue v = this.resolveFieldAccess(markers, context);
+		if (v != null)
+		{
+			return v;
+		}
+		
+		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
+		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
+		if (this.receiver != null)
+		{
+			marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
+		}
+		
+		markers.add(marker);
+		return this;
+	}
+
 	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, this.instance, this.name);
-		if (field != null)
+		if (ICall.privateAccess(context, this.receiver))
 		{
-			if (field.isEnumConstant())
+			IValue value = this.resolveField(markers, context);
+			if (value != null)
 			{
-				EnumValue enumValue = new EnumValue(this.position);
-				enumValue.name = this.name;
-				enumValue.type = field.getType();
-				return enumValue;
+				return value;
 			}
-			
-			this.field = field;
-			return this;
+			value = this.resolveMethod(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
 		}
-		
-		IMethod method = ICall.resolveMethod(context, this.instance, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
+		else
 		{
-			AbstractCall mc = this.toMethodCall(method);
-			mc.checkArguments(markers, context);
-			return mc;
+			IValue value = this.resolveMethod(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
+			value = this.resolveField(markers, context);
+			if (value != null)
+			{
+				return value;
+			}
 		}
 		
-		if (this.instance == null)
+		if (this.receiver == null)
 		{
 			IClass iclass = IContext.resolveClass(context, this.name);
 			if (iclass != null)
@@ -198,55 +321,57 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		
 		return null;
 	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+
+	private IValue resolveField(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		if (field != null)
 		{
-			this.instance = this.instance.resolve(markers, context);
+			if (field.isEnumConstant())
+			{
+				EnumValue enumValue = new EnumValue(field.getType(), this.name);
+				return enumValue;
+			}
+			
+			this.field = field;
+			return this;
 		}
-		
-		IValue v = this.resolveFieldAccess(markers, context);
-		if (v != null)
-		{
-			return v;
-		}
-		
-		Marker marker = markers.create(this.position, "resolve.method_field", this.name.unqualified);
-		marker.addInfo("Qualified Name: " + this.name.qualified);
-		if (this.instance != null)
-		{
-			marker.addInfo("Instance Type: " + this.instance.getType());
-		}
-		return this;
+		return null;
 	}
 	
+	private IValue resolveMethod(MarkerList markers, IContext context)
+	{
+		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, EmptyArguments.INSTANCE);
+		if (method != null)
+		{
+			AbstractCall mc = this.toMethodCall(method);
+			mc.checkArguments(markers, context);
+			return mc;
+		}
+		return null;
+	}
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.checkTypes(markers, context);
+			this.receiver.checkTypes(markers, context);
 		}
 		
 		if (this.field != null)
 		{
-			this.instance = this.field.checkAccess(markers, this.position, this.instance, context);
+			this.field = this.field.capture(context);
+			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.check(markers, context);
-		}
-		
-		if (this.field != null)
-		{
-			this.field.checkAccess(markers, this.position, instance, context);
+			this.receiver.check(markers, context);
 		}
 	}
 	
@@ -256,11 +381,11 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
 		{
 			IValue v = this.field.getValue();
-			return v != null && v.isConstant() ? v : this;
+			return v != null && v.isConstantOrField() ? v : this;
 		}
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.foldConstants();
+			this.receiver = this.receiver.foldConstants();
 		}
 		return this;
 	}
@@ -268,9 +393,9 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance = this.instance.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(context, compilableList);
 		}
 		return this;
 	}
@@ -278,27 +403,35 @@ public final class FieldAccess extends ASTNode implements IValue, INamed, IValue
 	@Override
 	public void writeExpression(MethodWriter writer) throws BytecodeException
 	{
-		this.field.writeGet(writer, this.instance);
+		int lineNumber = this.getLineNumber();
+		this.field.writeGet(writer, this.receiver, lineNumber);
 		
-		if (this.type != null && !this.type.isSuperTypeOf(this.field.getType()))
+		if (this.type != null)
 		{
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+			this.field.getType().writeCast(writer, this.type, lineNumber);
 		}
 	}
 	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		this.writeExpression(writer);
-		writer.writeInsn(this.field.getType().getReturnOpcode());
+		IType t = this.field.getType();
+		this.writeExpression(writer, t);
+		writer.writeInsn(t.getReturnOpcode());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.instance != null)
+		if (this.receiver != null)
 		{
-			this.instance.toString("", buffer);
+			this.receiver.toString("", buffer);
 			if (this.dotless && !Formatting.Field.useJavaFormat)
 			{
 				buffer.append(Formatting.Field.dotlessSeperator);

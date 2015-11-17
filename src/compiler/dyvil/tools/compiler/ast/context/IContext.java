@@ -1,56 +1,62 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.lang.List;
-
-import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.parsing.Name;
 
 public interface IContext
 {
-	public static final byte	VISIBLE		= 0;
-	public static final byte	INVISIBLE	= 1;
-	public static final byte	SEALED		= 2;
+	byte	VISIBLE		= 0;
+	byte	INVISIBLE	= 1;
+	byte	INTERNAL	= 2;
 	
-	public boolean isStatic();
+	boolean isStatic();
 	
-	public IDyvilHeader getHeader();
+	IDyvilHeader getHeader();
 	
-	public IClass getThisClass();
+	IClass getThisClass();
 	
-	public Package resolvePackage(Name name);
+	Package resolvePackage(Name name);
 	
-	public IClass resolveClass(Name name);
+	IClass resolveClass(Name name);
 	
-	public IType resolveType(Name name);
+	IType resolveType(Name name);
 	
-	public ITypeVariable resolveTypeVariable(Name name);
+	ITypeVariable resolveTypeVariable(Name name);
 	
-	public IDataMember resolveField(Name name);
+	IDataMember resolveField(Name name);
 	
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments);
+	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
-	public byte getVisibility(IClassMember member);
+	boolean handleException(IType type);
 	
-	public boolean handleException(IType type);
+	boolean isMember(IVariable variable);
 	
-	public static void addCompilable(IContext context, IClassCompilable compilable)
+	IDataMember capture(IVariable capture);
+	
+	IAccessible getAccessibleThis(IClass type);
+	
+	IAccessible getAccessibleImplicit();
+	
+	static void addCompilable(IContext context, IClassCompilable compilable)
 	{
 		IClass iclass = context.getThisClass();
 		if (iclass != null)
@@ -63,7 +69,7 @@ public interface IContext
 		header.addInnerClass(compilable);
 	}
 	
-	public static IClass resolveClass(IContext context, Name name)
+	static IClass resolveClass(IContext context, Name name)
 	{
 		IClass iclass = context.resolveClass(name);
 		if (iclass != null)
@@ -71,18 +77,10 @@ public interface IContext
 			return iclass;
 		}
 		
-		// Standart Dyvil Classes
-		iclass = Package.dyvilLang.resolveClass(name);
-		if (iclass != null)
-		{
-			return iclass;
-		}
-		
-		// Standart Java Classes
-		return Package.javaLang.resolveClass(name);
+		return Types.LANG_HEADER.resolveClass(name);
 	}
 	
-	public static IType resolveType(IContext context, Name name)
+	static IType resolveType(IContext context, Name name)
 	{
 		IType itype = context.resolveType(name);
 		if (itype != null)
@@ -90,14 +88,7 @@ public interface IContext
 			return itype;
 		}
 		
-		IClass iclass = Package.dyvilLang.resolveClass(name);
-		if (iclass != null)
-		{
-			return new ClassType(iclass);
-		}
-		
-		// Standart Java Classes
-		iclass = Package.javaLang.resolveClass(name);
+		IClass iclass = Types.LANG_HEADER.resolveClass(name);
 		if (iclass != null)
 		{
 			return new ClassType(iclass);
@@ -106,66 +97,28 @@ public interface IContext
 		return null;
 	}
 	
-	public static IConstructor resolveConstructor(IContext context, IArguments arguments)
+	static IConstructor resolveConstructor(IContext context, IArguments arguments)
 	{
-		List<ConstructorMatch> matches = new ArrayList();
+		ConstructorMatchList matches = new ConstructorMatchList();
 		context.getConstructorMatches(matches, arguments);
-		return getBestConstructor(matches);
+		return matches.getBestConstructor();
 	}
 	
-	public static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
 	{
-		List<MethodMatch> matches = new ArrayList();
+		MethodMatchList matches = new MethodMatchList();
 		context.getMethodMatches(matches, instance, name, arguments);
-		return getBestMethod(matches);
+		return matches.getBestMethod();
 	}
 	
-	public static IMethod getBestMethod(List<MethodMatch> matches)
+	static byte getVisibility(IContext context, IClassMember member)
 	{
-		int size = matches.size();
-		switch (size)
+		IClass thisClass = context.getThisClass();
+		if (thisClass != null)
 		{
-		case 0:
-			return null;
-		case 1:
-			return matches.get(0).method;
-		default:
-			MethodMatch bestMethod = matches.get(0);
-			int bestMatch = bestMethod.match;
-			for (int i = 1; i < size; i++)
-			{
-				MethodMatch m = matches.get(i);
-				if (m.match > bestMatch)
-				{
-					bestMethod = m;
-					bestMatch = m.match;
-				}
-			}
-			
-			return bestMethod.method;
+			return thisClass.getVisibility(member);
 		}
-	}
-	
-	public static IConstructor getBestConstructor(List<ConstructorMatch> matches)
-	{
-		int size = matches.size();
-		switch (size)
-		{
-		case 0:
-			return null;
-		case 1:
-			return matches.get(0).constructor;
-		default:
-			ConstructorMatch bestMatch = matches.get(0);
-			for (int i = 1; i < size; i++)
-			{
-				ConstructorMatch m = matches.get(i);
-				if (m.match > bestMatch.match)
-				{
-					bestMatch = m;
-				}
-			}
-			return bestMatch.constructor;
-		}
+		
+		return context.getHeader().getVisibility(member);
 	}
 }

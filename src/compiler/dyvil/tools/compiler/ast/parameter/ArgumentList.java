@@ -8,20 +8,20 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.Marker;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ArgumentList implements IArguments, IValueList
 {
 	private IValue[]	values;
 	private int			size;
 	
-	private boolean		varargs;
+	private boolean varargs;
 	
 	public ArgumentList()
 	{
@@ -78,7 +78,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public IArguments addLastValue(IValue value)
+	public IArguments withLastValue(IValue value)
 	{
 		IValue[] values = new IValue[this.size + 1];
 		System.arraycopy(this.values, 0, values, 0, this.size);
@@ -172,34 +172,32 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public IType getType(int index, IParameter param)
-	{
-		return this.values[index].getType();
-	}
-	
-	@Override
-	public int getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param)
 	{
 		if (index >= this.size)
 		{
-			return param.getValue() != null ? 3 : 0;
+			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
 		
 		return this.values[index].getTypeMatch(param.getType());
 	}
 	
 	@Override
-	public int getVarargsTypeMatch(int index, IParameter param)
+	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		if (index >= this.size)
+		if (index == this.size)
+		{
+			return DEFAULT_MATCH;
+		}
+		if (index > this.size)
 		{
 			return 0;
 		}
 		
 		IValue argument = this.values[index];
 		IType type = param.getType();
-		int m = argument.getTypeMatch(type);
-		if (m != 0)
+		float m = argument.getTypeMatch(type);
+		if (m > 0F)
 		{
 			return m;
 		}
@@ -216,12 +214,10 @@ public final class ArgumentList implements IArguments, IValueList
 		
 		IType type = param.getActualType();
 		IValue value = this.values[index];
-		IValue value1 = type.convertValue(value, typeContext, markers, context);
+		IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
-			marker.addInfo("Required Type: " + type);
-			marker.addInfo("Value Type: " + value.getType());
+			Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
@@ -232,14 +228,24 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (index >= this.size)
+		{
+			return;
+		}
+		
 		IType varParamType = param.getActualType();
 		
 		IValue value = this.values[index];
-		IValue value1 = varParamType.convertValue(value, typeContext, markers, context);
-		if (value1 != null)
+		if (value.isType(varParamType.getConcreteType(typeContext)))
 		{
-			this.values[index] = value1;
-			this.varargs = true;
+			IValue value1 = IType.convertValue(value, varParamType, typeContext, markers, context);
+			if (value1 != null)
+			{
+				this.values[index] = value1;
+				this.varargs = true;
+				return;
+			}
+			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type", param.getName());
 			return;
 		}
 		
@@ -248,12 +254,10 @@ public final class ArgumentList implements IArguments, IValueList
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			value1 = elementType.convertValue(value, typeContext, markers, context);
+			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = markers.create(value.getPosition(), "method.access.argument_type", param.getName());
-				marker.addInfo("Required Type: " + elementType);
-				marker.addInfo("Value Type: " + value.getType());
+				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type", param.getName());
 			}
 			else
 			{
@@ -263,26 +267,59 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 	
 	@Override
-	public void writeValue(int index, Name name, IValue defaultValue, MethodWriter writer) throws BytecodeException
+	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		if (index < this.size)
+		if (index >= this.size)
 		{
-			this.values[index].writeExpression(writer);
 			return;
 		}
-		defaultValue.writeExpression(writer);
+		param.getType().inferTypes(this.values[index].getType(), typeContext);
 	}
 	
 	@Override
-	public void writeVarargsValue(int index, Name name, IType type, MethodWriter writer) throws BytecodeException
+	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
 	{
-		if (this.varargs)
+		if (index >= this.size)
 		{
-			this.values[index].writeExpression(writer);
 			return;
 		}
 		
-		type = type.getElementType();
+		IType type = this.values[index].getType();
+		if (index + 1 == this.size && type.isArrayType())
+		{
+			param.getType().inferTypes(type, typeContext);
+			return;
+		}
+		
+		for (int i = index + 1; i < this.size; i++)
+		{
+			type = Types.combine(type, this.values[i].getType());
+		}
+		
+		param.getType().getElementType().inferTypes(type, typeContext);
+	}
+	
+	@Override
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
+	{
+		if (index < this.size)
+		{
+			this.values[index].writeExpression(writer, param.getType());
+			return;
+		}
+		param.getValue().writeExpression(writer, param.getType());
+	}
+	
+	@Override
+	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
+	{
+		if (this.varargs)
+		{
+			this.values[index].writeExpression(writer, param.getType());
+			return;
+		}
+		
+		IType type = param.getType().getElementType();
 		int len = this.size - index;
 		if (len < 0)
 		{
@@ -301,7 +338,7 @@ public final class ArgumentList implements IArguments, IValueList
 			writer.writeInsn(Opcodes.DUP);
 			IValue value = this.values[index + i];
 			writer.writeLDC(i);
-			value.writeExpression(writer);
+			value.writeExpression(writer, type);
 			writer.writeInsn(opcode);
 		}
 	}
@@ -375,7 +412,7 @@ public final class ArgumentList implements IArguments, IValueList
 		int len = this.size;
 		for (int i = 0; i < len; i++)
 		{
-			this.values[i].toString("", buffer);
+			this.values[i].toString(prefix, buffer);
 			if (i + 1 == len)
 			{
 				break;

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.ASTNode;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -13,15 +13,26 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class InitializerCall extends ASTNode implements IValue
+public class InitializerCall implements ICall
 {
-	private IConstructor	constructor;
-	private IArguments		arguments;
-	private boolean			isSuper;
+	protected ICodePosition position;
+	
+	protected boolean		isSuper;
+	protected IArguments	arguments	= EmptyArguments.INSTANCE;
+	
+	// Metadata
+	protected IConstructor constructor;
+	
+	public InitializerCall(ICodePosition position, boolean isSuper)
+	{
+		this.position = position;
+		this.isSuper = isSuper;
+	}
 	
 	public InitializerCall(ICodePosition position, IConstructor constructor, IArguments arguments, boolean isSuper)
 	{
@@ -31,17 +42,40 @@ public class InitializerCall extends ASTNode implements IValue
 		this.isSuper = isSuper;
 	}
 	
-	public InitializerCall(ICodePosition position, IConstructor constructor, IArguments arguments)
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	@Override
+	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
-		this.constructor = constructor;
-		this.arguments = arguments;
 	}
 	
 	@Override
 	public int valueTag()
 	{
 		return INITIALIZER_CALL;
+	}
+	
+	@Override
+	public IArguments getArguments()
+	{
+		return this.arguments;
+	}
+	
+	@Override
+	public void setArguments(IArguments arguments)
+	{
+		this.arguments = arguments;
+	}
+	
+	@Override
+	public boolean isResolved()
+	{
+		return true;
 	}
 	
 	@Override
@@ -63,22 +97,56 @@ public class InitializerCall extends ASTNode implements IValue
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
-	{
-		return 0;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.resolveTypes(markers, context);
 	}
 	
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public void checkArguments(MarkerList markers, IContext context)
+	{
+		this.constructor.checkArguments(markers, this.position, context, this.constructor.getTheClass().getType(), arguments);
+	}
+
+	@Override
+	public IValue resolveCall(MarkerList markers, IContext context)
+	{
+		IClass iclass = context.getThisClass();
+		if (this.isSuper)
+		{
+			iclass = iclass.getSuperType().getTheClass();
+		}
+		
+		IConstructor match = IContext.resolveConstructor(iclass, this.arguments);
+		if (match != null)
+		{
+			this.constructor = match;
+			this.checkArguments(markers, context);
+			return this;
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		IClass iclass = context.getThisClass();
+		Marker marker = I18n.createMarker(this.position, "resolve.constructor", iclass.getName().qualified);
+		if (!this.arguments.isEmpty())
+		{
+			StringBuilder builder = new StringBuilder("Argument Types: ");
+			this.arguments.typesToString(builder);
+			marker.addInfo(builder.toString());
+		}
+		
+		markers.add(marker);
+	}
+
+	@Override
+	public void resolveArguments(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
-		return this;
 	}
 	
 	@Override
@@ -118,18 +186,13 @@ public class InitializerCall extends ASTNode implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
-		this.constructor.writeInvoke(writer);
+		this.constructor.writeInvoke(writer, this.getLineNumber());
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.isSuper ? "super" : "this");
-		if (this.arguments == EmptyArguments.INSTANCE)
-		{
-			buffer.append(Formatting.Method.emptyParameters);
-			return;
-		}
+		buffer.append(this.isSuper ? "super.new" : "this.new");
 		this.arguments.toString(prefix, buffer);
 	}
 }

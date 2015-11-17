@@ -24,4 +24,5 @@ package dyvil.lang.literal;
  */
 public @interface BooleanConvertible
 {
+	String methodName() default "apply";
 }

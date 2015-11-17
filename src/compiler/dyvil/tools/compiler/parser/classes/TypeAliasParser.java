@@ -1,17 +1,15 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class TypeAliasParser extends Parser
 {
@@ -19,8 +17,8 @@ public class TypeAliasParser extends Parser
 	private static final int	NAME	= 2;
 	private static final int	EQUAL	= 4;
 	
-	protected ITypeAliasMap		map;
-	protected ITypeAlias		typeAlias;
+	protected ITypeAliasMap	map;
+	protected ITypeAlias	typeAlias;
 	
 	public TypeAliasParser(ITypeAliasMap map)
 	{
@@ -36,14 +34,7 @@ public class TypeAliasParser extends Parser
 	}
 	
 	@Override
-	public void reset()
-	{
-		this.mode = TYPE;
-		this.typeAlias = null;
-	}
-	
-	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		switch (this.mode)
 		{
@@ -54,11 +45,13 @@ public class TypeAliasParser extends Parser
 		case TYPE:
 			this.mode = NAME;
 			this.typeAlias = new TypeAlias();
-			if (token.type() == Keywords.TYPE)
+			if (token.type() == DyvilKeywords.TYPE)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type Alias - 'type' expected", true);
+			pm.reparse();
+			pm.report(token, "Invalid Type Alias - 'type' expected");
+			return;
 		case NAME:
 			if (ParserUtil.isIdentifier(token.type()))
 			{
@@ -69,15 +62,18 @@ public class TypeAliasParser extends Parser
 			}
 			pm.skip();
 			pm.popParser();
-			throw new SyntaxError(token, "Invalid Type Alias - Identifier expected");
+			pm.report(token, "Invalid Type Alias - Identifier expected");
+			return;
 		case EQUAL:
 			this.mode = 0;
-			pm.pushParser(new TypeParser(this.typeAlias));
-			if (token.type() == Symbols.EQUALS)
+			pm.pushParser(pm.newTypeParser(this.typeAlias));
+			if (token.type() == BaseSymbols.EQUALS)
 			{
 				return;
 			}
-			throw new SyntaxError(token, "Invalid Type Alias - '=' expected", true);
+			pm.reparse();
+			pm.report(token, "Invalid Type Alias - '=' expected");
+			return;
 		}
 	}
 }

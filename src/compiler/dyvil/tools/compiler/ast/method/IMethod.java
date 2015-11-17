@@ -1,63 +1,68 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.tools.compiler.ast.IASTNode;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.Label;
-
-public interface IMethod extends IASTNode, IClassMember, ICallableMember, IMethodSignature, IContext
+public interface IMethod extends IClassMember, ICallableMember, IMethodSignature, IContext
 {
-	public int getSignatureMatch(Name name, IValue instance, IArguments arguments);
+	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
+	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
+	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
 	// Misc
 	
-	public void setParameters(IParameter[] parameters, int parameterCount);
+	boolean isAbstract();
+	
+	void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
-	public default void addType(IType type)
+	default void addType(IType type)
 	{
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
 	
+	boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	
 	// Generics
 	
-	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
+	GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
 	
-	public boolean hasTypeVariables();
+	boolean hasTypeVariables();
 	
 	// Compilation
 	
-	public boolean isIntrinsic();
+	boolean isIntrinsic();
 	
-	public String getDescriptor();
+	int getInvokeOpcode();
 	
-	public String getSignature();
+	String getDescriptor();
 	
-	public String[] getExceptions();
+	String getSignature();
 	
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type) throws BytecodeException;
+	String[] getExceptions();
 	
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException;
+	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
 	
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException;
+	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 	
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments) throws BytecodeException;
+	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	
+	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
 }

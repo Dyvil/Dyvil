@@ -1,54 +1,59 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.lang.List;
-import dyvil.lang.Map;
+import java.io.InputStream;
 
+import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
-import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.external.ExternalClass;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.MethodMatch;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.lexer.CodeFile;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.CodePosition;
+import dyvil.tools.compiler.backend.ClassReader;
+import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.library.Library;
+import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.CodePosition;
 
-public class Package implements INamed, IContext
+public class Package implements INamed, IDefaultContext
 {
-	public static RootPackage	rootPackage	= new RootPackage();
+	public static RootPackage rootPackage = new RootPackage();
 	
-	public static Package		dyvil;
-	public static Package		dyvilLang;
-	public static Package		dyvilAnnotation;
-	public static Package		dyvilArray;
-	public static Package		dyvilFunction;
-	public static Package		dyvilTuple;
-	public static Package		dyvilLangLiteral;
-	public static Package		dyvilLangRef;
-	public static Package		dyvilLangRefSimple;
-	public static Package		java;
-	public static Package		javaLang;
-	public static Package		javaLangAnnotation;
+	public static Package	dyvil;
+	public static Package	dyvilAnnotation;
+	public static Package	dyvilArray;
+	public static Package	dyvilCollection;
+	public static Package	dyvilFunction;
+	public static Package	dyvilLang;
+	public static Package	dyvilLangLiteral;
+	public static Package	dyvilLangRef;
+	public static Package	dyvilLangRefSimple;
+	public static Package	dyvilTuple;
+	public static Package	dyvilUtil;
+	public static Package	java;
+	public static Package	javaIO;
+	public static Package	javaLang;
+	public static Package	javaLangAnnotation;
+	public static Package	javaUtil;
 	
-	public Package				parent;
-	public Name					name;
-	public String				fullName;
-	public String				internalName;
+	protected Package	parent;
+	protected Name		name;
+	protected String	fullName;
+	private String		internalName;
 	
-	public List<IDyvilHeader>	headers		= new ArrayList();
-	public Map<String, Package>	subPackages	= new HashMap();
+	private List<IClass>			classes		= new ArrayList();
+	protected List<IDyvilHeader>	headers		= new ArrayList();
+	protected Map<String, Package>	subPackages	= new HashMap();
 	
 	protected Package()
 	{
@@ -59,32 +64,37 @@ public class Package implements INamed, IContext
 		this.name = name;
 		this.parent = parent;
 		
-		if (parent == null || parent.name == null)
+		if (parent == null || parent == rootPackage)
 		{
 			this.fullName = name.qualified;
-			this.internalName = ClassFormat.packageToInternal(name.qualified) + "/";
+			this.setInternalName(ClassFormat.packageToInternal(name.qualified) + "/");
 		}
 		else
 		{
 			this.fullName = parent.fullName + "." + name.qualified;
-			this.internalName = parent.internalName + name.qualified + "/";
+			this.setInternalName(parent.getInternalName() + name.qualified + "/");
 		}
 	}
 	
 	public static void init()
 	{
-		dyvil = Library.dyvilLibrary.resolvePackage("dyvil");
-		dyvilLang = dyvil.resolvePackage("lang");
+		dyvil = rootPackage.resolvePackage("dyvil");
 		dyvilAnnotation = dyvil.resolvePackage("annotation");
 		dyvilArray = dyvil.resolvePackage("array");
+		dyvilCollection = dyvil.resolvePackage("collection");
 		dyvilFunction = dyvil.resolvePackage("function");
-		dyvilTuple = dyvil.resolvePackage("tuple");
+		dyvilLang = dyvil.resolvePackage("lang");
 		dyvilLangLiteral = dyvilLang.resolvePackage("literal");
 		dyvilLangRef = dyvilLang.resolvePackage("ref");
 		dyvilLangRefSimple = dyvilLangRef.resolvePackage("simple");
-		java = Library.javaLibrary.resolvePackage("java");
+		dyvilTuple = dyvil.resolvePackage("tuple");
+		dyvilUtil = dyvil.resolvePackage("util");
+		
+		java = rootPackage.resolvePackage("java");
+		javaIO = java.resolvePackage("io");
 		javaLang = java.resolvePackage("lang");
 		javaLangAnnotation = javaLang.resolvePackage("annotation");
+		javaUtil = java.resolvePackage("util");
 	}
 	
 	// Name
@@ -102,6 +112,16 @@ public class Package implements INamed, IContext
 	}
 	
 	// Units
+	
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
+	}
+	
+	public String getInternalName()
+	{
+		return this.internalName;
+	}
 	
 	public void addHeader(IDyvilHeader unit)
 	{
@@ -126,45 +146,18 @@ public class Package implements INamed, IContext
 		return pack;
 	}
 	
-	public void check(PackageDeclaration packageDecl, CodeFile file, MarkerList markers)
+	public void check(PackageDeclaration packageDecl, MarkerList markers)
 	{
 		if (packageDecl == null)
 		{
-			if (this.fullName != null)
-			{
-				markers.add(new CodePosition(0, 0, 1), "package.missing");
-			}
+			markers.add(I18n.createMarker(new CodePosition(0, 0, 1), "package.missing"));
 			return;
 		}
 		
-		if (this.fullName == null)
+		if (!this.fullName.equals(packageDecl.getPackage()))
 		{
-			markers.add(packageDecl.getPosition(), "package.default");
-			return;
+			markers.add(I18n.createMarker(packageDecl.getPosition(), "package.invalid", this.fullName));
 		}
-		
-		if (!this.fullName.equals(packageDecl.thePackage))
-		{
-			markers.add(packageDecl.getPosition(), "package.invalid");
-		}
-	}
-	
-	@Override
-	public boolean isStatic()
-	{
-		return true;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
 	}
 	
 	@Override
@@ -175,19 +168,39 @@ public class Package implements INamed, IContext
 	
 	public Package resolvePackage(String name)
 	{
-		return this.subPackages.get(name);
+		Package pack = this.subPackages.get(name);
+		if (pack != null)
+		{
+			return pack;
+		}
+		
+		String internal = this.internalName + name;
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			if (library.isSubPackage(internal))
+			{
+				return this.createSubPackage(name);
+			}
+		}
+		
+		return null;
 	}
 	
 	public IDyvilHeader resolveHeader(String name)
 	{
+		return this.resolveHeader(Name.getQualified(name));
+	}
+	
+	public IDyvilHeader resolveHeader(Name name)
+	{
 		for (IDyvilHeader unit : this.headers)
 		{
-			if (unit.getName().equals(name))
+			if (unit.getName() == name)
 			{
 				return unit;
 			}
 		}
-		return null;
+		return this.loadHeader(name);
 	}
 	
 	public IClass resolveClass(String name)
@@ -200,12 +213,105 @@ public class Package implements INamed, IContext
 	{
 		for (IDyvilHeader c : this.headers)
 		{
-			if (c.getName().equals(name.qualified))
+			if (c.getName() == name)
 			{
 				return c.getClass(name);
 			}
 		}
 		
+		for (IClass c : this.classes)
+		{
+			if (c.getName() == name)
+			{
+				return c;
+			}
+		}
+		
+		String qualifiedName = name.qualified;
+		// Check for inner / nested / anonymous classes
+		int cashIndex = qualifiedName.indexOf('$');
+		if (cashIndex >= 0)
+		{
+			Name firstName = Name.getQualified(qualifiedName.substring(0, cashIndex));
+			Name lastName = Name.getQualified(qualifiedName.substring(cashIndex + 1));
+			
+			IClass c = this.resolveClass(firstName);
+			if (c != null)
+			{
+				return c.resolveClass(lastName);
+			}
+		}
+		
+		return this.loadClass(name, qualifiedName);
+	}
+	
+	private IClass loadClass(Name name, String qualifiedName)
+	{
+		String fileName = this.getInternalName() + qualifiedName + FileType.CLASS_EXTENSION;
+		
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			IClass iclass = this.loadClass(fileName, name, library);
+			if (iclass != null)
+			{
+				return iclass;
+			}
+		}
+		
+		return null;
+	}
+	
+	private IDyvilHeader loadHeader(Name name)
+	{
+		String fileName = this.getInternalName() + name.qualified + FileType.OBJECT_EXTENSION;
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			IDyvilHeader header = this.loadHeader(fileName, name, library);
+			if (header != null)
+			{
+				return header;
+			}
+		}
+		
+		return null;
+	}
+	
+	public static IClass loadClass(String fileName, Name name)
+	{
+		for (Library library : DyvilCompiler.config.libraries)
+		{
+			InputStream is = library.getInputStream(fileName);
+			if (is != null)
+			{
+				ExternalClass bclass = new ExternalClass(name);
+				return ClassReader.loadClass(bclass, is, false);
+			}
+		}
+		return null;
+	}
+	
+	private IClass loadClass(String fileName, Name name, Library library)
+	{
+		InputStream is = library.getInputStream(fileName);
+		if (is != null)
+		{
+			ExternalClass bclass = new ExternalClass(name);
+			this.classes.add(bclass);
+			return ClassReader.loadClass(bclass, is, false);
+		}
+		return null;
+	}
+	
+	private IDyvilHeader loadHeader(String fileName, Name name, Library library)
+	{
+		InputStream is = library.getInputStream(fileName);
+		if (is != null)
+		{
+			DyvilHeader header = new ExternalHeader(name);
+			header.pack = this;
+			this.headers.add(header);
+			return ObjectFormat.read(is, header);
+		}
 		return null;
 	}
 	
@@ -218,40 +324,6 @@ public class Package implements INamed, IContext
 			return new ClassType(iclass);
 		}
 		return null;
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		return 0;
 	}
 	
 	@Override

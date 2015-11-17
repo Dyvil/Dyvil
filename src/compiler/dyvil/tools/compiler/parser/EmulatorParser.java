@@ -1,15 +1,37 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.parsing.token.IToken;
 
 public abstract class EmulatorParser extends Parser implements IParserManager
 {
-	protected IToken			firstToken;
-	protected Parser			tryParser;
+	protected IToken firstToken;
 	
+	protected Parser			tryParser;
 	protected Parser			parser;
 	protected IParserManager	pm;
+	
+	protected void reset()
+	{
+		this.firstToken = null;
+		this.tryParser = this.parser = null;
+		this.pm = null;
+	}
+	
+	protected void tryParser(IParserManager pm, IToken token, Parser parser)
+	{
+		this.pm = pm;
+		this.firstToken = token;
+		this.parser = this.tryParser = parser;
+	}
+	
+	@Override
+	public void stop()
+	{
+		this.pm.stop();
+	}
 	
 	@Override
 	public void skip()
@@ -75,7 +97,7 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 	}
 	
 	@Override
-	public void popParser(boolean reparse) throws SyntaxError
+	public void popParser(boolean reparse)
 	{
 		if (reparse)
 		{
@@ -89,5 +111,23 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 		}
 		
 		this.parser = this.parser.getParent();
+	}
+	
+	@Override
+	public Parser newExpressionParser(IValueConsumer valueConsumer)
+	{
+		return this.pm.newExpressionParser(valueConsumer);
+	}
+	
+	@Override
+	public Parser newTypeParser(ITypeConsumer typeConsumer)
+	{
+		return this.pm.newTypeParser(typeConsumer);
+	}
+	
+	@Override
+	public Parser newAnnotationParser(IAnnotation annotation)
+	{
+		return this.pm.newAnnotationParser(annotation);
 	}
 }

@@ -3,10 +3,10 @@ package dyvil.lang.literal;
 /**
  * Marks a class that can be instantiated with an array literal. This will cause
  * the compiler to insert a call to a method of that class with the signature
- * {@code static X apply([Y])}, where {@code Y} is the type of the array. Note
- * that such a method is automatically inserted by the <i>Dyvil Compiler</i> for
- * any {@code case class} that takes a single {@code [X]} parameter, as shown in
- * the below example.
+ * {@code static X apply([E])}, where {@code E} is the element type of the
+ * array. Note that such a method is automatically inserted by the <i>Dyvil
+ * Compiler</i> for any {@code case class} that takes a single {@code [E]}
+ * parameter, as shown in the below example.
  * <p>
  * Example:
  * 
@@ -23,4 +23,5 @@ package dyvil.lang.literal;
  */
 public @interface ArrayConvertible
 {
+	String methodName() default "apply";
 }

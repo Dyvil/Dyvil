@@ -1,37 +1,38 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalField extends Field
 {
 	private boolean	annotationsResolved;
 	private boolean	returnTypeResolved;
 	
-	public ExternalField(IClass iclass)
+	public ExternalField(IClass iclass, int access, Name name, IType type)
 	{
-		super(iclass);
+		super(iclass, name, type);
+		this.modifiers = access;
 	}
 	
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(null, Package.rootPackage);
+			this.annotations.resolveTypes(null, Package.rootPackage, this);
 		}
 	}
 	
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolve(null, this.theClass, TypePosition.RETURN_TYPE);
+		this.type = this.type.resolveType(null, this.theClass);
 	}
 	
 	@Override
@@ -45,7 +46,7 @@ public final class ExternalField extends Field
 	}
 	
 	@Override
-	public Annotation getAnnotation(int index)
+	public IAnnotation getAnnotation(IClass type)
 	{
 		if (this.annotations == null)
 		{
@@ -56,22 +57,7 @@ public final class ExternalField extends Field
 		{
 			this.resolveAnnotations();
 		}
-		return this.annotations[index];
-	}
-	
-	@Override
-	public Annotation getAnnotation(IClass type)
-	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		
-		if (!this.annotationsResolved)
-		{
-			this.resolveAnnotations();
-		}
-		return super.getAnnotation(type);
+		return this.annotations.getAnnotation(type);
 	}
 	
 	@Override

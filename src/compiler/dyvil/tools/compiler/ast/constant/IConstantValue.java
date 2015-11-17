@@ -3,52 +3,64 @@ package dyvil.tools.compiler.ast.constant;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IConstantValue extends IValue
 {
 	@Override
-	public default boolean isConstant()
+	default boolean isResolved()
 	{
 		return true;
 	}
 	
 	@Override
-	public default void resolveTypes(MarkerList markers, IContext context)
+	default boolean isConstant()
+	{
+		return true;
+	}
+	
+	@Override
+	default void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
 	
 	@Override
-	public default IValue resolve(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
-	public default void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public default void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public default IValue foldConstants()
+	default IValue resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 	
 	@Override
-	public default IValue cleanup(IContext context, IClassCompilableList compilableList)
+	default void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	default void check(MarkerList markers, IContext context)
+	{
+	}
+	
+	@Override
+	default IValue foldConstants()
 	{
 		return this;
 	}
 	
 	@Override
-	public int stringSize();
+	default IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		return this;
+	}
 	
 	@Override
-	public boolean toStringBuilder(StringBuilder builder);
+	default IValue toConstant(MarkerList markers)
+	{
+		return this;
+	}
+	
+	@Override
+	int stringSize();
+	
+	@Override
+	boolean toStringBuilder(StringBuilder builder);
 }

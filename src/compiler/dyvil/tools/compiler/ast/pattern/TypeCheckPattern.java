@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
-
-import org.objectweb.asm.Label;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class TypeCheckPattern implements IPattern
 {
@@ -38,6 +37,12 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
 	public int getPatternType()
 	{
 		return TYPECHECK;
@@ -56,7 +61,7 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public IPattern withType(IType type)
+	public IPattern withType(IType type, MarkerList markers)
 	{
 		if (type.isPrimitive())
 		{
@@ -88,39 +93,24 @@ public class TypeCheckPattern implements IPattern
 		
 		if (this.type != null)
 		{
-			this.type = this.type.resolve(markers, context, TypePosition.CLASS);
+			this.type = this.type.resolveType(markers, context);
 			
 			if (this.pattern != null && this.pattern.getPatternType() != WILDCARD)
 			{
-				this.pattern = this.pattern.withType(this.type);
+				this.pattern = this.pattern.withType(this.type, markers);
 			}
 			
 			if (this.type.isPrimitive())
 			{
-				markers.add(this.type.getPosition(), "pattern.typecheck.primitive");
+				markers.add(I18n.createMarker(this.position, "pattern.typecheck.primitive"));
 			}
 		}
 		else
 		{
-			markers.add(this.position, "pattern.typecheck.invalid");
+			markers.add(I18n.createMarker(this.position, "pattern.typecheck.invalid"));
 		}
 		
 		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.pattern != null)
-		{
-			this.pattern.checkTypes(markers, context);
-		}
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
-	{
-		// TODO
 	}
 	
 	@Override

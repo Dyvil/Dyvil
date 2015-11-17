@@ -2,24 +2,25 @@ package dyvil.collection.mutable;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Set;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.MutableList;
+import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArrayList;
 
 @NilConvertible
 @ArrayConvertible
-public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
+public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
 {
+	private static final long serialVersionUID = 5286872411535856904L;
+	
 	public static <E> ArrayList<E> apply()
 	{
 		return new ArrayList();
@@ -30,6 +31,11 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		return new ArrayList(elements, true);
 	}
 	
+	public static <E> ArrayList<E> fromArray(E... elements)
+	{
+		return new ArrayList(elements);
+	}
+	
 	public ArrayList()
 	{
 		super();
@@ -37,25 +43,25 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	
 	public ArrayList(int size)
 	{
-		super(size);
+		super((E[]) new Object[size], 0, true);
 	}
 	
-	public ArrayList(Object... elements)
+	public ArrayList(E... elements)
 	{
 		super(elements);
 	}
 	
-	public ArrayList(Object[] elements, boolean trusted)
+	public ArrayList(E[] elements, boolean trusted)
 	{
-		super(elements, trusted);
+		super(elements, elements.length, trusted);
 	}
 	
-	public ArrayList(Object[] elements, int size)
+	public ArrayList(E[] elements, int size)
 	{
 		super(elements, size);
 	}
 	
-	public ArrayList(Object[] elements, int size, boolean trusted)
+	public ArrayList(E[] elements, int size, boolean trusted)
 	{
 		super(elements, size, trusted);
 	}
@@ -63,44 +69,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	public ArrayList(Collection<E> collection)
 	{
 		super(collection);
-	}
-	
-	@Override
-	public Iterator<E> iterator()
-	{
-		return new Iterator<E>()
-		{
-			int	index;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArrayList.this.size;
-			}
-			
-			@Override
-			public E next()
-			{
-				return (E) ArrayList.this.elements[this.index++];
-			}
-			
-			@Override
-			public void remove()
-			{
-				if (this.index <= 0)
-				{
-					throw new IllegalStateException();
-				}
-				ArrayList.this.removeAt(this.index - 1);
-				this.index--;
-			}
-			
-			@Override
-			public String toString()
-			{
-				return "ListIterator(" + ArrayList.this + ")";
-			}
-		};
 	}
 	
 	@Override
@@ -118,158 +86,23 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<E> $plus(E element)
+	public MutableList<E> withCapacity(int newCapacity)
 	{
-		Object[] array = new Object[this.size + 1];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		array[this.size] = element;
-		return new ArrayList(array, this.size + 1, true);
+		Object[] newArray = new Object[Math.max(this.size, newCapacity)];
+		System.arraycopy(this.elements, 0, newArray, 0, this.size);
+		return new ArrayList(newArray, this.size, true);
 	}
 	
 	@Override
-	public MutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	public MutableList<E> reversed()
 	{
-		int len = collection.size();
-		Object[] array = new Object[this.size + len];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		
-		Object[] array1 = collection.toArray();
-		System.arraycopy(array1, 0, array, this.size, len);
-		return new ArrayList(array, this.size + len, true);
-	}
-	
-	@Override
-	public MutableList<E> $minus(Object element)
-	{
-		int index = this.indexOf(element);
-		if (index < 0)
+		Object[] newArray = new Object[this.size];
+		int index = this.size;
+		for (Object o : this.elements)
 		{
-			return this;
+			newArray[--index] = o;
 		}
-		
-		Object[] array = new Object[this.size - 1];
-		if (index > 0)
-		{
-			// copy the first part before the index
-			System.arraycopy(this.elements, 0, array, 0, index);
-		}
-		if (index < this.size)
-		{
-			// copy the second part after the index
-			System.arraycopy(this.elements, index + 1, array, index, this.size - index - 1);
-		}
-		return new ArrayList(array, this.size - 1, true);
-	}
-	
-	@Override
-	public MutableList<? extends E> $minus$minus(Collection<?> collection)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size];
-		
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.contains(e))
-			{
-				array[index++] = e;
-			}
-		}
-		return new ArrayList(array, index, true);
-	}
-	
-	@Override
-	public MutableList<? extends E> $amp(Collection<? extends E> collection)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size];
-		
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (collection.contains(e))
-			{
-				array[index++] = e;
-			}
-		}
-		return new ArrayList(array, index, true);
-	}
-	
-	@Override
-	public <R> MutableList<R> mapped(Function<? super E, ? extends R> mapper)
-	{
-		Object[] array = new Object[this.size];
-		for (int i = 0; i < this.size; i++)
-		{
-			array[i] = mapper.apply((E) this.elements[i]);
-		}
-		return new ArrayList(array, this.size, true);
-	}
-	
-	@Override
-	public <R> MutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
-	{
-		ArrayList<R> list = new ArrayList(this.size << 2);
-		for (int i = 0; i < this.size; i++)
-		{
-			for (R r : mapper.apply((E) this.elements[i]))
-			{
-				list.$plus$eq(r);
-			}
-		}
-		return list;
-	}
-	
-	@Override
-	public MutableList<E> filtered(Predicate<? super E> condition)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size];
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (condition.test((E) e))
-			{
-				array[index++] = e;
-			}
-		}
-		return new ArrayList(array, index, true);
-	}
-	
-	@Override
-	public MutableList<E> sorted()
-	{
-		Object[] array = new Object[this.size];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		Arrays.sort(array, 0, this.size);
-		return new ArrayList(array, this.size, true);
-	}
-	
-	@Override
-	public MutableList<E> sorted(Comparator<? super E> comparator)
-	{
-		Object[] array = new Object[this.size];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		Arrays.sort((E[]) array, 0, this.size, comparator);
-		return new ArrayList(array, this.size, true);
-	}
-	
-	@Override
-	public MutableList<E> distinct()
-	{
-		Object[] array = new Object[this.size];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = Set.distinct(array, this.size);
-		return new ArrayList(array, size, true);
-	}
-	
-	@Override
-	public MutableList<E> distinct(Comparator<? super E> comparator)
-	{
-		Object[] array = new Object[this.size];
-		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = Set.distinct((E[]) array, this.size, comparator);
-		return new ArrayList(array, size, true);
+		return new ArrayList(newArray, this.size, true);
 	}
 	
 	@Override
@@ -277,23 +110,6 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	{
 		this.ensureCapacity(this.size + 1);
 		this.elements[this.size++] = element;
-	}
-	
-	@Override
-	public void $minus$minus$eq(Collection<?> collection)
-	{
-		int index = 0;
-		Object[] array = new Object[this.size];
-		for (int i = 0; i < this.size; i++)
-		{
-			Object e = this.elements[i];
-			if (!collection.contains(e))
-			{
-				array[index++] = e;
-			}
-		}
-		this.elements = array;
-		this.size = index;
 	}
 	
 	@Override
@@ -307,8 +123,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.size = 0;
 	}
 	
-	@Override
-	public void resize(int newLength)
+	protected void resize(int newLength)
 	{
 		if (newLength < this.size)
 		{
@@ -449,8 +264,32 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void $amp$eq(Collection<? extends E> collection)
+	public boolean removeAll(Collection<?> collection)
 	{
+		boolean removed = false;
+		int index = 0;
+		Object[] array = new Object[this.size];
+		for (int i = 0; i < this.size; i++)
+		{
+			Object e = this.elements[i];
+			if (!collection.contains(e))
+			{
+				array[index++] = e;
+			}
+			else
+			{
+				removed = true;
+			}
+		}
+		this.elements = array;
+		this.size = index;
+		return removed;
+	}
+	
+	@Override
+	public boolean intersect(Collection<? extends E> collection)
+	{
+		boolean removed = false;
 		int index = 0;
 		Object[] array = new Object[this.size];
 		for (int i = 0; i < this.size; i++)
@@ -460,9 +299,14 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			{
 				array[index++] = e;
 			}
+			else
+			{
+				removed = true;
+			}
 		}
 		this.elements = array;
 		this.size = index;
+		return removed;
 	}
 	
 	@Override
@@ -502,7 +346,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			{
 				if (index >= array.length)
 				{
-					Object[] temp = new Object[index + 5];
+					Object[] temp = new Object[index << 1];
 					System.arraycopy(array, 0, temp, 0, index);
 					array = temp;
 				}
@@ -512,6 +356,17 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		
 		this.elements = array;
 		this.size = index;
+	}
+	
+	@Override
+	public void reverse()
+	{
+		for (int start = 0, end = this.size - 1; start <= end; start++, end--)
+		{
+			Object temp = this.elements[start];
+			this.elements[start] = this.elements[end];
+			this.elements[end] = temp;
+		}
 	}
 	
 	@Override
@@ -535,13 +390,25 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public void distinguish(Comparator<? super E> comparator)
 	{
-		this.size = Set.distinct((E[]) this.elements, this.size, comparator);
+		this.size = Set.sortDistinct((E[]) this.elements, this.size, comparator);
 	}
 	
 	@Override
 	public MutableList<E> copy()
 	{
 		return new ArrayList(this.elements, this.size);
+	}
+	
+	@Override
+	public MutableList<E> emptyCopy()
+	{
+		return new ArrayList(this.size);
+	}
+	
+	@Override
+	public MutableList<E> emptyCopy(int newCapacity)
+	{
+		return new ArrayList(newCapacity);
 	}
 	
 	@Override

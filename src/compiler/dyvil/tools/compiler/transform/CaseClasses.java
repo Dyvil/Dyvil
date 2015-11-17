@@ -1,22 +1,20 @@
 package dyvil.tools.compiler.transform;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-
-import org.objectweb.asm.Label;
 
 import static dyvil.reflect.Opcodes.*;
 
 public interface CaseClasses
 {
-	public static void writeEquals(MethodWriter writer, IClass theClass) throws BytecodeException
+	static void writeEquals(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		Label label;
 		// Write check 'if (this == obj)'
@@ -71,7 +69,7 @@ public interface CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	public static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
+	static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
 	{
 		IType type = field.getType();
 		
@@ -79,29 +77,29 @@ public interface CaseClasses
 		{
 			// Push 'this'
 			writer.writeVarInsn(ALOAD, 0);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			// Push 'var'
 			writer.writeVarInsn(ALOAD, 2);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			
 			Label label = new Label();
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
-			case ClassFormat.T_BYTE:
-			case ClassFormat.T_SHORT:
-			case ClassFormat.T_CHAR:
-			case ClassFormat.T_INT:
+			case PrimitiveType.BOOLEAN_CODE:
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
 				writer.writeJumpInsn(IF_ICMPEQ, label);
 				break;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				writer.writeJumpInsn(IF_LCMPEQ, label);
 				break;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				writer.writeJumpInsn(IF_FCMPEQ, label);
 				break;
-			case ClassFormat.T_DOUBLE:
-				writer.writeJumpInsn(IF_FCMPEQ, label);
+			case PrimitiveType.DOUBLE_CODE:
+				writer.writeJumpInsn(IF_DCMPEQ, label);
 				break;
 			}
 			writer.writeLDC(0);
@@ -117,19 +115,20 @@ public interface CaseClasses
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
 		writer.writeVarInsn(ALOAD, 0);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		writer.writeJumpInsn(IFNONNULL, elseLabel);
 		writer.writeVarInsn(ALOAD, 2);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		writer.writeJumpInsn(IFNULL, endLabel);
 		writer.writeLDC(0);
 		writer.writeInsn(IRETURN);
 		writer.writeLabel(elseLabel);
 		writer.writeVarInsn(ALOAD, 0);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		writer.writeVarInsn(ALOAD, 2);
-		field.writeGet(writer, null);
+		field.writeGet(writer, null, 0);
 		
+		writer.writeLineNumber(0);
 		if (type.isArrayType())
 		{
 			writeArrayEquals(writer, type.getElementType());
@@ -145,35 +144,35 @@ public interface CaseClasses
 		writer.writeLabel(endLabel);
 	}
 	
-	public static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
+	static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{
 		case IType.PRIMITIVE:
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
+			case PrimitiveType.BOOLEAN_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "equals", "([Z[Z)Z", true);
 				return;
-			case ClassFormat.T_BYTE:
+			case PrimitiveType.BYTE_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "equals", "([B[B)Z", true);
 				return;
-			case ClassFormat.T_SHORT:
+			case PrimitiveType.SHORT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "equals", "([S[S)Z", true);
 				return;
-			case ClassFormat.T_CHAR:
+			case PrimitiveType.CHAR_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "equals", "([C[C)Z", true);
 				return;
-			case ClassFormat.T_INT:
+			case PrimitiveType.INT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "equals", "([I[I)Z", true);
 				return;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "equals", "([J[J)Z", true);
 				return;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "equals", "([F[F)Z", true);
 				return;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "equals", "([D[D)Z", true);
 				return;
 			default:
@@ -188,7 +187,7 @@ public interface CaseClasses
 		}
 	}
 	
-	public static void writeHashCode(MethodWriter writer, IClass theClass) throws BytecodeException
+	static void writeHashCode(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		writer.writeLDC(31);
 		
@@ -198,7 +197,7 @@ public interface CaseClasses
 			IDataMember field = theClass.getParameter(i);
 			// Load the value of the field
 			writer.writeVarInsn(ALOAD, 0);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			// Write the hashing strategy for the field
 			writeHashCode(writer, field.getType());
 			// Add the hash to the previous result
@@ -211,14 +210,14 @@ public interface CaseClasses
 		writer.writeInsn(IRETURN);
 	}
 	
-	public static void writeHashCode(MethodWriter writer, IType type) throws BytecodeException
+	static void writeHashCode(MethodWriter writer, IType type) throws BytecodeException
 	{
 		
 		if (type.isPrimitive())
 		{
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
+			case PrimitiveType.BOOLEAN_CODE:
 			{
 				// Write boolean hashing by using 1231 if the value is true and
 				// 1237 if the value is false
@@ -235,15 +234,15 @@ public interface CaseClasses
 				writer.writeLabel(endLabel);
 				return;
 			}
-			case ClassFormat.T_BYTE:
+			case PrimitiveType.BYTE_CODE:
 				return;
-			case ClassFormat.T_SHORT:
+			case PrimitiveType.SHORT_CODE:
 				return;
-			case ClassFormat.T_CHAR:
+			case PrimitiveType.CHAR_CODE:
 				return;
-			case ClassFormat.T_INT:
+			case PrimitiveType.INT_CODE:
 				return;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				// Write a long hashing snippet by XORing the value by the value
 				// bit-shifted 32 bits to the right, and then converting the
 				// result to an integer. l1 = (int) (l ^ (l >>> 32))
@@ -253,14 +252,16 @@ public interface CaseClasses
 				writer.writeInsn(LOR);
 				writer.writeInsn(L2I);
 				return;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				// Write a float hashing snippet using Float.floatToIntBits
+				writer.writeLineNumber(0);
 				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I", false);
 				return;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				// Write a double hashing snippet using Double.doubleToLongBits
 				// and long hashing
-				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)L", false);
+				writer.writeLineNumber(0);
+				writer.writeInvokeInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)J", false);
 				writer.writeInsn(DUP2);
 				writer.writeLDC(32);
 				writer.writeInsn(LUSHR);
@@ -279,6 +280,7 @@ public interface CaseClasses
 		writer.writeInsn(DUP);
 		writer.writeJumpInsn(IFNULL, elseLabel);
 		// then
+		writer.writeLineNumber(0);
 		if (type.isArrayType())
 		{
 			writeArrayHashCode(writer, type.getElementType());
@@ -295,35 +297,35 @@ public interface CaseClasses
 		writer.writeLabel(endLabel);
 	}
 	
-	public static void writeArrayHashCode(MethodWriter writer, IType type) throws BytecodeException
+	static void writeArrayHashCode(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{
 		case IType.PRIMITIVE:
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
+			case PrimitiveType.BOOLEAN_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "hashCode", "([Z)Z", true);
 				return;
-			case ClassFormat.T_BYTE:
+			case PrimitiveType.BYTE_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "hashCode", "([B)I", true);
 				return;
-			case ClassFormat.T_SHORT:
+			case PrimitiveType.SHORT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "hashCode", "([S)I", true);
 				return;
-			case ClassFormat.T_CHAR:
+			case PrimitiveType.CHAR_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "hashCode", "([C)I", true);
 				return;
-			case ClassFormat.T_INT:
+			case PrimitiveType.INT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "hashCode", "([I)I", true);
 				return;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "hashCode", "([J)I", true);
 				return;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "hashCode", "([F)I", true);
 				return;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "hashCode", "([D)I", true);
 				return;
 			default:
@@ -338,7 +340,7 @@ public interface CaseClasses
 		}
 	}
 	
-	public static void writeToString(MethodWriter writer, IClass theClass) throws BytecodeException
+	static void writeToString(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		// ----- StringBuilder Constructor -----
 		writer.writeTypeInsn(NEW, "java/lang/StringBuilder");
@@ -357,9 +359,9 @@ public interface CaseClasses
 			
 			// Get the field
 			writer.writeVarInsn(ALOAD, 0);
-			field.writeGet(writer, null);
+			field.writeGet(writer, null, 0);
 			
-			writeToString(writer, type);
+			writeStringAppend(writer, type);
 			if (i + 1 < params)
 			{
 				// Separator Comma
@@ -380,16 +382,35 @@ public interface CaseClasses
 		writer.writeInsn(ARETURN);
 	}
 	
-	public static void writeToString(MethodWriter writer, IType type) throws BytecodeException
+	static void writeStringAppend(MethodWriter writer, String string) throws BytecodeException
+	{
+		switch (string.length())
+		{
+		case 0:
+			return;
+		case 1:
+			writer.writeLDC(string.charAt(0));
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+			return;
+		default:
+			writer.writeLDC(string);
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+			return;
+		}
+	}
+	
+	static void writeStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
+		
+		writer.writeLineNumber(0);
 		
 		if (type.isArrayType())
 		{
 			writer.writeInsn(Opcodes.SWAP);
 			writer.writeInsn(Opcodes.DUP_X1);
-			writeArrayToString(writer, type.getElementType());
+			writeArrayStringAppend(writer, type.getElementType());
 			return;
 		}
 		
@@ -412,35 +433,35 @@ public interface CaseClasses
 		return;
 	}
 	
-	public static void writeArrayToString(MethodWriter writer, IType type) throws BytecodeException
+	static void writeArrayStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{
 		case IType.PRIMITIVE:
-			switch (((PrimitiveType) type).typecode)
+			switch (type.getTypecode())
 			{
-			case ClassFormat.T_BOOLEAN:
+			case PrimitiveType.BOOLEAN_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "toString", "([ZLjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_BYTE:
+			case PrimitiveType.BYTE_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "toString", "([BLjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_SHORT:
+			case PrimitiveType.SHORT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "toString", "([SLjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_CHAR:
+			case PrimitiveType.CHAR_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "toString", "([CLjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_INT:
+			case PrimitiveType.INT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "toString", "([ILjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_LONG:
+			case PrimitiveType.LONG_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "toString", "([JLjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_FLOAT:
+			case PrimitiveType.FLOAT_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "toString", "([FLjava/lang/StringBuilder;)V", true);
 				return;
-			case ClassFormat.T_DOUBLE:
+			case PrimitiveType.DOUBLE_CODE:
 				writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "toString", "([DLjava/lang/StringBuilder;)V", true);
 				return;
 			default:

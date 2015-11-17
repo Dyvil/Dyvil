@@ -22,4 +22,5 @@ package dyvil.lang.literal;
  */
 public @interface NilConvertible
 {
+	String methodName() default "apply";
 }

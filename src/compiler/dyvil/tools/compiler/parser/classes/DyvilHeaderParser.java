@@ -1,42 +1,51 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.imports.ImportDeclaration;
-import dyvil.tools.compiler.ast.imports.IncludeDeclaration;
-import dyvil.tools.compiler.ast.imports.PackageDeclaration;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.header.HeaderDeclaration;
+import dyvil.tools.compiler.ast.header.ImportDeclaration;
+import dyvil.tools.compiler.ast.header.IncludeDeclaration;
+import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
-import dyvil.tools.compiler.transform.Keywords;
-import dyvil.tools.compiler.transform.Symbols;
+import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.token.IToken;
 
 public class DyvilHeaderParser extends Parser
 {
-	protected static final int	PACKAGE	= 1;
-	protected static final int	IMPORT	= 2;
+	protected static final int	PACKAGE		= 1;
+	protected static final int	IMPORT		= 2;
+	protected static final int	METADATA	= 4;
 	
-	protected IDyvilHeader		unit;
+	protected IDyvilHeader	unit;
+	protected boolean		unitHeader;
 	
-	public DyvilHeaderParser(IDyvilHeader unit)
+	protected int				modifiers;
+	protected AnnotationList	annotations;
+	
+	protected IToken lastToken;
+	
+	public DyvilHeaderParser(IDyvilHeader unit, boolean unitHeader)
 	{
 		this.unit = unit;
-		this.mode = PACKAGE | IMPORT;
+		this.unitHeader = unitHeader;
+		this.mode = PACKAGE;
 	}
 	
-	@Override
-	public void reset()
+	protected boolean parsePackage(IParserManager pm, IToken token, int type)
 	{
-		this.mode = PACKAGE | IMPORT;
-	}
-	
-	protected boolean parsePackage(IParserManager pm, IToken token)
-	{
-		if (token.type() == Keywords.PACKAGE)
+		if (type == DyvilKeywords.PACKAGE)
 		{
 			PackageDeclaration pack = new PackageDeclaration(token.raw());
 			this.unit.setPackageDeclaration(pack);
@@ -46,10 +55,11 @@ public class DyvilHeaderParser extends Parser
 		return false;
 	}
 	
-	protected boolean parseImport(IParserManager pm, IToken token) throws SyntaxError
+	protected boolean parseImport(IParserManager pm, IToken token, int type)
 	{
-		int type = token.type();
-		if (type == Keywords.IMPORT)
+		switch (type)
+		{
+		case DyvilKeywords.IMPORT:
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw());
 			pm.pushParser(new ImportParser(im -> {
@@ -58,7 +68,7 @@ public class DyvilHeaderParser extends Parser
 			}));
 			return true;
 		}
-		if (type == Keywords.USING)
+		case DyvilKeywords.USING:
 		{
 			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
 			pm.pushParser(new ImportParser(im -> {
@@ -67,53 +77,131 @@ public class DyvilHeaderParser extends Parser
 			}));
 			return true;
 		}
-		if (type == Keywords.OPERATOR)
-		{
+		case DyvilKeywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, true), true);
 			return true;
-		}
-		if (type == Keywords.PREFIX || type == Keywords.POSTFIX || type == Keywords.INFIX)
-		{
+		case DyvilKeywords.PREFIX:
+		case DyvilKeywords.POSTFIX:
+		case DyvilKeywords.INFIX:
 			pm.pushParser(new OperatorParser(this.unit, false), true);
 			return true;
-		}
-		if (type == Keywords.INCLUDE)
+		case DyvilKeywords.INCLUDE:
 		{
 			IncludeDeclaration i = new IncludeDeclaration(token.raw());
 			pm.pushParser(new IncludeParser(this.unit, i));
 			return true;
 		}
-		if (type == Keywords.TYPE)
+		case DyvilKeywords.TYPE:
 		{
 			TypeAlias typeAlias = new TypeAlias();
 			pm.pushParser(new TypeAliasParser(this.unit, typeAlias));
 			return true;
 		}
+		}
+		return false;
+	}
+	
+	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
+	{
+		int i;
+		if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
+		{
+			this.modifiers |= i;
+			return true;
+		}
+		if (type == DyvilSymbols.AT && token.next().type() != DyvilKeywords.INTERFACE)
+		{
+			this.parseAnnotation(pm, token);
+			return true;
+		}
+		if (type == DyvilKeywords.HEADER)
+		{
+			IToken next = token.next();
+			if (ParserUtil.isIdentifier(next.type()))
+			{
+				pm.skip();
+				if (this.unit.getHeaderDeclaration() != null)
+				{
+					pm.report(token, "Duplicate Header Declaration");
+					return true;
+				}
+				
+				Name name = next.nameValue();
+				this.unit.setHeaderDeclaration(new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
+				this.modifiers = 0;
+				this.annotations = null;
+				this.lastToken = null;
+				this.mode = IMPORT;
+				return true;
+			}
+		}
 		return false;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
-		if (token.type() == Symbols.SEMICOLON)
+		int type = token.type();
+		if (type == BaseSymbols.SEMICOLON)
 		{
 			return;
 		}
-		if (this.isInMode(PACKAGE))
+		if (type == Tokens.EOF)
 		{
-			if (this.parsePackage(pm, token))
+			pm.popParser();
+			return;
+		}
+		
+		switch (this.mode)
+		{
+		case PACKAGE:
+			if (this.parsePackage(pm, token, type))
 			{
 				this.mode = IMPORT;
 				return;
 			}
-		}
-		if (this.isInMode(IMPORT))
-		{
-			if (this.parseImport(pm, token))
+		case IMPORT:
+			if (this.parseImport(pm, token, type))
+			{
+				return;
+			}
+		case METADATA:
+			if (this.mode != METADATA)
+			{
+				this.lastToken = token;
+				this.mode = METADATA;
+			}
+			if (this.parseMetadata(pm, token, type))
 			{
 				return;
 			}
 		}
-		throw new SyntaxError(token, "Invalid Token - Delete this token");
+		
+		if (this.unitHeader)
+		{
+			if (this.lastToken != null)
+			{
+				pm.jump(this.lastToken);
+			}
+			pm.popParser();
+			pm.stop();
+			return;
+		}
+		
+		pm.report(token, "Invalid Header Element - Invalid " + token);
+		return;
+	}
+	
+	private void parseAnnotation(IParserManager pm, IToken token)
+	{
+		if (this.annotations == null)
+		{
+			this.annotations = new AnnotationList();
+		}
+		
+		Annotation annotation = new Annotation(token.raw());
+		this.annotations.addAnnotation(annotation);
+		pm.pushParser(pm.newAnnotationParser(annotation));
+		return;
 	}
 }

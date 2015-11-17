@@ -1,22 +1,18 @@
 package dyvil.collection.immutable;
 
+import java.util.Collections;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
-
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableMap;
-import dyvil.collection.MutableSet;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.collection.mutable.HashMap;
 
-public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements ImmutableSet<E>
 {
-	protected ImmutableMap<E, Object>	map;
+	private static final long serialVersionUID = 2820007412138106503L;
+	
+	protected ImmutableMap<E, Object> map;
 	
 	public MapBasedSet(ImmutableMap<E, ? extends Object> map)
 	{
@@ -38,7 +34,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	@Override
 	public ImmutableSet<E> $minus(Object element)
 	{
-		return new MapBasedSet(this.map.$minus(element));
+		return new MapBasedSet(this.map.$minus$at(element));
 	}
 	
 	@Override
@@ -154,5 +150,11 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	public MutableSet<E> mutable()
 	{
 		return new dyvil.collection.mutable.MapBasedSet<E>(this.map.mutable());
+	}
+	
+	@Override
+	public java.util.Set<E> toJava()
+	{
+		return Collections.unmodifiableSet(super.toJava());
 	}
 }

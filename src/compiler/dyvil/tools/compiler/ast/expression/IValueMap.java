@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.parsing.Name;
 
 public interface IValueMap
 {
-	public void addValue(Name key, IValue value);
+	void addValue(Name key, IValue value);
 	
-	public IValue getValue(Name key);
+	IValue getValue(Name key);
 	
-	public static class KeyValuePair
+	class KeyValuePair
 	{
 		public Name		key;
 		public IValue	value;

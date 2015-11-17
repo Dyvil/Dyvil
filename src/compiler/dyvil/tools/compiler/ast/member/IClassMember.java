@@ -1,10 +1,32 @@
 package dyvil.tools.compiler.ast.member;
 
-import dyvil.tools.compiler.ast.classes.IClass;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
-public interface IClassMember extends IMember, IClassCompilable
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.IObjectCompilable;
+
+public interface IClassMember extends IMember, IClassCompilable, IObjectCompilable
 {
-	public IClass getTheClass();
+	IClass getTheClass();
 	
-	public void setTheClass(IClass iclass);
+	void setTheClass(IClass iclass);
+	
+	@Override
+	default void write(DataOutput out) throws IOException
+	{
+		this.writeSignature(out);
+	}
+	
+	void writeSignature(DataOutput out) throws IOException;
+	
+	@Override
+	default void read(DataInput in) throws IOException
+	{
+		this.readSignature(in);
+	}
+	
+	void readSignature(DataInput in) throws IOException;
 }

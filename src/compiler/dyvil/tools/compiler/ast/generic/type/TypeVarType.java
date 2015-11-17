@@ -1,34 +1,31 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import dyvil.lang.List;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.IGeneric;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IRawType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
-public class TypeVarType implements IType
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+public class TypeVarType implements IRawType
 {
-	public ITypeVariable	typeVar;
+	protected ITypeVariable typeVar;
 	
 	public TypeVarType()
 	{
@@ -52,6 +49,18 @@ public class TypeVarType implements IType
 	}
 	
 	@Override
+	public ITypeVariable getTypeVariable()
+	{
+		return this.typeVar;
+	}
+	
+	@Override
+	public boolean isGenericType()
+	{
+		return false;
+	}
+	
+	@Override
 	public IClass getTheClass()
 	{
 		return this.typeVar.getTheClass();
@@ -66,25 +75,31 @@ public class TypeVarType implements IType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
-	public boolean equals(IType type)
+	public int getSuperTypeDistance(IType superType)
 	{
-		return this.typeVar.isSuperTypeOf(type);
+		return this.typeVar.getSuperTypeDistance(superType);
+	}
+	
+	@Override
+	public boolean isSameType(IType type)
+	{
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return false;
+		return this.typeVar == type.getTypeVariable();
 	}
 	
 	@Override
@@ -102,21 +117,17 @@ public class TypeVarType implements IType
 		}
 		
 		IType t = context.resolveType(this.typeVar);
-		if (t != Types.ANY)
+		if (t != null)
 		{
-			if (t.isPrimitive())
-			{
-				return t.getReferenceType();
-			}
 			return t;
 		}
-		return this;
+		return this.typeVar.getDefaultType();
 	}
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		return this.typeVar == typeVar ? this : Types.ANY;
+		return this.typeVar == typeVar ? this : null;
 	}
 	
 	@Override
@@ -124,7 +135,7 @@ public class TypeVarType implements IType
 	{
 		typeContext.addMapping(this.typeVar, concrete);
 	}
-
+	
 	@Override
 	public boolean isResolved()
 	{
@@ -132,24 +143,42 @@ public class TypeVarType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
 	
 	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
+		switch (position)
+		{
+		case CLASS:
+		case TYPE:
+			markers.add(I18n.createMarker(this.getPosition(), "type.class.typevar"));
+			break;
+		case SUPER_TYPE:
+			markers.add(I18n.createMarker(this.getPosition(), "type.super.typevar"));
+			break;
+		default:
+			break;
+		}
+	}
+	
+	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return null;
+		return this.typeVar.resolveField(name);
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		this.typeVar.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
@@ -193,16 +222,17 @@ public class TypeVarType implements IType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typeVar.getName().qualified);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/type/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/type/TypeArgument;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/types/TypeArgument;",
+				false);
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
 	}
 	
@@ -215,14 +245,7 @@ public class TypeVarType implements IType
 	@Override
 	public String toString()
 	{
-		StringBuilder buf = new StringBuilder();
-		IGeneric generic = this.typeVar.getGeneric();
-		this.toString("", buf);
-		if (generic instanceof INamed)
-		{
-			buf.append(" (of type ").append(((INamed) generic).getName()).append(")");
-		}
-		return buf.toString();
+		return this.typeVar.getName().toString();
 	}
 	
 	@Override

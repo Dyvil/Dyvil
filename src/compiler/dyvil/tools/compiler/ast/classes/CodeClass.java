@@ -1,37 +1,28 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.lang.annotation.ElementType;
-
-import dyvil.lang.List;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.ASTNode;
-import dyvil.tools.compiler.ast.access.FieldAssign;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisValue;
-import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
-import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
-import dyvil.tools.compiler.ast.method.IConstructor;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -40,44 +31,17 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.ModifierTypes;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.Opcodes;
-
-public class CodeClass extends ASTNode implements IClass
+public class CodeClass extends AbstractClass
 {
-	protected IDyvilHeader			unit;
-	protected IClass				outerClass;
-	
-	protected Annotation[]			annotations;
-	protected int					annotationCount;
-	protected int					modifiers;
-	
-	protected Name					name;
-	protected String				fullName;
-	protected String				internalName;
-	
-	protected ITypeVariable[]		generics;
-	protected int					genericCount;
-	
-	protected IParameter[]			parameters;
-	protected int					parameterCount;
-	
-	protected IType					superType	= Types.OBJECT;
-	protected IType[]				interfaces;
-	protected int					interfaceCount;
-	
-	protected IType					type;
-	
-	protected IClassCompilable[]	compilables;
-	protected int					compilableCount;
-	
-	protected IClassBody			body;
-	protected IClassMetadata		metadata;
+	protected IDyvilHeader	unit;
+	protected ICodePosition	position;
 	
 	public CodeClass()
 	{
@@ -99,197 +63,34 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public void setUnit(IDyvilHeader unit)
+	public ICodePosition getPosition()
 	{
-		this.unit = unit;
+		return this.position;
 	}
 	
 	@Override
-	public IDyvilHeader getUnit()
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	@Override
+	public void setHeader(IDyvilHeader unit)
+	{
+		this.unit = unit;
+		
+		if (this.name != null)
+		{
+			this.internalName = unit.getInternalName(this.name);
+			this.fullName = unit.getFullName(this.name);
+		}
+	}
+	
+	@Override
+	public IDyvilHeader getHeader()
 	{
 		return this.unit;
 	}
-	
-	@Override
-	public void setOuterClass(IClass iclass)
-	{
-		this.outerClass = iclass;
-	}
-	
-	@Override
-	public IClass getOuterClass()
-	{
-		return this.outerClass;
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return this.type;
-	}
-	
-	@Override
-	public int annotationCount()
-	{
-		return this.annotationCount;
-	}
-	
-	@Override
-	public void setAnnotations(Annotation[] annotations, int count)
-	{
-		this.annotations = annotations;
-		this.annotationCount = count;
-	}
-	
-	@Override
-	public void setAnnotation(int index, Annotation annotation)
-	{
-		this.annotations[index] = annotation;
-	}
-	
-	@Override
-	public void addAnnotation(Annotation annotation)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new Annotation[3];
-			this.annotations[0] = annotation;
-			this.annotationCount = 1;
-			return;
-		}
-		
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
-		{
-			Annotation[] temp = new Annotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
-			this.annotations = temp;
-		}
-		this.annotations[index] = annotation;
-	}
-	
-	@Override
-	public final void removeAnnotation(int index)
-	{
-		int numMoved = this.annotationCount - index - 1;
-		if (numMoved > 0)
-		{
-			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
-		}
-		this.annotations[--this.annotationCount] = null;
-	}
-	
-	@Override
-	public boolean addRawAnnotation(String type)
-	{
-		switch (type)
-		{
-		case "dyvil/annotation/sealed":
-			this.modifiers |= Modifiers.SEALED;
-			return false;
-		case "dyvil/annotation/Strict":
-			this.modifiers |= Modifiers.STRICT;
-			return false;
-		case "dyvil/annotation/object":
-			this.modifiers |= Modifiers.OBJECT_CLASS;
-			return false;
-		case "java/lang/Deprecated":
-			this.modifiers |= Modifiers.DEPRECATED;
-			return false;
-		case "java/lang/FunctionalInterface":
-			this.modifiers |= Modifiers.FUNCTIONAL;
-			return false;
-		}
-		return true;
-	}
-	
-	@Override
-	public ElementType getAnnotationType()
-	{
-		return ElementType.TYPE;
-	}
-	
-	@Override
-	public Annotation[] getAnnotations()
-	{
-		return this.annotations;
-	}
-	
-	@Override
-	public Annotation getAnnotation(int index)
-	{
-		return this.annotations[index];
-	}
-	
-	@Override
-	public Annotation getAnnotation(IClass type)
-	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			Annotation a = this.annotations[i];
-			if (a.type.getTheClass() == type)
-			{
-				return a;
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public void setModifiers(int modifiers)
-	{
-		this.modifiers = modifiers;
-	}
-	
-	@Override
-	public int getModifiers()
-	{
-		return this.modifiers;
-	}
-	
-	@Override
-	public boolean addModifier(int mod)
-	{
-		boolean flag = (this.modifiers & mod) == mod;
-		this.modifiers |= mod;
-		return flag;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.modifiers &= ~mod;
-	}
-	
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return (this.modifiers & mod) == mod;
-	}
-	
-	@Override
-	public boolean isAbstract()
-	{
-		return (this.modifiers & Modifiers.ABSTRACT) != 0;
-	}
-	
-	@Override
-	public int getAccessLevel()
-	{
-		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
-	}
-	
-	// Names
 	
 	@Override
 	public void setName(Name name)
@@ -297,393 +98,19 @@ public class CodeClass extends ASTNode implements IClass
 		this.name = name;
 		if (this.unit != null)
 		{
-			this.internalName = this.unit.getInternalName(name.qualified);
-			this.fullName = this.unit.getFullName(name.qualified);
+			this.internalName = this.unit.getInternalName(name);
+			this.fullName = this.unit.getFullName(name);
 		}
-	}
-	
-	@Override
-	public Name getName()
-	{
-		return this.name;
-	}
-	
-	@Override
-	public void setFullName(String name)
-	{
-		this.fullName = name;
-	}
-	
-	@Override
-	public String getFullName()
-	{
-		return this.fullName;
-	}
-	
-	// Generics
-	
-	@Override
-	public void setGeneric()
-	{
-		this.generics = new ITypeVariable[2];
-	}
-	
-	@Override
-	public boolean isGeneric()
-	{
-		return this.generics != null;
-	}
-	
-	@Override
-	public int genericCount()
-	{
-		return this.genericCount;
-	}
-	
-	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
-	{
-		this.generics = typeVars;
-		this.genericCount = count;
-	}
-	
-	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
-	{
-		this.generics[index] = var;
-	}
-	
-	@Override
-	public void addTypeVariable(ITypeVariable var)
-	{
-		if (this.generics == null)
-		{
-			this.generics = new ITypeVariable[3];
-			this.generics[0] = var;
-			this.genericCount = 1;
-			return;
-		}
-		
-		int index = this.genericCount++;
-		if (index >= this.generics.length)
-		{
-			ITypeVariable[] temp = new ITypeVariable[this.genericCount];
-			System.arraycopy(this.generics, 0, temp, 0, index);
-			this.generics = temp;
-		}
-		this.generics[index] = var;
-		
-		var.setIndex(index);
-	}
-	
-	@Override
-	public ITypeVariable[] getTypeVariables()
-	{
-		return this.generics;
-	}
-	
-	@Override
-	public ITypeVariable getTypeVariable(int index)
-	{
-		return this.generics[index];
-	}
-	
-	// Class Parameters
-	
-	@Override
-	public int parameterCount()
-	{
-		return this.parameterCount;
-	}
-	
-	@Override
-	public void setParameter(int index, IParameter param)
-	{
-		param.setTheClass(this);
-		this.parameters[index] = param;
-	}
-	
-	@Override
-	public void addParameter(IParameter param)
-	{
-		param.setTheClass(this);
-		IConstructor constructor = this.metadata.getConstructor();
-		
-		if (this.parameters == null)
-		{
-			this.parameters = new ClassParameter[2];
-			this.parameters[0] = param;
-			this.parameterCount = 1;
-			
-			if (constructor != null)
-			{
-				constructor.setParameters(this.parameters, 1);
-			}
-			return;
-		}
-		
-		int index = this.parameterCount++;
-		if (this.parameterCount > this.parameters.length)
-		{
-			ClassParameter[] temp = new ClassParameter[this.parameterCount];
-			System.arraycopy(this.parameters, 0, temp, 0, index);
-			this.parameters = temp;
-		}
-		this.parameters[index] = param;
-		
-		if (constructor != null)
-		{
-			constructor.setParameters(this.parameters, this.parameterCount);
-		}
-	}
-	
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
-	}
-	
-	@Override
-	public IParameter[] getParameters()
-	{
-		return this.parameters;
-	}
-	
-	// Super Types
-	
-	@Override
-	public void setSuperType(IType type)
-	{
-		this.superType = type;
-	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return this.superType;
-	}
-	
-	@Override
-	public boolean isSubTypeOf(IType type)
-	{
-		if (this == type.getTheClass())
-		{
-			return true;
-		}
-		if (this.superType != null && type.isSuperClassOf(this.superType))
-		{
-			return true;
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			if (type.isSuperClassOf(this.interfaces[i]))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public int interfaceCount()
-	{
-		return this.interfaceCount;
-	}
-	
-	@Override
-	public void setInterface(int index, IType type)
-	{
-		this.interfaces[index] = type;
-	}
-	
-	@Override
-	public void addInterface(IType type)
-	{
-		int index = this.interfaceCount++;
-		if (index >= this.interfaces.length)
-		{
-			IType[] temp = new IType[this.interfaceCount];
-			System.arraycopy(this.interfaces, 0, temp, 0, this.interfaces.length);
-			this.interfaces = temp;
-		}
-		this.interfaces[index] = type;
-	}
-	
-	@Override
-	public IType getInterface(int index)
-	{
-		return this.interfaces[index];
-	}
-	
-	// Body
-	
-	@Override
-	public void setBody(IClassBody body)
-	{
-		this.body = body;
-	}
-	
-	@Override
-	public IClassBody getBody()
-	{
-		return this.body;
-	}
-	
-	@Override
-	public int compilableCount()
-	{
-		return this.compilableCount;
-	}
-	
-	@Override
-	public void addCompilable(IClassCompilable compilable)
-	{
-		compilable.setInnerIndex(this.internalName, this.compilableCount);
-		
-		if (this.compilables == null)
-		{
-			this.compilables = new IClassCompilable[2];
-			this.compilables[0] = compilable;
-			this.compilableCount = 1;
-			return;
-		}
-		
-		int index = this.compilableCount++;
-		if (this.compilableCount > this.compilables.length)
-		{
-			IClassCompilable[] temp = new IClassCompilable[this.compilableCount];
-			System.arraycopy(this.compilables, 0, temp, 0, index);
-			this.compilables = temp;
-		}
-		this.compilables[index] = compilable;
-	}
-	
-	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilables[index];
-	}
-	
-	@Override
-	public void setMetadata(IClassMetadata metadata)
-	{
-		this.metadata = metadata;
-	}
-	
-	@Override
-	public IClassMetadata getMetadata()
-	{
-		return this.metadata;
-	}
-	
-	@Override
-	public IMethod getFunctionalMethod()
-	{
-		// Copy in ExternalClass
-		if ((this.modifiers & Modifiers.ABSTRACT) == 0)
-		{
-			return null;
-		}
-		
-		IMethod m;
-		if (this.body != null)
-		{
-			m = this.body.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		if (this.superType != null)
-		{
-			m = this.superType.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			m = this.interfaces[i].getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public String getInternalName()
-	{
-		return this.internalName;
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		StringBuilder buffer = new StringBuilder();
-		
-		if (this.genericCount > 0)
-		{
-			buffer.append('<');
-			for (int i = 0; i < this.genericCount; i++)
-			{
-				this.generics[i].appendSignature(buffer);
-			}
-			buffer.append('>');
-		}
-		
-		if (this.superType != null)
-		{
-			this.superType.appendSignature(buffer);
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			this.interfaces[i].appendSignature(buffer);
-		}
-		return buffer.toString();
-	}
-	
-	@Override
-	public String[] getInterfaceArray()
-	{
-		String[] interfaces = new String[this.interfaceCount];
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			interfaces[i] = this.interfaces[i].getInternalName();
-		}
-		return interfaces;
-	}
-	
-	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
-	{
-		if (this.superType != null)
-		{
-			IType type = this.superType.resolveType(typeVar);
-			if (type != Types.ANY)
-			{
-				return type.getConcreteType(concrete);
-			}
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i].resolveType(typeVar);
-			if (type != Types.ANY)
-			{
-				return type.getConcreteType(concrete);
-			}
-		}
-		return Types.ANY;
 	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.metadata == null)
+		{
+			this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		}
+		
 		if (this.genericCount > 0)
 		{
 			ClassGenericType type = new ClassGenericType(this);
@@ -702,66 +129,77 @@ public class CodeClass extends ASTNode implements IClass
 			this.type = new ClassType(this);
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].resolveTypes(markers, context);
+			this.annotations.resolveTypes(markers, context, this);
 		}
 		
-		int index = 1;
+		int localIndex = 1;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			IType type = param.getType();
 			param.resolveTypes(markers, this);
-			param.setIndex(index);
+			param.setLocalIndex(localIndex);
 			if (type == Types.LONG || type == Types.DOUBLE)
 			{
-				index += 2;
+				localIndex += 2;
 			}
 			else
 			{
-				index++;
+				localIndex++;
 			}
 		}
 		
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolve(markers, this, TypePosition.SUPER_TYPE);
+			this.superType = this.superType.resolveType(markers, this);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolve(markers, this, TypePosition.SUPER_TYPE);
+			this.interfaces[i] = this.interfaces[i].resolveType(markers, this);
 		}
+		
+		this.metadata.resolveTypes(markers, context);
 		
 		if (this.body != null)
 		{
 			this.body.resolveTypes(markers);
 		}
+		
+		this.metadata.resolveTypesBody(markers, context);
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			Annotation a = this.annotations[i];
-			String internalName = a.type.getInternalName();
-			if (internalName != null && !this.addRawAnnotation(internalName))
-			{
-				this.removeAnnotation(i--);
-				continue;
-			}
-			
-			a.resolve(markers, context);
+			this.annotations.resolve(markers, context);
 		}
 		
-		this.metadata.resolve(markers, context);
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].resolve(markers, this);
+		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolve(markers, this);
 		}
+		
+		if (this.superType != null)
+		{
+			this.superType.resolve(markers, this);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].resolve(markers, this);
+		}
+		
+		this.metadata.resolve(markers, context);
 		
 		if (this.body != null)
 		{
@@ -774,9 +212,14 @@ public class CodeClass extends ASTNode implements IClass
 	{
 		this.metadata.checkTypes(markers, context);
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].checkTypes(markers, context);
+			this.annotations.checkTypes(markers, context);
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].checkTypes(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -784,34 +227,51 @@ public class CodeClass extends ASTNode implements IClass
 			this.parameters[i].checkTypes(markers, this);
 		}
 		
+		if (this.superType != null)
+		{
+			this.superType.checkType(markers, this, TypePosition.SUPER_TYPE);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].checkType(markers, this, TypePosition.SUPER_TYPE);
+		}
+		
 		if (this.body != null)
 		{
 			this.body.checkTypes(markers);
+		}
+		
+		// Check Methods
+		if (this.superType != null)
+		{
+			this.superType.getTheClass().checkMethods(markers, this, this.superType);
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			type.getTheClass().checkMethods(markers, this, type);
 		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.superType != null)
+		int illegalModifiers = this.modifiers & ~Modifiers.CLASS_MODIFIERS & ~Modifiers.CLASS_TYPE_MODIFIERS;
+		if (illegalModifiers != 0)
 		{
-			IClass superClass = this.superType.getTheClass();
-			if (superClass != null)
-			{
-				int modifiers = superClass.getModifiers();
-				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
-				{
-					markers.add(this.superType.getPosition(), "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName());
-				}
-				else if ((modifiers & Modifiers.FINAL) != 0)
-				{
-					markers.add(this.superType.getPosition(), "class.extend.final", superClass.getName());
-				}
-				else if ((modifiers & Modifiers.DEPRECATED) != 0)
-				{
-					markers.add(this.superType.getPosition(), "class.extend.deprecated", superClass.getName());
-				}
-			}
+			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("class", this.name),
+					ModifierTypes.FIELD_OR_METHOD.toString(illegalModifiers)));
+		}
+		
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, this.getElementType());
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].check(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -822,24 +282,39 @@ public class CodeClass extends ASTNode implements IClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			IType type = this.interfaces[i];
+			type.check(markers, context);
+			
 			IClass iclass = type.getTheClass();
-			if (iclass != null)
+			if (iclass == null)
 			{
-				int modifiers = iclass.getModifiers();
-				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
-				{
-					markers.add(type.getPosition(), "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName());
-				}
-				else if ((modifiers & Modifiers.DEPRECATED) != 0)
-				{
-					markers.add(type.getPosition(), "class.implement.deprecated", iclass.getName());
-				}
+				continue;
+			}
+			
+			int modifiers = iclass.getModifiers();
+			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+			{
+				markers.add(I18n.createMarker(this.position, "class.implement.type", ModifierTypes.CLASS_TYPE.toString(modifiers), iclass.getName()));
+				continue;
 			}
 		}
 		
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.superType != null)
 		{
-			this.annotations[i].check(markers, context, ElementType.TYPE);
+			this.superType.check(markers, context);
+			
+			IClass superClass = this.superType.getTheClass();
+			if (superClass != null)
+			{
+				int modifiers = superClass.getModifiers();
+				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
+				{
+					markers.add(I18n.createMarker(this.position, "class.extend.type", ModifierTypes.CLASS_TYPE.toString(modifiers), superClass.getName()));
+				}
+				else if ((modifiers & Modifiers.FINAL) != 0)
+				{
+					markers.add(I18n.createMarker(this.position, "class.extend.final", superClass.getName()));
+				}
+			}
 		}
 		
 		if (this.body != null)
@@ -851,14 +326,29 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].foldConstants();
+			this.annotations.foldConstants();
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].foldConstants();
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.foldConstants();
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].foldConstants();
 		}
 		
 		if (this.body != null)
@@ -870,14 +360,29 @@ public class CodeClass extends ASTNode implements IClass
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		if (this.annotations != null)
 		{
-			this.annotations[i].cleanup(this, this);
+			this.annotations.cleanup(context, this);
+		}
+		
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].cleanup(this, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(this, this);
+		}
+		
+		if (this.superType != null)
+		{
+			this.superType.cleanup(this, this);
+		}
+		
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].cleanup(this, this);
 		}
 		
 		if (this.body != null)
@@ -887,313 +392,10 @@ public class CodeClass extends ASTNode implements IClass
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return false;
-	}
-	
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.unit;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return this;
-	}
-	
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		if (this.body != null)
-		{
-			IClass clazz = this.body.getClass(name);
-			if (clazz != null)
-			{
-				return clazz;
-			}
-		}
-		
-		if (this.outerClass != null)
-		{
-			return this.outerClass.resolveClass(name);
-		}
-		return this.unit.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		if (name == this.name)
-		{
-			return new ClassType(this);
-		}
-		
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			ITypeVariable var = this.generics[i];
-			if (var.getName() == name)
-			{
-				return new TypeVarType(var);
-			}
-		}
-		
-		return this.unit.resolveType(name);
-	}
-	
-	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
-	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			ITypeVariable var = this.generics[i];
-			if (var.getName() == name)
-			{
-				return var;
-			}
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			if (param.getName() == name)
-			{
-				return param;
-			}
-		}
-		
-		if (this.body != null)
-		{
-			// Own properties
-			IDataMember field = this.body.getProperty(name);
-			if (field != null)
-			{
-				return field;
-			}
-			
-			// Own fields
-			field = this.body.getField(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
-		
-		IDataMember match = this.metadata.resolveField(name);
-		if (match != null)
-		{
-			return match;
-		}
-		
-		// Inherited Fields
-		if (this.superType != null)
-		{
-			match = this.superType.resolveField(name);
-			if (match != null)
-			{
-				return match;
-			}
-		}
-		
-		if (this.unit != null && this.unit.hasMemberImports())
-		{
-			// Static Imports
-			match = this.unit.resolveField(name);
-			if (match != null)
-			{
-				return match;
-			}
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
-	{
-		if (this.body != null)
-		{
-			this.body.getMethodMatches(list, instance, name, arguments);
-		}
-		
-		this.metadata.getMethodMatches(list, instance, name, arguments);
-		
-		if (!list.isEmpty())
-		{
-			return;
-		}
-		
-		if (this.superType != null)
-		{
-			this.superType.getMethodMatches(list, instance, name, arguments);
-		}
-		
-		if (!list.isEmpty())
-		{
-			return;
-		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
-		}
-		
-		if (!list.isEmpty())
-		{
-			return;
-		}
-		
-		if (this.unit != null && this.unit.hasMemberImports())
-		{
-			this.unit.getMethodMatches(list, instance, name, arguments);
-		}
-	}
-	
-	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
-	{
-		if (this.body != null)
-		{
-			this.body.getConstructorMatches(list, arguments);
-		}
-		
-		this.metadata.getConstructorMatches(list, arguments);
-	}
-	
-	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
-	{
-		if (this.body != null)
-		{
-			IMethod m = this.body.getMethod(name, parameters, parameterCount, concrete);
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public IMethod getSuperMethod(Name name, IParameter[] parameters, int parameterCount)
-	{
-		if (this.superType != null)
-		{
-			IClass iclass = this.superType.getTheClass();
-			if (iclass != null)
-			{
-				IMethod m = iclass.getMethod(name, parameters, parameterCount, this.superType);
-				if (m != null)
-				{
-					return m;
-				}
-			}
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass != null)
-			{
-				IMethod m = iclass.getMethod(name, parameters, parameterCount, type);
-				if (m != null)
-				{
-					return m;
-				}
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public boolean isMember(IClassMember member)
-	{
-		return this == member.getTheClass();
-	}
-	
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
-	public byte getVisibility(IClassMember member)
-	{
-		IClass iclass = member.getTheClass();
-		if (iclass == this || iclass == null)
-		{
-			return VISIBLE;
-		}
-		
-		int level = member.getAccessLevel();
-		if ((level & Modifiers.SEALED) != 0)
-		{
-			if (iclass instanceof ExternalClass)
-			{
-				return SEALED;
-			}
-			// Clear the SEALED bit by ANDing with 0b1111
-			level &= 0b1111;
-		}
-		if (level == Modifiers.PUBLIC)
-		{
-			return VISIBLE;
-		}
-		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
-		{
-			if (this.superType != null && this.superType.getTheClass() == iclass)
-			{
-				return VISIBLE;
-			}
-			
-			for (int i = 0; i < this.interfaceCount; i++)
-			{
-				if (this.interfaces[i].getTheClass() == iclass)
-				{
-					return VISIBLE;
-				}
-			}
-		}
-		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
-		{
-			IDyvilHeader unit1 = this.unit;
-			IDyvilHeader unit2 = iclass.getUnit();
-			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
-			{
-				return VISIBLE;
-			}
-		}
-		
-		return INVISIBLE;
-	}
-	
-	@Override
-	public String getFileName()
-	{
-		return this.getName().qualified;
-	}
-	
-	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		// Header
 		
-		String internalName = this.getInternalName();
 		String signature = this.getSignature();
 		String superClass = null;
 		String[] interfaces = this.getInterfaceArray();
@@ -1208,7 +410,11 @@ public class CodeClass extends ASTNode implements IClass
 		{
 			mods |= Opcodes.ACC_SUPER;
 		}
-		writer.visit(DyvilCompiler.classVersion, mods, internalName, signature, superClass, interfaces);
+		writer.visit(DyvilCompiler.classVersion, mods, this.internalName, signature, superClass, interfaces);
+		
+		// Source
+		
+		writer.visitSource(this.getHeader().getName() + ".dyvil", null);
 		
 		// Outer Class
 		
@@ -1219,33 +425,21 @@ public class CodeClass extends ASTNode implements IClass
 		
 		// Annotations
 		
-		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/object;", true);
-		}
-		if ((this.modifiers & Modifiers.SEALED) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/sealed;", false);
-		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			writer.visitAnnotation("Ljava/lang/Deprecated;", true);
-		}
-		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
-		{
-			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
-		}
-		
-		for (int i = 0; i < this.annotationCount; i++)
-		{
-			this.annotations[i].write(writer);
-		}
+		this.writeAnnotations(writer);
 		
 		// Inner Class Info
 		
 		if (this.outerClass != null)
 		{
 			this.writeInnerClassInfo(writer);
+		}
+		
+		// Super Types
+		
+		if ((this.modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		{
+			this.metadata.write(writer, null);
+			return;
 		}
 		
 		if (this.superType != null)
@@ -1265,13 +459,6 @@ public class CodeClass extends ASTNode implements IClass
 			{
 				iclass.writeInnerClassInfo(writer);
 			}
-		}
-		
-		// Type Parameter Variances
-		
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].write(writer);
 		}
 		
 		// Fields, Methods and Properties
@@ -1294,7 +481,7 @@ public class CodeClass extends ASTNode implements IClass
 			}
 		}
 		
-		ThisValue thisValue = new ThisValue(this.type);
+		ThisExpr thisValue = new ThisExpr(this.type, VariableThis.DEFAULT);
 		StatementList instanceFields = new StatementList();
 		
 		IField[] staticFields = new IField[fields + 1];
@@ -1316,18 +503,24 @@ public class CodeClass extends ASTNode implements IClass
 			}
 			else
 			{
-				FieldAssign assign = new FieldAssign(null);
-				assign.name = f.getName();
-				assign.instance = thisValue;
-				assign.value = f.getValue();
-				assign.field = f;
+				FieldAssignment assign = new FieldAssignment(null, thisValue, f, f.getValue());
 				instanceFields.addValue(assign);
 			}
 		}
 		
-		for (int i = 0; i < this.parameterCount; i++)
+		if (this.parameterCount > 0)
 		{
-			this.parameters[i].write(writer);
+			AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/_internal/ClassParameters;", false);
+			AnnotationVisitor array = av.visitArray("names");
+			
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				IParameter param = this.parameters[i];
+				param.write(writer);
+				array.visit("", param.getName().qualified);
+			}
+			
+			array.visitEnd();
 		}
 		
 		for (int i = 0; i < constructors; i++)
@@ -1352,9 +545,10 @@ public class CodeClass extends ASTNode implements IClass
 		
 		this.metadata.write(writer, instanceFields);
 		
-		// Create the classinit method
+		// Create the static <clinit> method
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
 		mw.begin();
+		this.metadata.writeStaticInit(mw);
 		for (int i = 0; i < staticFieldCount; i++)
 		{
 			staticFields[i].writeStaticInit(mw);
@@ -1364,6 +558,51 @@ public class CodeClass extends ASTNode implements IClass
 			this.compilables[i].writeStaticInit(mw);
 		}
 		mw.end(Types.VOID);
+	}
+	
+	private void writeAnnotations(ClassWriter writer)
+	{
+		if ((this.modifiers & Modifiers.OBJECT_CLASS) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/annotation/_internal/object;", true);
+		}
+		if ((this.modifiers & Modifiers.INTERNAL) != 0)
+		{
+			writer.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
+		}
+		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		{
+			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+		}
+		if ((this.modifiers & Modifiers.FUNCTIONAL) != 0)
+		{
+			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
+		}
+		
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(writer);
+			}
+		}
+		
+		// Type Variable Annotations
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].write(writer);
+		}
+		
+		// Super Type Variable Annotations
+		if (this.superType != null)
+		{
+			this.superType.writeAnnotations(writer, TypeReference.newSuperTypeReference(-1), "");
+		}
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			this.interfaces[i].writeAnnotations(writer, TypeReference.newSuperTypeReference(i), "");
+		}
 	}
 	
 	@Override
@@ -1384,57 +623,106 @@ public class CodeClass extends ASTNode implements IClass
 		}
 	}
 	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	private void writeTypes(DataOutput out) throws IOException
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		IType.writeType(this.superType, out);
+		
+		int itfs = this.interfaceCount;
+		out.writeByte(itfs);
+		for (int i = 0; i < itfs; i++)
 		{
-			buffer.append(prefix);
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append('\n');
+			IType.writeType(this.interfaces[i], out);
+		}
+	}
+	
+	@Override
+	public void writeSignature(DataOutput out) throws IOException
+	{
+		this.writeTypes(out);
+		
+		int params = this.parameterCount;
+		out.writeByte(params);
+		for (int i = 0; i < params; i++)
+		{
+			IType.writeType(this.parameters[i].getType(), out);
+		}
+	}
+	
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		out.writeInt(this.modifiers);
+		
+		AnnotationList.write(this.annotations, out);
+		
+		out.writeUTF(this.name.unqualified);
+		
+		this.writeTypes(out);
+		
+		int params = this.parameterCount;
+		out.writeByte(params);
+		for (int i = 0; i < params; i++)
+		{
+			this.parameters[i].write(out);
+		}
+	}
+	
+	private void readTypes(DataInput in) throws IOException
+	{
+		this.superType = IType.readType(in);
+		
+		int itfs = in.readByte();
+		this.interfaceCount = itfs;
+		this.interfaces = new IType[itfs];
+		for (int i = 0; i < itfs; i++)
+		{
+			this.interfaces[i] = IType.readType(in);
+		}
+	}
+	
+	@Override
+	public void readSignature(DataInput in) throws IOException
+	{
+		this.readTypes(in);
+		
+		int params = in.readByte();
+		if (this.parameterCount != 0)
+		{
+			this.parameterCount = params;
+			for (int i = 0; i < params; i++)
+			{
+				this.parameters[i].setType(IType.readType(in));
+			}
+			return;
 		}
 		
-		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));
-		buffer.append(ModifierTypes.CLASS_TYPE.toString(this.modifiers)).append(this.name);
+		this.parameterCount = params;
+		this.parameters = new IParameter[params];
+		for (int i = 0; i < params; i++)
+		{
+			this.parameters[i] = new ClassParameter(Name.getQualified("par" + i), IType.readType(in));
+		}
+	}
+	
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.modifiers = in.readInt();
 		
-		if (this.genericCount > 0)
-		{
-			buffer.append('[');
-			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
-		}
+		this.annotations = AnnotationList.read(in);
 		
-		if (this.parameterCount > 0)
-		{
-			buffer.append('(');
-			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-			buffer.append(')');
-		}
+		this.name = Name.get(in.readUTF());
 		
-		if (this.superType == null)
-		{
-			buffer.append(" extends void");
-		}
-		else if (this.superType != Types.OBJECT)
-		{
-			buffer.append(" extends ");
-			this.superType.toString("", buffer);
-		}
+		this.readTypes(in);
 		
-		if (this.interfaceCount > 0)
+		int params = in.readByte();
+		this.parameters = new IParameter[params];
+		this.parameterCount = params;
+		for (int i = 0; i < params; i++)
 		{
-			buffer.append(" implements ");
-			Util.astToString(prefix, this.interfaces, this.interfaceCount, Formatting.Class.superClassesSeperator, buffer);
-		}
-		
-		if (this.body != null)
-		{
-			buffer.append('\n').append(prefix);
-			this.body.toString(prefix, buffer);
-		}
-		else
-		{
-			buffer.append(';');
+			ClassParameter param = new ClassParameter();
+			param.read(in);
+			this.parameters[i] = param;
 		}
 	}
 }

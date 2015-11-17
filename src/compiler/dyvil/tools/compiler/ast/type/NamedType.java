@@ -1,26 +1,26 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
-
-import dyvil.lang.List;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class NamedType implements IType
+public class NamedType implements IRawType
 {
 	protected ICodePosition	position;
 	protected Name			name;
@@ -33,49 +33,53 @@ public class NamedType implements IType
 	
 	protected static IType resolvePrimitive(Name name)
 	{
-		if (name == Name._void)
+		if (name == Names._void)
 		{
 			return Types.VOID;
 		}
-		if (name == Name._boolean)
+		if (name == Names._boolean)
 		{
 			return Types.BOOLEAN;
 		}
-		if (name == Name._byte)
+		if (name == Names._byte)
 		{
 			return Types.BYTE;
 		}
-		if (name == Name._short)
+		if (name == Names._short)
 		{
 			return Types.SHORT;
 		}
-		if (name == Name._char)
+		if (name == Names._char)
 		{
 			return Types.CHAR;
 		}
-		if (name == Name._int)
+		if (name == Names._int)
 		{
 			return Types.INT;
 		}
-		if (name == Name._long)
+		if (name == Names._long)
 		{
 			return Types.LONG;
 		}
-		if (name == Name._float)
+		if (name == Names._float)
 		{
 			return Types.FLOAT;
 		}
-		if (name == Name._double)
+		if (name == Names._double)
 		{
 			return Types.DOUBLE;
 		}
-		if (name == Name.any)
+		if (name == Names.any)
 		{
 			return Types.ANY;
 		}
-		if (name == Name.dynamic)
+		if (name == Names.dynamic)
 		{
 			return Types.DYNAMIC;
+		}
+		if (name == Names.auto)
+		{
+			return Types.UNKNOWN;
 		}
 		return null;
 	}
@@ -105,7 +109,7 @@ public class NamedType implements IType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public IType resolveType(MarkerList markers, IContext context)
 	{
 		// Try to resolve the name of this Type as a primitive type
 		IType t = resolvePrimitive(this.name);
@@ -117,27 +121,16 @@ public class NamedType implements IType
 		IType type = IContext.resolveType(context, this.name);
 		if (type == null)
 		{
-			markers.add(this.position, "resolve.type", this.toString());
+			markers.add(I18n.createMarker(this.position, "resolve.type", this.toString()));
 			return this;
 		}
 		
-		if (type.typeTag() == TYPE_VAR_TYPE)
-		{
-			switch (position)
-			{
-			case CLASS:
-			case TYPE:
-				markers.add(this.position, "type.class.typevar");
-				break;
-			case SUPER_TYPE:
-				markers.add(this.position, "type.super.typevar");
-				break;
-			default:
-				break;
-			}
-		}
-		
 		return type;
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 	}
 	
 	@Override
@@ -147,12 +140,12 @@ public class NamedType implements IType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
 	
@@ -186,15 +179,15 @@ public class NamedType implements IType
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.name.qualified);
+		out.writeUTF(this.name.qualified);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.getQualified(dis.readUTF());
+		this.name = Name.getQualified(in.readUTF());
 	}
 	
 	@Override

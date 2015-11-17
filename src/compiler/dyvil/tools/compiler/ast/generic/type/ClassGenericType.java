@@ -1,29 +1,31 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.lang.List;
-
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.ConstructorMatch;
+import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
-public final class ClassGenericType extends GenericType
+public class ClassGenericType extends GenericType
 {
-	protected IClass	theClass;
+	protected IClass theClass;
 	
 	public ClassGenericType()
 	{
@@ -31,6 +33,7 @@ public final class ClassGenericType extends GenericType
 	
 	public ClassGenericType(IClass iclass)
 	{
+		super(iclass.genericCount());
 		this.theClass = iclass;
 	}
 	
@@ -69,14 +72,14 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public boolean equals(IType type)
+	public boolean isSameType(IType type)
 	{
 		if (this == type)
 		{
 			return true;
 		}
 		
-		if (!super.equals(type))
+		if (!super.isSameType(type))
 		{
 			return false;
 		}
@@ -97,7 +100,7 @@ public final class ClassGenericType extends GenericType
 			return false;
 		}
 		
-		return this.argumentsMatch(type);
+		return !type.isGenericType() || this.argumentsMatch(type);
 	}
 	
 	protected boolean argumentsMatch(IType type)
@@ -107,7 +110,7 @@ public final class ClassGenericType extends GenericType
 		{
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
 			
-			IType otherType = type.resolveType(typeVar);
+			IType otherType = type.resolveTypeSafely(typeVar);
 			if (!typeVar.getVariance().checkCompatible(this.typeArguments[i], otherType))
 			{
 				return false;
@@ -118,38 +121,30 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
+	public IType combine(IType type)
+	{
+		if (this.argumentsMatch(type))
+		{
+			return this;
+		}
+		
+		return new ClassType(this.theClass);
+	}
+	
+	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
 		int index = typeVar.getIndex();
+		
 		if (this.theClass.getTypeVariable(index) != typeVar)
 		{
 			return this.theClass.resolveType(typeVar, this);
 		}
+		if (index > this.typeArgumentCount)
+		{
+			return null;
+		}
 		return this.typeArguments[index];
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
-	{
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			if (this.typeArguments[i].hasTypeVariables())
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		ClassGenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
-		}
-		return copy;
 	}
 	
 	@Override
@@ -159,7 +154,10 @@ public final class ClassGenericType extends GenericType
 		{
 			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
 			IType concreteType = concrete.resolveType(typeVar);
-			this.typeArguments[i].inferTypes(concreteType, typeContext);
+			if (concreteType != null)
+			{
+				this.typeArguments[i].inferTypes(concreteType, typeContext);
+			}
 		}
 	}
 	
@@ -170,9 +168,23 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolve(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
-		return this;
+		IClass iclass = this.theClass;
+		if (iclass != null)
+		{
+			if (iclass.hasModifier(Modifiers.DEPRECATED))
+			{
+				Deprecation.checkDeprecation(markers, this.getPosition(), iclass, "type");
+			}
+			
+			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
+			{
+				markers.add(I18n.createMarker(this.getPosition(), "type.access.internal", iclass.getName()));
+			}
+		}
+		
+		super.checkType(markers, context, position);
 	}
 	
 	@Override
@@ -182,15 +194,15 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-			this.theClass.getMethodMatches(list, instance, name, arguments);
+		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
-	public void getConstructorMatches(List<ConstructorMatch> list, IArguments arguments)
+	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-			this.theClass.getConstructorMatches(list, arguments);
+		this.theClass.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
@@ -206,18 +218,18 @@ public final class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public void write(DataOutputStream dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.theClass.getInternalName());
-		this.writeTypeArguments(dos);
+		out.writeUTF(this.theClass.getInternalName());
+		this.writeTypeArguments(out);
 	}
 	
 	@Override
-	public void read(DataInputStream dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		String internal = dis.readUTF();
+		String internal = in.readUTF();
 		this.theClass = Package.rootPackage.resolveInternalClass(internal);
-		this.readTypeArguments(dis);
+		this.readTypeArguments(in);
 	}
 	
 	@Override

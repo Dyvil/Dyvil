@@ -1,0 +1,16 @@
+package dyvil.tools.dpf.visitor;
+
+import dyvil.tools.parsing.Name;
+
+public interface NodeVisitor
+{
+	NodeVisitor visitNode(Name name);
+	
+	ValueVisitor visitProperty(Name name);
+	
+	NodeVisitor visitNodeAccess(Name name);
+	
+	default void visitEnd()
+	{
+	}
+}

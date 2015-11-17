@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.context;
 
-import dyvil.lang.Map;
-
+import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -10,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Types;
 
 public final class MapTypeContext implements ITypeContext
 {
-	private Map<ITypeVariable, IType>	map	= new IdentityHashMap();
+	private Map<ITypeVariable, IType> map = new IdentityHashMap();
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)

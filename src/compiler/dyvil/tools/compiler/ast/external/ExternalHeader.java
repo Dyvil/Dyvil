@@ -1,21 +1,23 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.lang.List;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.member.Name;
-import dyvil.tools.compiler.ast.method.MethodMatch;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
+import dyvil.tools.parsing.Name;
 
 public class ExternalHeader extends DyvilHeader
 {
 	private boolean	importsResolved;
 	private boolean	staticImportsResolved;
 	
-	public ExternalHeader(String name)
+	public ExternalHeader()
+	{
+	}
+	
+	public ExternalHeader(Name name)
 	{
 		super(name);
 	}
@@ -59,7 +61,7 @@ public class ExternalHeader extends DyvilHeader
 	}
 	
 	@Override
-	public void getMethodMatches(List<MethodMatch> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (!this.staticImportsResolved)
 		{

@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.statement.Label;
+import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class TableSwitchInstruction implements IInstruction
 {
@@ -30,7 +30,7 @@ public class TableSwitchInstruction implements IInstruction
 	public void write(MethodWriter writer) throws BytecodeException
 	{
 		int len = this.handlers.length;
-		org.objectweb.asm.Label[] labels = new org.objectweb.asm.Label[len];
+		dyvil.tools.asm.Label[] labels = new dyvil.tools.asm.Label[len];
 		for (int i = 0; i < len; i++)
 		{
 			labels[i] = this.handlers[i].target;

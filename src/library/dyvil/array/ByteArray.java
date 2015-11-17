@@ -6,27 +6,32 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+import dyvil.lang.Byte;
+import dyvil.lang.Int;
+
 import dyvil.annotation.Intrinsic;
-import dyvil.annotation.infix;
-import dyvil.annotation.inline;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
+import dyvil.collection.Range;
+import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
 public interface ByteArray
 {
-	public static final byte[]	EMPTY	= new byte[0];
+	byte[] EMPTY = new byte[0];
 	
-	public static byte[] apply()
+	static byte[] apply()
 	{
 		return EMPTY;
 	}
 	
-	public static byte[] apply(int count)
+	static byte[] apply(int count)
 	{
 		return new byte[count];
 	}
 	
-	public static byte[] apply(int count, byte repeatedValue)
+	static byte[] repeat(int count, byte repeatedValue)
 	{
 		byte[] array = new byte[count];
 		for (int i = 0; i < count; i++)
@@ -36,7 +41,7 @@ public interface ByteArray
 		return array;
 	}
 	
-	public static byte[] apply(int count, IntUnaryOperator generator)
+	static byte[] generate(int count, IntUnaryOperator generator)
 	{
 		byte[] array = new byte[count];
 		for (int i = 0; i < count; i++)
@@ -46,7 +51,7 @@ public interface ByteArray
 		return array;
 	}
 	
-	public static byte[] range(byte start, byte end)
+	static byte[] range(byte start, byte end)
 	{
 		int i = 0;
 		byte[] array = new byte[end - start + 1];
@@ -57,35 +62,68 @@ public interface ByteArray
 		return array;
 	}
 	
+	static byte[] rangeOpen(byte start, byte end)
+	{
+		int i = 0;
+		byte[] array = new byte[end - start];
+		for (; start < end; start++)
+		{
+			array[i++] = start;
+		}
+		return array;
+	}
+	
 	// Basic Array Operations
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH })
-	public static @infix int length(byte[] array)
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
+	static @infix int length(byte[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, BALOAD })
-	public static @infix byte subscript(byte[] array, int i)
+	@Intrinsic({ LOAD_0, LOAD_1, BALOAD })
+	static @infix byte subscript(byte[] array, int i)
 	{
 		return array[i];
 	}
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, BASTORE })
-	public static @infix void subscript_$eq(byte[] array, int i, byte v)
+	static @infix byte[] subscript(byte[] array, Range<Int> range)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		byte[] slice = new byte[count];
+		for (int i = 0; i < count; i++)
+		{
+			slice[i] = array[start + i];
+		}
+		return slice;
+	}
+	
+	@Intrinsic({ LOAD_0, LOAD_1, BASTORE })
+	static @infix void subscript_$eq(byte[] array, int i, byte v)
 	{
 		array[i] = v;
 	}
 	
+	static @infix void subscript_$eq(byte[] array, Range<Int> range, byte[] values)
+	{
+		int start = Int.unapply(range.first());
+		int count = Int.unapply(range.last()) - start + 1;
+		for (int i = 0; i < count; i++)
+		{
+			array[start + i] = values[i];
+		}
+	}
+	
 	// Operators
 	
-	@Intrinsic({ INSTANCE, ARGUMENTS, ARRAYLENGTH, IFEQ })
-	public static @infix boolean isEmpty(byte[] array)
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	static @infix boolean isEmpty(byte[] array)
 	{
 		return array.length == 0;
 	}
 	
-	public static @infix void forEach(byte[] array, IntConsumer action)
+	static @infix void forEach(byte[] array, IntConsumer action)
 	{
 		int len = array.length;
 		for (int i = 0; i < len; i++)
@@ -96,22 +134,22 @@ public interface ByteArray
 	
 	// Operators
 	
-	public static @infix @inline boolean $qmark(byte[] array, byte v)
+	static @infix @inline boolean $qmark(byte[] array, byte v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean $eq$eq(byte[] array1, byte[] array2)
+	static @infix @inline boolean $eq$eq(byte[] array1, byte[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline boolean $bang$eq(byte[] array1, byte[] array2)
+	static @infix @inline boolean $bang$eq(byte[] array1, byte[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	public static @infix byte[] $plus(byte[] array, byte v)
+	static @infix byte[] $plus(byte[] array, byte v)
 	{
 		int len = array.length;
 		byte[] res = new byte[len + 1];
@@ -120,7 +158,7 @@ public interface ByteArray
 		return res;
 	}
 	
-	public static @infix byte[] $plus$plus(byte[] array1, byte[] array2)
+	static @infix byte[] $plus$plus(byte[] array1, byte[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -130,7 +168,7 @@ public interface ByteArray
 		return res;
 	}
 	
-	public static @infix byte[] $minus(byte[] array, byte v)
+	static @infix byte[] $minus(byte[] array, byte v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -153,7 +191,7 @@ public interface ByteArray
 		return res;
 	}
 	
-	public static @infix byte[] $minus$minus(byte[] array1, byte[] array2)
+	static @infix byte[] $minus$minus(byte[] array1, byte[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -172,7 +210,7 @@ public interface ByteArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix byte[] $amp(byte[] array1, byte[] array2)
+	static @infix byte[] $amp(byte[] array1, byte[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -191,7 +229,7 @@ public interface ByteArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix byte[] mapped(byte[] array, IntUnaryOperator mapper)
+	static @infix byte[] mapped(byte[] array, IntUnaryOperator mapper)
 	{
 		int len = array.length;
 		byte[] res = new byte[len];
@@ -202,7 +240,7 @@ public interface ByteArray
 		return res;
 	}
 	
-	public static @infix byte[] flatMapped(byte[] array, IntFunction<byte[]> mapper)
+	static @infix byte[] flatMapped(byte[] array, IntFunction<byte[]> mapper)
 	{
 		int len = array.length;
 		int size = 0;
@@ -226,7 +264,7 @@ public interface ByteArray
 		return res;
 	}
 	
-	public static @infix byte[] filtered(byte[] array, IntPredicate condition)
+	static @infix byte[] filtered(byte[] array, IntPredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -244,7 +282,7 @@ public interface ByteArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	public static @infix byte[] sorted(byte[] array)
+	static @infix byte[] sorted(byte[] array)
 	{
 		byte[] res = array.clone();
 		Arrays.sort(res);
@@ -253,12 +291,12 @@ public interface ByteArray
 	
 	// Search Operations
 	
-	public static @infix int indexOf(byte[] array, byte v)
+	static @infix int indexOf(byte[] array, byte v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	public static @infix int indexOf(byte[] array, byte v, int start)
+	static @infix int indexOf(byte[] array, byte v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -270,12 +308,12 @@ public interface ByteArray
 		return -1;
 	}
 	
-	public static @infix int lastIndexOf(byte[] array, byte v)
+	static @infix int lastIndexOf(byte[] array, byte v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	public static @infix int lastIndexOf(byte[] array, byte v, int start)
+	static @infix int lastIndexOf(byte[] array, byte v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -287,36 +325,52 @@ public interface ByteArray
 		return -1;
 	}
 	
-	public static @infix @inline boolean contains(byte[] array, byte v)
+	static @infix @inline boolean contains(byte[] array, byte v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	public static @infix @inline boolean in(byte v, byte[] array)
+	static @infix @inline boolean in(byte v, byte[] array)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
 	// Copying
 	
-	public static @infix @inline byte[] copy(byte[] array)
+	static @infix @inline byte[] copy(byte[] array)
 	{
 		return array.clone();
 	}
 	
+	static @infix Byte[] boxed(byte[] array)
+	{
+		int len = array.length;
+		Byte[] boxed = new Byte[len];
+		for (int i = 0; i < len; i++)
+		{
+			boxed[i] = Byte.apply(array[i]);
+		}
+		return boxed;
+	}
+	
+	static @infix Iterable<Byte> toIterable(byte[] array)
+	{
+		return new ArrayList<Byte>(boxed(array), true);
+	}
+	
 	// equals, hashCode and toString
 	
-	public static @infix @inline boolean equals(byte[] array1, byte[] array2)
+	static @infix @inline boolean equals(byte[] array1, byte[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	public static @infix @inline int hashCode(byte[] array)
+	static @infix @inline int hashCode(byte[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	public static @infix String toString(byte[] array)
+	static @infix String toString(byte[] array)
 	{
 		if (array == null)
 		{
@@ -339,7 +393,7 @@ public interface ByteArray
 		return buf.append(']').toString();
 	}
 	
-	public static @infix void toString(byte[] array, StringBuilder builder)
+	static @infix void toString(byte[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

@@ -1,32 +1,43 @@
 package dyvil.tools.compiler.ast.generic;
 
+import java.lang.annotation.ElementType;
+
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.member.Name;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.TypeReference;
-
-public final class TypeVariable implements ITypeVariable, ITypeList
+public final class TypeVariable implements ITypeVariable
 {
-	protected ICodePosition	position;
+	protected ICodePosition position;
 	
-	protected Variance		variance	= Variance.INVARIANT;
-	protected Name			name;
-	protected IType[]		upperBounds	= new IType[1];
-	protected int			upperBoundCount;
-	protected IType			lowerBound;
+	protected Variance	variance	= Variance.INVARIANT;
+	protected Name		name;
+	protected IType[]	upperBounds	= new IType[1];
+	protected int		upperBoundCount;
+	protected IType		lowerBound;
 	
-	private int				index;
-	private IGeneric		generic;
+	private int			index;
+	private IGeneric	generic;
+	
+	private AnnotationList annotations;
 	
 	public TypeVariable(IGeneric generic)
 	{
@@ -108,34 +119,77 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	}
 	
 	@Override
-	public int typeCount()
+	public AnnotationList getAnnotations()
 	{
-		return this.upperBoundCount;
+		return this.annotations;
 	}
 	
 	@Override
-	public void setType(int index, IType type)
+	public void setAnnotations(AnnotationList annotations)
 	{
-		this.upperBounds[index] = type;
+		this.annotations = annotations;
 	}
 	
 	@Override
-	public void addType(IType type)
+	public void addAnnotation(IAnnotation annotation)
 	{
-		int index = this.upperBoundCount++;
-		if (index >= this.upperBounds.length)
+		if (this.annotations == null)
 		{
-			IType[] temp = new IType[this.upperBoundCount];
-			System.arraycopy(this.upperBounds, 0, temp, 0, index);
-			this.upperBounds = temp;
+			this.annotations = new AnnotationList();
 		}
-		this.upperBounds[index] = type;
+		
+		this.annotations.addAnnotation(annotation);
 	}
 	
 	@Override
-	public IType getType(int index)
+	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
-		return this.upperBounds[index];
+		switch (type)
+		{
+		case "Ldyvil/annotation/_internal/Covariant;":
+			this.variance = Variance.COVARIANT;
+			return false;
+		case "Ldyvil/annotation/_internal/Contravariant;":
+			this.variance = Variance.CONTRAVARIANT;
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public IAnnotation getAnnotation(IClass type)
+	{
+		return this.annotations == null ? null : this.annotations.getAnnotation(type);
+	}
+	
+	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.TYPE_PARAMETER;
+	}
+	
+	@Override
+	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
+	{
+		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0, typePath.getLength());
+	}
+	
+	@Override
+	public IType getDefaultType()
+	{
+		switch (this.upperBoundCount)
+		{
+		case 0:
+			return Types.ANY;
+		case 1:
+			return this.upperBounds[0];
+		case 2:
+			if (this.upperBounds[0].getTheClass() == Types.OBJECT_CLASS)
+			{
+				return this.upperBounds[1];
+			}
+		}
+		return Types.ANY;
 	}
 	
 	@Override
@@ -221,17 +275,57 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	}
 	
 	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			int m = superType.getSubClassDistance(this.upperBounds[i]);
+			if (m > 0)
+			{
+				return m;
+			}
+		}
+		return 2;
+	}
+	
+	@Override
+	public IDataMember resolveField(Name name)
+	{
+		IDataMember field;
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			field = this.upperBounds[i].resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].getMethodMatches(list, instance, name, arguments);
+		}
+	}
+	
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.lowerBound != null)
 		{
-			this.lowerBound = this.lowerBound.resolve(markers, context, TypePosition.TYPE);
+			this.lowerBound = this.lowerBound.resolveType(markers, context);
 		}
 		
 		if (this.upperBoundCount > 0)
 		{
 			// The first upper bound is meant to be a class bound.
-			IType type = this.upperBounds[0] = this.upperBounds[0].resolve(markers, context, TypePosition.TYPE);
+			IType type = this.upperBounds[0] = this.upperBounds[0].resolveType(markers, context);
 			IClass iclass = type.getTheClass();
 			if (iclass != null)
 			{
@@ -259,7 +353,7 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 			// not.
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
-				type = this.upperBounds[i] = this.upperBounds[i].resolve(markers, context, TypePosition.TYPE);
+				type = this.upperBounds[i] = this.upperBounds[i].resolveType(markers, context);
 				iclass = type.getTheClass();
 				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
@@ -268,6 +362,76 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 					i--;
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.resolve(markers, context);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].resolve(markers, context);
+		}
+	}
+	
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
+		}
+	}
+	
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.check(markers, context);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].check(markers, context);
+		}
+	}
+	
+	@Override
+	public void foldConstants()
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.foldConstants();
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].foldConstants();
+		}
+	}
+	
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.lowerBound != null)
+		{
+			this.lowerBound.cleanup(context, compilableList);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].cleanup(context, compilableList);
 		}
 	}
 	
@@ -295,13 +459,22 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	}
 	
 	@Override
-	public void write(ClassWriter writer)
+	public void write(TypeAnnotatableVisitor visitor)
 	{
+		boolean method = this.generic instanceof IMethod;
+		int typeRef = TypeReference.newTypeParameterReference(method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
+		
 		if (this.variance != Variance.INVARIANT)
 		{
-			int typeRef = TypeReference.newTypeParameterReference(TypeReference.CLASS_TYPE_PARAMETER, this.index).getValue();
-			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/Contravariant;" : "Ldyvil/annotation/Covariant;";
-			writer.visitTypeAnnotation(typeRef, null, type, true);
+			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/_internal/Contravariant;" : "Ldyvil/annotation/_internal/Covariant;";
+			visitor.visitTypeAnnotation(typeRef, null, type, true);
+		}
+		
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			typeRef = TypeReference.newTypeParameterBoundReference(
+					method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND, this.index, i);
+			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
 		}
 	}
 	
@@ -316,6 +489,16 @@ public final class TypeVariable implements ITypeVariable, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.annotations != null)
+		{
+			int count = this.annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				this.annotations.getAnnotation(i).toString(prefix, buffer);
+				buffer.append(' ');
+			}
+		}
+		
 		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
 		

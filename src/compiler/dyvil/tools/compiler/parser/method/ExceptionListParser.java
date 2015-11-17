@@ -3,55 +3,49 @@ package dyvil.tools.compiler.parser.method;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.lexer.marker.SyntaxError;
-import dyvil.tools.compiler.lexer.token.IToken;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.type.TypeParser;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.token.IToken;
 
 public class ExceptionListParser extends Parser implements ITypeConsumer
 {
-	private static final int	TYPE		= 0;
-	private static final int	SEPERATOR	= 1;
+	private static final int	TYPE		= 1;
+	private static final int	SEPARATOR	= 2;
 	
-	protected IExceptionList	exceptionList;
+	protected IExceptionList exceptionList;
 	
 	public ExceptionListParser(IExceptionList list)
 	{
 		this.exceptionList = list;
-	}
-	
-	@Override
-	public void reset()
-	{
 		this.mode = TYPE;
 	}
 	
 	@Override
-	public void parse(IParserManager pm, IToken token) throws SyntaxError
+	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (ParserUtil.isCloseBracket(type))
+		switch (type)
 		{
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+		case BaseSymbols.EQUALS:
+		case BaseSymbols.SEMICOLON:
 			pm.popParser(true);
 			return;
 		}
 		
-		if (this.mode == TYPE)
+		switch (this.mode)
 		{
-			pm.pushParser(new TypeParser(this), true);
-			this.mode = 1;
+		case TYPE:
+			pm.pushParser(pm.newTypeParser(this), true);
+			this.mode = SEPARATOR;
 			return;
-		}
-		if (this.mode == SEPERATOR)
-		{
-			if (ParserUtil.isSeperator(type))
+		case SEPARATOR:
+			if (type == BaseSymbols.COMMA)
 			{
-				this.mode = 0;
+				this.mode = TYPE;
 				return;
 			}
-			
 			pm.popParser(true);
 			return;
 		}

@@ -23,4 +23,5 @@ package dyvil.lang.literal;
  */
 public @interface TypeConvertible
 {
+	String methodName() default "apply";
 }

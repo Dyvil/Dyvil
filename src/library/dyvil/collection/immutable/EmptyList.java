@@ -1,27 +1,27 @@
 package dyvil.collection.immutable;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.Collection;
-import dyvil.lang.List;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation.object;
+import dyvil.annotation._internal.object;
 import dyvil.array.ObjectArray;
+import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
 
 @NilConvertible
 public @object class EmptyList<E> implements ImmutableList<E>
 {
-	public static final EmptyList	instance	= new EmptyList();
+	private static final long serialVersionUID = -6059901529322971155L;
+	
+	public static final EmptyList instance = new EmptyList();
 	
 	public static <E> EmptyList<E> apply()
 	{
@@ -47,7 +47,13 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return EmptyIterator.apply();
+		return EmptyIterator.instance;
+	}
+	
+	@Override
+	public Iterator<E> reverseIterator()
+	{
+		return EmptyIterator.instance;
 	}
 	
 	@Override
@@ -59,6 +65,30 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public void forEach(Consumer<? super E> action)
 	{
+	}
+	
+	@Override
+	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		return initialValue;
+	}
+	
+	@Override
+	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	{
+		return initialValue;
+	}
+	
+	@Override
+	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		return null;
+	}
+	
+	@Override
+	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		return null;
 	}
 	
 	@Override
@@ -150,6 +180,12 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public ImmutableList<E> reversed()
+	{
+		return this;
+	}
+	
+	@Override
 	public ImmutableList<E> sorted()
 	{
 		return this;
@@ -203,6 +239,12 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	public java.util.List<E> toJava()
+	{
+		return Collections.EMPTY_LIST;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return "[]";
@@ -218,5 +260,15 @@ public @object class EmptyList<E> implements ImmutableList<E>
 	public int hashCode()
 	{
 		return List.listHashCode(this);
+	}
+	
+	private Object writeReplace() throws java.io.ObjectStreamException
+	{
+		return instance;
+	}
+	
+	private Object readResolve() throws java.io.ObjectStreamException
+	{
+		return instance;
 	}
 }

@@ -4,139 +4,401 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 
+import dyvil.collection.mutable.ArrayMap;
 import dyvil.collection.mutable.HashMap;
+import dyvil.collection.mutable.TupleMap;
+import dyvil.collection.view.MapView;
+import dyvil.tuple.Tuple2;
+import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible
+@MapConvertible
 public interface MutableMap<K, V> extends Map<K, V>
 {
-	public static <K, V> MutableMap<K, V> apply()
+	static <K, V> MutableMap<K, V> apply()
 	{
 		return new HashMap();
 	}
 	
-	public static <K, V> MutableMap<K, V> apply(K key, V value)
+	static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
-		HashMap<K, V> map = new HashMap(1);
-		map.subscript_$eq(key, value);
+		return apply(new Tuple2<K, V>(key, value));
+	}
+	
+	static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
+	{
+		TupleMap<K, V> map = new TupleMap<K, V>();
+		map.$plus$eq(entry);
 		return map;
 	}
 	
-	public static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
+	static <K, V> MutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
-		return apply(entry.getKey(), entry.getValue());
-	}
-	
-	public static <K, V> MutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
-	{
-		HashMap<K, V> map = new HashMap(entries.length);
+		TupleMap<K, V> map = new TupleMap<K, V>();
 		for (Entry<? extends K, ? extends V> entry : entries)
 		{
-			map.subscript_$eq(entry.getKey(), entry.getValue());
+			map.$plus$eq(entry);
 		}
 		return map;
+	}
+	
+	static <K, V> MutableMap<K, V> apply(K[] keys, V[] values)
+	{
+		return new ArrayMap<K, V>(keys, values, true);
 	}
 	
 	// Simple Getters
 	
 	@Override
-	public int size();
+	default boolean isImmutable()
+	{
+		return false;
+	}
 	
 	@Override
-	public Iterator<Entry<K, V>> iterator();
+	int size();
 	
 	@Override
-	public Iterator<K> keyIterator();
+	Iterator<Entry<K, V>> iterator();
 	
 	@Override
-	public Iterator<V> valueIterator();
+	Iterator<K> keyIterator();
 	
 	@Override
-	public boolean containsKey(Object key);
+	Iterator<V> valueIterator();
 	
 	@Override
-	public boolean containsValue(Object value);
+	V get(Object key);
 	
 	@Override
-	public boolean contains(Object key, Object value);
-	
-	@Override
-	public V get(Object key);
+	Option<V> getOption(Object key);
 	
 	// Non-mutating Operations
 	
 	@Override
-	public MutableMap<K, V> $plus(K key, V value);
+	default MutableMap<K, V> $plus(K key, V value)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.subscript_$eq(key, value);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map);
+	default Map<K, V> $plus(Entry<? extends K, ? extends V> entry)
+	{
+		return this.$plus(entry.getKey(), entry.getValue());
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus(Object key);
+	default MutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$plus$plus$eq(map);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus(Object key, Object value);
+	default MutableMap<K, V> $minus$at(Object key)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$at$eq(key);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus$colon(Object value);
+	default MutableMap<K, V> $minus(Object key, Object value)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$eq(key, value);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> $minus$minus(Map<? super K, ? super V> map);
+	default Map<K, V> $minus(Entry<?, ?> entry)
+	{
+		return this.$minus(entry.getKey(), entry.getValue());
+	}
 	
 	@Override
-	public <U> MutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper);
+	default MutableMap<K, V> $minus$colon(Object value)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$colon$eq(value);
+		return copy;
+	}
 	
 	@Override
-	public MutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition);
+	default MutableMap<K, V> $minus$minus(Map<?, ?> map)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$minus$eq(map);
+		return copy;
+	}
+	
+	@Override
+	default Map<K, V> $minus$minus(Collection<?> keys)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.$minus$minus$eq(keys);
+		return copy;
+	}
+	
+	@Override
+	default <NK> MutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	{
+		MutableMap<NK, V> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			V value = entry.getValue();
+			copy.put(mapper.apply(entry.getKey(), value), value);
+		}
+		return copy;
+	}
+	
+	@Override
+	default <NV> MutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	{
+		MutableMap<K, NV> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			K key = entry.getKey();
+			copy.put(key, mapper.apply(key, entry.getValue()));
+		}
+		return copy;
+	}
+	
+	@Override
+	default <NK, NV> MutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	{
+		MutableMap<NK, NV> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			if (newEntry != null)
+			{
+				copy.put(newEntry);
+			}
+		}
+		return copy;
+	}
+	
+	@Override
+	default <NK, NV> MutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	{
+		MutableMap<NK, NV> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
+			{
+				copy.put(newEntry);
+			}
+		}
+		return copy;
+	}
+	
+	@Override
+	default MutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.filter(condition);
+		return copy;
+	}
+	
+	@Override
+	default MutableMap<V, K> inverted()
+	{
+		MutableMap<V, K> map = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			map.put(entry.getValue(), entry.getKey());
+		}
+		return map;
+	}
 	
 	// Mutating Operations
 	
 	@Override
-	public void clear();
+	void clear();
 	
 	@Override
-	public V put(K key, V value);
+	default void subscript_$eq(K key, V value)
+	{
+		this.put(key, value);
+	}
 	
 	@Override
-	public V removeKey(Object key);
+	V put(K key, V value);
 	
 	@Override
-	public boolean removeValue(Object value);
+	default V put(Entry<? extends K, ? extends V> entry)
+	{
+		return this.put(entry.getKey(), entry.getValue());
+	}
 	
 	@Override
-	public void map(BiFunction<? super K, ? super V, ? extends V> mapper);
+	default void putAll(Map<? extends K, ? extends V> map)
+	{
+		for (Entry<? extends K, ? extends V> entry : map)
+		{
+			this.put(entry);
+		}
+	}
 	
 	@Override
-	public void filter(BiPredicate<? super K, ? super V> condition);
+	boolean putIfAbsent(K key, V value);
+	
+	@Override
+	default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	{
+		return this.putIfAbsent(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
+	boolean replace(K key, V oldValue, V newValue);
+	
+	@Override
+	V replace(K key, V newValue);
+	
+	@Override
+	default V replace(Entry<? extends K, ? extends V> entry)
+	{
+		return this.replace(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
+	V removeKey(Object key);
+	
+	@Override
+	boolean removeValue(Object value);
+	
+	@Override
+	boolean remove(Object key, Object value);
+	
+	@Override
+	default boolean remove(Entry<?, ?> entry)
+	{
+		return this.remove(entry.getKey(), entry.getValue());
+	}
+	
+	@Override
+	default boolean removeKeys(Collection<?> keys)
+	{
+		boolean removed = false;
+		for (Object key : keys)
+		{
+			if (this.removeKey(key) != null)
+			{
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	@Override
+	default boolean removeAll(Map<?, ?> map)
+	{
+		boolean removed = false;
+		for (Entry<?, ?> entry : map)
+		{
+			if (this.remove(entry))
+			{
+				removed = true;
+			}
+		}
+		return removed;
+	}
+	
+	@Override
+	default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
+	{
+		int size = this.size();
+		Entry<K, V>[] entries = this.toArray();
+		
+		this.clear();
+		for (int i = 0; i < size; i++)
+		{
+			Entry<K, V> entry = entries[i];
+			V value = entry.getValue();
+			this.put(mapper.apply(entry.getKey(), value), value);
+		}
+	}
+	
+	@Override
+	void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
+	
+	@Override
+	default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+	{
+		Entry<K, V>[] entries = this.toArray();
+		
+		this.clear();
+		for (Entry<K, V> entry : entries)
+		{
+			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			if (newEntry != null)
+			{
+				this.put(newEntry);
+			}
+		}
+	}
+	
+	@Override
+	default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+	{
+		Entry<K, V>[] entries = this.toArray();
+		
+		this.clear();
+		for (Entry<K, V> entry : entries)
+		{
+			for (Entry<? extends K, ? extends V> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
+			{
+				this.put(newEntry);
+			}
+		}
+	}
+	
+	@Override
+	void filter(BiPredicate<? super K, ? super V> condition);
 	
 	// Copying
 	
 	@Override
-	public MutableMap<K, V> copy();
+	MutableMap<K, V> copy();
 	
 	@Override
-	public default MutableMap<K, V> mutable()
+	default MutableMap<K, V> mutable()
 	{
 		return this;
 	}
 	
 	@Override
-	public default MutableMap<K, V> mutableCopy()
+	default MutableMap<K, V> mutableCopy()
 	{
 		return this.copy();
 	}
 	
-	@Override
-	public ImmutableMap<K, V> immutable();
+	<NK, NV> MutableMap<NK, NV> emptyCopy();
 	
 	@Override
-	public default ImmutableMap<K, V> immutableCopy()
+	ImmutableMap<K, V> immutable();
+	
+	@Override
+	default ImmutableMap<K, V> immutableCopy()
 	{
 		return this.immutable();
 	}
+	
+	@Override
+	default ImmutableMap<K, V> view()
+	{
+		return new MapView(this);
+	}
+	
+	@Override
+	java.util.Map<K, V> toJava();
 }

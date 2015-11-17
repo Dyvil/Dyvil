@@ -1,348 +1,144 @@
 package dyvil.collection.immutable;
 
-import java.util.Iterator;
-import java.util.function.BiConsumer;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 
-import dyvil.lang.Entry;
-import dyvil.lang.Map;
+import dyvil.lang.literal.ArrayConvertible;
 
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.MutableMap;
-import dyvil.collection.mutable.HashMap;
+import dyvil.collection.*;
+import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.tuple.Tuple2;
+import dyvil.util.ImmutableException;
 
-public class ArrayMap<K, V> implements ImmutableMap<K, V>
+@ArrayConvertible
+public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements ImmutableMap<K, V>
 {
-	protected class ArrayEntry implements Entry<K, V>
+	private static final long serialVersionUID = 4583062458335627011L;
+	
+	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... tuples)
 	{
-		private int	index;
-		
-		private ArrayEntry(int index)
-		{
-			this.index = index;
-		}
-		
-		@Override
-		public K getKey()
-		{
-			return ArrayMap.this.keys[this.index];
-		}
-		
-		@Override
-		public V getValue()
-		{
-			return ArrayMap.this.values[this.index];
-		}
-		
-		@Override
-		public String toString()
-		{
-			return Entry.entryToString(this);
-		}
-		
-		@Override
-		public boolean equals(Object obj)
-		{
-			return Entry.entryEquals(this, obj);
-		}
-		
-		@Override
-		public int hashCode()
-		{
-			return Entry.entryHashCode(this);
-		}
+		return new ArrayMap(tuples);
 	}
 	
-	private final int	size;
-	private final K[]	keys;
-	private final V[]	values;
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder<K, V>();
+	}
+	
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new Builder<K, V>(capacity);
+	}
+	
+	protected ArrayMap(int capacity)
+	{
+		super(capacity);
+	}
 	
 	public ArrayMap(K[] keys, V[] values)
 	{
-		int size = keys.length;
-		if (size != values.length)
-		{
-			throw new IllegalArgumentException("keys.length != values.length");
-		}
-		
-		this.keys = (K[]) new Object[size];
-		System.arraycopy(keys, 0, this.keys, 0, size);
-		this.values = (V[]) new Object[size];
-		System.arraycopy(values, 0, this.values, 0, size);
-		this.size = size;
+		super(keys, values);
 	}
 	
 	public ArrayMap(K[] keys, V[] values, int size)
 	{
-		if (keys.length < size)
-		{
-			throw new IllegalArgumentException("keys.length < size");
-		}
-		if (values.length < size)
-		{
-			throw new IllegalArgumentException("values.length < size");
-		}
-		
-		this.keys = (K[]) new Object[size];
-		System.arraycopy(keys, 0, this.keys, 0, size);
-		this.values = (V[]) new Object[size];
-		System.arraycopy(values, 0, this.values, 0, size);
-		this.size = size;
+		super(keys, values);
 	}
 	
-	public ArrayMap(K[] keys, V[] values, boolean trusted)
+	public ArrayMap(Object[] keys, Object[] values, boolean trusted)
 	{
-		this.keys = keys;
-		this.values = values;
-		this.size = keys.length;
+		super(keys, values, keys.length, trusted);
 	}
 	
-	public ArrayMap(K[] keys, V[] values, int size, boolean trusted)
+	public ArrayMap(Object[] keys, Object[] values, int size, boolean trusted)
 	{
-		this.keys = keys;
-		this.values = values;
-		this.size = size;
+		super(keys, values, size, trusted);
 	}
 	
 	public ArrayMap(Map<K, V> map)
 	{
-		this.size = map.size();
-		this.keys = (K[]) new Object[this.size];
-		this.values = (V[]) new Object[this.size];
+		super(map);
+	}
+	
+	public ArrayMap(AbstractArrayMap<K, V> map)
+	{
+		super(map);
+	}
+	
+	public ArrayMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
+	}
+	
+	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
+	{
+		private ArrayMap<K, V> map;
 		
-		int index = 0;
-		for (Entry<K, V> entry : map)
+		public Builder()
 		{
-			this.keys[index] = entry.getKey();
-			this.values[index] = entry.getValue();
-			index++;
+			this.map = new ArrayMap(DEFAULT_CAPACITY);
 		}
-	}
-	
-	@Override
-	public int size()
-	{
-		return this.size;
-	}
-	
-	@Override
-	public boolean isEmpty()
-	{
-		return this.size == 0;
-	}
-	
-	@Override
-	public Iterator<Entry<K, V>> iterator()
-	{
-		return new Iterator<Entry<K, V>>()
+		
+		public Builder(int capacity)
 		{
-			private int	index;
-			
-			@Override
-			public boolean hasNext()
+			this.map = new ArrayMap(capacity);
+		}
+		
+		@Override
+		public void put(K key, V value)
+		{
+			if (this.map == null)
 			{
-				return this.index < ArrayMap.this.size;
+				throw new IllegalStateException("Already built");
 			}
 			
-			@Override
-			public Entry<K, V> next()
-			{
-				return new ArrayEntry(this.index++);
-			}
-		};
-	}
-	
-	@Override
-	public Iterator<K> keyIterator()
-	{
-		return new Iterator<K>()
+			this.map.putInternal(key, value);
+		}
+		
+		@Override
+		public ArrayMap<K, V> build()
 		{
-			private int	index;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArrayMap.this.size;
-			}
-			
-			@Override
-			public K next()
-			{
-				return ArrayMap.this.keys[this.index++];
-			}
-		};
-	}
-	
-	@Override
-	public Iterator<V> valueIterator()
-	{
-		return new Iterator<V>()
-		{
-			private int	index;
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < ArrayMap.this.size;
-			}
-			
-			@Override
-			public V next()
-			{
-				return ArrayMap.this.values[this.index++];
-			}
-		};
-	}
-	
-	@Override
-	public void forEach(Consumer<? super Entry<K, V>> action)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			action.accept(new Tuple2(this.keys[i], this.values[i]));
+			ArrayMap<K, V> map = this.map;
+			this.map = null;
+			return map;
 		}
 	}
 	
 	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action)
+	protected void removeAt(int index)
 	{
-		for (int i = 0; i < this.size; i++)
-		{
-			action.accept(this.keys[i], this.values[i]);
-		}
-	}
-	
-	@Override
-	public boolean containsKey(Object key)
-	{
-		if (key == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (this.keys[i] == null)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		for (int i = 0; i < this.size; i++)
-		{
-			if (key.equals(this.keys[i]))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean contains(Object key, Object value)
-	{
-		if (key == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (this.keys[i] == null && (value == null ? this.values[i] == null : value.equals(this.values[i])))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		for (int i = 0; i < this.size; i++)
-		{
-			if (key.equals(this.keys[i]) && (value == null ? this.values[i] == null : value.equals(this.values[i])))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean containsValue(Object value)
-	{
-		if (value == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (this.values[i] == null)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		for (int i = 0; i < this.size; i++)
-		{
-			if (value.equals(this.values[i]))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	@Override
-	public V get(Object key)
-	{
-		if (key == null)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (this.keys[i] == null)
-				{
-					return this.values[i];
-				}
-			}
-			return null;
-		}
-		for (int i = 0; i < this.size; i++)
-		{
-			if (key.equals(this.keys[i]))
-			{
-				return this.values[i];
-			}
-		}
-		return null;
+		throw new ImmutableException("Iterator.remove() on Immutable Map");
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		int len = this.size + 1;
-		Object[] keys = new Object[len];
-		Object[] values = new Object[len];
-		System.arraycopy(this.keys, 0, keys, 0, this.size);
-		System.arraycopy(this.values, 0, values, 0, this.size);
-		return new ArrayMap(keys, values, len, true);
+		ArrayMap<K, V> copy = new ArrayMap<K, V>(this);
+		copy.putInternal(key, value);
+		return copy;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		int index = this.size;
-		int len = index + map.size();
-		Object[] keys = new Object[len];
-		Object[] values = new Object[len];
-		System.arraycopy(this.keys, 0, keys, 0, index);
-		System.arraycopy(this.values, 0, values, 0, index);
+		ArrayMap<K, V> copy = new ArrayMap<K, V>(this.size + map.size());
 		
+		// Copy our keys and values
+		System.arraycopy(this.keys, 0, copy.keys, 0, this.size);
+		System.arraycopy(this.values, 0, copy.values, 0, this.size);
+		
+		// Put the new keys and values
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			keys[index] = entry.getKey();
-			values[index] = entry.getValue();
-			index++;
+			copy.putInternal(entry.getKey(), entry.getValue());
 		}
-		return new ArrayMap(keys, values, len, true);
+		return copy;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key)
+	public ImmutableMap<K, V> $minus$at(Object key)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -350,15 +146,14 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			K k = this.keys[i];
-			if (key == null ? k == null : key.equals(k))
+			K k = (K) this.keys[i];
+			if (Objects.equals(key, k))
 			{
 				continue;
 			}
 			
 			keys[index] = k;
-			values[index] = this.values[i];
-			index++;
+			values[index++] = this.values[i];
 		}
 		return new ArrayMap(keys, values, index, true);
 	}
@@ -372,19 +167,18 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			K k = this.keys[i];
-			if (key == null ? k == null : key.equals(k))
+			K k = (K) this.keys[i];
+			if (Objects.equals(key, k))
 			{
 				continue;
 			}
-			V v = this.values[i];
-			if (value == null ? v == null : value.equals(v))
+			V v = (V) this.values[i];
+			if (Objects.equals(value, v))
 			{
 				continue;
 			}
 			keys[index] = k;
-			values[index] = v;
-			index++;
+			values[index++] = v;
 		}
 		return new ArrayMap(keys, values, index, true);
 	}
@@ -398,21 +192,20 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			V v = this.values[i];
-			if (value == null ? v == null : value.equals(v))
+			V v = (V) this.values[i];
+			if (Objects.equals(value, v))
 			{
 				continue;
 			}
 			
 			keys[index] = this.keys[i];
-			values[index] = v;
-			index++;
+			values[index++] = v;
 		}
 		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<? super K, ? super V> map)
+	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -420,21 +213,54 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			K k = this.keys[i];
-			if (map.containsKey(k))
+			K k = (K) this.keys[i];
+			V v = (V) this.values[i];
+			if (map.contains(k, v))
 			{
 				continue;
 			}
 			
 			keys[index] = k;
-			values[index] = this.values[i];
-			index++;
+			values[index++] = v;
 		}
 		return new ArrayMap(keys, values, index, true);
 	}
 	
 	@Override
-	public <U> ImmutableMap<K, U> mapped(BiFunction<? super K, ? super V, ? extends U> mapper)
+	public ImmutableMap<K, V> $minus$minus(Collection<?> collection)
+	{
+		Object[] keys = new Object[this.size];
+		Object[] values = new Object[this.size];
+		
+		int index = 0;
+		for (int i = 0; i < this.size; i++)
+		{
+			K k = (K) this.keys[i];
+			if (collection.contains(k))
+			{
+				continue;
+			}
+			
+			keys[index] = k;
+			values[index++] = this.values[i];
+		}
+		return new ArrayMap(keys, values, index, true);
+	}
+	
+	@Override
+	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	{
+		ArrayMap<NK, V> copy = new ArrayMap<NK, V>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			V value = (V) this.values[i];
+			copy.putInternal(mapper.apply((K) this.keys[i], value), value);
+		}
+		return copy;
+	}
+	
+	@Override
+	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -442,9 +268,40 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		System.arraycopy(this.keys, 0, keys, 0, this.size);
 		for (int i = 0; i < this.size; i++)
 		{
-			values[i] = mapper.apply(this.keys[i], this.values[i]);
+			values[i] = mapper.apply((K) this.keys[i], (V) this.values[i]);
 		}
 		return new ArrayMap(keys, values, this.size, true);
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	{
+		ArrayMap<NK, NV> copy = new ArrayMap<NK, NV>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			Entry<? extends NK, ? extends NV> entry = mapper.apply((K) this.keys[i], (V) this.values[i]);
+			if (entry == null)
+			{
+				continue;
+			}
+			
+			copy.putInternal(entry.getKey(), entry.getValue());
+		}
+		return copy;
+	}
+	
+	@Override
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	{
+		ArrayMap<NK, NV> copy = new ArrayMap<NK, NV>(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			for (Entry<? extends NK, ? extends NV> entry : mapper.apply((K) this.keys[i], (V) this.values[i]))
+			{
+				copy.putInternal(entry.getKey(), entry.getValue());
+			}
+		}
+		return copy;
 	}
 	
 	@Override
@@ -456,8 +313,8 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			K k = this.keys[i];
-			V v = this.values[i];
+			K k = (K) this.keys[i];
+			V v = (V) this.values[i];
 			if (!condition.test(k, v))
 			{
 				continue;
@@ -471,49 +328,30 @@ public class ArrayMap<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
+	public ImmutableMap<V, K> inverted()
+	{
+		Object[] keys = new Object[this.size];
+		Object[] values = new Object[this.size];
+		System.arraycopy(this.keys, 0, values, 0, this.size);
+		System.arraycopy(this.values, 0, keys, 0, this.size);
+		return new ArrayMap(keys, values, this.size, true);
+	}
+	
+	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new ArrayMap(this.keys, this.values, this.size);
+		return new ArrayMap(this);
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		HashMap<K, V> map = new HashMap(this.size);
-		for (int i = 0; i < this.size; i++)
-		{
-			map.subscript_$eq(this.keys[i], this.values[i]);
-		}
-		return map;
+		return new dyvil.collection.mutable.ArrayMap(this);
 	}
 	
 	@Override
-	public String toString()
+	public java.util.Map<K, V> toJava()
 	{
-		if (this.size <= 0)
-		{
-			return "[]";
-		}
-		
-		StringBuilder builder = new StringBuilder("[ ");
-		builder.append(this.keys[0]).append(" -> ").append(this.values[0]);
-		for (int i = 1; i < this.size; i++)
-		{
-			builder.append(", ");
-			builder.append(this.keys[i]).append(" -> ").append(this.values[i]);
-		}
-		return builder.append(" ]").toString();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return Map.mapEquals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Map.mapHashCode(this);
+		return Collections.unmodifiableMap(super.toJava());
 	}
 }

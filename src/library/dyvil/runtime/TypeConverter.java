@@ -1,33 +1,29 @@
 package dyvil.runtime;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
-import jdk.internal.org.objectweb.asm.Type;
-
-import org.objectweb.asm.MethodVisitor;
+import dyvil.tools.asm.MethodVisitor;
+import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.Type;
 
 import static dyvil.runtime.Wrapper.*;
 
-import sun.invoke.util.BytecodeDescriptor;
-
 public class TypeConverter
 {
-	private static final String		DYVIL_LANG_NUMBER	= "dyvil/lang/Number";
+	private static final int NUM_WRAPPERS = Wrapper.values().length;
 	
-	private static final int		NUM_WRAPPERS		= Wrapper.values().length;
-	
-	private static final String		NAME_OBJECT			= "java/lang/Object";
-	private static final String		WRAPPER_PREFIX		= "Ldyvil/lang/";
+	private static final String	NAME_OBJECT		= "java/lang/Object";
+	private static final String	WRAPPER_PREFIX	= "Ldyvil/lang/";
 	
 	// Same for all primitives; name of the boxing method
-	private static final String		NAME_BOX_METHOD		= "apply";
+	private static final String	NAME_BOX_METHOD		= "apply";
+	private static final String	NAME_UNBOX_METHOD	= "unapply";
 	
 	// Table of opcodes for widening primitive conversions
-	private static final int[][]	wideningOpcodes		= new int[NUM_WRAPPERS][NUM_WRAPPERS];
+	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];
 	
-	private static final Wrapper[]	FROM_WRAPPER_NAME	= new Wrapper[16];
+	private static final Wrapper[] FROM_WRAPPER_NAME = new Wrapper[16];
 	
 	// Table of wrappers for primitives, indexed by ASM type sorts
-	private static final Wrapper[]	FROM_TYPE_SORT		= new Wrapper[16];
+	private static final Wrapper[] FROM_TYPE_SORT = new Wrapper[16];
 	
 	static
 	{
@@ -36,7 +32,7 @@ public class TypeConverter
 			if (w.basicTypeChar() != 'L')
 			{
 				int wi = hashWrapperName(w.wrapperSimpleName());
-				assert (FROM_WRAPPER_NAME[wi] == null);
+				assert FROM_WRAPPER_NAME[wi] == null;
 				FROM_WRAPPER_NAME[wi] = w;
 			}
 		}
@@ -100,19 +96,14 @@ public class TypeConverter
 		return "dyvil/lang/" + w.wrapperSimpleName();
 	}
 	
-	private static String unboxMethod(Wrapper w)
-	{
-		return w.primitiveSimpleName() + "Value";
-	}
-	
 	private static String boxingDescriptor(Wrapper w)
 	{
-		return String.format("(%s)L%s;", w.basicTypeChar(), wrapperName(w));
+		return "(" + w.basicTypeChar() + ")Ldyvil/lang/" + w.wrapperSimpleName() + ";";
 	}
 	
 	private static String unboxingDescriptor(Wrapper w)
 	{
-		return "()" + w.basicTypeChar();
+		return "(Ldyvil/lang/" + w.wrapperSimpleName() + ";)" + w.basicTypeChar();
 	}
 	
 	static void boxIfTypePrimitive(MethodVisitor mv, Type t)
@@ -143,12 +134,7 @@ public class TypeConverter
 	
 	static void unbox(MethodVisitor mv, String sname, Wrapper wt)
 	{
-		if (sname == DYVIL_LANG_NUMBER)
-		{
-			mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, sname, unboxMethod(wt), unboxingDescriptor(wt), true);
-			return;
-		}
-		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, sname, unboxMethod(wt), unboxingDescriptor(wt), false);
+		mv.visitMethodInsn(Opcodes.INVOKESTATIC, sname, NAME_UNBOX_METHOD, unboxingDescriptor(wt), false);
 	}
 	
 	private static String descriptorToName(String desc)
@@ -188,16 +174,40 @@ public class TypeConverter
 		return Wrapper.forBasicType(first);
 	}
 	
-	static void convertType(MethodVisitor mv, Class<?> arg, Class<?> target, Class<?> functional)
+	public static void convertType(MethodVisitor mv, Class<?> arg, Class<?> target, Class<?> functional)
 	{
 		if (arg.equals(target) && arg.equals(functional))
 		{
 			return;
 		}
-		if (arg == Void.TYPE || target == Void.TYPE)
+		if (arg == Void.TYPE)
 		{
+			if (target == Void.TYPE)
+			{
+				return;
+			}
+			if (target == Object.class || target == dyvil.lang.Void.class)
+			{
+				mv.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
+				return;
+			}
+			if (target != Void.TYPE)
+			{
+				mv.visitInsn(Opcodes.ACONST_NULL);
+			}
 			return;
 		}
+		if (target == Void.TYPE)
+		{
+			if (arg == long.class || arg == double.class)
+			{
+				mv.visitInsn(Opcodes.POP2);
+				return;
+			}
+			mv.visitInsn(Opcodes.POP);
+			return;
+		}
+		
 		if (arg.isPrimitive())
 		{
 			Wrapper wArg = Wrapper.forPrimitiveType(arg);
@@ -209,7 +219,7 @@ public class TypeConverter
 			else
 			{
 				// Primitive argument to reference target
-				String dTarget = BytecodeDescriptor.unparse(target);
+				String dTarget = Type.getDescriptor(target);
 				Wrapper wPrimTarget = wrapperOrNullFromDescriptor(dTarget);
 				if (wPrimTarget != null)
 				{
@@ -228,7 +238,7 @@ public class TypeConverter
 		}
 		else
 		{
-			String dArg = BytecodeDescriptor.unparse(arg);
+			String dArg = Type.getDescriptor(arg);
 			String dSrc;
 			if (functional.isPrimitive())
 			{
@@ -238,10 +248,10 @@ public class TypeConverter
 			{
 				// Cast to convert to possibly more specific type, and generate
 				// CCE for invalid arg
-				dSrc = BytecodeDescriptor.unparse(functional);
+				dSrc = Type.getDescriptor(functional);
 				cast(mv, dArg, dSrc);
 			}
-			String dTarget = BytecodeDescriptor.unparse(target);
+			String dTarget = Type.getDescriptor(target);
 			if (target.isPrimitive())
 			{
 				Wrapper wTarget = toWrapper(dTarget);
@@ -265,17 +275,7 @@ public class TypeConverter
 				{
 					// Source type is reference type, but not boxed type,
 					// assume it is super type of target type
-					String intermediate;
-					if (wTarget.isSigned() || wTarget.isFloating())
-					{
-						// Boxed number to primitive
-						intermediate = DYVIL_LANG_NUMBER;
-					}
-					else
-					{
-						// Character or Boolean
-						intermediate = wrapperName(wTarget);
-					}
+					String intermediate = wrapperName(wTarget);
 					cast(mv, dSrc, intermediate);
 					unbox(mv, intermediate, wTarget);
 				}

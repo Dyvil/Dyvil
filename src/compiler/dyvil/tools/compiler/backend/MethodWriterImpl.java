@@ -1,31 +1,30 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-import org.objectweb.asm.*;
-
 import static dyvil.reflect.Opcodes.*;
 
 public final class MethodWriterImpl implements MethodWriter
 {
-	private static final Long	LONG_MINUS_ONE	= Long.valueOf(-1);
+	private static final Long LONG_MINUS_ONE = Long.valueOf(-1);
 	
-	public ClassWriter			cw;
-	protected MethodVisitor		mv;
+	public ClassWriter		cw;
+	protected MethodVisitor	mv;
 	
-	protected Frame				frame			= new Frame();
-	private boolean				visitFrame;
-	private int					maxLocals;
-	private int					maxStack;
+	protected Frame	frame	= new Frame();
+	private boolean	visitFrame;
+	private int		maxLocals;
+	private int		maxStack;
 	
-	private boolean				hasReturn;
+	private boolean hasReturn;
 	
-	private int[]				syncLocals;
-	private int					syncCount;
+	private int[]	syncLocals;
+	private int		syncCount;
 	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
@@ -64,19 +63,31 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
+	public boolean hasReturn()
+	{
+		return this.hasReturn;
+	}
+	
+	@Override
 	public void begin()
 	{
 		this.mv.visitCode();
 	}
 	
 	@Override
-	public AnnotationVisitor addAnnotation(String type, boolean visible)
+	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
 		return this.mv.visitAnnotation(type, visible);
 	}
 	
 	@Override
-	public AnnotationVisitor addParameterAnnotation(int index, String type, boolean visible)
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	{
+		return this.mv.visitTypeAnnotation(typeRef, typePath, desc, visible);
+	}
+	
+	@Override
+	public AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible)
 	{
 		return this.mv.visitParameterAnnotation(index, type, visible);
 	}
@@ -290,20 +301,59 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void writeTargetLabel(Label label)
 	{
+		this.writeLabel(label);
 		this.visitFrame = true;
+		this.hasReturn = false;
+	}
+	
+	@Override
+	public void writeLineNumber(int lineNumber)
+	{
+		Label label = new Label();
 		this.mv.visitLabel(label);
+		this.mv.visitLineNumber(lineNumber, label);
 	}
 	
 	// Other Instructions
 	
 	@Override
-	public void writeInsn(int opcode) throws BytecodeException
+	public void writeInsn(int opcode, int lineNumber) throws BytecodeException
 	{
-		if (opcode <= 0)
+		switch (opcode)
 		{
-			return;
+		// NullPointerException, ArrayIndexOutOfBoundsException
+		case ARRAYLENGTH:
+		case IALOAD:
+		case LALOAD:
+		case FALOAD:
+		case DALOAD:
+		case AALOAD:
+		case BALOAD:
+		case CALOAD:
+		case SALOAD:
+		case IASTORE:
+		case LASTORE:
+		case FASTORE:
+		case DASTORE:
+		case BASTORE:
+		case CASTORE:
+		case SASTORE:
+			// ..., ArrayStoreException
+		case AASTORE:
+			// NullPointerException, any unchecked Exception
+		case OBJECT_EQUALS:
+			// ArithmeticException
+		case IDIV:
+		case LDIV:
+			this.writeLineNumber(lineNumber);
 		}
 		
+		this.writeInsn(opcode);
+	}
+	
+	@Override
+	public void writeInsn(int opcode) throws BytecodeException
+	{
 		if (opcode > 255)
 		{
 			switch (opcode)
@@ -312,22 +362,14 @@ public final class MethodWriterImpl implements MethodWriter
 				this.frame.push(ClassFormat.LONG);
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
 				return;
-			case Opcodes.BINV:
-			{
-				Label label1 = new Label();
-				Label label2 = new Label();
-				this.mv.visitJumpInsn(Opcodes.IFEQ, label1);
-				this.mv.visitInsn(Opcodes.ICONST_0);
-				this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-				this.mv.visitLabel(label1);
-				this.mv.visitInsn(Opcodes.ICONST_1);
-				this.mv.visitLabel(label2);
-			}
-			case Opcodes.IINV:
+			case Opcodes.BNOT:
+				this.writeBoolJump(Opcodes.IFEQ);
+				return;
+			case Opcodes.INOT:
 				this.mv.visitInsn(Opcodes.ICONST_M1);
 				this.mv.visitInsn(Opcodes.IXOR);
 				return;
-			case Opcodes.LINV:
+			case Opcodes.LNOT:
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
 				this.mv.visitInsn(Opcodes.IXOR);
 				return;
@@ -376,11 +418,28 @@ public final class MethodWriterImpl implements MethodWriter
 				this.mv.visitInsn(Opcodes.D2I);
 				this.mv.visitInsn(Opcodes.I2C);
 				return;
+			case NULL:
+				this.writeBoolJump(IFNULL);
+				return;
+			case NONNULL:
+				this.writeBoolJump(IFNONNULL);
+				return;
+			case ACMPEQ:
+				this.writeBoolJump(Opcodes.IF_ACMPEQ);
+				return;
+			case ACMPNE:
+				this.writeBoolJump(Opcodes.IF_ACMPNE);
+				return;
 			case Opcodes.OBJECT_EQUALS:
 				this.frame.pop();
 				this.frame.pop();
-				this.frame.push(ClassFormat.INT);
 				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+				this.frame.push(ClassFormat.BOOLEAN);
+				return;
+			case SWAP2:
+				this.frame.reserve(2);
+				this.mv.visitInsn(Opcodes.DUP2_X2);
+				this.mv.visitInsn(Opcodes.POP2);
 				return;
 			case Opcodes.AUTO_SWAP:
 				BackendUtil.swap(this);
@@ -401,16 +460,13 @@ public final class MethodWriterImpl implements MethodWriter
 			
 			if (opcode >= ICMPEQ && opcode <= ICMPLE)
 			{
-				opcode -= ICMPEQ;
-				
-				Label label1 = new Label();
-				Label label2 = new Label();
-				this.mv.visitJumpInsn(Opcodes.IF_ICMPEQ + opcode, label1);
-				this.mv.visitInsn(Opcodes.ICONST_0);
-				this.mv.visitJumpInsn(Opcodes.GOTO, label2);
-				this.mv.visitLabel(label1);
-				this.mv.visitInsn(Opcodes.ICONST_1);
-				this.mv.visitLabel(label2);
+				this.writeBoolJump(Opcodes.IF_ICMPEQ + opcode - ICMPEQ);
+				return;
+			}
+			if (opcode >= LCMPEQ && opcode <= DCMPLE)
+			{
+				this.writeBoolJump(Opcodes.IF_LCMPEQ + opcode - LCMPEQ);
+				return;
 			}
 			return;
 		}
@@ -433,6 +489,20 @@ public final class MethodWriterImpl implements MethodWriter
 			this.hasReturn = true;
 		}
 		this.mv.visitInsn(opcode);
+	}
+	
+	private void writeBoolJump(int jump) throws BytecodeException
+	{
+		Label label1 = new Label();
+		Label label2 = new Label();
+		
+		this.writeJumpInsn(jump, label1);
+		
+		this.writeInsn(Opcodes.ICONST_0);
+		this.writeJumpInsn(Opcodes.GOTO, label2);
+		this.writeTargetLabel(label1);
+		this.writeInsn(Opcodes.ICONST_1);
+		this.writeTargetLabel(label2);
 	}
 	
 	@Override
@@ -534,8 +604,10 @@ public final class MethodWriterImpl implements MethodWriter
 		this.visitFrame = true;
 		this.frame.visitJumpInsn(opcode);
 		
-		target.info = this.frame;
-		this.frame = this.frame.copy();
+		if (target.info == null)
+		{
+			target.info = this.frame.copy();
+		}
 		
 		this.mv.visitJumpInsn(opcode, target);
 	}
@@ -566,14 +638,38 @@ public final class MethodWriterImpl implements MethodWriter
 		this.mv.visitMultiANewArrayInsn(type, dims);
 	}
 	
+	private static int getNewArrayCode(int typecode)
+	{
+		switch (typecode)
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+			return ClassFormat.T_BOOLEAN;
+		case PrimitiveType.BYTE_CODE:
+			return ClassFormat.T_BYTE;
+		case PrimitiveType.SHORT_CODE:
+			return ClassFormat.T_SHORT;
+		case PrimitiveType.CHAR_CODE:
+			return ClassFormat.T_CHAR;
+		case PrimitiveType.INT_CODE:
+			return ClassFormat.T_INT;
+		case PrimitiveType.LONG_CODE:
+			return ClassFormat.T_LONG;
+		case PrimitiveType.FLOAT_CODE:
+			return ClassFormat.T_FLOAT;
+		case PrimitiveType.DOUBLE_CODE:
+			return ClassFormat.T_DOUBLE;
+		}
+		return 0;
+	}
+	
 	@Override
 	public void writeNewArray(IType type, int dims) throws BytecodeException
 	{
 		if (dims == 1)
 		{
-			if (type.typeTag() == IType.PRIMITIVE)
+			if (type.isPrimitive())
 			{
-				this.writeIntInsn(Opcodes.NEWARRAY, ((PrimitiveType) type).typecode);
+				this.writeIntInsn(Opcodes.NEWARRAY, getNewArrayCode(type.getTypecode()));
 				return;
 			}
 			
@@ -652,6 +748,12 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		this.frame.visitInsn(Opcodes.TABLESWITCH);
 		
+		defaultHandler.info = this.frame.copy();
+		for (Label l : handlers)
+		{
+			l.info = this.frame.copy();
+		}
+		
 		this.mv.visitTableSwitchInsn(start, end, defaultHandler, handlers);
 	}
 	
@@ -661,6 +763,12 @@ public final class MethodWriterImpl implements MethodWriter
 		this.insnCallback();
 		
 		this.frame.visitInsn(Opcodes.LOOKUPSWITCH);
+		
+		defaultHandler.info = this.frame.copy();
+		for (Label l : handlers)
+		{
+			l.info = this.frame.copy();
+		}
 		
 		this.mv.visitLookupSwitchInsn(defaultHandler, keys, handlers);
 	}
@@ -729,8 +837,12 @@ public final class MethodWriterImpl implements MethodWriter
 		
 		if (!this.hasReturn)
 		{
-			this.insnCallback();
-			this.mv.visitInsn(type.getReturnOpcode());
+			int opcode = type.getReturnOpcode();
+			if (opcode == RETURN || this.frame.actualStackCount > 0)
+			{
+				this.insnCallback();
+				this.mv.visitInsn(opcode);
+			}
 		}
 		this.mv.visitMaxs(this.frame.maxStack, this.frame.maxLocals);
 		this.mv.visitEnd();

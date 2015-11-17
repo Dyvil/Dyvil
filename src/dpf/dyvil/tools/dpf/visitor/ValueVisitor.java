@@ -1,0 +1,28 @@
+package dyvil.tools.dpf.visitor;
+
+import dyvil.tools.parsing.Name;
+
+public interface ValueVisitor
+{
+	void visitInt(int value);
+	
+	void visitLong(long value);
+	
+	void visitFloat(float value);
+	
+	void visitDouble(double value);
+	
+	void visitString(String value);
+	
+	StringInterpolationVisitor visitStringInterpolation();
+	
+	void visitName(Name name);
+	
+	ValueVisitor visitValueAccess(Name name);
+	
+	ListVisitor visitList();
+	
+	MapVisitor visitMap();
+	
+	BuilderVisitor visitBuilder(Name name);
+}

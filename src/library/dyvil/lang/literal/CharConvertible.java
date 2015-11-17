@@ -26,4 +26,5 @@ package dyvil.lang.literal;
  */
 public @interface CharConvertible
 {
+	String methodName() default "apply";
 }
