@@ -10,8 +10,8 @@ import static dyvil.tools.parsing.lexer.Tokens.*;
 
 public final class DyvilLexer
 {
-	private MarkerList	markers;
-	private Symbols		symbols;
+	private MarkerList markers;
+	private Symbols    symbols;
 	
 	public DyvilLexer(MarkerList markers, Symbols symbols)
 	{
@@ -29,39 +29,39 @@ public final class DyvilLexer
 		int start = 0;
 		int lineNumber = 1;
 		
-		char l = 0;
-		char c = 0;
+		char prevChar = 0;
+		char currentChar;
 		int type = 0;
 		int subtype = 0;
 		boolean addToken = false;
 		boolean reparse = true;
 		boolean string = false;
-		for (int i = 0; i < len; ++i, l = c)
+		for (int i = 0; i < len; ++i, prevChar = currentChar)
 		{
-			c = code.charAt(i);
+			currentChar = code.charAt(i);
 			
 			if (type == 0)
 			{
 				start = i;
 				
-				if (c == '\n')
+				if (currentChar == '\n')
 				{
 					lineNumber++;
 					continue;
 				}
-				if (c <= ' ')
+				if (currentChar <= ' ')
 				{
 					continue;
 				}
 				
-				if (string && c == ')')
+				if (string && currentChar == ')')
 				{
 					type = STRING;
 					subtype = STRING_PART;
 					continue;
 				}
 				
-				int m = getMode(c, code, i);
+				int m = getMode(currentChar, code, i);
 				type = m & 0xFFFF;
 				subtype = m & 0xFFFF0000;
 			}
@@ -73,48 +73,48 @@ public final class DyvilLexer
 				switch (subtype)
 				{
 				case MOD_LETTER:
-					if (c == '_' || c == '$')
+					if (currentChar == '_' || currentChar == '$')
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						subtype = MOD_LETTER | MOD_SYMBOL;
 						continue;
 					}
-					if (LexerUtil.isIdentifierPart(c))
+					if (LexerUtil.isIdentifierPart(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						continue;
 					}
 					addToken = true;
 					break typeswitch;
 				case MOD_SYMBOL:
-					if (c == '_' || c == '$')
+					if (currentChar == '_' || currentChar == '$')
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						subtype = MOD_LETTER | MOD_SYMBOL;
 						continue;
 					}
-					if (LexerUtil.isIdentifierSymbol(c))
+					if (LexerUtil.isIdentifierSymbol(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						continue;
 					}
 					addToken = true;
 					break typeswitch;
 				case MOD_LETTER | MOD_SYMBOL:
-					if (c == '_' || c == '$')
+					if (currentChar == '_' || currentChar == '$')
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						continue;
 					}
-					if (LexerUtil.isIdentifierPart(c))
+					if (LexerUtil.isIdentifierPart(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						subtype = MOD_LETTER;
 						continue;
 					}
-					if (LexerUtil.isIdentifierSymbol(c))
+					if (LexerUtil.isIdentifierSymbol(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 						subtype = MOD_LETTER;
 						continue;
 					}
@@ -123,7 +123,7 @@ public final class DyvilLexer
 				}
 				break;
 			case SPECIAL_IDENTIFIER:
-				switch (c)
+				switch (currentChar)
 				{
 				case '\n':
 				case '\t':
@@ -139,23 +139,23 @@ public final class DyvilLexer
 					reparse = false;
 					break typeswitch;
 				default:
-					buf.append(c);
+					buf.append(currentChar);
 					continue;
 				}
 			case SYMBOL:
-				buf.append(c);
+				buf.append(currentChar);
 				addToken = true;
 				reparse = false;
 				break;
 			case BRACKET:
-				buf.append(c);
+				buf.append(currentChar);
 				addToken = true;
 				reparse = false;
 				break;
 			case COMMENT:
 				if (subtype == MOD_LINE)
 				{
-					if (c == '\n')
+					if (currentChar == '\n')
 					{
 						type = 0;
 						lineNumber++;
@@ -164,11 +164,11 @@ public final class DyvilLexer
 				}
 				else if (subtype == MOD_BLOCK)
 				{
-					if (c == '\n')
+					if (currentChar == '\n')
 					{
 						lineNumber++;
 					}
-					else if (l == '*' && c == '/')
+					else if (prevChar == '*' && currentChar == '/')
 					{
 						type = 0;
 						continue;
@@ -177,10 +177,16 @@ public final class DyvilLexer
 				break;
 			case INT:
 			case LONG:
-				switch (c)
+				switch (currentChar)
 				{
 				case 'l':
 				case 'L':
+					if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
+					{
+						addToken = true;
+						break typeswitch;
+					}
+
 					type = LONG;
 					addToken = true;
 					reparse = false;
@@ -190,11 +196,12 @@ public final class DyvilLexer
 				}
 				if (subtype == MOD_DEC)
 				{
-					if (LexerUtil.isDigit(c))
+					if (LexerUtil.isDigit(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
+						break;
 					}
-					else if (c == '.')
+					else if (currentChar == '.')
 					{
 						if (!LexerUtil.isDigit(code.charAt(i + 1)))
 						{
@@ -204,34 +211,49 @@ public final class DyvilLexer
 						}
 						type = DOUBLE;
 						buf.append('.');
+						break;
 					}
-					else if (c == 'e' || c == 'E')
+
+					switch (currentChar)
 					{
-						type = FLOAT;
+					case 'e':
+					case 'E':
+						type = DOUBLE;
 						buf.append('e');
-					}
-					else if (c == 'f' || c == 'F')
-					{
+						break typeswitch;
+					case 'f':
+					case 'F':
+						if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
+						{
+							addToken = true;
+							break typeswitch;
+						}
+
 						type = FLOAT;
 						addToken = true;
 						reparse = false;
-					}
-					else if (c == 'd' || c == 'D')
-					{
+						break typeswitch;
+					case 'd':
+					case 'D':
+						if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
+						{
+							addToken = true;
+							break typeswitch;
+						}
+
 						type = DOUBLE;
 						addToken = true;
 						reparse = false;
+						break typeswitch;
 					}
-					else
-					{
-						addToken = true;
-					}
+					addToken = true;
+					break;
 				}
 				else if (subtype == MOD_BIN)
 				{
-					if (c == 'b' || LexerUtil.isBinDigit(c))
+					if (currentChar == 'b' || LexerUtil.isBinDigit(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 					}
 					else
 					{
@@ -240,9 +262,9 @@ public final class DyvilLexer
 				}
 				else if (subtype == MOD_OCT)
 				{
-					if (c == 'o' || LexerUtil.isOctDigit(c))
+					if (currentChar == 'o' || LexerUtil.isOctDigit(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 					}
 					else
 					{
@@ -251,9 +273,9 @@ public final class DyvilLexer
 				}
 				else if (subtype == MOD_HEX)
 				{
-					if (c == 'x' || LexerUtil.isHexDigit(c))
+					if (currentChar == 'x' || LexerUtil.isHexDigit(currentChar))
 					{
-						buf.append(c);
+						buf.append(currentChar);
 					}
 					else
 					{
@@ -263,38 +285,59 @@ public final class DyvilLexer
 				break;
 			case FLOAT:
 			case DOUBLE:
-				if (c == 'x')
+				if (LexerUtil.isDigit(currentChar))
 				{
-					subtype = MOD_HEX;
-					buf.append(c);
+					buf.append(currentChar);
+					break;
 				}
-				else if (c == 'f' || c == 'F')
+
+				switch (currentChar)
 				{
+				case 'x':
+					subtype = MOD_HEX;
+					buf.append(currentChar);
+					break typeswitch;
+				case 'f':
+				case 'F':
+					if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
+					{
+						addToken = true;
+						break typeswitch;
+					}
+
 					type = FLOAT;
 					addToken = true;
 					reparse = false;
-				}
-				else if (c == 'd' || c == 'D')
-				{
+					break typeswitch;
+				case 'd':
+				case 'D':
+					if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
+					{
+						addToken = true;
+						break typeswitch;
+					}
+
 					type = DOUBLE;
 					addToken = true;
 					reparse = false;
-				}
-				else if (LexerUtil.isDigit(c) || c == 'e')
-				{
-					buf.append(c);
-				}
-				else if (c == '-' && code.charAt(i - 1) == 'e')
-				{
-					buf.append('-');
-				}
-				else
-				{
+					break typeswitch;
+				case 'e':
+					buf.append('e');
+					break typeswitch;
+				case '-':
+					if (code.charAt(i - 1) == 'e')
+					{
+						buf.append('-');
+						break typeswitch;
+					}
+
 					addToken = true;
 				}
+
+				addToken = true;
 				break;
 			case STRING:
-				if (c == '"' && (buf.length() > 0 || string))
+				if (currentChar == '"' && (buf.length() > 0 || string))
 				{
 					if (!string && buf.charAt(0) == '"')
 					{
@@ -309,7 +352,7 @@ public final class DyvilLexer
 					reparse = false;
 					break;
 				}
-				else if (c == '\\')
+				else if (currentChar == '\\')
 				{
 					char c1 = code.charAt(i + 1);
 					if (c1 == '(')
@@ -335,36 +378,36 @@ public final class DyvilLexer
 					buf.append('\\');
 					break;
 				}
-				else if (c != '\t')
+				else if (currentChar != '\t')
 				{
-					buf.append(c);
+					buf.append(currentChar);
 				}
 				break;
 			case SINGLE_QUOTED_STRING:
-				if (c == '\'' && buf.length() > 0)
+				if (currentChar == '\'' && buf.length() > 0)
 				{
 					addToken = true;
 					reparse = false;
 				}
-				else if (c == '\\' && appendEscape(buf, code.charAt(i + 1)))
+				else if (currentChar == '\\' && appendEscape(buf, code.charAt(i + 1)))
 				{
 					i++;
 					continue;
 				}
-				else if (c != '\t')
+				else if (currentChar != '\t')
 				{
-					buf.append(c);
+					buf.append(currentChar);
 				}
 				break;
 			case LITERAL_STRING:
-				if (c == '"' && buf.length() > 0)
+				if (currentChar == '"' && buf.length() > 0)
 				{
 					addToken = true;
 					reparse = false;
 				}
-				else if (c != '@' || buf.length() > 0)
+				else if (currentChar != '@' || buf.length() > 0)
 				{
-					buf.append(c);
+					buf.append(currentChar);
 				}
 				break;
 			}
