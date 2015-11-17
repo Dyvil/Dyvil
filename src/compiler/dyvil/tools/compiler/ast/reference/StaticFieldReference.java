@@ -1,26 +1,25 @@
 package dyvil.tools.compiler.ast.reference;
 
-import dyvil.lang.Map;
-import dyvil.lang.Set;
-
+import dyvil.collection.Map;
+import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.collection.mutable.MapBasedSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.member.IClassCompilable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.lexer.marker.MarkerList;
-import dyvil.tools.compiler.lexer.position.ICodePosition;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class StaticFieldReference implements IReference, IClassCompilable
 {
-	private static Map<String, Set<IField>>	map	= new IdentityHashMap();
+	private static Map<String, Set<IField>> map = new IdentityHashMap();
 	
 	protected IField						field;
 	
@@ -39,7 +38,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		Set<IField> set = map.get(className);
 		if (set == null)
 		{
-			set = new MapBasedSet<>(new IdentityHashMap());
+			set = new MapBasedSet<IField>(new IdentityHashMap<>());
 			map.put(className, set);
 		}
 		
@@ -55,10 +54,9 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		compilableList.addCompilable(this);
-		
 		if (addToMap(this.className, this.field))
 		{
+			compilableList.addCompilable(this);
 			this.isUnique = true;
 		}
 	}
@@ -131,7 +129,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		writer.writeVarInsn(Opcodes.ASTORE, var);
 		
 		// Get the Class of the field container type
-		writer.writeLDC(org.objectweb.asm.Type.getType(fieldClassType));
+		writer.writeLDC(dyvil.tools.asm.Type.getType(fieldClassType));
 		writer.writeLDC(fieldName);
 		// Get the Field using reflection
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
