@@ -1,5 +1,9 @@
 package dyvil.collection;
 
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
+
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -12,19 +16,19 @@ import java.util.stream.StreamSupport;
 
 /**
  * A <b>Queryable</b> represents a special {@link Iterable} that includes a
- * number of special operations for querying. These operations include
- * {@link #stream()} for lazy evaluation, {@link #fold(Object, BiFunction)},
- * {@link #reduce(BiFunction)}, {@link #map(Function)},
- * {@link #flatMap(Function)} and {@link #filter(Predicate)}.
- * 
+ * number of special operations for querying. These operations include {@link
+ * #stream()} for lazy evaluation, {@link #fold(Object, BiFunction)}, {@link
+ * #reduce(BiFunction)}, {@link #map(Function)}, {@link #flatMap(Function)} and
+ * {@link #filter(Predicate)}.
+ *
  * @param <E>
- *            the element type
+ * 		the element type
  */
 public interface Queryable<E> extends Iterable<E>
 {
 	/**
 	 * Returns the number of elements in this query.
-	 * 
+	 *
 	 * @return the number of elements
 	 */
 	int size();
@@ -32,7 +36,7 @@ public interface Queryable<E> extends Iterable<E>
 	/**
 	 * Returns true iff this query is empty, i.e. the number of elements as
 	 * returned by {@link #size()} is {@code 0}.
-	 * 
+	 *
 	 * @return true, iff this query is empty
 	 */
 	default boolean isEmpty()
@@ -42,7 +46,7 @@ public interface Queryable<E> extends Iterable<E>
 	
 	/**
 	 * Creates and returns an {@link Iterator} over the elements of this query.
-	 * 
+	 *
 	 * @return an iterator over the elements of this query
 	 */
 	@Override
@@ -51,7 +55,7 @@ public interface Queryable<E> extends Iterable<E>
 	/**
 	 * Creates and returns a {@link Spliterator} over the elements of this
 	 * query.
-	 * 
+	 *
 	 * @return a spliterator over the elements of this query
 	 */
 	@Override
@@ -63,7 +67,7 @@ public interface Queryable<E> extends Iterable<E>
 	/**
 	 * Creates and returns a sequential {@link Stream} of this query, based on
 	 * the {@link Spliterator} returned by {@link #spliterator()}.
-	 * 
+	 *
 	 * @return a stream of this query
 	 */
 	default Stream<E> stream()
@@ -74,7 +78,7 @@ public interface Queryable<E> extends Iterable<E>
 	/**
 	 * Creates and returns a parallel {@link Stream} of this query, based on the
 	 * {@link Spliterator} returned by {@link #spliterator()}.
-	 * 
+	 *
 	 * @return a parallel stream of this query
 	 */
 	default Stream<E> parallelStream()
@@ -93,19 +97,21 @@ public interface Queryable<E> extends Iterable<E>
 	
 	/**
 	 * Folds this entire query into a single value by repeatedly reducing the
-	 * elements of this query and the initial value using the given
-	 * {@code reducer}. If this query does not contain any elements, the initial
-	 * value is simply returned. Otherwise, it is repeatedly replaced with the
-	 * result of {@code reducer.apply(initialValue, element)} for every element
-	 * in this query.
-	 * 
+	 * elements of this query and the initial value using the given {@code
+	 * reducer}. If this query does not contain any elements, the initial value
+	 * is simply returned. Otherwise, it is repeatedly replaced with the result
+	 * of {@code reducer.apply(initialValue, element)} for every element in this
+	 * query.
+	 *
 	 * @param initialValue
-	 *            the initial value
+	 * 		the initial value
 	 * @param reducer
-	 *            the reducer function
+	 * 		the reducer function
+	 *
 	 * @return the folded value
 	 */
-	default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R fold(R initialValue,
+			BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (E element : this)
 		{
@@ -117,9 +123,10 @@ public interface Queryable<E> extends Iterable<E>
 	/**
 	 * Reduces this entire query into a single value by repeatedly reducing the
 	 * elements using the given {@code reducer} binary operator.
-	 * 
+	 *
 	 * @param reducer
-	 *            the reducer binary operator
+	 * 		the reducer binary operator
+	 *
 	 * @return the reduced value
 	 */
 	/*
@@ -167,15 +174,42 @@ public interface Queryable<E> extends Iterable<E>
 		}
 		return false;
 	}
+
+	default E find(Predicate<? super E> condition)
+	{
+		for (E element : this)
+		{
+			if (condition.test(element))
+			{
+				return element;
+			}
+		}
+
+		return null;
+	}
+
+	default Option<E> findOption(Predicate<? super E> condition)
+	{
+		for (E element : this)
+		{
+			if (condition.test(element))
+			{
+				return new Some<E>(element);
+			}
+		}
+
+		return None.apply();
+	}
 	
 	/**
 	 * Returns true if and if only this query contains the given {@code element}
 	 * . By default, 'contains' in defined such that any element in this query
-	 * matches the given element in a way so that
-	 * {@code element.equals(this.element)}.
-	 * 
+	 * matches the given element in a way so that {@code
+	 * element.equals(this.element)}.
+	 *
 	 * @param element
-	 *            the element to find
+	 * 		the element to find
+	 *
 	 * @return true, iff this query contains the element
 	 */
 	default boolean contains(Object element)
@@ -187,9 +221,9 @@ public interface Queryable<E> extends Iterable<E>
 	 * Maps all elements in this query using the given {@code mapper} function
 	 * by supplying them to the function and replacing them with the result of
 	 * the call {mapper.apply(element)}.
-	 * 
+	 *
 	 * @param mapper
-	 *            the mapping function
+	 * 		the mapping function
 	 */
 	void map(Function<? super E, ? extends E> mapper);
 	
@@ -199,15 +233,15 @@ public interface Queryable<E> extends Iterable<E>
 	 * the call {@code mapper.apply(element)}. If the mapper returns multiple
 	 * results at once, they are 'flattened' and added to this query
 	 * sequentially as shown in the below example.
-	 * 
+	 * <p>
 	 * <pre>
 	 * List[int] list = MutableList(1, 2, 3, 4)
 	 * list.flatMap(i => [ i, i * 10 ])
 	 * println list // prints [ 1, 10, 2, 20, 3, 30, 4, 40 ]
 	 * </pre>
-	 * 
+	 *
 	 * @param mapper
-	 *            the mapping function
+	 * 		the mapping function
 	 */
 	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
@@ -215,9 +249,9 @@ public interface Queryable<E> extends Iterable<E>
 	 * Removes all elements from the query that do not fulfill the requirement
 	 * given by the {@code condition}, i.e. if {@code condition.test(element)}
 	 * returns {@code false}.
-	 * 
+	 *
 	 * @param condition
-	 *            the condition
+	 * 		the condition
 	 */
 	void filter(Predicate<? super E> condition);
 	
@@ -228,7 +262,8 @@ public interface Queryable<E> extends Iterable<E>
 		return builder.toString();
 	}
 	
-	default void toString(StringBuilder builder, String prefix, String separator, String postfix)
+	default void toString(StringBuilder builder, String prefix,
+			String separator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())
