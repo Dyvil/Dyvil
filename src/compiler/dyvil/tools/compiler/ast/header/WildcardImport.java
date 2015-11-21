@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -15,6 +11,10 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class WildcardImport extends Import
 {
@@ -32,19 +32,26 @@ public final class WildcardImport extends Import
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IContext context,
+			boolean using)
 	{
 		if (this.parent != null)
 		{
 			this.parent.resolveTypes(markers, context, false);
 			context = this.parent.getContext();
+
+			if (context == null)
+			{
+				return;
+			}
 		}
 		
 		if (using)
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(I18n.createMarker(this.position, "using.wildcard.invalid"));
+				markers.add(I18n.createMarker(this.position,
+						"using.wildcard.invalid"));
 				return;
 			}
 			
@@ -54,7 +61,8 @@ public final class WildcardImport extends Import
 		
 		if (!(context instanceof Package))
 		{
-			markers.add(I18n.createMarker(this.position, "import.wildcard.invalid"));
+			markers.add(I18n.createMarker(this.position,
+					"import.wildcard.invalid"));
 			return;
 		}
 		this.context = context;
@@ -69,24 +77,45 @@ public final class WildcardImport extends Import
 	@Override
 	public Package resolvePackage(Name name)
 	{
+		if (this.context == null)
+		{
+			return null;
+		}
+
 		return this.context.resolvePackage(name);
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
+		if (this.context == null)
+		{
+			return null;
+		}
+
 		return this.context.resolveClass(name);
 	}
 	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
+		if (this.context == null)
+		{
+			return null;
+		}
+
 		return this.context.resolveField(name);
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance,
+			Name name, IArguments arguments)
 	{
+		if (this.context == null)
+		{
+			return;
+		}
+
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	

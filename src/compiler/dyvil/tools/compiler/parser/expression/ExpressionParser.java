@@ -14,7 +14,9 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.operator.*;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.pattern.ICase;
-import dyvil.tools.compiler.ast.statement.*;
+import dyvil.tools.compiler.ast.statement.IfStatement;
+import dyvil.tools.compiler.ast.statement.ReturnStatement;
+import dyvil.tools.compiler.ast.statement.SyncStatement;
 import dyvil.tools.compiler.ast.statement.control.BreakStatement;
 import dyvil.tools.compiler.ast.statement.control.ContinueStatement;
 import dyvil.tools.compiler.ast.statement.control.GoToStatement;
@@ -23,7 +25,6 @@ import dyvil.tools.compiler.ast.statement.exception.TryStatement;
 import dyvil.tools.compiler.ast.statement.loop.DoStatement;
 import dyvil.tools.compiler.ast.statement.loop.WhileStatement;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -42,37 +43,38 @@ import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-public final class ExpressionParser extends Parser implements ITypeConsumer, IValueConsumer
+public final class ExpressionParser extends Parser
+		implements ITypeConsumer, IValueConsumer
 {
 	public static final int VALUE = 0x1;
 	
-	public static final int	ACCESS		= 0x2;
-	public static final int	DOT_ACCESS	= 0x4;
+	public static final int ACCESS     = 0x2;
+	public static final int DOT_ACCESS = 0x4;
 	
-	public static final int	STATEMENT				= 0x8;
-	public static final int	TYPE					= 0x10;
-	public static final int	CONSTRUCTOR				= 0x20;
-	public static final int	CONSTRUCTOR_END			= 0x40;
-	public static final int	ANONYMOUS_CLASS_END		= 0x80;
-	public static final int	CONSTRUCTOR_PARAMETERS	= 0x100;
-	public static final int	PARAMETERS_END			= 0x2000;
-	public static final int	SUBSCRIPT_END			= 0x4000;
-	public static final int	TYPE_ARGUMENTS_END		= 0x8000;
+	public static final int STATEMENT              = 0x8;
+	public static final int TYPE                   = 0x10;
+	public static final int CONSTRUCTOR            = 0x20;
+	public static final int CONSTRUCTOR_END        = 0x40;
+	public static final int ANONYMOUS_CLASS_END    = 0x80;
+	public static final int CONSTRUCTOR_PARAMETERS = 0x100;
+	public static final int PARAMETERS_END         = 0x2000;
+	public static final int SUBSCRIPT_END          = 0x4000;
+	public static final int TYPE_ARGUMENTS_END     = 0x8000;
 	
 	public static final int BYTECODE_END = 0x10000;
 	
-	public static final int	PATTERN_IF	= 0x20000;
-	public static final int	PATTERN_END	= 0x40000;
+	public static final int PATTERN_IF  = 0x20000;
+	public static final int PATTERN_END = 0x40000;
 	
-	public static final int	PARAMETERIZED_THIS_END	= 0x80000;
-	public static final int	PARAMETERIZED_SUPER_END	= 0x100000;
+	public static final int PARAMETERIZED_THIS_END  = 0x80000;
+	public static final int PARAMETERIZED_SUPER_END = 0x100000;
 	
 	protected IValueConsumer valueConsumer;
 	
 	private IValue value;
 	
-	private boolean		explicitDot;
-	private Operator	operator;
+	private boolean  explicitDot;
+	private Operator operator;
 	
 	public ExpressionParser(IValueConsumer field)
 	{
@@ -130,7 +132,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			case Tokens.STRING_START:
 			{
-				StringInterpolationExpr ssv = new StringInterpolationExpr(token);
+				StringInterpolationExpr ssv = new StringInterpolationExpr(
+						token);
 				this.value = ssv;
 				this.mode = ACCESS;
 				pm.pushParser(new StingInterpolationParser(ssv), true);
@@ -238,17 +241,20 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = PATTERN_END;
 			if (type == DyvilKeywords.IF)
 			{
-				pm.pushParser(pm.newExpressionParser(v -> ((ICase) this.value).setCondition(v)));
+				pm.pushParser(pm.newExpressionParser(
+						v -> ((ICase) this.value).setCondition(v)));
 				return;
 			}
 			//$FALL-THROUGH$
 		case PATTERN_END:
-			if (type == BaseSymbols.COLON || type == DyvilSymbols.ARROW_OPERATOR)
+			if (type == BaseSymbols.COLON
+					|| type == DyvilSymbols.ARROW_OPERATOR)
 			{
 				this.mode = END;
 				if (token.next().type() != DyvilKeywords.CASE)
 				{
-					pm.pushParser(pm.newExpressionParser(v -> ((ICase) this.value).setAction(v)));
+					pm.pushParser(pm.newExpressionParser(
+							v -> ((ICase) this.value).setAction(v)));
 				}
 				return;
 			}
@@ -331,14 +337,16 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Constructor Argument List - ')' expected");
+				pm.report(token,
+						"Invalid Constructor Argument List - ')' expected");
 			}
 			this.value.expandPosition(token);
 			this.mode = ACCESS;
 			if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.skip();
-				this.parseBody(pm, ((ConstructorCall) this.value).toClassConstructor());
+				this.parseBody(pm,
+						((ConstructorCall) this.value).toClassConstructor());
 				return;
 			}
 			return;
@@ -356,7 +364,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				pm.report(token, "Invalid Method Type Parameter List - ']' expected");
+				pm.report(token,
+						"Invalid Method Type Parameter List - ']' expected");
 			}
 			
 			MethodCall mc = (MethodCall) this.value;
@@ -369,7 +378,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			{
 				pm.skip();
 				IArguments arguments = this.parseArguments(pm, next.next());
-				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), arguments);
+				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(),
+						mc.getReceiver(), arguments);
 				amc.setGenericData(genericData);
 				
 				this.value = amc;
@@ -379,18 +389,26 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (ParserUtil.isIdentifier(nextType))
 			{
 				pm.skip();
-				this.value = ((MethodCall) this.value).getReceiver();
-				this.parseAccess(pm, token.next(), token.next().type(), token.next().nameValue(), null);
+				this.value = mc.getReceiver();
+				this.parseAccess(pm, token.next(), token.next().type(),
+						token.next().nameValue(), null);
 				
 				if (this.value instanceof AbstractCall)
 				{
 					((AbstractCall) this.value).setGenericData(genericData);
 				}
+				if (this.value instanceof FieldAccess)
+				{
+					FieldAccess fieldAccess = (FieldAccess) this.value;
+					mc.setName(fieldAccess.getName());
+					this.value = mc;
+				}
 				return;
 			}
 			if (ParserUtil.isExpressionTerminator(nextType))
 			{
-				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), EmptyArguments.INSTANCE);
+				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(),
+						mc.getReceiver(), EmptyArguments.INSTANCE);
 				amc.setGenericData(genericData);
 				this.value = amc;
 				this.mode = ACCESS;
@@ -398,7 +416,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			
 			SingleArgument argument = new SingleArgument();
-			ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), argument);
+			ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(),
+					mc.getReceiver(), argument);
 			amc.setGenericData(genericData);
 			this.value = amc;
 			
@@ -460,7 +479,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = co;
 				return;
 			case DyvilKeywords.IS:
-				InstanceOfOperator io = new InstanceOfOperator(token.raw(), this.value);
+				InstanceOfOperator io = new InstanceOfOperator(token.raw(),
+						this.value);
 				pm.pushParser(pm.newTypeParser(io));
 				this.value = io;
 				return;
@@ -482,7 +502,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			case BaseSymbols.OPEN_PARENTHESIS:
 				// Parse an apply call
 				// e.g. 1("a"), this("stuff"), "myString"(2)
-				ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value, this.parseArguments(pm, token.next()));
+				ApplyMethodCall amc = new ApplyMethodCall(
+						this.value.getPosition(), this.value,
+						this.parseArguments(pm, token.next()));
 				this.value = amc;
 				this.mode = PARAMETERS_END;
 				return;
@@ -504,7 +526,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				}
 				
 				SingleArgument sa = new SingleArgument();
-				ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value, sa);
+				ApplyMethodCall amc = new ApplyMethodCall(
+						this.value.getPosition(), this.value, sa);
 				this.parseApply(pm, token, sa, Operators.DEFAULT);
 				pm.reparse();
 				this.value = amc;
@@ -538,11 +561,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	/**
 	 * Creates the body and initializes parsing for anonymous classes.
-	 * 
+	 *
 	 * @param pm
-	 *            the current parsing context manager.
+	 * 		the current parsing context manager.
 	 * @param cc
-	 *            the anonymous class AST node.
+	 * 		the anonymous class AST node.
 	 */
 	private void parseBody(IParserManager pm, ClassConstructor cc)
 	{
@@ -558,26 +581,18 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	 * Parses an argument list and creates the appropriate AST representation.
 	 * The following instances can be created by this method:
 	 * <p>
-	 * <ul>
-	 * <li>{@link EmptyArguments} - For empty argument lists:<br>
-	 * <code>
-	 * this.call()
-	 * </code>
-	 * <li>{@link ArgumentList} - For simple indexed argument lists:<br>
-	 * <code>
-	 * this.call(1, "abc", null)
-	 * </code>
-	 * <li>{@link ArgumentMap} - For named argument lists / maps:<br>
-	 * <code>
-	 * this.call(index: 1, string: "abc")
-	 * </code>
-	 * </ul>
-	 * 
+	 * <ul> <li>{@link EmptyArguments} - For empty argument lists:<br> <code>
+	 * this.call() </code> <li>{@link ArgumentList} - For simple indexed
+	 * argument lists:<br> <code> this.call(1, "abc", null) </code> <li>{@link
+	 * ArgumentMap} - For named argument lists / maps:<br> <code>
+	 * this.call(index: 1, string: "abc") </code> </ul>
+	 *
 	 * @param pm
-	 *            the current parsing context manager.
+	 * 		the current parsing context manager.
 	 * @param next
-	 *            the next token. The current token is assumed to be the opening
-	 *            parenthesis of the argument list.
+	 * 		the next token. The current token is assumed to be the opening
+	 * 		parenthesis of the argument list.
+	 *
 	 * @return the appropriate AST representation for the type of argument list.
 	 */
 	private IArguments parseArguments(IParserManager pm, IToken next)
@@ -587,7 +602,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			return EmptyArguments.VISIBLE;
 		}
-		if (ParserUtil.isIdentifier(type) && next.next().type() == BaseSymbols.COLON)
+		if (ParserUtil.isIdentifier(type)
+				&& next.next().type() == BaseSymbols.COLON)
 		{
 			ArgumentMap map = new ArgumentMap();
 			pm.pushParser(new ExpressionMapParser(map));
@@ -601,17 +617,18 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	/**
 	 * Parses an ACCESS sequence.
-	 * 
+	 *
 	 * @param pm
-	 *            the current parsing context manager.
+	 * 		the current parsing context manager.
 	 * @param token
-	 *            the current token, has to be any {@code IDENTIFIER} token.
+	 * 		the current token, has to be any {@code IDENTIFIER} token.
 	 * @param type
-	 *            the {@code type} of the current {@code token}.
+	 * 		the {@code type} of the current {@code token}.
 	 * @param name
-	 *            the {@code nameValue} of the {@code token}.
+	 * 		the {@code nameValue} of the {@code token}.
 	 */
-	private void parseAccess(IParserManager pm, IToken token, int type, Name name, Operator op)
+	private void parseAccess(IParserManager pm, IToken token, int type,
+			Name name, Operator op)
 	{
 		IToken next = token.next();
 		int nextType = next.type();
@@ -634,7 +651,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			call.setDotless(!this.explicitDot);
 			this.value = call;
 			this.mode = ACCESS;
-			if (op.type != Operator.POSTFIX && !ParserUtil.isExpressionTerminator(nextType))
+			if (op.type != Operator.POSTFIX && !ParserUtil
+					.isExpressionTerminator(nextType))
 			{
 				SingleArgument sa = new SingleArgument();
 				call.setArguments(sa);
@@ -675,14 +693,16 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				call.setArguments(this.parseArguments(pm, next.next()));
 				return;
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
-				SubscriptGetter getter = new SubscriptGetter(token, new FieldAccess(token.raw(), this.value, name));
+				SubscriptGetter getter = new SubscriptGetter(token,
+						new FieldAccess(token.raw(), this.value, name));
 				this.value = getter;
 				this.mode = SUBSCRIPT_END;
 				pm.skip();
 				pm.pushParser(new ExpressionListParser(getter.getArguments()));
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
-				LambdaExpr lv = new LambdaExpr(next.raw(), new MethodParameter(token.raw(), token.nameValue()));
+				LambdaExpr lv = new LambdaExpr(next.raw(),
+						new MethodParameter(token.raw(), token.nameValue()));
 				this.mode = END;
 				this.value = lv;
 				pm.pushParser(pm.newExpressionParser(lv));
@@ -709,9 +729,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				// e.g. this + that
 				// ... IDENTIFIER NON-EXPRESSION-TERMINATOR
 				// e.g. this.plus that
-				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isExpressionTerminator(next.next().type()))
+				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil
+						.isExpressionTerminator(next.next().type()))
 				{
-					FieldAccess access = new FieldAccess(token, this.value, name);
+					FieldAccess access = new FieldAccess(token, this.value,
+							name);
 					access.setDotless(!this.explicitDot);
 					this.value = access;
 					this.mode = ACCESS;
@@ -730,11 +752,13 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		this.value = call;
 		this.mode = ACCESS;
 		
-		this.parseApply(pm, token.next(), sa, op == null ? Operators.DEFAULT : op);
+		this.parseApply(pm, token.next(), sa,
+				op == null ? Operators.DEFAULT : op);
 		return;
 	}
 	
-	private void parseIdentifierAccess(IParserManager pm, IToken token, int type)
+	private void parseIdentifierAccess(IParserManager pm, IToken token,
+			int type)
 	{
 		Name name = token.nameValue();
 		Operator operator = pm.getOperator(name);
@@ -742,7 +766,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			// Handle operator precedence
 			int p;
-			if (operator == null || (p = this.operator.precedence) > operator.precedence)
+			if (operator == null
+					|| (p = this.operator.precedence) > operator.precedence)
 			{
 				this.valueConsumer.setValue(this.value);
 				pm.popParser(true);
@@ -758,7 +783,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					pm.popParser(true);
 					return;
 				case Operator.INFIX_NONE:
-					pm.report(token, "Invalid Operator " + name + " - Operator without associativity is not allowed at this location");
+					pm.report(token, "Invalid Operator " + name
+							+ " - Operator without associativity is not allowed at this location");
 					return;
 				case Operator.INFIX_RIGHT:
 				}
@@ -774,24 +800,25 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	 * {@code pm.reparse()} has to be called after this method, depending on the
 	 * token that is passed. E.g.:
 	 * <p>
-	 * 
+	 * <p>
 	 * <pre>
 	 * this 3
 	 * print "abc"
 	 * button { ... }
 	 * </pre>
-	 * 
+	 *
 	 * @param pm
-	 *            the current parsing context manager
+	 * 		the current parsing context manager
 	 * @param token
-	 *            the first token of the expression that is a parameter to the
-	 *            APPLY method
+	 * 		the first token of the expression that is a parameter to the APPLY
+	 * 		method
 	 * @param sa
-	 *            the argument container
+	 * 		the argument container
 	 * @param op
-	 *            the operator that precedes this call. Can be null.
+	 * 		the operator that precedes this call. Can be null.
 	 */
-	private void parseApply(IParserManager pm, IToken token, SingleArgument sa, Operator op)
+	private void parseApply(IParserManager pm, IToken token, SingleArgument sa,
+			Operator op)
 	{
 		if (token.type() == BaseSymbols.OPEN_CURLY_BRACKET)
 		{
@@ -808,11 +835,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	/**
 	 * Parses an assignment based on the current {@code value}.
-	 * 
+	 *
 	 * @param pm
-	 *            the current parsing context manager
+	 * 		the current parsing context manager
 	 * @param token
-	 *            the current token, i.e. the '=' sign
+	 * 		the current token, i.e. the '=' sign
 	 */
 	private void parseAssignment(IParserManager pm, IToken token)
 	{
@@ -830,7 +857,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.FIELD_ACCESS:
 		{
 			FieldAccess fa = (FieldAccess) this.value;
-			FieldAssignment assign = new FieldAssignment(position, fa.getInstance(), fa.getName());
+			FieldAssignment assign = new FieldAssignment(position,
+					fa.getInstance(), fa.getName());
 			this.value = assign;
 			pm.pushParser(pm.newExpressionParser(assign));
 			return;
@@ -838,7 +866,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.APPLY_CALL:
 		{
 			ApplyMethodCall call = (ApplyMethodCall) this.value;
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.getReceiver(), call.getArguments());
+			UpdateMethodCall updateCall = new UpdateMethodCall(position,
+					call.getReceiver(), call.getArguments());
 			this.value = updateCall;
 			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
@@ -846,8 +875,10 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.METHOD_CALL:
 		{
 			MethodCall call = (MethodCall) this.value;
-			FieldAccess fa = new FieldAccess(position, call.getReceiver(), call.getName());
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.getArguments());
+			FieldAccess fa = new FieldAccess(position, call.getReceiver(),
+					call.getName());
+			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa,
+					call.getArguments());
 			this.value = updateCall;
 			pm.pushParser(pm.newExpressionParser(updateCall));
 			return;
@@ -855,7 +886,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		case IValue.SUBSCRIPT_GET:
 		{
 			SubscriptGetter getter = (SubscriptGetter) this.value;
-			SubscriptSetter setter = new SubscriptSetter(position, getter.getReceiver(), getter.getArguments());
+			SubscriptSetter setter = new SubscriptSetter(position,
+					getter.getReceiver(), getter.getArguments());
 			this.value = setter;
 			pm.pushParser(pm.newExpressionParser(setter));
 			return;
@@ -985,7 +1017,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
-				pm.report(token, "Invalid Expression - 'else' not allowed at this location");
+				pm.report(token,
+						"Invalid Expression - 'else' not allowed at this location");
 				return true;
 			}
 			this.valueConsumer.setValue(this.value);
@@ -1010,7 +1043,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case DyvilKeywords.FOR:
 		{
-			pm.pushParser(new ForStatementParser(this.valueConsumer, token.raw()));
+			pm.pushParser(
+					new ForStatementParser(this.valueConsumer, token.raw()));
 			this.mode = END;
 			return true;
 		}
@@ -1071,7 +1105,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				pm.report(token, "Invalid Expression - 'catch' not allowed at this location");
+				pm.report(token,
+						"Invalid Expression - 'catch' not allowed at this location");
 				return true;
 			}
 			this.valueConsumer.setValue(this.value);
@@ -1082,7 +1117,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				pm.report(token, "Invalid Expression - 'finally' not allowed at this location");
+				pm.report(token,
+						"Invalid Expression - 'finally' not allowed at this location");
 				return true;
 			}
 			this.valueConsumer.setValue(this.value);
