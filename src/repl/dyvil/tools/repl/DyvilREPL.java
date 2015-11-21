@@ -267,14 +267,17 @@ public class DyvilREPL
 		
 		if (this.parser.parse(null, tokens, new DyvilUnitParser(this.context, false)))
 		{
+			this.context.reportErrors();
 			return;
 		}
 		if (this.parser.parse(null, tokens, new ClassBodyParser(this.context)))
 		{
+			this.context.reportErrors();
 			return;
 		}
-		
+
 		this.parser.parse(this.context.markers, tokens, new ExpressionParser(this.context));
+		this.context.reportErrors();
 	}
 	
 	private static void runCommand(String line)
