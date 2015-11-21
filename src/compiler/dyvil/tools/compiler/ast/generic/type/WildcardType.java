@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -27,6 +23,10 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class WildcardType implements IRawType, ITyped
 {
@@ -186,7 +186,7 @@ public final class WildcardType implements IRawType, ITyped
 		
 		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
-			markers.add(I18n.createMarker(this.position, "type.invalid.wildcard"));
+			markers.add(I18n.createMarker(this.position, "type.wildcard.invalid"));
 		}
 	}
 	

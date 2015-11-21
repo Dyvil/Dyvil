@@ -85,11 +85,6 @@ public final class NilExpr implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == dyvil.tools.compiler.ast.type.Types.UNKNOWN)
-		{
-			return this;
-		}
-		
 		if (type.isArrayType())
 		{
 			return this;
@@ -102,7 +97,9 @@ public final class NilExpr implements IValue
 			this.requiredType = type;
 			return this;
 		}
-		return null;
+
+		markers.add(I18n.createMarker(this.position, "nil.type", type));
+		return this;
 	}
 	
 	@Override
@@ -139,7 +136,6 @@ public final class NilExpr implements IValue
 	{
 		if (this.requiredType == null)
 		{
-			markers.add(I18n.createMarker(this.position, "nil.type"));
 			return;
 		}
 		

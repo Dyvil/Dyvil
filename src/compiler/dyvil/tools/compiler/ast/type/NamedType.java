@@ -63,7 +63,19 @@ public class NamedType implements IRawType, ITypeConsumer
 	{
 		return null;
 	}
-	
+
+	@Override
+	public boolean isSuperClassOf(IType type)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		return false;
+	}
+
 	@Override
 	public boolean isResolved()
 	{
@@ -107,7 +119,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		IType type = IContext.resolveType(context, this.name);
 		if (type != null)
 		{
-			return this;
+			return type;
 		}
 
 		Package thePackage = Package.rootPackage.resolvePackage(this.name);

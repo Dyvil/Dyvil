@@ -69,7 +69,19 @@ public class NamedGenericType extends GenericType
 	{
 		return null;
 	}
-	
+
+	@Override
+	public boolean isSuperClassOf(IType type)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		return false;
+	}
+
 	@Override
 	public boolean isResolved()
 	{
