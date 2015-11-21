@@ -1,13 +1,16 @@
 package dyvil.tools.compiler.util;
 
-import java.util.*;
-
 import dyvil.tools.parsing.marker.Info;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.marker.Warning;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.MarkerLevel;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class I18n
 {
@@ -16,19 +19,16 @@ public class I18n
 		// do not instantiate
 	}
 	
-	private static final String			BUNDLE_NAME		= "dyvil.tools.compiler.lang.MarkerMessages";	//$NON-NLS-1$
-	private static final ResourceBundle	RESOURCE_BUNDLE	= loadBundle();
-	
-	private static ResourceBundle loadBundle()
-	{
-		return ResourceBundle.getBundle(BUNDLE_NAME);
-	}
-	
+	private static final ResourceBundle LOCALIZATION_BUNDLE = ResourceBundle
+			.getBundle("dyvil.tools.compiler.lang.MarkerMessages");
+	private static final ResourceBundle MARKER_BUNDLE       = ResourceBundle
+			.getBundle("dyvil.tools.compiler.config.MarkerLevels");
+
 	public static String getString(String key)
 	{
 		try
 		{
-			return RESOURCE_BUNDLE.getString(key);
+			return LOCALIZATION_BUNDLE.getString(key);
 		}
 		catch (MissingResourceException e)
 		{
@@ -41,25 +41,33 @@ public class I18n
 		return String.format(getString(key), args);
 	}
 	
-	static final Map<String, MarkerLevel> map = new HashMap();
+	static final Map<String, MarkerLevel> map = new HashMap<>();
 	
 	private static MarkerLevel getMarkerLevel(String key)
 	{
 		MarkerLevel m = map.get(key);
 		if (m == null)
 		{
-			switch (getString("marker." + key))
+			try
 			{
-			case "info":
-				m = MarkerLevel.INFO;
-				break;
-			case "warning":
-				m = MarkerLevel.WARNING;
-				break;
-			case "ignore":
-				m = MarkerLevel.IGNORE;
-				break;
-			default:
+				switch (MARKER_BUNDLE.getString("key"))
+				{
+				case "info":
+					m = MarkerLevel.INFO;
+					break;
+				case "warning":
+					m = MarkerLevel.WARNING;
+					break;
+				case "ignore":
+					m = MarkerLevel.IGNORE;
+					break;
+				default:
+					m = MarkerLevel.ERROR;
+					break;
+				}
+			}
+			catch (MissingResourceException ex)
+			{
 				m = MarkerLevel.ERROR;
 			}
 			
