@@ -235,6 +235,11 @@ public class DyvilREPL
 		try
 		{
 			String currentCode = readLine();
+			if (currentCode == null)
+			{
+				return;
+			}
+
 			String trim = currentCode.trim();
 			if (trim.length() > 1 && trim.charAt(0) == ':' && trim.charAt(1) != ':')
 			{
