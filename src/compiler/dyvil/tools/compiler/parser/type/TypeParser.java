@@ -18,26 +18,27 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
-public final class TypeParser extends Parser
+public final class TypeParser extends Parser implements ITypeConsumer
 {
-	public static final int	NAME			= 1;
-	public static final int	GENERICS		= 2;
-	public static final int	GENERICS_END	= 4;
-	public static final int	ARRAY_COLON		= 8;
-	public static final int	ARRAY_END		= 16;
-	public static final int	WILDCARD_TYPE	= 32;
-	public static final int	TUPLE_END		= 64;
-	public static final int	LAMBDA_TYPE		= 128;
-	public static final int	LAMBDA_END		= 256;
-	public static final int	ANNOTATION_END	= 512;
+	public static final int NAME           = 1;
+	public static final int GENERICS       = 2;
+	public static final int GENERICS_END   = 4;
+	public static final int ARRAY_COLON    = 8;
+	public static final int ARRAY_END      = 16;
+	public static final int WILDCARD_TYPE  = 32;
+	public static final int TUPLE_END      = 64;
+	public static final int LAMBDA_TYPE    = 128;
+	public static final int LAMBDA_END     = 256;
+	public static final int ANNOTATION_END = 512;
 	
-	protected ITypeConsumer typed;
-	
+	protected ITypeConsumer consumer;
+
+	private IType parentType;
 	private IType type;
 	
 	public TypeParser(ITypeConsumer consumer)
 	{
-		this.typed = consumer;
+		this.consumer = consumer;
 		this.mode = NAME;
 	}
 	
@@ -53,7 +54,7 @@ public final class TypeParser extends Parser
 				Name name = token.nameValue();
 				if (name == Names.qmark)
 				{
-					this.typed.setType(new OptionType(this.type));
+					this.consumer.setType(new OptionType(this.type));
 					pm.popParser();
 					return;
 				}
@@ -61,7 +62,7 @@ public final class TypeParser extends Parser
 			
 			if (this.type != null)
 			{
-				this.typed.setType(this.type);
+				this.consumer.setType(this.type);
 			}
 			pm.popParser(true);
 			return;
@@ -93,7 +94,7 @@ public final class TypeParser extends Parser
 				this.mode = LAMBDA_END;
 				return;
 			case DyvilKeywords.NULL:
-				this.typed.setType(Types.NULL);
+				this.consumer.setType(Types.NULL);
 				pm.popParser();
 				return;
 			case DyvilSymbols.WILDCARD:
@@ -104,24 +105,35 @@ public final class TypeParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				IToken next = token.next();
-				int nextType = next.type();
-				if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || nextType == DyvilSymbols.GENERIC_CALL)
+				switch (next.type())
 				{
-					this.type = new NamedGenericType(token.raw(), token.nameValue());
+				case BaseSymbols.OPEN_SQUARE_BRACKET:
+					this.type = new NamedGenericType(token.raw(), token.nameValue(), this.parentType);
 					this.mode = GENERICS;
 					return;
-				}
-				if (nextType == DyvilSymbols.ARROW_OPERATOR)
-				{
-					LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
-					this.type = lt;
-					this.mode = LAMBDA_END;
+				case DyvilSymbols.ARROW_OPERATOR:
+					if (this.parentType == null)
+					{
+						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
+						this.type = lt;
+						this.mode = LAMBDA_END;
+						pm.skip();
+						pm.pushParser(pm.newTypeParser(lt));
+						return;
+					}
+					break; // intentional
+				case BaseSymbols.DOT:
+					NamedType namedType = new NamedType(token.raw(), token.nameValue(), this.parentType);
+					TypeParser parser = new TypeParser(this);
+					parser.parentType = namedType;
+
+					pm.pushParser(parser);
 					pm.skip();
-					pm.pushParser(pm.newTypeParser(lt));
+					this.mode = END;
 					return;
 				}
 				
-				this.type = new NamedType(token.raw(), token.nameValue());
+				this.type = new NamedType(token.raw(), token.nameValue(), this.parentType);
 				this.mode = END;
 				return;
 			}
@@ -157,7 +169,7 @@ public final class TypeParser extends Parser
 			return;
 		case LAMBDA_END:
 			this.type.expandPosition(token.prev());
-			this.typed.setType(this.type);
+			this.consumer.setType(this.type);
 			pm.popParser(true);
 			return;
 		case ARRAY_COLON:
@@ -180,14 +192,14 @@ public final class TypeParser extends Parser
 			}
 			return;
 		case GENERICS:
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET || type == DyvilSymbols.GENERIC_CALL)
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = GENERICS_END;
 				return;
 			}
 			this.type.expandPosition(token.prev());
-			this.typed.setType(this.type);
+			this.consumer.setType(this.type);
 			pm.popParser(true);
 			return;
 		case WILDCARD_TYPE:
@@ -207,7 +219,7 @@ public final class TypeParser extends Parser
 				this.mode = END;
 				return;
 			}
-			this.typed.setType(this.type);
+			this.consumer.setType(this.type);
 			pm.popParser(true);
 			return;
 		case GENERICS_END:
@@ -223,5 +235,11 @@ public final class TypeParser extends Parser
 			pm.pushParser(pm.newTypeParser((ITyped) this.type), true);
 			return;
 		}
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 }

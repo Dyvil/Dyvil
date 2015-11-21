@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 
 public final class Types
 {
@@ -276,5 +277,58 @@ public final class Types
 		{
 			addSuperTypes(iclass.getInterface(i).getConcreteType(type), types);
 		}
+	}
+
+	public static IType resolvePrimitive(Name name)
+	{
+		if (name == Names._void)
+		{
+			return VOID;
+		}
+		if (name == Names._boolean)
+		{
+			return BOOLEAN;
+		}
+		if (name == Names._byte)
+		{
+			return BYTE;
+		}
+		if (name == Names._short)
+		{
+			return SHORT;
+		}
+		if (name == Names._char)
+		{
+			return CHAR;
+		}
+		if (name == Names._int)
+		{
+			return INT;
+		}
+		if (name == Names._long)
+		{
+			return LONG;
+		}
+		if (name == Names._float)
+		{
+			return FLOAT;
+		}
+		if (name == Names._double)
+		{
+			return DOUBLE;
+		}
+		if (name == Names.any)
+		{
+			return ANY;
+		}
+		if (name == Names.dynamic)
+		{
+			return DYNAMIC;
+		}
+		if (name == Names.auto)
+		{
+			return UNKNOWN;
+		}
+		return null;
 	}
 }

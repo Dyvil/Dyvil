@@ -1,3 +1,3 @@
-package dyvil.lang
+package dyvil
 
 import	dyvil.annotation.analysis._

@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -22,15 +18,27 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class NamedGenericType extends GenericType
 {
-	protected ICodePosition	position;
-	protected Name			name;
+	protected IType         parent;
+	protected ICodePosition position;
+	protected Name          name;
 	
 	public NamedGenericType(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
+	}
+
+	public NamedGenericType(ICodePosition position, Name name, IType parent)
+	{
+		this.position = position;
+		this.name = name;
+		this.parent = parent;
 	}
 	
 	@Override
@@ -89,37 +97,38 @@ public class NamedGenericType extends GenericType
 			if (this.typeArgumentCount > 0)
 			{
 				this.resolveTypeArguments(markers, context);
-				return new LambdaType(this.typeArguments, this.typeArgumentCount - 1, this.typeArguments[this.typeArgumentCount - 1]);
+				return new LambdaType(this.typeArguments, this.typeArgumentCount - 1,
+				                      this.typeArguments[this.typeArgumentCount - 1]);
 			}
 		}
+
+		IType resolved = new NamedType(this.position, this.name, this.parent).resolveType(markers, context);
 		
-		IClass iclass = IContext.resolveClass(context, this.name);
-		
+		IClass iclass = resolved.getTheClass();
 		if (iclass == null)
 		{
-			markers.add(I18n.createMarker(this.position, "resolve.type", this.toString()));
+			this.resolveTypeArguments(markers, context);
+			return this;
 		}
-		else
+
+		if (this.typeArgumentCount == 0)
 		{
-			if (this.typeArgumentCount == 0)
+			return new ClassType(iclass);
+		}
+
+		int varCount = iclass.genericCount();
+		if (varCount == 0)
+		{
+			if (this.typeArgumentCount != 0)
 			{
-				return new ClassType(iclass);
+				markers.add(I18n.createMarker(this.position, "generic.not_generic", this.name.qualified));
 			}
-			
-			int varCount = iclass.genericCount();
-			if (varCount == 0)
-			{
-				if (this.typeArgumentCount != 0)
-				{
-					markers.add(I18n.createMarker(this.position, "generic.not_generic", this.name.qualified));
-				}
-				return new ClassType(iclass);
-			}
-			if (varCount != this.typeArgumentCount)
-			{
-				markers.add(I18n.createMarker(this.position, "generic.count"));
-				return new ClassType(iclass);
-			}
+			return new ClassType(iclass);
+		}
+		if (varCount != this.typeArgumentCount)
+		{
+			markers.add(I18n.createMarker(this.position, "generic.count"));
+			return new ClassType(iclass);
 		}
 		
 		/*
@@ -133,12 +142,6 @@ public class NamedGenericType extends GenericType
 		 * TypePosition.GENERIC_ARGUMENT; }
 		 */
 		
-		if (iclass == null)
-		{
-			this.resolveTypeArguments(markers, context);
-			return this;
-		}
-		
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			IType resolvedType = this.typeArguments[i].resolveType(markers, context);
@@ -148,7 +151,8 @@ public class NamedGenericType extends GenericType
 			ITypeVariable typeVariable = iclass.getTypeVariable(i);
 			if (!typeVariable.isAssignableFrom(resolvedType))
 			{
-				Marker marker = I18n.createMarker(resolvedType.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified);
+				Marker marker = I18n.createMarker(resolvedType.getPosition(), "generic.type.incompatible",
+				                                  typeVariable.getName().qualified);
 				marker.addInfo(I18n.getString("generic.type", resolvedType));
 				marker.addInfo(I18n.getString("typevariable", typeVariable));
 				markers.add(marker);
