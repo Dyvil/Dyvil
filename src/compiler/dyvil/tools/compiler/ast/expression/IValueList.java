@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.statement.control.Label;
 
-public interface IValueList extends Iterable<IValue>
+public interface IValueList extends Iterable<IValue>, IValueConsumer
 {
 	int valueCount();
 	
@@ -23,4 +24,10 @@ public interface IValueList extends Iterable<IValue>
 	void addValue(int index, IValue value);
 	
 	IValue getValue(int index);
+
+	@Override
+	default void setValue(IValue value)
+	{
+		this.addValue(value);
+	}
 }

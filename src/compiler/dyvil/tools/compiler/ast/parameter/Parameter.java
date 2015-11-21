@@ -2,14 +2,21 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
@@ -17,9 +24,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public abstract class Parameter extends Member implements IParameter
 {
-	protected int		index;
-	protected int localIndex;
-	protected boolean	varargs;
+	protected int     index;
+	protected int     localIndex;
+	protected boolean varargs;
 	
 	protected IValue defaultValue;
 	
@@ -112,6 +119,89 @@ public abstract class Parameter extends Member implements IParameter
 		}
 		return true;
 	}
+
+	@Override
+	public AnnotationVisitor visitAnnotation(String internalType)
+	{
+		switch (internalType)
+		{
+		case "dyvil/annotation/_internal/DefaultValue":
+			return new AnnotationValueReader(this);
+		case "dyvil/annotation/_internal/DefaultArrayValue":
+			return new AnnotationValueReader(
+					value -> this.defaultValue = value.withType(this.type, this.type, null, null));
+		}
+
+		return IParameter.super.visitAnnotation(internalType);
+	}
+
+	protected void writeDefaultAnnotation(MethodWriter writer)
+	{
+		if (this.type.isArrayType())
+		{
+			AnnotationVisitor visitor = writer
+					.visitParameterAnnotation(this.index, "Ldyvil/annotation/_internal/DefaultArrayValue;", false);
+			visitor = visitor.visitArray("value");
+
+			ArrayExpr arrayExpr = (ArrayExpr) this.defaultValue;
+			int count = arrayExpr.valueCount();
+			IType elementType = this.type.getElementType();
+
+			for (int i = 0; i < count; i++)
+			{
+				writeDefaultAnnotation(visitor, elementType, arrayExpr.getValue(i));
+			}
+
+			visitor.visitEnd();
+
+			return;
+		}
+
+		AnnotationVisitor visitor = writer
+				.visitParameterAnnotation(this.index, "Ldyvil/annotation/_internal/DefaultValue;", false);
+		writeDefaultAnnotation(visitor, this.type, this.defaultValue);
+	}
+
+	private static void writeDefaultAnnotation(AnnotationVisitor visitor, IType type, IValue value)
+	{
+		if (type.isPrimitive())
+		{
+			switch (type.getTypecode())
+			{
+			case PrimitiveType.BOOLEAN_CODE:
+				visitor.visit("booleanValue", value.booleanValue());
+				return;
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
+				visitor.visit("intValue", value.intValue());
+				return;
+			case PrimitiveType.LONG_CODE:
+				visitor.visit("longValue", value.longValue());
+				return;
+			case PrimitiveType.FLOAT_CODE:
+				visitor.visit("floatValue", value.floatValue());
+				return;
+			case PrimitiveType.DOUBLE_CODE:
+				visitor.visit("doubleValue", value.doubleValue());
+				return;
+			}
+
+			return;
+		}
+
+		IClass iClass = type.getTheClass();
+		if (iClass == Types.STRING_CLASS)
+		{
+			visitor.visit("stringValue", value.stringValue());
+			return;
+		}
+		if (iClass == ClassOperator.Types.CLASS_CLASS)
+		{
+			visitor.visit("classValue", value.toObject());
+		}
+	}
 	
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -161,7 +251,8 @@ public abstract class Parameter extends Member implements IParameter
 	{
 		if (this.annotations != null)
 		{
-			AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(Parameter.this.index, desc, visible);
+			AnnotatableVisitor visitor = (desc, visible) -> writer
+					.visitParameterAnnotation(Parameter.this.index, desc, visible);
 			
 			int count = this.annotations.annotationCount();
 			for (int i = 0; i < count; i++)
@@ -171,6 +262,11 @@ public abstract class Parameter extends Member implements IParameter
 		}
 		
 		this.type.writeAnnotations(writer, TypeReference.newFormalParameterReference(this.index), "");
+
+		if (this.defaultValue != null)
+		{
+			this.writeDefaultAnnotation(writer);
+		}
 	}
 	
 	@Override

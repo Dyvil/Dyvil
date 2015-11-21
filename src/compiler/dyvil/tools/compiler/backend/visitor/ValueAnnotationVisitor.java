@@ -48,7 +48,7 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		AnnotationValue value = new AnnotationValue(annotation);
 		this.consumer.setValue(value);
-		return new AnnotationVisitorImpl(value, annotation);
+		return new AnnotationReader(value, annotation);
 	}
 	
 	@Override
@@ -56,7 +56,7 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	{
 		ArrayExpr valueList = new ArrayExpr();
 		this.consumer.setValue(valueList);
-		return new ArrayAnnotationVisitor(valueList);
+		return new AnnotationValueReader(valueList);
 	}
 	
 	@Override

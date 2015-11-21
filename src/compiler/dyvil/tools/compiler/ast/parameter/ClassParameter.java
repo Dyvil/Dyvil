@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
@@ -17,7 +15,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
@@ -25,6 +22,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.lang.annotation.ElementType;
 
 public final class ClassParameter extends Parameter implements IField
 {
@@ -226,19 +225,6 @@ public final class ClassParameter extends Parameter implements IField
 		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.annotations, this.type);
-		
-		if (this.defaultValue == null)
-		{
-			return;
-		}
-		
-		// Copy the access modifiers and add the STATIC modifier
-		int modifiers = this.theClass.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
-		String name = "parDefault$class$" + this.index;
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, "()" + desc, null, null));
-		mw.begin();
-		this.defaultValue.writeExpression(mw, this.type);
-		mw.end(this.type);
 	}
 	
 	@Override

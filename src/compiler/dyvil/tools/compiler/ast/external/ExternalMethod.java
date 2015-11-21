@@ -23,7 +23,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
+import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -331,6 +331,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			break;
 		}
 		}
-		return new AnnotationVisitorImpl(null, annotation);
+		return new AnnotationReader(null, annotation);
 	}
 }

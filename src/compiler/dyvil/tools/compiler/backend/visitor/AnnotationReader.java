@@ -13,13 +13,13 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.parsing.Name;
 
-public class AnnotationVisitorImpl implements AnnotationVisitor
+public class AnnotationReader implements AnnotationVisitor
 {
 	private IAnnotationConsumer	consumer;
 	private IAnnotation			annotation;
 	private ArgumentMap			arguments;
 	
-	public AnnotationVisitorImpl(IAnnotationConsumer consumer, IAnnotation annotation)
+	public AnnotationReader(IAnnotationConsumer consumer, IAnnotation annotation)
 	{
 		this.consumer = consumer;
 		this.annotation = annotation;
@@ -54,7 +54,7 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		AnnotationValue value = new AnnotationValue(annotation);
 		this.arguments.addValue(Name.getQualified(key), value);
-		return new AnnotationVisitorImpl(value, annotation);
+		return new AnnotationReader(value, annotation);
 	}
 	
 	@Override
@@ -62,7 +62,7 @@ public class AnnotationVisitorImpl implements AnnotationVisitor
 	{
 		ArrayExpr valueList = new ArrayExpr();
 		this.arguments.addValue(Name.getQualified(key), valueList);
-		return new ArrayAnnotationVisitor(valueList);
+		return new AnnotationValueReader(valueList);
 	}
 	
 	@Override
