@@ -1,12 +1,16 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.*;
+import dyvil.collection.impl.AbstractIdentityHashMap;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.tuple.Tuple2;
+
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.collection.*;
-import dyvil.collection.impl.AbstractIdentityHashMap;
-import dyvil.tuple.Tuple2;
-
+@NilConvertible
+@ArrayConvertible
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 7106880090218416170L;
