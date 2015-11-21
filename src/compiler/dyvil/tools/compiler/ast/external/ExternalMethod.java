@@ -95,7 +95,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(null, this);
-			param.setIndex(i);
 		}
 	}
 	

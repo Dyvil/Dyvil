@@ -302,7 +302,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.setter != null || this.setterModifiers != 0)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
-			this.setterParameter.setIndex(1);
+			this.setterParameter.setIndex(0);
 		}
 		
 		if (this.setter != null)

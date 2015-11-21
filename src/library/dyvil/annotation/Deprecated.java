@@ -1,7 +1,13 @@
 package dyvil.annotation;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.util.MarkerLevel;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.SOURCE)
+@ClassParameters(names = { "value", "description", "since", "reasons", "replacements", "level" })
 public @interface Deprecated
 {
 	enum Reason

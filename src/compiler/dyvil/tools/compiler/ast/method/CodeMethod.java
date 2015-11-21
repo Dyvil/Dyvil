@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -31,6 +27,10 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class CodeMethod extends AbstractMethod
 {
@@ -82,7 +82,6 @@ public class CodeMethod extends AbstractMethod
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, this);
-			param.setIndex(i);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)

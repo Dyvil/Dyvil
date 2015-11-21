@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -33,6 +31,8 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.lang.annotation.ElementType;
 
 public abstract class AbstractClass implements IClass
 {
@@ -360,6 +360,7 @@ public abstract class AbstractClass implements IClass
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
+		param.setIndex(index);
 	}
 	
 	@Override

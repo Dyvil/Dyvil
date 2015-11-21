@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -43,6 +38,11 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
 
 public class Constructor extends Member implements IConstructor
 {
@@ -242,7 +242,6 @@ public class Constructor extends Member implements IConstructor
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, this);
-			param.setIndex(i);
 		}
 		
 		if (this.value != null)

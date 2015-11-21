@@ -26,6 +26,7 @@ public class Deprecation
 {
 	public static final Name Deprecated   = Name.getQualified("Deprecated");
 	public static final Name Experimental = Name.getQualified("Experimental");
+	public static final Name UsageInfo    = Name.getQualified("UsageInfo");
 	
 	public static final String JAVA_INTERNAL  = "java/lang/Deprecated";
 	public static final String DYVIL_INTERNAL = "dyvil/annotation/Deprecated";
@@ -33,9 +34,9 @@ public class Deprecation
 	
 	public static final IClass DEPRECATED_CLASS   = Package.dyvilAnnotation.resolveClass(Deprecated);
 	public static final IClass EXPERIMENTAL_CLASS = Package.dyvilAnnotation.resolveClass(Experimental);
+	public static final IClass USAGE_INFO_CLASS   = Package.dyvilAnnotation.resolveClass(UsageInfo);
 
-	public static final IType DEPRECATED   = new ClassType(DEPRECATED_CLASS);
-	public static final IType EXPERIMENTAL = new ClassType(EXPERIMENTAL_CLASS);
+	public static final IType DEPRECATED = new ClassType(DEPRECATED_CLASS);
 	
 	private static final IParameter DEP_VALUE_PARAM        = DEPRECATED_CLASS.getParameter(0);
 	private static final IParameter DEP_DESCRIPTION_PARAM  = DEPRECATED_CLASS.getParameter(1);
@@ -49,6 +50,10 @@ public class Deprecation
 	private static final IParameter EXP_STAGE_PARAM       = EXPERIMENTAL_CLASS.getParameter(2);
 	private static final IParameter EXP_MARKER_TYPE_PARAM = EXPERIMENTAL_CLASS.getParameter(3);
 
+	private static final IParameter INF_VALUE_PARAM       = USAGE_INFO_CLASS.getParameter(0);
+	private static final IParameter INF_DESCRIPTION_PARAM = USAGE_INFO_CLASS.getParameter(1);
+	private static final IParameter INF_MARKER_TYPE_PARAM = USAGE_INFO_CLASS.getParameter(2);
+
 	public static void checkAnnotations(MarkerList markers, ICodePosition position, IMember member, String memberType)
 	{
 		if (member.hasModifier(Modifiers.DEPRECATED))
@@ -60,6 +65,12 @@ public class Deprecation
 		if (annotation != null)
 		{
 			checkExperimental(markers, position, member, memberType, annotation);
+		}
+
+		annotation = member.getAnnotation(USAGE_INFO_CLASS);
+		if (annotation != null)
+		{
+			checkUsageInfo(markers, position, member, memberType, annotation);
 		}
 	}
 
@@ -172,6 +183,34 @@ public class Deprecation
 
 		// Stage
 		marker.addInfo(I18n.getString("experimental.stage", stage.name().toLowerCase()));
+
+		markers.add(marker);
+	}
+
+	private static void checkUsageInfo(MarkerList markers, ICodePosition position, IMember member, String memberType, IAnnotation annotation)
+	{
+		IArguments arguments = annotation.getArguments();
+
+		MarkerLevel markerLevel = getEnumValue(arguments, INF_MARKER_TYPE_PARAM, MarkerLevel.class);
+		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
+		{
+			return;
+		}
+
+		String value = getStringValue(arguments, INF_VALUE_PARAM);
+		String description = getStringValue(arguments, INF_DESCRIPTION_PARAM);
+
+		value = value.replace("{membertype}", I18n.getString("member." + memberType))
+		             .replace("{membername}", member.getName().toString());
+
+		Marker marker = I18n.createTextMarker(position, markerLevel, value);
+		assert marker != null;
+
+		// Description
+		if (!description.isEmpty())
+		{
+			marker.addInfo(I18n.getString("experimental.description", description));
+		}
 
 		markers.add(marker);
 	}
