@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -21,6 +16,10 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class ClassType implements IRawType
 {
@@ -90,11 +89,8 @@ public class ClassType implements IRawType
 		IClass iclass = this.theClass;
 		if (iclass != null)
 		{
-			if (iclass.hasModifier(Modifiers.DEPRECATED))
-			{
-				Deprecation.checkDeprecation(markers, this.getPosition(), iclass, "type");
-			}
-			
+			Deprecation.checkAnnotations(markers, this.getPosition(), iclass, "type");
+
 			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
 			{
 				markers.add(I18n.createMarker(this.getPosition(), "type.access.internal", iclass.getName()));

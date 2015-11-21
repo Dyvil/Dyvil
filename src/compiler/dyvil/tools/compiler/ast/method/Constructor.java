@@ -686,11 +686,8 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			Deprecation.checkDeprecation(markers, position, this, "constructor");
-		}
-		
+		Deprecation.checkAnnotations(markers, position, this, "constructor");
+
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:

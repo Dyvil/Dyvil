@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.annotation.mutating;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -48,31 +46,34 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.lang.annotation.ElementType;
+
 import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
 
 public abstract class AbstractMethod extends Member implements IMethod, ILabelContext
 {
-	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker", "linkExtension",
-			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
-			
+	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
+	                                               "linkExtension",
+	                                               "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+
 	static final int VARARGS_MATCH = 100;
 	
-	protected ITypeVariable[]	generics;
-	protected int				genericCount;
+	protected ITypeVariable[] generics;
+	protected int             genericCount;
 	
-	protected IParameter[]	parameters	= new MethodParameter[3];
-	protected int			parameterCount;
+	protected IParameter[] parameters = new MethodParameter[3];
+	protected int parameterCount;
 	
-	protected IType[]	exceptions;
-	protected int		exceptionCount;
+	protected IType[] exceptions;
+	protected int     exceptionCount;
 	
 	protected IValue value;
 	
 	// Metadata
-	protected IClass		theClass;
-	protected String		descriptor;
-	protected IntrinsicData	intrinsicData;
+	protected IClass        theClass;
+	protected String        descriptor;
+	protected IntrinsicData intrinsicData;
 	
 	public AbstractMethod(IClass iclass)
 	{
@@ -676,7 +677,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				IValue instance1 = IType.convertValue(instance, par.getType(), typeContext, markers, context);
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, par.getType(), typeContext, "method.access.infix_type", par.getName());
+					Util.createTypeError(markers, instance, par.getType(), typeContext, "method.access.infix_type",
+					                     par.getName());
 				}
 				else
 				{
@@ -685,7 +687,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				
 				if ((this.modifiers & Modifiers.VARARGS) != 0)
 				{
-					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1], typeContext, markers, context);
+					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1],
+					                            typeContext, markers, context);
 					
 					for (int i = 0; i < this.parameterCount - 2; i++)
 					{
@@ -713,7 +716,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "method.access.static.type", this.name, this.theClass.getFullName()));
+					markers.add(I18n.createMarker(position, "method.access.static.type", this.name,
+					                              this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -731,7 +735,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, type, typeContext, "method.access.receiver_type", this.name);
+					Util.createTypeError(markers, instance, type, typeContext, "method.access.receiver_type",
+					                     this.name);
 				}
 				else
 				{
@@ -832,11 +837,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			Deprecation.checkDeprecation(markers, position, this, "method");
-		}
-		
+		Deprecation.checkAnnotations(markers, position, this, "method");
+
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
@@ -1022,7 +1024,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -1049,7 +1052,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -1062,7 +1066,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -1130,7 +1135,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 	
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		this.writeInstance(writer, instance);
 		this.writeArguments(writer, instance, arguments);
@@ -1138,7 +1144,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		writer.writeLineNumber(lineNumber);
 		
@@ -1149,7 +1156,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
 			writer.writeInvokeDynamic(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
-					new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified, this.getDescriptor()));
+			                          new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
+			                                     this.getDescriptor()));
 			return;
 		}
 		

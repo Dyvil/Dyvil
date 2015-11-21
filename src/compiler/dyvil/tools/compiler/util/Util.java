@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -229,5 +230,10 @@ public class Util
 		String qualified = name.qualified.substring(0, name.qualified.length() - 3);
 		String unqualified = name.unqualified.substring(0, name.unqualified.length() - 1);
 		return Name.get(qualified, unqualified);
+	}
+
+	public static String toString(IClassMember member, String type)
+	{
+		return I18n.getString("member.named", I18n.getString("member." + type), member.getName());
 	}
 }

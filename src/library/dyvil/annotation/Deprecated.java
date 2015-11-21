@@ -9,15 +9,15 @@ public @interface Deprecated
 		UNSPECIFIED, DANGEROUS, CONDEMNED, SUPERSEDED, UNIMPLEMENTED
 	}
 	
-	String value() default "";
-	
-	String marker() default "The {member} is deprecated";
+	String value() default "The {membertype} {membername} is deprecated";
+
+	String description() default "";
 	
 	String since() default "";
 	
-	Reason[]reasons() default { Reason.UNSPECIFIED };
+	Reason[] reasons() default { Reason.UNSPECIFIED };
 	
-	String[]replacements() default {};
+	String[] replacements() default {};
 	
 	MarkerLevel level() default MarkerLevel.WARNING;
 }

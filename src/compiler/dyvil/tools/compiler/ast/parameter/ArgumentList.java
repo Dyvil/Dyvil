@@ -18,8 +18,8 @@ import java.util.Iterator;
 
 public final class ArgumentList implements IArguments, IValueList
 {
-	private IValue[]	values;
-	private int			size;
+	private IValue[] values;
+	private int      size;
 	
 	private boolean varargs;
 	
@@ -168,6 +168,11 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
+		if (index >= this.size)
+		{
+			return null;
+		}
+
 		return this.values[index];
 	}
 	
@@ -245,7 +250,8 @@ public final class ArgumentList implements IArguments, IValueList
 				this.varargs = true;
 				return;
 			}
-			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type", param.getName());
+			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type",
+			                     param.getName());
 			return;
 		}
 		
@@ -257,7 +263,8 @@ public final class ArgumentList implements IArguments, IValueList
 			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
-				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type", param.getName());
+				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type",
+				                     param.getName());
 			}
 			else
 			{

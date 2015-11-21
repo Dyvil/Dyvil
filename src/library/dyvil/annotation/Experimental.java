@@ -9,7 +9,9 @@ public @interface Experimental
 		DANGEROUS, UNSTABLE, UNRECOMMENDED, BETA, ALPHA, PRERELEASE
 	}
 	
-	String value() default "";
+	String value() default "The {membertype} {membername} is experimental: {value}";
+
+	String description() default "";
 	
 	Stage stage() default Stage.UNRECOMMENDED;
 	

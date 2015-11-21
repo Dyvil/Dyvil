@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.field;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
@@ -27,6 +25,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
@@ -190,11 +190,8 @@ public class Field extends Member implements IField
 			}
 		}
 		
-		if (this.hasModifier(Modifiers.DEPRECATED))
-		{
-			Deprecation.checkDeprecation(markers, position, this, "field");
-		}
-		
+		Deprecation.checkAnnotations(markers, position, this, "field");
+
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
