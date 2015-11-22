@@ -50,7 +50,7 @@ public class I18n
 		{
 			try
 			{
-				switch (MARKER_BUNDLE.getString("key"))
+				switch (MARKER_BUNDLE.getString(key))
 				{
 				case "info":
 					m = MarkerLevel.INFO;
