@@ -162,7 +162,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	default int getSuperTypeDistance(IType superType)
 	{
-		return this.getTheClass().getSuperTypeDistance(superType);
+		IClass iClass = this.getTheClass();
+		return iClass == null ? 0 : iClass.getSuperTypeDistance(superType);
 	}
 	
 	default float getSubTypeDistance(IType subtype)
