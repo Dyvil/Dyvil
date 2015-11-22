@@ -16,6 +16,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -30,13 +31,13 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 {
 	protected ICodePosition position;
 	
-	protected Variable	variable;
-	protected IValue	action;
+	protected Variable variable;
+	protected IValue   action;
 	
 	// Metadata
-	protected Label	startLabel;
-	protected Label	updateLabel;
-	protected Label	endLabel;
+	protected Label startLabel;
+	protected Label updateLabel;
+	protected Label endLabel;
 	
 	public ForEachStatement(ICodePosition position, Variable var)
 	{
@@ -198,7 +199,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				this.variable.setType(varType = rangeType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(I18n.createMarker(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
+					markers.add(I18n.createMarker(this.variable.getPosition(), "for.variable.infer",
+					                              this.variable.getName()));
 				}
 			}
 			else if (rangeType == Types.UNKNOWN)
@@ -213,7 +215,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				markers.add(marker);
 			}
 			
-			RangeForStatement rfs = new RangeForStatement(this.position, this.variable, value1, value2, ro.isHalfOpen());
+			RangeForStatement rfs = new RangeForStatement(this.position, this.variable, value1, value2,
+			                                              ro.isHalfOpen());
 			rfs.resolveAction(this.action, markers, context);
 			return rfs;
 		}
@@ -226,7 +229,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				this.variable.setType(varType = valueType.getElementType());
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(I18n.createMarker(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
+					markers.add(I18n.createMarker(this.variable.getPosition(), "for.variable.infer",
+					                              this.variable.getName()));
 				}
 			}
 			else if (!varType.classEquals(valueType.getElementType()))
@@ -249,7 +253,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				this.variable.setType(varType = iterableType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(I18n.createMarker(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
+					markers.add(I18n.createMarker(this.variable.getPosition(), "for.variable.infer",
+					                              this.variable.getName()));
 				}
 			}
 			else if (!varType.isSuperTypeOf(iterableType))
@@ -385,15 +390,35 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.forStart);
+		buffer.append("for");
+		Formatting.appendSeparator(buffer, "for.open_paren", '(');
+
 		this.variable.getType().toString(prefix, buffer);
-		buffer.append(' ').append(this.variable.getName()).append(Formatting.Statements.forEachSeperator);
+		buffer.append(' ').append(this.variable.getName());
+
+		Formatting.appendSeparator(buffer, "for.each.separator", ':');
+
 		this.variable.getValue().toString(prefix, buffer);
-		buffer.append(Formatting.Statements.forEnd);
-		
-		if (this.action != null)
+
+		if (Formatting.getBoolean("for.close_paren.space_before"))
 		{
-			this.action.toString(prefix, buffer);
+			buffer.append(' ');
+		}
+		buffer.append(')');
+		
+		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
+		{
+			String actionPrefix = Formatting.getIndent("for.indent", prefix);
+			if (Formatting.getBoolean("for.close_paren.newline_after"))
+			{
+				buffer.append('\n').append(actionPrefix);
+			}
+			else if (Formatting.getBoolean("for.close_paren.space_after"))
+			{
+				buffer.append(' ');
+			}
+
+			this.action.toString(actionPrefix, buffer);
 		}
 	}
 }

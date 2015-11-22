@@ -65,8 +65,7 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context,
-			boolean using)
+	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
 		if (this.parent != null)
 		{
@@ -134,8 +133,7 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance,
-			Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
@@ -172,9 +170,15 @@ public final class MultiImport extends Import implements IImportList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.appendParent(prefix, buffer);
-		buffer.append(Formatting.Import.multiImportStart);
-		Util.astToString(prefix, this.imports, this.importCount,
-				Formatting.Import.multiImportSeperator, buffer);
-		buffer.append(Formatting.Import.multiImportEnd);
+
+		Formatting.appendSeparator(buffer, "import.multi.open_brace", '{');
+		Util.astToString(prefix, this.imports, this.importCount, Formatting.getSeparator("import.multi.separator", ','),
+		                 buffer);
+
+		if (Formatting.getBoolean("import.multi.close_brace.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append('}');
 	}
 }

@@ -298,7 +298,7 @@ public abstract class Parameter extends Member implements IParameter
 		
 		if (this.defaultValue != null)
 		{
-			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.defaultValue.toString(prefix, buffer);
 		}
 	}

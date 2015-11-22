@@ -23,24 +23,24 @@ public class MapExpr implements IValue
 {
 	public static final class Types
 	{
-		public static final IClass	MAP_CLASS				= Package.dyvilCollection.resolveClass("Map");
-		public static final IClass	MAP_CONVERTIBLE_CLASS	= Package.dyvilLangLiteral.resolveClass("MapConvertible");
+		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
+		public static final IClass MAP_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("MapConvertible");
 		
-		public static final ITypeVariable	KEY_VARIABLE	= Types.MAP_CLASS.getTypeVariable(0);
-		public static final ITypeVariable	VALUE_VARIABLE	= Types.MAP_CLASS.getTypeVariable(1);
+		public static final ITypeVariable KEY_VARIABLE   = Types.MAP_CLASS.getTypeVariable(0);
+		public static final ITypeVariable VALUE_VARIABLE = Types.MAP_CLASS.getTypeVariable(1);
 	}
 	
 	protected ICodePosition position;
 	
-	protected IValue[]	keys;
-	protected IValue[]	values;
+	protected IValue[] keys;
+	protected IValue[] values;
 	
 	protected int count;
 	
 	// Metadata
-	private IType	type;
-	private IType	keyType;
-	private IType	valueType;
+	private IType type;
+	private IType keyType;
+	private IType valueType;
 	
 	public MapExpr(ICodePosition position)
 	{
@@ -121,8 +121,11 @@ public class MapExpr implements IValue
 			IAnnotation annotation = mapType.getTheClass().getAnnotation(Types.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
-				ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count), new ArrayExpr(this.values, this.count) }, 2);
-				return new LiteralConversion(this, annotation, arguments).withType(mapType, typeContext, markers, context);
+				ArgumentList arguments = new ArgumentList(
+						new IValue[] { new ArrayExpr(this.keys, this.count), new ArrayExpr(this.values, this.count) },
+						2);
+				return new LiteralConversion(this, annotation, arguments)
+						.withType(mapType, typeContext, markers, context);
 			}
 			return null;
 		}
@@ -304,7 +307,8 @@ public class MapExpr implements IValue
 	{
 		if (this.count == 0)
 		{
-			writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance", "Ldyvil/collection/immutable/EmptyMap;");
+			writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance",
+			                      "Ldyvil/collection/immutable/EmptyMap;");
 			return;
 		}
 		
@@ -334,7 +338,7 @@ public class MapExpr implements IValue
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
-				"([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
+		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 	}
 	
 	@Override
@@ -349,23 +353,41 @@ public class MapExpr implements IValue
 	{
 		if (this.count <= 0)
 		{
-			buffer.append(Formatting.Expression.emptyArray);
+			if (Formatting.getBoolean("map.empty.space_between"))
+			{
+				buffer.append("[ ]");
+			}
+			else
+			{
+				buffer.append("[]");
+			}
 			return;
 		}
-		
-		buffer.append(Formatting.Expression.arrayStart);
+
+		String mapPrefix = Formatting.getIndent("map.entry_separator.indent", prefix);
+		buffer.append('[');
+		if (Formatting.getBoolean("map.open_paren.space_after"))
+		{
+			buffer.append(' ');
+		}
 		
 		this.keys[0].toString(prefix, buffer);
-		buffer.append(Formatting.Expression.mapSeparator);
+		Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
 		this.values[0].toString(prefix, buffer);
+
 		for (int i = 1; i < this.count; i++)
 		{
-			buffer.append(Formatting.Expression.arraySeperator);
+			Formatting.appendSeparator(buffer, "map.entry_separator", ',');
+
 			this.keys[i].toString(prefix, buffer);
-			buffer.append(Formatting.Expression.mapSeparator);
+			Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
 			this.values[i].toString(prefix, buffer);
 		}
 		
-		buffer.append(Formatting.Expression.arrayEnd);
+		if (Formatting.getBoolean("map.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(']');
 	}
 }

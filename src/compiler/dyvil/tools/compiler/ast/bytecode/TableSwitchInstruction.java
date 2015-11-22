@@ -42,14 +42,16 @@ public class TableSwitchInstruction implements IInstruction
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("TABLESWITCH [");
+
 		int len = Math.min(this.end - this.start + 1, this.handlers.length);
-		String prefix1 = prefix + Formatting.Method.indent;
+		String switchPrefix = Formatting.getIndent("bytecode.switch.indent", prefix);
 		
 		for (int i = 0; i < len; i++)
 		{
-			buffer.append('\n').append(prefix1).append(this.start + i).append(": ").append(this.handlers[i]);
+			buffer.append('\n').append(switchPrefix).append(this.start + i).append(": ").append(this.handlers[i]);
 		}
-		buffer.append('\n').append(prefix1).append("default: ").append(this.defaultHandler);
+
+		buffer.append('\n').append(switchPrefix).append("default: ").append(this.defaultHandler);
 		buffer.append('\n').append(prefix).append(']');
 	}
 }

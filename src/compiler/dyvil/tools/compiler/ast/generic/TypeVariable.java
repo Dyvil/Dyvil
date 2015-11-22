@@ -514,16 +514,16 @@ public final class TypeVariable implements ITypeVariable
 		
 		if (this.lowerBound != null)
 		{
-			buffer.append(Formatting.Type.genericLowerBound);
+			Formatting.appendSeparator(buffer, "type.bound", ">:");
 			this.lowerBound.toString(prefix, buffer);
 		}
 		if (this.upperBoundCount > 0)
 		{
-			buffer.append(Formatting.Type.genericUpperBound);
+			Formatting.appendSeparator(buffer, "type.bound", "<:");
 			this.upperBounds[0].toString(prefix, buffer);
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
-				buffer.append(Formatting.Type.genericBoundSeperator);
+				Formatting.appendSeparator(buffer, "type.bound.separator", '&');
 				this.upperBounds[i].toString(prefix, buffer);
 			}
 		}

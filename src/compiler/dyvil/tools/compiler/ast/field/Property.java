@@ -37,18 +37,15 @@ import java.lang.annotation.ElementType;
 
 public class Property extends Member implements IProperty, IContext
 {
-	private static final byte	GETTER	= 1;
-	private static final byte	SETTER	= 2;
-	
 	protected IClass theClass;
 	
-	protected IValue	getter;
-	protected IValue	setter;
-	protected int		getterModifiers;
-	protected int		setterModifiers;
+	protected IValue getter;
+	protected IValue setter;
+	protected int    getterModifiers;
+	protected int    setterModifiers;
 	
-	protected MethodParameter	setterParameter;
-	protected IProperty			overrideProperty;
+	protected MethodParameter setterParameter;
+	protected IProperty       overrideProperty;
 	
 	public Property(IClass iclass)
 	{
@@ -202,7 +199,8 @@ public class Property extends Member implements IProperty, IContext
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "property.access.static.type", this.name.unqualified, this.theClass.getFullName()));
+					markers.add(I18n.createMarker(position, "property.access.static.type", this.name.unqualified,
+					                              this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -338,7 +336,8 @@ public class Property extends Member implements IProperty, IContext
 			IValue get1 = this.getter.withType(this.type, this.type, markers, context);
 			if (get1 == null)
 			{
-				Marker marker = I18n.createMarker(this.getter.getPosition(), "property.getter.type.incompatible", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.getter.getPosition(), "property.getter.type.incompatible",
+				                                  this.name.unqualified);
 				marker.addInfo(I18n.getString("property.type", this.type));
 				marker.addInfo(I18n.getString("property.getter.type", this.getter.getType()));
 				markers.add(marker);
@@ -455,7 +454,9 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.getterModifiers != 0)
 		{
-			ModifierTypes.checkMethodModifiers(markers, this, this.getterModifiers | this.modifiers, this.getter != null, "property.getter");
+			ModifierTypes
+					.checkMethodModifiers(markers, this, this.getterModifiers | this.modifiers, this.getter != null,
+					                      "property.getter");
 		}
 		if (this.setter != null)
 		{
@@ -465,11 +466,12 @@ public class Property extends Member implements IProperty, IContext
 			{
 				markers.add(I18n.createMarker(this.position, "property.type.void"));
 			}
-			
 		}
 		if (this.setterModifiers != 0)
 		{
-			ModifierTypes.checkMethodModifiers(markers, this, this.setterModifiers | this.modifiers, this.setter != null, "property.setter");
+			ModifierTypes
+					.checkMethodModifiers(markers, this, this.setterModifiers | this.modifiers, this.setter != null,
+					                      "property.setter");
 		}
 		
 		// No setter and no getter
@@ -632,11 +634,11 @@ public class Property extends Member implements IProperty, IContext
 			}
 		}
 		
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
-		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		if ((modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
@@ -652,8 +654,10 @@ public class Property extends Member implements IProperty, IContext
 			int modifiers = this.modifiers | this.getterModifiers;
 			
 			MethodWriter mw = new MethodWriterImpl(writer,
-					writer.visitMethod(modifiers, this.name.qualified, "()" + extended, signature == null ? null : "()" + signature, null));
-					
+			                                       writer.visitMethod(modifiers, this.name.qualified, "()" + extended,
+			                                                          signature == null ? null : "()" + signature,
+			                                                          null));
+
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
@@ -672,9 +676,11 @@ public class Property extends Member implements IProperty, IContext
 		{
 			int modifiers = this.modifiers | this.setterModifiers;
 			
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq", "(" + extended + ")V",
-					signature == null ? null : "(" + signature + ")V", null));
-					
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq",
+			                                                                  "(" + extended + ")V", signature == null ?
+					                                                                  null :
+					                                                                  "(" + signature + ")V", null));
+
 			if ((this.modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
@@ -765,37 +771,87 @@ public class Property extends Member implements IProperty, IContext
 		this.type.toString("", buffer);
 		buffer.append(' ');
 		buffer.append(this.name);
-		
-		buffer.append('\n').append(prefix).append('{');
+
+		// Block Start
+		if (Formatting.getBoolean("property.block.newline"))
+		{
+			buffer.append('\n').append(prefix);
+		}
+		else
+		{
+			buffer.append(' ');
+		}
+		buffer.append('{');
+
+		// Getters
 		if (this.getter != null || this.getterModifiers != 0)
 		{
-			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
-			buffer.append(ModifierTypes.FIELD.toString(this.getterModifiers));
-			buffer.append(Formatting.Field.propertyGet);
+			String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
+
+			buffer.append('\n').append(prefix);
+			buffer.append(ModifierTypes.FIELD.toString(this.getterModifiers)).append("get");
+
+			// Separator
+			if (Formatting.getBoolean("property.getter.separator.space_before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append(':');
+			if (Formatting.getBoolean("property.getter.newline"))
+			{
+				buffer.append('\n').append(getterPrefix);
+			}
+			else if (Formatting.getBoolean("property.getter.separator.space_after"))
+			{
+				buffer.append(' ');
+			}
+
 			if (this.getter != null)
 			{
-				this.getter.toString(prefix + Formatting.Method.indent, buffer);
+				this.getter.toString(getterPrefix, buffer);
 			}
-			
-			if (this.setter == null && this.setterModifiers == 0)
+
+			if (Formatting.getBoolean("property.getter.semicolon"))
 			{
-				buffer.append('\n').append(prefix).append('}');
-				return;
+				buffer.append(';');
 			}
-			
-			buffer.append(';');
 		}
+
+		// Setters
 		if (this.setter != null || this.setterModifiers != 0)
 		{
-			buffer.append('\n').append(prefix).append(Formatting.Method.indent);
-			buffer.append(ModifierTypes.FIELD.toString(this.setterModifiers));
-			buffer.append(Formatting.Field.propertySet);
+			String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
+
+			buffer.append('\n').append(prefix);
+			buffer.append(ModifierTypes.FIELD.toString(this.setterModifiers)).append("set");
+
+			// Separator
+			if (Formatting.getBoolean("property.setter.separator.space_before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append(':');
+			if (Formatting.getBoolean("property.setter.newline"))
+			{
+				buffer.append('\n').append(setterPrefix);
+			}
+			else if (Formatting.getBoolean("property.setter.separator.space_after"))
+			{
+				buffer.append(' ');
+			}
+
 			if (this.setter != null)
 			{
-				this.setter.toString(prefix + Formatting.Method.indent, buffer);
+				this.setter.toString(setterPrefix, buffer);
 			}
-			buffer.append(';');
+
+			if (Formatting.getBoolean("property.setter.semicolon"))
+			{
+				buffer.append(';');
+			}
 		}
+
+		// Block End
 		buffer.append('\n').append(prefix).append('}');
 	}
 }

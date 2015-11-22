@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
@@ -251,14 +250,7 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			buffer.append(' ');
 		}
 		
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.name.qualified).append("$eq");
-		}
-		else
-		{
-			buffer.append(this.name.unqualified).append('=');
-		}
+		buffer.append(this.name).append('=');
 		
 		this.arguments.toString(prefix, buffer);
 	}

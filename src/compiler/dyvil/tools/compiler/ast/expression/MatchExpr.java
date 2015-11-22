@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import java.util.Arrays;
-
 import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -21,17 +19,19 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.util.Arrays;
+
 public final class MatchExpr implements IValue
 {
 	protected ICodePosition position;
 	
-	protected IValue		value;
-	protected MatchCase[]	cases	= new MatchCase[3];
-	protected int			caseCount;
+	protected IValue value;
+	protected MatchCase[] cases = new MatchCase[3];
+	protected int caseCount;
 	
 	// Metadata
-	private boolean	exhaustive;
-	private IType	type;
+	private boolean exhaustive;
+	private IType   type;
 	
 	public MatchExpr(ICodePosition position, IValue value)
 	{
@@ -373,7 +373,7 @@ public final class MatchExpr implements IValue
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		for (int i = 0;;)
+		for (int i = 0; ; )
 		{
 			MatchCase c = this.cases[i];
 			IValue condition = c.condition;
@@ -449,8 +449,8 @@ public final class MatchExpr implements IValue
 		int low = Integer.MAX_VALUE; // the minimum int
 		int high = Integer.MIN_VALUE; // the maximum int
 		boolean switchVar = false; // Do we need to store the value in a
-									// variable (for string equality checks
-									// later)
+		// variable (for string equality checks
+		// later)
 		
 		// Second run: count the number of total cases, the minimum and maximum
 		// int value, find the default case, and find out if a variable needs to
@@ -580,13 +580,14 @@ public final class MatchExpr implements IValue
 	 * Determines whether to generate a {@code tableswitch} or a
 	 * {@code lookupswitch} instruction, and returns {@code true} when a
 	 * {@code tableswitch} should be generated.
-	 * 
+	 *
 	 * @param low
-	 *            the lowest value
+	 * 		the lowest value
 	 * @param high
-	 *            the highest value
+	 * 		the highest value
 	 * @param count
-	 *            the number of cases
+	 * 		the number of cases
+	 *
 	 * @return true, if a tableswitch instruction should be used
 	 */
 	private static boolean useTableSwitch(int low, int high, int count)
@@ -684,19 +685,27 @@ public final class MatchExpr implements IValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.value.toString(prefix, buffer);
-		if (this.caseCount == 1)
+		if (this.caseCount == 1 && Formatting.getBoolean("match.convert_single"))
 		{
 			buffer.append(" match ");
 			this.cases[0].toString(prefix, buffer);
 			return;
 		}
-		
-		buffer.append(" match {\n");
-		String prefix1 = prefix + Formatting.Method.indent;
+
+		if (Formatting.getBoolean("match.newline_after"))
+		{
+			buffer.append(" match\n").append(prefix).append("{\n");
+		}
+		else
+		{
+			buffer.append(" match {\n");
+		}
+
+		String casePrefix = Formatting.getIndent("match.indent", prefix);
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			buffer.append(prefix1);
-			this.cases[i].toString(prefix1, buffer);
+			buffer.append(casePrefix);
+			this.cases[i].toString(casePrefix, buffer);
 			buffer.append('\n');
 		}
 		buffer.append(prefix).append('}');

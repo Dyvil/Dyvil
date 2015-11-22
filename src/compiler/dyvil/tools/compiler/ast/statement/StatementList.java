@@ -107,7 +107,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.valueCount > 0)
 		{
-			IValue typed = this.values[this.valueCount - 1].withType(type, typeContext, markers, new CombiningContext(this, context));
+			IValue typed = this.values[this.valueCount - 1]
+					.withType(type, typeContext, markers, new CombiningContext(this, context));
 			if (typed != null)
 			{
 				this.values[this.valueCount - 1] = typed;
@@ -504,14 +505,26 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.valueCount == 0)
 		{
-			buffer.append(Formatting.Expression.emptyExpression);
+			if (Formatting.getBoolean("statement.empty.newline"))
+			{
+				buffer.append('{').append('\n').append(prefix).append('}');
+			}
+			else if (Formatting.getBoolean("statement.empty.space_between"))
+			{
+				buffer.append("{ }");
+			}
+			else
+			{
+				buffer.append("{}");
+			}
 			return;
 		}
 		
-		buffer.append('\n').append(prefix).append('{').append('\n');
+		buffer.append('{').append('\n');
 
-		String indentedPrefix = prefix + Formatting.Method.indent;
+		String indentedPrefix = Formatting.getIndent("statement.indent", prefix);
 		int prevLine = 0;
+		Label label = null;
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -521,25 +534,41 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 			if (pos != null)
 			{
-				if (pos.startLine() - prevLine > 1)
+				if (pos.startLine() - prevLine > 1 && i > 0)
 				{
 					buffer.append('\n').append(indentedPrefix);
 				}
 				prevLine = pos.endLine();
 			}
 			
-			if (this.labels != null)
+			if (this.labels != null && (label = this.labels[i]) != null)
 			{
-				Label l = this.labels[i];
-				if (l != null)
+				buffer.append(label.name);
+
+				if (Formatting.getBoolean("label.separator.space_before"))
 				{
-					buffer.append(l.name).append(Formatting.Expression.labelSeperator);
+					buffer.append(' ');
+				}
+				buffer.append(':');
+				if (Formatting.getBoolean("label.separator.newline_after"))
+				{
+					buffer.append('\n').append(indentedPrefix);
+				}
+				else if (Formatting.getBoolean("label.separator.newline_after"))
+				{
+					buffer.append(' ');
 				}
 			}
 			
 			value.toString(indentedPrefix, buffer);
-			buffer.append(";\n");
+
+			if (Formatting.getBoolean("statement.semicolon"))
+			{
+				buffer.append(';');
+			}
+			buffer.append('\n');
 		}
+
 		buffer.append(prefix).append('}');
 	}
 }

@@ -20,9 +20,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TuplePattern extends Pattern implements IPatternList
 {
-	private IPattern[]	patterns	= new IPattern[3];
-	private int			patternCount;
-	private IType		tupleType;
+	private IPattern[] patterns = new IPattern[3];
+	private int   patternCount;
+	private IType tupleType;
 	
 	public TuplePattern(ICodePosition position)
 	{
@@ -175,8 +175,31 @@ public final class TuplePattern extends Pattern implements IPatternList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Expression.tupleStart);
-		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.Expression.tupleSeperator, buffer);
-		buffer.append(Formatting.Expression.tupleEnd);
+		if (this.patternCount == 0)
+		{
+			if (Formatting.getBoolean("tuple.empty.space_between"))
+			{
+				buffer.append("( )");
+			}
+			else
+			{
+				buffer.append("()");
+			}
+			return;
+		}
+
+		buffer.append('(');
+		if (Formatting.getBoolean("tuple.open_paren.space_after"))
+		{
+			buffer.append(' ');
+		}
+
+		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.getSeparator("tuple.separator", ','), buffer);
+
+		if (Formatting.getBoolean("tuple.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(')');
 	}
 }

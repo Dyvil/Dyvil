@@ -801,41 +801,68 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 1)
+		IParameter parameter;
+		if (this.parameterCount == 1 && (parameter = this.parameters[0]).getType() == Types.UNKNOWN && !Formatting
+				.getBoolean("lambda.single.wrap"))
 		{
-			IParameter param = this.parameters[0];
-			if (param.getType() != Types.UNKNOWN)
+			buffer.append(parameter.getName());
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
 			{
-				buffer.append('(');
-				param.toString(prefix, buffer);
-				buffer.append(')');
+				buffer.append(' ');
 			}
-			else
-			{
-				buffer.append(param.getName());
-			}
-			buffer.append(' ');
 		}
-		else if (this.parameterCount > 1)
+		else if (this.parameterCount > 0)
 		{
 			buffer.append('(');
-			IParameter first = this.parameters[0];
-			if (first.getType() == Types.UNKNOWN)
+			if (Formatting.getBoolean("lambda.open_paren.space_after"))
 			{
-				buffer.append(first.getName());
+				buffer.append(' ');
+			}
+
+			parameter = this.parameters[0];
+			if (parameter.getType() == Types.UNKNOWN)
+			{
+				buffer.append(parameter.getName());
 				for (int i = 1; i < this.parameterCount; i++)
 				{
-					buffer.append(", ").append(this.parameters[i].getName());
+					Formatting.appendSeparator(buffer, "lambda.separator", ',');
+					buffer.append(this.parameters[i].getName());
 				}
 			}
 			else
 			{
-				Util.astToString(prefix, this.parameters, this.parameterCount, ", ", buffer);
+				Util.astToString(prefix, this.parameters, this.parameterCount,
+				                 Formatting.getSeparator("lambda.separator", ','), buffer);
 			}
-			buffer.append(") ");
+
+			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			{
+				buffer.append(' ');
+			}
+
+			buffer.append(')');
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
+			{
+				buffer.append(' ');
+			}
+		}
+		else if (Formatting.getBoolean("lambda.empty.wrap"))
+		{
+			buffer.append("()");
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
+			{
+				buffer.append(' ');
+			}
 		}
 		
-		buffer.append(Formatting.Expression.lambdaSeperator);
+		buffer.append("=>");
+		if (Formatting.getBoolean("lambda.arrow.space_after"))
+		{
+			buffer.append(' ');
+		}
+
 		this.value.toString(prefix, buffer);
 	}
 }

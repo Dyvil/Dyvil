@@ -19,9 +19,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class CaseClassPattern extends Pattern implements IPatternList
 {
-	private IType		type;
-	private IPattern[]	patterns	= new IPattern[2];
-	private int			patternCount;
+	private IType type;
+	private IPattern[] patterns = new IPattern[2];
+	private int patternCount;
 	
 	public CaseClassPattern(ICodePosition position)
 	{
@@ -190,8 +190,14 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.type.toString(prefix, buffer);
-		buffer.append('(');
-		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.Expression.tupleSeperator, buffer);
+		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.getSeparator("parameters.separator", ','),
+		                 buffer);
+
+		if (Formatting.getBoolean("parameters.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
 		buffer.append(')');
 	}
 }

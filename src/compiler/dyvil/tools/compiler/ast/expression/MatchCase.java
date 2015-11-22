@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -17,9 +18,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class MatchCase implements ICase, IDefaultContext
 {
-	protected IPattern	pattern;
-	protected IValue	condition;
-	protected IValue	action;
+	protected IPattern pattern;
+	protected IValue   condition;
+	protected IValue   action;
 	
 	protected Label switchLabel;
 	
@@ -195,7 +196,26 @@ public class MatchCase implements ICase, IDefaultContext
 			buffer.append(" if ");
 			this.condition.toString(prefix, buffer);
 		}
-		buffer.append(" => ");
+
+		if (Formatting.getBoolean("case.separator.space_before"))
+		{
+			buffer.append(' ');
+		}
+
+		if (Formatting.getBoolean("case.separator.arrow"))
+		{
+			buffer.append("=>");
+		}
+		else
+		{
+			buffer.append(':');
+		}
+
+		if (Formatting.getBoolean("case.separator.space_after"))
+		{
+			buffer.append(' ');
+		}
+
 		if (this.action != null)
 		{
 			this.action.toString(prefix, buffer);

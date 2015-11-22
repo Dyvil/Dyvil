@@ -22,9 +22,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IfStatement extends AbstractValue
 {
-	protected IValue	condition;
-	protected IValue	then;
-	protected IValue	elseThen;
+	protected IValue condition;
+	protected IValue then;
+	protected IValue elseThen;
 	
 	// Metadata
 	private IType commonType;
@@ -399,22 +399,57 @@ public class IfStatement extends AbstractValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.ifStart);
+		buffer.append("if");
+
+		Formatting.appendSeparator(buffer, "if.open_paren", '(');
 		if (this.condition != null)
 		{
 			this.condition.toString(prefix, buffer);
 		}
-		buffer.append(Formatting.Statements.ifEnd);
-		
-		if (this.then != null)
+		Formatting.appendSeparator(buffer, "if.close_paren", ')');
+
+		if (this.then != null && !Util.formatStatementList(prefix, buffer, this.then))
 		{
-			this.then.toString(prefix, buffer);
-			
-			if (this.elseThen != null)
+			String actionPrefix = Formatting.getIndent("if.indent", prefix);
+			if (Formatting.getBoolean("if.close_paren.newline_after"))
 			{
-				buffer.append(Formatting.Statements.ifElse);
-				this.elseThen.toString(prefix, buffer);
+				buffer.append('\n').append(actionPrefix);
 			}
+			else if (Formatting.getBoolean("if.close_paren.space_after"))
+			{
+				buffer.append(' ');
+			}
+
+			this.then.toString(actionPrefix, buffer);
+		}
+
+		if (this.elseThen != null)
+		{
+			if (Formatting.getBoolean("if.else.newline_before"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else if (Formatting.getBoolean("if.else.space_before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append("else");
+
+			if (Util.formatStatementList(prefix, buffer, this.elseThen))
+			{
+				return;
+			}
+
+			if (Formatting.getBoolean("if.else.newline_after"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else if (Formatting.getBoolean("if.else.space_after"))
+			{
+				buffer.append(' ');
+			}
+
+			this.elseThen.toString(prefix, buffer);
 		}
 	}
 }

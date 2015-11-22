@@ -33,9 +33,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
 	public static final IClass[] functionClasses = new IClass[22];
 	
-	protected IType		returnType;
-	protected IType[]	parameterTypes;
-	protected int		parameterCount;
+	protected IType   returnType;
+	protected IType[] parameterTypes;
+	protected int     parameterCount;
 	
 	public LambdaType()
 	{
@@ -441,7 +441,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/FunctionType", "apply",
-				"(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/types/FunctionType;", false);
+		                       "(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvil/reflect/types/FunctionType;", false);
 	}
 	
 	@Override
@@ -487,7 +487,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		int index = typePath.getStepArgument(step);
 		if (index < this.parameterCount)
 		{
-			this.parameterTypes[index] = IType.withAnnotation(this.parameterTypes[index], annotation, typePath, step + 1, steps);
+			this.parameterTypes[index] = IType
+					.withAnnotation(this.parameterTypes[index], annotation, typePath, step + 1, steps);
 			return;
 		}
 		this.returnType = IType.withAnnotation(this.returnType, annotation, typePath, step + 1, steps);
@@ -549,29 +550,55 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 1)
+		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting
+				.getBoolean("lambda.single.wrap"))
 		{
-			if (this.parameterTypes[0].typeTag() == TUPLE)
+			this.parameterTypes[0].toString(prefix, buffer);
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
 			{
-				buffer.append(Formatting.Method.parametersStart);
-				this.parameterTypes[0].toString(prefix, buffer);
-				buffer.append(Formatting.Method.parametersEnd);
+				buffer.append(' ');
 			}
-			else
-			{
-				this.parameterTypes[0].toString(prefix, buffer);
-			}
-			buffer.append(' ');
 		}
 		else if (this.parameterCount > 0)
 		{
-			buffer.append(Formatting.Method.parametersStart);
-			Util.astToString(prefix, this.parameterTypes, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-			buffer.append(Formatting.Method.parametersEnd);
+			buffer.append('(');
+			if (Formatting.getBoolean("lambda.open_paren.space_after"))
+			{
+				buffer.append(' ');
+			}
+
+			Util.astToString(prefix, this.parameterTypes, this.parameterCount,
+			                 Formatting.getSeparator("lambda.separator", ','), buffer);
+
+			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append(')');
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
+			{
+				buffer.append(' ');
+			}
+		}
+		else if (Formatting.getBoolean("lambda.empty.wrap"))
+		{
+			buffer.append("()");
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
+			{
+				buffer.append(' ');
+			}
+		}
+
+		buffer.append("=>");
+
+		if (Formatting.getBoolean("lambda.arrow.space_after"))
+		{
 			buffer.append(' ');
 		}
-		
-		buffer.append(Formatting.Expression.lambdaSeperator);
+
 		this.returnType.toString("", buffer);
 	}
 	
@@ -583,17 +610,5 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, this.parameterCount);
 		lt.returnType = this.returnType;
 		return lt;
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return IType.equals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return System.identityHashCode(getLambdaClass(this.parameterCount));
 	}
 }
