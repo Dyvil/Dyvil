@@ -9,11 +9,11 @@ apply plugin: 'application'
 
 group					= 'dyvil-team'
 
-version					= '0.9.0'
+version					= '0.10.0'
 
-String libraryVersion	= '0.8.0'
-String compilerVersion	= '0.9.0'
-String replVersion		= '0.5.0'
+String libraryVersion	= '0.9.0'
+String compilerVersion	= '0.10.0'
+String replVersion		= '0.6.0'
 String dpfVersion		= '0.2.1'
 
 boolean nightly			= false
@@ -273,6 +273,8 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 // ---------------------------------------- Version Files ----------------------------------------
 
 task prepareRelease(type: Copy) {
+	outputs.upToDateWhen { return false }
+
 	from 'versions/'
 	
 	if (nightly) {
@@ -312,7 +314,6 @@ task wrapper(type: Wrapper) {
  * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
  */
 clean.doLast {
-	println "Re-recreating build/dyilbin"
 	file('build/dyvilbin').mkdirs()
 }
 
