@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -20,6 +16,10 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class SingleImport extends Import
 {
@@ -223,7 +223,7 @@ public final class SingleImport extends Import
 		buffer.append(this.name);
 		if (this.alias != null)
 		{
-			buffer.append(Formatting.Import.aliasSeperator);
+			Formatting.appendSeparator(buffer, "import.alias", "=>");
 			buffer.append(this.alias);
 		}
 	}

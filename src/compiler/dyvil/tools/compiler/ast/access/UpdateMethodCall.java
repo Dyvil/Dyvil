@@ -65,24 +65,29 @@ public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 			this.receiver.toString(prefix, buffer);
 		}
 		
-		if (this.arguments instanceof ArgumentList)
-		{
-			buffer.append(Formatting.Method.parametersStart);
-			int len = this.arguments.size() - 1;
-			
-			this.arguments.getValue(0, null).toString(prefix, buffer);
-			for (int i = 1; i < len; i++)
-			{
-				buffer.append(Formatting.Method.parameterSeperator);
-				this.arguments.getValue(i, null).toString(prefix, buffer);
-			}
-			buffer.append(Formatting.Method.parametersEnd);
-			buffer.append(Formatting.Field.keyValueSeperator);
-			this.arguments.getValue(len, null).toString(prefix, buffer);
-		}
-		else
+		if (!(this.arguments instanceof ArgumentList))
 		{
 			this.arguments.toString(prefix, buffer);
 		}
+
+		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+
+		int count = this.arguments.size() - 1;
+		this.arguments.getValue(0, null).toString(prefix, buffer);
+		for (int i = 1; i < count; i++)
+		{
+			Formatting.appendSeparator(buffer, "parameters.separator", ',');
+			this.arguments.getValue(i, null).toString(prefix, buffer);
+		}
+
+		if (Formatting.getBoolean("parameters.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(')');
+
+		Formatting.appendSeparator(buffer, "field.assignment", '=');
+
+		this.arguments.getLastValue().toString(prefix, buffer);
 	}
 }

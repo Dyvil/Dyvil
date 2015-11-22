@@ -441,7 +441,7 @@ public class Field extends Member implements IField
 		
 		if (this.value != null)
 		{
-			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(prefix, buffer);
 		}
 	}

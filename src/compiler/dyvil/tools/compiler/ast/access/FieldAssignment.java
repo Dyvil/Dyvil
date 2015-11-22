@@ -366,7 +366,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		if (this.receiver != null)
 		{
-			this.receiver.toString("", buffer);
+			this.receiver.toString(prefix, buffer);
 			buffer.append('.');
 		}
 		
@@ -374,7 +374,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		
 		if (this.value != null)
 		{
-			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(prefix, buffer);
 		}
 	}

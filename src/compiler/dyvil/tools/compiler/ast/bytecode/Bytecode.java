@@ -18,9 +18,9 @@ public final class Bytecode implements IValue
 {
 	protected ICodePosition position;
 	
-	private IInstruction[]	instructions	= new IInstruction[3];
-	private int				instructionCount;
-	private Label[]			labels;
+	private IInstruction[] instructions = new IInstruction[3];
+	private int     instructionCount;
+	private Label[] labels;
 	
 	public Bytecode(ICodePosition position)
 	{
@@ -229,36 +229,83 @@ public final class Bytecode implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		buffer.append('@');
+
+		if (Formatting.getBoolean("bytecode.start.space_after"))
+		{
+			buffer.append(' ');
+		}
+
 		if (this.instructionCount == 0)
 		{
-			buffer.append('@').append(Formatting.Expression.emptyExpression);
-		}
-		else
-		{
-			buffer.append("@ {\n");
-			String prefix1 = prefix + Formatting.Method.indent;
-			boolean label = false;
-			for (int i = 0; i < this.instructionCount; i++)
+			if (Formatting.getBoolean("statement.empty.newline"))
 			{
-				buffer.append(prefix1);
-				if (this.labels != null && i < this.labels.length)
-				{
-					Label l = this.labels[i];
-					if (l != null)
-					{
-						buffer.append(l.name).append(Formatting.Expression.labelSeperator).append(prefix1);
-						label = true;
-					}
-				}
-				
-				if (label)
+				buffer.append('{').append('\n').append(prefix).append('}');
+			}
+			else if (Formatting.getBoolean("statement.empty.space_between"))
+			{
+				buffer.append("{ }");
+			}
+			else
+			{
+				buffer.append("{}");
+			}
+			return;
+		}
+
+		if (Formatting.getBoolean("statementment.open_brace.newline"))
+		{
+			buffer.append('\n').append(prefix).append('{').append(prefix);
+		}
+
+		String instructionPrefix = Formatting.getIndent("statement.indent", prefix);
+		String labelPrefix = Formatting.getIndent("label.indent", instructionPrefix);
+
+		boolean hasLabel = false;
+		Label label = null;
+		boolean labelNewline = Formatting.getBoolean("label.separator.newline_after");
+
+		for (int i = 0; i < this.instructionCount; i++)
+		{
+			buffer.append(instructionPrefix);
+			if (this.labels != null && i < this.labels.length && (label = this.labels[i]) != null)
+			{
+				buffer.append(label.name);
+
+				if (Formatting.getBoolean("label.separator.space_before"))
 				{
 					buffer.append(' ');
 				}
-				this.instructions[i].toString(prefix1, buffer);
-				buffer.append('\n');
+				buffer.append(':');
+
+				if (labelNewline)
+				{
+					buffer.append('\n');
+				}
+				else if (Formatting.getBoolean("label.separator.space_after"))
+				{
+					buffer.append(' ');
+				}
+
+				hasLabel = true;
 			}
-			buffer.append(prefix).append('}');
+
+			if (hasLabel)
+			{
+				if (labelNewline)
+				{
+					buffer.append(labelPrefix);
+				}
+				this.instructions[i].toString(labelPrefix, buffer);
+			}
+			else
+			{
+				buffer.append(instructionPrefix);
+				this.instructions[i].toString(instructionPrefix, buffer);
+			}
+			buffer.append('\n');
 		}
+
+		buffer.append(prefix).append('}');
 	}
 }

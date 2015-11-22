@@ -20,8 +20,8 @@ import java.util.Iterator;
 
 public final class SingleArgument implements IArguments, IValueConsumer
 {
-	private IValue	value;
-	private boolean	varargs;
+	private IValue  value;
+	private boolean varargs;
 	
 	public SingleArgument()
 	{
@@ -157,7 +157,8 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		IValue typed = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (typed == null)
 		{
-			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type",
+			                     param.getName());
 		}
 		else
 		{
@@ -185,7 +186,8 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		value1 = IType.convertValue(this.value, type.getElementType(), typeContext, markers, context);
 		if (value1 == null)
 		{
-			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type",
+			                     param.getName());
 		}
 		else
 		{
@@ -330,11 +332,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		if (Formatting.Method.useJavaFormat)
+		if (Formatting.getBoolean("method.call.java_format"))
 		{
-			buffer.append('(');
+			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
 			this.value.toString(prefix, buffer);
-			buffer.append(')');
+			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 			return;
 		}
 		buffer.append(' ');

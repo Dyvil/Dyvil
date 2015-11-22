@@ -26,7 +26,6 @@ import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -1208,42 +1207,64 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		if (this.genericCount > 0)
 		{
-			buffer.append('[');
-			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			Util.astToString(prefix, this.generics, this.genericCount,
+			                 Formatting.getSeparator("generics.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}
 		
-		buffer.append(Formatting.Method.parametersStart);
-		Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-		buffer.append(Formatting.Method.parametersEnd);
+		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+		Util.astToString(prefix, this.parameters, this.parameterCount,
+		                 Formatting.getSeparator("parameters.separator", ','), buffer);
+		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 		
 		if (this.exceptionCount > 0)
 		{
-			buffer.append(Formatting.Method.signatureThrowsSeperator);
-			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
+			String throwsPrefix = prefix;
+			if (Formatting.getBoolean("method.throws.newline"))
+			{
+				throwsPrefix = Formatting.getIndent("method.throws.indent", prefix);
+				buffer.append('\n').append(throwsPrefix).append("throws ");
+			}
+			else
+			{
+				buffer.append(" throws ");
+			}
+
+			Util.astToString(throwsPrefix, this.exceptions, this.exceptionCount,
+			                 Formatting.getSeparator("method.throws", ','), buffer);
 		}
 		
-		if (this.value == null)
+		if (this.value != null)
 		{
-			buffer.append(';');
-			return;
-		}
-		
-		if (this.value.valueTag() != IValue.STATEMENT_LIST)
-		{
-			buffer.append(Formatting.Method.signatureBodySeperator);
+			if (Util.formatStatementList(prefix, buffer, this.value))
+			{
+				return;
+			}
+
+			if (Formatting.getBoolean("method.declaration.space_before"))
+			{
+				buffer.append(' ');
+			}
+
+			buffer.append('=');
+
+			String valuePrefix = Formatting.getIndent("method.declaration.indent", prefix);
+			if (Formatting.getBoolean("method.declaration.newline_after"))
+			{
+				buffer.append('\n').append(valuePrefix);
+			}
+			else if (Formatting.getBoolean("method.declaration.space_after"))
+			{
+				buffer.append(' ');
+			}
+
 			this.value.toString(prefix, buffer);
-			buffer.append(';');
-			return;
 		}
-		
-		if (((StatementList) this.value).isEmpty())
+
+		if (Formatting.getBoolean("method.semicolon"))
 		{
-			buffer.append(Formatting.Method.emptyBody);
-			return;
+			buffer.append(';');
 		}
-		
-		buffer.append(' ');
-		this.value.toString(prefix, buffer);
 	}
 }

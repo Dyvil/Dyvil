@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -21,10 +17,14 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public abstract class GenericType implements IObjectType, ITypeList
 {
-	protected IType[]	typeArguments;
-	protected int		typeArgumentCount;
+	protected IType[] typeArguments;
+	protected int     typeArgumentCount;
 	
 	public GenericType()
 	{
@@ -186,7 +186,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/GenericType", "apply",
-				"(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/types/GenericType;", false);
+		                       "(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/types/GenericType;", false);
 	}
 	
 	@Override
@@ -198,7 +198,8 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		
 		int index = typePath.getStepArgument(step);
-		this.typeArguments[index] = IType.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1, steps);
+		this.typeArguments[index] = IType
+				.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1, steps);
 	}
 	
 	@Override
@@ -249,10 +250,17 @@ public abstract class GenericType implements IObjectType, ITypeList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.getName());
+
 		if (this.typeArgumentCount > 0)
 		{
-			buffer.append('[');
-			Util.astToString(prefix, this.typeArguments, this.typeArgumentCount, Formatting.Type.genericSeperator, buffer);
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			Util.astToString(prefix, this.typeArguments, this.typeArgumentCount,
+			                 Formatting.getSeparator("generics.separator", ','), buffer);
+
+			if (Formatting.getBoolean("generics.close_bracket.space_before"))
+			{
+				buffer.append(' ');
+			}
 			buffer.append(']');
 		}
 	}
@@ -266,16 +274,4 @@ public abstract class GenericType implements IObjectType, ITypeList
 	
 	@Override
 	public abstract GenericType clone();
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return IType.equals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return System.identityHashCode(this.getTheClass());
-	}
 }

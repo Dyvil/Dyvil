@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import java.util.Iterator;
-
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -23,6 +21,8 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.util.Iterator;
+
 public final class TupleExpr implements IValue, IValueList
 {
 	public static final class Types
@@ -37,8 +37,8 @@ public final class TupleExpr implements IValue, IValueList
 	
 	protected ICodePosition position;
 	
-	protected IValue[]	values;
-	protected int		valueCount;
+	protected IValue[] values;
+	protected int      valueCount;
 	
 	// Metadata
 	private IType tupleType;
@@ -161,7 +161,8 @@ public final class TupleExpr implements IValue, IValueList
 		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
-			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount)).withType(type, typeContext, markers, context);
+			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
+					.withType(type, typeContext, markers, context);
 		}
 		
 		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
@@ -174,8 +175,9 @@ public final class TupleExpr implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType elementType = iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS ? dyvil.tools.compiler.ast.type.Types.ANY
-					: type.resolveTypeSafely(iclass.getTypeVariable(i));
+			IType elementType = iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS ?
+					dyvil.tools.compiler.ast.type.Types.ANY :
+					type.resolveTypeSafely(iclass.getTypeVariable(i));
 			
 			IValue value = this.values[i];
 			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
@@ -206,7 +208,8 @@ public final class TupleExpr implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 		
-		return TupleType.isSuperType(type, this.values, this.valueCount) || type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null;
+		return TupleType.isSuperType(type, this.values, this.valueCount)
+				|| type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null;
 	}
 	
 	@Override
@@ -317,8 +320,31 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Expression.tupleStart);
-		Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.tupleSeperator, buffer);
-		buffer.append(Formatting.Expression.tupleEnd);
+		if (this.valueCount == 0)
+		{
+			if (Formatting.getBoolean("tuple.empty.space_between"))
+			{
+				buffer.append("( )");
+			}
+			else
+			{
+				buffer.append("()");
+			}
+			return;
+		}
+
+		buffer.append('(');
+		if (Formatting.getBoolean("tuple.open_paren.space_after"))
+		{
+			buffer.append(' ');
+		}
+
+		Util.astToString(prefix, this.values, this.valueCount, Formatting.getSeparator("tuple.separator", ','), buffer);
+
+		if (Formatting.getBoolean("tuple.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(')');
 	}
 }

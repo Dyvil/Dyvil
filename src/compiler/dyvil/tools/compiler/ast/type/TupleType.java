@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -28,13 +24,17 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public final class TupleType implements IObjectType, ITypeList
 {
-	public static final IClass[]	tupleClasses	= new IClass[22];
-	public static final String[]	descriptors		= new String[22];
+	public static final IClass[] tupleClasses = new IClass[22];
+	public static final String[] descriptors  = new String[22];
 	
-	protected IType[]	types;
-	protected int		typeCount;
+	protected IType[] types;
+	protected int     typeCount;
 	
 	public TupleType()
 	{
@@ -395,7 +395,8 @@ public final class TupleType implements IObjectType, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply", "([Ldyvil/lang/Type;)Ldyvil/reflect/types/TupleType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply",
+		                       "([Ldyvil/lang/Type;)Ldyvil/reflect/types/TupleType;", false);
 	}
 	
 	@Override
@@ -461,9 +462,32 @@ public final class TupleType implements IObjectType, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Expression.tupleStart);
-		Util.astToString(prefix, this.types, this.typeCount, Formatting.Expression.tupleSeperator, buffer);
-		buffer.append(Formatting.Expression.tupleEnd);
+		if (this.typeCount == 0)
+		{
+			if (Formatting.getBoolean("tuple.empty.space_between"))
+			{
+				buffer.append("( )");
+			}
+			else
+			{
+				buffer.append("()");
+			}
+			return;
+		}
+
+		buffer.append('(');
+		if (Formatting.getBoolean("tuple.open_paren.space_after"))
+		{
+			buffer.append(' ');
+		}
+
+		Util.astToString(prefix, this.types, this.typeCount, Formatting.getSeparator("tuple.separator", ','), buffer);
+
+		if (Formatting.getBoolean("tuple.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(')');
 	}
 	
 	@Override
@@ -473,17 +497,5 @@ public final class TupleType implements IObjectType, ITypeList
 		tt.typeCount = this.typeCount;
 		System.arraycopy(this.types, 0, tt.types, 0, this.typeCount);
 		return tt;
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return IType.equals(this, obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return System.identityHashCode(getTupleClass(this.typeCount));
 	}
 }

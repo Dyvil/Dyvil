@@ -396,9 +396,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		if (this.receiver != null)
 		{
 			this.receiver.toString("", buffer);
-			if (this.dotless && !Formatting.Field.useJavaFormat)
+			if (this.dotless && !Formatting.getBoolean("field.access.java_format"))
 			{
-				buffer.append(Formatting.Field.dotlessSeperator);
+				buffer.append(' ');
 			}
 			else
 			{

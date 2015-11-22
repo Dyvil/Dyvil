@@ -163,9 +163,10 @@ public final class GenericData implements ITypeList, ITypeContext
 		int len = this.genericCount;
 		if (len > 0)
 		{
-			buffer.append('.').append('[');
-			Util.astToString(prefix, this.generics, len, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
+			buffer.append('.');
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			Util.astToString(prefix, this.generics, len, Formatting.getSeparator("generics.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}
 	}
 }

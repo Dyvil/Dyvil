@@ -11,13 +11,14 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public final class SyncStatement extends AbstractValue implements IStatement
 {
-	protected IValue	lock;
-	protected IValue	action;
+	protected IValue lock;
+	protected IValue action;
 	
 	public SyncStatement(ICodePosition position)
 	{
@@ -190,12 +191,41 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.syncStart);
+		buffer.append("synchronized");
+
+		Formatting.appendSeparator(buffer, "sync.open_paren", '(');
 		if (this.lock != null)
 		{
 			this.lock.toString(prefix, buffer);
 		}
-		buffer.append(Formatting.Statements.syncEnd);
+
+		if (Formatting.getBoolean("sync.close_paren.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(')');
+
+		if (this.action == null)
+		{
+			return;
+		}
+
+		if (Util.formatStatementList(prefix, buffer, this.action))
+		{
+			return;
+		}
+
+		String valuePrefix = Formatting.getIndent("sync.indent", prefix);
+
+		if (Formatting.getBoolean("sync.close_paren.newline_after"))
+		{
+			buffer.append('\n').append(valuePrefix);
+		}
+		else if (Formatting.getBoolean("sync.close_paren.space_after"))
+		{
+			buffer.append(' ');
+		}
+
 		this.action.toString(prefix, buffer);
 	}
 }

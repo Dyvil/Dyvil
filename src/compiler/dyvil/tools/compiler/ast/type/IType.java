@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -32,6 +28,10 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
@@ -252,10 +252,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!type.isResolved())
-		{
-			return value;
-		}
 		if (type.hasTypeVariables())
 		{
 			type = type.getConcreteType(typeContext);
@@ -265,6 +261,10 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (!this.isResolved())
+		{
+			return value;
+		}
 		return value.withType(this, typeContext, markers, context);
 	}
 	
@@ -297,15 +297,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * @return
 	 */
 	boolean hasTypeVariables();
-	
-	/**
-	 * Returns a copy of this type with all type variables replaced.
-	 *
-	 * @param typeVariables
-	 * 		the type variables
-	 *
-	 * @return
-	 */
+
 	IType getConcreteType(ITypeContext context);
 	
 	void inferTypes(IType concrete, ITypeContext typeContext);

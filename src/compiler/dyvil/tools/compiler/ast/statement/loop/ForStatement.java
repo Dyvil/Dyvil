@@ -13,6 +13,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -20,22 +21,22 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ForStatement implements IStatement, IDefaultContext, ILoop
 {
-	public static final Name	$forStart	= Name.getQualified("$forStart");
-	public static final Name	$forUpdate	= Name.getQualified("$forCondition");
-	public static final Name	$forEnd		= Name.getQualified("$forEnd");
+	public static final Name $forStart  = Name.getQualified("$forStart");
+	public static final Name $forUpdate = Name.getQualified("$forCondition");
+	public static final Name $forEnd    = Name.getQualified("$forEnd");
 	
-	protected ICodePosition	position;
-	protected Variable		variable;
+	protected ICodePosition position;
+	protected Variable      variable;
 	
-	protected IValue	condition;
-	protected IValue	update;
+	protected IValue condition;
+	protected IValue update;
 	
 	protected IValue action;
 	
 	// Metadata
-	protected Label	startLabel;
-	protected Label	updateLabel;
-	protected Label	endLabel;
+	protected Label startLabel;
+	protected Label updateLabel;
+	protected Label endLabel;
 	
 	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
 	{
@@ -322,28 +323,66 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.forStart);
+		buffer.append("for");
+		Formatting.appendSeparator(buffer, "for.open_paren", '(');
+
 		if (this.variable != null)
 		{
 			this.variable.toString(prefix, buffer);
+
+			if (Formatting.getBoolean("for.variable_semicolon.space_before"))
+			{
+				buffer.append(' ');
+			}
 		}
+
 		buffer.append(';');
 		if (this.condition != null)
 		{
-			buffer.append(' ');
+			if (Formatting.getBoolean("for.variable_semicolon.space_after"))
+			{
+				buffer.append(' ');
+			}
+
 			this.condition.toString(prefix, buffer);
+
+			if (Formatting.getBoolean("for.condition_semicolon.space_before"))
+			{
+				buffer.append(' ');
+			}
 		}
+
 		buffer.append(';');
+
 		if (this.update != null)
 		{
-			buffer.append(' ');
+			if (Formatting.getBoolean("for.condition_semicolon.space_after"))
+			{
+				buffer.append(' ');
+			}
+
 			this.update.toString(prefix, buffer);
 		}
-		buffer.append(Formatting.Statements.forEnd);
-		
-		if (this.action != null)
+
+		if (Formatting.getBoolean("for.close_paren.space_before"))
 		{
-			this.action.toString(prefix, buffer);
+			buffer.append(' ');
+		}
+		buffer.append(')');
+		
+		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
+		{
+			String actionPrefix = Formatting.getIndent("for.indent", prefix);
+			if (Formatting.getBoolean("for.close_paren.newline_after"))
+			{
+				buffer.append('\n').append(actionPrefix);
+			}
+			else if (Formatting.getBoolean("for.close_paren.space_after"))
+			{
+				buffer.append(' ');
+			}
+
+			this.action.toString(actionPrefix, buffer);
 		}
 	}
 }

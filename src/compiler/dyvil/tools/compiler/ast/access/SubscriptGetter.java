@@ -59,7 +59,8 @@ public class SubscriptGetter extends AbstractCall
 			
 			IArguments oldArgs = call.getArguments();
 			
-			ArrayExpr array = new ArrayExpr(this.position, ((ArgumentList) this.arguments).getValues(), this.arguments.size());
+			ArrayExpr array = new ArrayExpr(this.position, ((ArgumentList) this.arguments).getValues(),
+			                                this.arguments.size());
 			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
 			
 			IValue resolvedCall = call.resolveCall(markers, context);
@@ -113,13 +114,19 @@ public class SubscriptGetter extends AbstractCall
 			this.receiver.toString(prefix, buffer);
 		}
 		
-		buffer.append('[');
+		Formatting.appendSeparator(buffer, "method.subscript.open_bracket", '[');
+
 		int count = this.arguments.size();
 		this.arguments.getValue(0, null).toString(prefix, buffer);
 		for (int i = 1; i < count; i++)
 		{
-			buffer.append(Formatting.Expression.arraySeperator);
+			Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
 			this.arguments.getValue(i, null).toString(prefix, buffer);
+		}
+
+		if (Formatting.getBoolean("method.subscript.close_bracket.space_before"))
+		{
+			buffer.append(' ');
 		}
 		buffer.append(']');
 	}

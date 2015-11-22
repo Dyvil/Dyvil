@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.File;
-import java.io.IOException;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
@@ -41,6 +36,11 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.IOException;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
@@ -743,7 +743,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			buffer.append(prefix);
 			this.packageDeclaration.toString(prefix, buffer);
 			buffer.append(";\n");
-			if (Formatting.Package.newLine)
+			if (Formatting.getBoolean("package.newline"))
 			{
 				buffer.append('\n');
 			}
@@ -768,7 +768,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				this.imports[i].toString(prefix, buffer);
 				buffer.append(";\n");
 			}
-			if (Formatting.Import.newLine)
+			if (Formatting.getBoolean("import.newline"))
 			{
 				buffer.append('\n');
 			}
@@ -782,7 +782,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				this.usings[i].toString(prefix, buffer);
 				buffer.append(";\n");
 			}
-			if (Formatting.Import.newLine)
+			if (Formatting.getBoolean("import.newline"))
 			{
 				buffer.append('\n');
 			}
@@ -796,7 +796,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				entry.getValue().toString(buffer);
 				buffer.append(";\n");
 			}
-			if (Formatting.Import.newLine)
+			if (Formatting.getBoolean("import.newline"))
 			{
 				buffer.append('\n');
 			}
@@ -810,7 +810,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				entry.getValue().toString("", buffer);
 				buffer.append(";\n");
 			}
-			if (Formatting.Import.newLine)
+			if (Formatting.getBoolean("import.newline"))
 			{
 				buffer.append('\n');
 			}

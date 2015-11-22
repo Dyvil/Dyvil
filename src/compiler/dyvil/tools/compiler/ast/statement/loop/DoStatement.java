@@ -13,6 +13,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -20,17 +21,17 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class DoStatement extends AbstractValue implements IStatement, ILoop
 {
-	private static final Name	$doStart		= Name.getQualified("$doStart");
-	private static final Name	$doCondition	= Name.getQualified("$doCondition");
-	private static final Name	$doEnd			= Name.getQualified("$doEnd");
+	private static final Name $doStart     = Name.getQualified("$doStart");
+	private static final Name $doCondition = Name.getQualified("$doCondition");
+	private static final Name $doEnd       = Name.getQualified("$doEnd");
 	
-	protected IValue	action;
-	protected IValue	condition;
+	protected IValue action;
+	protected IValue condition;
 	
 	// Metadata
-	private Label	startLabel;
-	private Label	conditionLabel;
-	private Label	endLabel;
+	private Label startLabel;
+	private Label conditionLabel;
+	private Label endLabel;
 	
 	public DoStatement(ICodePosition position)
 	{
@@ -231,19 +232,43 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.doStart);
-		if (this.action != null)
+		buffer.append("do");
+
+		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
 		{
-			buffer.append(' ');
+			String actionPrefix = Formatting.getIndent("do.indent", prefix);
+			if (Formatting.getBoolean("do.newline_after"))
+			{
+				buffer.append('\n').append(actionPrefix);
+			}
+			else
+			{
+				buffer.append(' ');
+			}
+
 			this.action.toString(prefix, buffer);
 		}
 		
 		if (this.condition != null)
 		{
-			buffer.append(' ');
-			buffer.append(Formatting.Statements.doWhile);
+			if (Formatting.getBoolean("do.while.newline_before"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else if (Formatting.getBoolean("do.while.space_before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append("while");
+
+			Formatting.appendSeparator(buffer, "while.open_paren", '(');
 			this.condition.toString(prefix, buffer);
-			buffer.append(Formatting.Statements.doEnd);
+
+			if (Formatting.getBoolean("while.close_paren.space_before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append(')');
 		}
 	}
 }
