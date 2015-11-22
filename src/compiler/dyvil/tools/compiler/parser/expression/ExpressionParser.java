@@ -159,11 +159,9 @@ public final class ExpressionParser extends Parser
 				this.value = new DoubleValue(token.raw(), token.doubleValue());
 				this.mode = ACCESS;
 				return;
-			case DyvilSymbols.ELLIPSIS:
+			case DyvilSymbols.WILDCARD:
 				this.value = new WildcardValue(token.raw());
 				this.mode = ACCESS;
-				return;
-			case DyvilSymbols.WILDCARD:
 				return;
 			case BaseSymbols.OPEN_PARENTHESIS:
 				IToken next = token.next();

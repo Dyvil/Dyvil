@@ -20,13 +20,13 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 {
 	protected ICodePosition position;
 	
-	protected IValue		receiver;
-	protected IArguments	arguments	= EmptyArguments.INSTANCE;
-	protected GenericData	genericData;
+	protected IValue receiver;
+	protected IArguments arguments = EmptyArguments.INSTANCE;
+	protected GenericData genericData;
 	
 	// Metadata
-	protected IMethod	method;
-	protected IType		type;
+	protected IMethod method;
+	protected IType   type;
 	
 	@Override
 	public ICodePosition getPosition()
@@ -154,7 +154,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 			this.genericData.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveReceiver(MarkerList markers, IContext context)
 	{
@@ -188,7 +188,8 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 				data = this.getGenericData();
 			}
 			
-			this.receiver = this.method.checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
+			this.receiver = this.method
+					.checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
 		}
 		
 		this.type = null;
@@ -216,7 +217,8 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		
 		if (this.method != null)
 		{
-			this.method.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
+			this.method
+					.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 		}
 		
 		this.arguments.check(markers, context);

@@ -30,9 +30,9 @@ import java.io.IOException;
 
 public final class WildcardType implements IRawType, ITyped
 {
-	public ICodePosition	position;
-	protected IType			bound;
-	protected Variance		variance;
+	public    ICodePosition position;
+	protected IType         bound;
+	protected Variance      variance;
 	
 	public WildcardType()
 	{
@@ -349,7 +349,8 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(), "Ldyvil/reflect/Variance;");
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(),
+		                      "Ldyvil/reflect/Variance;");
 		
 		if (this.bound != null)
 		{
@@ -361,7 +362,7 @@ public final class WildcardType implements IRawType, ITyped
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/WildcardType", "apply",
-				"(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/types/WildcardType;", false);
+		                       "(Ldyvil/reflect/Variance;Ldyvil/lang/Type;)Ldyvil/reflect/types/WildcardType;", false);
 	}
 	
 	@Override
@@ -410,8 +411,11 @@ public final class WildcardType implements IRawType, ITyped
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append('_');
-		this.variance.appendInfix(sb);
-		sb.append(this.bound);
+		if (this.bound != null)
+		{
+			this.variance.appendInfix(sb);
+			sb.append(this.bound);
+		}
 		return sb.toString();
 	}
 	
@@ -424,12 +428,6 @@ public final class WildcardType implements IRawType, ITyped
 			this.variance.appendInfix(buffer);
 			this.bound.toString(prefix, buffer);
 		}
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.bound == null ? false : this.bound.equals(obj);
 	}
 	
 	@Override

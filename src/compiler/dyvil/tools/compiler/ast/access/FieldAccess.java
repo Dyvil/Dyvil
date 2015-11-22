@@ -57,6 +57,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		this.position = position;
 		this.receiver = instance;
 		this.field = field;
+		this.name = field.getName();
 	}
 	
 	@Override

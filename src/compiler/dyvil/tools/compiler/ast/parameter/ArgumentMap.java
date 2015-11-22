@@ -19,9 +19,9 @@ import java.util.NoSuchElementException;
 
 public final class ArgumentMap implements IArguments, IValueMap
 {
-	private Name[]		keys	= new Name[3];
-	private IValue[]	values	= new IValue[3];
-	private int			size;
+	private Name[]   keys   = new Name[3];
+	private IValue[] values = new IValue[3];
+	private int size;
 	
 	@Override
 	public Iterator<IValue> iterator()
@@ -153,6 +153,12 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
+		if (param == null)
+		{
+			this.values[index] = value;
+			return;
+		}
+
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
@@ -167,6 +173,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
+		if (param == null)
+		{
+			return this.values[index];
+		}
+
 		return this.getValue(param.getName());
 	}
 	

@@ -107,8 +107,6 @@ public class Closure extends StatementList
 				return le;
 			}
 			}
-			
-			return null;
 		}
 		
 		super.resolve(markers, context1);
