@@ -32,8 +32,7 @@ public final class WildcardImport extends Import
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context,
-			boolean using)
+	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
 		if (this.parent != null)
 		{
@@ -50,8 +49,7 @@ public final class WildcardImport extends Import
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(I18n.createMarker(this.position,
-						"using.wildcard.invalid"));
+				markers.add(I18n.createMarker(this.position, "using.wildcard.invalid"));
 				return;
 			}
 			
@@ -61,8 +59,7 @@ public final class WildcardImport extends Import
 		
 		if (!(context instanceof Package))
 		{
-			markers.add(I18n.createMarker(this.position,
-					"import.wildcard.invalid"));
+			markers.add(I18n.createMarker(this.position, "import.wildcard.invalid"));
 			return;
 		}
 		this.context = context;
@@ -108,8 +105,7 @@ public final class WildcardImport extends Import
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance,
-			Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.context == null)
 		{

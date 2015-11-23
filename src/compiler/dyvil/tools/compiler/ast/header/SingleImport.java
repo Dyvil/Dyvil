@@ -92,7 +92,7 @@ public final class SingleImport extends Import
 				return;
 			}
 			
-			this.methods = new ArrayList();
+			this.methods = new ArrayList<>();
 			int len = body.methodCount();
 			for (int i = 0; i < len; i++)
 			{
@@ -178,7 +178,9 @@ public final class SingleImport extends Import
 		}
 		for (IMethod method : this.methods)
 		{
-			float match = method.getSignatureMatch(name, instance, arguments);
+			Name usedName = method.getName() == this.alias ? this.alias : this.name;
+
+			float match = method.getSignatureMatch(usedName, instance, arguments);
 			if (match > 0)
 			{
 				list.add(method, match);

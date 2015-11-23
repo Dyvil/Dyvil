@@ -4,3 +4,6 @@ using	dyvil.math.MathUtils._
 import	dyvil.math.Complex
 
 import	java.math.{ BigInteger, BigDecimal }
+
+using	java.math.BigInteger.valueOf => apply
+using	java.math.BigDecimal.valueOf => apply
