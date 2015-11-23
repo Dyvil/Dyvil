@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import java.util.Iterator;
-
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -23,6 +21,8 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.util.Iterator;
+
 public final class ArrayExpr implements IValue, IValueList
 {
 	public static final class Types
@@ -37,12 +37,12 @@ public final class ArrayExpr implements IValue, IValueList
 	
 	protected ICodePosition position;
 	
-	protected IValue[]	values;
-	protected int		valueCount;
+	protected IValue[] values;
+	protected int      valueCount;
 	
 	// Metadata
-	protected IType	arrayType;
-	protected IType	elementType;
+	protected IType arrayType;
+	protected IType elementType;
 	
 	public ArrayExpr()
 	{
@@ -176,7 +176,8 @@ public final class ArrayExpr implements IValue, IValueList
 			}
 			if (arrayType.classEquals(dyvil.tools.compiler.ast.type.Types.ITERABLE))
 			{
-				return new LiteralConversion(this, getArrayToIterable()).withType(arrayType, typeContext, markers, context);
+				return new LiteralConversion(this, getArrayToIterable())
+						.withType(arrayType, typeContext, markers, context);
 			}
 			if (iclass != dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS)
 			{
@@ -222,14 +223,16 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return ARRAY_TO_ITERABLE;
 		}
-		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.Types.getObjectArray().getBody().getMethod(Name.getQualified("toIterable"));
+		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.Types.getObjectArray().getBody()
+		                                                              .getMethod(Name.getQualified("toIterable"));
 	}
 	
 	private boolean isConvertibleFrom(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		return iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS || iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null
-				|| dyvil.tools.compiler.ast.type.Types.ITERABLE.isSuperClassOf(type);
+		return iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS
+				|| iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || dyvil.tools.compiler.ast.type.Types.ITERABLE
+				.isSuperClassOf(type);
 	}
 	
 	@Override
@@ -474,13 +477,29 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		if (this.valueCount == 0)
 		{
-			buffer.append(Formatting.Expression.emptyArray);
+			if (Formatting.getBoolean("array.empty.space_between"))
+			{
+				buffer.append("[ ]");
+			}
+			else
+			{
+				buffer.append("[]");
+			}
+			return;
 		}
-		else
+
+		buffer.append('[');
+		if (Formatting.getBoolean("array.open_bracket.space_after"))
 		{
-			buffer.append(Formatting.Expression.arrayStart);
-			Util.astToString(prefix, this.values, this.valueCount, Formatting.Expression.arraySeperator, buffer);
-			buffer.append(Formatting.Expression.arrayEnd);
+			buffer.append(' ');
 		}
+
+		Util.astToString(prefix, this.values, this.valueCount, Formatting.getSeparator("array.separator", ','), buffer);
+
+		if (Formatting.getBoolean("array.close_bracket.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(']');
 	}
 }

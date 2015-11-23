@@ -284,9 +284,9 @@ public final class MethodCall extends AbstractCall implements INamed
 		if (this.receiver != null)
 		{
 			this.receiver.toString(prefix, buffer);
-			if (this.dotless && !Formatting.Method.useJavaFormat)
+			if (this.dotless && !Formatting.getBoolean("method.access.java_format"))
 			{
-				buffer.append(Formatting.Method.dotlessSeperator);
+				buffer.append(' ');
 			}
 			else if (this.genericData == null)
 			{

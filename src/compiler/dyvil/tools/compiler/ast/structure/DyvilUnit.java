@@ -1,19 +1,18 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.io.File;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.sources.FileType;
 import dyvil.tools.parsing.CodeFile;
 import dyvil.tools.parsing.Name;
+
+import java.io.File;
 
 public class DyvilUnit extends DyvilHeader
 {
@@ -266,10 +265,6 @@ public class DyvilUnit extends DyvilHeader
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].toString(prefix, buffer);
-			if (Formatting.Class.newLine)
-			{
-				buffer.append('\n');
-			}
 		}
 	}
 }

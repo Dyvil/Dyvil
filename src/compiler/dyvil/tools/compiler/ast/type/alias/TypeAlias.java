@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type.alias;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -12,6 +8,10 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class TypeAlias implements ITypeAlias
 {
@@ -122,7 +122,8 @@ public class TypeAlias implements ITypeAlias
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("type ").append(this.name).append(Formatting.Field.keyValueSeperator);
+		buffer.append("type ").append(this.name);
+		Formatting.appendSeparator(buffer, "field.assignment", '=');
 		this.type.toString(prefix, buffer);
 	}
 }

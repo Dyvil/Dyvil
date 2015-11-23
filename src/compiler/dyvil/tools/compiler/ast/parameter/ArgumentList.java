@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Iterator;
-
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -16,10 +14,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Iterator;
+
 public final class ArgumentList implements IArguments, IValueList
 {
-	private IValue[]	values;
-	private int			size;
+	private IValue[] values;
+	private int      size;
 	
 	private boolean varargs;
 	
@@ -168,6 +168,11 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
+		if (index >= this.size)
+		{
+			return null;
+		}
+
 		return this.values[index];
 	}
 	
@@ -212,16 +217,16 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType type = param.getActualType();
+		IType type = param.getActualType().getParameterType();
 		IValue value = this.values[index];
-		IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
-		if (value1 == null)
+		IValue typed = IType.convertValue(value, type, typeContext, markers, context);
+		if (typed == null)
 		{
 			Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", param.getName());
 		}
 		else
 		{
-			this.values[index] = value1;
+			this.values[index] = typed;
 		}
 	}
 	
@@ -245,7 +250,8 @@ public final class ArgumentList implements IArguments, IValueList
 				this.varargs = true;
 				return;
 			}
-			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type", param.getName());
+			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type",
+			                     param.getName());
 			return;
 		}
 		
@@ -257,7 +263,8 @@ public final class ArgumentList implements IArguments, IValueList
 			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
 			if (value1 == null)
 			{
-				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type", param.getName());
+				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type",
+				                     param.getName());
 			}
 			else
 			{
@@ -342,7 +349,20 @@ public final class ArgumentList implements IArguments, IValueList
 			writer.writeInsn(opcode);
 		}
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

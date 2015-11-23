@@ -1,7 +1,5 @@
 package dyvil.tools.repl;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
@@ -38,26 +36,28 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
 	private static final String REPL$CLASSES = "repl$classes/";
 	
-	protected DyvilREPL		repl;
-	protected String		currentCode;
-	private int				classIndex;
-	private String			className;
-	protected MarkerList	markers	= new MarkerList();
+	protected DyvilREPL repl;
+	protected String    currentCode;
+	private   int       classIndex;
+	private   String    className;
+	protected MarkerList markers = new MarkerList();
 	
-	public Map<Name, IField>	fields	= new IdentityHashMap();
-	public List<IMethod>		methods	= new ArrayList();
-	public Map<Name, IClass>	classes	= new IdentityHashMap();
+	public Map<Name, IField> fields  = new IdentityHashMap<>();
+	public List<IMethod>     methods = new ArrayList<>();
+	public Map<Name, IClass> classes = new IdentityHashMap<>();
 	
-	protected List<IClassCompilable>	compilableList	= new ArrayList();
-	protected List<IClassCompilable>	innerClassList	= new ArrayList();
+	protected List<IClassCompilable> compilableList = new ArrayList<>();
+	protected List<IClassCompilable> innerClassList = new ArrayList<>();
 	
 	private IClass memberClass;
 	
-	private Map<String, AtomicInteger> resultIndexes = new HashMap();
+	private Map<String, AtomicInteger> resultIndexes = new HashMap<>();
 	
 	public REPLContext(DyvilREPL repl)
 	{
@@ -72,22 +72,26 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		this.cleanup();
 	}
 	
-	protected boolean reportErrors()
+	protected boolean hasErrors()
+	{
+		return this.markers.getErrors() > 0;
+	}
+
+	protected void reportErrors()
 	{
 		if (this.markers.isEmpty())
 		{
-			return false;
+			return;
 		}
+
 		StringBuilder buf = new StringBuilder();
 		this.markers.sort();
 		for (Marker m : this.markers)
 		{
 			m.log(this.currentCode, buf);
 		}
-		
+
 		System.err.println(buf.toString());
-		
-		return this.markers.getErrors() > 0;
 	}
 	
 	private void compileInnerClasses()
@@ -114,7 +118,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		field.checkTypes(this.markers, this);
 		field.check(this.markers, this);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return false;
 		}
@@ -202,7 +206,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void setValue(IValue value)
 	{
-		REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, value, this.className, Modifiers.FINAL);
+		REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, value, this.className,
+		                                      Modifiers.FINAL);
 		this.memberClass = this.getREPLClass(field);
 		
 		value.resolveTypes(this.markers, this);
@@ -231,7 +236,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		value.checkTypes(this.markers, this);
 		value.check(this.markers, this);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -273,7 +278,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		declaration.resolveTypes(this.markers, this, false);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -287,7 +292,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		declaration.resolveTypes(this.markers, this, true);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -301,7 +306,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		component.resolve(this.markers);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -315,7 +320,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
 		typeAlias.resolve(this.markers, this);
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -338,7 +343,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		catch (ClassNotFoundException ex)
 		{
-		
+
 		}
 		
 		// Run the usual phases
@@ -347,7 +352,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		iclass.checkTypes(this.markers, this);
 		iclass.check(this.markers, this);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -405,8 +410,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addField(IField field)
 	{
-		REPLVariable var = new REPLVariable(this, field.getPosition(), field.getName(), field.getType(), field.getValue(), this.className,
-				field.getModifiers());
+		REPLVariable var = new REPLVariable(this, field.getPosition(), field.getName(), field.getType(),
+		                                    field.getValue(), this.className, field.getModifiers());
 		var.setAnnotations(field.getAnnotations());
 		this.memberClass = this.getREPLClass(var);
 		
@@ -427,7 +432,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		property.checkTypes(this.markers, this);
 		property.check(this.markers, this);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -455,7 +460,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		REPLMemberClass iclass = this.getREPLClass(method);
 		
 		method.resolveTypes(this.markers, this);
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}
@@ -464,7 +469,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		method.checkTypes(this.markers, this);
 		method.check(this.markers, this);
 		
-		if (this.reportErrors())
+		if (this.hasErrors())
 		{
 			return;
 		}

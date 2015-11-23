@@ -33,57 +33,61 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated
 	
 	IType getDefaultType();
 	
+	IType getParameterType();
+
 	// Upper Bounds
-	
+
 	int upperBoundCount();
-	
+
 	void setUpperBound(int index, IType bound);
-	
+
 	void addUpperBound(IType bound);
-	
+
 	IType getUpperBound(int index);
-	
+
 	IType[] getUpperBounds();
-	
+
 	void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath);
-	
+
 	// Lower Bounds
-	
+
 	void setLowerBound(IType bound);
-	
+
 	IType getLowerBound();
-	
+
 	// Super Types
-	
+
 	IClass getTheClass();
-	
-	boolean isSuperTypeOf(IType type);
-	
+
+	boolean isAssignableFrom(IType type);
+
+	boolean isSuperClassOf(IType type);
+
 	int getSuperTypeDistance(IType superType);
-	
+
 	// Resolution
-	
+
 	IDataMember resolveField(Name name);
-	
+
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
-	
+
 	// Phases
-	
+
 	void resolveTypes(MarkerList markers, IContext context);
-	
+
 	void resolve(MarkerList markers, IContext context);
-	
+
 	void checkTypes(MarkerList markers, IContext context);
-	
+
 	void check(MarkerList markers, IContext context);
-	
+
 	void foldConstants();
-	
+
 	void cleanup(IContext context, IClassCompilableList compilableList);
-	
+
 	// Compilation
-	
+
 	void appendSignature(StringBuilder buffer);
-	
+
 	void write(TypeAnnotatableVisitor visitor);
 }

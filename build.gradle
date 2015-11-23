@@ -9,11 +9,11 @@ apply plugin: 'application'
 
 group					= 'dyvil-team'
 
-version					= '0.9.0'
+version					= '0.10.0'
 
-String libraryVersion	= '0.8.0'
-String compilerVersion	= '0.9.0'
-String replVersion		= '0.5.0'
+String libraryVersion	= '0.9.0'
+String compilerVersion	= '0.10.0'
+String replVersion		= '0.6.0'
 String dpfVersion		= '0.2.1'
 
 boolean nightly			= false
@@ -48,24 +48,11 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
-	main {
-		resources {
-			srcDir "${buildDir}/dyvilbin"
-			srcDir "src/resources"
-
-			include resourceFilters
-		}
-		return
-	}
-
 	library {
 		java {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
-
-			compileClasspath += main.resources
-			runtimeClasspath += main.resources
 		}
 	}
 	
@@ -83,8 +70,14 @@ sourceSets {
 			srcDir 'src/compiler'
 
 			compileClasspath += library.output
-			runtimeClasspath += library.output + main.resources
+			runtimeClasspath += library.output + compiler.resources
 		}
+		resources {
+			srcDir 'src/resources'
+
+			include resourceFilters
+		}
+		return
 	}
 	
 	repl {
@@ -92,7 +85,7 @@ sourceSets {
 			srcDir 'src/repl'
 
 			compileClasspath += library.output + compiler.output
-			runtimeClasspath += library.output + compiler.output + main.resources
+			runtimeClasspath += library.output + compiler.output + compiler.resources
 		}
 	}
 }
@@ -109,6 +102,10 @@ repositories {
 
 dependencies {
 	testCompile 'junit:junit:4.12'
+
+	runtime files("$buildDir/dyvilbin") {
+		builtBy 'compileLibraryDyvil'
+	}
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
@@ -193,17 +190,17 @@ task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLi
 	// Required to make UP-TO-DATE work
 	outputs.upToDateSpec = new AndSpec()
 
-	String src = "src/dyvil/library/"
-	String bin = "dyvilbin"
-	
+	String src = "build/src/dyvil/library"
+	String bin = "build/dyvilbin"
+
 	// All Dyvil Class and Header files
-	inputs.dir "${buildDir}/${src}"
+	inputs.dir src
 	// All possible Output Files (.class, .dyo)
-	outputs.dir "${buildDir}/${bin}"
+	outputs.dir bin
 	
 	main = 'dyvil.tools.compiler.DyvilCompiler'
 	classpath = sourceSets.compiler.runtimeClasspath
-	args = [ "source_dir=build/${src}", "output_dir=build/${bin}", 'compile' ]
+	args = [ "source_dir=${src}", "output_dir=${bin}", 'compile' ]
 }
 
 // ---------------------------------------- Build Tasks ----------------------------------------
@@ -214,7 +211,10 @@ task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLi
 task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
 	from sourceSets.main.resources
 	from sourceSets.library.output
-	from sourceSets.library.resources
+
+	from ("$buildDir/dyvilbin") {
+		include resourceFilters
+	}
 	
 	archiveName = "dyvil-library-${libraryVersion}.jar"
 }
@@ -252,15 +252,16 @@ task buildREPL(type: Jar, dependsOn: 'replClasses') {
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
 task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses', 'dpfClasses' ]) {
-	from sourceSets.main.resources
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	from sourceSets.compiler.output
 	from sourceSets.compiler.resources
 	from sourceSets.repl.output
 	from sourceSets.dpf.output
-	
-	include '**/*.*'
+
+	from("$buildDir/dyvilbin") {
+		include resourceFilters
+	}
 
 	archiveName = "dyvil-${version}.jar"
 	
@@ -272,6 +273,8 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 // ---------------------------------------- Version Files ----------------------------------------
 
 task prepareRelease(type: Copy) {
+	outputs.upToDateWhen { return false }
+
 	from 'versions/'
 	
 	if (nightly) {
@@ -311,7 +314,6 @@ task wrapper(type: Wrapper) {
  * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
  */
 clean.doLast {
-	println "Re-recreating build/dyilbin"
 	file('build/dyvilbin').mkdirs()
 }
 
@@ -324,5 +326,5 @@ task cleanTemps(type: Delete) {
 	delete file("${buildDir}/dependency-cache/")
 	delete file("${buildDir}/tmp/")
 	delete file("${buildDir}/resources/")
-	delete fileTree("${buildDir}/dyvilbin/")
+	delete fileTree("$buildDir/dyvilbin")
 }

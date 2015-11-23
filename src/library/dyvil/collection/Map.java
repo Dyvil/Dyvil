@@ -1,5 +1,13 @@
 package dyvil.collection;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
@@ -9,15 +17,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.MapConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.tuple.Tuple2;
-import dyvil.util.None;
-import dyvil.util.Option;
-import dyvil.util.Some;
 
 @NilConvertible(methodName = "fromNil")
 @ArrayConvertible
@@ -39,7 +38,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return ImmutableMap.apply(entry);
 	}
 	
-	static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
+	static <K, V> ImmutableMap<K, V> apply(
+			Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
 	}
@@ -63,7 +63,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Returns true if and if only this map contains no mappings. The standard
 	 * implementation defines a map as empty if it's size as calculated by
 	 * {@link #size()} is exactly {@code 0}.
-	 * 
+	 *
 	 * @return true, if this map contains no mappings
 	 */
 	default boolean isEmpty()
@@ -95,7 +95,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Creates and returns an {@link Iterator} over the mappings of this map,
 	 * packed in {@linkplain Entry Tuples} containing the key as their first
 	 * value and the value as their second value.
-	 * 
+	 *
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
@@ -105,7 +105,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Creates and returns an {@link Spliterator} over the mappings of this map,
 	 * packed in {@linkplain Entry Tuples} containing the key as their first
 	 * value and the value as their second value.
-	 * 
+	 *
 	 * @return an iterator over the mappings of this map
 	 */
 	@Override
@@ -225,7 +225,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	default void forEachKey(Consumer<? super K> action)
 	{
-		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
+		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext(); )
 		{
 			action.accept(iterator.next());
 		}
@@ -233,7 +233,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	default void forEachValue(Consumer<? super V> action)
 	{
-		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
+		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext(); )
 		{
 			action.accept(iterator.next());
 		}
@@ -262,13 +262,27 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 		return false;
 	}
+
+	default Entry<K, V> find(BiPredicate<? super K, ? super V> condition)
+	{
+		for (Entry<K, V> entry : this)
+		{
+			if (condition.test(entry.getKey(), entry.getValue()))
+			{
+				return entry;
+			}
+		}
+
+		return null;
+	}
 	
 	/**
 	 * Returns true if and if only this map contains a mapping for the given
 	 * {@code key}.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
+	 *
 	 * @return true, if this map contains a mapping for the key
 	 */
 	default boolean $qmark$at(Object key)
@@ -279,11 +293,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the
 	 * given {@code key} to the given {@code value}.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
 	 * @param value
-	 *            the value
+	 * 		the value
+	 *
 	 * @return true, if this map contains a mapping for the key and the value
 	 */
 	default boolean $qmark(Object key, Object value)
@@ -297,9 +312,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * given by the second value of the {@code entry}. The default
 	 * implementation of this method delegates to the {@link $qmark(Object,
 	 * Object)} method.
-	 * 
+	 *
 	 * @param entry
-	 *            the entry
+	 * 		the entry
+	 *
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
 	default boolean $qmark(Entry<?, ?> entry)
@@ -310,9 +326,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Returns true if and if only this map contains a mapping to the given
 	 * {@code value}.
-	 * 
+	 *
 	 * @param value
-	 *            the value
+	 * 		the value
+	 *
 	 * @return true, if this map contains a mapping to the value
 	 */
 	default boolean $qmark$colon(Object value)
@@ -323,14 +340,16 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Returns true if and if only this map contains a mapping for the given
 	 * {@code key}.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
+	 *
 	 * @return true, if this map contains a mapping for the key
 	 */
 	default boolean containsKey(Object key)
 	{
-		for (Iterator<K> keyIterator = this.keyIterator(); keyIterator.hasNext();)
+		for (Iterator<K> keyIterator = this.keyIterator(); keyIterator
+				.hasNext(); )
 		{
 			if (Objects.equals(key, keyIterator.next()))
 			{
@@ -344,14 +363,16 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Returns true if and if only this map contains a mapping to the given
 	 * {@code value}.
-	 * 
+	 *
 	 * @param value
-	 *            the value
+	 * 		the value
+	 *
 	 * @return true, if this map contains a mapping to the value
 	 */
 	default boolean containsValue(Object value)
 	{
-		for (Iterator<V> valueIterator = this.valueIterator(); valueIterator.hasNext();)
+		for (Iterator<V> valueIterator = this.valueIterator(); valueIterator
+				.hasNext(); )
 		{
 			if (Objects.equals(value, valueIterator.next()))
 			{
@@ -365,11 +386,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Returns true if and if only this map contains a mapping that maps the
 	 * given {@code key} to the given {@code value}.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
 	 * @param value
-	 *            the value
+	 * 		the value
+	 *
 	 * @return true, if this map contains a mapping for the key and the value
 	 */
 	default boolean contains(Object key, Object value)
@@ -391,9 +413,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * given by the second value of the {@code entry}. The default
 	 * implementation of this method delegates to the {@link $qmark(Object,
 	 * Object)} method.
-	 * 
+	 *
 	 * @param entry
-	 *            the entry
+	 * 		the entry
+	 *
 	 * @return true, if this map contains the mapping represented by the entry
 	 */
 	default boolean contains(Entry<?, ?> entry)
@@ -405,9 +428,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Gets and returns the value for the given {@code key}. If no mapping for
 	 * the {@code key} exists, {@code null} is returned. This alias forwarder
 	 * for Dyvil Subscript Syntax delegates to {@link #get(Object)}.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
+	 *
 	 * @return the value
 	 */
 	default V subscript(Object key)
@@ -418,9 +442,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Gets and returns the value for the given {@code key}. If no mapping for
 	 * the {@code key} exists, {@code null} is returned.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
+	 *
 	 * @return the value
 	 */
 	V get(Object key);
@@ -429,11 +454,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Gets and returns an optional value for the given {@code key}. If no
 	 * mapping for the {@code key} exists, {@link None} is returned, otherwise,
 	 * the mapped value is wrapped in a {@link Some}.
-	 * 
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
+	 *
 	 * @return an option containing the value, or None if not mapping exists for
-	 *         the key
+	 * the key
 	 */
 	Option<V> getOption(Object key);
 	
@@ -441,43 +467,46 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	/**
 	 * Returns a map that contains all entries of this map plus the new entry
-	 * specified by {@code key} and {@code value} as if it were added by
-	 * {@link #subscript_$eq(Object, Object)}. If the {@code key} is already
-	 * present in this map, a map is returned that uses the given {@code value}
-	 * instead of the previous value for the {@code key}, and that has the same
-	 * size as this map.
-	 * 
+	 * specified by {@code key} and {@code value} as if it were added by {@link
+	 * #subscript_$eq(Object, Object)}. If the {@code key} is already present in
+	 * this map, a map is returned that uses the given {@code value} instead of
+	 * the previous value for the {@code key}, and that has the same size as
+	 * this map.
+	 *
 	 * @param key
-	 *            the key
+	 * 		the key
 	 * @param value
-	 *            the value
+	 * 		the value
+	 *
 	 * @return a map that contains all entries of this map plus the new entry
 	 */
 	Map<K, V> $plus(K key, V value);
 	
 	/**
-	 * Returns a map that contains all entries of this map plus the new
-	 * {@code entry}, as if it were added by
-	 * {@link #subscript_$eq(Object, Object)}. If the {@code key} is already
-	 * present in this map, a map is returned that uses the given {@code value}
-	 * instead of the previous value for the {@code key}, and that has the same
-	 * size as this map.
-	 * 
-	 * @see #$plus(Object, Object)
+	 * Returns a map that contains all entries of this map plus the new {@code
+	 * entry}, as if it were added by {@link #subscript_$eq(Object, Object)}. If
+	 * the {@code key} is already present in this map, a map is returned that
+	 * uses the given {@code value} instead of the previous value for the {@code
+	 * key}, and that has the same size as this map.
+	 *
 	 * @param entry
-	 *            the entry
+	 * 		the entry
+	 *
 	 * @return a map that contains all entries of this map plus the new entry
+	 *
+	 * @see #$plus(Object, Object)
 	 */
 	Map<K, V> $plus(Entry<? extends K, ? extends V> entry);
 	
 	/**
 	 * Returns a map that contains all entries of this map plus all entries of
-	 * the given {@code map}, as if they were added by
-	 * {@link #subscript_$eq(Object, Object)}. If a key in the given map is
-	 * already present in this map, a map is returned that uses the value from
-	 * the given {@code map} for that key.
-	 * 
+	 * the given {@code map}, as if they were added by {@link
+	 * #subscript_$eq(Object, Object)}. If a key in the given map is already
+	 * present in this map, a map is returned that uses the value from the given
+	 * {@code map} for that key.
+	 *
 	 * @param map
+	 *
 	 * @return
 	 */
 	Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
@@ -496,24 +525,28 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * map contains the exact entry, which means both key and value have to
 	 * match. If entries should be removed based on keys only (ignoring values),
 	 * {@link #$minus$minus(Collection) --} should be used instead.
-	 * 
+	 *
 	 * @param map
-	 *            the map whose entries should not be present in the resulting
-	 *            map
+	 * 		the map whose entries should not be present in the resulting map
+	 *
 	 * @return a map that contains all entries of this map minus the entries of
-	 *         the given map
+	 * the given map
 	 */
 	Map<K, V> $minus$minus(Map<?, ?> map);
 	
 	Map<K, V> $minus$minus(Collection<?> keys);
 	
-	<NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
+	<NK> Map<NK, V> keyMapped(
+			BiFunction<? super K, ? super V, ? extends NK> mapper);
 	
-	<NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
+	<NV> Map<K, NV> valueMapped(
+			BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
-	<NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	<NK, NV> Map<NK, NV> entryMapped(
+			BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
 	
-	<NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
+	<NK, NV> Map<NK, NV> flatMapped(
+			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 	
 	Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
@@ -611,9 +644,11 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
-	void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
+	void mapEntries(
+			BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
 	
-	void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
+	void flatMap(
+			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
 	
 	void filter(BiPredicate<? super K, ? super V> condition);
 	
@@ -660,7 +695,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	default void toKeyArray(int index, Object[] store)
 	{
-		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext();)
+		for (Iterator<K> iterator = this.keyIterator(); iterator.hasNext(); )
 		{
 			store[index++] = iterator.next();
 		}
@@ -687,7 +722,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	default void toValueArray(int index, Object[] store)
 	{
-		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext();)
+		for (Iterator<V> iterator = this.valueIterator(); iterator.hasNext(); )
 		{
 			store[index++] = iterator.next();
 		}
@@ -711,10 +746,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Returns the Java Collection Framework equivalent of this map. The
 	 * returned map is not a view of this one, but an exact copy. Immutable maps
 	 * should return a map that is locked for mutation, which is usually ensured
-	 * by wrapping the map with
-	 * {@link java.util.Collections#unmodifiableMap(java.util.Map)
+	 * by wrapping the map with {@link java.util.Collections#unmodifiableMap(java.util.Map)
 	 * Collections.unmodifiableMap}.
-	 * 
+	 *
 	 * @return a java collection containing the elements of this collection
 	 */
 	java.util.Map<K, V> toJava();
@@ -742,7 +776,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		while (true)
 		{
 			Entry<K, V> entry = iterator.next();
-			builder.append(entry.getKey()).append(" -> ").append(entry.getValue());
+			builder.append(entry.getKey()).append(" -> ")
+					.append(entry.getValue());
 			if (iterator.hasNext())
 			{
 				builder.append(", ");
@@ -794,21 +829,27 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 			{
 				continue;
 			}
-			int hash = (key == null ? 0 : key.hashCode()) * 31 + (value == null ? 0 : value.hashCode());
+			int hash =
+					(key == null ? 0 : key.hashCode()) * 31 + (value == null ?
+							0 :
+							value.hashCode());
 			sum += hash;
 			product *= hash;
 		}
 		return sum * 31 + product;
 	}
 	
-	default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	default String toString(String prefix, String entrySeparator,
+			String keyValueSeparator, String postfix)
 	{
 		StringBuilder builder = new StringBuilder();
-		this.toString(builder, prefix, entrySeparator, keyValueSeparator, postfix);
+		this.toString(builder, prefix, entrySeparator, keyValueSeparator,
+				postfix);
 		return builder.toString();
 	}
 	
-	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	default void toString(StringBuilder builder, String prefix,
+			String entrySeparator, String keyValueSeparator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())
@@ -819,11 +860,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		
 		Iterator<Entry<K, V>> iterator = this.iterator();
 		Entry<K, V> first = iterator.next();
-		builder.append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+		builder.append(first.getKey()).append(keyValueSeparator)
+				.append(first.getValue());
 		while (iterator.hasNext())
 		{
 			first = iterator.next();
-			builder.append(entrySeparator).append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+			builder.append(entrySeparator).append(first.getKey())
+					.append(keyValueSeparator).append(first.getValue());
 		}
 		builder.append(postfix);
 	}

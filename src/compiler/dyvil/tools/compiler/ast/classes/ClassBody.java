@@ -23,17 +23,17 @@ public class ClassBody implements IClassBody
 {
 	public IClass theClass;
 	
-	public IClass[]	classes;
-	public int		classCount;
+	public IClass[] classes;
+	public int      classCount;
 	
-	private IField[]		fields			= new IField[3];
-	private int				fieldCount;
-	private IConstructor[]	constructors	= new IConstructor[1];
-	private int				constructorCount;
-	private IMethod[]		methods			= new IMethod[3];
-	private int				methodCount;
-	private IProperty[]		properties		= new IProperty[3];
-	private int				propertyCount;
+	private IField[] fields = new IField[3];
+	private int fieldCount;
+	private IConstructor[] constructors = new IConstructor[1];
+	private int constructorCount;
+	private IMethod[] methods = new IMethod[3];
+	private int methodCount;
+	private IProperty[] properties = new IProperty[3];
+	private int propertyCount;
 	
 	protected IMethod functionalMethod;
 	
@@ -483,7 +483,8 @@ public class ClassBody implements IClassBody
 			
 			if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
 			{
-				markers.add(I18n.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(), candidate.getName(), this.theClass.getName()));
+				markers.add(I18n.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(),
+				                              candidate.getName(), this.theClass.getName()));
 			}
 		}
 	}
@@ -568,14 +569,11 @@ public class ClassBody implements IClassBody
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Class.bodyStart).append('\n');
-		String prefix1 = prefix + Formatting.Class.bodyIndent;
-		
 		if (this.classCount > 0)
 		{
 			for (int i = 0; i < this.classCount; i++)
 			{
-				this.classes[i].toString(prefix1, buffer);
+				this.classes[i].toString(prefix, buffer);
 				buffer.append('\n');
 				if (i + 1 < this.classCount)
 				{
@@ -589,8 +587,14 @@ public class ClassBody implements IClassBody
 		{
 			for (int i = 0; i < this.fieldCount; i++)
 			{
-				this.fields[i].toString(prefix1, buffer);
-				buffer.append(';').append('\n');
+				this.fields[i].toString(prefix, buffer);
+
+				if (Formatting.getBoolean("field.declaration.semicolon"))
+				{
+					buffer.append(';');
+				}
+
+				buffer.append('\n');
 			}
 			buffer.append('\n');
 		}
@@ -599,7 +603,7 @@ public class ClassBody implements IClassBody
 		{
 			for (int i = 0; i < this.constructorCount; i++)
 			{
-				this.constructors[i].toString(prefix1, buffer);
+				this.constructors[i].toString(prefix, buffer);
 				buffer.append('\n');
 				if (i + 1 < this.constructorCount)
 				{
@@ -613,7 +617,7 @@ public class ClassBody implements IClassBody
 		{
 			for (int i = 0; i < this.propertyCount; i++)
 			{
-				this.properties[i].toString(prefix1, buffer);
+				this.properties[i].toString(prefix, buffer);
 				buffer.append('\n');
 				if (i + 1 < this.propertyCount)
 				{
@@ -628,7 +632,7 @@ public class ClassBody implements IClassBody
 			for (int i = 0; i < this.methodCount; i++)
 			{
 				IMethod method = this.methods[i];
-				method.toString(prefix1, buffer);
+				method.toString(prefix, buffer);
 				buffer.append('\n');
 				if (i + 1 < this.methodCount)
 				{
@@ -636,7 +640,5 @@ public class ClassBody implements IClassBody
 				}
 			}
 		}
-		
-		buffer.append(prefix).append(Formatting.Class.bodyEnd);
 	}
 }

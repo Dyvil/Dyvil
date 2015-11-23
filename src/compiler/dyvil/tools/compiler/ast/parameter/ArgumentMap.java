@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -17,41 +14,18 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Iterator;
+
 public final class ArgumentMap implements IArguments, IValueMap
 {
-	private Name[]		keys	= new Name[3];
-	private IValue[]	values	= new IValue[3];
-	private int			size;
+	private Name[]   keys   = new Name[3];
+	private IValue[] values = new IValue[3];
+	private int size;
 	
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values, this.size);
-	}
-	
-	public Iterator<KeyValuePair> entryIterator()
-	{
-		return new Iterator<KeyValuePair>()
-		{
-			private int index;
-			
-			@Override
-			public KeyValuePair next()
-			{
-				if (this.index >= ArgumentMap.this.size)
-				{
-					throw new NoSuchElementException("ArrayIterator.next()");
-				}
-				int index = this.index++;
-				return new KeyValuePair(ArgumentMap.this.keys[index], ArgumentMap.this.values[index]);
-			}
-			
-			@Override
-			public boolean hasNext()
-			{
-				return this.index < this.index;
-			}
-		};
+		return new ArrayIterator<>(this.values, this.size);
 	}
 	
 	@Override
@@ -153,6 +127,12 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
+		if (param == null)
+		{
+			this.values[index] = value;
+			return;
+		}
+
 		Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
@@ -167,6 +147,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
+		if (param == null)
+		{
+			return this.values[index];
+		}
+
 		return this.getValue(param.getName());
 	}
 	
@@ -201,16 +186,16 @@ public final class ArgumentMap implements IArguments, IValueMap
 				continue;
 			}
 			
-			IType type = param.getActualType();
+			IType type = param.getActualType().getParameterType();
 			IValue value = this.values[i];
-			IValue value1 = IType.convertValue(value, type, typeContext, markers, context);
-			if (value1 == null)
+			IValue typed = IType.convertValue(value, type, typeContext, markers, context);
+			if (typed == null)
 			{
 				Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", key);
 			}
 			else
 			{
-				this.values[i] = value1;
+				this.values[i] = typed;
 			}
 			return;
 		}
@@ -263,7 +248,21 @@ public final class ArgumentMap implements IArguments, IValueMap
 	{
 		this.writeValue(index, param, writer);
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -329,19 +328,22 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('(');
+		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+
 		int len = this.size;
 		for (int i = 0; i < len; i++)
 		{
-			buffer.append(this.keys[i]).append(Formatting.Method.keyValueSeperator);
+			buffer.append(this.keys[i]);
+			Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
 			this.values[i].toString(prefix, buffer);
 			if (i + 1 == len)
 			{
 				break;
 			}
-			buffer.append(", ");
+			Formatting.appendSeparator(buffer, "parameters.separator", ',');
 		}
-		buffer.append(')');
+
+		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 	}
 	
 	@Override
@@ -352,11 +354,11 @@ public final class ArgumentMap implements IArguments, IValueMap
 		for (int i = 0; i < len; i++)
 		{
 			IType type = this.values[i].getType();
-			buffer.append(this.keys[i]).append(Formatting.Method.keyValueSeperator);
+			buffer.append(this.keys[i]).append(": ");
 			
 			if (type == null)
 			{
-				buffer.append("[null-value]");
+				buffer.append("_");
 			}
 			else
 			{

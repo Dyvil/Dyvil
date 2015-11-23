@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.method;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -44,14 +39,19 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+
 public class Constructor extends Member implements IConstructor
 {
 	protected IClass theClass;
 	
-	protected IParameter[]	parameters	= new MethodParameter[3];
-	protected int			parameterCount;
-	protected IType[]		exceptions;
-	protected int			exceptionCount;
+	protected IParameter[] parameters = new MethodParameter[3];
+	protected int     parameterCount;
+	protected IType[] exceptions;
+	protected int     exceptionCount;
 	
 	protected IValue value;
 	
@@ -242,7 +242,6 @@ public class Constructor extends Member implements IConstructor
 		{
 			IParameter param = this.parameters[i];
 			param.resolveTypes(markers, this);
-			param.setIndex(i);
 		}
 		
 		if (this.value != null)
@@ -318,7 +317,8 @@ public class Constructor extends Member implements IConstructor
 			return;
 		}
 		
-		this.value = Util.prependValue(new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true), this.value);
+		this.value = Util
+				.prependValue(new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true), this.value);
 	}
 	
 	@Override
@@ -654,7 +654,8 @@ public class Constructor extends Member implements IConstructor
 			{
 				gt.setType(i, Types.ANY);
 				
-				markers.add(I18n.createMarker(position, "constructor.typevar.infer", this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
+				markers.add(I18n.createMarker(position, "constructor.typevar.infer",
+				                              this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
 			}
 		}
 		
@@ -686,11 +687,8 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0)
-		{
-			Deprecation.checkDeprecation(markers, position, this, "constructor");
-		}
-		
+		Deprecation.checkAnnotations(markers, position, this, "constructor");
+
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
@@ -772,9 +770,9 @@ public class Constructor extends Member implements IConstructor
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		MethodWriter mw = new MethodWriterImpl(writer,
-				writer.visitMethod(modifiers, "<init>", this.getDescriptor(), this.getSignature(), this.getExceptions()));
-				
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(),
+		                                                                  this.getSignature(), this.getExceptions()));
+
 		mw.setThisType(this.theClass.getInternalName());
 		
 		if (this.annotations != null)
@@ -830,12 +828,14 @@ public class Constructor extends Member implements IConstructor
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
+			              param.getSignature(), start, end);
 		}
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException
+	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException
 	{
 		writer.writeTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
 		if (type != Types.VOID)
@@ -948,20 +948,36 @@ public class Constructor extends Member implements IConstructor
 		buffer.append(ModifierTypes.METHOD.toString(this.modifiers));
 		buffer.append("new");
 		
-		buffer.append(Formatting.Method.parametersStart);
-		Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-		buffer.append(Formatting.Method.parametersEnd);
+		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+		Util.astToString(prefix, this.parameters, this.parameterCount,
+		                 Formatting.getSeparator("parameters.separator", ','), buffer);
+		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 		
 		if (this.exceptionCount > 0)
 		{
-			buffer.append(Formatting.Method.signatureThrowsSeperator);
-			Util.astToString(prefix, this.exceptions, this.exceptionCount, Formatting.Method.throwsSeperator, buffer);
+			String throwsPrefix = prefix;
+			if (Formatting.getBoolean("constructor.throws.newline"))
+			{
+				throwsPrefix = Formatting.getIndent("constructor.throws.indent", prefix);
+				buffer.append('\n').append(throwsPrefix).append("throws ");
+			}
+			else
+			{
+				buffer.append(" throws ");
+			}
+
+			Util.astToString(throwsPrefix, this.exceptions, this.exceptionCount,
+			                 Formatting.getSeparator("constructor.throws", ','), buffer);
 		}
 		
 		if (this.value != null)
 		{
-			this.value.toString(prefix, buffer);
+			Util.formatStatementList(prefix, buffer, this.value);
 		}
-		buffer.append(';');
+
+		if (Formatting.getBoolean("constructor.semicolon"))
+		{
+			buffer.append(';');
+		}
 	}
 }

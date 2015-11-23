@@ -1,15 +1,14 @@
 package dyvil.collection;
 
+import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.view.ListView;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.view.ListView;
 
 @NilConvertible
 @ArrayConvertible
@@ -17,7 +16,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 {
 	static <E> MutableList<E> apply()
 	{
-		return new ArrayList();
+		return new ArrayList<>();
 	}
 	
 	static <E> MutableList<E> apply(E element)
@@ -37,12 +36,12 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	static <E> MutableList<E> apply(E... elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList<>(elements);
 	}
 	
-	static <E> MutableList<E> fromArray(E... elements)
+	static <E> MutableList<E> fromArray(E[] elements)
 	{
-		return new ArrayList(elements, true);
+		return new ArrayList<>(elements, true);
 	}
 	
 	// Accessors

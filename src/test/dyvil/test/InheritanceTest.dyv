@@ -28,7 +28,7 @@ public class InheritanceTest
 	
 	public static void main([String] args)
 	{
-		println(new FooFoo.foo)
-		println(new FooBar.foo)
+		println(new FooFoo().foo)
+		println(new FooBar().foo)
 	}
 }

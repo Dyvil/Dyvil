@@ -1,18 +1,20 @@
 package dyvil.collection.mutable;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 
-import static dyvil.collection.impl.AbstractIdentityHashMap.index;
-import static dyvil.collection.impl.AbstractIdentityHashMap.maskNull;
-import static dyvil.collection.impl.AbstractIdentityHashMap.unmaskNull;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
+import static dyvil.collection.impl.AbstractIdentityHashMap.*;
+
+@NilConvertible
+@ArrayConvertible
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements MutableSet<E>
 {
 	private static final long serialVersionUID = 5634688694810236366L;

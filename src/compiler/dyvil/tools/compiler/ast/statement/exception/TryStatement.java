@@ -17,16 +17,17 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TryStatement extends AbstractValue implements IStatement, IDefaultContext
 {
-	protected IValue		action;
-	protected CatchBlock[]	catchBlocks	= new CatchBlock[1];
-	protected int			catchBlockCount;
-	protected IValue		finallyBlock;
+	protected IValue action;
+	protected CatchBlock[] catchBlocks = new CatchBlock[1];
+	protected int    catchBlockCount;
+	protected IValue finallyBlock;
 	
 	// Metadata
 	private IType commonType;
@@ -418,23 +419,82 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.tryStart);
-		if (this.action != null)
+		buffer.append("try");
+
+		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
 		{
-			this.action.toString(prefix, buffer);
+			String actionPrefix = Formatting.getIndent("try.indent", prefix);
+			if (Formatting.getBoolean("try.newline_after"))
+			{
+				buffer.append('\n').append(actionPrefix);
+			}
+
+			this.action.toString(actionPrefix, buffer);
 		}
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
-			
-			buffer.append('\n').append(prefix).append(Formatting.Statements.catchStart);
+
+			if (Formatting.getBoolean("try.catch.newline_before"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+
+			buffer.append("catch");
+
+			Formatting.appendSeparator(buffer, "try.catch.open_paren", '(');
+
 			block.type.toString(prefix, buffer);
-			buffer.append(' ').append(block.varName).append(Formatting.Statements.catchEnd);
+			buffer.append(' ').append(block.varName);
+
+			if (Formatting.getBoolean("try.catch.close_paren.space_before"))
+			{
+				buffer.append(' ');
+			}
+			buffer.append(')');
+
+			if (Util.formatStatementList(prefix, buffer, block.action))
+			{
+				continue;
+			}
+
+			String actionIndent = Formatting.getIndent("try.catch.indent", prefix);
+			if (Formatting.getBoolean("try.catch.close_paren.newline_after"))
+			{
+				buffer.append('\n').append(actionIndent);
+			}
+			else if (Formatting.getBoolean("try.catch.close_paren.space_after"))
+			{
+				buffer.append(' ');
+			}
+
 			block.action.toString(prefix, buffer);
 		}
 		if (this.finallyBlock != null)
 		{
-			buffer.append('\n').append(prefix).append(Formatting.Statements.tryFinally);
+			if (Formatting.getBoolean("try.finally.newline_before"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+
+			buffer.append("finally");
+
+			if (Util.formatStatementList(prefix, buffer, this.finallyBlock))
+			{
+				return;
+			}
+
+			String actionIndent = Formatting.getIndent("try.finally.indent", prefix);
+			if (Formatting.getBoolean("try.finally.newline_after"))
+			{
+				buffer.append('\n').append(actionIndent);
+			}
+			else
+			{
+				buffer.append(' ');
+			}
+
 			this.finallyBlock.toString(prefix, buffer);
 		}
 	}

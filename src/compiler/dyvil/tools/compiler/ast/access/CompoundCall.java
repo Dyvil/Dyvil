@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
@@ -106,7 +105,9 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			// -> x.update(y..., x.apply(y...).op(z))
 			
 			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
-			IValue update = new UpdateMethodCall(this.position, ac.receiver, ac.arguments.withLastValue(Names.update, op)).resolveCall(markers, context);
+			IValue update = new UpdateMethodCall(this.position, ac.receiver,
+			                                     ac.arguments.withLastValue(Names.update, op))
+					.resolveCall(markers, context);
 			return update;
 		}
 		else if (type == SUBSCRIPT_GET)
@@ -118,8 +119,9 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			// -> x.subscript_=(y..., x.subscript(y...).op(z))
 			
 			IValue op = new MethodCall(this.position, ac, this.name, this.arguments).resolveCall(markers, context);
-			IValue subscript_$eq = new SubscriptSetter(this.position, ac.receiver, ac.arguments.withLastValue(Names.subscript_$eq, op)).resolveCall(markers,
-					context);
+			IValue subscript_$eq = new SubscriptSetter(this.position, ac.receiver,
+			                                           ac.arguments.withLastValue(Names.subscript_$eq, op))
+					.resolveCall(markers, context);
 			return subscript_$eq;
 		}
 		else if (type != FIELD_ACCESS)
@@ -141,7 +143,7 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 	@Override
 	public void reportResolve(MarkerList markers, IContext context)
 	{
-		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);		
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 	}
 	
 	@Override
@@ -155,13 +157,15 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			if (fa.field != null)
 			{
 				fa.field = fa.field.capture(context);
-				this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.receiver, this.arguments.getLastValue()));
+				this.arguments.setLastValue(fa.field.checkAssign(markers, context, fa.getPosition(), fa.receiver,
+				                                                 this.arguments.getLastValue()));
 			}
 		}
 		
 		if (this.method != null)
 		{
-			this.method.checkArguments(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
+			this.method.checkArguments(markers, this.position, context, this.receiver, this.arguments,
+			                           this.getGenericData());
 		}
 		this.arguments.checkTypes(markers, context);
 	}
@@ -176,17 +180,22 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 		
 		if (this.method != null)
 		{
-			IType receiverType = this.receiver.getType();
-			IType methodReturnType = super.getType();
-			if (!receiverType.isSuperTypeOf(methodReturnType))
+			if (this.receiver != null)
 			{
-				Marker marker = I18n.createMarker(this.position, "method.compound.type.incompatible", this.name, this.receiver.toString());
-				marker.addInfo(I18n.getString("receiver.type", receiverType));
-				marker.addInfo(I18n.getString("method.type", methodReturnType));
-				markers.add(marker);
+				IType receiverType = this.receiver.getType();
+				IType methodReturnType = this.method.getType();
+				if (!receiverType.isSuperTypeOf(methodReturnType))
+				{
+					Marker marker = I18n.createMarker(this.position, "method.compound.type.incompatible", this.name,
+					                                  this.receiver.toString());
+					marker.addInfo(I18n.getString("receiver.type", receiverType));
+					marker.addInfo(I18n.getString("method.type", methodReturnType));
+					markers.add(marker);
+				}
 			}
 			
-			this.method.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
+			this.method
+					.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 		}
 		
 		this.arguments.check(markers, context);
@@ -215,7 +224,8 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			return;
 		}
 		
-		f.writeSet(writer, access.receiver, new MethodCall(this.position, access, this.method, this.arguments), this.getLineNumber());
+		f.writeSet(writer, access.receiver, new MethodCall(this.position, access, this.method, this.arguments),
+		           this.getLineNumber());
 	}
 	
 	private boolean writeIINC(MethodWriter writer, IDataMember f) throws BytecodeException
@@ -251,14 +261,7 @@ public final class CompoundCall extends AbstractCall implements INamed, IValueCo
 			buffer.append(' ');
 		}
 		
-		if (Formatting.Method.convertQualifiedNames)
-		{
-			buffer.append(this.name.qualified).append("$eq");
-		}
-		else
-		{
-			buffer.append(this.name.unqualified).append('=');
-		}
+		buffer.append(this.name).append('=');
 		
 		this.arguments.toString(prefix, buffer);
 	}

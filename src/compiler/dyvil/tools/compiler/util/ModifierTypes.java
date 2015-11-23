@@ -413,11 +413,11 @@ public enum ModifierTypes
 		// If the method does not have an implementation and is static
 		if (isStatic && isAbstract)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", I18n.getString("member." + type, member.getName())));
+			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", Util.toString(member, type)));
 		}
 		else if (isAbstract && isNative)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", I18n.getString("member." + type, member.getName())));
+			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", Util.toString(member, type)));
 		}
 		else
 		{
@@ -425,14 +425,16 @@ public enum ModifierTypes
 			{
 				if (!hasValue)
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.static.unimplemented", I18n.getString("member." + type, member.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.static.unimplemented",
+					                             Util.toString(member, type)));
 				}
 			}
 			if (isNative)
 			{
 				if (!hasValue)
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.native.implemented", I18n.getString("member." + type, member.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.native.implemented",
+					                             Util.toString(member, type)));
 				}
 			}
 			if (isAbstract)
@@ -440,18 +442,19 @@ public enum ModifierTypes
 				IClass theClass = member.getTheClass();
 				if (!theClass.isAbstract())
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class", I18n.getString("member." + type, member.getName()),
-							theClass.getName()));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.concrete_class",
+					                             Util.toString(member, type), theClass.getName()));
 				}
 				if (hasValue)
 				{
-					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.implemented", I18n.getString("member." + type, member.getName())));
+					markers.add(I18n.createError(member.getPosition(), "modifiers.abstract.implemented",
+					                             Util.toString(member, type)));
 				}
 			}
 		}
 		if (!hasValue && !isAbstract && !isNative)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.unimplemented", I18n.getString("member." + type, member.getName())));
+			markers.add(I18n.createError(member.getPosition(), "modifiers.unimplemented", Util.toString(member, type)));
 		}
 	}
 }

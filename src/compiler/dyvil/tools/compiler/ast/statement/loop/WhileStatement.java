@@ -15,6 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -232,15 +233,41 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(Formatting.Statements.whileStart);
+		buffer.append("while");
+
+		Formatting.appendSeparator(buffer, "while.open_paren", '(');
 		if (this.condition != null)
 		{
 			this.condition.toString(prefix, buffer);
 		}
-		buffer.append(Formatting.Statements.whileEnd);
-		if (this.action != null)
+
+		if (Formatting.getBoolean("while.close_paren.space_before"))
 		{
-			this.action.toString(prefix, buffer);
+			buffer.append(' ');
 		}
+		buffer.append(')');
+
+		if (this.action == null)
+		{
+			return;
+		}
+
+		if (Util.formatStatementList(prefix, buffer, this.action))
+		{
+			return;
+		}
+
+		String valuePrefix = Formatting.getIndent("while.indent", prefix);
+
+		if (Formatting.getBoolean("while.close_paren.newline_after"))
+		{
+			buffer.append('\n').append(valuePrefix);
+		}
+		else if (Formatting.getBoolean("while.close_paren.space_after"))
+		{
+			buffer.append(' ');
+		}
+
+		this.action.toString(prefix, buffer);
 	}
 }

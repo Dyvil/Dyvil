@@ -30,12 +30,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	{
 		String internal = ClassFormat.extendedToInternal(desc);
 		IParameter param = this.method.getParameter_(parameter);
-		if (param.addRawAnnotation(internal, null))
-		{
-			Annotation annotation = new Annotation(new InternalType(internal));
-			return new AnnotationVisitorImpl(this.method, annotation);
-		}
-		return null;
+		return param.visitAnnotation(internal);
 	}
 	
 	@Override
@@ -45,7 +40,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		if (this.method.addRawAnnotation(internal, null))
 		{
 			Annotation annotation = new Annotation(new InternalType(internal));
-			return new AnnotationVisitorImpl(this.method, annotation);
+			return new AnnotationReader(this.method, annotation);
 		}
 		return null;
 	}

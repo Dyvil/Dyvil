@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.field;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -23,6 +21,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.lang.annotation.ElementType;
 
 public final class Variable extends Member implements IVariable
 {
@@ -357,7 +357,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (this.value != null)
 		{
-			buffer.append(Formatting.Field.keyValueSeperator);
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(prefix, buffer);
 		}
 	}

@@ -8,9 +8,11 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -229,5 +231,29 @@ public class Util
 		String qualified = name.qualified.substring(0, name.qualified.length() - 3);
 		String unqualified = name.unqualified.substring(0, name.unqualified.length() - 1);
 		return Name.get(qualified, unqualified);
+	}
+
+	public static String toString(IClassMember member, String type)
+	{
+		return I18n.getString("member.named", I18n.getString("member." + type), member.getName());
+	}
+
+	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)
+	{
+		if (value.valueTag() == IValue.STATEMENT_LIST)
+		{
+			if (Formatting.getBoolean("statement.open_brace.newline_before"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else
+			{
+				buffer.append(' ');
+			}
+
+			value.toString(prefix, buffer);
+			return true;
+		}
+		return false;
 	}
 }

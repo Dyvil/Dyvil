@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -34,40 +32,42 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.lang.annotation.ElementType;
+
 public abstract class AbstractClass implements IClass
 {
 	// Metadata
 	
-	protected IClass			outerClass;
-	protected IClassMetadata	metadata;
-	protected IType				type;
+	protected IClass         outerClass;
+	protected IClassMetadata metadata;
+	protected IType          type;
 	
 	// Modifiers and Annotations
 	
-	protected AnnotationList	annotations;
-	protected int				modifiers;
+	protected AnnotationList annotations;
+	protected int            modifiers;
 	
 	// Signature
 	
-	protected Name		name;
-	protected String	fullName;
-	protected String	internalName;
+	protected Name   name;
+	protected String fullName;
+	protected String internalName;
 	
-	protected ITypeVariable[]	generics;
-	protected int				genericCount;
+	protected ITypeVariable[] generics;
+	protected int             genericCount;
 	
-	protected IParameter[]	parameters;
-	protected int			parameterCount;
+	protected IParameter[] parameters;
+	protected int          parameterCount;
 	
-	protected IType		superType	= Types.OBJECT;
-	protected IType[]	interfaces;
-	protected int		interfaceCount;
+	protected IType superType = Types.OBJECT;
+	protected IType[] interfaces;
+	protected int     interfaceCount;
 	
 	// Body
 	
-	protected IClassBody			body;
-	protected IClassCompilable[]	compilables;
-	protected int					compilableCount;
+	protected IClassBody         body;
+	protected IClassCompilable[] compilables;
+	protected int                compilableCount;
 	
 	@Override
 	public void setOuterClass(IClass iclass)
@@ -360,6 +360,7 @@ public abstract class AbstractClass implements IClass
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
+		param.setIndex(index);
 	}
 	
 	@Override
@@ -542,7 +543,8 @@ public abstract class AbstractClass implements IClass
 		
 		if (this.superType != null)
 		{
-			if (this.superType.getTheClass().checkImplements(markers, iclass, candidate, this.superType.getConcreteType(typeContext)))
+			if (this.superType.getTheClass()
+			                  .checkImplements(markers, iclass, candidate, this.superType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -1028,16 +1030,18 @@ public abstract class AbstractClass implements IClass
 		
 		if (this.genericCount > 0)
 		{
-			buffer.append('[');
-			Util.astToString(prefix, this.generics, this.genericCount, Formatting.Type.genericSeperator, buffer);
-			buffer.append(']');
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			Util.astToString(prefix, this.generics, this.genericCount,
+			                 Formatting.getSeparator("generics.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}
 		
 		if (this.parameterCount > 0)
 		{
-			buffer.append('(');
-			Util.astToString(prefix, this.parameters, this.parameterCount, Formatting.Method.parameterSeperator, buffer);
-			buffer.append(')');
+			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+			Util.astToString(prefix, this.parameters, this.parameterCount,
+			                 Formatting.getSeparator("parameters.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 		}
 		
 		if (this.superType == null)
@@ -1046,22 +1050,60 @@ public abstract class AbstractClass implements IClass
 		}
 		else if (this.superType != Types.OBJECT)
 		{
-			buffer.append(" extends ");
+			String extendsPrefix = prefix;
+			if (Formatting.getBoolean("class.extends.newline"))
+			{
+				extendsPrefix = Formatting.getIndent("class.extends.indent", extendsPrefix);
+				buffer.append('\n').append(extendsPrefix).append("extends ");
+			}
+			else
+			{
+				buffer.append(" extends ");
+			}
+
 			this.superType.toString("", buffer);
 		}
 		
 		if (this.interfaceCount > 0)
 		{
-			buffer.append(" implements ");
-			Util.astToString(prefix, this.interfaces, this.interfaceCount, Formatting.Class.superClassesSeperator, buffer);
+			String implementsPrefix = prefix;
+			if (Formatting.getBoolean("class.implements.newline"))
+			{
+				implementsPrefix = Formatting.getIndent("class.implements.indent", implementsPrefix);
+				buffer.append('\n').append(implementsPrefix).append("implements ");
+			}
+			else
+			{
+				buffer.append(" implements ");
+			}
+
+			Util.astToString(implementsPrefix, this.interfaces, this.interfaceCount,
+			                 Formatting.getSeparator("class.implements.separator", ','), buffer);
 		}
 		
 		if (this.body != null)
 		{
-			buffer.append('\n').append(prefix);
-			this.body.toString(prefix, buffer);
+			String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
+			if (Formatting.getBoolean("class.body.open_bracket.newline"))
+			{
+				buffer.append('\n').append(prefix);
+			}
+			else
+			{
+				buffer.append(' ');
+			}
+
+			buffer.append('{').append('\n');
+
+			this.body.toString(bodyPrefix, buffer);
+			buffer.append(prefix).append('}');
+
+			if (Formatting.getBoolean("class.body.close_bracket.newline_after"))
+			{
+				buffer.append('\n');
+			}
 		}
-		else
+		else if (Formatting.getBoolean("class.semicolon"))
 		{
 			buffer.append(';');
 		}

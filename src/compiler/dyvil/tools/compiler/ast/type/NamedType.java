@@ -1,10 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -12,76 +9,35 @@ import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class NamedType implements IRawType
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+public class NamedType implements IRawType, ITypeConsumer
 {
-	protected ICodePosition	position;
-	protected Name			name;
+	protected IType         parent;
+	protected ICodePosition position;
+	protected Name          name;
 	
 	public NamedType(ICodePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
 	}
-	
-	protected static IType resolvePrimitive(Name name)
+
+	public NamedType(ICodePosition position, Name name, IType parent)
 	{
-		if (name == Names._void)
-		{
-			return Types.VOID;
-		}
-		if (name == Names._boolean)
-		{
-			return Types.BOOLEAN;
-		}
-		if (name == Names._byte)
-		{
-			return Types.BYTE;
-		}
-		if (name == Names._short)
-		{
-			return Types.SHORT;
-		}
-		if (name == Names._char)
-		{
-			return Types.CHAR;
-		}
-		if (name == Names._int)
-		{
-			return Types.INT;
-		}
-		if (name == Names._long)
-		{
-			return Types.LONG;
-		}
-		if (name == Names._float)
-		{
-			return Types.FLOAT;
-		}
-		if (name == Names._double)
-		{
-			return Types.DOUBLE;
-		}
-		if (name == Names.any)
-		{
-			return Types.ANY;
-		}
-		if (name == Names.dynamic)
-		{
-			return Types.DYNAMIC;
-		}
-		if (name == Names.auto)
-		{
-			return Types.UNKNOWN;
-		}
-		return null;
+		this.position = position;
+		this.name = name;
+		this.parent = parent;
 	}
 	
 	@Override
@@ -95,13 +51,31 @@ public class NamedType implements IRawType
 	{
 		return this.name;
 	}
-	
+
+	@Override
+	public void setType(IType type)
+	{
+		this.parent = type;
+	}
+
 	@Override
 	public IClass getTheClass()
 	{
 		return null;
 	}
-	
+
+	@Override
+	public boolean isSuperClassOf(IType type)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		return false;
+	}
+
 	@Override
 	public boolean isResolved()
 	{
@@ -111,21 +85,51 @@ public class NamedType implements IRawType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		// Try to resolve the name of this Type as a primitive type
-		IType t = resolvePrimitive(this.name);
-		if (t != null)
+		if (this.parent != null)
 		{
-			return t;
-		}
-		
-		IType type = IContext.resolveType(context, this.name);
-		if (type == null)
-		{
-			markers.add(I18n.createMarker(this.position, "resolve.type", this.toString()));
+			this.parent = this.parent.resolveType(markers, context);
+
+			if (!this.parent.isResolved())
+			{
+				return this;
+			}
+
+			IType type = this.parent.resolveType(this.name);
+			if (type != null)
+			{
+				return type;
+			}
+
+			Package thePackage = this.parent.resolvePackage(this.name);
+			if (thePackage != null)
+			{
+				return new PackageType(thePackage);
+			}
+
+			markers.add(I18n.createError(this.position, "resolve.type.package", this.name, this.parent));
 			return this;
 		}
-		
-		return type;
+
+		IType primitive = Types.resolvePrimitive(this.name);
+		if (primitive != null)
+		{
+			return primitive;
+		}
+
+		IType type = IContext.resolveType(context, this.name);
+		if (type != null)
+		{
+			return type;
+		}
+
+		Package thePackage = Package.rootPackage.resolvePackage(this.name);
+		if (thePackage != null)
+		{
+			return new PackageType(thePackage);
+		}
+
+		markers.add(I18n.createError(this.position, "resolve.type", this.name));
+		return this;
 	}
 	
 	@Override
@@ -193,18 +197,27 @@ public class NamedType implements IRawType
 	@Override
 	public String toString()
 	{
+		if (this.parent != null)
+		{
+			return this.parent.toString() + '.' + this.name;
+		}
 		return this.name.toString();
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		if (this.parent != null)
+		{
+			this.parent.toString(prefix, buffer);
+			buffer.append('.');
+		}
 		buffer.append(this.name);
 	}
 	
 	@Override
 	public IType clone()
 	{
-		return new NamedType(this.position, this.name);
+		return new NamedType(this.position, this.name, this.parent);
 	}
 }

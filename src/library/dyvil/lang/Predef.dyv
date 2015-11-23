@@ -35,10 +35,12 @@ public final class Predef
 	
 	// Lists
 	
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "$plus", "(Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEINTERFACE, 0, 1, 2 ],
+			strings: [ "dyvil/collection/ImmutableList", "$plus", "(Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
 	public infix ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
 	
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ],
+			strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 	
 	// Closures
@@ -60,8 +62,8 @@ public final class Predef
 	
 	public static void repeat(int n, => void f) = for (int i : 0 ..< n) f()
 	
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ]
-				, strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ],
+			strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
 	public static long measureMillis(=> void closure)
 	{
 		long millis = System.currentTimeMillis
@@ -69,8 +71,8 @@ public final class Predef
 		return System.currentTimeMillis - millis
 	}
 	
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ]
-			, strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ],
+			strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
 	public static long measureNanos(=> void closure)
 	{
 		long nanos = System.nanoTime
@@ -108,7 +110,8 @@ public final class Predef
 	
 	// Print
 	
-	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "()V" ])
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, INVOKEVIRTUAL, 3, 4, 5 ],
+			strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "()V" ])
 	public static void println() = System.out.println()
 	
 	public static void println(boolean v) = System.out.println(if (v) "true" else "false")
@@ -127,7 +130,8 @@ public final class Predef
 	
 	public static void println(double v) = System.out.println(v.toString)
 	
-	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "(Ljava/lang/String;)V" ])
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ],
+			strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "(Ljava/lang/String;)V" ])
 	public static void println(String s) = System.out.println(s)
 	
 	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
@@ -152,10 +156,12 @@ public final class Predef
 	
 	// Tuples
 	
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ],
+			strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
 	public infix (A, B) ->[A, B](A a, B b) = (a, b)
 	
-	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
+	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ],
+			strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
 	public infix (B, A) <-[A, B](A a, B b) = (b, a)
 	
 	public static void ???() = throw new UnsupportedOperationException("Not Implemented!")

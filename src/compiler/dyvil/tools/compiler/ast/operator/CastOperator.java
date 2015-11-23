@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -121,7 +122,7 @@ public final class CastOperator extends AbstractValue
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.isSuperClassOf(prevType) && primitiveType == primitiveValue)
+		if (!this.typeHint && this.type.isSameType(prevType) && primitiveType == primitiveValue)
 		{
 			markers.add(I18n.createMarker(this.position, "cast.unnecessary"));
 			this.typeHint = true;
@@ -178,7 +179,13 @@ public final class CastOperator extends AbstractValue
 		this.writeExpression(writer, this.type);
 		writer.writeInsn(this.type.getReturnOpcode());
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

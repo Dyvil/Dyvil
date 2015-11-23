@@ -5,12 +5,10 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.compiler.util.Util;
@@ -25,7 +23,7 @@ public final class MethodParameter extends Parameter
 {
 	public ICallableMember method;
 	
-	protected ReferenceType	refType;
+	protected ReferenceType refType;
 	
 	public MethodParameter()
 	{
@@ -176,35 +174,6 @@ public final class MethodParameter extends Parameter
 	}
 	
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		super.cleanup(context, compilableList);
-		
-		if (this.defaultValue != null)
-		{
-			compilableList.addCompilable(this);
-		}
-	}
-	
-	@Override
-	public void write(ClassWriter writer) throws BytecodeException
-	{
-		if (this.defaultValue == null)
-		{
-			return;
-		}
-		
-		// Copy the access modifiers and add the STATIC modifier
-		int modifiers = this.method.getModifiers() & Modifiers.ACCESS_MODIFIERS | Modifiers.STATIC;
-		String name = "parDefault$" + this.method.getName().qualified + "$" + this.index;
-		String desc = "()" + this.type.getExtendedName();
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, name, desc, null, null));
-		mw.begin();
-		this.defaultValue.writeExpression(mw, this.type);
-		mw.end(this.type);
-	}
-	
-	@Override
 	public void write(MethodWriter writer)
 	{
 		this.localIndex = writer.localCount();
@@ -244,5 +213,10 @@ public final class MethodParameter extends Parameter
 			value.writeExpression(writer, this.type);
 		}
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+	}
+
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
 	}
 }

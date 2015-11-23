@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.MapTypeContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -37,36 +38,41 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer
 {
-	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory", "metafactory",
-			"(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;" + "Ljava/lang/invoke/MethodType;" + "Ljava/lang/invoke/MethodType;"
-					+ "Ljava/lang/invoke/MethodHandle;" + "Ljava/lang/invoke/MethodType;)" + "Ljava/lang/invoke/CallSite;");
-					
+	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
+	                                                  "metafactory",
+	                                                  "(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;"
+			                                                  + "Ljava/lang/invoke/MethodType;"
+			                                                  + "Ljava/lang/invoke/MethodType;"
+			                                                  + "Ljava/lang/invoke/MethodHandle;"
+			                                                  + "Ljava/lang/invoke/MethodType;)"
+			                                                  + "Ljava/lang/invoke/CallSite;");
+
 	protected ICodePosition position;
 	
-	protected IParameter[]	parameters;
-	protected int			parameterCount;
-	protected IValue		value;
+	protected IParameter[] parameters;
+	protected int          parameterCount;
+	protected IValue       value;
 	
 	// Metadata
 	
 	/**
 	 * The instantiated type this lambda expression represents
 	 */
-	protected IType	type;
-	private IType	returnType;
+	protected IType type;
+	private   IType returnType;
 	
 	/**
 	 * The abstract method this lambda expression implements
 	 */
 	protected IMethod method;
 	
-	private CaptureVariable[]	capturedFields;
-	private int					capturedFieldCount;
-	private IClass				thisClass;
+	private CaptureVariable[] capturedFields;
+	private int               capturedFieldCount;
+	private IClass            thisClass;
 	
-	private String	owner;
-	private String	name;
-	private String	lambdaDesc;
+	private String owner;
+	private String name;
+	private String lambdaDesc;
 	
 	private int directInvokeOpcode;
 	
@@ -211,6 +217,14 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			{
 				this.returnType = valueType;
 			}
+			else
+			{
+				ITypeVariable typeVariable = this.returnType.getTypeVariable();
+				if (typeVariable != null)
+				{
+					this.returnType = typeVariable.getParameterType();
+				}
+			}
 			
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
 			if (value1 == null)
@@ -291,7 +305,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 		
 		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType();
-		return;
 	}
 	
 	@Override
@@ -663,8 +676,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	
 	/**
 	 * @return the descriptor that contains the captured instance and captured
-	 *         variables (if present) as the argument types and the instantiated
-	 *         method type as the return type.
+	 * variables (if present) as the argument types and the instantiated
+	 * method type as the return type.
 	 */
 	private String getInvokeDescriptor()
 	{
@@ -685,7 +698,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	
 	/**
 	 * @return the specialized method type of the SAM method, as opposed to
-	 *         {@link IMethod#getDescriptor()}.
+	 * {@link IMethod#getDescriptor()}.
 	 */
 	private String getSpecialDescriptor()
 	{
@@ -702,8 +715,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	
 	/**
 	 * @return the descriptor of the (synthetic) lambda callback method,
-	 *         including captured variables, parameter types and the return
-	 *         type.
+	 * including captured variables, parameter types and the return
+	 * type.
 	 */
 	private String getLambdaDescriptor()
 	{
@@ -718,7 +731,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			this.capturedFields[i].getActualType().appendExtendedName(buffer);
 		}
-		for (int i = this.directInvokeOpcode != 0 && this.directInvokeOpcode != Opcodes.INVOKESTATIC ? 1 : 0; i < this.parameterCount; i++)
+		for (int i = this.directInvokeOpcode != 0 && this.directInvokeOpcode != Opcodes.INVOKESTATIC ? 1 : 0;
+		     i < this.parameterCount; i++)
 		{
 			this.parameters[i].getType().appendExtendedName(buffer);
 		}
@@ -743,8 +757,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 		
 		boolean instance = this.thisClass != null;
-		int modifiers = instance ? Modifiers.PRIVATE | Modifiers.SYNTHETIC : Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(), null, null));
+		int modifiers = instance ?
+				Modifiers.PRIVATE | Modifiers.SYNTHETIC :
+				Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
+		MethodWriter mw = new MethodWriterImpl(writer,
+		                                       writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(),
+		                                                          null, null));
 		
 		int index = 0;
 		if (instance)
@@ -783,41 +801,68 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 1)
+		IParameter parameter;
+		if (this.parameterCount == 1 && (parameter = this.parameters[0]).getType() == Types.UNKNOWN && !Formatting
+				.getBoolean("lambda.single.wrap"))
 		{
-			IParameter param = this.parameters[0];
-			if (param.getType() != Types.UNKNOWN)
+			buffer.append(parameter.getName());
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
 			{
-				buffer.append('(');
-				param.toString(prefix, buffer);
-				buffer.append(')');
+				buffer.append(' ');
 			}
-			else
-			{
-				buffer.append(param.getName());
-			}
-			buffer.append(' ');
 		}
-		else if (this.parameterCount > 1)
+		else if (this.parameterCount > 0)
 		{
 			buffer.append('(');
-			IParameter first = this.parameters[0];
-			if (first.getType() == Types.UNKNOWN)
+			if (Formatting.getBoolean("lambda.open_paren.space_after"))
 			{
-				buffer.append(first.getName());
+				buffer.append(' ');
+			}
+
+			parameter = this.parameters[0];
+			if (parameter.getType() == Types.UNKNOWN)
+			{
+				buffer.append(parameter.getName());
 				for (int i = 1; i < this.parameterCount; i++)
 				{
-					buffer.append(", ").append(this.parameters[i].getName());
+					Formatting.appendSeparator(buffer, "lambda.separator", ',');
+					buffer.append(this.parameters[i].getName());
 				}
 			}
 			else
 			{
-				Util.astToString(prefix, this.parameters, this.parameterCount, ", ", buffer);
+				Util.astToString(prefix, this.parameters, this.parameterCount,
+				                 Formatting.getSeparator("lambda.separator", ','), buffer);
 			}
-			buffer.append(") ");
+
+			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			{
+				buffer.append(' ');
+			}
+
+			buffer.append(')');
+
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
+			{
+				buffer.append(' ');
+			}
+		}
+		else if (Formatting.getBoolean("lambda.empty.wrap"))
+		{
+			buffer.append("()");
+			if (Formatting.getBoolean("lambda.arrow.space_before"))
+			{
+				buffer.append(' ');
+			}
 		}
 		
-		buffer.append(Formatting.Expression.lambdaSeperator);
+		buffer.append("=>");
+		if (Formatting.getBoolean("lambda.arrow.space_after"))
+		{
+			buffer.append(' ');
+		}
+
 		this.value.toString(prefix, buffer);
 	}
 }

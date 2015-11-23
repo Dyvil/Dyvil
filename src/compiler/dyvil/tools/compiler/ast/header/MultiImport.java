@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -17,10 +13,14 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public final class MultiImport extends Import implements IImportList
 {
-	private IImport[]	imports	= new IImport[2];
-	private int			importCount;
+	private IImport[] imports = new IImport[2];
+	private int importCount;
 	
 	public MultiImport(ICodePosition position)
 	{
@@ -71,6 +71,11 @@ public final class MultiImport extends Import implements IImportList
 		{
 			this.parent.resolveTypes(markers, context, false);
 			context = this.parent.getContext();
+
+			if (context == null)
+			{
+				return;
+			}
 		}
 		
 		for (int i = 0; i < this.importCount; i++)
@@ -165,8 +170,15 @@ public final class MultiImport extends Import implements IImportList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.appendParent(prefix, buffer);
-		buffer.append(Formatting.Import.multiImportStart);
-		Util.astToString(prefix, this.imports, this.importCount, Formatting.Import.multiImportSeperator, buffer);
-		buffer.append(Formatting.Import.multiImportEnd);
+
+		Formatting.appendSeparator(buffer, "import.multi.open_brace", '{');
+		Util.astToString(prefix, this.imports, this.importCount, Formatting.getSeparator("import.multi.separator", ','),
+		                 buffer);
+
+		if (Formatting.getBoolean("import.multi.close_brace.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append('}');
 	}
 }

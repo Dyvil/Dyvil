@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.statement.AppliedStatementList;
+import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
@@ -23,20 +23,21 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
 {
-	private static final int	OPEN_BRACKET	= 1;
-	private static final int	EXPRESSION		= 2;
-	private static final int	TYPE			= 4;
-	private static final int	SEPARATOR		= 8;
+	private static final int OPEN_BRACKET  = 1;
+	private static final int EXPRESSION    = 2;
+	private static final int TYPE          = 4;
+	private static final int VARIABLE_NAME = 8;
+	private static final int SEPARATOR     = 16;
 	
 	protected IValueConsumer consumer;
 	
-	private boolean			applied;
-	private StatementList	statementList;
+	private boolean       applied;
+	private StatementList statementList;
 	
-	private Name			label;
-	private IType			type;
-	private int				modifiers;
-	private AnnotationList	annotations;
+	private Name           label;
+	private IType          type;
+	private int            modifiers;
+	private AnnotationList annotations;
 	
 	public StatementListParser(IValueConsumer consumer)
 	{
@@ -65,10 +66,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	@Override
 	public void report(IToken token, String message)
 	{
-		this.pm.jump(this.firstToken);
-		this.pm.pushParser(this.pm.newExpressionParser(this));
-		this.reset();
-		this.mode = SEPARATOR;
+		this.revertExpression(this.pm);
 	}
 	
 	@Override
@@ -96,7 +94,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		{
 		case OPEN_BRACKET:
 			this.mode = EXPRESSION;
-			this.statementList = this.applied ? new AppliedStatementList(token) : new StatementList(token);
+			this.statementList = this.applied ? new Closure(token) : new StatementList(token);
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.report(token, "Invalid Statement List - '{' expected");
@@ -150,39 +148,33 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.mode = TYPE;
 			//$FALL-THROUGH$
 		case TYPE:
+			if (this.parser == null)
+			{
+				this.revertExpression(pm);
+				return;
+			}
+
+			this.parser.parse(this, token);
+			return;
+		case VARIABLE_NAME:
 			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.EQUALS)
 			{
-				if (this.type != null)
-				{
-					Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
-					variable.setModifiers(this.modifiers);
-					variable.setAnnotations(this.annotations);
-					
-					FieldInitializer fi = new FieldInitializer(variable);
-					pm.pushParser(pm.newExpressionParser(variable));
-					this.setValue(fi);
-				}
-				else if (token != this.firstToken)
-				{
-					this.parser.parse(this, token);
-					pm.reparse();
-					return;
-				}
-				
-				this.reset();
-				this.mode = SEPARATOR;
+				Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
+				variable.setModifiers(this.modifiers);
+				variable.setAnnotations(this.annotations);
+
+				FieldInitializer fi = new FieldInitializer(variable);
+				this.setValue(fi);
+
 				pm.skip();
-				return;
-			}
-			else if (this.parser == null)
-			{
-				pm.jump(this.firstToken);
+				pm.pushParser(pm.newExpressionParser(variable));
+
 				this.reset();
-				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = SEPARATOR;
 				return;
 			}
-			this.parser.parse(this, token);
+
+			this.revertExpression(pm);
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
@@ -207,6 +199,14 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		}
 	}
+
+	public void revertExpression(IParserManager pm)
+	{
+		pm.jump(this.firstToken);
+		this.reset();
+		pm.pushParser(pm.newExpressionParser(this));
+		this.mode = SEPARATOR;
+	}
 	
 	@Override
 	public void setValue(IValue value)
@@ -226,5 +226,6 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	public void setType(IType type)
 	{
 		this.type = type;
+		this.mode = VARIABLE_NAME;
 	}
 }

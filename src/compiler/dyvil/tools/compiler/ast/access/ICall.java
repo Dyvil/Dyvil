@@ -2,11 +2,14 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
@@ -18,21 +21,112 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface ICall extends IValue
 {
+	default IValue getReceiver()
+	{
+		return null;
+	}
+
+	default void setReceiver(IValue receiver)
+	{
+	}
+
 	void setArguments(IArguments arguments);
 	
 	IArguments getArguments();
+
+	default int wildcardCount()
+	{
+		int count = 0;
+
+		IValue receiver = this.getReceiver();
+		if (receiver != null && receiver.valueTag() == IValue.WILDCARD)
+		{
+			count = 1;
+		}
+
+		for (IValue value : this.getArguments())
+		{
+			if (value.valueTag() == IValue.WILDCARD)
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	default IValue toLambda(MarkerList markers, IContext context, int wildcards)
+	{
+		ICodePosition position = this.getPosition();
+
+		IParameter[] parameters = new IParameter[wildcards];
+		for (int i = 0; i < wildcards; i++)
+		{
+			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i));
+		}
+
+		int index = 0;
+
+		IValue receiver = this.getReceiver();
+		if (receiver != null && receiver.valueTag() == IValue.WILDCARD)
+		{
+			this.setReceiver(convertWildcardValue(receiver, parameters[index++]));
+		}
+
+		IArguments arguments = this.getArguments();
+		for (int i = 0, size = arguments.size(); i < size; i++)
+		{
+			IValue value = arguments.getValue(i, null);
+			if (value.valueTag() == IValue.WILDCARD)
+			{
+				arguments.setValue(i, null, convertWildcardValue(value, parameters[index++]));
+			}
+		}
+
+		LambdaExpr lambdaExpr = new LambdaExpr(position, parameters, wildcards);
+		lambdaExpr.setValue(this);
+		return lambdaExpr.resolve(markers, context);
+	}
+
+	public static IValue convertWildcardValue(IValue value, IParameter parameter)
+	{
+		ICodePosition valuePosition = value.getPosition();
+		parameter.setPosition(valuePosition);
+		return new FieldAccess(valuePosition, null, parameter);
+	}
 	
 	@Override
 	default IValue resolve(MarkerList markers, IContext context)
 	{
+		// Wildcard Conversion
+		int wildcards = this.wildcardCount();
+		if (wildcards > 0)
+		{
+			return this.toLambda(markers, context, wildcards);
+		}
+
 		this.resolveReceiver(markers, context);
 		this.resolveArguments(markers, context);
-		IValue v = this.resolveCall(markers, context);
-		if (v != null)
+
+		IValue resolved = this.resolveCall(markers, context);
+		if (resolved != null)
 		{
-			return v;
+			return resolved;
 		}
-		
+
+		// Don't report an error if the receiver is not resolved
+		IValue receiver = this.getReceiver();
+		if (receiver != null && !receiver.isResolved())
+		{
+			return this;
+		}
+
+		// Don't report an error if the arguments are not resolved
+		if (!this.getArguments().isResolved())
+		{
+			return this;
+		}
+
 		this.reportResolve(markers, context);
 		return this;
 	}

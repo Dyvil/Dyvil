@@ -1,15 +1,10 @@
 package dyvil.tools.compiler.ast.external;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
-import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -29,7 +24,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -41,13 +35,17 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
-import dyvil.tools.compiler.backend.visitor.AnnotationVisitorImpl;
+import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
 import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
 import dyvil.tools.compiler.sources.FileType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public final class ExternalClass extends AbstractClass
 {
@@ -570,7 +568,7 @@ public final class ExternalClass extends AbstractClass
 			}
 			
 			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
-			return new AnnotationVisitorImpl(this, annotation);
+			return new AnnotationReader(this, annotation);
 		}
 		return null;
 	}
@@ -612,7 +610,7 @@ public final class ExternalClass extends AbstractClass
 			break;
 		}
 		}
-		return new AnnotationVisitorImpl(null, annotation);
+		return new AnnotationReader(null, annotation);
 	}
 	
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
@@ -709,18 +707,6 @@ public final class ExternalClass extends AbstractClass
 		if ((access & Modifiers.VARARGS) != 0)
 		{
 			method.setVarargsParameter();
-		}
-		
-		if (name.startsWith("parDefault$"))
-		{
-			int i = name.indexOf('$', 12);
-			Name methodName = Name.getQualified(name.substring(12, i));
-			IMethod targetMethod = this.body.getMethod(methodName);
-			int parIndex = Integer.parseInt(name.substring(i + 1));
-			
-			MethodCall call = new MethodCall(null, null, method, EmptyArguments.INSTANCE);
-			targetMethod.getParameter(parIndex).setValue(call);
-			return new SimpleMethodVisitor(method);
 		}
 		
 		this.body.addMethod(method);

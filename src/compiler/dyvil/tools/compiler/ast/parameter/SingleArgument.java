@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Iterator;
-
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.reflect.Opcodes;
@@ -18,10 +16,12 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Iterator;
+
 public final class SingleArgument implements IArguments, IValueConsumer
 {
-	private IValue	value;
-	private boolean	varargs;
+	private IValue  value;
+	private boolean varargs;
 	
 	public SingleArgument()
 	{
@@ -153,15 +153,16 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getActualType();
-		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
-		if (value1 == null)
+		IType type = param.getActualType().getParameterType();
+		IValue typed = IType.convertValue(this.value, type, typeContext, markers, context);
+		if (typed == null)
 		{
-			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type",
+			                     param.getName());
 		}
 		else
 		{
-			this.value = value1;
+			this.value = typed;
 		}
 	}
 	
@@ -185,7 +186,8 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		value1 = IType.convertValue(this.value, type.getElementType(), typeContext, markers, context);
 		if (value1 == null)
 		{
-			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type", param.getName());
+			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type",
+			                     param.getName());
 		}
 		else
 		{
@@ -261,7 +263,13 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		return this.value == null ? EmptyIterator.instance : new SingletonIterator<IValue>(this.value);
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		return this.value == null || this.value.isResolved();
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -330,11 +338,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		if (Formatting.Method.useJavaFormat)
+		if (Formatting.getBoolean("method.call.java_format"))
 		{
-			buffer.append('(');
+			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
 			this.value.toString(prefix, buffer);
-			buffer.append(')');
+			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 			return;
 		}
 		buffer.append(' ');

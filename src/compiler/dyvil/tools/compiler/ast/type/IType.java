@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -33,6 +29,10 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public interface IType extends IASTNode, IStaticContext, ITypeContext
 {
 	enum TypePosition
@@ -60,42 +60,43 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		 * the latter cannot be contravariant.
 		 */
 		RETURN_TYPE, /**
-						 * Allows Class Types, Parameterized Types and Type
-						 * Variable Types, but the latter cannot be covariant.
-						 */
-		PARAMETER_TYPE, /**
-						 * Allows all Types.
-						 */
-		GENERIC_ARGUMENT
+	 * Allows Class Types, Parameterized Types and Type
+	 * Variable Types, but the latter cannot be covariant.
+	 */
+	PARAMETER_TYPE, /**
+	 * Allows all Types.
+	 */
+	GENERIC_ARGUMENT
 	}
 	
 	// Basic Types
-	int	UNKNOWN		= 0;
-	int	NULL		= 1;
-	int	ANY			= 2;
-	int	DYNAMIC		= 3;
-	int	PRIMITIVE	= 4;
+	int UNKNOWN   = 0;
+	int NULL      = 1;
+	int ANY       = 2;
+	int DYNAMIC   = 3;
+	int PRIMITIVE = 4;
 	
 	// Class Types
-	int	CLASS		= 16;
-	int	NAMED		= 17;
-	int	INTERNAL	= 18;
+	int CLASS    = 16;
+	int NAMED    = 17;
+	int INTERNAL = 18;
+	int PACKAGE  = 19;
 	
 	// Generic Types
-	int	GENERIC				= 24;
-	int	GENERIC_NAMED		= 25;
-	int	GENERIC_INTERNAL	= 26;
+	int GENERIC          = 24;
+	int GENERIC_NAMED    = 25;
+	int GENERIC_INTERNAL = 26;
 	
 	// Compound Types
-	int	TUPLE		= 32;
-	int	LAMBDA		= 33;
-	int	ARRAY		= 34;
-	int	MAP			= 35;
-	int	OPTIONAL	= 36;
+	int TUPLE    = 32;
+	int LAMBDA   = 33;
+	int ARRAY    = 34;
+	int MAP      = 35;
+	int OPTIONAL = 36;
 	
 	// Type Variable Types
-	int	TYPE_VAR_TYPE		= 64;
-	int	INTERNAL_TYPE_VAR	= 65;
+	int TYPE_VAR_TYPE     = 64;
+	int INTERNAL_TYPE_VAR = 65;
 	
 	int WILDCARD_TYPE = 80;
 	
@@ -161,7 +162,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	default int getSuperTypeDistance(IType superType)
 	{
-		return this.getTheClass().getSuperTypeDistance(superType);
+		IClass iClass = this.getTheClass();
+		return iClass == null ? 0 : iClass.getSuperTypeDistance(superType);
 	}
 	
 	default float getSubTypeDistance(IType subtype)
@@ -191,8 +193,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	/**
 	 * Returns true if {@code type} is a subtype of this type
-	 * 
+	 *
 	 * @param type
+	 *
 	 * @return
 	 */
 	default boolean isSuperTypeOf(IType type)
@@ -259,6 +262,10 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (!this.isResolved())
+		{
+			return value;
+		}
 		return value.withType(this, typeContext, markers, context);
 	}
 	
@@ -269,7 +276,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * variable.
 	 * <p>
 	 * Example:<br>
-	 * 
+	 * <p>
 	 * <pre>
 	 * GenericType gt = type[List[String]]
 	 * ITypeVariable tv = type[List].getTypeVariable("E")
@@ -287,18 +294,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	/**
 	 * Returns true if this is or contains any type variables.
-	 * 
+	 *
 	 * @return
 	 */
 	boolean hasTypeVariables();
-	
-	/**
-	 * Returns a copy of this type with all type variables replaced.
-	 * 
-	 * @param typeVariables
-	 *            the type variables
-	 * @return
-	 */
+
 	IType getConcreteType(ITypeContext context);
 	
 	void inferTypes(IType concrete, ITypeContext typeContext);

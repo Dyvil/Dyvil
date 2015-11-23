@@ -29,15 +29,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldAccess implements IValue, INamed, IReceiverAccess
 {
-	protected ICodePosition	position;
-	protected IValue		receiver;
-	protected Name			name;
+	protected ICodePosition position;
+	protected IValue        receiver;
+	protected Name          name;
 	
 	protected boolean dotless;
 	
 	// Metadata
-	protected IDataMember	field;
-	protected IType			type;
+	protected IDataMember field;
+	protected IType       type;
 	
 	public FieldAccess()
 	{
@@ -60,6 +60,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		this.position = position;
 		this.receiver = instance;
 		this.field = field;
+		this.name = field.getName();
 	}
 	
 	@Override
@@ -263,13 +264,19 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.resolveReceiver(markers, context);
-		
+
 		IValue v = this.resolveFieldAccess(markers, context);
 		if (v != null)
 		{
 			return v;
 		}
-		
+
+		// Don't report an error if the receiver is not resolved
+		if (this.receiver != null && !this.receiver.isResolved())
+		{
+			return this;
+		}
+
 		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
 		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
 		if (this.receiver != null)
@@ -432,9 +439,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		if (this.receiver != null)
 		{
 			this.receiver.toString("", buffer);
-			if (this.dotless && !Formatting.Field.useJavaFormat)
+			if (this.dotless && !Formatting.getBoolean("field.access.java_format"))
 			{
-				buffer.append(Formatting.Field.dotlessSeperator);
+				buffer.append(' ');
 			}
 			else
 			{

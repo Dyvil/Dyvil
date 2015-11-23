@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.operator;
 
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.FieldAssignment;
+import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringConcatExpr;
 import dyvil.tools.compiler.ast.type.Types;
@@ -64,7 +65,7 @@ public interface Operators
 				sbe.addValue(arg2);
 				return sbe;
 			}
-			if (arg1.isType(Types.STRING) && arg1.valueTag() != IValue.NULL || arg2.isType(Types.STRING) && arg2.valueTag() != IValue.NULL)
+			if (isStringBuilderElement(arg1) || isStringBuilderElement(arg2))
 			{
 				StringConcatExpr sbe = new StringConcatExpr();
 				sbe.addValue(arg1);
@@ -131,5 +132,19 @@ public interface Operators
 			return null;
 		}
 		return null;
+	}
+
+	static boolean isStringBuilderElement(IValue arg1)
+	{
+		if (!arg1.isType(Types.STRING))
+		{
+			return false;
+		}
+		switch (arg1.valueTag()) {
+		case IValue.NULL:
+		case IntValue.WILDCARD:
+			return false;
+		}
+		return true;
 	}
 }

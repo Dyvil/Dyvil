@@ -3,33 +3,33 @@ package dyvil.tools.compiler.backend.visitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.backend.ClassFormat;
 
-public final class ArrayAnnotationVisitor implements AnnotationVisitor
+public class AnnotationValueReader implements AnnotationVisitor
 {
-	private IValueList array;
+	IValueConsumer consumer;
 	
-	public ArrayAnnotationVisitor(IValueList array)
+	public AnnotationValueReader(IValueConsumer consumer)
 	{
-		this.array = array;
+		this.consumer = consumer;
 	}
 	
 	@Override
 	public void visit(String key, Object obj)
 	{
-		this.array.addValue(IValue.fromObject(obj));
+		this.consumer.setValue(IValue.fromObject(obj));
 	}
 	
 	@Override
 	public void visitEnum(String key, String enumClass, String name)
 	{
-		IValue enumValue = AnnotationVisitorImpl.getEnumValue(enumClass, name);
+		IValue enumValue = AnnotationReader.getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
-			this.array.addValue(enumValue);
+			this.consumer.setValue(enumValue);
 		}
 	}
 	
@@ -38,16 +38,25 @@ public final class ArrayAnnotationVisitor implements AnnotationVisitor
 	{
 		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		AnnotationValue value = new AnnotationValue(annotation);
-		this.array.addValue(value);
-		return new AnnotationVisitorImpl(value, annotation);
+		this.consumer.setValue(value);
+		return new AnnotationReader(value, annotation);
 	}
 	
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ArrayExpr valueList = new ArrayExpr(null);
-		this.array.addValue(valueList);
-		return new ArrayAnnotationVisitor(valueList);
+		ArrayExpr valueList = new ArrayExpr();
+		IValueConsumer outerConsumer = this.consumer;
+
+		return new AnnotationValueReader(valueList)
+		{
+			@Override
+			public void visitEnd()
+			{
+				valueList.getType();
+				outerConsumer.setValue(valueList);
+			}
+		};
 	}
 	
 	@Override

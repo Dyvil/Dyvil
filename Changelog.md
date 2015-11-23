@@ -1,3 +1,98 @@
+Dyvil v0.10.0
+=============
+
+- Added Partially Applied Functions using Wildcard Values in Methods.
+- Added Qualified Types using the `package.package.TypeName` syntax.
+- Number Literals with a trailing `L`, `F` or `D` only recognize these characters if they are not suceeded by another letter.
+- Changed the Wildcard Value Syntax from `...` to `_`.
+
+## Dyvil Library v0.9.0
+
+- Added the `@UsageInfo` annotation.
+- Added the `@dyvil.annotation.analysis.Contract`, `@NotNull` and `@Nullable` annotations and the `dyvil.Analysis` header.
+- Added the `@DefaultValue` and `@DefaultArrayValue` annotations.
+- Added the `Predef.run(=> any)`, `.run(any, any => any)`, `.use(any, any => void)` and `.with(any, any => any)` methods.
+- Added mutable and immutable `TreeSet` implementations that use a backing `TreeMap`.
+- Added the `Queryable.allMatch(E => boolean)` and `.exists(E => boolean)` methods.
+- Added the `Map.allMatch((K, V) => boolean)` and `.exists((K, V) => boolean)` methods.
+- Added several methods to find and return the first or last element matching a condition in Queryables and Maps.
+- Added default implementations for `dyvil.collection.Map.containsKey(Object)` and `.containsValue(Object)`.
+- Added missing `@NilConvertible` and `@ArrayConvertible` annotations to `IdentityHashMap`s and `IdentityHashSet`s.
+- Converted the Utility Interfaces `dyvil.io.FileUtils`, `.WebUtils` and `dyvil.random.RandomUtils` to classes with private constructors.
+- Implemented the `.toString()`, `.equals(any)` and `.hashCode()` methods for the `dyvil.util.Some` class.
+- Improved the `@Deprecated` annotation by adding an optional Description.
+- Renamed `dyvil/annotation/specialized.dyvil` to `Specialized.dyv`.
+- Renamed `dyvil/lang/Null.dyvil` to `Null.dyv`.
+- Moved `dyvil/lang/JavaUtils.dyh` to the `dyvil` package.
+
+## Dyvil Compiler v0.10.0
+
+- Re-added Closure (formerly Applied Statement Lists) Support.
+- Overhauled the Formatting System which now uses a config file.
+- Additional Marker Information is not also localized rather than being hard-coded Strings.
+- Constructors that attempt to create an array of a non-reified generic type argument will now cause a compiler error.
+- String Concatenation Chains that contain expressions returning a Void result will create an error marker.
+- Added a warning for when the `dyvil.Lang` header cannot be resolved.
+- Added Compiler Support for the `@Experimental` annotation.
+- Added Compiler Support for the `@UsageInfo` annotation.
+- Added the `dyvil.tools.compiler.ast.access.IReceiverAccess` class as a supertype of `dyvil.tools.compiler.ast.access.ICall`.
+- Added the `IReceiverAccess.resolveReceiver()` method and implemented it in all subtypes.
+- Added a callback to check if an expression has been resolved without errors, i.e. has a valid type.
+- Added `IClass.getClassType()` to get a non-generic version of a classes' type'.
+- Added `CastOperator.toString()` implementation.
+- Added `ThisValue.toString()` implementation.
+- Updated Field Assignment Resolution to mimic Field Access behaviour in regards to Setter methods and private access contexts.
+- Updated / Improved Subscript Method Resolution to work in more cases and be more flexible.
+- Updated Parameter Default Values to use Annotations (`@DefaultValue` and `@DefaultArrayValue`).
+- Updated the MarkerMessages member. localizations.
+- Improved Wildcard Literal and Nil Literal marker messages.
+- Improved Lambda Type Checking.
+- Improved String Builder Expression Conversion for Wildcard Values.
+- Fixed Class Parameters being capturable.
+- Fixed Lambda Type inference working incorrectly.
+- Fixed Void Results being handled incorrectly by the `AbstractLMF` type checker.
+- Fixed Semicolon Inference working incorrectly when the last token in the line is a symbol (like `.,;:`).
+- Fixed Automatic Lambda Conversion working incorrectly in some cases.
+- Fixed empty Statement Lists being compiled incorrectly when used as expressions.
+- Fixed Intrinsics not being converted to the correct type after being compiled.
+- Fixed Literal Conversion Expressions type-checking incorrectly with non-concrete types.
+- Fixed Field Accesses checking the receiver type in a way that previously removed the receiver completely and added a proper error message.
+- Fixed Method Override Return Type checking using non-concrete types.
+- Fixed Tuple Type Variable resolution working incorrectly because of an erroneous assumption.
+- Fixed Type Variable Types being type-checked incorrectly, allowing any type to be compatible with a Type Var Type in the local scope.
+- Fixed Array Constructors causing compiler errors.
+- Fixed Field Assignments without actual assignment values causing compiler errors.
+- Fixed a parser error that was caused when unregistered operators ending with the `=` symbol were used.
+- Fixed Invalid Import Statements causing Compiler Errors.
+- Fixed Method Calls with Type Arguments but without Parameters ignoring the Type Arguments.
+- Fixed Class Parameter indexes being set incorrectly.
+- Fixed Named Type Resolution working incorrectly.
+- Fixed Compiler Errors being caused when type-checking unresolved types.
+- Fixed `WildcardValue.toString()` implementation for unbounded Wildcard Types.
+- Fixed Field Assignments in Statement Lists being parsed incorrectly because they are treated as Variable Declarations in some cases.
+- Fixed Compound Call Type Check failing because the method return type is always inferred to `void`.
+- Fixed `IType.getSuperTypeDistance(IType)` causing a NPE for unresolved types.
+- Refactored the `StatementList` class.
+- Moved some methods from `AbstractClass` to `IClass` and implemented them in subclasses.
+- Moved the Internal Annotations (Annotations used for Bytecode attributes, modifiers, special metadata, etc.) to the `dyvil.annotation._internal` package.
+- Renamed `IType.equals(IType)` to `.isSameType`.
+- Renamed `dyvil.tools.compiler.lang.lang.properties` to `MarkerMessages.properties`.
+- Removed the `dyvil.tools.compiler.ast.expression.IValued` class.
+- Moved Marker Level Properties from the MarkerMessages.properties file to a new resource and updated the `I18n` class accordingly.
+- Type Structure Changes.
+- AST Structure Changes.
+
+## Dyvil REPL v0.6.0
+
+- Added the `:complete` REPL command.
+- Empty Commands and Commands starting with `:` are no longer recognized as such by the REPL.
+- Improved the `:exit` (`:quit`, `:q`) REPL command.
+- Improved Exception Stack Trace printing in the REPL.
+- Fixed rare NPE when `CTRL-D` is inserted in the REPL.
+- Fixed REPL Markers not being reported when the input was not parseable as an expression.
+
+## Dyvil Property Format v0.2.1
+
 Dyvil v0.9.0
 ============
 
@@ -8,7 +103,7 @@ Dyvil v0.9.0
 - Trailing dots in number literals are now only interpreted as Floating Point Literals if the next character is a digit.
 - Floating Point Literals without an explicit `F` or `D` suffix are now implicitly of type double.
 
-# Dyvil Library v0.8.0
+## Dyvil Library v0.8.0
 
 - Added the `Map.keys()` and `Map.values()` methods to simplify use in For Each Statements.
 - Added the `Map.keyMapped(BiFunction)` and `.mapKeys(BiFunction)` methods.
@@ -42,7 +137,7 @@ Dyvil v0.9.0
 - Renamed `List.apply(int, Object)` and `List.apply(int, IntFunction<Object>)` as well as their `ImmutableList` counterparts to `.repeat` and `.generate` for clarity.
 - Renamed the `[X].apply(int, X)` and `[X].apply(int, => X)` methods to `repeat` and `generate`, respectively.
 
-# Dyvil Compiler v0.9.0
+## Dyvil Compiler v0.9.0
 
 - Overhauled the Intrinsic System.
 - Added support for `INVOKE*`, `GET*`, and `PUT*` instructions in Intrinsic Annotations.
@@ -76,7 +171,7 @@ Dyvil v0.9.0
 - Fixed the generated code for `equals` and `hashCode` in Case Classes working incorrectly for doubles.
 - Fixed `Util.toTime(long)` working incorrectly for long timespans.
 
-# Dyvil REPL v0.5.0
+## Dyvil REPL v0.5.0
 
 - Added a check if a class has already been defined.
 - Added the :debug command.
@@ -91,7 +186,7 @@ Dyvil v0.9.0
 - Fixed semantic error markers not being reported in the REPL.
 - Fixed strange formatting in IDE consoles by using stdout and stderr within very short periods of time.
 
-# Dyvil Propery Format v0.2.1
+## Dyvil Propery Format v0.2.1
 
 - Made commas in DPF Maps optional.
 

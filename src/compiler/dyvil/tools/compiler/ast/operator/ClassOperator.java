@@ -27,7 +27,7 @@ public final class ClassOperator extends AbstractValue
 	{
 		public static final IClass		CLASS_CLASS	= Package.javaLang.resolveClass("Class");
 		public static final ClassType	CLASS		= new ClassType(CLASS_CLASS);
-		
+
 		public static final IClass CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
 		
 		private Types()

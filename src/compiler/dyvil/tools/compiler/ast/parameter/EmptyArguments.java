@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import java.util.Collections;
-import java.util.Iterator;
-
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -12,10 +9,13 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Collections;
+import java.util.Iterator;
+
 public final class EmptyArguments implements IArguments
 {
-	public static final EmptyArguments	VISIBLE		= new EmptyArguments(true);
-	public static final EmptyArguments	INSTANCE	= new EmptyArguments(false);
+	public static final EmptyArguments VISIBLE  = new EmptyArguments(true);
+	public static final EmptyArguments INSTANCE = new EmptyArguments(false);
 	
 	private boolean visible;
 	
@@ -135,7 +135,13 @@ public final class EmptyArguments implements IArguments
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -169,9 +175,18 @@ public final class EmptyArguments implements IArguments
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.visible)
+		if (!this.visible)
 		{
-			buffer.append(Formatting.Method.emptyParameters);
+			return;
+		}
+
+		if (Formatting.getBoolean("parameters.empty.space_between"))
+		{
+			buffer.append("( )");
+		}
+		else
+		{
+			buffer.append("()");
 		}
 	}
 	

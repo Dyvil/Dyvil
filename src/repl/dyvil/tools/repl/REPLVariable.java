@@ -16,9 +16,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class REPLVariable extends Field
 {
-	private REPLContext	context;
-	protected String	className;
-	private Class		theClass;
+	private   REPLContext context;
+	protected String      className;
+	private   Class       theClass;
 	
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
 	{
@@ -65,6 +65,35 @@ public class REPLVariable extends Field
 		{
 			ex.printStackTrace();
 		}
+		catch (ExceptionInInitializerError t)
+		{
+			printFilteredTrace(t.getCause());
+		}
+		catch (Throwable t)
+		{
+			printFilteredTrace(t);
+		}
+	}
+
+	private static void printFilteredTrace(Throwable throwable)
+	{
+		StackTraceElement[] traceElements = throwable.getStackTrace();
+		int count = traceElements.length;
+		int lastIndex = count - 1;
+
+		for (; lastIndex >= 0; --lastIndex)
+		{
+			if (traceElements[lastIndex].getClassName().startsWith("sun.misc.Unsafe"))
+			{
+				break;
+			}
+		}
+		StackTraceElement[] newTraceElements = new StackTraceElement[lastIndex + 1];
+		System.arraycopy(traceElements, 0, newTraceElements, 0, lastIndex + 1);
+
+		throwable.setStackTrace(newTraceElements);
+
+		throwable.printStackTrace();
 	}
 	
 	protected void compute(List<IClassCompilable> compilableList)

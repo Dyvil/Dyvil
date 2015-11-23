@@ -1,4 +1,4 @@
-package dyvil.lang
+package dyvil
 
 using	dyvil.random.RandomUtils._
 using	dyvil.collection.JavaCollections._

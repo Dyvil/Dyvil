@@ -1,19 +1,20 @@
 package dyvil.collection.mutable;
 
-import java.util.Arrays;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
+import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+
 @NilConvertible
+@ArrayConvertible
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = -2508405537563871840L;
