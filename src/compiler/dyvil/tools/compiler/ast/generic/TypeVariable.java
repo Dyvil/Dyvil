@@ -174,7 +174,8 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
 	{
-		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0, typePath.getLength());
+		this.upperBounds[index] = IType
+				.withAnnotation(this.upperBounds[index], annotation, typePath, 0, typePath.getLength());
 	}
 	
 	@Override
@@ -282,7 +283,30 @@ public final class TypeVariable implements ITypeVariable
 		}
 		return true;
 	}
-	
+
+	@Override
+	public boolean isSuperClassOf(IType type)
+	{
+		if (this.upperBoundCount > 0)
+		{
+			for (int i = 0; i < this.upperBoundCount; i++)
+			{
+				if (!this.upperBounds[i].isSuperClassOf(type))
+				{
+					return false;
+				}
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (!type.isSuperClassOf(this.lowerBound))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
@@ -471,19 +495,22 @@ public final class TypeVariable implements ITypeVariable
 	public void write(TypeAnnotatableVisitor visitor)
 	{
 		boolean method = this.generic instanceof IMethod;
-		int typeRef = TypeReference.newTypeParameterReference(method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
+		int typeRef = TypeReference.newTypeParameterReference(
+				method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
 		
 		if (this.variance != Variance.INVARIANT)
 		{
-			String type = this.variance == Variance.CONTRAVARIANT ? "Ldyvil/annotation/_internal/Contravariant;" : "Ldyvil/annotation/_internal/Covariant;";
+			String type = this.variance == Variance.CONTRAVARIANT ?
+					"Ldyvil/annotation/_internal/Contravariant;" :
+					"Ldyvil/annotation/_internal/Covariant;";
 			visitor.visitTypeAnnotation(typeRef, null, type, true);
 		}
 		
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			typeRef = TypeReference
-					.newTypeParameterBoundReference(method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND, this.index,
-							i);
+			typeRef = TypeReference.newTypeParameterBoundReference(
+					method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
+					this.index, i);
 			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
 		}
 	}

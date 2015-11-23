@@ -87,7 +87,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
-		return this.typeVar == type.getTypeVariable();
+		return this.typeVar.isSuperClassOf(type);
 	}
 	
 	@Override

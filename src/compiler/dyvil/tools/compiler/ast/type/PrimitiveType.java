@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -28,20 +24,24 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 import static dyvil.reflect.Opcodes.*;
 
 public final class PrimitiveType implements IType
 {
 	// Duplicate of this mapping is present in dyvil.reflect.types.PrimitiveType
-	public static final int	VOID_CODE		= 0;
-	public static final int	BOOLEAN_CODE	= 1;
-	public static final int	BYTE_CODE		= 2;
-	public static final int	SHORT_CODE		= 3;
-	public static final int	CHAR_CODE		= 4;
-	public static final int	INT_CODE		= 5;
-	public static final int	LONG_CODE		= 6;
-	public static final int	FLOAT_CODE		= 7;
-	public static final int	DOUBLE_CODE		= 8;
+	public static final int VOID_CODE    = 0;
+	public static final int BOOLEAN_CODE = 1;
+	public static final int BYTE_CODE    = 2;
+	public static final int SHORT_CODE   = 3;
+	public static final int CHAR_CODE    = 4;
+	public static final int INT_CODE     = 5;
+	public static final int LONG_CODE    = 6;
+	public static final int FLOAT_CODE   = 7;
+	public static final int DOUBLE_CODE  = 8;
 	
 	private static final long PROMOTION_BITS = 0x3C3C0CFC;
 	
@@ -69,22 +69,22 @@ public final class PrimitiveType implements IType
 		// @formatter:on
 	}
 	
-	protected final Name	name;
-	protected IClass		theClass;
+	protected final Name   name;
+	protected       IClass theClass;
 	
-	private final int	typecode;
-	private final char	typeChar;
+	private final int  typecode;
+	private final char typeChar;
 	
-	private final int		opcodeOffset1;
-	private final int		opcodeOffset2;
-	private final Object	frameType;
+	private final int    opcodeOffset1;
+	private final int    opcodeOffset2;
+	private final Object frameType;
 	
-	protected IMethod	boxMethod;
-	protected IMethod	unboxMethod;
+	protected IMethod boxMethod;
+	protected IMethod unboxMethod;
 	
-	private IClass			arrayClass;
-	private ReferenceType	refType;
-	private IType			simpleRefType;
+	private IClass        arrayClass;
+	private ReferenceType refType;
+	private IType         simpleRefType;
 	
 	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
@@ -505,7 +505,8 @@ public final class PrimitiveType implements IType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typecode);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/PrimitiveType", "apply", "(I)Ldyvil/reflect/types/PrimitiveType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/PrimitiveType", "apply",
+		                       "(I)Ldyvil/reflect/types/PrimitiveType;", false);
 	}
 	
 	@Override
@@ -535,10 +536,10 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
+		IType primitiveTarget = target;
 		if (!target.isPrimitive())
 		{
-			this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
-			return;
+			primitiveTarget = getPrimitiveType(target);
 		}
 		
 		switch (this.typecode)
@@ -548,17 +549,22 @@ public final class PrimitiveType implements IType
 		case SHORT_CODE:
 		case CHAR_CODE:
 		case INT_CODE:
-			writeIntCast(target, writer);
-			return;
+			writeIntCast(primitiveTarget, writer);
+			break;
 		case LONG_CODE:
-			writeLongCast(target, writer);
-			return;
+			writeLongCast(primitiveTarget, writer);
+			break;
 		case FLOAT_CODE:
-			writeFloatCast(target, writer);
-			return;
+			writeFloatCast(primitiveTarget, writer);
+			break;
 		case DOUBLE_CODE:
-			writeDoubleCast(target, writer);
-			return;
+			writeDoubleCast(primitiveTarget, writer);
+			break;
+		}
+
+		if (primitiveTarget != target)
+		{
+			primitiveTarget.getBoxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
 		}
 	}
 	

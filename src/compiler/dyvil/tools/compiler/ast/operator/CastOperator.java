@@ -122,7 +122,7 @@ public final class CastOperator extends AbstractValue
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.isSuperClassOf(prevType) && primitiveType == primitiveValue)
+		if (!this.typeHint && this.type.isSameType(prevType) && primitiveType == primitiveValue)
 		{
 			markers.add(I18n.createMarker(this.position, "cast.unnecessary"));
 			this.typeHint = true;

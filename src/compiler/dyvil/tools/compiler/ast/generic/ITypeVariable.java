@@ -61,6 +61,8 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated
 
 	boolean isAssignableFrom(IType type);
 
+	boolean isSuperClassOf(IType type);
+
 	int getSuperTypeDistance(IType superType);
 
 	// Resolution
