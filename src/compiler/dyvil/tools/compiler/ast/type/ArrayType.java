@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -24,6 +20,10 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class ArrayType implements IObjectType, ITyped
 {
@@ -146,19 +146,33 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			return false;
 		}
-		return this.type.isSuperTypeOf(type.getElementType());
+
+		IType elementType = type.getElementType();
+		return this.type.isSuperTypeOf(elementType) && this.type.isPrimitive() == elementType.isPrimitive();
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return type.isArrayType() && this.getElementType().classEquals(type.getElementType());
+		if (!type.isArrayType())
+		{
+			return false;
+		}
+
+		IType elementType = type.getElementType();
+		return this.type.classEquals(elementType) && this.type.isPrimitive() == elementType.isPrimitive();
 	}
 	
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
-		return type.isArrayType() && this.getElementType().isSuperClassOf(type.getElementType());
+		if (!type.isArrayType())
+		{
+			return false;
+		}
+
+		IType elementType = type.getElementType();
+		return this.type.isSuperClassOf(elementType) && this.type.isPrimitive() == elementType.isPrimitive();
 	}
 	
 	@Override
@@ -333,7 +347,8 @@ public class ArrayType implements IObjectType, ITyped
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ArrayType", "apply", "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ArrayType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ArrayType", "apply",
+		                       "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ArrayType;", false);
 	}
 	
 	@Override
@@ -383,17 +398,5 @@ public class ArrayType implements IObjectType, ITyped
 	public IType clone()
 	{
 		return new ArrayType(this.type);
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return 127 * this.type.hashCode();
 	}
 }

@@ -9,14 +9,14 @@ import static dyvil.tools.compiler.backend.ClassFormat.*;
 
 public class Frame
 {
-	protected Object[]	stack;
-	protected int		stackCount;
-	protected int		actualStackCount;
-	protected int		maxStack;
+	protected Object[] stack;
+	protected int      stackCount;
+	protected int      actualStackCount;
+	protected int      maxStack;
 	
-	protected Object[]	locals;
-	protected int		localCount;
-	protected int		maxLocals;
+	protected Object[] locals;
+	protected int      localCount;
+	protected int      maxLocals;
 	
 	public Frame()
 	{
@@ -234,6 +234,11 @@ public class Frame
 	
 	public void set(Object type)
 	{
+		if (type == null)
+		{
+			return;
+		}
+
 		if (type == LONG || type == DOUBLE)
 		{
 			Object o = this.stack[this.stackCount - 1];
