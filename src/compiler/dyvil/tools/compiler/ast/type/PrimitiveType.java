@@ -539,7 +539,15 @@ public final class PrimitiveType implements IType
 		IType primitiveTarget = target;
 		if (!target.isPrimitive())
 		{
+			// Try to extract a primitive type
 			primitiveTarget = getPrimitiveType(target);
+
+			// Target is not a primitive type
+			if (primitiveTarget == target)
+			{
+				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+				return;
+			}
 		}
 		
 		switch (this.typecode)
@@ -562,6 +570,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 
+		// If the target is not primitive
 		if (primitiveTarget != target)
 		{
 			primitiveTarget.getBoxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
