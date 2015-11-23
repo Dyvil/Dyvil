@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.reference;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashMap;
-import dyvil.collection.mutable.MapBasedSet;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
@@ -22,13 +22,16 @@ public class StaticFieldReference implements IReference, IClassCompilable
 {
 	private static Map<String, Set<IField>> map = new IdentityHashMap<>();
 	
-	protected IField						field;
-	
-	private boolean							isUnique;
-	private String							className;
-	private String							idFieldName;
-	private String							refFieldType;
-	
+	protected IField field;
+
+	// Metadata
+	private boolean isUnique;
+	private String  className;
+	private String  fieldName;
+	private String  fieldOriginClassName;
+	private String  refFieldName;
+	private String  refFieldType;
+
 	public StaticFieldReference(IField field)
 	{
 		this.field = field;
@@ -39,7 +42,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		Set<IField> set = map.get(className);
 		if (set == null)
 		{
-			set = new MapBasedSet<IField>(new IdentityHashMap<>());
+			set = new IdentityHashSet<>();
 			map.put(className, set);
 		}
 		
@@ -61,15 +64,39 @@ public class StaticFieldReference implements IReference, IClassCompilable
 			this.isUnique = true;
 		}
 	}
+
+	// Lazy Field Getters
+
+	public String getFieldName()
+	{
+		if (this.fieldName != null)
+		{
+			return fieldName;
+		}
+
+		return this.fieldName = this.field.getName().qualified;
+	}
+
+	private String getFieldOriginClassName()
+	{
+		if (this.fieldOriginClassName != null)
+		{
+			return this.fieldOriginClassName;
+		}
+
+		return this.fieldOriginClassName = this.field.getTheClass().getInternalName();
+	}
 	
 	private String getRefFieldName()
 	{
-		if (this.idFieldName != null)
+		if (this.refFieldName != null)
 		{
-			return this.idFieldName;
+			return this.refFieldName;
 		}
-		
-		return this.idFieldName = "$fieldRef$" + this.className.replace('/', '$') + "$" + this.field.getName().qualified;
+
+		// Format: $staticRef$[originClassName]$[fieldName]
+		return this.refFieldName =
+				"$staticRef$" + this.getFieldOriginClassName().replace('/', '$') + '$' + this.getFieldName();
 	}
 	
 	private String getRefFieldType()
@@ -81,7 +108,9 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		
 		return this.refFieldType = 'L' + Types.getInternalRef(this.field.getType(), "") + ';';
 	}
-	
+
+	// IClassCompilable callback implementations
+
 	@Override
 	public void setInnerIndex(String internalName, int index)
 	{
@@ -110,9 +139,9 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		{
 			return;
 		}
-		
-		String fieldName = this.field.getName().qualified;
-		String fieldClassType = 'L' + this.field.getTheClass().getInternalName() + ';';
+
+		String fieldName = this.getFieldName();
+		String fieldOriginClassName = this.getFieldOriginClassName();
 		
 		String refFieldName = this.getRefFieldName();
 		String refFieldType = this.getRefFieldType();
@@ -121,16 +150,19 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
 
 		// Load the field class
-		writer.writeLDC(Type.getType(fieldClassType));
+		writer.writeLDC(Type.getObjectType(fieldOriginClassName));
 		// Load the field name
 		writer.writeLDC(fieldName);
 
 		// Invoke the factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/FieldAccessFactory", factoryMethodName, factoryMethodType, false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/FieldAccessFactory", factoryMethodName,
+		                       factoryMethodType, false);
 		
 		// Assign the reference field
 		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, refFieldType);
 	}
+
+	// Reference getter implementation
 	
 	@Override
 	public void writeReference(MethodWriter writer) throws BytecodeException
