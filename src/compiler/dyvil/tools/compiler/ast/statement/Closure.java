@@ -67,7 +67,13 @@ public class Closure extends StatementList
 		}
 		return super.getTypeMatch(type);
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{

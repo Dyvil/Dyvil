@@ -76,6 +76,8 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
 	// Phase Methods
+
+	boolean isResolved();
 	
 	void resolveTypes(MarkerList markers, IContext context);
 	

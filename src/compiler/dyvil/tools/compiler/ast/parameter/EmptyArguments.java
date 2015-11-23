@@ -135,7 +135,13 @@ public final class EmptyArguments implements IArguments
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

@@ -263,7 +263,13 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		return this.value == null ? EmptyIterator.instance : new SingletonIterator<IValue>(this.value);
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		return this.value == null || this.value.isResolved();
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

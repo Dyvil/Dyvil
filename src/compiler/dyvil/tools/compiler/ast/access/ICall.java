@@ -114,6 +114,19 @@ public interface ICall extends IValue
 			return resolved;
 		}
 
+		// Don't report an error if the receiver is not resolved
+		IValue receiver = this.getReceiver();
+		if (receiver != null && !receiver.isResolved())
+		{
+			return this;
+		}
+
+		// Don't report an error if the arguments are not resolved
+		if (!this.getArguments().isResolved())
+		{
+			return this;
+		}
+
 		this.reportResolve(markers, context);
 		return this;
 	}

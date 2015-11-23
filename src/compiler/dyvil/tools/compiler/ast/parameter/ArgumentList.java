@@ -349,7 +349,20 @@ public final class ArgumentList implements IArguments, IValueList
 			writer.writeInsn(opcode);
 		}
 	}
-	
+
+	@Override
+	public boolean isResolved()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
