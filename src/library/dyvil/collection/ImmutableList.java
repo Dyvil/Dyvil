@@ -1,5 +1,15 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.mutating;
+import dyvil.collection.immutable.AppendList;
+import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.immutable.EmptyList;
+import dyvil.collection.immutable.SingletonList;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.util.ImmutableException;
+
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -7,17 +17,6 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.annotation.mutating;
-import dyvil.annotation._internal.Covariant;
-import dyvil.collection.immutable.AppendList;
-import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.immutable.EmptyList;
-import dyvil.collection.immutable.SingletonList;
-import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible
@@ -51,7 +50,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	static <E> ImmutableList<E> apply(E... elements)
 	{
-		return new ArrayList(elements, true);
+		return new ArrayList<>(elements, true);
 	}
 	
 	static <E> ImmutableList<E> repeat(int count, E repeatedValue)
@@ -74,9 +73,9 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList(elements, count, true);
 	}
 	
-	static <E> ImmutableList<E> fromArray(E... elements)
+	static <E> ImmutableList<E> fromArray(E[] elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList<>(elements);
 	}
 	
 	static <E> ImmutableList<E> linked(E... elements)

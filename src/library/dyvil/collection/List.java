@@ -1,5 +1,10 @@
 package dyvil.collection;
 
+import dyvil.collection.immutable.EmptyList;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -7,12 +12,6 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.collection.immutable.EmptyList;
-import dyvil.collection.mutable.ArrayList;
 
 /**
  * A <b>List</b> is a data type that represents an ordered (sequential)
@@ -93,7 +92,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return ImmutableList.apply(elements);
 	}
 	
-	static <E> ImmutableList<E> fromArray(E... elements)
+	static <E> ImmutableList<E> fromArray(E[] elements)
 	{
 		return ImmutableList.fromArray(elements);
 	}
@@ -449,22 +448,12 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	
 	static <E> boolean listEquals(List<E> list, Object o)
 	{
-		if (!(o instanceof List))
-		{
-			return false;
-		}
-		
-		return listEquals(list, (List) o);
+		return o instanceof List && listEquals(list, (List<E>) o);
 	}
 	
 	static <E> boolean listEquals(List<E> c1, List<E> c2)
 	{
-		if (c1.size() != c2.size())
-		{
-			return false;
-		}
-		
-		return Collection.orderedEquals(c1, c2);
+		return c1.size() == c2.size() && Collection.orderedEquals(c1, c2);
 	}
 	
 	static <E> int listHashCode(List<E> list)
