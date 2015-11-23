@@ -21,21 +21,25 @@ public final class Types
 {
 	public static IDyvilHeader LANG_HEADER;
 	
-	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V', Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
-			Opcodes.IALOAD, null);
-	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z', Opcodes.ILOAD, Opcodes.BALOAD,
-			ClassFormat.BOOLEAN);
-	public static final PrimitiveType BYTE    = new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B', Opcodes.ILOAD, Opcodes.BALOAD,
-			ClassFormat.BOOLEAN);
-	public static final PrimitiveType SHORT   = new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S', Opcodes.ILOAD, Opcodes.SALOAD,
-			ClassFormat.SHORT);
-	public static final PrimitiveType CHAR    = new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C', Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
-	public static final PrimitiveType INT     = new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I', Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
-	public static final PrimitiveType LONG    = new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J', Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
-	public static final PrimitiveType FLOAT   = new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F', Opcodes.FLOAD, Opcodes.FALOAD,
-			ClassFormat.FLOAT);
-	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D', Opcodes.DLOAD, Opcodes.DALOAD,
-			ClassFormat.DOUBLE);
+	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
+	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
+	                                                              Opcodes.IALOAD, null);
+	public static final PrimitiveType BOOLEAN = new PrimitiveType(Names._boolean, PrimitiveType.BOOLEAN_CODE, 'Z',
+	                                                              Opcodes.ILOAD, Opcodes.BALOAD, ClassFormat.BOOLEAN);
+	public static final PrimitiveType BYTE    = new PrimitiveType(Names._byte, PrimitiveType.BYTE_CODE, 'B',
+	                                                              Opcodes.ILOAD, Opcodes.BALOAD, ClassFormat.BOOLEAN);
+	public static final PrimitiveType SHORT   = new PrimitiveType(Names._short, PrimitiveType.SHORT_CODE, 'S',
+	                                                              Opcodes.ILOAD, Opcodes.SALOAD, ClassFormat.SHORT);
+	public static final PrimitiveType CHAR    = new PrimitiveType(Names._char, PrimitiveType.CHAR_CODE, 'C',
+	                                                              Opcodes.ILOAD, Opcodes.CALOAD, ClassFormat.CHAR);
+	public static final PrimitiveType INT     = new PrimitiveType(Names._int, PrimitiveType.INT_CODE, 'I',
+	                                                              Opcodes.ILOAD, Opcodes.IALOAD, ClassFormat.INT);
+	public static final PrimitiveType LONG    = new PrimitiveType(Names._long, PrimitiveType.LONG_CODE, 'J',
+	                                                              Opcodes.LLOAD, Opcodes.LALOAD, ClassFormat.LONG);
+	public static final PrimitiveType FLOAT   = new PrimitiveType(Names._float, PrimitiveType.FLOAT_CODE, 'F',
+	                                                              Opcodes.FLOAD, Opcodes.FALOAD, ClassFormat.FLOAT);
+	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D',
+	                                                              Opcodes.DLOAD, Opcodes.DALOAD, ClassFormat.DOUBLE);
 
 	public static final DynamicType DYNAMIC = new DynamicType();
 	public static final UnknownType UNKNOWN = new UnknownType();
@@ -91,8 +95,10 @@ public final class Types
 
 		if (LANG_HEADER == null)
 		{
-			DyvilCompiler.log("Warning: The dyvil.Lang header could not be found. This may cause serious compilation problems.");
-			for (Library library : DyvilCompiler.config.libraries) {
+			DyvilCompiler
+					.log("Warning: The dyvil.Lang header could not be found. This may cause serious compilation problems.");
+			for (Library library : DyvilCompiler.config.libraries)
+			{
 				System.out.println("\tlibrary = " + library);
 			}
 			LANG_HEADER = new DyvilHeader();
@@ -191,7 +197,7 @@ public final class Types
 		return OBJECT_ARRAY_CLASS;
 	}
 	
-	public static ReferenceType getRef(IType type)
+	public static ReferenceType getObjectRef(IType type)
 	{
 		if (OBJECT_REF_CLASS == null)
 		{
@@ -201,18 +207,37 @@ public final class Types
 		return new ReferenceType(OBJECT_REF_CLASS, type);
 	}
 	
-	protected static IType getSimpleRef(IType type)
+	protected static IType getObjectSimpleRef(IType type)
 	{
 		if (OBJECT_SIMPLE_REF_CLASS == null)
 		{
 			OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
 		}
-		
+
 		ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
 		gt.addType(type);
 		return gt;
 	}
-	
+
+	public static String getTypeRefKeyword(IType type)
+	{
+		if (type.isPrimitive())
+		{
+			return type.getTheClass().getName().qualified;
+		}
+		return "Object";
+	}
+
+	public static String getInternalRef(IType type, String prefix)
+	{
+		return "dyvil/lang/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
+	}
+
+	public static String getAccessFactoryName(IType type, boolean isStatic)
+	{
+		return (isStatic ? "newStatic" : "new") + getTypeRefKeyword(type) + "Ref";
+	}
+
 	public static IType combine(IType type1, IType type2)
 	{
 		if (type1.isSameType(type2))
@@ -221,16 +246,7 @@ public final class Types
 		}
 		return type1;
 	}
-	
-	public static String getInternalRef(IType type, String prefix)
-	{
-		if (type.isPrimitive())
-		{
-			return "dyvil/lang/ref/" + prefix + type.getTheClass().getName().qualified + "Ref";
-		}
-		return "dyvil/lang/ref/" + prefix + "ObjectRef";
-	}
-	
+
 	public static IType findCommonSuperType(IType type1, IType type2)
 	{
 		if (type1 == Types.VOID || type2 == Types.VOID)

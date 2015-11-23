@@ -6,6 +6,7 @@ import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.collection.mutable.MapBasedSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,7 +20,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class StaticFieldReference implements IReference, IClassCompilable
 {
-	private static Map<String, Set<IField>> map = new IdentityHashMap();
+	private static Map<String, Set<IField>> map = new IdentityHashMap<>();
 	
 	protected IField						field;
 	
@@ -115,43 +116,20 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		
 		String refFieldName = this.getRefFieldName();
 		String refFieldType = this.getRefFieldType();
-		String wrapperClass = Types.getInternalRef(this.field.getType(), "unsafe/Unsafe");
-		
-		int var = writer.localCount();
-		
-		// Create a new wrapper object
-		writer.writeTypeInsn(Opcodes.NEW, wrapperClass);
-		writer.writeInsn(Opcodes.DUP);
-		
-		// Get the Unsafe and store it in a local variable
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/ReflectUtils", "unsafe", "Lsun/misc/Unsafe;");
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(Opcodes.ASTORE, var);
-		
-		// Get the Class of the field container type
-		writer.writeLDC(dyvil.tools.asm.Type.getType(fieldClassType));
+
+		String factoryMethodName = Types.getAccessFactoryName(this.field.getType(), true);
+		String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
+
+		// Load the field class
+		writer.writeLDC(Type.getType(fieldClassType));
+		// Load the field name
 		writer.writeLDC(fieldName);
-		// Get the Field using reflection
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
-		// Store it in a second local variable
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(Opcodes.ASTORE, var + 1);
-		
-		// Get the field base
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "sun/misc/Unsafe", "staticFieldBase", "(Ljava/lang/reflect/Field;)Ljava/lang/Object;", false);
-		
-		// Get the field offset
-		writer.writeVarInsn(Opcodes.ALOAD, var);
-		writer.writeVarInsn(Opcodes.ALOAD, var + 1);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "sun/misc/Unsafe", "staticFieldOffset", "(Ljava/lang/reflect/Field;)J", false);
-		
-		// Init the wrapper object
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, wrapperClass, "<init>", "(Ljava/lang/Object;J)V", false);
+
+		// Invoke the factory method
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/FieldAccessFactory", factoryMethodName, factoryMethodType, false);
 		
 		// Assign the reference field
 		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, refFieldType);
-		
-		writer.resetLocals(var);
 	}
 	
 	@Override

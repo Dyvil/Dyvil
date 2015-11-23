@@ -126,7 +126,7 @@ public final class MethodParameter extends Parameter
 		
 		if ((this.modifiers & Modifiers.VAR) != 0)
 		{
-			this.refType = Types.getRef(this.type);
+			this.refType = this.type.getRefType();
 		}
 	}
 	
@@ -192,7 +192,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			this.refType.writeGet(writer, this.index);
+			this.refType.writeGet(writer, this.localIndex);
 			return;
 		}
 		
@@ -204,7 +204,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			this.refType.writeSet(writer, this.index, value);
+			this.refType.writeSet(writer, this.localIndex, value);
 			return;
 		}
 		
