@@ -128,21 +128,24 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	@Override
 	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		if (index == 1)
+		int size = this.size();
+		if (index == size)
 		{
-			return DEFAULT_MATCH;
+			return VARARGS_MATCH;
 		}
-		if (index > 1 || this.value == null)
+		if (index > size)
 		{
 			return 0;
 		}
 		
-		float m = this.value.getTypeMatch(param.getType());
-		if (m != 0)
+		float valueMatch = this.value.getTypeMatch(param.getType());
+		if (valueMatch > 0)
 		{
-			return m;
+			return valueMatch;
 		}
-		return this.value.getTypeMatch(param.getType().getElementType());
+
+		valueMatch = this.value.getTypeMatch(param.getType().getElementType());
+		return valueMatch > 0 ? valueMatch + VARARGS_MATCH : 0;
 	}
 	
 	@Override

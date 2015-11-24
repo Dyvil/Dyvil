@@ -587,16 +587,13 @@ public class Constructor extends Member implements IConstructor
 				}
 				match += m;
 			}
-			for (int i = parCount; i < argumentCount; i++)
+
+			m = arguments.getVarargsTypeMatch(parCount, varParam);
+			if (m == 0)
 			{
-				m = arguments.getVarargsTypeMatch(i, varParam);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
+				return 0;
 			}
-			return match + AbstractMethod.VARARGS_MATCH;
+			return m + match;
 		}
 		else if (argumentCount > this.parameterCount)
 		{

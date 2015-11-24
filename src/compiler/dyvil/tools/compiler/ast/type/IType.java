@@ -168,6 +168,10 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	default float getSubTypeDistance(IType subtype)
 	{
+		if (subtype.isArrayType() && this.getTheClass() == Types.OBJECT_CLASS)
+		{
+			return ArrayType.OBJECT_DISTANCE;
+		}
 		return subtype.getSuperTypeDistance(this);
 	}
 	

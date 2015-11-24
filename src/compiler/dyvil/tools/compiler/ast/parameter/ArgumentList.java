@@ -192,7 +192,7 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		if (index == this.size)
 		{
-			return DEFAULT_MATCH;
+			return VARARGS_MATCH;
 		}
 		if (index > this.size)
 		{
@@ -201,12 +201,23 @@ public final class ArgumentList implements IArguments, IValueList
 		
 		IValue argument = this.values[index];
 		IType type = param.getType();
-		float m = argument.getTypeMatch(type);
-		if (m > 0F)
+		float totalMatch = argument.getTypeMatch(type);
+		if (totalMatch > 0F)
 		{
-			return m;
+			return totalMatch;
 		}
-		return argument.getTypeMatch(type.getElementType());
+
+		IType elementType = type.getElementType();
+		for (totalMatch = 0; index < this.size; index++)
+		{
+			float valueMatch = this.values[index].getTypeMatch(elementType);
+			if (valueMatch <= 0)
+			{
+				return 0F;
+			}
+			totalMatch += valueMatch;
+		}
+		return totalMatch > 0F ? totalMatch + VARARGS_MATCH : 0;
 	}
 	
 	@Override

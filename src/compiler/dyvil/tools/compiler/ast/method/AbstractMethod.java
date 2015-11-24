@@ -542,8 +542,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return 1;
 		}
 		
-		int parIndex = 0;
-		int match = 1;
+		int parameterStartIndex = 0;
+		int totalMatch = 1;
 		int argumentCount = arguments.size();
 		
 		// infix modifier implementation
@@ -557,14 +557,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else if (mod == Modifiers.INFIX)
 			{
 				IType t2 = this.parameters[0].getType();
-				float m = receiver.getTypeMatch(t2);
-				if (m == 0)
+				float receiverMatch = receiver.getTypeMatch(t2);
+				if (receiverMatch == 0)
 				{
 					return 0;
 				}
-				match += m;
+				totalMatch += receiverMatch;
 				
-				parIndex = 1;
+				parameterStartIndex = 1;
 			}
 			else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
@@ -578,56 +578,51 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				{
 					return 0;
 				}
-				match += receiverMatch;
+				totalMatch += receiverMatch;
 			}
 		}
 		if ((this.modifiers & Modifiers.VARARGS) != 0)
 		{
-			int varargsStart = this.parameterCount - 1 - parIndex;
+			int varargsStart = this.parameterCount - 1 - parameterStartIndex;
 			
-			float m;
-			for (int i = parIndex; i < varargsStart; i++)
+			for (int i = parameterStartIndex; i < varargsStart; i++)
 			{
-				IParameter par = this.parameters[i + parIndex];
-				m = arguments.getTypeMatch(i, par);
-				if (m == 0)
+				IParameter par = this.parameters[i + parameterStartIndex];
+				float valueMatch = arguments.getTypeMatch(i, par);
+				if (valueMatch <= 0)
 				{
 					return 0;
 				}
-				match += m;
+				totalMatch += valueMatch;
 			}
 			
-			IParameter varParam = this.parameters[varargsStart + parIndex];
-			for (int i = varargsStart; i < argumentCount; i++)
+			IParameter varParam = this.parameters[varargsStart + parameterStartIndex];
+			float varargsMatch = arguments.getVarargsTypeMatch(varargsStart, varParam);
+			if (varargsMatch <= 0)
 			{
-				m = arguments.getVarargsTypeMatch(i, varParam);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
+				return 0;
 			}
-			return match + VARARGS_MATCH;
+			return totalMatch + varargsMatch;
 		}
 		
-		int len = this.parameterCount - parIndex;
-		if (argumentCount > len)
+		int parameterLeft = this.parameterCount - parameterStartIndex;
+		if (argumentCount > parameterLeft)
 		{
 			return 0;
 		}
 		
-		for (int i = 0; i < len; i++)
+		for (int argumentIndex = 0; argumentIndex < parameterLeft; argumentIndex++)
 		{
-			IParameter par = this.parameters[i + parIndex];
-			float m = arguments.getTypeMatch(i, par);
-			if (m == 0)
+			IParameter par = this.parameters[argumentIndex + parameterStartIndex];
+			float valueMatch = arguments.getTypeMatch(argumentIndex, par);
+			if (valueMatch <= 0)
 			{
 				return 0;
 			}
-			match += m;
+			totalMatch += valueMatch;
 		}
 		
-		return match;
+		return totalMatch;
 	}
 	
 	@Override

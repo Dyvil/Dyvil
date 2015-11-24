@@ -14,6 +14,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
 	float DEFAULT_MATCH = 1000;
+	float VARARGS_MATCH = 100;
 	
 	@Override
 	default ICodePosition getPosition()

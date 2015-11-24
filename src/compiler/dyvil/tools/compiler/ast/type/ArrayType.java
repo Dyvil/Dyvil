@@ -27,6 +27,7 @@ import java.io.IOException;
 
 public class ArrayType implements IObjectType, ITyped
 {
+	public static final int OBJECT_DISTANCE = 2;
 	private IType type;
 	
 	public ArrayType()
@@ -180,9 +181,15 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		if (!superType.isArrayType())
 		{
-			return superType.getTheClass() == Types.OBJECT_CLASS ? 1 : 0;
+			return superType.getTheClass() == Types.OBJECT_CLASS ? OBJECT_DISTANCE : 0;
 		}
-		return this.type.getSuperTypeDistance(superType.getElementType());
+
+		IType elementType = superType.getElementType();
+		if (this.type.isPrimitive() || elementType.isPrimitive())
+		{
+			return this.type.isSameType(elementType) ? 1 : 0;
+		}
+		return this.type.getSuperTypeDistance(elementType);
 	}
 	
 	@Override
@@ -192,7 +199,12 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			return 0F;
 		}
-		return this.type.getSubTypeDistance(subtype.getElementType());
+		IType elementType = subtype.getElementType();
+		if (this.type.isPrimitive() || elementType.isPrimitive())
+		{
+			return this.type.isSameType(elementType) ? 1 : 0;
+		}
+		return this.type.getSubTypeDistance(elementType);
 	}
 	
 	@Override
@@ -201,6 +213,11 @@ public class ArrayType implements IObjectType, ITyped
 		if (!subtype.isArrayType())
 		{
 			return 0;
+		}
+		IType elementType = subtype.getElementType();
+		if (this.type.isPrimitive() || elementType.isPrimitive())
+		{
+			return this.type.isSameType(elementType) ? 1 : 0;
 		}
 		return this.type.getSubClassDistance(subtype.getElementType());
 	}

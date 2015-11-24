@@ -123,7 +123,7 @@ public final class EmptyArguments implements IArguments
 	@Override
 	public float getVarargsTypeMatch(int index, IParameter param)
 	{
-		return DEFAULT_MATCH;
+		return VARARGS_MATCH;
 	}
 	
 	@Override
