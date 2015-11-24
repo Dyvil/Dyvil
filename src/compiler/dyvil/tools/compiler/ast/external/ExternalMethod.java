@@ -148,7 +148,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
 		if (name != this.name)
 		{
@@ -163,7 +163,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		{
 			this.resolveParameters();
 		}
-		return super.getSignatureMatch(name, instance, arguments);
+		return super.getSignatureMatch(name, receiver, arguments);
 	}
 	
 	@Override

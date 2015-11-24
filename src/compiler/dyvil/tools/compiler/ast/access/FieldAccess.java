@@ -153,10 +153,20 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field == null ? false : type.isSuperTypeOf(this.getType());
+		return this.field != null && type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
+	public float getTypeMatch(IType type)
+	{
+		if (this.field == null)
+		{
+			return 0;
+		}
+		
+		return type.getSubTypeDistance(this.getType());
+	}
+
 	public void setName(Name name)
 	{
 		this.name = name;

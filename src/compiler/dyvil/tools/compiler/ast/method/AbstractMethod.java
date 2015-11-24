@@ -529,7 +529,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
 		if (name != this.name && name != null)
 		{
@@ -547,17 +547,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int argumentCount = arguments.size();
 		
 		// infix modifier implementation
-		if (instance != null)
+		if (receiver != null)
 		{
 			int mod = this.modifiers & Modifiers.INFIX;
-			if (mod != 0 && instance.valueTag() == IValue.CLASS_ACCESS)
+			if (mod != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
-				instance = null;
+				receiver = null;
 			}
 			else if (mod == Modifiers.INFIX)
 			{
 				IType t2 = this.parameters[0].getType();
-				float m = instance.getTypeMatch(t2);
+				float m = receiver.getTypeMatch(t2);
 				if (m == 0)
 				{
 					return 0;
@@ -566,14 +566,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				
 				parIndex = 1;
 			}
-			else if (mod == Modifiers.STATIC && instance.valueTag() != IValue.CLASS_ACCESS)
+			else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
 				// Disallow non-static access to static method
 				return 0;
 			}
 			else
 			{
-				float receiverMatch = instance.getTypeMatch(this.theClass.getType());
+				float receiverMatch = receiver.getTypeMatch(this.theClass.getClassType());
 				if (receiverMatch <= 0)
 				{
 					return 0;

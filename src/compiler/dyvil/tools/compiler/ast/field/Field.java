@@ -139,25 +139,25 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		if (instance != null)
+		if (receiver != null)
 		{
 			if ((this.modifiers & Modifiers.STATIC) != 0)
 			{
-				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(I18n.createMarker(position, "field.access.static", this.name));
 				}
-				else if (instance.getType().getTheClass() != this.theClass)
+				else if (receiver.getType().getTheClass() != this.theClass)
 				{
 					markers.add(I18n.createMarker(position, "field.access.static.type", this.name, this.theClass.getFullName()));
 				}
-				instance = null;
+				receiver = null;
 			}
-			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
-				if (!instance.getType().getTheClass().isObject())
+				if (!receiver.getType().getTheClass().isObject())
 				{
 					markers.add(I18n.createMarker(position, "field.access.instance", this.name));
 				}
@@ -165,15 +165,15 @@ public class Field extends Member implements IField
 			else
 			{
 				IType type = this.theClass.getClassType();
-				IValue instance1 = IType.convertValue(instance, type, type, markers, context);
+				IValue typedReceiver = IType.convertValue(receiver, type, type, markers, context);
 				
-				if (instance1 == null)
+				if (typedReceiver == null)
 				{
-					Util.createTypeError(markers, instance, type, type, "field.access.receiver_type", this.name);
+					Util.createTypeError(markers, receiver, type, type, "field.access.receiver_type", this.name);
 				}
 				else
 				{
-					instance = instance1;
+					receiver = typedReceiver;
 				}
 			}
 		}
@@ -186,7 +186,7 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(I18n.createMarker(position, "field.access.unqualified", this.name.unqualified));
-				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
@@ -202,7 +202,7 @@ public class Field extends Member implements IField
 			break;
 		}
 		
-		return instance;
+		return receiver;
 	}
 	
 	@Override
