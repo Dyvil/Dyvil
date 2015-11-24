@@ -38,8 +38,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return ImmutableMap.apply(entry);
 	}
 	
-	static <K, V> ImmutableMap<K, V> apply(
-			Tuple2<? extends K, ? extends V>... entries)
+	@SafeVarargs
+	static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
 	}
@@ -348,8 +348,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 */
 	default boolean containsKey(Object key)
 	{
-		for (Iterator<K> keyIterator = this.keyIterator(); keyIterator
-				.hasNext(); )
+		for (Iterator<K> keyIterator = this.keyIterator(); keyIterator.hasNext(); )
 		{
 			if (Objects.equals(key, keyIterator.next()))
 			{
@@ -371,8 +370,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 */
 	default boolean containsValue(Object value)
 	{
-		for (Iterator<V> valueIterator = this.valueIterator(); valueIterator
-				.hasNext(); )
+		for (Iterator<V> valueIterator = this.valueIterator(); valueIterator.hasNext(); )
 		{
 			if (Objects.equals(value, valueIterator.next()))
 			{
@@ -506,8 +504,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * {@code map} for that key.
 	 *
 	 * @param map
+	 * 		the second map to add entries from
 	 *
-	 * @return
+	 * @return the map that contains all entries of this map plus all entries of the other map
 	 */
 	Map<K, V> $plus$plus(Map<? extends K, ? extends V> map);
 	
@@ -536,17 +535,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	Map<K, V> $minus$minus(Collection<?> keys);
 	
-	<NK> Map<NK, V> keyMapped(
-			BiFunction<? super K, ? super V, ? extends NK> mapper);
+	<NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
 	
-	<NV> Map<K, NV> valueMapped(
-			BiFunction<? super K, ? super V, ? extends NV> mapper);
+	<NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
-	<NK, NV> Map<NK, NV> entryMapped(
-			BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	<NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
 	
-	<NK, NV> Map<NK, NV> flatMapped(
-			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
+	<NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 	
 	Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
 	
@@ -644,11 +639,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
-	void mapEntries(
-			BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
+	void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
 	
-	void flatMap(
-			BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
+	void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
 	
 	void filter(BiPredicate<? super K, ? super V> condition);
 	
@@ -776,8 +769,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		while (true)
 		{
 			Entry<K, V> entry = iterator.next();
-			builder.append(entry.getKey()).append(" -> ")
-					.append(entry.getValue());
+			builder.append(entry.getKey()).append(" -> ").append(entry.getValue());
 			if (iterator.hasNext())
 			{
 				builder.append(", ");
@@ -797,7 +789,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 			return false;
 		}
 		
-		return mapEquals(map, (Map) obj);
+		return mapEquals(map, (Map<K, V>) obj);
 	}
 	
 	static <K, V> boolean mapEquals(Map<K, V> map1, Map<K, V> map2)
@@ -829,27 +821,21 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 			{
 				continue;
 			}
-			int hash =
-					(key == null ? 0 : key.hashCode()) * 31 + (value == null ?
-							0 :
-							value.hashCode());
+			int hash = (key == null ? 0 : key.hashCode()) * 31 + (value == null ? 0 : value.hashCode());
 			sum += hash;
 			product *= hash;
 		}
 		return sum * 31 + product;
 	}
 	
-	default String toString(String prefix, String entrySeparator,
-			String keyValueSeparator, String postfix)
+	default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
 	{
 		StringBuilder builder = new StringBuilder();
-		this.toString(builder, prefix, entrySeparator, keyValueSeparator,
-				postfix);
+		this.toString(builder, prefix, entrySeparator, keyValueSeparator, postfix);
 		return builder.toString();
 	}
 	
-	default void toString(StringBuilder builder, String prefix,
-			String entrySeparator, String keyValueSeparator, String postfix)
+	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())
@@ -860,13 +846,11 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		
 		Iterator<Entry<K, V>> iterator = this.iterator();
 		Entry<K, V> first = iterator.next();
-		builder.append(first.getKey()).append(keyValueSeparator)
-				.append(first.getValue());
+		builder.append(first.getKey()).append(keyValueSeparator).append(first.getValue());
 		while (iterator.hasNext())
 		{
 			first = iterator.next();
-			builder.append(entrySeparator).append(first.getKey())
-					.append(keyValueSeparator).append(first.getValue());
+			builder.append(entrySeparator).append(first.getKey()).append(keyValueSeparator).append(first.getValue());
 		}
 		builder.append(postfix);
 	}

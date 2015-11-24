@@ -7,10 +7,7 @@ import dyvil.util.Some;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -110,8 +107,7 @@ public interface Queryable<E> extends Iterable<E>
 	 *
 	 * @return the folded value
 	 */
-	default <R> R fold(R initialValue,
-			BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (E element : this)
 		{
@@ -149,6 +145,16 @@ public interface Queryable<E> extends Iterable<E>
 		}
 		
 		return first;
+	}
+
+	default Option<E> reduceOption(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.isEmpty())
+		{
+			return None.instance;
+		}
+
+		return new Some<>(this.reduce(reducer));
 	}
 	
 	default boolean allMatch(Predicate<? super E> condition)
@@ -262,8 +268,7 @@ public interface Queryable<E> extends Iterable<E>
 		return builder.toString();
 	}
 	
-	default void toString(StringBuilder builder, String prefix,
-			String separator, String postfix)
+	default void toString(StringBuilder builder, String prefix, String separator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())
