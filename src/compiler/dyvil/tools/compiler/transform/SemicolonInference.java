@@ -7,9 +7,6 @@ import dyvil.tools.parsing.token.InferredSemicolon;
 
 public final class SemicolonInference
 {
-	private static final int VALUE_KEYWORDS = DyvilKeywords.TRUE | DyvilKeywords.FALSE | DyvilKeywords.BREAK | DyvilKeywords.CONTINUE | DyvilKeywords.THIS
-			| DyvilKeywords.SUPER | DyvilSymbols.ELLIPSIS | DyvilSymbols.WILDCARD;
-			
 	private SemicolonInference()
 	{
 		// no instances
@@ -56,21 +53,39 @@ public final class SemicolonInference
 		if (nextLine == prevLine + 1)
 		{
 			// Check last token on line in question
-			
 			int prevType = prev.type();
-			
+
 			// Check if the previous token is a symbol
 			if ((prevType & Tokens.SYMBOL) != 0)
 			{
+				switch (prevType)
+				{
+				case DyvilSymbols.WILDCARD:
+				case DyvilSymbols.ELLIPSIS:
+					break; // continue inference checking
+				default:
+					return; // don't infer a semicolon
+				}
 				return;
 			}
-			
+
 			// Check if the previous token is a keyword, but not a value keyword
-			if ((prevType & Tokens.KEYWORD) != 0 && (prevType & VALUE_KEYWORDS) == 0)
+			if ((prevType & Tokens.KEYWORD) != 0)
 			{
-				return;
+				switch (prevType)
+				{
+				case DyvilKeywords.TRUE:
+				case DyvilKeywords.FALSE:
+				case DyvilKeywords.BREAK:
+				case DyvilKeywords.CONTINUE:
+				case DyvilKeywords.THIS:
+				case DyvilKeywords.SUPER:
+					break; // continue inference checking
+				default:
+					return; // don't infer a semicolon
+				}
 			}
-			
+
 			// Check for other token types
 			switch (prevType)
 			{
@@ -81,17 +96,17 @@ public final class SemicolonInference
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				return;
 			}
-			
+
 			// Check first token on the next line
-			
+
 			int nextType = next.type();
-			
+
 			// Check if the first token on the next line is a symbol
 			if ((nextType & Tokens.SYMBOL) != 0)
 			{
 				return;
 			}
-			
+
 			// Check for other token types
 			switch (nextType)
 			{
