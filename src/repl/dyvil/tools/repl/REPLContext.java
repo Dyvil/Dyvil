@@ -225,10 +225,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		IType type = value.getType();
-		value = value.withType(type, type, this.markers, this);
-		if (value == null)
+		IValue typedValue = value.withType(type, type, this.markers, this);
+		if (typedValue != null)
 		{
-			throw new Error("Invalid Value - Invalid Type " + type);
+			value = typedValue;
 		}
 		
 		type = value.getType();

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -33,9 +34,9 @@ public final class NilExpr implements IValue
 	protected ICodePosition position;
 	
 	// Metadata
-	private IType	requiredType;
-	private Name	methodName;
-	private IMethod	method;
+	private IType   requiredType;
+	private Name    methodName;
+	private IMethod method;
 	
 	public NilExpr()
 	{
@@ -87,6 +88,8 @@ public final class NilExpr implements IValue
 	{
 		if (type.isArrayType())
 		{
+			this.requiredType = type;
+			this.methodName = Names.apply;
 			return this;
 		}
 		
@@ -98,7 +101,14 @@ public final class NilExpr implements IValue
 			return this;
 		}
 
-		markers.add(I18n.createMarker(this.position, "nil.type", type));
+		if (type != dyvil.tools.compiler.ast.type.Types.UNKNOWN)
+		{
+			markers.add(I18n.createMarker(this.position, "nil.type", type));
+		}
+		else
+		{
+			markers.add(I18n.createMarker(this.position, "nil.untyped", type));
+		}
 		return this;
 	}
 	
@@ -136,6 +146,7 @@ public final class NilExpr implements IValue
 	{
 		if (this.requiredType == null)
 		{
+			// markers.add(I18n.createError(this.position, "nil.untyped"));
 			return;
 		}
 		
@@ -185,7 +196,8 @@ public final class NilExpr implements IValue
 			{
 				// Write a Field Access to the EMPTY fields in the Primitive
 				// Array Classes
-				writer.writeFieldInsn(Opcodes.GETSTATIC, this.requiredType.getTheClass().getInternalName(), "EMPTY", this.requiredType.getExtendedName());
+				writer.writeFieldInsn(Opcodes.GETSTATIC, this.requiredType.getTheClass().getInternalName(), "EMPTY",
+				                      this.requiredType.getExtendedName());
 				return;
 			}
 			
