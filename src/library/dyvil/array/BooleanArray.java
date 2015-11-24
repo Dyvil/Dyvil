@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntPredicate;
-import java.util.function.Predicate;
-
-import dyvil.lang.Boolean;
-import dyvil.lang.Int;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Boolean;
+import dyvil.lang.Int;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -68,12 +67,9 @@ public interface BooleanArray
 	static @infix boolean[] subscript(boolean[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		boolean[] slice = new boolean[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -86,11 +82,8 @@ public interface BooleanArray
 	static @infix void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
@@ -101,10 +94,9 @@ public interface BooleanArray
 	
 	static @infix void forEach(boolean[] array, Consumer<Boolean> action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			action.accept(Boolean.apply(array[i]));
+			action.accept(Boolean.apply(v));
 		}
 	}
 	
@@ -173,9 +165,8 @@ public interface BooleanArray
 		int len = array1.length;
 		boolean[] res = new boolean[len];
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array1)
 		{
-			boolean v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -192,9 +183,8 @@ public interface BooleanArray
 		int len = array1.length;
 		boolean[] res = new boolean[len];
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array1)
 		{
-			boolean v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -218,13 +208,12 @@ public interface BooleanArray
 	
 	static @infix boolean[] flatMapped(boolean[] array, Function<Boolean, boolean[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		boolean[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			boolean[] a = mapper.apply(Boolean.apply(array[i]));
+			boolean[] a = mapper.apply(Boolean.apply(v));
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -245,9 +234,8 @@ public interface BooleanArray
 		int index = 0;
 		int len = array.length;
 		boolean[] res = new boolean[len];
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			boolean v = array[i];
 			if (condition.test(Boolean.apply(v)))
 			{
 				res[index++] = v;
@@ -269,20 +257,20 @@ public interface BooleanArray
 		boolean[] res = new boolean[len];
 		
 		// Count the number of 'false' in the array
-		int f = 0;
+		int falseEntries = 0;
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			if (!array[i])
+			if (!v)
 			{
-				f++;
+				falseEntries++;
 			}
 		}
 		
 		// Make the remaining elements of the result true
-		for (; f < len; f++)
+		for (; falseEntries < len; falseEntries++)
 		{
-			res[f] = true;
+			res[falseEntries] = true;
 		}
 		return res;
 	}

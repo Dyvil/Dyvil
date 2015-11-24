@@ -1,5 +1,19 @@
 package dyvil.array;
 
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.Reified;
+import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.inline;
+import dyvil.collection.Range;
+import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Boolean;
+import dyvil.lang.Byte;
+import dyvil.lang.*;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Long;
+import dyvil.lang.Short;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -8,23 +22,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
-
-import dyvil.lang.Boolean;
-import dyvil.lang.Byte;
-import dyvil.lang.Char;
-import dyvil.lang.Double;
-import dyvil.lang.Float;
-import dyvil.lang.Int;
-import dyvil.lang.Long;
-import dyvil.lang.Rangeable;
-import dyvil.lang.Short;
-
-import dyvil.annotation.Intrinsic;
-import dyvil.annotation.Reified;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.inline;
-import dyvil.collection.Range;
-import dyvil.collection.immutable.ArrayList;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -99,12 +96,9 @@ public interface ObjectArray
 	static @infix <T> T[] subscript(T[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		T[] slice = (T[]) Array.newInstance(array.getClass().getComponentType(), count);
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -117,11 +111,8 @@ public interface ObjectArray
 	static @infix <T> void subscript_$eq(T[] array, Range<Int> range, T[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
@@ -132,10 +123,9 @@ public interface ObjectArray
 	
 	static @infix <T> void forEach(T[] array, Consumer<? super T> action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (T v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
@@ -201,13 +191,11 @@ public interface ObjectArray
 	static @infix <T> T[] $minus$minus(T[] array1, T[] array2)
 	{
 		int index = 0;
-		int len = array1.length;
 		// We can safely use clone here because no data will be leaked
 		T[] res = array1.clone();
 		
-		for (int i = 0; i < len; i++)
+		for (T v : array1)
 		{
-			T v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -221,13 +209,11 @@ public interface ObjectArray
 	static @infix <T> T[] $amp(T[] array1, T[] array2)
 	{
 		int index = 0;
-		int len = array1.length;
 		// We can safely use clone here because no data will be leaked
 		T[] res = array1.clone();
 		
-		for (int i = 0; i < len; i++)
+		for (T v : array1)
 		{
-			T v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -251,13 +237,12 @@ public interface ObjectArray
 	
 	static @infix <T, @Reified U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
 	{
-		int len = array.length;
 		int size = 0;
 		U[] res = (U[]) EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (T v : array)
 		{
-			U[] a = mapper.apply(array[i]);
+			U[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -276,12 +261,10 @@ public interface ObjectArray
 	static @infix <T> T[] filtered(T[] array, Predicate<T> condition)
 	{
 		int index = 0;
-		int len = array.length;
 		// We can safely use clone here because no data will be leaked
 		T[] res = array.clone();
-		for (int i = 0; i < len; i++)
+		for (T v : array)
 		{
-			T v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -393,7 +376,7 @@ public interface ObjectArray
 		return copy(array, newLength, (Class<T>) array.getClass().getComponentType());
 	}
 	
-	static @infix <T, N> N[] copy(T[] array, int newLength, Class<N> type)
+	static @infix <T extends N, N> N[] copy(T[] array, int newLength, Class<N> type)
 	{
 		N[] newArray = (N[]) Array.newInstance(type, newLength);
 		System.arraycopy(array, 0, newArray, 0, newLength);

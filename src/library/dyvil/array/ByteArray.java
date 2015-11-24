@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-
-import dyvil.lang.Byte;
-import dyvil.lang.Int;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Byte;
+import dyvil.lang.Int;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -90,12 +89,9 @@ public interface ByteArray
 	static @infix byte[] subscript(byte[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		byte[] slice = new byte[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -108,11 +104,8 @@ public interface ByteArray
 	static @infix void subscript_$eq(byte[] array, Range<Int> range, byte[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	// Operators
@@ -125,10 +118,9 @@ public interface ByteArray
 	
 	static @infix void forEach(byte[] array, IntConsumer action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (byte v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
@@ -197,9 +189,8 @@ public interface ByteArray
 		int len = array1.length;
 		byte[] res = new byte[len];
 		
-		for (int i = 0; i < len; i++)
+		for (byte v : array1)
 		{
-			byte v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -216,9 +207,8 @@ public interface ByteArray
 		int len = array1.length;
 		byte[] res = new byte[len];
 		
-		for (int i = 0; i < len; i++)
+		for (byte v : array1)
 		{
-			byte v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -246,9 +236,9 @@ public interface ByteArray
 		int size = 0;
 		byte[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (byte v : array)
 		{
-			byte[] a = mapper.apply(array[i]);
+			byte[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -269,9 +259,8 @@ public interface ByteArray
 		int index = 0;
 		int len = array.length;
 		byte[] res = new byte[len];
-		for (int i = 0; i < len; i++)
+		for (byte v : array)
 		{
-			byte v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -327,12 +316,12 @@ public interface ByteArray
 	
 	static @infix @inline boolean contains(byte[] array, byte v)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	static @infix @inline boolean in(byte v, byte[] array)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying

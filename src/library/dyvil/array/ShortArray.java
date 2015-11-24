@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-
-import dyvil.lang.Int;
-import dyvil.lang.Short;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Int;
+import dyvil.lang.Short;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -101,12 +100,9 @@ public interface ShortArray
 	static @infix short[] subscript(short[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		short[] slice = new short[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -119,11 +115,8 @@ public interface ShortArray
 	static @infix void subscript_$eq(short[] array, Range<Int> range, short[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
@@ -134,10 +127,9 @@ public interface ShortArray
 	
 	static @infix void forEach(int[] array, IntConsumer action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (int v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
@@ -206,9 +198,8 @@ public interface ShortArray
 		int len = array1.length;
 		short[] res = new short[len];
 		
-		for (int i = 0; i < len; i++)
+		for (short v : array1)
 		{
-			short v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -225,9 +216,8 @@ public interface ShortArray
 		int len = array1.length;
 		short[] res = new short[len];
 		
-		for (int i = 0; i < len; i++)
+		for (short v : array1)
 		{
-			short v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -255,9 +245,9 @@ public interface ShortArray
 		int size = 0;
 		short[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (short v : array)
 		{
-			short[] a = mapper.apply(array[i]);
+			short[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -278,9 +268,8 @@ public interface ShortArray
 		int index = 0;
 		int len = array.length;
 		short[] res = new short[len];
-		for (int i = 0; i < len; i++)
+		for (short v : array)
 		{
-			short v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -336,12 +325,12 @@ public interface ShortArray
 	
 	static @infix @inline boolean contains(short[] array, short v)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	static @infix @inline boolean in(short v, short[] array)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying

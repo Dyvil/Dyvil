@@ -1,18 +1,17 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-
-import dyvil.lang.Int;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Int;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -89,12 +88,9 @@ public interface IntArray
 	static @infix int[] subscript(int[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		int[] slice = new int[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -107,11 +103,8 @@ public interface IntArray
 	static @infix void subscript_$eq(int[] array, Range<Int> range, int[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
@@ -122,10 +115,9 @@ public interface IntArray
 	
 	static @infix void forEach(int[] array, IntConsumer action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (int v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
@@ -194,9 +186,8 @@ public interface IntArray
 		int len = array1.length;
 		int[] res = new int[len];
 		
-		for (int i = 0; i < len; i++)
+		for (int v : array1)
 		{
-			int v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -213,9 +204,8 @@ public interface IntArray
 		int len = array1.length;
 		int[] res = new int[len];
 		
-		for (int i = 0; i < len; i++)
+		for (int v : array1)
 		{
-			int v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -239,13 +229,12 @@ public interface IntArray
 	
 	static @infix int[] flatMapped(int[] array, IntFunction<int[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		int[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (int v : array)
 		{
-			int[] a = mapper.apply(array[i]);
+			int[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -266,9 +255,8 @@ public interface IntArray
 		int index = 0;
 		int len = array.length;
 		int[] res = new int[len];
-		for (int i = 0; i < len; i++)
+		for (int v : array)
 		{
-			int v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -324,12 +312,12 @@ public interface IntArray
 	
 	static @infix @inline boolean contains(int[] array, int v)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	static @infix @inline boolean in(int v, int[] array)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying

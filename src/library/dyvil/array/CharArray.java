@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-
-import dyvil.lang.Char;
-import dyvil.lang.Int;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Char;
+import dyvil.lang.Int;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -90,12 +89,9 @@ public interface CharArray
 	static @infix char[] subscript(char[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		char[] slice = new char[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -108,11 +104,8 @@ public interface CharArray
 	static @infix void subscript_$eq(char[] array, Range<Int> range, char[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
@@ -123,10 +116,9 @@ public interface CharArray
 	
 	static @infix void forEach(char[] array, IntConsumer action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (char v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
@@ -195,9 +187,8 @@ public interface CharArray
 		int len = array1.length;
 		char[] res = new char[len];
 		
-		for (int i = 0; i < len; i++)
+		for (char v : array1)
 		{
-			char v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -214,9 +205,8 @@ public interface CharArray
 		int len = array1.length;
 		char[] res = new char[len];
 		
-		for (int i = 0; i < len; i++)
+		for (char v : array1)
 		{
-			char v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -240,13 +230,12 @@ public interface CharArray
 	
 	static @infix char[] flatMapped(char[] array, IntFunction<char[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		char[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (char v : array)
 		{
-			char[] a = mapper.apply(array[i]);
+			char[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -267,9 +256,8 @@ public interface CharArray
 		int index = 0;
 		int len = array.length;
 		char[] res = new char[len];
-		for (int i = 0; i < len; i++)
+		for (char v : array)
 		{
-			char v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -325,12 +313,12 @@ public interface CharArray
 	
 	static @infix @inline boolean contains(char[] array, char v)
 	{
-		return Arrays.binarySearch(array, v) != -1;
+		return indexOf(array, v, 0) != -1;
 	}
 	
 	static @infix @inline boolean in(char v, char[] array)
 	{
-		return Arrays.binarySearch(array, v) != -1;
+		return indexOf(array, v, 0) != -1;
 	}
 	
 	// Copying

@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.IntConsumer;
-import java.util.function.LongFunction;
-import java.util.function.LongPredicate;
-import java.util.function.LongUnaryOperator;
-
-import dyvil.lang.Int;
-import dyvil.lang.Long;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Int;
+import dyvil.lang.Long;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.LongFunction;
+import java.util.function.LongPredicate;
+import java.util.function.LongUnaryOperator;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -90,12 +89,9 @@ public interface LongArray
 	static @infix long[] subscript(long[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		long[] slice = new long[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
@@ -108,11 +104,8 @@ public interface LongArray
 	static @infix void subscript_$eq(long[] array, Range<Int> range, long[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
@@ -123,10 +116,9 @@ public interface LongArray
 	
 	static @infix void forEach(int[] array, IntConsumer action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (int v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
@@ -195,9 +187,8 @@ public interface LongArray
 		int len = array1.length;
 		long[] res = new long[len];
 		
-		for (int i = 0; i < len; i++)
+		for (long v : array1)
 		{
-			long v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -214,9 +205,8 @@ public interface LongArray
 		int len = array1.length;
 		long[] res = new long[len];
 		
-		for (int i = 0; i < len; i++)
+		for (long v : array1)
 		{
-			long v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -240,13 +230,12 @@ public interface LongArray
 	
 	static @infix long[] flatMapped(long[] array, LongFunction<long[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		long[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (long v : array)
 		{
-			long[] a = mapper.apply(array[i]);
+			long[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -267,9 +256,8 @@ public interface LongArray
 		int index = 0;
 		int len = array.length;
 		long[] res = new long[len];
-		for (int i = 0; i < len; i++)
+		for (long v : array)
 		{
-			long v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -325,12 +313,12 @@ public interface LongArray
 	
 	static @infix @inline boolean contains(long[] array, long v)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	static @infix @inline boolean in(long v, long[] array)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying
