@@ -87,11 +87,6 @@ public final class FieldInitializer implements IStatement
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		this.variable.writeInit(writer);

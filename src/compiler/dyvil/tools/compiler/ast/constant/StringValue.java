@@ -18,8 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringValue implements IConstantValue
 {
-	protected ICodePosition	position;
-	protected String		value;
+	protected ICodePosition position;
+	protected String        value;
 	
 	public StringValue(String value)
 	{
@@ -75,7 +75,8 @@ public final class StringValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Types.STRING) || type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
+		return type.isSuperTypeOf(Types.STRING)
+				|| type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
@@ -114,16 +115,18 @@ public final class StringValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

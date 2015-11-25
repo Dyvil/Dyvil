@@ -388,23 +388,23 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		int lineNumber = this.getLineNumber();
 		this.field.writeGet(writer, this.receiver, lineNumber);
-		
-		if (this.type != null)
+
+		if (type == null)
 		{
-			this.field.getType().writeCast(writer, this.type, lineNumber);
+			type = this.type;
 		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		IType t = this.field.getType();
-		this.writeExpression(writer, t);
-		writer.writeInsn(t.getReturnOpcode());
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(this.type.getReturnOpcode());
+		}
+		if (type != null)
+		{
+			this.field.getType().writeCast(writer, type, lineNumber);
+		}
 	}
 	
 	@Override

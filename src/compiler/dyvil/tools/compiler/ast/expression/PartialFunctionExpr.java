@@ -31,20 +31,20 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class PartialFunctionExpr implements IValue, ICase, IClassCompilable, IDefaultContext
 {
-	public static final IClass			PARTIALFUNCTION_CLASS	= Package.dyvilFunction.resolveClass("PartialFunction");
-	public static final ClassType		PARTIALFUNCTION			= new ClassType(PARTIALFUNCTION_CLASS);
-	public static final ITypeVariable	PAR_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(0);
-	public static final ITypeVariable	RETURN_TYPE				= PARTIALFUNCTION_CLASS.getTypeVariable(1);
+	public static final IClass        PARTIALFUNCTION_CLASS = Package.dyvilFunction.resolveClass("PartialFunction");
+	public static final ClassType     PARTIALFUNCTION       = new ClassType(PARTIALFUNCTION_CLASS);
+	public static final ITypeVariable PAR_TYPE              = PARTIALFUNCTION_CLASS.getTypeVariable(0);
+	public static final ITypeVariable RETURN_TYPE           = PARTIALFUNCTION_CLASS.getTypeVariable(1);
 	
 	protected ICodePosition position;
 	
-	protected IPattern	pattern;
-	protected IValue	condition;
-	protected IValue	action;
+	protected IPattern pattern;
+	protected IValue   condition;
+	protected IValue   action;
 	
 	// Metadata
-	protected IType	type;
-	private String	internalClassName;
+	protected IType  type;
+	private   String internalClassName;
 	
 	public PartialFunctionExpr(ICodePosition position)
 	{
@@ -304,7 +304,8 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		
 		// Header
 		String signature = builder.toString();
-		writer.visit(DyvilCompiler.classVersion, 0, this.internalClassName, signature, "java/lang/Object", new String[] { "dyvil/function/PartialFunction" });
+		writer.visit(DyvilCompiler.classVersion, 0, this.internalClassName, signature, "java/lang/Object",
+		             new String[] { "dyvil/function/PartialFunction" });
 		
 		// Constructor
 		MethodVisitor mv = writer.visitMethod(0, "<init>", "()V", null, null);
@@ -327,7 +328,9 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		parType.appendSignature(signatureBuilder);
 		signature = signatureBuilder.append(")Z").toString();
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "isDefined", definedDesc, signature, null));
+		MethodWriter mw = new MethodWriterImpl(writer,
+		                                       writer.visitMethod(Modifiers.PUBLIC, "isDefined", definedDesc, signature,
+		                                                          null));
 		Label elseLabel = new Label();
 		mw.begin();
 		mw.setThisType(this.internalClassName);
@@ -388,7 +391,8 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		{
 			// isDefined bridge
 			
-			mv = writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, "isDefined", "(Ljava/lang/Object;)Z", null, null);
+			mv = writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, "isDefined",
+			                        "(Ljava/lang/Object;)Z", null, null);
 			mv.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitVarInsn(Opcodes.ALOAD, 1);
@@ -399,7 +403,8 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 			
 			// apply bridge
 			
-			mv = writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, "apply", "(Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+			mv = writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, "apply",
+			                        "(Ljava/lang/Object;)Ljava/lang/Object;", null, null);
 			mv.visitCode();
 			mv.visitVarInsn(Opcodes.ALOAD, 0);
 			mv.visitVarInsn(Opcodes.ALOAD, 1);
@@ -411,18 +416,20 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeTypeInsn(Opcodes.NEW, this.internalClassName);
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, this.internalClassName, "<init>", "()V", false);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.type.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

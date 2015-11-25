@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.ast.operator;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,8 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CastOperator extends AbstractValue
 {
-	protected IValue	value;
-	protected IType		type	= Types.UNKNOWN;
+	protected IValue value;
+	protected IType type = Types.UNKNOWN;
 	
 	// Metadata
 	private boolean typeHint;
@@ -103,7 +104,8 @@ public final class CastOperator extends AbstractValue
 			this.value = value1;
 			
 			IType valueType = value1.getType();
-			if (!prevType.isSameType(valueType) && this.type.isSuperClassOf(valueType) && valueType.isPrimitive() == this.type.isPrimitive())
+			if (!prevType.isSameType(valueType) && this.type.isSuperClassOf(valueType)
+					&& valueType.isPrimitive() == this.type.isPrimitive())
 			{
 				this.typeHint = true;
 				this.type = valueType;
@@ -167,17 +169,21 @@ public final class CastOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
-		this.value.getType().writeCast(writer, this.type, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer, this.type);
-		writer.writeInsn(this.type.getReturnOpcode());
+		this.value.writeExpression(writer, null);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.AUTO_POP);
+			return;
+		}
+
+		if (type == null)
+		{
+			type = this.type;
+		}
+		this.value.getType().writeCast(writer, type, this.getLineNumber());
 	}
 
 	@Override

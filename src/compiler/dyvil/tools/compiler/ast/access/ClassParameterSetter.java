@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -26,8 +27,10 @@ public final class ClassParameterSetter implements IValue
 	}
 	
 	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		assert type == Types.VOID;
+
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified, this.parameter.getDescription());
@@ -114,11 +117,5 @@ public final class ClassParameterSetter implements IValue
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
 	}
 }

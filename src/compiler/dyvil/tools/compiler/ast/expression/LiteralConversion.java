@@ -21,9 +21,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LiteralConversion implements IValue
 {
-	private IValue		literal;
-	private IArguments	arguments;
-	private IType		type;
+	private IValue     literal;
+	private IArguments arguments;
+	private IType      type;
 	
 	private IMethod method;
 	
@@ -113,7 +113,9 @@ public final class LiteralConversion implements IValue
 			{
 				StringBuilder builder = new StringBuilder();
 				this.arguments.typesToString(builder);
-				markers.add(I18n.createMarker(this.literal.getPosition(), "literal.method", this.literal.getType(), type, builder));
+				markers.add(
+						I18n.createMarker(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
+						                  builder));
 				this.type = type;
 				return null;
 			}
@@ -184,15 +186,14 @@ public final class LiteralConversion implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.method.writeCall(writer, null, this.arguments, null, this.literal.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.literal.writeStatement(writer);
+		if (type == null)
+		{
+			type = this.type;
+		}
+
+		this.method.writeCall(writer, null, this.arguments, type, this.literal.getLineNumber());
 	}
 	
 	@Override

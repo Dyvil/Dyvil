@@ -17,8 +17,8 @@ public class FloatValue implements IConstantValue
 {
 	private static FloatValue NULL;
 	
-	protected ICodePosition	position;
-	protected float			value;
+	protected ICodePosition position;
+	protected float         value;
 	
 	public FloatValue(float value)
 	{
@@ -88,7 +88,8 @@ public class FloatValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT) || type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null;
+		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT)
+				|| type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
@@ -149,16 +150,18 @@ public class FloatValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.FRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.FRETURN);
+		}
+		else if (type != null)
+		{
+			Types.FLOAT.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

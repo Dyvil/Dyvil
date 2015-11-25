@@ -1073,23 +1073,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
-	private void writeInstance(MethodWriter writer, IValue instance) throws BytecodeException
+	private void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
 	{
-		if (instance != null)
+		if (receiver != null)
 		{
 			if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 			{
-				instance.writeExpression(writer, this.parameters[0].getType());
+				receiver.writeExpression(writer, this.parameters[0].getType());
 				return;
 			}
 			
-			if (instance.isPrimitive() && this.intrinsicData != null)
+			if (receiver.isPrimitive() && this.intrinsicData != null)
 			{
-				instance.writeExpression(writer);
+				receiver.writeExpression(writer, null);
 				return;
 			}
 			
-			instance.writeExpression(writer, this.theClass.getType());
+			receiver.writeExpression(writer, this.theClass.getType());
 		}
 	}
 	
@@ -1132,7 +1132,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
 			throws BytecodeException
 	{
-		this.writeInstance(writer, instance);
+		this.writeReceiver(writer, instance);
 		this.writeArguments(writer, instance, arguments);
 		this.writeInvoke(writer, instance, arguments, lineNumber);
 	}

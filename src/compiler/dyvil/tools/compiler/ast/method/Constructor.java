@@ -809,10 +809,10 @@ public class Constructor extends Member implements IConstructor
 			
 			if (instanceFields != null)
 			{
-				instanceFields.writeStatement(mw);
+				instanceFields.writeExpression(mw, Types.VOID);
 			}
 			
-			this.value.writeStatement(mw);
+			this.value.writeExpression(mw, Types.VOID);
 			mw.writeLabel(end);
 			mw.end(Types.VOID);
 		}

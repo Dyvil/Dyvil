@@ -16,11 +16,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class BooleanValue implements IConstantValue
 {
-	public static final BooleanValue	TRUE	= new BooleanValue(true);
-	public static final BooleanValue	FALSE	= new BooleanValue(false);
+	public static final BooleanValue TRUE  = new BooleanValue(true);
+	public static final BooleanValue FALSE = new BooleanValue(false);
 	
-	protected ICodePosition	position;
-	protected boolean		value;
+	protected ICodePosition position;
+	protected boolean       value;
 	
 	public BooleanValue(boolean value)
 	{
@@ -88,7 +88,8 @@ public final class BooleanValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) || type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null;
+		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN)
+				|| type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
@@ -125,7 +126,7 @@ public final class BooleanValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		if (this.value)
 		{
@@ -135,13 +136,15 @@ public final class BooleanValue implements IConstantValue
 		{
 			writer.writeLDC(0);
 		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

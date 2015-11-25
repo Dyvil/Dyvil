@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -23,9 +22,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-import static dyvil.tools.compiler.ast.statement.loop.ForStatement.$forEnd;
-import static dyvil.tools.compiler.ast.statement.loop.ForStatement.$forStart;
-import static dyvil.tools.compiler.ast.statement.loop.ForStatement.$forUpdate;
+import static dyvil.tools.compiler.ast.statement.loop.ForStatement.*;
 
 public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 {
@@ -366,13 +363,6 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			this.action = this.action.cleanup(new CombiningContext(this, context), compilableList);
 		}
 		return this;
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
-		writer.writeInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override

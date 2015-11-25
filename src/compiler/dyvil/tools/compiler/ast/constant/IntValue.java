@@ -17,8 +17,8 @@ public final class IntValue implements IConstantValue
 {
 	private static IntValue NULL;
 	
-	protected ICodePosition	position;
-	protected int			value;
+	protected ICodePosition position;
+	protected int           value;
 	
 	public IntValue(int value)
 	{
@@ -88,7 +88,8 @@ public final class IntValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.INT || type.isSuperTypeOf(Types.INT) || type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null;
+		return type == Types.INT || type.isSuperTypeOf(Types.INT)
+				|| type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
@@ -149,16 +150,18 @@ public final class IntValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.INT.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

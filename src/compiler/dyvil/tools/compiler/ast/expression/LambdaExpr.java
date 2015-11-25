@@ -623,7 +623,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		int handleType;
 		
@@ -649,7 +649,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			if (this.value != null)
 			{
-				this.value.writeExpression(writer);
+				this.value.writeExpression(writer, this.returnType);
 			}
 			
 			handleType = this.directInvokeOpcode;
@@ -665,13 +665,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		writer.writeLineNumber(this.getLineNumber());
 		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, type1, handle, type2);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.type.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	/**

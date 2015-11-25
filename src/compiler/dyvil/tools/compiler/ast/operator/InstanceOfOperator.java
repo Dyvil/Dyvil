@@ -147,17 +147,19 @@ public final class InstanceOfOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, Types.OBJECT);
 		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

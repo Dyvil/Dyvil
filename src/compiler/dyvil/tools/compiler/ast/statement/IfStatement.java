@@ -318,8 +318,13 @@ public class IfStatement extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (type == Types.VOID) {
+			this.writeStatement(writer);
+			return;
+		}
+
 		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 		Object commonFrameType = this.commonType.getFrameType();
@@ -354,13 +359,12 @@ public class IfStatement extends AbstractValue
 		
 		writer.writeTargetLabel(elseEnd);
 	}
-	
-	@Override
+
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		if (this.then == null)
 		{
-			this.condition.writeExpression(writer);
+			this.condition.writeExpression(writer, Types.BOOLEAN);
 			writer.writeInsn(Opcodes.POP);
 			return;
 		}
@@ -373,11 +377,11 @@ public class IfStatement extends AbstractValue
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
-			this.then.writeStatement(writer);
+			this.then.writeExpression(writer, Types.VOID);
 			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 			writer.writeTargetLabel(elseStart);
 			// Else Block
-			this.elseThen.writeStatement(writer);
+			this.elseThen.writeExpression(writer, Types.VOID);
 			writer.writeTargetLabel(elseEnd);
 		}
 		else
@@ -385,7 +389,7 @@ public class IfStatement extends AbstractValue
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
-			this.then.writeStatement(writer);
+			this.then.writeExpression(writer, Types.VOID);
 			writer.writeTargetLabel(elseStart);
 		}
 	}

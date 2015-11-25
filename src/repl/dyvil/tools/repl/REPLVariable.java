@@ -192,7 +192,7 @@ public class REPLVariable extends Field
 	{
 		if (this.type == Types.VOID)
 		{
-			this.value.writeStatement(mw);
+			this.value.writeExpression(mw, Types.VOID);
 			return;
 		}
 		

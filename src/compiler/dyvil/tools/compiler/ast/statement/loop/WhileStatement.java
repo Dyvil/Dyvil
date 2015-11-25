@@ -205,13 +205,6 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
-		writer.writeInsn(Opcodes.ACONST_NULL);
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
@@ -223,7 +216,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		// While Block
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 		

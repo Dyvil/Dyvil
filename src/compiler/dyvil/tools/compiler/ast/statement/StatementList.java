@@ -386,7 +386,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		int statementCount = this.valueCount - 1;
 		if (statementCount < 0)
@@ -405,11 +405,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			// Write all statements except the last one
 			for (int i = 0; i < statementCount; i++)
 			{
-				this.values[i].writeStatement(writer);
+				this.values[i].writeExpression(writer, Types.VOID);
 			}
 
 			// Write the last expression
-			this.values[statementCount].writeExpression(writer, this.returnType);
+			this.values[statementCount].writeExpression(writer, type);
 		}
 		else
 		{
@@ -422,7 +422,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 					writer.writeLabel(label.target);
 				}
 				
-				this.values[i].writeStatement(writer);
+				this.values[i].writeExpression(writer, Types.VOID);
 			}
 
 			// Write last expression (and label)
@@ -432,7 +432,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				writer.writeLabel(label.target);
 			}
 			
-			this.values[statementCount].writeExpression(writer);
+			this.values[statementCount].writeExpression(writer, type);
 		}
 		
 		writer.resetLocals(localCount);
@@ -447,50 +447,6 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			Variable var = entry.getValue();
 			var.writeLocal(writer, start, end);
-		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
-		
-		writer.writeLabel(start);
-		int localCount = writer.localCount();
-		
-		if (this.labels == null)
-		{
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				this.values[i].writeStatement(writer);
-			}
-		}
-		else
-		{
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				Label label = this.labels[i];
-				if (label != null)
-				{
-					writer.writeLabel(label.target);
-				}
-				
-				this.values[i].writeStatement(writer);
-			}
-		}
-		
-		writer.resetLocals(localCount);
-		writer.writeLabel(end);
-		
-		if (this.variables == null)
-		{
-			return;
-		}
-		
-		for (Entry<Name, Variable> entry : this.variables)
-		{
-			entry.getValue().writeLocal(writer, start, end);
 		}
 	}
 	

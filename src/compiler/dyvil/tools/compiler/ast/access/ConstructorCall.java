@@ -25,9 +25,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ConstructorCall implements ICall
 {
-	protected ICodePosition	position;
-	protected IType			type;
-	protected IArguments	arguments;
+	protected ICodePosition position;
+	protected IType         type;
+	protected IArguments    arguments;
 	
 	protected IConstructor constructor;
 	
@@ -317,7 +317,7 @@ public class ConstructorCall implements ICall
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		if (this.type.isArrayType())
 		{
@@ -331,26 +331,24 @@ public class ConstructorCall implements ICall
 			}
 			
 			ArgumentList paramList = (ArgumentList) this.arguments;
-			IType type = this.type;
+			IType arrayType = this.type;
 			
 			for (int i = 0; i < len; i++)
 			{
 				paramList.getValue(i).writeExpression(writer, Types.INT);
-				type = type.getElementType();
+				arrayType = arrayType.getElementType();
 			}
 			
-			writer.writeNewArray(type, len);
+			writer.writeNewArray(arrayType, len);
 			return;
 		}
 		
-		this.constructor.writeCall(writer, this.arguments, null, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+		this.constructor.writeCall(writer, this.arguments, type, this.getLineNumber());
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
 	}
 	
 	@Override

@@ -140,7 +140,7 @@ public final class AndOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		Label label = new Label();
 		Label label2 = new Label();
@@ -151,13 +151,15 @@ public final class AndOperator extends AbstractValue
 		writer.writeLabel(label);
 		writer.writeLDC(0);
 		writer.writeLabel(label2);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer, Types.BOOLEAN);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

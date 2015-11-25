@@ -241,7 +241,7 @@ public final class StringInterpolationExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		int len = this.count / 2;
 		String string = this.strings[0];
@@ -263,20 +263,22 @@ public final class StringInterpolationExpr implements IValue
 		for (int i = 0; i < len; i++)
 		{
 			IValue value = this.values[i];
-			value.writeExpression(writer);
+			value.writeExpression(writer, null);
 			CaseClasses.writeStringAppend(writer, value.getType());
 			
 			string = this.strings[i + 1];
 			CaseClasses.writeStringAppend(writer, string);
 		}
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			dyvil.tools.compiler.ast.type.Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

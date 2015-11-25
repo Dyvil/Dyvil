@@ -260,20 +260,12 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.receiver, this.arguments, this.type, this.getLineNumber());
-		this.getType().writeCast(writer, type, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.method.writeCall(writer, this.receiver, this.arguments, this.type, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.method.writeCall(writer, this.receiver, this.arguments, Types.VOID, this.getLineNumber());
+		if (type == null)
+		{
+			type = this.getType();
+		}
+
+		this.method.writeCall(writer, this.receiver, this.arguments, type, this.getLineNumber());
 	}
 	
 	@Override

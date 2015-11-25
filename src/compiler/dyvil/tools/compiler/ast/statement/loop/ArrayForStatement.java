@@ -94,7 +94,7 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Load the array
-		var.getValue().writeExpression(writer);
+		var.getValue().writeExpression(writer, null);
 		
 		// Local Variables
 		int locals = writer.localCount();
@@ -131,7 +131,7 @@ public class ArrayForStatement extends ForEachStatement
 		// Action
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		
 		writer.writeLabel(updateLabel);

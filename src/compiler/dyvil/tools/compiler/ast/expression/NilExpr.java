@@ -186,7 +186,7 @@ public final class NilExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		// Write an array type
 		if (this.requiredType.isArrayType())
@@ -211,17 +211,18 @@ public final class NilExpr implements IValue
 			}
 			
 			writer.writeNewArray(elementType, dims);
-			return;
 		}
-		
-		this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+		else
+		{
+			this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.getLineNumber());
+		}
+
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID) {
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null) {
+			this.requiredType.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

@@ -186,13 +186,7 @@ public final class Bytecode implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		if (this.labels == null)
 		{
@@ -202,7 +196,7 @@ public final class Bytecode implements IValue
 			}
 			return;
 		}
-		
+
 		for (Label label : this.labels)
 		{
 			if (label != null)
@@ -210,7 +204,7 @@ public final class Bytecode implements IValue
 				label.target = new dyvil.tools.asm.Label();
 			}
 		}
-		
+
 		for (int i = 0; i < this.instructionCount; i++)
 		{
 			if (i < this.labels.length)
@@ -221,7 +215,7 @@ public final class Bytecode implements IValue
 					writer.writeLabel(l.target);
 				}
 			}
-			
+
 			this.instructions[i].write(writer);
 		}
 	}

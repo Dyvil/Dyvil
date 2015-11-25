@@ -344,13 +344,6 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		// FIXME
-		this.commonType.writeDefaultValue(writer);
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
@@ -360,7 +353,7 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 		writer.writeTargetLabel(tryStart);
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		writer.writeLabel(tryEnd);
@@ -369,10 +362,10 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 		{
 			CatchBlock block = this.catchBlocks[i];
 			dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
-			String type = block.type.getInternalName();
+			String handlerType = block.type.getInternalName();
 			
 			writer.writeTargetLabel(handlerLabel);
-			writer.startCatchBlock(type);
+			writer.startCatchBlock(handlerType);
 			// We need a NOP here so the MethodWriter creates a StackMapFrame
 			// that does *not* include the variable that is about to be
 			// registered.
@@ -385,17 +378,17 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 				// store it.
 				int localCount = writer.localCount();
 				block.variable.writeInit(writer, null);
-				block.action.writeStatement(writer);
+				block.action.writeExpression(writer, Types.VOID);
 				writer.resetLocals(localCount);
 			}
 			// Otherwise pop the exception from the stack
 			else
 			{
 				writer.writeInsn(Opcodes.POP);
-				block.action.writeStatement(writer);
+				block.action.writeExpression(writer, Types.VOID);
 			}
 			
-			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, type);
+			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
@@ -407,7 +400,7 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 			writer.startCatchBlock("java/lang/Throwable");
 			writer.writeInsn(Opcodes.POP);
 			writer.writeLabel(endLabel);
-			this.finallyBlock.writeStatement(writer);
+			this.finallyBlock.writeExpression(writer, Types.VOID);
 			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else

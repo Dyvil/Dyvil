@@ -70,7 +70,7 @@ public class ReferenceType extends ClassType
 		
 		if (value != null)
 		{
-			value.writeExpression(writer);
+			value.writeExpression(writer, null);
 		}
 		else
 		{

@@ -448,28 +448,26 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		IType type = this.elementType;
-		int opcode = type.getArrayStoreOpcode();
+		IType elementType = this.elementType;
+		int opcode = elementType.getArrayStoreOpcode();
 		
 		writer.writeLDC(this.valueCount);
-		writer.writeNewArray(type, 1);
+		writer.writeNewArray(elementType, 1);
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			writer.writeInsn(Opcodes.DUP);
 			writer.writeLDC(i);
-			this.values[i].writeExpression(writer, type);
+			this.values[i].writeExpression(writer, elementType);
 			writer.writeInsn(opcode);
 		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
 	}
 	
 	@Override

@@ -17,8 +17,8 @@ public class DoubleValue implements IConstantValue
 {
 	private static DoubleValue NULL;
 	
-	protected ICodePosition	position;
-	protected double		value;
+	protected ICodePosition position;
+	protected double        value;
 	
 	public DoubleValue(double value)
 	{
@@ -88,7 +88,8 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.DOUBLE || type.isSuperTypeOf(Types.DOUBLE) || type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null;
+		return type == Types.DOUBLE || type.isSuperTypeOf(Types.DOUBLE)
+				|| type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
@@ -149,16 +150,18 @@ public class DoubleValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.DRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.DRETURN);
+		}
+		else if (type != null)
+		{
+			Types.DOUBLE.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

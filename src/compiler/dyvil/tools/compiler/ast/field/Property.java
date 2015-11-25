@@ -692,7 +692,7 @@ public class Property extends Member implements IProperty, IContext
 			if (this.setter != null)
 			{
 				mw.begin();
-				this.setter.writeStatement(mw);
+				this.setter.writeExpression(mw, Types.VOID);
 				mw.end(Types.VOID);
 			}
 		}

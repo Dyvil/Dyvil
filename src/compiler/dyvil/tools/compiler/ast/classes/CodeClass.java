@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
@@ -37,6 +33,10 @@ import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class CodeClass extends AbstractClass
 {
@@ -501,7 +501,7 @@ public class CodeClass extends AbstractClass
 			{
 				staticFields[staticFieldCount++] = f;
 			}
-			else
+			else if (f.getValue() != null)
 			{
 				FieldAssignment assign = new FieldAssignment(null, thisValue, f, f.getValue());
 				instanceFields.addValue(assign);

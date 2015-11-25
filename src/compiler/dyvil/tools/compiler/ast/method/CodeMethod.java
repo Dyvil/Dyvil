@@ -228,7 +228,8 @@ public class CodeMethod extends AbstractMethod
 		int illegalModifiers = this.modifiers & ~Modifiers.METHOD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(I18n.createError(this.position, "method.illegal_modifiers", this.name, ModifierTypes.FIELD.toString(illegalModifiers)));
+			markers.add(I18n.createError(this.position, "method.illegal_modifiers", this.name,
+			                             ModifierTypes.FIELD.toString(illegalModifiers)));
 		}
 		
 		// Check illegal modifier combinations
@@ -392,8 +393,9 @@ public class CodeMethod extends AbstractMethod
 		
 		String[] exceptions2 = this.getExceptions();
 		MethodWriter mw = new MethodWriterImpl(writer,
-				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), exceptions2));
-				
+		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
+		                                                          this.getSignature(), exceptions2));
+
 		if ((this.modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.setThisType(this.theClass.getInternalName());
@@ -413,14 +415,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			mw.begin();
 			mw.writeLabel(start);
-			if (this.type == Types.VOID)
-			{
-				this.value.writeStatement(mw);
-			}
-			else
-			{
-				this.value.writeExpression(mw, this.type);
-			}
+			this.value.writeExpression(mw, this.type);
 			mw.writeLabel(end);
 			mw.end(this.type);
 		}
@@ -428,7 +423,8 @@ public class CodeMethod extends AbstractMethod
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
+			              param.getSignature(), start, end);
 		}
 		
 		if ((this.modifiers & Modifiers.STATIC) != 0)
@@ -461,8 +457,9 @@ public class CodeMethod extends AbstractMethod
 			
 			// Generate a bridge method
 			mw = new MethodWriterImpl(writer,
-					writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified, desc, null, exceptions2));
-					
+			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
+			                                             this.name.qualified, desc, null, exceptions2));
+
 			start = new Label();
 			end = new Label();
 			
@@ -487,8 +484,9 @@ public class CodeMethod extends AbstractMethod
 			
 			mw.writeLineNumber(lineNumber);
 			boolean itf = this.theClass.isInterface();
-			mw.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL, this.theClass.getInternalName(),
-					this.name.qualified, this.getDescriptor(), itf);
+			mw.writeInvokeInsn(
+					(modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL,
+					this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), itf);
 			this.type.writeCast(mw, overrideReturnType, lineNumber);
 			mw.writeInsn(overrideReturnType.getReturnOpcode());
 			mw.end();

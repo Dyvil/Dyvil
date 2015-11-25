@@ -335,37 +335,11 @@ public interface IValue extends IASTNode, ITyped
 	
 	// Compilation
 	
-	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		this.getType().writeCast(writer, type, this.getLineNumber());
-	}
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as an expression. That means that this element remains as
-	 * the first element of the stack.
-	 *
-	 * @param visitor
-	 *
-	 * @throws BytecodeException
-	 */
-	void writeExpression(MethodWriter writer) throws BytecodeException;
-	
-	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as a statement. That means that this element is removed
-	 * from the stack.
-	 *
-	 * @param writer
-	 *
-	 * @throws BytecodeException
-	 */
-	void writeStatement(MethodWriter writer) throws BytecodeException;
+	void writeExpression(MethodWriter writer, IType type) throws BytecodeException;
 	
 	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.writeExpression(writer);
+		this.writeExpression(writer, Types.BOOLEAN);
 		writer.writeJumpInsn(Opcodes.IFNE, dest);
 	}
 	
@@ -385,7 +359,7 @@ public interface IValue extends IASTNode, ITyped
 	 */
 	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.writeExpression(writer);
+		this.writeExpression(writer, Types.BOOLEAN);
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);
 	}
 	

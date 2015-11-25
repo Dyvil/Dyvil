@@ -27,9 +27,9 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 {
 	protected ICodePosition position;
 	
-	protected IValue	receiver;
-	protected Name		name;
-	protected IValue	value;
+	protected IValue receiver;
+	protected Name   name;
+	protected IValue value;
 	
 	protected IDataMember field;
 	
@@ -157,21 +157,14 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.field != null)
+		if (this.receiver != null)
 		{
-			this.field.resolveTypes(markers, context);
+			this.receiver.resolveTypes(markers, context);
 		}
-		else
+
+		if (this.value != null)
 		{
-			if (this.receiver != null)
-			{
-				this.receiver.resolveTypes(markers, context);
-			}
-			
-			if (this.value != null)
-			{
-				this.value.resolveTypes(markers, context);
-			}
+			this.value.resolveTypes(markers, context);
 		}
 	}
 	
@@ -328,31 +321,37 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		final IType fieldType = this.field.getType();
+		final int lineNumber = this.getLineNumber();
+
 		if (this.receiver == null)
 		{
-			this.value.writeExpression(writer, this.field.getType());
-			writer.writeInsn(Opcodes.AUTO_DUP);
+			this.value.writeExpression(writer, fieldType);
+
+			if (type != Types.VOID)
+			{
+				writer.writeInsn(Opcodes.AUTO_DUP);
+			}
 		}
 		else
 		{
-			this.receiver.writeExpression(writer);
-			this.value.writeExpression(writer);
-			writer.writeInsn(Opcodes.AUTO_DUP_X1);
+			this.receiver.writeExpression(writer, null);
+			this.value.writeExpression(writer, fieldType);
+
+			if (type != Types.VOID)
+			{
+				writer.writeInsn(Opcodes.AUTO_DUP_X1);
+			}
 		}
-		this.field.writeSet(writer, null, null, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		if (this.value == null)
+
+		this.field.writeSet(writer, null, null, lineNumber);
+
+		if (type != null)
 		{
-			return;
+			fieldType.writeCast(writer, type, lineNumber);
 		}
-		
-		this.field.writeSet(writer, this.receiver, this.value, this.getLineNumber());
 	}
 	
 	@Override

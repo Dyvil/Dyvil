@@ -4,9 +4,9 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -164,16 +164,18 @@ public final class TypeOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.genericType.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override
