@@ -114,7 +114,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		return this.field != null && this.field.hasModifier(Modifiers.CONST);
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.receiver.hasSideEffects();
+	}
+
 	@Override
 	public boolean isResolved()
 	{

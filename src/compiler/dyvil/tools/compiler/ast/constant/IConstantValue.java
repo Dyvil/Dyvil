@@ -18,7 +18,13 @@ public interface IConstantValue extends IValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	default boolean hasSideEffects()
+	{
+		return false;
+	}
+
 	@Override
 	default void resolveTypes(MarkerList markers, IContext context)
 	{

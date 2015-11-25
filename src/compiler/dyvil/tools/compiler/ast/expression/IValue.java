@@ -24,92 +24,92 @@ public interface IValue extends IASTNode, ITyped
 	// --- Expression IDs ---
 	
 	// Literals
-	int	VOID			= 0;
-	int	NULL			= 1;
-	int	NIL				= 2;
-	int	WILDCARD		= 3;
-	int	BOOLEAN			= 4;
-	int	BYTE			= 5;
-	int	SHORT			= 6;
-	int	CHAR			= 7;
-	int	INT				= 8;
-	int	LONG			= 9;
-	int	FLOAT			= 10;
-	int	DOUBLE			= 11;
-	int	STRING			= 12;
-	int	STRING_INTERPOLATION	= 13;
+	int VOID                 = 0;
+	int NULL                 = 1;
+	int NIL                  = 2;
+	int WILDCARD             = 3;
+	int BOOLEAN              = 4;
+	int BYTE                 = 5;
+	int SHORT                = 6;
+	int CHAR                 = 7;
+	int INT                  = 8;
+	int LONG                 = 9;
+	int FLOAT                = 10;
+	int DOUBLE               = 11;
+	int STRING               = 12;
+	int STRING_INTERPOLATION = 13;
 	
 	// Compound Constructs
-	int	STATEMENT_LIST	= 32;
-	int	BYTECODE		= 33;
-	int	TUPLE			= 34;
-	int	ARRAY			= 35;
-	int	MAP				= 36;
-	int	ANNOTATION		= 37;
+	int STATEMENT_LIST = 32;
+	int BYTECODE       = 33;
+	int TUPLE          = 34;
+	int ARRAY          = 35;
+	int MAP            = 36;
+	int ANNOTATION     = 37;
 	
 	// Basic Language Constructs
-	int	THIS	= 64;
-	int	SUPER	= 65;
+	int THIS  = 64;
+	int SUPER = 65;
 	
-	int	CAST_OPERATOR		= 66;
-	int	ISOF_OPERATOR		= 67;
-	int	CASE_STATEMENT		= 68;
-	int	MATCH				= 69;
-	int	LAMBDA				= 70;
-	int	PARTIAL_FUNCTION	= 71;
+	int CAST_OPERATOR    = 66;
+	int ISOF_OPERATOR    = 67;
+	int CASE_STATEMENT   = 68;
+	int MATCH            = 69;
+	int LAMBDA           = 70;
+	int PARTIAL_FUNCTION = 71;
 	
 	// Access and Invocation
-	int	CLASS_ACCESS	= 96;
-	int	FIELD_ACCESS	= 97;
-	int	ENUM_ACCESS		= 98;
-	int	METHOD_CALL		= 99;
-	int	APPLY_CALL		= 100;
-	int	UPDATE_CALL		= 101;
-	int	SUBSCRIPT_GET	= 102;
-	int	SUBSCRIPT_SET	= 103;
+	int CLASS_ACCESS  = 96;
+	int FIELD_ACCESS  = 97;
+	int ENUM_ACCESS   = 98;
+	int METHOD_CALL   = 99;
+	int APPLY_CALL    = 100;
+	int UPDATE_CALL   = 101;
+	int SUBSCRIPT_GET = 102;
+	int SUBSCRIPT_SET = 103;
 	
 	// Special Invocation
-	int	CONSTRUCTOR_CALL	= 112;
-	int	INITIALIZER_CALL	= 113;
+	int CONSTRUCTOR_CALL = 112;
+	int INITIALIZER_CALL = 113;
 	
 	// Assignments
-	int	FIELD_ASSIGN	= 120;
-	int	COMPOUND_CALL	= 121;
+	int FIELD_ASSIGN  = 120;
+	int COMPOUND_CALL = 121;
 	
 	// Special Operators and Intrinsics
-	int	SWAP_OPERATOR	= 128;
-	int	BOOLEAN_AND		= 129;
-	int	BOOLEAN_OR		= 130;
-	int	BOOLEAN_NOT		= 131;
-	int	CLASS_OPERATOR	= 132;
-	int	TYPE_OPERATOR	= 133;
-	int	NULLCHECK		= 134;
-	int	RANGE_OPERATOR	= 135;
-	int	STRINGBUILDER	= 136;
+	int SWAP_OPERATOR  = 128;
+	int BOOLEAN_AND    = 129;
+	int BOOLEAN_OR     = 130;
+	int BOOLEAN_NOT    = 131;
+	int CLASS_OPERATOR = 132;
+	int TYPE_OPERATOR  = 133;
+	int NULLCHECK      = 134;
+	int RANGE_OPERATOR = 135;
+	int STRINGBUILDER  = 136;
 	
 	// Basic Control Statements
-	int	RETURN			= 192;
-	int	IF				= 193;
-	int	SWITCH			= 194;
-	int	FOR				= 195;
-	int	WHILE			= 196;
-	int	DO_WHILE		= 197;
-	int	TRY				= 198;
-	int	THROW			= 199;
-	int	SYNCHRONIZED	= 200;
+	int RETURN       = 192;
+	int IF           = 193;
+	int SWITCH       = 194;
+	int FOR          = 195;
+	int WHILE        = 196;
+	int DO_WHILE     = 197;
+	int TRY          = 198;
+	int THROW        = 199;
+	int SYNCHRONIZED = 200;
 	
 	// Jump Statements
-	int	BREAK		= 214;
-	int	CONTINUE	= 215;
-	int	GOTO		= 216;
+	int BREAK    = 214;
+	int CONTINUE = 215;
+	int GOTO     = 216;
 	
 	// Pseudo-Expressions
-	int	VARIABLE		= 232;
-	int	NESTED_METHOD	= 233;
+	int VARIABLE      = 232;
+	int NESTED_METHOD = 233;
 	
 	// Special Types only used by the compiler
-	int	REFERENCE			= 240;
-	int	LITERAL_CONVERSION	= 241;
+	int REFERENCE          = 240;
+	int LITERAL_CONVERSION = 241;
 	
 	// --- Other Constants ---
 	
@@ -130,6 +130,11 @@ public interface IValue extends IASTNode, ITyped
 	default boolean isConstantOrField()
 	{
 		return this.isConstant();
+	}
+
+	default boolean hasSideEffects()
+	{
+		return !this.isConstantOrField();
 	}
 	
 	default boolean isPrimitive()
@@ -164,9 +169,10 @@ public interface IValue extends IASTNode, ITyped
 	 * Returns how much the type of this value 'matches' the given type.
 	 * {@code 1} indicates a perfect match, while {@code 0} marks incompatible
 	 * types. A higher value means that the value is less suitable for the type.
-	 * 
+	 *
 	 * @param type
-	 *            the type to match
+	 * 		the type to match
+	 *
 	 * @return the subtyping distance
 	 */
 	default float getTypeMatch(IType type)
@@ -178,7 +184,7 @@ public interface IValue extends IASTNode, ITyped
 	
 	default void resolveStatement(ILabelContext context, MarkerList markers)
 	{
-	
+
 	}
 	
 	IValue resolve(MarkerList markers, IContext context);
@@ -339,8 +345,9 @@ public interface IValue extends IASTNode, ITyped
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
 	 * {@code writer} as an expression. That means that this element remains as
 	 * the first element of the stack.
-	 * 
+	 *
 	 * @param visitor
+	 *
 	 * @throws BytecodeException
 	 */
 	void writeExpression(MethodWriter writer) throws BytecodeException;
@@ -349,8 +356,9 @@ public interface IValue extends IASTNode, ITyped
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
 	 * {@code writer} as a statement. That means that this element is removed
 	 * from the stack.
-	 * 
+	 *
 	 * @param writer
+	 *
 	 * @throws BytecodeException
 	 */
 	void writeStatement(MethodWriter writer) throws BytecodeException;
@@ -369,9 +377,10 @@ public interface IValue extends IASTNode, ITyped
 	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
 	 * means the JVM would jump to {@code dest} if the current value on the
 	 * stack equals {@code 0}.
-	 * 
+	 *
 	 * @param writer
 	 * @param dest
+	 *
 	 * @throws BytecodeException
 	 */
 	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
