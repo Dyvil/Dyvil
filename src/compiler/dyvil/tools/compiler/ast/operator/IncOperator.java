@@ -1,0 +1,325 @@
+package dyvil.tools.compiler.ast.operator;
+
+import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.marker.MarkerList;
+
+public class IncOperator extends AbstractValue
+{
+	protected IValue      receiver;
+	protected IDataMember field;
+
+	private int     value;
+	private boolean prefix;
+
+	public IncOperator(IDataMember field, int value, boolean prefix)
+	{
+		this.field = field;
+		this.value = value;
+		this.prefix = prefix;
+	}
+
+	public IncOperator(IValue receiver, IDataMember field, int value, boolean prefix)
+	{
+		this.receiver = receiver;
+		this.field = field;
+		this.value = value;
+		this.prefix = prefix;
+	}
+
+	@Override
+	public int valueTag()
+	{
+		return INC;
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
+	@Override
+	public IType getType()
+	{
+		return this.field.getType();
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this;
+	}
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.resolveTypes(markers, context);
+		}
+	}
+
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver = this.receiver.resolve(markers, context);
+		}
+		return this;
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.checkTypes(markers, context);
+		}
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.check(markers, context);
+		}
+	}
+
+	@Override
+	public IValue foldConstants()
+	{
+		if (this.receiver != null)
+		{
+			this.receiver = this.receiver.foldConstants();
+		}
+		return this;
+	}
+
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver = this.receiver.cleanup(context, compilableList);
+		}
+		return this;
+	}
+
+	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		final int typecode = this.field.getType().getTypecode();
+		final int lineNumber = this.getLineNumber();
+		boolean receiver = this.receiver != null;
+
+		if (type == Types.VOID)
+		{
+			// Prefix / Postfix doesn't make a difference here
+
+			if (this.canUseIINC(typecode))
+			{
+				writer.writeIINC(((IVariable) this.field).getLocalIndex(), this.value);
+				return;
+			}
+
+			if (receiver)
+			{
+				this.receiver.writeExpression(writer, null);
+				writer.writeInsn(Opcodes.DUP);
+			}
+
+			this.field.writeGet(writer, null, lineNumber);
+			this.writeAdd1(writer, typecode);
+
+			this.field.writeSet(writer, null, null, lineNumber);
+			return;
+		}
+
+		if (this.canUseIINC(typecode))
+		{
+			int localIndex = ((IVariable) this.field).getLocalIndex();
+			if (this.prefix)
+			{
+				writer.writeIINC(localIndex, this.value);
+				writer.writeVarInsn(this.field.getType().getLoadOpcode(), localIndex);
+			}
+			else
+			{
+				writer.writeVarInsn(this.field.getType().getLoadOpcode(), localIndex);
+				writer.writeIINC(localIndex, this.value);
+			}
+		}
+		else
+		{
+			int localCount = 0;
+
+			if (receiver)
+			{
+				localCount = writer.localCount();
+
+				this.receiver.writeExpression(writer, null);
+				// Copy the receiver
+				writer.writeInsn(Opcodes.DUP);
+				// Store the receiver in a local variable
+				writer.writeVarInsn(Opcodes.ASTORE, localCount);
+			}
+
+			// Load the old value
+			this.field.writeGet(writer, null, lineNumber);
+
+			if (this.prefix)
+			{
+				// Compute the new value
+				this.writeAdd1(writer, typecode);
+				// Copy the new value
+				writer.writeInsn(Opcodes.AUTO_DUP);
+			}
+			else
+			{
+				// Copy the old value
+				writer.writeInsn(Opcodes.AUTO_DUP);
+				// Compute the new value
+				this.writeAdd1(writer, typecode);
+			}
+
+			if (receiver)
+			{
+				// Load the receiver again
+				writer.writeVarInsn(Opcodes.ALOAD, localCount);
+				// Swap the receiver and the top value
+				writer.writeInsn(Opcodes.AUTO_SWAP);
+			}
+
+			// Store the field
+			this.field.writeSet(writer, null, null, lineNumber);
+			// The new value is left on the stack
+
+			if (receiver)
+			{
+				writer.resetLocals(localCount);
+			}
+		}
+
+		if (type != null)
+		{
+			this.field.getType().writeCast(writer, type, lineNumber);
+		}
+	}
+
+	public boolean canUseIINC(int typecode) throws BytecodeException
+	{
+		if (this.receiver != null)
+		{
+			return false;
+		}
+		if (this.field.isVariable())
+		{
+			switch (typecode)
+			{
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void writeAdd1(MethodWriter writer, int typecode) throws BytecodeException
+	{
+		switch (typecode)
+		{
+		case PrimitiveType.BYTE_CODE:
+		case PrimitiveType.SHORT_CODE:
+		case PrimitiveType.CHAR_CODE:
+		case PrimitiveType.INT_CODE:
+			writer.writeLDC(this.value);
+			writer.writeInsn(Opcodes.IADD);
+			return;
+		case PrimitiveType.LONG_CODE:
+			writer.writeLDC((long) this.value);
+			writer.writeInsn(Opcodes.LADD);
+			return;
+		case PrimitiveType.FLOAT_CODE:
+			writer.writeLDC((float) this.value);
+			writer.writeInsn(Opcodes.FADD);
+			return;
+		case PrimitiveType.DOUBLE_CODE:
+			writer.writeLDC((double) this.value);
+			writer.writeInsn(Opcodes.DADD);
+			return;
+		default:
+		}
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.value == 1)
+		{
+			if (this.prefix)
+			{
+				buffer.append("++");
+				this.appendAccess(prefix, buffer);
+			}
+			else
+			{
+				this.appendAccess(prefix, buffer);
+				buffer.append("++");
+			}
+		}
+		else if (this.value == -1)
+		{
+			if (this.prefix)
+			{
+				buffer.append("--");
+				this.appendAccess(prefix, buffer);
+			}
+			else
+			{
+				this.appendAccess(prefix, buffer);
+				buffer.append("--");
+			}
+		}
+		else if (this.value > 0)
+		{
+			this.appendAccess(prefix, buffer);
+			buffer.append(" += ").append(this.value);
+		}
+		else if (this.value < 0)
+		{
+			this.appendAccess(prefix, buffer);
+			buffer.append(" -= ").append(-this.value);
+		}
+		else
+		{
+			this.appendAccess(prefix, buffer);
+		}
+	}
+
+	private void appendAccess(String prefix, StringBuilder buffer)
+	{
+		if (this.receiver != null)
+		{
+			this.receiver.toString(prefix, buffer);
+			buffer.append('.');
+		}
+
+		buffer.append(this.field.getName());
+	}
+}

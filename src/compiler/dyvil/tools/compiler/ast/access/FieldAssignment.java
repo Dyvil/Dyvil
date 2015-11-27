@@ -50,8 +50,12 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		this.position = position;
 		this.receiver = instance;
 		this.field = field;
-		this.name = field.getName();
 		this.value = value;
+
+		if (field != null)
+		{
+			this.name = field.getName();
+		}
 	}
 	
 	@Override

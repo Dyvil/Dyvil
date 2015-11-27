@@ -1,0 +1,51 @@
+package dyvil.test
+
+public class IncTest {
+	public static void main([String] args) {
+		println "-- Local Int Test --"
+		localIntTest
+		println "-- Local Long Test --"
+		localLongTest
+		println "-- Static Test --"
+		staticTest
+		println "-- Instance Test --"
+		instanceTest
+	}
+
+	private static void localIntTest() {
+		int i = 0
+        i += 2
+        println(i += 1)
+	}
+
+	private static void localLongTest() {
+		long l = 0
+    	l += 3
+    	println(l += 1)
+	}
+
+	private static int counter = 0
+
+	private static void staticTest() {
+		counter += 4
+		println(counter += 1)
+	}
+
+	private static class Counter {
+		int value = 0
+	}
+
+	private static void instanceTest() {
+		Counter counter = new Counter
+		instanceStatementTest(counter)
+		instanceExpressionTest(counter)
+	}
+
+	private static void instanceStatementTest(Counter counter) {
+		counter.value += 2
+	}
+
+	private static void instanceExpressionTest(Counter counter) {
+		println(counter.value += 2)
+	}
+}

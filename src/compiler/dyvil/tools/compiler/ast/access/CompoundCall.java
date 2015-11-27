@@ -2,7 +2,10 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.operator.IncOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -17,6 +20,11 @@ public final class CompoundCall
 
 	protected static IValue resolveCall(MarkerList markers, IContext context, ICodePosition position, IValue receiver, Name name, IArguments arguments)
 	{
+		if (arguments.isEmpty())
+		{
+			return null;
+		}
+
 		int type = receiver.valueTag();
 		if (type == IValue.APPLY_CALL)
 		{
@@ -48,13 +56,51 @@ public final class CompoundCall
 		{
 			FieldAccess fieldAccess = (FieldAccess) receiver;
 
+			if (isIncConvertible(fieldAccess.getType(), name))
+			{
+				IValue value = arguments.getLastValue();
+				if (IValue.isNumeric(value.valueTag()))
+				{
+					int intValue = value.intValue();
+					if (name == Names.minus)
+					{
+						intValue = -intValue;
+					}
+					return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, false);
+				}
+			}
+
 			// x op= z
 			// -> x = x.op(z)
 
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			if (op == null)
+			{
+				return null;
+			}
+
 			return new FieldAssignment(position, fieldAccess.getReceiver(), fieldAccess.field, op);
 		}
 
 		return null;
+	}
+
+	private static boolean isIncConvertible(IType type, Name name)
+	{
+		if (name != Names.plus && name != Names.minus)
+		{
+			return false;
+		}
+		if (!type.isPrimitive())
+		{
+			return false;
+		}
+		switch (type.typeTag())
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+		case PrimitiveType.VOID_CODE:
+			return false;
+		}
+		return true;
 	}
 }
