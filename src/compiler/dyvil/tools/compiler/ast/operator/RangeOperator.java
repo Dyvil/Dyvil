@@ -112,7 +112,13 @@ public class RangeOperator implements IValue
 	{
 		return this.type != null && this.type.isResolved();
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.firstValue.hasSideEffects() || this.lastValue.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{

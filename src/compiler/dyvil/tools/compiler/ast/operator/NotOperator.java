@@ -40,7 +40,13 @@ public final class NotOperator extends AbstractValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.value.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{

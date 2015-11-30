@@ -50,7 +50,13 @@ public final class OrOperator extends AbstractValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.left.hasSideEffects() || this.right.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{

@@ -47,7 +47,13 @@ public final class NullCheckOperator implements IValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.value.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{

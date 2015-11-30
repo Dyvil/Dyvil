@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -21,7 +22,7 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ClassOperator extends AbstractValue
+public final class ClassOperator extends AbstractValue implements IConstantValue
 {
 	public static final class Types
 	{
@@ -58,21 +59,9 @@ public final class ClassOperator extends AbstractValue
 	}
 	
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-	
-	@Override
 	public Object toObject()
 	{
 		return dyvil.tools.asm.Type.getType(this.type.getExtendedName());
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return true;
 	}
 	
 	@Override
@@ -128,12 +117,6 @@ public final class ClassOperator extends AbstractValue
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers)
-	{
-		return this;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type == null)
@@ -180,6 +163,56 @@ public final class ClassOperator extends AbstractValue
 	{
 		this.type.cleanup(context, compilableList);
 		return this;
+	}
+
+	@Override
+	public int stringSize()
+	{
+		if (this.type.isPrimitive())
+		{
+			return this.type.getName().qualified.length();
+		}
+
+		IClass iClass = this.type.getTheClass();
+		if (iClass == null)
+		{
+			return 20;
+		}
+
+		if (iClass.isInterface())
+		{
+			return "interface ".length() + iClass.getInternalName().length();
+		}
+
+		return "class ".length() + iClass.getInternalName().length();
+	}
+
+	@Override
+	public boolean toStringBuilder(StringBuilder builder)
+	{
+		if (this.type.isPrimitive())
+		{
+			builder.append(this.type.getName().qualified);
+			return true;
+		}
+
+		IClass iClass = this.type.getTheClass();
+		if (iClass == null)
+		{
+			return false;
+		}
+
+		if (iClass.isInterface())
+		{
+			builder.append("interface ");
+		}
+		else
+		{
+			builder.append("class ");
+		}
+
+		builder.append(iClass.getFullName());
+		return true;
 	}
 	
 	@Override

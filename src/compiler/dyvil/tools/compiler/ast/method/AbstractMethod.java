@@ -73,6 +73,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected IClass        theClass;
 	protected String        descriptor;
 	protected IntrinsicData intrinsicData;
+
+	protected boolean sideEffects = true;
 	
 	public AbstractMethod(IClass iclass)
 	{
@@ -289,6 +291,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
 				return this.getClass() != ExternalMethod.class;
 			}
+			return true;
+		case "dyvil/annotation/pure":
+			this.sideEffects = false;
+			return true;
 		}
 		return true;
 	}
@@ -361,7 +367,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return (this.modifiers & Modifiers.ABSTRACT) != 0 && !this.isObjectMethod();
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.sideEffects;
+	}
+
+	@Override
+	public void setHasSideEffects(boolean sideEffects)
+	{
+		this.sideEffects = sideEffects;
+	}
+
 	protected boolean isObjectMethod()
 	{
 		switch (this.parameterCount)

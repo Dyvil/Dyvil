@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.dynamic;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.array.ObjectArray;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -32,6 +27,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
 
 public class DynamicMethod implements IMethod, IDefaultContext
 {
@@ -204,7 +204,18 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	{
 		return false;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return true;
+	}
+
+	@Override
+	public void setHasSideEffects(boolean sideEffects)
+	{
+	}
+
 	@Override
 	public int getAccessLevel()
 	{

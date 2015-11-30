@@ -1,18 +1,18 @@
 package dyvil.annotation;
 
+import dyvil.util.Immutable;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import dyvil.util.Immutable;
-
 /**
  * Marks a mutating method, i.e. a method that mutates the members of a mutable
  * type. If a method annotated as {@code mutating} is called on any instance of
- * the {@link Immutable} interface, compiler should report the error specified
- * by {@link #error()}.
- * 
+ * the {@link Immutable} interface, the compiler should report the error specified
+ * by {@link #value()}.
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -32,7 +32,7 @@ public @interface mutating
 	 * <li>{@code method} - The name of the method
 	 * <li>{@code type} - The type of the callee
 	 * </ul>
-	 * 
+	 *
 	 * @return the error to be reported by the compiler
 	 */
 	String value() default VALUE_DEFAULT;

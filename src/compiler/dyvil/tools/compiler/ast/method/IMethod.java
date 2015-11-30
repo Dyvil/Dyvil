@@ -28,6 +28,10 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	// Misc
 	
 	boolean isAbstract();
+
+	boolean hasSideEffects();
+
+	void setHasSideEffects(boolean sideEffects);
 	
 	void setParameters(IParameter[] parameters, int parameterCount);
 	
