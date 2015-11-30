@@ -111,25 +111,18 @@ public final class MethodCall extends AbstractCall implements INamed
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		int args = this.arguments.size();
-		if (args == 1)
+		if (args == 1 && this.receiver != null)
 		{
-			IValue op;
-			if (this.receiver != null)
-			{
-				op = Operators.getPriority(this.receiver, this.name, this.arguments.getFirstValue());
-			}
-			else
-			{
-				op = Operators.getPriority(this.name, this.arguments.getFirstValue());
-			}
-			
+			// Prioritized Infix Operators
+			IValue op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
 			if (op != null)
 			{
 				op.setPosition(this.position);
 				return op;
 			}
 		}
-		
+
+		// Normal Method Resolution
 		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
 		if (method != null)
 		{
@@ -138,21 +131,45 @@ public final class MethodCall extends AbstractCall implements INamed
 			return this;
 		}
 		
-		if (args == 1 && this.receiver != null)
+		if (args == 1)
 		{
-			IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
+			IValue op;
+			if (this.receiver == null)
+			{
+				// Prefix Operators
+				op = Operators.getPrefix(this.name, this.arguments.getFirstValue());
+				if (op != null)
+				{
+					op.setPosition(this.position);
+					return op;
+				}
+			}
+			else
+			{
+				// Infix Operators
+				op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
+				if (op != null)
+				{
+					op.setPosition(this.position);
+					return op;
+				}
+
+				String qualified = this.name.qualified;
+				if (qualified.endsWith("$eq"))
+				{
+					Name name = Util.stripEq(this.name);
+
+					return CompoundCall
+							.resolveCall(markers, context, this.position, this.receiver, name, this.arguments);
+				}
+			}
+		}
+		if (args == 0 && this.receiver != null)
+		{
+			IValue op = Operators.getPostfix(this.receiver, this.name);
 			if (op != null)
 			{
-				op.setPosition(this.position);
 				return op;
-			}
-			
-			String qualified = this.name.qualified;
-			if (qualified.endsWith("$eq"))
-			{
-				Name name = Util.stripEq(this.name);
-
-				return CompoundCall.resolveCall(markers, context, this.position, this.receiver, name, this.arguments);
 			}
 		}
 		

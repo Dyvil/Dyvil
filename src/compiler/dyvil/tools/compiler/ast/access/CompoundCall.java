@@ -4,8 +4,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.operator.IncOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -56,7 +54,7 @@ public final class CompoundCall
 		{
 			FieldAccess fieldAccess = (FieldAccess) receiver;
 
-			if (isIncConvertible(fieldAccess.getType(), name))
+			if ((name == Names.plus || name == Names.minus) && IncOperator.isIncConvertible(fieldAccess.getType()))
 			{
 				IValue value = arguments.getLastValue();
 				if (IValue.isNumeric(value.valueTag()))
@@ -83,24 +81,5 @@ public final class CompoundCall
 		}
 
 		return null;
-	}
-
-	private static boolean isIncConvertible(IType type, Name name)
-	{
-		if (name != Names.plus && name != Names.minus)
-		{
-			return false;
-		}
-		if (!type.isPrimitive())
-		{
-			return false;
-		}
-		switch (type.typeTag())
-		{
-		case PrimitiveType.BOOLEAN_CODE:
-		case PrimitiveType.VOID_CODE:
-			return false;
-		}
-		return true;
 	}
 }

@@ -38,6 +38,21 @@ public class IncOperator extends AbstractValue
 		this.prefix = prefix;
 	}
 
+	public static boolean isIncConvertible(IType type)
+	{
+		if (!type.isPrimitive())
+		{
+			return false;
+		}
+		switch (type.getTypecode())
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+		case PrimitiveType.VOID_CODE:
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public int valueTag()
 	{
