@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.operator.IncOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -31,11 +32,18 @@ public final class CompoundCall
 			// x(y...) op= z
 			// -> x(y...) = x(y...).op(z)
 			// -> x.update(y..., x.apply(y...).op(z))
+
+			SideEffectHelper helper = new SideEffectHelper();
+
+			IValue applyReceiver = applyCall.receiver = helper.process(applyCall.receiver);
+			IArguments applyArguments = applyCall.arguments = helper.process(applyCall.arguments);
 			
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
-			return new UpdateMethodCall(position, applyCall.receiver,
-			                            applyCall.arguments.withLastValue(Names.update, op))
+			IValue update = new UpdateMethodCall(position, applyReceiver,
+			                                     applyArguments.withLastValue(Names.update, op))
 					.resolveCall(markers, context);
+
+			return helper.finish(update);
 		}
 		else if (type == IValue.SUBSCRIPT_GET)
 		{
@@ -44,42 +52,64 @@ public final class CompoundCall
 			// x[y...] op= z
 			// -> x[y...] = x[y...].op(z)
 			// -> x.subscript_=(y..., x.subscript(y...).op(z))
-			
+
+			SideEffectHelper helper = new SideEffectHelper();
+
+			IValue subscriptReceiver = subscriptGetter.receiver = helper.process(subscriptGetter.receiver);
+			IArguments subscriptArguments = subscriptGetter.arguments = helper.process(subscriptGetter.arguments);
+
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
-			return new SubscriptSetter(position, subscriptGetter.receiver,
-			                           subscriptGetter.arguments.withLastValue(Names.subscript_$eq, op))
+			IArguments subscriptSetterArguments = subscriptArguments.withLastValue(Names.subscript_$eq, op);
+			IValue subscript = new SubscriptSetter(position, subscriptReceiver, subscriptSetterArguments)
 					.resolveCall(markers, context);
+
+			return helper.finish(subscript);
 		}
 		else if (type == IValue.FIELD_ACCESS)
 		{
 			FieldAccess fieldAccess = (FieldAccess) receiver;
 
-			if ((name == Names.plus || name == Names.minus) && IncOperator.isIncConvertible(fieldAccess.getType()))
+			IValue op = getIncOperator(name, arguments, fieldAccess);
+			if (op != null)
 			{
-				IValue value = arguments.getLastValue();
-				if (IValue.isNumeric(value.valueTag()))
-				{
-					int intValue = value.intValue();
-					if (name == Names.minus)
-					{
-						intValue = -intValue;
-					}
-					return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, false);
-				}
+				return op;
 			}
 
 			// x op= z
 			// -> x = x.op(z)
 
-			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
-			if (op == null)
+			SideEffectHelper helper = new SideEffectHelper();
+
+			IValue fieldReceiver = fieldAccess.receiver = helper.process(fieldAccess.receiver);
+
+			IValue methodCall = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			if (methodCall == null)
 			{
 				return null;
 			}
 
-			return new FieldAssignment(position, fieldAccess.getReceiver(), fieldAccess.field, op);
+			FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.field, methodCall);
+			return helper.finish(assignment);
 		}
 
+		return null;
+	}
+	
+	private static IValue getIncOperator(Name name, IArguments arguments, FieldAccess fieldAccess)
+	{
+		if ((name == Names.plus || name == Names.minus) && IncOperator.isIncConvertible(fieldAccess.getType()))
+		{
+			IValue value = arguments.getLastValue();
+			if (IValue.isNumeric(value.valueTag()))
+			{
+				int intValue = value.intValue();
+				if (name == Names.minus)
+				{
+					intValue = -intValue;
+				}
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, false);
+			}
+		}
 		return null;
 	}
 }

@@ -118,7 +118,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public boolean hasSideEffects()
 	{
-		return this.receiver.hasSideEffects();
+		return this.receiver != null && this.receiver.hasSideEffects();
 	}
 
 	@Override
