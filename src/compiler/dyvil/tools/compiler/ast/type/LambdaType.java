@@ -33,10 +33,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
 	public static final IClass[] functionClasses = new IClass[22];
 
-	protected IType   returnType;
+	protected IType returnType;
 
 	protected IType[] parameterTypes;
 	protected int     parameterCount;
+
 	public LambdaType()
 	{
 		this.parameterTypes = new IType[2];
@@ -239,14 +240,18 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.parameterCount != 0 || value.isType(this))
+		if (this.parameterCount != 0)
 		{
 			return value.withType(this, typeContext, markers, context);
 		}
 
-		IValue value1 = value
-				.withType(this.returnType.getConcreteType(typeContext).getParameterType(), typeContext, markers,
-				          context);
+		IType type = value.getType();
+		if (type == Types.UNKNOWN || IObjectType.super.isSuperTypeOf(type))
+		{
+			return value.withType(this, typeContext, markers, context);
+		}
+
+		IValue value1 = IType.convertValue(value, this.returnType, typeContext, markers, context);
 		if (value1 != null)
 		{
 			return this.wrapLambda(value1, typeContext);

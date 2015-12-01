@@ -76,12 +76,13 @@ public class Closure extends StatementList
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.returnType = null;
 		if (this.resolved)
 		{
+			this.returnType = null;
 			return super.resolve(markers, context);
 		}
 
+		this.returnType = Types.UNKNOWN;
 		// Do this in withType
 		return this;
 	}
