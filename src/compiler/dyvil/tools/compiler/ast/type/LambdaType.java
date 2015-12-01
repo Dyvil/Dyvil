@@ -32,41 +32,41 @@ import java.io.IOException;
 public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
 	public static final IClass[] functionClasses = new IClass[22];
-	
+
 	protected IType   returnType;
+
 	protected IType[] parameterTypes;
 	protected int     parameterCount;
-	
 	public LambdaType()
 	{
 		this.parameterTypes = new IType[2];
 	}
-	
+
 	public LambdaType(IType type)
 	{
 		this.parameterTypes = new IType[1];
 		this.parameterTypes[0] = type;
 		this.parameterCount = 1;
 	}
-	
+
 	public LambdaType(TupleType tupleType)
 	{
 		this.parameterTypes = tupleType.types;
 		this.parameterCount = tupleType.typeCount;
 	}
-	
+
 	public LambdaType(IType[] types, int typeCount, IType returnType)
 	{
 		this.parameterTypes = types;
 		this.parameterCount = typeCount;
 		this.returnType = returnType;
 	}
-	
+
 	public LambdaType(int typeCount)
 	{
 		this.parameterTypes = new IType[typeCount];
 	}
-	
+
 	public static IClass getLambdaClass(int typeCount)
 	{
 		IClass iclass = functionClasses[typeCount];
@@ -74,56 +74,56 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			return iclass;
 		}
-		
+
 		iclass = Package.dyvilFunction.resolveClass("Function" + typeCount);
 		functionClasses[typeCount] = iclass;
 		return iclass;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return LAMBDA;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.getTheClass().getName();
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.returnType = type;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.returnType;
 	}
-	
+
 	// ITypeList Overrides
-	
+
 	@Override
 	public int typeCount()
 	{
 		return this.parameterCount;
 	}
-	
+
 	@Override
 	public void setType(int index, IType type)
 	{
 		this.parameterTypes[index] = type;
 	}
-	
+
 	@Override
 	public void addType(IType type)
 	{
@@ -136,21 +136,38 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.parameterTypes[index] = type;
 	}
-	
+
 	@Override
 	public IType getType(int index)
 	{
 		return this.parameterTypes[index];
 	}
-	
+
 	// IType Overrides
-	
+
+	@Override
+	public IType getParameterType()
+	{
+		if (this.hasTypeVariables())
+		{
+			IType[] parameterTypes = new IType[this.parameterCount];
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				parameterTypes[i] = this.parameterTypes[i].getParameterType();
+			}
+			IType returnType = this.returnType.getParameterType();
+			return new LambdaType(parameterTypes, parameterCount, returnType);
+		}
+
+		return this;
+	}
+
 	@Override
 	public IClass getTheClass()
 	{
 		return getLambdaClass(this.parameterCount);
 	}
-	
+
 	@Override
 	public int getSubClassDistance(IType subtype)
 	{
@@ -162,10 +179,10 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				return i;
 			}
 		}
-		
+
 		return IObjectType.super.getSubClassDistance(subtype);
 	}
-	
+
 	@Override
 	public float getSubTypeDistance(IType subtype)
 	{
@@ -177,10 +194,10 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				return f;
 			}
 		}
-		
+
 		return IObjectType.super.getSubTypeDistance(subtype);
 	}
-	
+
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
@@ -188,57 +205,59 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			return true;
 		}
-		
+
 		if (!IObjectType.super.isSuperTypeOf(type))
 		{
 			return false;
 		}
-		
+
 		IClass iclass = this.getTheClass();
 		ITypeVariable typeVar = iclass.getTypeVariable(this.parameterCount);
 		IType type1 = type.resolveTypeSafely(typeVar);
-		
+
 		// Return type is Covariant
 		if (!this.returnType.isSuperTypeOf(type1))
 		{
 			return false;
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			typeVar = iclass.getTypeVariable(i);
 			type1 = type.resolveType(typeVar);
-			
+
 			// Contravariance
 			if (!type1.isSuperTypeOf(this.parameterTypes[i]))
 			{
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.parameterCount != 0 || IObjectType.super.isSuperClassOf(value.getType()))
+		if (this.parameterCount != 0 || value.isType(this))
 		{
 			return value.withType(this, typeContext, markers, context);
 		}
-		
-		IValue value1 = value.withType(this.returnType.getConcreteType(typeContext).getParameterType(), typeContext, markers, context);
+
+		IValue value1 = value
+				.withType(this.returnType.getConcreteType(typeContext).getParameterType(), typeContext, markers,
+				          context);
 		if (value1 != null)
 		{
 			return this.wrapLambda(value1, typeContext);
 		}
 		return null;
 	}
-	
+
 	public LambdaExpr wrapLambda(IValue value, ITypeContext typeContext)
 	{
 		IType returnType = value.getType();
-		
+
 		LambdaExpr le = new LambdaExpr(value.getPosition(), null, 0);
 		le.setMethod(this.getFunctionalMethod());
 		le.setReturnType(returnType);
@@ -247,7 +266,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		le.inferReturnType(this, typeContext, returnType);
 		return le;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
@@ -264,7 +283,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		return this.parameterTypes[index];
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{

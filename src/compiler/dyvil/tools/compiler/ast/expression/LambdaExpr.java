@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.MapTypeContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -162,7 +161,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public boolean isResolved()
 	{
-		return this.type != null && this.type.isResolved();
+		return true;
 	}
 	
 	@Override
@@ -216,14 +215,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			if (this.returnType == Types.UNKNOWN)
 			{
 				this.returnType = valueType;
-			}
-			else
-			{
-				ITypeVariable typeVariable = this.returnType.getTypeVariable();
-				if (typeVariable != null)
-				{
-					this.returnType = typeVariable.getParameterType();
-				}
 			}
 			
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
@@ -339,12 +330,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			IParameter lambdaParam = this.parameters[i];
 			IParameter param = method.getParameter(i);
+			IType paramType = param.getType().getParameterType();
 			IType lambdaParamType = lambdaParam.getType();
 			if (lambdaParamType == Types.UNKNOWN)
 			{
 				continue;
 			}
-			if (!param.getType().isSameType(lambdaParamType))
+			if (!paramType.isSuperTypeOf(lambdaParamType))
 			{
 				return false;
 			}

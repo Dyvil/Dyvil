@@ -35,21 +35,23 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 {
 	protected ICodePosition position;
 	
-	protected IValue[] values = new IValue[3];
-	protected int     valueCount;
-	protected Label[] labels;
+	protected IValue[] values;
+	protected int      valueCount;
+	protected Label[]  labels;
 	
 	// Metadata
-	private   Map<Name, Variable> variables;
+	protected Map<Name, Variable> variables;
 	protected IType               returnType;
 	
 	public StatementList()
 	{
+		this.values = new IValue[3];
 	}
 	
 	public StatementList(ICodePosition position)
 	{
 		this.position = position;
+		this.values = new IValue[3];
 	}
 	
 	@Override

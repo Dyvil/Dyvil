@@ -65,18 +65,18 @@ public class LambdaTest
 
 		repeat(3) { println "Testing..." }
 
-		with ("Still testing...") { println $it }
+		with ("Still testing...") { println $0 }
 
 		closure1()
 	}
 
 	private static void partialFunctionTest() {
-		(int, int) => int compareInts = _ compareTo _ ;
+		(int, int) => int compareInts = _ compareTo _
 		int => void printFun = println _
 
 		printFun(compareInts(1, 2))
 
-		with ("Test running...") { println _ }
+		// with ("Test running...") { println _ }
 		with ("Test completed", println _)
 	}
 }

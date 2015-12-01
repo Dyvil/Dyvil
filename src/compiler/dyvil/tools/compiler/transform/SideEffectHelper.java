@@ -15,7 +15,7 @@ public class SideEffectHelper
 
 	public IValue processValue(IValue value)
 	{
-		if (!value.hasSideEffects())
+		if (value == null || !value.hasSideEffects())
 		{
 			return value;
 		}
