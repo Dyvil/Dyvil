@@ -22,16 +22,21 @@ public final class Predef
 	public infix boolean isNonNull(Object o) = o.isNonNull
 	
 	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS ])
-	public infix boolean ==(Object o1, Object o2) = o1 equals o2
+	public infix boolean operator ==(Object o1, Object o2) = o1 equals o2
 	
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	public infix boolean ===(Object o1, Object o2) = o1 === o2
+	public infix boolean operator ===(Object o1, Object o2) = o1 === o2
 	
 	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS, BNOT ])
-	public infix boolean !=(Object o1, Object o2) = !(o1 equals o2)
+	public infix boolean operator !=(Object o1, Object o2) = !(o1 equals o2)
 	
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	public infix boolean !==(Object o1, Object o2) = o1 !== o2
+	public infix boolean operator !==(Object o1, Object o2) = o1 !== o2
+
+	public infix R operator ?[R](boolean condition, => R result1, => R result2) {
+		if (condition)	return result1.apply
+		else			return result2.apply
+	}
 	
 	// Lists
 	
