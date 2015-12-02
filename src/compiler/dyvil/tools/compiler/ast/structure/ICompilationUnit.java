@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.io.File;
-
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.parsing.CodeFile;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.io.File;
 
 public interface ICompilationUnit extends IASTNode
 {
@@ -16,7 +16,8 @@ public interface ICompilationUnit extends IASTNode
 		int size = markers.size();
 		if (size > 0)
 		{
-			StringBuilder buf = new StringBuilder("Problems in ").append(fileType).append(' ').append(source).append(":\n\n");
+			StringBuilder buf = new StringBuilder("Problems in ").append(fileType).append(' ').append(source)
+			                                                     .append(":\n\n");
 			String code = source.getCode();
 			
 			int warnings = markers.getWarnings();
@@ -26,7 +27,8 @@ public interface ICompilationUnit extends IASTNode
 			{
 				marker.log(code, buf);
 			}
-			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
+			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings)
+			   .append(warnings == 1 ? " Warning" : " Warnings");
 			DyvilCompiler.log(buf.toString());
 			if (errors > 0)
 			{

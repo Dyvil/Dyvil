@@ -1,11 +1,5 @@
 package dyvil.collection.impl;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
@@ -14,6 +8,12 @@ import dyvil.util.ImmutableException;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 {
@@ -43,7 +43,8 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		@Override
 		public String toString()
 		{
-			return unmaskNull(AbstractIdentityHashMap.this.table[this.index]) + " -> " + AbstractIdentityHashMap.this.table[this.index + 1];
+			return unmaskNull(AbstractIdentityHashMap.this.table[this.index]) + " -> "
+					+ AbstractIdentityHashMap.this.table[this.index + 1];
 		}
 		
 		@Override
@@ -61,10 +62,11 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	
 	protected abstract class TableIterator<E> implements Iterator<E>
 	{
-		protected int		index				= AbstractIdentityHashMap.this.size != 0 ? 0 : AbstractIdentityHashMap.this.table.length;
-		protected int		lastReturnedIndex	= -1;
-		protected boolean	indexValid;
-		protected Object[]	traversalTable		= AbstractIdentityHashMap.this.table;
+		protected int index             =
+				AbstractIdentityHashMap.this.size != 0 ? 0 : AbstractIdentityHashMap.this.table.length;
+		protected int lastReturnedIndex = -1;
+		protected boolean indexValid;
+		protected Object[] traversalTable = AbstractIdentityHashMap.this.table;
 		
 		@Override
 		public boolean hasNext()
@@ -137,7 +139,8 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 				// See closeDeletion for explanation of this conditional
 				if (i < r && (r <= d || d <= i) || r <= d && d <= i)
 				{
-					if (i < deletedSlot && d >= deletedSlot && this.traversalTable == AbstractIdentityHashMap.this.table)
+					if (i < deletedSlot && d >= deletedSlot
+							&& this.traversalTable == AbstractIdentityHashMap.this.table)
 					{
 						int remaining = len - deletedSlot;
 						Object[] newTable = new Object[remaining];
@@ -158,13 +161,13 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	
 	private static final long serialVersionUID = -2493470311862510577L;
 	
-	protected static final int		DEFAULT_CAPACITY	= 12;
-	protected static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
+	protected static final int   DEFAULT_CAPACITY    = 12;
+	protected static final float DEFAULT_LOAD_FACTOR = 2F / 3F;
 	
 	protected static final Object NULL = new Object();
 	
-	protected transient Object[]	table;
-	protected transient int			size;
+	protected transient Object[] table;
+	protected transient int      size;
 	
 	public AbstractIdentityHashMap()
 	{

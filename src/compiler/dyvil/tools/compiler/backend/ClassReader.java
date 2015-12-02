@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.backend;
 
-import java.io.InputStream;
-
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.external.ExternalClass;
+
+import java.io.InputStream;
 
 public class ClassReader implements ClassVisitor
 {

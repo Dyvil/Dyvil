@@ -2,7 +2,7 @@ package dyvil.random;
 
 /**
  * A {@link Random} implementation that always returns the minimum value.
- * 
+ *
  * @author Clashsoft
  */
 public final class MinRandom implements Random

@@ -11,14 +11,14 @@ import java.util.logging.Logger;
  * loggers {@link Logger#log(Level, String)} method. It is possible to specify a
  * custom level with a custom name, which will be used as the logging level of
  * any log records produced by output stream.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
 public class LoggerOutputStream extends PrintStream
 {
-	private Level	level;
-	private Logger	logger;
+	private Level  level;
+	private Logger logger;
 	
 	public LoggerOutputStream(Logger logger)
 	{

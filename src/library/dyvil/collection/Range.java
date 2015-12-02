@@ -1,21 +1,20 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
+import dyvil.collection.range.ClosedRange;
+import dyvil.collection.range.EmptyRange;
+import dyvil.collection.range.HalfOpenRange;
+import dyvil.lang.Ordered;
+import dyvil.lang.Rangeable;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.literal.TupleConvertible;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
-
-import dyvil.lang.Ordered;
-import dyvil.lang.Rangeable;
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
-
-import dyvil.annotation._internal.Covariant;
-import dyvil.collection.range.ClosedRange;
-import dyvil.collection.range.EmptyRange;
-import dyvil.collection.range.HalfOpenRange;
 
 @NilConvertible
 @TupleConvertible
@@ -38,14 +37,14 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	
 	/**
 	 * Returns the first element in this range
-	 * 
+	 *
 	 * @return the first element in this range
 	 */
 	T first();
 	
 	/**
 	 * Returns the last element in this range
-	 * 
+	 *
 	 * @return the last element in this range
 	 */
 	T last();
@@ -53,7 +52,7 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	/**
 	 * Returns the exact number of elements in this range, i.e. the number of
 	 * elements that would be returned by the {@link #iterator()}.
-	 * 
+	 *
 	 * @return the number of elements in this range
 	 */
 	int count();
@@ -63,7 +62,7 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	 * number of elements cannot be directly computed, {@code -1} should be
 	 * returned. Otherwise, the result should equal the result of
 	 * {@link #count()}.
-	 * 
+	 *
 	 * @return the estimated number of elements in this range
 	 */
 	default int estimateCount()

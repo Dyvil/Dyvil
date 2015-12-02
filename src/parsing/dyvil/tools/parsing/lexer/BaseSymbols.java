@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class BaseSymbols implements Symbols
 {
-	public static Map<Character, String>	symbolMap		= new HashMap();
-	public static Map<String, Character>	replacementMap	= new HashMap();
+	public static Map<Character, String> symbolMap      = new HashMap();
+	public static Map<String, Character> replacementMap = new HashMap();
 	
 	static
 	{
@@ -33,27 +33,27 @@ public class BaseSymbols implements Symbols
 	
 	public static final BaseSymbols INSTANCE = new BaseSymbols();
 	
-	public static final int	PARENTHESIS	= Tokens.BRACKET | 0x00010000;
-	public static final int	SQUARE		= Tokens.BRACKET | 0x00020000;
-	public static final int	CURLY		= Tokens.BRACKET | 0x00040000;
+	public static final int PARENTHESIS = Tokens.BRACKET | 0x00010000;
+	public static final int SQUARE      = Tokens.BRACKET | 0x00020000;
+	public static final int CURLY       = Tokens.BRACKET | 0x00040000;
 	
-	public static final int	OPEN	= 0x00000000;
-	public static final int	CLOSE	= 0x00100000;
+	public static final int OPEN  = 0x00000000;
+	public static final int CLOSE = 0x00100000;
 	
-	public static final int	OPEN_BRACKET			= Tokens.BRACKET | OPEN;
-	public static final int	CLOSE_BRACKET			= Tokens.BRACKET | CLOSE;
-	public static final int	OPEN_PARENTHESIS		= PARENTHESIS | OPEN;
-	public static final int	CLOSE_PARENTHESIS		= PARENTHESIS | CLOSE;
-	public static final int	OPEN_SQUARE_BRACKET		= SQUARE | OPEN;
-	public static final int	CLOSE_SQUARE_BRACKET	= SQUARE | CLOSE;
-	public static final int	OPEN_CURLY_BRACKET		= CURLY | OPEN;
-	public static final int	CLOSE_CURLY_BRACKET		= CURLY | CLOSE;
+	public static final int OPEN_BRACKET         = Tokens.BRACKET | OPEN;
+	public static final int CLOSE_BRACKET        = Tokens.BRACKET | CLOSE;
+	public static final int OPEN_PARENTHESIS     = PARENTHESIS | OPEN;
+	public static final int CLOSE_PARENTHESIS    = PARENTHESIS | CLOSE;
+	public static final int OPEN_SQUARE_BRACKET  = SQUARE | OPEN;
+	public static final int CLOSE_SQUARE_BRACKET = SQUARE | CLOSE;
+	public static final int OPEN_CURLY_BRACKET   = CURLY | OPEN;
+	public static final int CLOSE_CURLY_BRACKET  = CURLY | CLOSE;
 	
-	public static final int	DOT			= Tokens.SYMBOL | 0x00010000;
-	public static final int	COLON		= Tokens.SYMBOL | 0x00020000;
-	public static final int	SEMICOLON	= Tokens.SYMBOL | 0x00030000;
-	public static final int	COMMA		= Tokens.SYMBOL | 0x00040000;
-	public static final int	EQUALS		= Tokens.SYMBOL | 0x00050000;
+	public static final int DOT       = Tokens.SYMBOL | 0x00010000;
+	public static final int COLON     = Tokens.SYMBOL | 0x00020000;
+	public static final int SEMICOLON = Tokens.SYMBOL | 0x00030000;
+	public static final int COMMA     = Tokens.SYMBOL | 0x00040000;
+	public static final int EQUALS    = Tokens.SYMBOL | 0x00050000;
 	
 	@Override
 	public int getKeywordType(String value)
@@ -120,8 +120,9 @@ public class BaseSymbols implements Symbols
 	
 	private static boolean isSymbol(char c)
 	{
-		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@' || c == '#' || c == '%' || c == '^'
-				|| c == '&' || c == '~' || c == '?' || c == '|' || c == '\\' || c == ':' || c == '.';
+		return c == '=' || c == '>' || c == '<' || c == '+' || c == '-' || c == '*' || c == '/' || c == '!' || c == '@'
+				|| c == '#' || c == '%' || c == '^' || c == '&' || c == '~' || c == '?' || c == '|' || c == '\\'
+				|| c == ':' || c == '.';
 	}
 	
 	public static String qualify(String s)

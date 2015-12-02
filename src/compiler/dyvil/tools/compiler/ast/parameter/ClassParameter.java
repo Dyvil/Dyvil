@@ -159,7 +159,8 @@ public final class ClassParameter extends Parameter implements IField
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = I18n.createMarker(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
+			Marker marker = I18n
+					.createMarker(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
 			marker.addInfo(I18n.getString("classparameter.type", this.type));
 			marker.addInfo(I18n.getString("value.type", newValue.getType()));
 			markers.add(marker);
@@ -184,7 +185,8 @@ public final class ClassParameter extends Parameter implements IField
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "classparameter.type.incompatible", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "classparameter.type.incompatible",
+				                                  this.name.unqualified);
 				marker.addInfo(I18n.getString("classparameter.type", this.type));
 				marker.addInfo(I18n.getString("value.type", this.defaultValue.getType()));
 				markers.add(marker);
@@ -224,7 +226,8 @@ public final class ClassParameter extends Parameter implements IField
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String desc = this.getDescription();
-		FieldVisitor fv = writer.visitField(this.modifiers.toFlags() & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
+		FieldVisitor fv = writer
+				.visitField(this.modifiers.toFlags() & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.annotations, this.type);
 	}
@@ -249,11 +252,13 @@ public final class ClassParameter extends Parameter implements IField
 		{
 			StringBuilder desc = new StringBuilder("()");
 			this.type.appendExtendedName(desc);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.theClass.getInternalName(), this.name.qualified, desc.toString(), true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.theClass.getInternalName(), this.name.qualified,
+			                       desc.toString(), true);
 		}
 		else
 		{
-			writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+			writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified,
+			                      this.getDescription());
 		}
 	}
 	
@@ -270,6 +275,7 @@ public final class ClassParameter extends Parameter implements IField
 			value.writeExpression(writer, this.type);
 		}
 		
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified,
+		                      this.getDescription());
 	}
 }

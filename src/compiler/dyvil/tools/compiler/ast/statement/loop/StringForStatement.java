@@ -13,9 +13,9 @@ public class StringForStatement extends ForEachStatement
 {
 	public static final Name $string = Name.getQualified("$string");
 	
-	protected Variable	indexVar;
-	protected Variable	lengthVar;
-	protected Variable	stringVar;
+	protected Variable indexVar;
+	protected Variable lengthVar;
+	protected Variable stringVar;
 	
 	public StringForStatement(ICodePosition position, Variable var)
 	{

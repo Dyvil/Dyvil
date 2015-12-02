@@ -4,8 +4,8 @@ import dyvil.lang.ref.DoubleRef;
 
 public class DoubleArrayRef implements DoubleRef
 {
-	protected final double[]	array;
-	protected final int			index;
+	protected final double[] array;
+	protected final int      index;
 	
 	public DoubleArrayRef(double[] array, int index)
 	{

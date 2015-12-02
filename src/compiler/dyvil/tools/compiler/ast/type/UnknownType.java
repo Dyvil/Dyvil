@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -19,6 +15,10 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -153,7 +153,8 @@ public class UnknownType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/UnknownType", "instance", "Ldyvil/reflect/types/UnknownType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/UnknownType", "instance",
+		                      "Ldyvil/reflect/types/UnknownType;", false);
 	}
 	
 	@Override

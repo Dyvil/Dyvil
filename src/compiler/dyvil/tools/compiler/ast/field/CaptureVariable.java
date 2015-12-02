@@ -19,9 +19,9 @@ import java.lang.annotation.ElementType;
 
 public class CaptureVariable implements IVariable
 {
-	public int			index;
-	public IVariable	variable;
-	public IType		type;
+	public int       index;
+	public IVariable variable;
+	public IType     type;
 	
 	public CaptureVariable()
 	{

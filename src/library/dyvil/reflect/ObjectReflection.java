@@ -1,9 +1,9 @@
 package dyvil.reflect;
 
+import dyvil.annotation._internal.infix;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-
-import dyvil.annotation._internal.infix;
 
 public class ObjectReflection
 {
@@ -25,7 +25,9 @@ public class ObjectReflection
 		}
 	}
 	
-	public static @infix <T> T createInstance(Class<T> c)
+	public static
+	@infix
+	<T> T createInstance(Class<T> c)
 	{
 		try
 		{
@@ -37,7 +39,9 @@ public class ObjectReflection
 		}
 	}
 	
-	public static @infix <T> T createInstance(Class<T> c, Object... parameters)
+	public static
+	@infix
+	<T> T createInstance(Class<T> c, Object... parameters)
 	{
 		Class[] parameterTypes = new Class[parameters.length];
 		for (int i = 0; i < parameters.length; i++)
@@ -51,7 +55,9 @@ public class ObjectReflection
 		return createInstance(c, parameterTypes, parameters);
 	}
 	
-	public static @infix <T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
+	public static
+	@infix
+	<T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
 	{
 		try
 		{
@@ -64,7 +70,9 @@ public class ObjectReflection
 		}
 	}
 	
-	public static @infix <T> T allocateInstance(Class<T> c)
+	public static
+	@infix
+	<T> T allocateInstance(Class<T> c)
 	{
 		try
 		{
@@ -76,7 +84,9 @@ public class ObjectReflection
 		}
 	}
 	
-	public static @infix <T> void copyFields(T from, T to)
+	public static
+	@infix
+	<T> void copyFields(T from, T to)
 	{
 		try
 		{

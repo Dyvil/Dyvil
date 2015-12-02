@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
  * @version 1.0
  */
 @Retention(RetentionPolicy.SOURCE)
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target( { ElementType.FIELD, ElementType.METHOD })
 public @interface Native
-{
-}
+{}

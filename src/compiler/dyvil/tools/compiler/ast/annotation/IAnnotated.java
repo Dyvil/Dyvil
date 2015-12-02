@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.annotation;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
+
+import java.lang.annotation.ElementType;
 
 public interface IAnnotated extends IAnnotationConsumer
 {

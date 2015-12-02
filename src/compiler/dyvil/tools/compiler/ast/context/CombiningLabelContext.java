@@ -6,8 +6,8 @@ import dyvil.tools.parsing.Name;
 
 public class CombiningLabelContext implements ILabelContext
 {
-	private ILabelContext	context1;
-	private ILabelContext	context2;
+	private ILabelContext context1;
+	private ILabelContext context2;
 	
 	public CombiningLabelContext(ILabelContext context1, ILabelContext context2)
 	{

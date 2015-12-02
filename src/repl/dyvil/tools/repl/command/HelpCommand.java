@@ -30,5 +30,4 @@ public class HelpCommand implements ICommand
 			System.out.println(entry.getValue().getDescription());
 		}
 	}
-	
 }

@@ -7,30 +7,35 @@ import dyvil.annotation._internal.infix;
  * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used
  * for several String-conversions such as parsing {@code boolean}s, {@code int}s
  * or {@code float}s or converting integers to roman numeral representations.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
 @Utility(String.class)
 public final class StringConversions
 {
-	private static final String[]	ROMANDIGIT	= { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
-	private static final int[]		ROMANNUMBER	= { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+	private static final String[] ROMANDIGIT  = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV",
+			"I" };
+	private static final int[]    ROMANNUMBER = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
 	
-	private static final String[] ROMANCACHE = { "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI",
-			"XVII", "XVIII", "XIX", "XX" };
-			
+	private static final String[] ROMANCACHE = { "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI",
+			"XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" };
+
 	private StringConversions()
 	{
 		// no instances
 	}
 	
-	public static @infix boolean toBoolean(String s)
+	public static
+	@infix
+	boolean toBoolean(String s)
 	{
 		return s != null && s.equalsIgnoreCase("true");
 	}
 	
-	public static @infix byte toByte(String s)
+	public static
+	@infix
+	byte toByte(String s)
 	{
 		try
 		{
@@ -42,7 +47,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix byte toByte(String s, byte _default)
+	public static
+	@infix
+	byte toByte(String s, byte _default)
 	{
 		try
 		{
@@ -54,7 +61,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix byte toByte(String s, byte _default, int radix)
+	public static
+	@infix
+	byte toByte(String s, byte _default, int radix)
 	{
 		try
 		{
@@ -66,7 +75,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix short toShort(String s)
+	public static
+	@infix
+	short toShort(String s)
 	{
 		try
 		{
@@ -78,7 +89,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix short toShort(String s, short _default)
+	public static
+	@infix
+	short toShort(String s, short _default)
 	{
 		try
 		{
@@ -90,7 +103,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix short toShort(String s, short _default, int radix)
+	public static
+	@infix
+	short toShort(String s, short _default, int radix)
 	{
 		try
 		{
@@ -102,7 +117,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix int toInt(String s)
+	public static
+	@infix
+	int toInt(String s)
 	{
 		try
 		{
@@ -114,7 +131,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix int toInt(String s, int _default)
+	public static
+	@infix
+	int toInt(String s, int _default)
 	{
 		try
 		{
@@ -126,7 +145,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix int toInt(String s, int _default, int radix)
+	public static
+	@infix
+	int toInt(String s, int _default, int radix)
 	{
 		try
 		{
@@ -138,7 +159,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix long toLong(String s)
+	public static
+	@infix
+	long toLong(String s)
 	{
 		try
 		{
@@ -150,7 +173,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix long toLong(String s, long _default)
+	public static
+	@infix
+	long toLong(String s, long _default)
 	{
 		try
 		{
@@ -162,7 +187,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix long toLong(String s, long _default, int radix)
+	public static
+	@infix
+	long toLong(String s, long _default, int radix)
 	{
 		try
 		{
@@ -174,7 +201,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix float toFloat(String s)
+	public static
+	@infix
+	float toFloat(String s)
 	{
 		try
 		{
@@ -186,7 +215,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix float toFloat(String s, float _default)
+	public static
+	@infix
+	float toFloat(String s, float _default)
 	{
 		try
 		{
@@ -198,7 +229,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix double toDouble(String s)
+	public static
+	@infix
+	double toDouble(String s)
 	{
 		try
 		{
@@ -210,7 +243,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix double toDouble(String s, double _default)
+	public static
+	@infix
+	double toDouble(String s, double _default)
 	{
 		try
 		{
@@ -222,7 +257,9 @@ public final class StringConversions
 		}
 	}
 	
-	public static @infix String toRomanString(int number)
+	public static
+	@infix
+	String toRomanString(int number)
 	{
 		if (number < 0)
 		{
@@ -234,7 +271,8 @@ public final class StringConversions
 		}
 		else if (number >= 4000)
 		{
-			throw new NumberFormatException("Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
+			throw new NumberFormatException(
+					"Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
 		}
 		
 		StringBuilder builder = new StringBuilder();
@@ -250,7 +288,9 @@ public final class StringConversions
 		return builder.toString();
 	}
 	
-	public static @infix String toRomanString(long number)
+	public static
+	@infix
+	String toRomanString(long number)
 	{
 		if (number < 0L)
 		{
@@ -262,7 +302,8 @@ public final class StringConversions
 		}
 		else if (number >= 4000L)
 		{
-			throw new NumberFormatException("Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
+			throw new NumberFormatException(
+					"Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
 		}
 		
 		StringBuilder builder = new StringBuilder();

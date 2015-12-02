@@ -15,12 +15,12 @@ import static dyvil.collection.impl.AbstractIdentityHashMap.*;
 
 @NilConvertible
 @ArrayConvertible
-public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements MutableSet<E>
+public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = 5634688694810236366L;
 	
-	private float			loadFactor;
-	private transient int	threshold;
+	private           float loadFactor;
+	private transient int   threshold;
 	
 	public static <E> IdentityHashSet<E> apply()
 	{

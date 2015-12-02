@@ -24,8 +24,8 @@ public final class TypeOperator extends AbstractValue
 {
 	public static final class Types
 	{
-		public static final IClass		TYPE_CLASS	= Package.dyvilLang.resolveClass("Type");
-		public static final ClassType	TYPE		= new ClassType();
+		public static final IClass    TYPE_CLASS = Package.dyvilLang.resolveClass("Type");
+		public static final ClassType TYPE       = new ClassType();
 		
 		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
 		

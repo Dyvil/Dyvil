@@ -1,12 +1,13 @@
 package dyvil.reflect.types;
 
+import dyvil.annotation._internal.object;
 import dyvil.lang.Type;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation._internal.object;
-
 @NilConvertible
-public @object class UnknownType<T> implements Type<T>
+public
+@object
+class UnknownType<T> implements Type<T>
 {
 	public static final UnknownType instance = new UnknownType();
 	

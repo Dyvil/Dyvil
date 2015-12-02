@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassParameterSetter implements IValue
 {
-	private IClass		theClass;
-	private IParameter	parameter;
+	private IClass     theClass;
+	private IParameter parameter;
 	
 	public ClassParameterSetter(IClass theClass, IParameter param)
 	{
@@ -33,7 +33,8 @@ public final class ClassParameterSetter implements IValue
 
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified, this.parameter.getDescription());
+		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
+		                      this.parameter.getDescription());
 	}
 	
 	@Override

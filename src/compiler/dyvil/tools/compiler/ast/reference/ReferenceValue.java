@@ -12,8 +12,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ReferenceValue implements IValue
 {
-	protected IValue			value;
-	protected final IReference	reference;
+	protected       IValue     value;
+	protected final IReference reference;
 	
 	public ReferenceValue(IValue value, IReference reference)
 	{

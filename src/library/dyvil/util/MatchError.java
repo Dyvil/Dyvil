@@ -1,10 +1,9 @@
 package dyvil.util;
 
 import dyvil.lang.Byte;
-import dyvil.lang.Char;
+import dyvil.lang.*;
 import dyvil.lang.Double;
 import dyvil.lang.Float;
-import dyvil.lang.Int;
 import dyvil.lang.Long;
 import dyvil.lang.Short;
 
@@ -14,7 +13,7 @@ import dyvil.lang.Short;
  * patterns can handle. The MatchError contains the value that was attempted to
  * be matched, and it's {@link #getMessage()} method returns a string describing
  * the value as well as it's type.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */

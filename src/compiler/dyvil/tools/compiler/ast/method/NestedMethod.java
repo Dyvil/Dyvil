@@ -21,9 +21,9 @@ import dyvil.tools.parsing.Name;
 
 public class NestedMethod extends CodeMethod
 {
-	private IClass				thisClass;
-	private CaptureVariable[]	capturedFields;
-	private int					capturedFieldCount;
+	private IClass            thisClass;
+	private CaptureVariable[] capturedFields;
+	private int               capturedFieldCount;
 	
 	public transient IContext context;
 	
@@ -153,8 +153,9 @@ public class NestedMethod extends CodeMethod
 		}
 		
 		MethodWriter mw = new MethodWriterImpl(writer,
-				writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(), this.getSignature(), this.getExceptions()));
-				
+		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
+		                                                          this.getSignature(), this.getExceptions()));
+
 		if (this.thisClass != null)
 		{
 			mw.setThisType(this.theClass.getInternalName());
@@ -198,7 +199,8 @@ public class NestedMethod extends CodeMethod
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(), param.getSignature(), start, end);
+			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
+			              param.getSignature(), start, end);
 		}
 	}
 	
@@ -212,21 +214,24 @@ public class NestedMethod extends CodeMethod
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException
 	{
 		this.writeCaptures(writer);
 		super.writeCall(writer, instance, arguments, type, lineNumber);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		this.writeCaptures(writer);
 		super.writeJump(writer, dest, instance, arguments, lineNumber);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		this.writeCaptures(writer);
 		super.writeInvJump(writer, dest, instance, arguments, lineNumber);

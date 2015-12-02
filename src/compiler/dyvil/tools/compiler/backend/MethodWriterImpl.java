@@ -13,18 +13,18 @@ public final class MethodWriterImpl implements MethodWriter
 {
 	private static final Long LONG_MINUS_ONE = Long.valueOf(-1);
 	
-	public ClassWriter		cw;
-	protected MethodVisitor	mv;
+	public    ClassWriter   cw;
+	protected MethodVisitor mv;
 	
-	protected Frame	frame	= new Frame();
-	private boolean	visitFrame;
-	private int		maxLocals;
-	private int		maxStack;
+	protected Frame frame = new Frame();
+	private boolean visitFrame;
+	private int     maxLocals;
+	private int     maxStack;
 	
 	private boolean hasReturn;
 	
-	private int[]	syncLocals;
-	private int		syncCount;
+	private int[] syncLocals;
+	private int   syncCount;
 	
 	public MethodWriterImpl(ClassWriter cw, MethodVisitor mv)
 	{
@@ -433,7 +433,8 @@ public final class MethodWriterImpl implements MethodWriter
 			case Opcodes.OBJECT_EQUALS:
 				this.frame.pop();
 				this.frame.pop();
-				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
+				this.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z",
+				                        false);
 				this.frame.push(ClassFormat.BOOLEAN);
 				return;
 			case SWAP2:
@@ -710,7 +711,8 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeFieldInsn(int opcode, String owner, String name, String desc, Object fieldType) throws BytecodeException
+	public void writeFieldInsn(int opcode, String owner, String name, String desc, Object fieldType)
+			throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -720,7 +722,8 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType, boolean isInterface) throws BytecodeException
+	public void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType, boolean isInterface)
+			throws BytecodeException
 	{
 		this.insnCallback();
 		
@@ -730,7 +733,8 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs) throws BytecodeException
+	public void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
+			throws BytecodeException
 	{
 		this.insnCallback();
 		

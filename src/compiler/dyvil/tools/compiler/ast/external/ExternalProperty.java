@@ -11,8 +11,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalProperty extends Property
 {
-	private boolean	annotationsResolved;
-	private boolean	returnTypeResolved;
+	private boolean annotationsResolved;
+	private boolean returnTypeResolved;
 	
 	public ExternalProperty(IClass iclass)
 	{

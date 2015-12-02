@@ -63,7 +63,7 @@ public class ModifierList implements ModifierSet
 	@Override
 	public void toString(StringBuilder builder)
 	{
-		for (int i = 0; i<  this.count; i++)
+		for (int i = 0; i < this.count; i++)
 		{
 			this.modifiers[i].toString(builder);
 			builder.append(' ');

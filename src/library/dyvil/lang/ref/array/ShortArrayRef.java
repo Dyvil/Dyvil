@@ -4,8 +4,8 @@ import dyvil.lang.ref.ShortRef;
 
 public class ShortArrayRef implements ShortRef
 {
-	protected final short[]	array;
-	protected final int		index;
+	protected final short[] array;
+	protected final int     index;
 	
 	public ShortArrayRef(short[] array, int index)
 	{

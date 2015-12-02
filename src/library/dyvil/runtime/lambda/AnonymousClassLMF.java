@@ -1,14 +1,5 @@
 package dyvil.runtime.lambda;
 
-import java.io.File;
-import java.lang.invoke.*;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -18,11 +9,19 @@ import dyvil.tools.asm.ClassWriter;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Type;
+import sun.misc.Unsafe;
+
+import java.io.File;
+import java.lang.invoke.*;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
-
-import sun.misc.Unsafe;
 
 public final class AnonymousClassLMF extends AbstractLMF
 {
@@ -47,8 +46,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 		LOOKUP = lookup;
 	}
 	
-	private static final int	CLASSFILE_VERSION	= 52;
-	private static final String	NAME_FACTORY		= "get$Lambda";
+	private static final int    CLASSFILE_VERSION = 52;
+	private static final String NAME_FACTORY      = "get$Lambda";
 	
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
@@ -57,7 +56,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 	 */
 	private static final File dumpDirectory = null;
 	
-	/** Used to ensure that each spun class name is unique */
+	/**
+	 * Used to ensure that each spun class name is unique
+	 */
 	private static final AtomicInteger counter = new AtomicInteger(0);
 	
 	/* See context values in AbstractValidatingLambdaMetafactory * */
@@ -114,14 +115,16 @@ public final class AnonymousClassLMF extends AbstractLMF
 	 */
 	private String toString;
 	
-	public AnonymousClassLMF(MethodHandles.Lookup caller, MethodType invokedType, String samMethodName, MethodType samMethodType, MethodHandle implMethod,
-			MethodType instantiatedMethodType, String toString) throws LambdaConversionException
+	public AnonymousClassLMF(MethodHandles.Lookup caller, MethodType invokedType, String samMethodName, MethodType samMethodType, MethodHandle implMethod, MethodType instantiatedMethodType, String toString)
+			throws LambdaConversionException
 	{
 		super(caller, invokedType, samMethodName, samMethodType, implMethod, instantiatedMethodType);
 		this.implMethodClassName = this.implDefiningClass.getName().replace('.', '/');
 		this.implMethodName = this.implInfo.getName();
 		this.implMethodDesc = this.implMethodType.toMethodDescriptorString();
-		this.implMethodReturnClass = this.implKind == MethodHandleInfo.REF_newInvokeSpecial ? this.implDefiningClass : this.implMethodType.returnType();
+		this.implMethodReturnClass = this.implKind == MethodHandleInfo.REF_newInvokeSpecial ?
+				this.implDefiningClass :
+				this.implMethodType.returnType();
 		this.constructorType = invokedType.changeReturnType(Void.TYPE);
 		this.lambdaClassName = this.targetClass.getName().replace('.', '/') + "$Lambda$" + counter.incrementAndGet();
 		
@@ -166,7 +169,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 			});
 			if (ctrs.length != 1)
 			{
-				throw new LambdaConversionException("Expected one lambda constructor for " + innerClass.getCanonicalName() + ", got " + ctrs.length);
+				throw new LambdaConversionException(
+						"Expected one lambda constructor for " + innerClass.getCanonicalName() + ", got "
+								+ ctrs.length);
 			}
 			
 			try
@@ -194,9 +199,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 	{
 		String samIntf = this.samBase.getName().replace('.', '/');
 		
-		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null, "java/lang/Object",
-				new String[] { samIntf });
-				
+		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName,
+		              null, "java/lang/Object", new String[] { samIntf });
+
 		// Generate final fields to be filled in by constructor
 		for (int i = 0; i < this.argDescs.length; i++)
 		{
@@ -220,7 +225,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 		
 		if (dumpDirectory != null)
 		{
-			File dumpFile = new File(dumpDirectory, this.lambdaClassName.replace('/', File.separatorChar).concat(".class"));
+			File dumpFile = new File(dumpDirectory,
+			                         this.lambdaClassName.replace('/', File.separatorChar).concat(".class"));
 			FileUtils.write(dumpFile, bytes);
 		}
 		
@@ -231,7 +237,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 	
 	private void generateFactory()
 	{
-		MethodVisitor m = this.cw.visitMethod(PRIVATE | STATIC, NAME_FACTORY, this.invokedType.toMethodDescriptorString(), null, null);
+		MethodVisitor m = this.cw
+				.visitMethod(PRIVATE | STATIC, NAME_FACTORY, this.invokedType.toMethodDescriptorString(), null, null);
 		m.visitCode();
 		m.visitTypeInsn(NEW, this.lambdaClassName);
 		m.visitInsn(Opcodes.DUP);
@@ -242,7 +249,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 			m.visitVarInsn(getLoadOpcode(argType), varIndex);
 			varIndex += getParameterSize(argType);
 		}
-		m.visitMethodInsn(INVOKESPECIAL, this.lambdaClassName, "<init>", this.constructorType.toMethodDescriptorString(), false);
+		m.visitMethodInsn(INVOKESPECIAL, this.lambdaClassName, "<init>",
+		                  this.constructorType.toMethodDescriptorString(), false);
 		m.visitInsn(ARETURN);
 		m.visitMaxs(-1, -1);
 		m.visitEnd();
@@ -251,7 +259,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 	private void generateConstructor()
 	{
 		// Generate constructor
-		MethodVisitor ctor = this.cw.visitMethod(PRIVATE, "<init>", this.constructorType.toMethodDescriptorString(), null, null);
+		MethodVisitor ctor = this.cw
+				.visitMethod(PRIVATE, "<init>", this.constructorType.toMethodDescriptorString(), null, null);
 		ctor.visitCode();
 		ctor.visitVarInsn(ALOAD, 0);
 		ctor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
@@ -281,7 +290,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 	
 	private void generateSAM()
 	{
-		MethodVisitor mv = this.cw.visitMethod(PUBLIC, this.samMethodName, this.samMethodType.toMethodDescriptorString(), null, null);
+		MethodVisitor mv = this.cw
+				.visitMethod(PUBLIC, this.samMethodName, this.samMethodType.toMethodDescriptorString(), null, null);
 		
 		mv.visitCode();
 		
@@ -299,9 +309,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 		this.convertArgumentTypes(mv, this.samMethodType);
 		
 		// Invoke the method we want to forward to
-		mv.visitMethodInsn(invocationOpcode(this.implKind), this.implMethodClassName, this.implMethodName, this.implMethodDesc,
-				this.implDefiningClass.isInterface());
-				
+		mv.visitMethodInsn(invocationOpcode(this.implKind), this.implMethodClassName, this.implMethodName,
+		                   this.implMethodDesc, this.implDefiningClass.isInterface());
+
 		// Convert the return value (if any) and return it
 		// Note: if adapting from non-void to void, the 'return'
 		// instruction will pop the unneeded result
@@ -325,7 +335,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 			Class<?> rcvrType = samType.parameterType(0);
 			mv.visitVarInsn(getLoadOpcode(rcvrType), lvIndex + 1);
 			lvIndex += getParameterSize(rcvrType);
-			TypeConverter.convertType(mv, rcvrType, this.implDefiningClass, this.instantiatedMethodType.parameterType(0));
+			TypeConverter
+					.convertType(mv, rcvrType, this.implDefiningClass, this.instantiatedMethodType.parameterType(0));
 		}
 		else
 		{
@@ -339,7 +350,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 			Class<?> argType = samType.parameterType(i);
 			mv.visitVarInsn(getLoadOpcode(argType), lvIndex + 1);
 			lvIndex += getParameterSize(argType);
-			TypeConverter.convertType(mv, argType, this.implMethodType.parameterType(argOffset + i), this.instantiatedMethodType.parameterType(i));
+			TypeConverter.convertType(mv, argType, this.implMethodType.parameterType(argOffset + i),
+			                          this.instantiatedMethodType.parameterType(i));
 		}
 	}
 	

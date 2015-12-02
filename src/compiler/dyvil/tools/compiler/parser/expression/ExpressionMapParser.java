@@ -13,9 +13,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public class ExpressionMapParser extends Parser implements IValueConsumer
 {
-	public static final int	NAME		= 1;
-	public static final int	VALUE		= 2;
-	public static final int	SEPERATOR	= 4;
+	public static final int NAME      = 1;
+	public static final int VALUE     = 2;
+	public static final int SEPERATOR = 4;
 	
 	protected IValueMap valueMap;
 	

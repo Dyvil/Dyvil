@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.structure;
 
-import java.io.InputStream;
-
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
@@ -25,35 +23,37 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.CodePosition;
 
+import java.io.InputStream;
+
 public class Package implements INamed, IDefaultContext
 {
 	public static RootPackage rootPackage = new RootPackage();
 	
-	public static Package	dyvil;
-	public static Package	dyvilAnnotation;
-	public static Package	dyvilArray;
-	public static Package	dyvilCollection;
-	public static Package	dyvilFunction;
-	public static Package	dyvilLang;
-	public static Package	dyvilLangLiteral;
-	public static Package	dyvilLangRef;
-	public static Package	dyvilLangRefSimple;
-	public static Package	dyvilTuple;
-	public static Package	dyvilUtil;
-	public static Package	java;
-	public static Package	javaIO;
-	public static Package	javaLang;
-	public static Package	javaLangAnnotation;
-	public static Package	javaUtil;
+	public static Package dyvil;
+	public static Package dyvilAnnotation;
+	public static Package dyvilArray;
+	public static Package dyvilCollection;
+	public static Package dyvilFunction;
+	public static Package dyvilLang;
+	public static Package dyvilLangLiteral;
+	public static Package dyvilLangRef;
+	public static Package dyvilLangRefSimple;
+	public static Package dyvilTuple;
+	public static Package dyvilUtil;
+	public static Package java;
+	public static Package javaIO;
+	public static Package javaLang;
+	public static Package javaLangAnnotation;
+	public static Package javaUtil;
 	
-	protected Package	parent;
-	protected Name		name;
-	protected String	fullName;
-	private String		internalName;
+	protected Package parent;
+	protected Name    name;
+	protected String  fullName;
+	private   String  internalName;
 	
-	private List<IClass>			classes		= new ArrayList();
-	protected List<IDyvilHeader>	headers		= new ArrayList();
-	protected Map<String, Package>	subPackages	= new HashMap();
+	private   List<IClass>         classes     = new ArrayList();
+	protected List<IDyvilHeader>   headers     = new ArrayList();
+	protected Map<String, Package> subPackages = new HashMap();
 	
 	protected Package()
 	{

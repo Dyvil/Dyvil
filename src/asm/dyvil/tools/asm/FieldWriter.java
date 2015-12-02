@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2011 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,18 +31,18 @@ package dyvil.tools.asm;
 
 final class FieldWriter implements FieldVisitor
 {
-	private final ClassWriter	cw;
-	private final int			access;
-	private final int			name;
-	private final int			desc;
-	private int					signature;
-	private int					value;
+	private final ClassWriter cw;
+	private final int         access;
+	private final int         name;
+	private final int         desc;
+	private       int         signature;
+	private       int         value;
 	
-	private AnnotationWriter	anns;
-	private AnnotationWriter	ianns;
-	private AnnotationWriter	tanns;
-	private AnnotationWriter	itanns;
-	private Attribute			attrs;
+	private AnnotationWriter anns;
+	private AnnotationWriter ianns;
+	private AnnotationWriter tanns;
+	private AnnotationWriter itanns;
+	private Attribute        attrs;
 	
 	FieldWriter next;
 	
@@ -190,7 +190,8 @@ final class FieldWriter implements FieldVisitor
 	void put(final ByteVector out)
 	{
 		final int FACTOR = ClassWriter.TO_ACC_SYNTHETIC;
-		int mask = Opcodes.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE | (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) / FACTOR;
+		int mask = Opcodes.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE
+				| (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) / FACTOR;
 		out.putShort(this.access & ~mask).putShort(this.name).putShort(this.desc);
 		int attributeCount = 0;
 		if (this.value != 0)

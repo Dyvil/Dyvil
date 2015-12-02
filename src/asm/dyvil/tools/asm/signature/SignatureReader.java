@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2011 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -107,7 +107,7 @@ public class SignatureReader
 	 * {@link dyvil.tools.asm.ClassVisitor#visitField ClassVisitor.visitField}
 	 * or {@link dyvil.tools.asm.MethodVisitor#visitLocalVariable
 	 * MethodVisitor.visitLocalVariable} methods.
-	 * 
+	 *
 	 * @param v
 	 *            the visitor that must visit this signature.
 	 */
@@ -118,7 +118,7 @@ public class SignatureReader
 	
 	/**
 	 * Parses a field type signature and makes the given visitor visit it.
-	 * 
+	 *
 	 * @param signature
 	 *            a string containing the signature that must be parsed.
 	 * @param pos
@@ -147,20 +147,20 @@ public class SignatureReader
 		case 'V':
 			v.visitBaseType(c);
 			return pos;
-			
+
 		case '[':
 			return parseType(signature, pos, v.visitArrayType());
-			
+
 		case 'T':
 			end = signature.indexOf(';', pos);
 			v.visitTypeVariable(signature.substring(pos, end));
 			return end + 1;
-			
+
 		default: // case 'L':
 			start = pos;
 			visited = false;
 			inner = false;
-			for (;;)
+			for (; ; )
 			{
 				switch (c = signature.charAt(pos++))
 				{
@@ -187,7 +187,7 @@ public class SignatureReader
 					visited = false;
 					inner = true;
 					break;
-					
+
 				case '<':
 					name = signature.substring(start, pos - 1);
 					if (inner)
@@ -200,7 +200,7 @@ public class SignatureReader
 					}
 					visited = true;
 					top:
-					for (;;)
+					for (; ; )
 					{
 						switch (c = signature.charAt(pos))
 						{

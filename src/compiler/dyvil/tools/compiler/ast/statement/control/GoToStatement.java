@@ -3,9 +3,9 @@ package dyvil.tools.compiler.ast.statement.control;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.IStatement;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -16,8 +16,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class GoToStatement extends AbstractValue implements IStatement
 {
-	public Label	label;
-	public Name		name;
+	public Label label;
+	public Name  name;
 	
 	public GoToStatement(ICodePosition position)
 	{

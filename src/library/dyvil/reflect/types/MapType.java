@@ -1,13 +1,12 @@
 package dyvil.reflect.types;
 
-import dyvil.lang.Type;
-
 import dyvil.collection.Map;
+import dyvil.lang.Type;
 
 public class MapType<K, V> implements Type<Map<K, V>>
 {
-	private Type<K>	keyType;
-	private Type<V>	valueType;
+	private Type<K> keyType;
+	private Type<V> valueType;
 	
 	public static <K, V> MapType<K, V> apply(Type<K> keyType, Type<V> valueType)
 	{

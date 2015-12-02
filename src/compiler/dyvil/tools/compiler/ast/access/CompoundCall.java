@@ -56,7 +56,8 @@ public final class CompoundCall
 			SideEffectHelper helper = new SideEffectHelper();
 
 			IValue subscriptReceiver = subscriptGetter.receiver = helper.processValue(subscriptGetter.receiver);
-			IArguments subscriptArguments = subscriptGetter.arguments = helper.processArguments(subscriptGetter.arguments);
+			IArguments subscriptArguments = subscriptGetter.arguments = helper
+					.processArguments(subscriptGetter.arguments);
 
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
 			IArguments subscriptSetterArguments = subscriptArguments.withLastValue(Names.subscript_$eq, op);

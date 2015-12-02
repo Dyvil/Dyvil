@@ -45,11 +45,12 @@ public class MethodReflection
 	 * {@code object[0]} is a String[]
 	 * </ul>
 	 * </ul>
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param object
-	 *            the object
+	 * 		the object
+	 *
 	 * @return the method
 	 */
 	public static Method getMethod(Class clazz, Object object)
@@ -90,13 +91,14 @@ public class MethodReflection
 	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with
 	 * the given name {@code methodName} and the given parameter types
 	 * {@code parameterTypes}.
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param methodName
-	 *            the method name
+	 * 		the method name
 	 * @param parameterTypes
-	 *            the parameter types
+	 * 		the parameter types
+	 *
 	 * @return the method
 	 */
 	public static Method getMethod(Class clazz, String methodName, Class[] parameterTypes)
@@ -123,13 +125,14 @@ public class MethodReflection
 	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with
 	 * a name contained in {@code methodNames} and the given parameter types
 	 * {@code parameterTypes}.
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param methodNames
-	 *            the possible method names
+	 * 		the possible method names
 	 * @param parameterTypes
-	 *            the parameter types
+	 * 		the parameter types
+	 *
 	 * @return the method
 	 */
 	public static Method getMethod(Class clazz, String[] methodNames, Class[] parameterTypes)
@@ -142,18 +145,20 @@ public class MethodReflection
 				return m;
 			}
 		}
-		System.err.println(new NoSuchMethodException("Method not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(methodNames)));
+		System.err.println(new NoSuchMethodException(
+				"Method not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(methodNames)));
 		return null;
 	}
 	
 	/**
 	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with
 	 * the given method ID {@code methodID}.
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param methodID
-	 *            the method ID
+	 * 		the method ID
+	 *
 	 * @return the method
 	 */
 	public static Method getMethod(Class clazz, int methodID)
@@ -203,13 +208,14 @@ public class MethodReflection
 	 * Directly invokes the given {@link Method} {@code method} on the given
 	 * {@link Object} {@code instance} with the given arguments {@code args} and
 	 * returns the result.
-	 * 
+	 *
 	 * @param method
-	 *            the method to invoke
+	 * 		the method to invoke
 	 * @param instance
-	 *            the instance
+	 * 		the instance
 	 * @param args
-	 *            the arguments
+	 * 		the arguments
+	 *
 	 * @return the result
 	 */
 	public static <R> R invoke(Method method, Object instance, Object[] args)

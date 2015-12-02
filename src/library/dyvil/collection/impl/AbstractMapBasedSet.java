@@ -1,10 +1,10 @@
 package dyvil.collection.impl;
 
-import java.util.Iterator;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
+
+import java.util.Iterator;
 
 public abstract class AbstractMapBasedSet<E> implements Set<E>
 {

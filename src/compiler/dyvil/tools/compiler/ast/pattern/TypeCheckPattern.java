@@ -14,9 +14,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class TypeCheckPattern implements IPattern
 {
-	private ICodePosition	position;
-	private IPattern		pattern;
-	private IType			type;
+	private ICodePosition position;
+	private IPattern      pattern;
+	private IType         type;
 	
 	public TypeCheckPattern(ICodePosition position, IPattern pattern)
 	{

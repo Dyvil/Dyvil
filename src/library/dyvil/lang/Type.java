@@ -3,7 +3,6 @@ package dyvil.lang;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.StringConvertible;
-
 import dyvil.reflect.types.GenericType;
 import dyvil.reflect.types.NamedType;
 import dyvil.reflect.types.PrimitiveType;

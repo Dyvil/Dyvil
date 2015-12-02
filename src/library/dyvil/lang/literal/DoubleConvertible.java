@@ -8,7 +8,7 @@ package dyvil.lang.literal;
  * single {@code double} parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}DoubleConvertible
  * case class Percentage(double value)
@@ -18,13 +18,13 @@ package dyvil.lang.literal;
  *         set: ...
  *     }
  * }
- * 
+ *
  * // ----------
- * 
+ *
  * Percentage p = 100.0
  * int i = p.AsInt
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface DoubleConvertible

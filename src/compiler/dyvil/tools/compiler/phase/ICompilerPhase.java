@@ -21,7 +21,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 {
 	/**
 	 * Recursively deletes all files in the output directory.
-	 * 
+	 *
 	 * @see DyvilCompiler#clean()
 	 */
 	ICompilerPhase CLEAN = new CompilerPhase(0, "CLEAN", units -> DyvilCompiler.clean());
@@ -49,7 +49,8 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	/**
 	 * Saves the formatted AST to the input file
 	 */
-	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT", unit -> FileUtils.write(unit.getInputFile(), unit.toString()));
+	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT",
+	                                                    unit -> FileUtils.write(unit.getInputFile(), unit.toString()));
 	
 	/**
 	 * Resolves packages, classes and types.
@@ -101,7 +102,8 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Converts the .class files in the bin directory to a JAR file, sets up the
 	 * classpath and signs the JAR.
 	 */
-	ICompilerPhase JAR = new CompilerPhase(210, "JAR", units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
+	ICompilerPhase JAR = new CompilerPhase(210, "JAR",
+	                                       units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
 	
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.

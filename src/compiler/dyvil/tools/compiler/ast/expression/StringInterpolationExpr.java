@@ -23,7 +23,8 @@ public final class StringInterpolationExpr implements IValue
 {
 	public static final class Types
 	{
-		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("StringInterpolationConvertible");
+		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral
+				.resolveClass("StringInterpolationConvertible");
 		
 		private Types()
 		{
@@ -33,9 +34,9 @@ public final class StringInterpolationExpr implements IValue
 	
 	protected ICodePosition position;
 	
-	private IValue[]	values	= new IValue[1];
-	private String[]	strings	= new String[2];
-	private int			count;
+	private IValue[] values  = new IValue[1];
+	private String[] strings = new String[2];
+	private int count;
 	
 	public StringInterpolationExpr(ICodePosition position)
 	{
@@ -269,7 +270,8 @@ public final class StringInterpolationExpr implements IValue
 			string = this.strings[i + 1];
 			CaseClasses.writeStringAppend(writer, string);
 		}
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
+		                       false);
 
 		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
 		{

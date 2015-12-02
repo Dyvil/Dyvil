@@ -6,11 +6,11 @@ import dyvil.tools.parsing.lexer.Tokens;
 
 public final class DyvilSymbols implements Symbols
 {
-	public static final int	HASH			= Tokens.SYMBOL | 0x00060000;
-	public static final int	WILDCARD		= Tokens.SYMBOL | 0x00070000;
-	public static final int	ARROW_OPERATOR	= Tokens.SYMBOL | 0x00080000;
-	public static final int	ELLIPSIS		= Tokens.SYMBOL | 0x00090000;
-	public static final int	AT				= Tokens.SYMBOL | 0x000B0000;
+	public static final int HASH           = Tokens.SYMBOL | 0x00060000;
+	public static final int WILDCARD       = Tokens.SYMBOL | 0x00070000;
+	public static final int ARROW_OPERATOR = Tokens.SYMBOL | 0x00080000;
+	public static final int ELLIPSIS       = Tokens.SYMBOL | 0x00090000;
+	public static final int AT             = Tokens.SYMBOL | 0x000B0000;
 	
 	public static final DyvilSymbols INSTANCE = new DyvilSymbols();
 	

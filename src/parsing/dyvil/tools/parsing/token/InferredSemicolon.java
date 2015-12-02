@@ -6,11 +6,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class InferredSemicolon implements IToken
 {
-	public IToken	prev;
-	public IToken	next;
+	public IToken prev;
+	public IToken next;
 	
-	public final int	lineNumber;
-	public final int	start;
+	public final int lineNumber;
+	public final int start;
 	
 	public InferredSemicolon(int lineNumber, int start)
 	{

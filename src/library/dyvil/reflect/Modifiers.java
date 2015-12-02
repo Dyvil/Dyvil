@@ -1,6 +1,5 @@
 package dyvil.reflect;
 
-import dyvil.annotation.*;
 import dyvil.annotation._internal.*;
 
 /**
@@ -9,7 +8,7 @@ import dyvil.annotation._internal.*;
  * Note that only modifiers less than {@code 0xFFFF} will actually appear in the
  * Bytecode, other modifiers such as the ones added by <i>Dyvil</i> will be
  * converted to annotations.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -254,9 +253,10 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on methods.
 	 */
-	int METHOD_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | PREFIX | BRIDGE
-			| VARARGS | OVERRIDE;
-			
+	int METHOD_MODIFIERS =
+			MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | PREFIX | BRIDGE
+					| VARARGS | OVERRIDE;
+
 	/**
 	 * The modifiers that can be used on parameters.
 	 */

@@ -1,15 +1,14 @@
 package dyvil.collection;
 
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
-
+import dyvil.collection.mutable.FlatArrayMatrix;
+import dyvil.collection.view.MatrixView;
 import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-
-import dyvil.collection.mutable.FlatArrayMatrix;
-import dyvil.collection.view.MatrixView;
 import dyvil.tuple.Tuple2;
+
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 @NilConvertible
 @ArrayConvertible

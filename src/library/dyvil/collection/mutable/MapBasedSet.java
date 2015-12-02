@@ -1,13 +1,13 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.*;
+import dyvil.collection.impl.AbstractMapBasedSet;
+
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.*;
-import dyvil.collection.impl.AbstractMapBasedSet;
-
-public class MapBasedSet<E> extends AbstractMapBasedSet<E>implements MutableSet<E>
+public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = 3329100687699880194L;
 	

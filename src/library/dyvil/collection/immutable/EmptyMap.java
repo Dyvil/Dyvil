@@ -1,5 +1,13 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation._internal.object;
+import dyvil.array.ObjectArray;
+import dyvil.collection.*;
+import dyvil.collection.iterator.EmptyIterator;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.util.None;
+import dyvil.util.Option;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
@@ -7,17 +15,10 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.annotation._internal.object;
-import dyvil.array.ObjectArray;
-import dyvil.collection.*;
-import dyvil.collection.iterator.EmptyIterator;
-import dyvil.util.None;
-import dyvil.util.Option;
-
 @NilConvertible
-public @object class EmptyMap<K, V> implements ImmutableMap<K, V>
+public
+@object
+class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 4719096668028950933L;
 	

@@ -9,18 +9,18 @@ import dyvil.annotation._internal.postfix;
  * several math functions such as absolute values, min, max, clamping, ranges
  * and others. Most methods of this class are declared as {@code infix}, which
  * means they can be called on their arguments in <i>Dyvil</i> code.
- * 
+ * <p>
  * <PRE>
  * int abs = -1 abs
  * int floor = 4.5 floor
  * float average = [ 1F, 2.3F, 4F ] average
  * [int] range = 1 .. 4
  * </PRE>
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
-@Utility({ byte.class, short.class, int.class, long.class, float.class, double.class })
+@Utility( { byte.class, short.class, int.class, long.class, float.class, double.class })
 public final class MathUtils
 {
 	private static final class SinHolder
@@ -57,19 +57,23 @@ public final class MathUtils
 		}
 	}
 	
-	private static final int[] deBruijnBits = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18,
-			6, 11, 5, 10, 9 };
-			
-	private static final int[] sqrtTable = new int[] { 0, 16, 22, 27, 32, 35, 39, 42, 45, 48, 50, 53, 55, 57, 59, 61, 64, 65, 67, 69, 71, 73, 75, 76, 78, 80,
-			81, 83, 84, 86, 87, 89, 90, 91, 93, 94, 96, 97, 98, 99, 101, 102, 103, 104, 106, 107, 108, 109, 110, 112, 113, 114, 115, 116, 117, 118, 119, 120,
-			121, 122, 123, 124, 125, 126, 128, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 144, 145, 146, 147, 148,
-			149, 150, 150, 151, 152, 153, 154, 155, 155, 156, 157, 158, 159, 160, 160, 161, 162, 163, 163, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171,
-			172, 173, 173, 174, 175, 176, 176, 177, 178, 178, 179, 180, 181, 181, 182, 183, 183, 184, 185, 185, 186, 187, 187, 188, 189, 189, 190, 191, 192,
-			192, 193, 193, 194, 195, 195, 196, 197, 197, 198, 199, 199, 200, 201, 201, 202, 203, 203, 204, 204, 205, 206, 206, 207, 208, 208, 209, 209, 210,
-			211, 211, 212, 212, 213, 214, 214, 215, 215, 216, 217, 217, 218, 218, 219, 219, 220, 221, 221, 222, 222, 223, 224, 224, 225, 225, 226, 226, 227,
-			227, 228, 229, 229, 230, 230, 231, 231, 232, 232, 233, 234, 234, 235, 235, 236, 236, 237, 237, 238, 238, 239, 240, 240, 241, 241, 242, 242, 243,
-			243, 244, 244, 245, 245, 246, 246, 247, 247, 248, 248, 249, 249, 250, 250, 251, 251, 252, 252, 253, 253, 254, 254, 255 };
-			
+	private static final int[] deBruijnBits = new int[] { 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31,
+			27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 };
+
+	private static final int[] sqrtTable = new int[] { 0, 16, 22, 27, 32, 35, 39, 42, 45, 48, 50, 53, 55, 57, 59, 61,
+			64, 65, 67, 69, 71, 73, 75, 76, 78, 80, 81, 83, 84, 86, 87, 89, 90, 91, 93, 94, 96, 97, 98, 99, 101, 102,
+			103, 104, 106, 107, 108, 109, 110, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125,
+			126, 128, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 144, 145,
+			146, 147, 148, 149, 150, 150, 151, 152, 153, 154, 155, 155, 156, 157, 158, 159, 160, 160, 161, 162, 163,
+			163, 164, 165, 166, 167, 167, 168, 169, 170, 170, 171, 172, 173, 173, 174, 175, 176, 176, 177, 178, 178,
+			179, 180, 181, 181, 182, 183, 183, 184, 185, 185, 186, 187, 187, 188, 189, 189, 190, 191, 192, 192, 193,
+			193, 194, 195, 195, 196, 197, 197, 198, 199, 199, 200, 201, 201, 202, 203, 203, 204, 204, 205, 206, 206,
+			207, 208, 208, 209, 209, 210, 211, 211, 212, 212, 213, 214, 214, 215, 215, 216, 217, 217, 218, 218, 219,
+			219, 220, 221, 221, 222, 222, 223, 224, 224, 225, 225, 226, 226, 227, 227, 228, 229, 229, 230, 230, 231,
+			231, 232, 232, 233, 234, 234, 235, 235, 236, 236, 237, 237, 238, 238, 239, 240, 240, 241, 241, 242, 242,
+			243, 243, 244, 244, 245, 245, 246, 246, 247, 247, 248, 248, 249, 249, 250, 250, 251, 251, 252, 252, 253,
+			253, 254, 254, 255 };
+
 	private MathUtils()
 	{
 	}
@@ -118,7 +122,10 @@ public final class MathUtils
 		return c <= d ? c : d;
 	}
 	
-	public static @infix @postfix int min(int... ints)
+	public static
+	@infix
+	@postfix
+	int min(int... ints)
 	{
 		int min = Integer.MAX_VALUE;
 		for (int i : ints)
@@ -131,7 +138,10 @@ public final class MathUtils
 		return min;
 	}
 	
-	public static @infix @postfix long min(long... longs)
+	public static
+	@infix
+	@postfix
+	long min(long... longs)
 	{
 		long min = Long.MAX_VALUE;
 		for (long i : longs)
@@ -144,7 +154,10 @@ public final class MathUtils
 		return min;
 	}
 	
-	public static @infix @postfix float min(float... floats)
+	public static
+	@infix
+	@postfix
+	float min(float... floats)
 	{
 		float min = Float.POSITIVE_INFINITY;
 		for (float i : floats)
@@ -157,7 +170,10 @@ public final class MathUtils
 		return min;
 	}
 	
-	public static @infix @postfix double min(double... doubles)
+	public static
+	@infix
+	@postfix
+	double min(double... doubles)
 	{
 		double min = Double.NEGATIVE_INFINITY;
 		for (double i : doubles)
@@ -194,7 +210,10 @@ public final class MathUtils
 		return c > d ? c : d;
 	}
 	
-	public static @infix @postfix int max(int... ints)
+	public static
+	@infix
+	@postfix
+	int max(int... ints)
 	{
 		int max = Integer.MIN_VALUE;
 		for (int i : ints)
@@ -207,7 +226,10 @@ public final class MathUtils
 		return max;
 	}
 	
-	public static @infix @postfix long max(long... longs)
+	public static
+	@infix
+	@postfix
+	long max(long... longs)
 	{
 		long max = Long.MIN_VALUE;
 		for (long i : longs)
@@ -220,7 +242,10 @@ public final class MathUtils
 		return max;
 	}
 	
-	public static @infix @postfix float max(float... floats)
+	public static
+	@infix
+	@postfix
+	float max(float... floats)
 	{
 		float max = Float.NEGATIVE_INFINITY;
 		for (float i : floats)
@@ -233,7 +258,10 @@ public final class MathUtils
 		return max;
 	}
 	
-	public static @infix @postfix double max(double... doubles)
+	public static
+	@infix
+	@postfix
+	double max(double... doubles)
 	{
 		double max = Double.NEGATIVE_INFINITY;
 		for (double i : doubles)
@@ -248,103 +276,137 @@ public final class MathUtils
 	
 	/**
 	 * Returns the absolute value of this {@code int}.
-	 * 
+	 *
 	 * @param i
+	 *
 	 * @return the abs value
 	 */
-	public static @infix int abs(int i)
+	public static
+	@infix
+	int abs(int i)
 	{
 		return i < 0 ? -i : i;
 	}
 	
 	/**
 	 * Returns the absolute value of this {@code long}.
-	 * 
+	 *
 	 * @param l
+	 *
 	 * @return the abs value
 	 */
-	public static @infix long abs(long l)
+	public static
+	@infix
+	long abs(long l)
 	{
 		return l < 0 ? -l : l;
 	}
 	
 	/**
 	 * Returns the absolute value of this {@code float}.
-	 * 
+	 *
 	 * @param f
+	 *
 	 * @return the abs value
 	 */
-	public static @infix float abs(float f)
+	public static
+	@infix
+	float abs(float f)
 	{
 		return f < 0F ? -f : f;
 	}
 	
 	/**
 	 * Returns the absolute value of this {@code double}.
-	 * 
+	 *
 	 * @param d
+	 *
 	 * @return the abs value
 	 */
-	public static @infix double abs(double d)
+	public static
+	@infix
+	double abs(double d)
 	{
 		return d < 0D ? -d : d;
 	}
 	
-	public static @infix int floor(float f)
+	public static
+	@infix
+	int floor(float f)
 	{
 		int i = (int) f;
 		return f < i ? i - 1 : i;
 	}
 	
-	public static @infix int floor(double d)
+	public static
+	@infix
+	int floor(double d)
 	{
 		int i = (int) d;
 		return d < i ? i - 1 : i;
 	}
 	
-	public static @infix int ceil(float f)
+	public static
+	@infix
+	int ceil(float f)
 	{
 		int i = (int) f;
 		return f > i ? i + 1 : i;
 	}
 	
-	public static @infix int ceil(double d)
+	public static
+	@infix
+	int ceil(double d)
 	{
 		int i = (int) d;
 		return d > i ? i + 1 : i;
 	}
 	
-	public static @infix float sin(float f)
+	public static
+	@infix
+	float sin(float f)
 	{
 		return SinHolder.sinTable[(int) (f * SinHolder.sinFactor2) & 0xFFFF];
 	}
 	
-	public static @infix float cos(float f)
+	public static
+	@infix
+	float cos(float f)
 	{
 		return SinHolder.sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
-	public static @infix float tan(float f)
+	public static
+	@infix
+	float tan(float f)
 	{
 		return sin(f) / cos(f);
 	}
 	
-	public static @infix double sin(double d)
+	public static
+	@infix
+	double sin(double d)
 	{
 		return Math.sin(d);
 	}
 	
-	public static @infix double cos(double d)
+	public static
+	@infix
+	double cos(double d)
 	{
 		return Math.cos(d);
 	}
 	
-	public static @infix double tan(double d)
+	public static
+	@infix
+	double tan(double d)
 	{
 		return Math.tan(d);
 	}
 	
-	public static @infix byte sqrt(byte b)
+	public static
+	@infix
+	byte sqrt(byte b)
 	{
 		if (b >= 0)
 		{
@@ -353,7 +415,9 @@ public final class MathUtils
 		return 0;
 	}
 	
-	public static @infix short sqrt(short s)
+	public static
+	@infix
+	short sqrt(short s)
 	{
 		int xn;
 		
@@ -389,7 +453,9 @@ public final class MathUtils
 		return 0;
 	}
 	
-	public static @infix int sqrt(int i)
+	public static
+	@infix
+	int sqrt(int i)
 	{
 		int xn;
 		
@@ -477,37 +543,51 @@ public final class MathUtils
 		return 0;
 	}
 	
-	public static @infix long sqrt(long l)
+	public static
+	@infix
+	long sqrt(long l)
 	{
 		return (long) Math.sqrt(l);
 	}
 	
-	public static @infix float sqrt(float f)
+	public static
+	@infix
+	float sqrt(float f)
 	{
 		return (float) Math.sqrt(f);
 	}
 	
-	public static @infix double sqrt(double d)
+	public static
+	@infix
+	double sqrt(double d)
 	{
 		return Math.sqrt(d);
 	}
 	
-	public static @infix int truncate(double d)
+	public static
+	@infix
+	int truncate(double d)
 	{
 		return (int) (d + 1024D) - 1024;
 	}
 	
-	public static @infix int bucket(int i, int factor)
+	public static
+	@infix
+	int bucket(int i, int factor)
 	{
 		return i < 0 ? ~(~i / factor) : i / factor;
 	}
 	
-	public static @infix long bucket(long l, long factor)
+	public static
+	@infix
+	long bucket(long l, long factor)
 	{
 		return l < 0 ? ~(~l / factor) : l / factor;
 	}
 	
-	public static @infix int clamp(int i, int min, int max)
+	public static
+	@infix
+	int clamp(int i, int min, int max)
 	{
 		if (i <= min)
 		{
@@ -520,7 +600,9 @@ public final class MathUtils
 		return i;
 	}
 	
-	public static @infix long clamp(long l, long min, long max)
+	public static
+	@infix
+	long clamp(long l, long min, long max)
 	{
 		if (l <= min)
 		{
@@ -533,7 +615,9 @@ public final class MathUtils
 		return l;
 	}
 	
-	public static @infix float clamp(float f, float min, float max)
+	public static
+	@infix
+	float clamp(float f, float min, float max)
 	{
 		if (f <= min)
 		{
@@ -546,7 +630,9 @@ public final class MathUtils
 		return f;
 	}
 	
-	public static @infix double clamp(double d, double min, double max)
+	public static
+	@infix
+	double clamp(double d, double min, double max)
 	{
 		if (d <= min)
 		{
@@ -559,7 +645,9 @@ public final class MathUtils
 		return d;
 	}
 	
-	public static @infix int interpolate(float f, int min, int max)
+	public static
+	@infix
+	int interpolate(float f, int min, int max)
 	{
 		if (f <= 0F)
 		{
@@ -572,7 +660,9 @@ public final class MathUtils
 		return min + (int) ((max - min) * f);
 	}
 	
-	public static @infix long interpolate(double d, long min, long max)
+	public static
+	@infix
+	long interpolate(double d, long min, long max)
 	{
 		if (d <= 0D)
 		{
@@ -585,7 +675,9 @@ public final class MathUtils
 		return min + (long) ((max - min) * d);
 	}
 	
-	public static @infix float interpolate(float f, float min, float max)
+	public static
+	@infix
+	float interpolate(float f, float min, float max)
 	{
 		if (f <= 0F)
 		{
@@ -598,7 +690,9 @@ public final class MathUtils
 		return min + (max - min) * f;
 	}
 	
-	public static @infix double interpolate(double d, double min, double max)
+	public static
+	@infix
+	double interpolate(double d, double min, double max)
 	{
 		if (d <= 0D)
 		{
@@ -611,7 +705,9 @@ public final class MathUtils
 		return min + (max - min) * d;
 	}
 	
-	public static @postfix int $bang(int v)
+	public static
+	@postfix
+	int $bang(int v)
 	{
 		int j = v;
 		while (v > 1)
@@ -621,7 +717,9 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @postfix long $bang(long v)
+	public static
+	@postfix
+	long $bang(long v)
 	{
 		long j = v;
 		while (v > 1L)
@@ -631,7 +729,9 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @postfix float $bang(float v)
+	public static
+	@postfix
+	float $bang(float v)
 	{
 		float j = v;
 		while (v > 1F)
@@ -641,7 +741,9 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @postfix double $bang(double v)
+	public static
+	@postfix
+	double $bang(double v)
 	{
 		double j = v;
 		while (v > 1D)
@@ -651,7 +753,9 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static @infix int nPr(int n)
+	public static
+	@infix
+	int nPr(int n)
 	{
 		return $bang(n);
 	}
@@ -661,14 +765,17 @@ public final class MathUtils
 	 * {@code k} at a time. The result is equal to
 	 * <p>
 	 * n! / (n-k)!
-	 * 
+	 *
 	 * @param n
-	 *            the total number of objects
+	 * 		the total number of objects
 	 * @param k
-	 *            the number of objects to pick
+	 * 		the number of objects to pick
+	 *
 	 * @return the number of combinations
 	 */
-	public static @infix int nPr(int n, int k)
+	public static
+	@infix
+	int nPr(int n, int k)
 	{
 		return $bang(n) / $bang(n - k);
 	}
@@ -676,12 +783,15 @@ public final class MathUtils
 	/**
 	 * Returns the number of combinations of {@code n} objects. This doesn't
 	 * regard the order of the elements, so the result is always 1.
-	 * 
+	 *
 	 * @param n
-	 *            the number of objects
+	 * 		the number of objects
+	 *
 	 * @return the number of combinations
 	 */
-	public static @infix int nCr(int n)
+	public static
+	@infix
+	int nCr(int n)
 	{
 		return 1;
 	}
@@ -692,19 +802,24 @@ public final class MathUtils
 	 * result is equal to
 	 * <p>
 	 * n! / (k! * (n-k)!)
-	 * 
+	 *
 	 * @param n
-	 *            the total number of objects
+	 * 		the total number of objects
 	 * @param k
-	 *            the number of objects to pick
+	 * 		the number of objects to pick
+	 *
 	 * @return the number of combinations
 	 */
-	public static @infix int nCr(int n, int k)
+	public static
+	@infix
+	int nCr(int n, int k)
 	{
 		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
-	public static @infix int sum(int... ints)
+	public static
+	@infix
+	int sum(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -714,7 +829,9 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix long sum(long... longs)
+	public static
+	@infix
+	long sum(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -724,7 +841,9 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix float sum(float... floats)
+	public static
+	@infix
+	float sum(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -734,7 +853,9 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix double sum(double... doubles)
+	public static
+	@infix
+	double sum(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -744,7 +865,9 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static @infix float average(int... ints)
+	public static
+	@infix
+	float average(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -754,7 +877,9 @@ public final class MathUtils
 		return total / (float) ints.length;
 	}
 	
-	public static @infix double average(long... longs)
+	public static
+	@infix
+	double average(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -764,7 +889,9 @@ public final class MathUtils
 		return total / (double) longs.length;
 	}
 	
-	public static @infix float average(float... floats)
+	public static
+	@infix
+	float average(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -774,7 +901,9 @@ public final class MathUtils
 		return total / floats.length;
 	}
 	
-	public static @infix double average(double... doubles)
+	public static
+	@infix
+	double average(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -784,7 +913,9 @@ public final class MathUtils
 		return total / doubles.length;
 	}
 	
-	public static @infix float angle(float f)
+	public static
+	@infix
+	float angle(float f)
 	{
 		f %= 360F;
 		if (f >= 180F)
@@ -798,7 +929,9 @@ public final class MathUtils
 		return f;
 	}
 	
-	public static @infix double angle(double d)
+	public static
+	@infix
+	double angle(double d)
 	{
 		d %= 360D;
 		if (d >= 180D)
@@ -812,7 +945,9 @@ public final class MathUtils
 		return d;
 	}
 	
-	public static @infix int powerOfTwo(int i)
+	public static
+	@infix
+	int powerOfTwo(int i)
 	{
 		int j = i - 1;
 		j |= j >> 1;
@@ -823,12 +958,16 @@ public final class MathUtils
 		return j + 1;
 	}
 	
-	public static @infix boolean isPowerOfTwo(int i)
+	public static
+	@infix
+	boolean isPowerOfTwo(int i)
 	{
 		return (i & -i) != 0;
 	}
 	
-	public static @infix int logBaseTwo(int i)
+	public static
+	@infix
+	int logBaseTwo(int i)
 	{
 		if (isPowerOfTwo(i))
 		{
@@ -837,42 +976,58 @@ public final class MathUtils
 		return deBruijnBits[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
 	}
 	
-	public static @infix boolean apply(int i, byte bit)
+	public static
+	@infix
+	boolean apply(int i, byte bit)
 	{
 		return (i & 1 << bit) != 0;
 	}
 	
-	public static @infix int update(int i, byte bit, boolean set)
+	public static
+	@infix
+	int update(int i, byte bit, boolean set)
 	{
 		return set ? i | 1 << bit : i ^ ~(1 << bit);
 	}
 	
-	public static @infix int setBit(int i, byte bit)
+	public static
+	@infix
+	int setBit(int i, byte bit)
 	{
 		return i | 1 << bit;
 	}
 	
-	public static @infix int clearBit(int i, byte bit)
+	public static
+	@infix
+	int clearBit(int i, byte bit)
 	{
 		return i & ~(1 << bit);
 	}
 	
-	public static @infix boolean apply(long l, byte bit)
+	public static
+	@infix
+	boolean apply(long l, byte bit)
 	{
 		return (l & 1L << bit) != 0;
 	}
 	
-	public static @infix long update(long l, byte bit, boolean set)
+	public static
+	@infix
+	long update(long l, byte bit, boolean set)
 	{
 		return set ? l | 1L << bit : l ^ ~(1L << bit);
 	}
 	
-	public static @infix long setBit(long l, byte bit)
+	public static
+	@infix
+	long setBit(long l, byte bit)
 	{
 		return l | 1L << bit;
 	}
 	
-	public static @infix long clearBit(long l, byte bit)
+	public static
+	@infix
+	long clearBit(long l, byte bit)
 	{
 		return l & ~(1 << bit);
 	}

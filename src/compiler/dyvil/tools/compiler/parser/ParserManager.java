@@ -18,10 +18,10 @@ public class ParserManager implements IParserManager
 	
 	protected IOperatorMap operators;
 	
-	protected TokenIterator	tokens;
-	protected int			skip;
-	protected boolean		reparse;
-	protected boolean		hasStopped;
+	protected TokenIterator tokens;
+	protected int           skip;
+	protected boolean       reparse;
+	protected boolean       hasStopped;
 	
 	public ParserManager()
 	{

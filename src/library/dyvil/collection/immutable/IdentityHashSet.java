@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @ArrayConvertible
-public class IdentityHashSet<E> extends AbstractIdentityHashSet<E>implements ImmutableSet<E>
+public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -1347044009183554635L;
 	

@@ -1,16 +1,16 @@
 package dyvil.tools.parsing;
 
+import dyvil.tools.parsing.token.IToken;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import dyvil.tools.parsing.token.IToken;
 
 public class TokenIterator implements Iterator<IToken>
 {
 	protected final IToken first;
 	
-	protected IToken	lastReturned;
-	protected IToken	next;
+	protected IToken lastReturned;
+	protected IToken next;
 	
 	public TokenIterator(IToken first)
 	{

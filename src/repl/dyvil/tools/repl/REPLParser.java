@@ -12,8 +12,8 @@ import dyvil.tools.parsing.token.IToken;
 
 public class REPLParser extends ParserManager
 {
-	private REPLContext	context;
-	private boolean		syntaxErrors;
+	private REPLContext context;
+	private boolean     syntaxErrors;
 	
 	public REPLParser(REPLContext context)
 	{

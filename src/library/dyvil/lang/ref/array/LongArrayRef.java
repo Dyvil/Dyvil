@@ -4,8 +4,8 @@ import dyvil.lang.ref.LongRef;
 
 public class LongArrayRef implements LongRef
 {
-	protected final long[]	array;
-	protected final int		index;
+	protected final long[] array;
+	protected final int    index;
 	
 	public LongArrayRef(long[] array, int index)
 	{

@@ -15,8 +15,8 @@ import java.io.IOException;
 
 public class TypeAlias implements ITypeAlias
 {
-	protected Name	name;
-	protected IType	type;
+	protected Name  name;
+	protected IType type;
 	
 	public TypeAlias()
 	{

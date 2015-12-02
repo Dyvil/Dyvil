@@ -73,19 +73,25 @@ public interface IntArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	static @infix int length(int[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	static
+	@infix
+	int length(int[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, IALOAD })
-	static @infix int subscript(int[] array, int i)
+	@Intrinsic( { LOAD_0, LOAD_1, IALOAD })
+	static
+	@infix
+	int subscript(int[] array, int i)
 	{
 		return array[i];
 	}
 	
-	static @infix int[] subscript(int[] array, Range<Int> range)
+	static
+	@infix
+	int[] subscript(int[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
@@ -94,26 +100,34 @@ public interface IntArray
 		return slice;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, IASTORE })
-	static @infix void subscript_$eq(int[] array, int i, int v)
+	@Intrinsic( { LOAD_0, LOAD_1, IASTORE })
+	static
+	@infix
+	void subscript_$eq(int[] array, int i, int v)
 	{
 		array[i] = v;
 	}
 	
-	static @infix void subscript_$eq(int[] array, Range<Int> range, int[] values)
+	static
+	@infix
+	void subscript_$eq(int[] array, Range<Int> range, int[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	static @infix boolean isEmpty(int[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	static
+	@infix
+	boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	static @infix void forEach(int[] array, IntConsumer action)
+	static
+	@infix
+	void forEach(int[] array, IntConsumer action)
 	{
 		for (int v : array)
 		{
@@ -123,22 +137,33 @@ public interface IntArray
 	
 	// Operators
 	
-	static @infix @inline boolean $qmark(int[] array, int v)
+	static
+	@infix
+	@inline
+	boolean $qmark(int[] array, int v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	static @infix @inline boolean $eq$eq(int[] array1, int[] array2)
+	static
+	@infix
+	@inline
+	boolean $eq$eq(int[] array1, int[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline boolean $bang$eq(int[] array1, int[] array2)
+	static
+	@infix
+	@inline
+	boolean $bang$eq(int[] array1, int[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	static @infix int[] $plus(int[] array, int v)
+	static
+	@infix
+	int[] $plus(int[] array, int v)
 	{
 		int len = array.length;
 		int[] res = new int[len + 1];
@@ -147,7 +172,9 @@ public interface IntArray
 		return res;
 	}
 	
-	static @infix int[] $plus$plus(int[] array1, int[] array2)
+	static
+	@infix
+	int[] $plus$plus(int[] array1, int[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -157,7 +184,9 @@ public interface IntArray
 		return res;
 	}
 	
-	static @infix int[] $minus(int[] array, int v)
+	static
+	@infix
+	int[] $minus(int[] array, int v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -180,7 +209,9 @@ public interface IntArray
 		return res;
 	}
 	
-	static @infix int[] $minus$minus(int[] array1, int[] array2)
+	static
+	@infix
+	int[] $minus$minus(int[] array1, int[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -198,7 +229,9 @@ public interface IntArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix int[] $amp(int[] array1, int[] array2)
+	static
+	@infix
+	int[] $amp(int[] array1, int[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -216,7 +249,9 @@ public interface IntArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix int[] mapped(int[] array, IntUnaryOperator mapper)
+	static
+	@infix
+	int[] mapped(int[] array, IntUnaryOperator mapper)
 	{
 		int len = array.length;
 		int[] res = new int[len];
@@ -227,7 +262,9 @@ public interface IntArray
 		return res;
 	}
 	
-	static @infix int[] flatMapped(int[] array, IntFunction<int[]> mapper)
+	static
+	@infix
+	int[] flatMapped(int[] array, IntFunction<int[]> mapper)
 	{
 		int size = 0;
 		int[] res = EMPTY;
@@ -250,7 +287,9 @@ public interface IntArray
 		return res;
 	}
 	
-	static @infix int[] filtered(int[] array, IntPredicate condition)
+	static
+	@infix
+	int[] filtered(int[] array, IntPredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -267,7 +306,9 @@ public interface IntArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix int[] sorted(int[] array)
+	static
+	@infix
+	int[] sorted(int[] array)
 	{
 		int[] res = array.clone();
 		Arrays.sort(res);
@@ -276,12 +317,16 @@ public interface IntArray
 	
 	// Search Operations
 	
-	static @infix int indexOf(int[] array, int v)
+	static
+	@infix
+	int indexOf(int[] array, int v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	static @infix int indexOf(int[] array, int v, int start)
+	static
+	@infix
+	int indexOf(int[] array, int v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -293,12 +338,16 @@ public interface IntArray
 		return -1;
 	}
 	
-	static @infix int lastIndexOf(int[] array, int v)
+	static
+	@infix
+	int lastIndexOf(int[] array, int v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	static @infix int lastIndexOf(int[] array, int v, int start)
+	static
+	@infix
+	int lastIndexOf(int[] array, int v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -310,24 +359,35 @@ public interface IntArray
 		return -1;
 	}
 	
-	static @infix @inline boolean contains(int[] array, int v)
+	static
+	@infix
+	@inline
+	boolean contains(int[] array, int v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static @infix @inline boolean in(int v, int[] array)
+	static
+	@infix
+	@inline
+	boolean in(int v, int[] array)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying
 	
-	static @infix @inline int[] copy(int[] array)
+	static
+	@infix
+	@inline
+	int[] copy(int[] array)
 	{
 		return array.clone();
 	}
 	
-	static @infix Int[] boxed(int[] array)
+	static
+	@infix
+	Int[] boxed(int[] array)
 	{
 		int len = array.length;
 		Int[] boxed = new Int[len];
@@ -338,24 +398,34 @@ public interface IntArray
 		return boxed;
 	}
 	
-	static @infix Iterable<Int> toIterable(int[] array)
+	static
+	@infix
+	Iterable<Int> toIterable(int[] array)
 	{
 		return new ArrayList<Int>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	static @infix @inline boolean equals(int[] array1, int[] array2)
+	static
+	@infix
+	@inline
+	boolean equals(int[] array1, int[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline int hashCode(int[] array)
+	static
+	@infix
+	@inline
+	int hashCode(int[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	static @infix String toString(int[] array)
+	static
+	@infix
+	String toString(int[] array)
 	{
 		if (array == null)
 		{
@@ -378,7 +448,9 @@ public interface IntArray
 		return buf.append(']').toString();
 	}
 	
-	static @infix void toString(int[] array, StringBuilder builder)
+	static
+	@infix
+	void toString(int[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

@@ -1,14 +1,13 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.lang.literal.CharConvertible;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+import dyvil.lang.literal.CharConvertible;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -17,17 +16,17 @@ public class Char implements Integer, Serializable
 {
 	private static final long serialVersionUID = -4823027430692159020L;
 	
-	public static final char	min		= java.lang.Character.MIN_VALUE;
-	public static final char	max		= java.lang.Character.MAX_VALUE;
-	public static final byte	size	= java.lang.Character.SIZE;
+	public static final char min  = java.lang.Character.MIN_VALUE;
+	public static final char max  = java.lang.Character.MAX_VALUE;
+	public static final byte size = java.lang.Character.SIZE;
 	
 	protected char value;
 	
 	private static final class ConstantPool
 	{
-		protected static final int	TABLE_MIN	= -128;
-		protected static final int	TABLE_SIZE	= 256;
-		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		protected static final int TABLE_MIN  = -128;
+		protected static final int TABLE_SIZE = 256;
+		protected static final int TABLE_MAX  = TABLE_MIN + TABLE_SIZE;
 		
 		protected static final Char[] TABLE = new Char[TABLE_SIZE];
 		
@@ -49,7 +48,9 @@ public class Char implements Integer, Serializable
 		return new Char(v);
 	}
 	
-	public static @infix char unapply(Char v)
+	public static
+	@infix
+	char unapply(Char v)
 	{
 		return v == null ? 0 : v.value;
 	}
@@ -521,34 +522,53 @@ public class Char implements Integer, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/String", "valueOf", "(C)Ljava/lang/String;" })
-	public static @infix @inline String toString(char value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/String", "valueOf",
+			"(C)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(char value)
 	{
 		return String.valueOf(value);
 	}
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString", "(I)Ljava/lang/String;" })
-	public static @infix @inline String toDecimalString(char value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString",
+			"(I)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toDecimalString(char value)
 	{
 		return java.lang.Integer.toString(value);
 	}
 	
-	public static @infix @inline String toBinaryString(char value)
+	public static
+	@infix
+	@inline
+	String toBinaryString(char value)
 	{
 		return java.lang.Integer.toBinaryString(value);
 	}
 	
-	public static @infix @inline String toHexString(char value)
+	public static
+	@infix
+	@inline
+	String toHexString(char value)
 	{
 		return java.lang.Integer.toHexString(value);
 	}
 	
-	public static @infix @inline String toOctalString(char value)
+	public static
+	@infix
+	@inline
+	String toOctalString(char value)
 	{
 		return java.lang.Integer.toOctalString(value);
 	}
 	
-	public static @infix String toString(char value, int radix)
+	public static
+	@infix
+	String toString(char value, int radix)
 	{
 		switch (radix)
 		{
@@ -570,8 +590,10 @@ public class Char implements Integer, Serializable
 		return String.valueOf(this.value);
 	}
 	
-	@Intrinsic({ LOAD_0 })
-	public static @postfix int $hash$hash(char v)
+	@Intrinsic( { LOAD_0 })
+	public static
+	@postfix
+	int $hash$hash(char v)
 	{
 		return v;
 	}

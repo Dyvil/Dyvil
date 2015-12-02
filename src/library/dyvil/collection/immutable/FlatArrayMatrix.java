@@ -1,13 +1,13 @@
 package dyvil.collection.immutable;
 
-import java.util.function.Function;
-
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
 
-public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements ImmutableMatrix<E>
+import java.util.function.Function;
+
+public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements ImmutableMatrix<E>
 {
 	private static final long serialVersionUID = 7265281981107132533L;
 	

@@ -1,13 +1,12 @@
 package dyvil.reflect.types;
 
 import dyvil.lang.Type;
-
 import dyvil.reflect.Variance;
 
 public class WildcardType<T> implements Type<T>
 {
-	protected final Variance	variance;
-	protected final Type		bound;
+	protected final Variance variance;
+	protected final Type     bound;
 	
 	public static <T> WildcardType<T> apply(Variance variance, Type upperBounds)
 	{

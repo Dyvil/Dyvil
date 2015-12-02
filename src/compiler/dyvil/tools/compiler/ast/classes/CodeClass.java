@@ -415,7 +415,8 @@ public class CodeClass extends AbstractClass
 		{
 			modifiers |= Opcodes.ACC_SUPER;
 		}
-		writer.visit(DyvilCompiler.classVersion, modifiers & 0x7631, this.internalName, signature, superClass, interfaces);
+		writer.visit(DyvilCompiler.classVersion, modifiers & 0x7631, this.internalName, signature, superClass,
+		             interfaces);
 		
 		// Source
 		
@@ -625,7 +626,8 @@ public class CodeClass extends AbstractClass
 			{
 				modifiers &= ~Opcodes.ACC_STATIC;
 			}
-			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified, modifiers);
+			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified,
+			                       modifiers);
 		}
 	}
 	

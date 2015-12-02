@@ -1,16 +1,17 @@
 package dyvil.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import dyvil.string.StringConversions;
 import dyvil.string.StringUtils;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class StringTests
 {
-	static final String[]	cases		= { "Just a random sentence", "testing some stuff", "the Cake is A LIE", "tHIS hAs WeIrD CaSiNG" };
-	static final String[]	titleCase	= { "Just A Random Sentence", "Testing Some Stuff", "The Cake Is A Lie", "This Has Weird Casing" };
+	static final String[] cases     = { "Just a random sentence", "testing some stuff", "the Cake is A LIE",
+			"tHIS hAs WeIrD CaSiNG" };
+	static final String[] titleCase = { "Just A Random Sentence", "Testing Some Stuff", "The Cake Is A Lie",
+			"This Has Weird Casing" };
 	
 	@Test
 	public void testAcronym()

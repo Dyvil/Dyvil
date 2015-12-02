@@ -1,11 +1,11 @@
 package dyvil.collection;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
 @ArrayConvertible

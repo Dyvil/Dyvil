@@ -31,11 +31,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalMethod extends AbstractMethod implements IExternalMethod
 {
-	private boolean	annotationsResolved;
-	private boolean	returnTypeResolved;
-	private boolean	genericsResolved;
-	private boolean	parametersResolved;
-	private boolean	exceptionsResolved;
+	private boolean annotationsResolved;
+	private boolean returnTypeResolved;
+	private boolean genericsResolved;
+	private boolean parametersResolved;
+	private boolean exceptionsResolved;
 	
 	public ExternalMethod(IClass iclass, Name name, String desc, ModifierSet modifiers)
 	{
@@ -261,7 +261,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -271,7 +272,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -281,7 +283,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -319,7 +322,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
+			this.exceptions[index] = IType
+					.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

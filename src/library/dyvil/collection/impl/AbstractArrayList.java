@@ -1,5 +1,9 @@
 package dyvil.collection.impl;
 
+import dyvil.collection.Collection;
+import dyvil.collection.List;
+import dyvil.collection.Set;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Comparator;
@@ -7,18 +11,14 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import dyvil.collection.Collection;
-import dyvil.collection.List;
-import dyvil.collection.Set;
-
 public abstract class AbstractArrayList<E> implements List<E>
 {
 	private static final long serialVersionUID = 5613951730812933112L;
 	
 	protected static final int DEFAULT_CAPACITY = 10;
 	
-	protected transient Object[]	elements;
-	protected transient int			size;
+	protected transient Object[] elements;
+	protected transient int      size;
 	
 	public AbstractArrayList(E... elements)
 	{

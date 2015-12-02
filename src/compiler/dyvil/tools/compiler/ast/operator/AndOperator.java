@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class AndOperator extends AbstractValue
 {
-	public IValue	left;
-	public IValue	right;
+	public IValue left;
+	public IValue right;
 	
 	public AndOperator(IValue left, IValue right)
 	{
@@ -128,7 +128,8 @@ public final class AndOperator extends AbstractValue
 	
 	private boolean bothTrue()
 	{
-		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN && this.right.booleanValue();
+		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN
+				&& this.right.booleanValue();
 	}
 	
 	@Override

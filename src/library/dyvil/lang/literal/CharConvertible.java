@@ -8,20 +8,20 @@ package dyvil.lang.literal;
  * single {@code char} parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}CharConvertible
  * case class Key(char c)
  * {
  *     public boolean isPressed() = ...
  * }
- * 
+ *
  * // ----------
- * 
+ *
  * Key key = 'A'
  * if (key.isPressed) { ... }
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface CharConvertible

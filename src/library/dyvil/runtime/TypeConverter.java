@@ -10,12 +10,12 @@ public class TypeConverter
 {
 	private static final int NUM_WRAPPERS = Wrapper.values().length;
 	
-	private static final String	NAME_OBJECT		= "java/lang/Object";
-	private static final String	WRAPPER_PREFIX	= "Ldyvil/lang/";
+	private static final String NAME_OBJECT    = "java/lang/Object";
+	private static final String WRAPPER_PREFIX = "Ldyvil/lang/";
 	
 	// Same for all primitives; name of the boxing method
-	private static final String	NAME_BOX_METHOD		= "apply";
-	private static final String	NAME_UNBOX_METHOD	= "unapply";
+	private static final String NAME_BOX_METHOD   = "apply";
+	private static final String NAME_UNBOX_METHOD = "unapply";
 	
 	// Table of opcodes for widening primitive conversions
 	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];

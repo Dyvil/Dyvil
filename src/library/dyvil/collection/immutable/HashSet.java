@@ -1,21 +1,20 @@
 package dyvil.collection.immutable;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractHashSet;
+import dyvil.lang.literal.ArrayConvertible;
 import dyvil.util.ImmutableException;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static dyvil.collection.impl.AbstractHashMap.DEFAULT_CAPACITY;
 
 @ArrayConvertible
-public class HashSet<E> extends AbstractHashSet<E>implements ImmutableSet<E>
+public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -1698577535888129119L;
 	

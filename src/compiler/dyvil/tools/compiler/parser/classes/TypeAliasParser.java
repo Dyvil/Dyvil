@@ -13,12 +13,12 @@ import dyvil.tools.parsing.token.IToken;
 
 public class TypeAliasParser extends Parser
 {
-	private static final int	TYPE	= 1;
-	private static final int	NAME	= 2;
-	private static final int	EQUAL	= 4;
+	private static final int TYPE  = 1;
+	private static final int NAME  = 2;
+	private static final int EQUAL = 4;
 	
-	protected ITypeAliasMap	map;
-	protected ITypeAlias	typeAlias;
+	protected ITypeAliasMap map;
+	protected ITypeAlias    typeAlias;
 	
 	public TypeAliasParser(ITypeAliasMap map)
 	{

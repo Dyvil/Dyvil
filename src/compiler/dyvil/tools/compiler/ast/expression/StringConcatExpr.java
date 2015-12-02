@@ -15,8 +15,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringConcatExpr implements IValue
 {
-	private IValue[]	values	= new IValue[3];
-	private int			valueCount;
+	private IValue[] values = new IValue[3];
+	private int valueCount;
 	
 	public StringConcatExpr()
 	{
@@ -161,7 +161,8 @@ public class StringConcatExpr implements IValue
 		{
 			this.values[0].writeExpression(writer, Types.STRING);
 			this.values[1].writeExpression(writer, Types.STRING);
-			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;", false);
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat",
+			                       "(Ljava/lang/String;)Ljava/lang/String;", false);
 			return;
 		}
 		
@@ -190,7 +191,8 @@ public class StringConcatExpr implements IValue
 			CaseClasses.writeStringAppend(writer, value.getType());
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
+		                       false);
 
 		if (type == Types.VOID)
 		{

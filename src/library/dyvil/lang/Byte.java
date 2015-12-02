@@ -1,12 +1,12 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -14,17 +14,17 @@ public class Byte implements Integer, Serializable
 {
 	private static final long serialVersionUID = 7537160263489097418L;
 	
-	public static final byte	min		= java.lang.Byte.MIN_VALUE;
-	public static final byte	max		= java.lang.Byte.MAX_VALUE;
-	public static final byte	size	= java.lang.Byte.SIZE;
+	public static final byte min  = java.lang.Byte.MIN_VALUE;
+	public static final byte max  = java.lang.Byte.MAX_VALUE;
+	public static final byte size = java.lang.Byte.SIZE;
 	
 	protected byte value;
 	
 	private static final class ConstantPool
 	{
-		protected static final int	TABLE_MIN	= -128;
-		protected static final int	TABLE_SIZE	= 256;
-		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		protected static final int TABLE_MIN  = -128;
+		protected static final int TABLE_SIZE = 256;
+		protected static final int TABLE_MAX  = TABLE_MIN + TABLE_SIZE;
 		
 		protected static final Byte[] TABLE = new Byte[TABLE_SIZE];
 		
@@ -46,7 +46,9 @@ public class Byte implements Integer, Serializable
 		return new Byte(v);
 	}
 	
-	public static @infix byte unapply(Byte v)
+	public static
+	@infix
+	byte unapply(Byte v)
 	{
 		return v == null ? 0 : v.value;
 	}
@@ -518,28 +520,43 @@ public class Byte implements Integer, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString", "(I)Ljava/lang/String;" })
-	public static @infix @inline String toString(byte value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString",
+			"(I)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(byte value)
 	{
 		return java.lang.Integer.toString(value);
 	}
 	
-	public static @infix @inline String toBinaryString(byte value)
+	public static
+	@infix
+	@inline
+	String toBinaryString(byte value)
 	{
 		return java.lang.Integer.toBinaryString(value);
 	}
 	
-	public static @infix @inline String toHexString(byte value)
+	public static
+	@infix
+	@inline
+	String toHexString(byte value)
 	{
 		return java.lang.Integer.toHexString(value);
 	}
 	
-	public static @infix @inline String toOctalString(byte value)
+	public static
+	@infix
+	@inline
+	String toOctalString(byte value)
 	{
 		return java.lang.Integer.toOctalString(value);
 	}
 	
-	public static @infix String toString(byte value, int radix)
+	public static
+	@infix
+	String toString(byte value, int radix)
 	{
 		switch (radix)
 		{
@@ -561,8 +578,10 @@ public class Byte implements Integer, Serializable
 		return java.lang.Integer.toString(this.value);
 	}
 	
-	@Intrinsic({ LOAD_0 })
-	public static @postfix int $hash$hash(byte v)
+	@Intrinsic( { LOAD_0 })
+	public static
+	@postfix
+	int $hash$hash(byte v)
 	{
 		return v;
 	}

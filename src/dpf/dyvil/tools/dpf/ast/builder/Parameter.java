@@ -8,8 +8,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class Parameter extends ValueCreator implements IASTNode
 {
-	private Name	name;
-	private Value	value;
+	private Name  name;
+	private Value value;
 	
 	public Parameter(Name name)
 	{

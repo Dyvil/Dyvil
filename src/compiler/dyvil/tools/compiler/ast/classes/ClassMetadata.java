@@ -25,21 +25,21 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
 {
-	protected static final int	CONSTRUCTOR	= 1;
-	protected static final int	APPLY		= 2;
-	protected static final int	EQUALS		= 4;
-	protected static final int	HASHCODE	= 8;
-	protected static final int	TOSTRING	= 16;
+	protected static final int CONSTRUCTOR = 1;
+	protected static final int APPLY       = 2;
+	protected static final int EQUALS      = 4;
+	protected static final int HASHCODE    = 8;
+	protected static final int TOSTRING    = 16;
 	
-	protected static final int	WRITE_OBJECT	= 32;
-	protected static final int	WRITE_REPLACE	= 64;
-	protected static final int	READ_OBJECT		= 128;
-	protected static final int	READ_RESOLVE	= 256;
+	protected static final int WRITE_OBJECT  = 32;
+	protected static final int WRITE_REPLACE = 64;
+	protected static final int READ_OBJECT   = 128;
+	protected static final int READ_RESOLVE  = 256;
 	
 	protected final IClass theClass;
 	
-	protected IConstructor	constructor;
-	protected IConstructor	superConstructor;
+	protected IConstructor constructor;
+	protected IConstructor superConstructor;
 	
 	protected byte methods;
 	

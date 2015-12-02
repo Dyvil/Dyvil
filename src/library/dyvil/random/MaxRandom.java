@@ -4,7 +4,7 @@ import dyvil.math.MathUtils;
 
 /**
  * A {@link Random} implementation that always returns the maximum value.
- * 
+ *
  * @author Clashsoft
  */
 public final class MaxRandom implements Random

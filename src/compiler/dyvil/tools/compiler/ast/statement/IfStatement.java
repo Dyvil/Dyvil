@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -320,7 +320,8 @@ public class IfStatement extends AbstractValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type == Types.VOID) {
+		if (type == Types.VOID)
+		{
 			this.writeStatement(writer);
 			return;
 		}

@@ -1,12 +1,13 @@
 package dyvil.reflect.types;
 
+import dyvil.annotation._internal.object;
 import dyvil.lang.Type;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation._internal.object;
-
 @NilConvertible
-public @object class AnyType implements Type<Object>
+public
+@object
+class AnyType implements Type<Object>
 {
 	public static final AnyType instance = new AnyType();
 	

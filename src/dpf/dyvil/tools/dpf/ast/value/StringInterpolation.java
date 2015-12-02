@@ -9,8 +9,8 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 
 public class StringInterpolation extends ValueCreator implements Value, StringInterpolationVisitor
 {
-	private List<String>	strings	= new ArrayList<String>();
-	private List<Value>		values	= new ArrayList<Value>();
+	private List<String> strings = new ArrayList<String>();
+	private List<Value>  values  = new ArrayList<Value>();
 	
 	@Override
 	public void visitStringPart(String string)

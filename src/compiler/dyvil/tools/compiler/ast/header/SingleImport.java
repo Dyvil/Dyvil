@@ -23,14 +23,14 @@ import java.io.IOException;
 
 public final class SingleImport extends Import
 {
-	public Name	name;
-	public Name	alias;
+	public Name name;
+	public Name alias;
 	
-	private IClass	theClass;
-	private Package	thePackage;
+	private IClass  theClass;
+	private Package thePackage;
 	
-	private IDataMember		field;
-	private List<IMethod>	methods;
+	private IDataMember   field;
+	private List<IMethod> methods;
 	
 	public SingleImport(ICodePosition position)
 	{

@@ -15,12 +15,12 @@ import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
-public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V>implements MutableMap<K, V>
+public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = -2508405537563871840L;
 	
-	private float			loadFactor;
-	private transient int	threshold;
+	private           float loadFactor;
+	private transient int   threshold;
 	
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{

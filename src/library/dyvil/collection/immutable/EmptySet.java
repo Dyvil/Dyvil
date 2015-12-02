@@ -1,5 +1,14 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation._internal.object;
+import dyvil.array.ObjectArray;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
+import dyvil.collection.iterator.EmptyIterator;
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Spliterator;
@@ -8,18 +17,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.annotation._internal.object;
-import dyvil.array.ObjectArray;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
-import dyvil.collection.iterator.EmptyIterator;
-
 @NilConvertible
-public @object class EmptySet<E> implements ImmutableSet<E>
+public
+@object
+class EmptySet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -6445525479912514756L;
 	

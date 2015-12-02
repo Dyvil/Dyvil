@@ -1,11 +1,11 @@
 package dyvil.reflect;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-
 import dyvil.annotation._internal.infix;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class FieldReflection
 {
@@ -33,15 +33,17 @@ public class FieldReflection
 	/**
 	 * Adds the modifiers {@code mod} to the given {@link Field} {@code field}
 	 * if {@code flag} is true, and removed them otherwise.
-	 * 
+	 *
 	 * @param field
-	 *            the field
+	 * 		the field
 	 * @param mod
-	 *            the modifiers
+	 * 		the modifiers
 	 * @param flag
-	 *            add or remove
+	 * 		add or remove
 	 */
-	public static @infix void setModifier(Field field, int mod, boolean flag)
+	public static
+	@infix
+	void setModifier(Field field, int mod, boolean flag)
 	{
 		try
 		{
@@ -63,7 +65,9 @@ public class FieldReflection
 		}
 	}
 	
-	public static @infix void setAssignable(Field field)
+	public static
+	@infix
+	void setAssignable(Field field)
 	{
 		try
 		{
@@ -111,11 +115,12 @@ public class FieldReflection
 	/**
 	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with
 	 * the name {@code name}.
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param name
-	 *            the field name
+	 * 		the field name
+	 *
 	 * @return the field
 	 */
 	public static Field getField(Class clazz, String name)
@@ -134,11 +139,12 @@ public class FieldReflection
 	/**
 	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with a
 	 * name contained in {@code fieldNames}.
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param fieldNames
-	 *            the possible field names
+	 * 		the possible field names
+	 *
 	 * @return the field
 	 */
 	public static Field getField(Class clazz, String... fieldNames)
@@ -154,18 +160,20 @@ public class FieldReflection
 				}
 			}
 		}
-		System.err.println(new NoSuchFieldException("Field not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(fieldNames)));
+		System.err.println(new NoSuchFieldException(
+				"Field not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(fieldNames)));
 		return null;
 	}
 	
 	/**
 	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with
 	 * the field ID {@code fieldID}
-	 * 
+	 *
 	 * @param clazz
-	 *            the clazz
+	 * 		the clazz
 	 * @param fieldID
-	 *            the field ID
+	 * 		the field ID
+	 *
 	 * @return the field
 	 */
 	public static Field getField(Class clazz, int fieldID)
@@ -214,11 +222,12 @@ public class FieldReflection
 	/**
 	 * Directly gets the value of the given {@link Field} on the given
 	 * {@link Object} {@code instance}.
-	 * 
+	 *
 	 * @param field
-	 *            the field to get
+	 * 		the field to get
 	 * @param instance
-	 *            the instance
+	 * 		the instance
+	 *
 	 * @return the value
 	 */
 	public static <R> R getValue(Field field, Object instance)
@@ -277,13 +286,13 @@ public class FieldReflection
 	 * Directly sets the value of the given {@link Field} on the given
 	 * {@link Object} {@code instance} to the given {@link Object} {@code value}
 	 * .
-	 * 
+	 *
 	 * @param field
-	 *            the field to set
+	 * 		the field to set
 	 * @param instance
-	 *            the instance
+	 * 		the instance
 	 * @param value
-	 *            the new value
+	 * 		the new value
 	 */
 	public static <T, V> void setField(Field field, T instance, V value)
 	{

@@ -4,8 +4,8 @@ import dyvil.lang.ref.ObjectRef;
 
 public class ObjectArrayRef<T> implements ObjectRef<T>
 {
-	protected final T[]	array;
-	protected final int	index;
+	protected final T[] array;
+	protected final int index;
 	
 	public ObjectArrayRef(T[] array, int index)
 	{

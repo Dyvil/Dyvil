@@ -26,10 +26,10 @@ import java.lang.annotation.ElementType;
 
 public final class CaptureField implements IField
 {
-	public IClass		theClass;
-	public String		name;
-	public IDataMember	field;
-	private IType		type;
+	public  IClass      theClass;
+	public  String      name;
+	public  IDataMember field;
+	private IType       type;
 	
 	public CaptureField(IClass iclass)
 	{
@@ -232,7 +232,8 @@ public final class CaptureField implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED, this.name, this.type.getExtendedName(), this.type.getSignature(), null);
+		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED, this.name, this.type.getExtendedName(),
+		                  this.type.getSignature(), null);
 	}
 	
 	@Override

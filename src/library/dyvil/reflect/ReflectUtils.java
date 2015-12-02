@@ -1,14 +1,14 @@
 package dyvil.reflect;
 
-import java.lang.reflect.Field;
-
 import sun.misc.JavaLangAccess;
 import sun.misc.SharedSecrets;
 
+import java.lang.reflect.Field;
+
 public final class ReflectUtils
 {
-	protected static final JavaLangAccess	JAVA_LANG_ACCESS	= SharedSecrets.getJavaLangAccess();
-	public static final sun.misc.Unsafe		UNSAFE;
+	protected static final JavaLangAccess JAVA_LANG_ACCESS = SharedSecrets.getJavaLangAccess();
+	public static final sun.misc.Unsafe UNSAFE;
 	
 	static
 	{

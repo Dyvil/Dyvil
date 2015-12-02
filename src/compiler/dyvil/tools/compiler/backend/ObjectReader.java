@@ -6,8 +6,8 @@ import java.io.IOException;
 
 public class ObjectReader implements DataInput, AutoCloseable
 {
-	private final DataInputStream	input;
-	private String[]				constantPool;
+	private final DataInputStream input;
+	private       String[]        constantPool;
 	
 	public ObjectReader(DataInputStream input) throws IOException
 	{

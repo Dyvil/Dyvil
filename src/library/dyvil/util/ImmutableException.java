@@ -3,7 +3,7 @@ package dyvil.util;
 /**
  * An {@linkplain Exception} that is thrown when accessing a mutating member of
  * an immutable collection.
- * 
+ *
  * @author Clashsoft
  */
 public class ImmutableException extends RuntimeException

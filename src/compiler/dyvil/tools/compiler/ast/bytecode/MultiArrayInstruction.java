@@ -6,8 +6,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class MultiArrayInstruction implements IInstruction
 {
-	private String	type;
-	private int		dims;
+	private String type;
+	private int    dims;
 	
 	public MultiArrayInstruction(String type, int dims)
 	{

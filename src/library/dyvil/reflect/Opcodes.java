@@ -7,7 +7,7 @@ import dyvil.tools.asm.util.Printer;
 /**
  * The <b>Opcodes</b> interface declares all opcodes that can be used in
  * <i>Dyvil</i> Bytecode Expressions.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -95,7 +95,7 @@ public interface Opcodes
 	
 	/**
 	 * Pushes a byte onto the stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the byte
 	 */
@@ -103,7 +103,7 @@ public interface Opcodes
 	
 	/**
 	 * Pushes a short onto the stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the first 8 bits of the short
 	 * @param operand2
@@ -114,7 +114,7 @@ public interface Opcodes
 	/**
 	 * Loads a constant. The operand can be of types {@code int}, {@code long},
 	 * {@code float}, {@code double}, {@link String} or {@link Class}.
-	 * 
+	 *
 	 * @param operand1
 	 *            the constant
 	 */
@@ -123,7 +123,7 @@ public interface Opcodes
 	/**
 	 * Loads an {@code int} value from a local variable and pushes it onto the
 	 * stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -132,7 +132,7 @@ public interface Opcodes
 	/**
 	 * Loads a {@code long} value from a local variable and pushes it onto the
 	 * stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -141,7 +141,7 @@ public interface Opcodes
 	/**
 	 * Loads a {@code float} value from a local variable and pushes it onto the
 	 * stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -150,7 +150,7 @@ public interface Opcodes
 	/**
 	 * Loads a {@code double} value from a local variable and pushes it onto the
 	 * stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -159,7 +159,7 @@ public interface Opcodes
 	/**
 	 * Loads an Object reference from a local variable and pushes it onto the
 	 * stack.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -184,7 +184,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from a the stack and stores it in a local
 	 * variable.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -193,7 +193,7 @@ public interface Opcodes
 	/**
 	 * Removes a {@code long} value from a the stack and stores it in a local
 	 * variable.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -202,7 +202,7 @@ public interface Opcodes
 	/**
 	 * Removes a {@code float} value from a the stack and stores it in a local
 	 * variable.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -211,7 +211,7 @@ public interface Opcodes
 	/**
 	 * Removes a {@code double} value from a the stack and stores it in a local
 	 * variable.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -220,7 +220,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from a the stack and stores it in a local
 	 * variable.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 */
@@ -466,12 +466,12 @@ public interface Opcodes
 	 * Removes two {@code int} values from the stack, left-shifts value1 by
 	 * value2 bits and pushes the result onto the stack.
 	 */
-	int	ISHL	= 120;
+	int ISHL = 120;
 	/**
 	 * Removes two {@code long} values from the stack, left-shifts value1 by
 	 * value2 bits and pushes the result onto the stack.
 	 */
-	int	LSHL	= 121;
+	int LSHL = 121;
 	
 	/**
 	 * Removes two {@code int} values from the stack, arithmetic right-shifts
@@ -535,7 +535,7 @@ public interface Opcodes
 	
 	/**
 	 * Increments a local variable.
-	 * 
+	 *
 	 * @param operand1
 	 *            the local variable index
 	 * @param operand2
@@ -666,7 +666,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given
 	 * {@link Label} if it equals {@code 0}.
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -675,7 +675,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given
 	 * {@link Label} if it does not equal {@code 0}.
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -684,7 +684,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given
 	 * {@link Label} if it is less than {@code 0}.
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -693,7 +693,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given
 	 * {@link Label} if it is greater than or equal to {@code 0}.
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -702,7 +702,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given
 	 * {@link Label} if it is greater than {@code 0}.
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -711,7 +711,7 @@ public interface Opcodes
 	/**
 	 * Removes an {@code int} value from the stack and jumps to the given
 	 * {@link Label} if it is less than {@code 0}.
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -786,7 +786,7 @@ public interface Opcodes
 	/**
 	 * Checks if the value on top of the stack can be cast to the given type,
 	 * and throws a {@link ClassCastException} otherwise.
-	 * 
+	 *
 	 * @param type
 	 *            the type
 	 */
@@ -797,7 +797,7 @@ public interface Opcodes
 	 * pushes the result as an {@code int} on the stack. If the cast is
 	 * applicable, the result is {@code 1}, and if it is not applicable or the
 	 * top value on the stack way {@code null}, the result is {@code 0}.
-	 * 
+	 *
 	 * @param type
 	 *            the type
 	 */
@@ -812,7 +812,7 @@ public interface Opcodes
 	/**
 	 * Removes a reference from the stack and jumps to the given {@link Label}
 	 * if it is a {@code null} reference
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -821,7 +821,7 @@ public interface Opcodes
 	/**
 	 * Removes a reference from the stack and jumps to the given {@link Label}
 	 * if it is not a {@code null} reference
-	 * 
+	 *
 	 * @param label
 	 *            the label
 	 */
@@ -877,78 +877,78 @@ public interface Opcodes
 	 */
 	int LNOT = 272;
 	
-	int	L2B	= 280;
-	int	L2S	= 281;
-	int	L2C	= 282;
-	int	F2B	= 283;
-	int	F2S	= 284;
-	int	F2C	= 285;
-	int	D2B	= 286;
-	int	D2S	= 287;
-	int	D2C	= 289;
+	int L2B = 280;
+	int L2S = 281;
+	int L2C = 282;
+	int F2B = 283;
+	int F2S = 284;
+	int F2C = 285;
+	int D2B = 286;
+	int D2S = 287;
+	int D2C = 289;
 	
-	int	ICMPEQ	= 290;
-	int	ICMPNE	= 291;
-	int	ICMPLT	= 292;
-	int	ICMPGE	= 293;
-	int	ICMPGT	= 294;
-	int	ICMPLE	= 295;
+	int ICMPEQ = 290;
+	int ICMPNE = 291;
+	int ICMPLT = 292;
+	int ICMPGE = 293;
+	int ICMPGT = 294;
+	int ICMPLE = 295;
 	
-	int	LCMPEQ	= 296;
-	int	LCMPNE	= 297;
-	int	LCMPLT	= 298;
-	int	LCMPGE	= 299;
-	int	LCMPGT	= 300;
-	int	LCMPLE	= 301;
+	int LCMPEQ = 296;
+	int LCMPNE = 297;
+	int LCMPLT = 298;
+	int LCMPGE = 299;
+	int LCMPGT = 300;
+	int LCMPLE = 301;
 	
-	int	FCMPEQ	= 302;
-	int	FCMPNE	= 303;
-	int	FCMPLT	= 304;
-	int	FCMPGE	= 305;
-	int	FCMPGT	= 306;
-	int	FCMPLE	= 307;
+	int FCMPEQ = 302;
+	int FCMPNE = 303;
+	int FCMPLT = 304;
+	int FCMPGE = 305;
+	int FCMPGT = 306;
+	int FCMPLE = 307;
 	
-	int	DCMPEQ	= 308;
-	int	DCMPNE	= 309;
-	int	DCMPLT	= 310;
-	int	DCMPGE	= 311;
-	int	DCMPGT	= 312;
-	int	DCMPLE	= 313;
+	int DCMPEQ = 308;
+	int DCMPNE = 309;
+	int DCMPLT = 310;
+	int DCMPGE = 311;
+	int DCMPGT = 312;
+	int DCMPLE = 313;
 	
-	int	ACMPEQ	= 314;
-	int	ACMPNE	= 315;
+	int ACMPEQ = 314;
+	int ACMPNE = 315;
 	
-	int	NULL	= 316;
-	int	NONNULL	= 317;
+	int NULL    = 316;
+	int NONNULL = 317;
 	
-	int	IF_LCMPEQ	= 330;
-	int	IF_LCMPNE	= 331;
-	int	IF_LCMPLT	= 332;
-	int	IF_LCMPGE	= 333;
-	int	IF_LCMPGT	= 334;
-	int	IF_LCMPLE	= 335;
+	int IF_LCMPEQ = 330;
+	int IF_LCMPNE = 331;
+	int IF_LCMPLT = 332;
+	int IF_LCMPGE = 333;
+	int IF_LCMPGT = 334;
+	int IF_LCMPLE = 335;
 	
-	int	IF_FCMPEQ	= 336;
-	int	IF_FCMPNE	= 337;
-	int	IF_FCMPLT	= 338;
-	int	IF_FCMPGE	= 339;
-	int	IF_FCMPGT	= 340;
-	int	IF_FCMPLE	= 341;
+	int IF_FCMPEQ = 336;
+	int IF_FCMPNE = 337;
+	int IF_FCMPLT = 338;
+	int IF_FCMPGE = 339;
+	int IF_FCMPGT = 340;
+	int IF_FCMPLE = 341;
 	
-	int	IF_DCMPEQ	= 342;
-	int	IF_DCMPNE	= 343;
-	int	IF_DCMPLT	= 344;
-	int	IF_DCMPGE	= 345;
-	int	IF_DCMPGT	= 346;
-	int	IF_DCMPLE	= 347;
+	int IF_DCMPEQ = 342;
+	int IF_DCMPNE = 343;
+	int IF_DCMPLT = 344;
+	int IF_DCMPGE = 345;
+	int IF_DCMPGT = 346;
+	int IF_DCMPLE = 347;
 	
 	int SWAP2 = 400;
 	
-	int	AUTO_SWAP	= 411;
-	int	AUTO_POP	= 412;
-	int	AUTO_POP2	= 413;
-	int	AUTO_DUP	= 414;
-	int	AUTO_DUP_X1	= 415;
+	int AUTO_SWAP   = 411;
+	int AUTO_POP    = 412;
+	int AUTO_POP2   = 413;
+	int AUTO_DUP    = 414;
+	int AUTO_DUP_X1 = 415;
 	
 	int OBJECT_EQUALS = 450;
 	
@@ -1058,7 +1058,8 @@ public interface Opcodes
 	
 	static boolean isJumpOpcode(int opcode)
 	{
-		return opcode >= IFEQ && opcode <= JSR || opcode == GOTO || opcode == IFNULL || opcode == IFNONNULL || opcode >= IF_LCMPEQ && opcode <= IF_DCMPLE;
+		return opcode >= IFEQ && opcode <= JSR || opcode == GOTO || opcode == IFNULL || opcode == IFNONNULL
+				|| opcode >= IF_LCMPEQ && opcode <= IF_DCMPLE;
 	}
 	
 	static int getInverseOpcode(int opcode)

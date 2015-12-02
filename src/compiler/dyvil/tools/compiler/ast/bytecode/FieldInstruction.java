@@ -8,9 +8,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class FieldInstruction implements IInstruction
 {
-	private int		opcode;
-	private String	owner;
-	private String	fieldName;
+	private int    opcode;
+	private String owner;
+	private String fieldName;
 	
 	private String desc;
 	

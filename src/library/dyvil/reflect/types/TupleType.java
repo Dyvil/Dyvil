@@ -6,8 +6,8 @@ import dyvil.lang.literal.TupleConvertible;
 @TupleConvertible
 public class TupleType implements Type
 {
-	protected Type[]	types;
-	protected Class		theClass;
+	protected Type[] types;
+	protected Class  theClass;
 	
 	public static TupleType apply(Type... types)
 	{

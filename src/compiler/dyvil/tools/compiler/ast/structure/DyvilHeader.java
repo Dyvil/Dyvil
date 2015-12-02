@@ -45,27 +45,27 @@ import java.io.IOException;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
-	public final CodeFile	inputFile;
-	public final File		outputDirectory;
-	public final File		outputFile;
+	public final CodeFile inputFile;
+	public final File     outputDirectory;
+	public final File     outputFile;
 	
-	protected Name		name;
-	protected Package	pack;
+	protected Name    name;
+	protected Package pack;
 	
-	protected TokenIterator	tokens;
-	protected MarkerList	markers	= new MarkerList();
+	protected TokenIterator tokens;
+	protected MarkerList markers = new MarkerList();
 	
 	protected PackageDeclaration packageDeclaration;
 	
-	protected ImportDeclaration[]	imports	= new ImportDeclaration[5];
-	protected int					importCount;
-	protected ImportDeclaration[]	usings	= new ImportDeclaration[1];
-	protected int					usingCount;
-	protected IncludeDeclaration[]	includes;
-	protected int					includeCount;
+	protected ImportDeclaration[] imports = new ImportDeclaration[5];
+	protected int importCount;
+	protected ImportDeclaration[] usings = new ImportDeclaration[1];
+	protected int                  usingCount;
+	protected IncludeDeclaration[] includes;
+	protected int                  includeCount;
 	
-	protected Map<Name, Operator>	operators	= new IdentityHashMap();
-	protected Map<Name, ITypeAlias>	typeAliases	= new IdentityHashMap();
+	protected Map<Name, Operator>   operators   = new IdentityHashMap();
+	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap();
 	
 	protected HeaderDeclaration headerDeclaration;
 	
@@ -409,7 +409,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		if (this.headerDeclaration == null)
 		{
-			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, new FlagModifierSet(Modifiers.PUBLIC), null);
+			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name,
+			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
 		}
 	}
 	

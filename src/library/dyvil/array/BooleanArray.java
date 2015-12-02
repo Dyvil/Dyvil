@@ -52,19 +52,25 @@ public interface BooleanArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	static @infix int length(boolean[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	static
+	@infix
+	int length(boolean[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, BALOAD })
-	static @infix boolean subscript(boolean[] array, int i)
+	@Intrinsic( { LOAD_0, LOAD_1, BALOAD })
+	static
+	@infix
+	boolean subscript(boolean[] array, int i)
 	{
 		return array[i];
 	}
 	
-	static @infix boolean[] subscript(boolean[] array, Range<Int> range)
+	static
+	@infix
+	boolean[] subscript(boolean[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
@@ -73,26 +79,34 @@ public interface BooleanArray
 		return slice;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, BASTORE })
-	static @infix void subscript_$eq(boolean[] array, int i, boolean v)
+	@Intrinsic( { LOAD_0, LOAD_1, BASTORE })
+	static
+	@infix
+	void subscript_$eq(boolean[] array, int i, boolean v)
 	{
 		array[i] = v;
 	}
 	
-	static @infix void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
+	static
+	@infix
+	void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	static @infix boolean isEmpty(int[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	static
+	@infix
+	boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	static @infix void forEach(boolean[] array, Consumer<Boolean> action)
+	static
+	@infix
+	void forEach(boolean[] array, Consumer<Boolean> action)
 	{
 		for (boolean v : array)
 		{
@@ -102,22 +116,33 @@ public interface BooleanArray
 	
 	// Operators
 	
-	static @infix @inline boolean $qmark(boolean[] array, boolean v)
+	static
+	@infix
+	@inline
+	boolean $qmark(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static @infix @inline boolean $eq$eq(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	@inline
+	boolean $eq$eq(boolean[] array1, boolean[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline boolean $bang$eq(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	@inline
+	boolean $bang$eq(boolean[] array1, boolean[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	static @infix boolean[] $plus(boolean[] array, boolean v)
+	static
+	@infix
+	boolean[] $plus(boolean[] array, boolean v)
 	{
 		int len = array.length;
 		boolean[] res = new boolean[len + 1];
@@ -126,7 +151,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] $plus$plus(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	boolean[] $plus$plus(boolean[] array1, boolean[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -136,7 +163,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] $minus(boolean[] array, boolean v)
+	static
+	@infix
+	boolean[] $minus(boolean[] array, boolean v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -159,7 +188,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] $minus$minus(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	boolean[] $minus$minus(boolean[] array1, boolean[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -177,7 +208,9 @@ public interface BooleanArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix boolean[] $amp(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	boolean[] $amp(boolean[] array1, boolean[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -195,7 +228,9 @@ public interface BooleanArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix boolean[] mapped(boolean[] array, Predicate<Boolean> mapper)
+	static
+	@infix
+	boolean[] mapped(boolean[] array, Predicate<Boolean> mapper)
 	{
 		int len = array.length;
 		boolean[] res = new boolean[len];
@@ -206,7 +241,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] flatMapped(boolean[] array, Function<Boolean, boolean[]> mapper)
+	static
+	@infix
+	boolean[] flatMapped(boolean[] array, Function<Boolean, boolean[]> mapper)
 	{
 		int size = 0;
 		boolean[] res = EMPTY;
@@ -229,7 +266,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] filtered(boolean[] array, Predicate<Boolean> condition)
+	static
+	@infix
+	boolean[] filtered(boolean[] array, Predicate<Boolean> condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -246,7 +285,9 @@ public interface BooleanArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix boolean[] sorted(boolean[] array)
+	static
+	@infix
+	boolean[] sorted(boolean[] array)
 	{
 		int len = array.length;
 		if (len <= 0)
@@ -277,12 +318,16 @@ public interface BooleanArray
 	
 	// Search Operations
 	
-	static @infix int indexOf(boolean[] array, boolean v)
+	static
+	@infix
+	int indexOf(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	static @infix int indexOf(boolean[] array, boolean v, int start)
+	static
+	@infix
+	int indexOf(boolean[] array, boolean v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -294,12 +339,16 @@ public interface BooleanArray
 		return -1;
 	}
 	
-	static @infix int lastIndexOf(boolean[] array, boolean v)
+	static
+	@infix
+	int lastIndexOf(boolean[] array, boolean v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	static @infix int lastIndexOf(boolean[] array, boolean v, int start)
+	static
+	@infix
+	int lastIndexOf(boolean[] array, boolean v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -311,24 +360,35 @@ public interface BooleanArray
 		return -1;
 	}
 	
-	static @infix @inline boolean contains(boolean[] array, boolean v)
+	static
+	@infix
+	@inline
+	boolean contains(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static @infix @inline boolean in(boolean v, boolean[] array)
+	static
+	@infix
+	@inline
+	boolean in(boolean v, boolean[] array)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying
 	
-	static @infix @inline boolean[] copy(boolean[] array)
+	static
+	@infix
+	@inline
+	boolean[] copy(boolean[] array)
 	{
 		return array.clone();
 	}
 	
-	static @infix Boolean[] boxed(boolean[] array)
+	static
+	@infix
+	Boolean[] boxed(boolean[] array)
 	{
 		int len = array.length;
 		Boolean[] boxed = new Boolean[len];
@@ -339,24 +399,34 @@ public interface BooleanArray
 		return boxed;
 	}
 	
-	static @infix Iterable<Boolean> toIterable(boolean[] array)
+	static
+	@infix
+	Iterable<Boolean> toIterable(boolean[] array)
 	{
 		return new ArrayList<Boolean>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	static @infix @inline boolean equals(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	@inline
+	boolean equals(boolean[] array1, boolean[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline int hashCode(boolean[] array)
+	static
+	@infix
+	@inline
+	int hashCode(boolean[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	static @infix String toString(boolean[] array)
+	static
+	@infix
+	String toString(boolean[] array)
 	{
 		if (array == null)
 		{
@@ -379,7 +449,9 @@ public interface BooleanArray
 		return buf.append(']').toString();
 	}
 	
-	static @infix void toString(boolean[] array, StringBuilder builder)
+	static
+	@infix
+	void toString(boolean[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

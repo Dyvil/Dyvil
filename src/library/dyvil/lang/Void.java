@@ -1,10 +1,12 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
 import dyvil.annotation._internal.object;
 
-public final @object class Void implements Serializable
+import java.io.Serializable;
+
+public final
+@object
+class Void implements Serializable
 {
 	private static final long serialVersionUID = -7512474716905358710L;
 	
@@ -12,7 +14,7 @@ public final @object class Void implements Serializable
 	
 	private Void()
 	{
-	
+
 	}
 	
 	public static Void apply()

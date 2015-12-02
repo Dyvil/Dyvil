@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.RetentionPolicy;
-import java.util.EnumSet;
-import java.util.Set;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.MethodVisitor;
@@ -19,11 +14,16 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
+import java.util.EnumSet;
+import java.util.Set;
+
 public final class AnnotationMetadata implements IClassMetadata
 {
-	private IClass			theClass;
-	public RetentionPolicy	retention;
-	public Set<ElementType>	targets;
+	private IClass           theClass;
+	public  RetentionPolicy  retention;
+	public  Set<ElementType> targets;
 	
 	public AnnotationMetadata(IClass iclass)
 	{
@@ -138,7 +138,9 @@ public final class AnnotationMetadata implements IClassMetadata
 			
 			StringBuilder desc = new StringBuilder("()");
 			param.getType().appendExtendedName(desc);
-			MethodVisitor mw = writer.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, param.getName().qualified, desc.toString(), null, null);
+			MethodVisitor mw = writer
+					.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, param.getName().qualified, desc.toString(),
+					             null, null);
 			
 			IValue value = param.getValue();
 			if (value != null)

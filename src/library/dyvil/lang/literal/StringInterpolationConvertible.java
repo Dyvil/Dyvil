@@ -6,17 +6,17 @@ package dyvil.lang.literal;
  * signature {@code static X apply(String, Object...)}.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}StringInterpolationConvertible
  * case class Format(String format, Object... values)
- * 
+ *
  * // ----------
- * 
+ *
  * String world = "World"
  * Format f = "Hello \(world)"
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface StringInterpolationConvertible

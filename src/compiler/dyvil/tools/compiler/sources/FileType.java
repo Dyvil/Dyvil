@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.sources;
 
-import java.io.File;
-
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -9,6 +7,8 @@ import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.parsing.CodeFile;
+
+import java.io.File;
 
 public class FileType implements IFileType
 {
@@ -18,13 +18,13 @@ public class FileType implements IFileType
 		DyvilHeader newHeader(Package pack, CodeFile inputFile, File outputFile);
 	}
 	
-	public static final String	CLASS_EXTENSION		= ".class";
-	public static final String	OBJECT_EXTENSION	= ".dyo";
+	public static final String CLASS_EXTENSION  = ".class";
+	public static final String OBJECT_EXTENSION = ".dyo";
 	
 	public static final Map<String, IFileType> fileTypes = new HashMap();
 	
-	public static final IFileType	DYVIL_UNIT		= new FileType("dyv", DyvilUnit::new);
-	public static final IFileType	DYVIL_HEADER	= new FileType("dyh", DyvilHeader::new);
+	public static final IFileType DYVIL_UNIT   = new FileType("dyv", DyvilUnit::new);
+	public static final IFileType DYVIL_HEADER = new FileType("dyh", DyvilHeader::new);
 	
 	static
 	{
@@ -34,8 +34,8 @@ public class FileType implements IFileType
 		fileTypes.put("dyvilh", DYVIL_HEADER);
 	}
 	
-	protected String			extension;
-	protected HeaderSupplier	headerSupplier;
+	protected String         extension;
+	protected HeaderSupplier headerSupplier;
 	
 	public FileType(String extension, HeaderSupplier headerSupplier)
 	{

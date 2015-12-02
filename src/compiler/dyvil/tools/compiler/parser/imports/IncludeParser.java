@@ -13,12 +13,12 @@ import dyvil.tools.parsing.token.IToken;
 
 public class IncludeParser extends Parser
 {
-	private static final int	INCLUDE	= 0;
-	private static final int	NAME	= 1;
-	private static final int	DOT		= 2;
+	private static final int INCLUDE = 0;
+	private static final int NAME    = 1;
+	private static final int DOT     = 2;
 	
-	private IDyvilHeader		header;
-	private IncludeDeclaration	includeDeclaration;
+	private IDyvilHeader       header;
+	private IncludeDeclaration includeDeclaration;
 	
 	public IncludeParser(IDyvilHeader header)
 	{

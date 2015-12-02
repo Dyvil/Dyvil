@@ -6,9 +6,9 @@ import dyvil.lang.literal.TupleConvertible;
 @TupleConvertible
 public class FunctionType implements Type
 {
-	protected Type[]	types;
-	protected Type		returnType;
-	protected Class		theClass;
+	protected Type[] types;
+	protected Type   returnType;
+	protected Class  theClass;
 	
 	public static FunctionType apply(Type returnType, Type... types)
 	{

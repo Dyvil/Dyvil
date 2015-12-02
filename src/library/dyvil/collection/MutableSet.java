@@ -1,15 +1,14 @@
 package dyvil.collection;
 
-import java.util.Iterator;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.view.SetView;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible

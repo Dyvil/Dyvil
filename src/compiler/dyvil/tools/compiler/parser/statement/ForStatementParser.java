@@ -15,25 +15,25 @@ import dyvil.tools.parsing.token.IToken;
 
 public class ForStatementParser extends Parser implements IValueConsumer
 {
-	private static final int	FOR				= 1;
-	private static final int	FOR_START		= 2;
-	private static final int	TYPE			= 4;
-	private static final int	VARIABLE		= 8;
-	private static final int	SEPERATOR		= 16;
-	private static final int	VARIABLE_END	= 32;
-	private static final int	CONDITION_END	= 64;
-	private static final int	FOR_END			= 128;
-	private static final int	STATEMENT		= 256;
-	private static final int	STATEMENT_END	= 512;
+	private static final int FOR           = 1;
+	private static final int FOR_START     = 2;
+	private static final int TYPE          = 4;
+	private static final int VARIABLE      = 8;
+	private static final int SEPERATOR     = 16;
+	private static final int VARIABLE_END  = 32;
+	private static final int CONDITION_END = 64;
+	private static final int FOR_END       = 128;
+	private static final int STATEMENT     = 256;
+	private static final int STATEMENT_END = 512;
 	
 	protected IValueConsumer field;
 	
-	private ICodePosition	position;
-	private Variable		variable;
-	private IValue			update;
-	private IValue			condition;
-	private IValue			action;
-	private boolean			forEach;
+	private ICodePosition position;
+	private Variable      variable;
+	private IValue        update;
+	private IValue        condition;
+	private IValue        action;
+	private boolean       forEach;
 	
 	public ForStatementParser(IValueConsumer field)
 	{

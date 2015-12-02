@@ -8,16 +8,15 @@ import dyvil.collection.*;
  * primarily designed to be used in conjunction with the {@link mutating}
  * annotation, which allows compile-time checking mutating accesses to immutable
  * types, especially {@link Collection collections}.
- * 
+ *
+ * @author Clashsoft
+ * @version 1.0
  * @see mutating
  * @see Collection
  * @see ImmutableCollection
  * @see ImmutableList
  * @see ImmutableMap
  * @see ImmutableMatrix
- * @author Clashsoft
- * @version 1.0
  */
 public interface Immutable
-{
-}
+{}

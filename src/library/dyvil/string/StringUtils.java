@@ -1,9 +1,5 @@
 package dyvil.string;
 
-import java.lang.reflect.Field;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import dyvil.annotation.Utility;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
@@ -13,6 +9,10 @@ import dyvil.math.MathUtils;
 import dyvil.random.RandomUtils;
 import dyvil.reflect.Modifiers;
 
+import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for
  * several String-related functions such as splitting a string into a list of
@@ -20,7 +20,7 @@ import dyvil.reflect.Modifiers;
  * camelCase, counting the number of times a character appears a the string,
  * getting the index of a Regular Expression as well as several useful utility
  * functions.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -29,12 +29,17 @@ public interface StringUtils
 {
 	String[] EMPTY_STRING_ARRAY = new String[0];
 	
-	static @infix @inline String $times(int count, String string)
+	static
+	@infix
+	@inline
+	String $times(int count, String string)
 	{
 		return $times(string, count);
 	}
 	
-	static @infix String $times(String string, int count)
+	static
+	@infix
+	String $times(String string, int count)
 	{
 		switch (count)
 		{
@@ -67,19 +72,25 @@ public interface StringUtils
 	/**
 	 * Formats the given {@link String} {@code format} with the given
 	 * {@code Object[] args} using {@link String#format(String, Object...)}.
-	 * 
+	 *
 	 * @param format
-	 *            the format String
+	 * 		the format String
 	 * @param args
-	 *            the format arguments
+	 * 		the format arguments
+	 *
 	 * @return the formatted String
 	 */
-	static @infix @inline String format(String format, Object... args)
+	static
+	@infix
+	@inline
+	String format(String format, Object... args)
 	{
 		return String.format(format, args);
 	}
 	
-	static @infix String[] words(String string)
+	static
+	@infix
+	String[] words(String string)
 	{
 		List<String> words = wordList(string);
 		String[] array = new String[words.size()];
@@ -92,12 +103,15 @@ public interface StringUtils
 	 * is described as a sequence of letter characters, which are themselves
 	 * described in terms of {@link CharUtils#isLetter(char)}. Every other
 	 * non-etter character is simply ommitted from the list of words.
-	 * 
+	 *
 	 * @param string
-	 *            the string to split
+	 * 		the string to split
+	 *
 	 * @return a list of words in the given string
 	 */
-	static @infix List<String> wordList(String string)
+	static
+	@infix
+	List<String> wordList(String string)
 	{
 		List<String> words = new ArrayList();
 		StringBuilder buffer = new StringBuilder(10);
@@ -131,12 +145,15 @@ public interface StringUtils
 	 * the algorithm adds the line to a list collecting the lines and proceeds
 	 * with a new, empty line. This is done until all words have been processed,
 	 * at which point the generated list of lines will be returned.
-	 * 
+	 *
 	 * @param string
 	 * @param maxLength
+	 *
 	 * @return
 	 */
-	static @infix List<String> trimLineLength(String string, int maxLength)
+	static
+	@infix
+	List<String> trimLineLength(String string, int maxLength)
 	{
 		String[] words = string.split("\\s");
 		StringBuilder buffer = new StringBuilder(10);
@@ -163,12 +180,15 @@ public interface StringUtils
 	 * Splits the given {@code string} into an array of lines separated by
 	 * newline ({@code \n}) characters using it's {@link String#split(String)
 	 * split(String)} method
-	 * 
+	 *
 	 * @param string
-	 *            the string to split
+	 * 		the string to split
+	 *
 	 * @return an array of lines
 	 */
-	static @infix String[] lines(String string)
+	static
+	@infix
+	String[] lines(String string)
 	{
 		if (string == null || string.isEmpty())
 		{
@@ -181,9 +201,10 @@ public interface StringUtils
 	 * Splits the given {@code string} into a {@link List} of lines separated by
 	 * newline ({@code \n}) characters using it's {@link String#split(String)
 	 * split(String)} method
-	 * 
+	 *
 	 * @param string
-	 *            the string to split
+	 * 		the string to split
+	 *
 	 * @return a List of lines
 	 */
 	static List<String> lineList(String string)
@@ -198,14 +219,17 @@ public interface StringUtils
 	/**
 	 * Returns the Levenshtein distance between the given {@link String Strings}
 	 * {@code s1} and {@code s2}.
-	 * 
+	 *
 	 * @param s1
-	 *            the first string
+	 * 		the first string
 	 * @param s2
-	 *            the second string
+	 * 		the second string
+	 *
 	 * @return the Levenshtein distance between the two strings
 	 */
-	static @infix int distanceTo(String s1, String s2)
+	static
+	@infix
+	int distanceTo(String s1, String s2)
 	{
 		if (s1.equals(s2))
 		{
@@ -237,7 +261,9 @@ public interface StringUtils
 			a2[0] = i + 1;
 			for (j = 0; j < len2; j++)
 			{
-				a2[j + 1] = s1.charAt(i) == s2.charAt(j) ? MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j]) : MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j] + 1);
+				a2[j + 1] = s1.charAt(i) == s2.charAt(j) ?
+						MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j]) :
+						MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j] + 1);
 			}
 			System.arraycopy(a2, 0, a1, 0, alen);
 		}
@@ -249,12 +275,15 @@ public interface StringUtils
 	 * is done by replacing all whitespace characters in the string with
 	 * underscores ({@code _}) and converting all other characters to
 	 * lower-case.
-	 * 
+	 *
 	 * @param string
-	 *            the string to convert
+	 * 		the string to convert
+	 *
 	 * @return the string converted to a valid identifier
 	 */
-	static @infix String toIdentifier(String string)
+	static
+	@infix
+	String toIdentifier(String string)
 	{
 		int len = string.length();
 		StringBuilder result = new StringBuilder(len);
@@ -285,12 +314,15 @@ public interface StringUtils
 	 * Example:<br>
 	 * {@code getAcronym("Hello World")} returns "HW";
 	 * {@code getAcronym("Half-Life 3")} returns "HL3"
-	 * 
+	 *
 	 * @param string
-	 *            the string
+	 * 		the string
+	 *
 	 * @return the acronym of the string
 	 */
-	static @infix String toAcronym(String string)
+	static
+	@infix
+	String toAcronym(String string)
 	{
 		if (string == null)
 		{
@@ -336,13 +368,16 @@ public interface StringUtils
 	 * <p>
 	 * Vowels are defined in terms of {@link CharUtils#isVowel(char)}<br>
 	 * Consonants are defined in terms of {@link CharUtils#isConsonant(char)}
-	 * 
+	 *
 	 * @param string
-	 *            the string to remove the vowels from
+	 * 		the string to remove the vowels from
+	 *
 	 * @return a readable acronym-like version of the string with most vowels
-	 *         removed
+	 * removed
 	 */
-	static @infix String removeVowels(String string)
+	static
+	@infix
+	String removeVowels(String string)
 	{
 		if (string == null)
 		{
@@ -375,7 +410,9 @@ public interface StringUtils
 		return builder.append(next).toString();
 	}
 	
-	static @infix String toTitleCase(String s)
+	static
+	@infix
+	String toTitleCase(String s)
 	{
 		if (s == null)
 		{
@@ -413,7 +450,9 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	static @infix String toLowerCamelCase(String s)
+	static
+	@infix
+	String toLowerCamelCase(String s)
 	{
 		if (s == null)
 		{
@@ -451,7 +490,9 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	static @infix String toUpperCamelCase(String s)
+	static
+	@infix
+	String toUpperCamelCase(String s)
 	{
 		if (s == null)
 		{
@@ -489,7 +530,9 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	static @infix String toInvertedCase(String s)
+	static
+	@infix
+	String toInvertedCase(String s)
 	{
 		if (s == null)
 		{
@@ -516,14 +559,17 @@ public interface StringUtils
 	/**
 	 * Counts the number of times the given {@code char c} appears in the given
 	 * {@link String} {@code text}.
-	 * 
+	 *
 	 * @param string
-	 *            the input string
+	 * 		the input string
 	 * @param c
-	 *            the character to search for
+	 * 		the character to search for
+	 *
 	 * @return the number of times the character appears in the string
 	 */
-	static @infix int count(String string, char c)
+	static
+	@infix
+	int count(String string, char c)
 	{
 		int count = 0;
 		int len = string.length();
@@ -540,14 +586,17 @@ public interface StringUtils
 	/**
 	 * Checks if the given {@link String} {@code text} contains the given
 	 * {@code char c}.
-	 * 
+	 *
 	 * @param string
-	 *            the string
+	 * 		the string
 	 * @param c
-	 *            the character
+	 * 		the character
+	 *
 	 * @return true, if the string contains the character
 	 */
-	static @infix boolean contains(String string, char c)
+	static
+	@infix
+	boolean contains(String string, char c)
 	{
 		return string.indexOf(c) != -1;
 	}
@@ -555,14 +604,16 @@ public interface StringUtils
 	/**
 	 * Checks if the given {@link String} {@code text} contains the regular
 	 * expression given by the {@link String} {@code regex}.
-	 * 
+	 *
+	 * @param string
+	 * 		the string
+	 * @param regex
+	 * 		the regular expression
+	 *
+	 * @return true, if the string contains the regular expression
+	 *
 	 * @see Pattern
 	 * @see Matcher#find()
-	 * @param string
-	 *            the string
-	 * @param regex
-	 *            the regular expression
-	 * @return true, if the string contains the regular expression
 	 */
 	static boolean containsRegex(String string, String regex)
 	{
@@ -600,16 +651,19 @@ public interface StringUtils
 	
 	/**
 	 * Returns a new random name.
-	 * 
+	 *
 	 * @param random
-	 *            the random
+	 * 		the random
 	 * @param minLength
-	 *            the min length
+	 * 		the min length
 	 * @param maxLength
-	 *            the max length
+	 * 		the max length
+	 *
 	 * @return the next random name
 	 */
-	static @infix String nextNoun(java.util.Random random, int minLength, int maxLength)
+	static
+	@infix
+	String nextNoun(java.util.Random random, int minLength, int maxLength)
 	{
 		int len = RandomUtils.nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);

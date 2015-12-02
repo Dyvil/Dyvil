@@ -10,8 +10,8 @@ import dyvil.tools.parsing.Name;
 
 public class ExternalHeader extends DyvilHeader
 {
-	private boolean	importsResolved;
-	private boolean	staticImportsResolved;
+	private boolean importsResolved;
+	private boolean staticImportsResolved;
 	
 	public ExternalHeader()
 	{

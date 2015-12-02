@@ -10,9 +10,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class Node implements NodeElement, NodeVisitor
 {
-	protected Name				name;
-	protected List<Node>		nodes		= new ArrayList<Node>();
-	protected List<NodeElement>	elements	= new ArrayList<NodeElement>();
+	protected Name name;
+	protected List<Node>        nodes    = new ArrayList<Node>();
+	protected List<NodeElement> elements = new ArrayList<NodeElement>();
 	
 	protected ICodePosition position;
 	

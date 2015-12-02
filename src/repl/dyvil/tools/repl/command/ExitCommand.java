@@ -37,5 +37,4 @@ public class ExitCommand implements ICommand
 		System.exit(code);
 		return;
 	}
-	
 }

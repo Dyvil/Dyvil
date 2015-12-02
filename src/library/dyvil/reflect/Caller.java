@@ -4,7 +4,7 @@ public class Caller
 {
 	/**
 	 * Returns the caller {@link Class}.
-	 * 
+	 *
 	 * @return the called class.
 	 */
 	public static Class getCallerClass()
@@ -22,7 +22,7 @@ public class Caller
 	
 	/**
 	 * Returns the name of the caller class.
-	 * 
+	 *
 	 * @return the name of the caller class.
 	 */
 	public static String getCallerClassName()
@@ -32,7 +32,7 @@ public class Caller
 	
 	/**
 	 * Returns the caller {@link StackTraceElement}.
-	 * 
+	 *
 	 * @return the caller stack trace element
 	 */
 	public static StackTraceElement getCaller()

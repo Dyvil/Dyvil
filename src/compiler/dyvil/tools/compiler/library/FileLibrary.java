@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.library;
 
-import java.io.*;
-
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.util.None;
 import dyvil.util.Option;
+
+import java.io.*;
 
 public final class FileLibrary extends Library
 {

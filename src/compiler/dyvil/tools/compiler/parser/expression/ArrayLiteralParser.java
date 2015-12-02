@@ -11,18 +11,18 @@ import dyvil.tools.parsing.token.IToken;
 
 public class ArrayLiteralParser extends Parser implements IValueConsumer
 {
-	protected static final int	OPEN_BRACKET	= 1;
-	protected static final int	SEPARATOR		= 2;
-	protected static final int	COLON			= 4;
+	protected static final int OPEN_BRACKET = 1;
+	protected static final int SEPARATOR    = 2;
+	protected static final int COLON        = 4;
 	
 	protected IValueConsumer consumer;
 	
 	private IToken startPosition;
 	
-	private IValue[]	values	= new IValue[3];
-	private int			valueCount;
-	private IValue[]	values2;
-	private boolean		map;
+	private IValue[] values = new IValue[3];
+	private int      valueCount;
+	private IValue[] values2;
+	private boolean  map;
 	
 	public ArrayLiteralParser(IValueConsumer consumer)
 	{

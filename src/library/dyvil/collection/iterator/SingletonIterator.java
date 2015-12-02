@@ -1,17 +1,17 @@
 package dyvil.collection.iterator;
 
+import dyvil.lang.literal.TupleConvertible;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import dyvil.lang.literal.TupleConvertible;
-
 @TupleConvertible
 public class SingletonIterator<E> implements Iterator<E>
 {
-	private boolean	returned;
-	private final E	element;
+	private       boolean returned;
+	private final E       element;
 	
 	public static <E> SingletonIterator<E> apply(E element)
 	{

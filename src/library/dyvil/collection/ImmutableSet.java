@@ -1,19 +1,18 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
+import dyvil.collection.immutable.ArraySet;
+import dyvil.collection.immutable.EmptySet;
+import dyvil.collection.immutable.SingletonSet;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.util.ImmutableException;
+
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.annotation._internal.Covariant;
-import dyvil.collection.immutable.ArraySet;
-import dyvil.collection.immutable.EmptySet;
-import dyvil.collection.immutable.SingletonSet;
-import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible

@@ -4,8 +4,8 @@ import dyvil.lang.ref.ByteRef;
 
 public class ByteArrayRef implements ByteRef
 {
-	protected final byte[]	array;
-	protected final int		index;
+	protected final byte[] array;
+	protected final int    index;
 	
 	public ByteArrayRef(byte[] array, int index)
 	{

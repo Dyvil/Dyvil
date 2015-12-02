@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * A class marked as a <b>Utility</b> class provides utility methods for any or
  * a given type. A utility should either be an {@code interface} or a {final
  * class} without a public constructor.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -19,8 +19,8 @@ public @interface Utility
 {
 	/**
 	 * The classes of objects on which this {@linkplain Utility} class operates.
-	 * 
+	 *
 	 * @return the classes
 	 */
-	Class[]value() default {};
+	Class[] value() default {};
 }

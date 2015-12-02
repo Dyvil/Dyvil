@@ -63,7 +63,8 @@ public interface ICall extends IValue
 		IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)
 		{
-			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN, EmptyModifiers.INSTANCE);
+			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
+			                                    EmptyModifiers.INSTANCE);
 		}
 
 		int index = 0;

@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.backend;
 
-import java.io.*;
-
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+
+import java.io.*;
 
 public class ObjectFormat
 {
@@ -19,7 +19,8 @@ public class ObjectFormat
 			return;
 		}
 		
-		try (ObjectWriter writer = new ObjectWriter(); OutputStream fo = new BufferedOutputStream(new FileOutputStream(file)))
+		try (ObjectWriter writer = new ObjectWriter();
+		     OutputStream fo = new BufferedOutputStream(new FileOutputStream(file)))
 		{
 			writer.writeShort(FILE_VERSION);
 			header.write(writer);

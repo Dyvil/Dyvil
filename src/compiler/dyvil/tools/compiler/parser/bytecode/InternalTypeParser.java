@@ -10,8 +10,8 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class InternalTypeParser extends Parser
 {
-	private static final int	NAME	= 1;
-	private static final int	SLASH	= 2;
+	private static final int NAME  = 1;
+	private static final int SLASH = 2;
 	
 	protected IInternalTyped typed;
 	
@@ -73,7 +73,8 @@ public final class InternalTypeParser extends Parser
 	
 	private static boolean isPrimitiveName(Name name)
 	{
-		return name == Names._void || name == Names._boolean || name == Names._byte || name == Names._short || name == Names._char || name == Names._int
-				|| name == Names._long || name == Names._float || name == Names._double;
+		return name == Names._void || name == Names._boolean || name == Names._byte || name == Names._short
+				|| name == Names._char || name == Names._int || name == Names._long || name == Names._float
+				|| name == Names._double;
 	}
 }

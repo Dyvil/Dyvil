@@ -6,12 +6,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LongToken implements IToken
 {
-	private IToken	prev;
-	private IToken	next;
+	private IToken prev;
+	private IToken next;
 	
-	private final int	lineNumber;
-	private final int	start;
-	private final int	end;
+	private final int lineNumber;
+	private final int start;
+	private final int end;
 	
 	private long value;
 	

@@ -1,21 +1,20 @@
 package dyvil.collection.mutable;
 
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractArrayMap;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
+
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
-public class ArrayMap<K, V> extends AbstractArrayMap<K, V>implements MutableMap<K, V>
+public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 5171722024919718041L;
 	

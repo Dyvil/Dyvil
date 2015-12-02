@@ -5,8 +5,8 @@ import java.util.NoSuchElementException;
 
 public class AppendIterator<E> implements Iterator<E>
 {
-	private final Iterator<? extends E>	head;
-	private final E						tail;
+	private final Iterator<? extends E> head;
+	private final E                     tail;
 	
 	private boolean returned;
 	

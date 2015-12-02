@@ -8,8 +8,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class NodeAccess implements NodeVisitor, NodeElement
 {
-	protected Name			name;
-	protected NodeElement	element;
+	protected Name        name;
+	protected NodeElement element;
 	
 	private ICodePosition position;
 	

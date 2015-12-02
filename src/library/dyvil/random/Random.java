@@ -3,8 +3,8 @@ package dyvil.random;
 @FunctionalInterface
 public interface Random
 {
-	float	FLOAT_UNIT	= 1F / (1 << 24);
-	double	DOUBLE_UNIT	= 1D / (1L << 53);
+	float  FLOAT_UNIT  = 1F / (1 << 24);
+	double DOUBLE_UNIT = 1D / (1L << 53);
 	
 	static Random apply()
 	{

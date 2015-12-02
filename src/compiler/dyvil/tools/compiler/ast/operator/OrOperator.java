@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class OrOperator extends AbstractValue
 {
-	public IValue	left;
-	public IValue	right;
+	public IValue left;
+	public IValue right;
 	
 	public OrOperator(IValue left, IValue right)
 	{
@@ -119,7 +119,8 @@ public final class OrOperator extends AbstractValue
 	
 	private boolean bothFalse()
 	{
-		return this.left.valueTag() == BOOLEAN && !this.left.booleanValue() && this.right.valueTag() == BOOLEAN && !this.right.booleanValue();
+		return this.left.valueTag() == BOOLEAN && !this.left.booleanValue() && this.right.valueTag() == BOOLEAN
+				&& !this.right.booleanValue();
 	}
 	
 	@Override

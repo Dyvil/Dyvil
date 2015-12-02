@@ -5,12 +5,12 @@ import java.util.function.BooleanSupplier;
 
 public final class Console
 {
-	private static BufferedReader	reader	= new BufferedReader(new InputStreamReader(System.in));
-	private static PrintStream		out		= System.out;
+	private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+	private static PrintStream    out    = System.out;
 	
 	private Console()
 	{
-	
+
 	}
 	
 	public static void setOut(PrintStream out)

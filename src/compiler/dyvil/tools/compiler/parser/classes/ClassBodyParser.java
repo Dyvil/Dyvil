@@ -43,8 +43,8 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	protected IClass             theClass;
 	protected IClassBodyConsumer consumer;
 	
-	private IType          type;
-	private ModifierSet    modifiers = new ModifierList();
+	private IType type;
+	private ModifierSet modifiers = new ModifierList();
 	private AnnotationList annotations;
 	
 	private IMember member;

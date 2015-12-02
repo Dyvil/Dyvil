@@ -1,9 +1,8 @@
 package dyvil.reflect.types;
 
+import dyvil.array.ObjectArray;
 import dyvil.lang.Type;
 import dyvil.lang.literal.TypeConvertible;
-
-import dyvil.array.ObjectArray;
 
 @TypeConvertible
 public class ArrayType<T> implements Type<T[]>

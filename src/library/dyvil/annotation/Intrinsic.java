@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
  * require a Label as parameter can be part of the {@link #value() opcode array}
  * , and the <i>Dyvil Compiler</i> will automatically insert the Labels after
  * the opcode.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface Intrinsic
 {
-	int[]value();
+	int[] value();
 	
 	String[] strings() default {};
 }

@@ -26,11 +26,11 @@ public class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
 	
-	private static DyvilREPL		instance;
-	private static BufferedReader	reader;
+	private static DyvilREPL      instance;
+	private static BufferedReader reader;
 	
-	protected REPLContext	context	= new REPLContext(this);
-	protected REPLParser	parser	= new REPLParser(this.context);
+	protected REPLContext context = new REPLContext(this);
+	protected REPLParser  parser  = new REPLParser(this.context);
 	
 	protected File dumpDir;
 	

@@ -2,10 +2,9 @@ package dyvil.runtime;
 
 import dyvil.lang.Boolean;
 import dyvil.lang.Byte;
-import dyvil.lang.Char;
+import dyvil.lang.*;
 import dyvil.lang.Double;
 import dyvil.lang.Float;
-import dyvil.lang.Int;
 import dyvil.lang.Long;
 import dyvil.lang.Short;
 import dyvil.lang.Void;
@@ -24,13 +23,13 @@ public enum Wrapper
 	VOID('V', void.class, Void.class, 1 << 6);
 	
 	private static final int SIZE_MASK = (1 << 4) - 1;
-	private static final int UNSIGNED = 1 << 4;
-	private static final int FLOATING = 1 << 5;
-	private static final int OTHER = 1 << 6;
+	private static final int UNSIGNED  = 1 << 4;
+	private static final int FLOATING  = 1 << 5;
+	private static final int OTHER     = 1 << 6;
 	
-	private char basicTypeChar;
-	private Class primitiveClass;
-	private Class wrapperClass;
+	private char   basicTypeChar;
+	private Class  primitiveClass;
+	private Class  wrapperClass;
 	private String primitiveSimpleName;
 	private String wrapperSimpleName;
 	
@@ -38,8 +37,8 @@ public enum Wrapper
 	private byte flags;
 	
 	private static final Wrapper[] FROM_PRIMITIVE = new Wrapper[16];
-	private static final Wrapper[] FROM_WRAPPER = new Wrapper[16];
-	private static final Wrapper[] FROM_CHAR = new Wrapper[16];
+	private static final Wrapper[] FROM_WRAPPER   = new Wrapper[16];
+	private static final Wrapper[] FROM_CHAR      = new Wrapper[16];
 	
 	static
 	{

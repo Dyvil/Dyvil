@@ -13,9 +13,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class Builder implements Value, BuilderVisitor
 {
-	private Name			name;
-	private List<Parameter>	parameters	= new ArrayList();
-	private Node			node;
+	private Name name;
+	private List<Parameter> parameters = new ArrayList();
+	private Node node;
 	
 	public Builder(Name name)
 	{

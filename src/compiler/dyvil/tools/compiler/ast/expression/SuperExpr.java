@@ -16,8 +16,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class SuperExpr implements IValue
 {
-	protected ICodePosition	position;
-	protected IType			type	= Types.UNKNOWN;
+	protected ICodePosition position;
+	protected IType type = Types.UNKNOWN;
 	
 	public SuperExpr(ICodePosition position)
 	{

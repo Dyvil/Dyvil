@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.phase;
 
-import java.util.function.Consumer;
-
 import dyvil.collection.Collection;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
+import java.util.function.Consumer;
+
 public class CompilerPhase implements ICompilerPhase
 {
-	private int										id;
-	private String									name;
-	private Consumer<Collection<ICompilationUnit>>	apply;
+	private int                                    id;
+	private String                                 name;
+	private Consumer<Collection<ICompilationUnit>> apply;
 	
 	public CompilerPhase(int id, String name, Consumer<Collection<ICompilationUnit>> apply)
 	{

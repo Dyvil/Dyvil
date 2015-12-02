@@ -1,36 +1,36 @@
 package dyvil.collection;
 
+import dyvil.tuple.Tuple3;
+
 import java.io.Serializable;
 import java.util.Objects;
-
-import dyvil.tuple.Tuple3;
 
 public interface Cell<R, C, V> extends Serializable
 {
 	/**
 	 * Returns the row stored by this cell
-	 * 
+	 *
 	 * @return the row
 	 */
 	R getRow();
 	
 	/**
 	 * Returns the column stored by this cell
-	 * 
+	 *
 	 * @return the column
 	 */
 	C getColumn();
 	
 	/**
 	 * Returns the value stored by this cell
-	 * 
+	 *
 	 * @return the value
 	 */
 	V getValue();
 	
 	/**
 	 * Converts this entry to a {@link Tuple3 Tuple}.
-	 * 
+	 *
 	 * @return a tuple with this cell's row, column and value
 	 */
 	default Tuple3<R, C, V> toTuple()

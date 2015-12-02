@@ -11,9 +11,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class WhileStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	CONDITION		= 1;
-	public static final int	CONDITION_END	= 2;
-	public static final int	BLOCK			= 4;
+	public static final int CONDITION     = 1;
+	public static final int CONDITION_END = 2;
+	public static final int BLOCK         = 4;
 	
 	protected WhileStatement statement;
 	

@@ -217,10 +217,12 @@ public final class NilExpr implements IValue
 			this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.getLineNumber());
 		}
 
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID) {
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
+		{
 			writer.writeInsn(Opcodes.ARETURN);
 		}
-		else if (type != null) {
+		else if (type != null)
+		{
 			this.requiredType.writeCast(writer, type, this.getLineNumber());
 		}
 	}

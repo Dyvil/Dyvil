@@ -1,25 +1,24 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.mutating;
+import dyvil.collection.immutable.ArrayMap;
+import dyvil.collection.immutable.EmptyMap;
+import dyvil.collection.immutable.SingletonMap;
+import dyvil.collection.immutable.TupleMap;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.tuple.Tuple2;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
+import dyvil.util.Option;
+
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.MapConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.annotation.mutating;
-import dyvil.annotation._internal.Covariant;
-import dyvil.collection.immutable.ArrayMap;
-import dyvil.collection.immutable.EmptyMap;
-import dyvil.collection.immutable.SingletonMap;
-import dyvil.collection.immutable.TupleMap;
-import dyvil.tuple.Tuple2;
-import dyvil.util.Immutable;
-import dyvil.util.ImmutableException;
-import dyvil.util.Option;
 
 @NilConvertible
 @ArrayConvertible

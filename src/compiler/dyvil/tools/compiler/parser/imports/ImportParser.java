@@ -17,15 +17,15 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ImportParser extends Parser
 {
-	public static final Name	annotation	= Name.getQualified("annotation");
-	public static final Name	type		= Name.getQualified("type");
+	public static final Name annotation = Name.getQualified("annotation");
+	public static final Name type       = Name.getQualified("type");
 	
-	private static final int	IMPORT		= 1;
-	private static final int	DOT_ALIAS	= 2;
-	private static final int	MULTIIMPORT	= 4;
+	private static final int IMPORT      = 1;
+	private static final int DOT_ALIAS   = 2;
+	private static final int MULTIIMPORT = 4;
 	
-	protected IImportConsumer	consumer;
-	protected IImport			theImport;
+	protected IImportConsumer consumer;
+	protected IImport         theImport;
 	
 	public ImportParser(IImportConsumer consumer)
 	{

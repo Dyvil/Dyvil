@@ -12,8 +12,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class AnonymousClass extends CodeClass
 {
-	protected CaptureField[]	capturedFields;
-	protected int				capturedFieldCount;
+	protected CaptureField[] capturedFields;
+	protected int            capturedFieldCount;
 	
 	protected FieldThis thisField;
 	

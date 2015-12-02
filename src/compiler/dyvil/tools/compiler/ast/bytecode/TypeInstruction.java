@@ -7,8 +7,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class TypeInstruction implements IInstruction, IInternalTyped
 {
-	private int		opcode;
-	private String	type;
+	private int    opcode;
+	private String type;
 	
 	public TypeInstruction(int opcode)
 	{

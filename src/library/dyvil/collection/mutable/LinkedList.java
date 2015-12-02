@@ -1,20 +1,18 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.Collection;
+import dyvil.collection.Deque;
+import dyvil.collection.*;
+import dyvil.collection.List;
+import dyvil.collection.Set;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.collection.Collection;
-import dyvil.collection.Deque;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.List;
-import dyvil.collection.MutableList;
-import dyvil.collection.Set;
 
 @NilConvertible
 @ArrayConvertible
@@ -24,9 +22,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	
 	protected static class Node<E>
 	{
-		E		item;
-		Node<E>	next;
-		Node<E>	prev;
+		E       item;
+		Node<E> next;
+		Node<E> prev;
 		
 		Node(Node<E> prev, E element, Node<E> next)
 		{
@@ -36,9 +34,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 	}
 	
-	protected transient int		size;
-	protected transient Node<E>	first;
-	protected transient Node<E>	last;
+	protected transient int     size;
+	protected transient Node<E> first;
+	protected transient Node<E> last;
 	
 	public static <E> LinkedList<E> apply()
 	{

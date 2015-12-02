@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2011 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,106 +31,107 @@ package dyvil.tools.asm;
 
 public class ClassWriter implements ClassVisitor
 {
-	public static final int	COMPUTE_MAXS			= 1;
-	public static final int	COMPUTE_FRAMES			= 2;
-	static final int		ACC_SYNTHETIC_ATTRIBUTE	= 0x40000;
-	static final int		TO_ACC_SYNTHETIC		= ACC_SYNTHETIC_ATTRIBUTE / Opcodes.ACC_SYNTHETIC;
-	static final int		NOARG_INSN				= 0;
-	static final int		SBYTE_INSN				= 1;
-	static final int		SHORT_INSN				= 2;
-	static final int		VAR_INSN				= 3;
-	static final int		IMPLVAR_INSN			= 4;
-	static final int		TYPE_INSN				= 5;
-	static final int		FIELDORMETH_INSN		= 6;
-	static final int		ITFMETH_INSN			= 7;
-	static final int		INDYMETH_INSN			= 8;
-	static final int		LABEL_INSN				= 9;
-	static final int		LABELW_INSN				= 10;
-	static final int		LDC_INSN				= 11;
-	static final int		LDCW_INSN				= 12;
-	static final int		IINC_INSN				= 13;
-	static final int		TABL_INSN				= 14;
-	static final int		LOOK_INSN				= 15;
-	static final int		MANA_INSN				= 16;
-	static final int		WIDE_INSN				= 17;
+	public static final int COMPUTE_MAXS            = 1;
+	public static final int COMPUTE_FRAMES          = 2;
+	static final        int ACC_SYNTHETIC_ATTRIBUTE = 0x40000;
+	static final        int TO_ACC_SYNTHETIC        = ACC_SYNTHETIC_ATTRIBUTE / Opcodes.ACC_SYNTHETIC;
+	static final        int NOARG_INSN              = 0;
+	static final        int SBYTE_INSN              = 1;
+	static final        int SHORT_INSN              = 2;
+	static final        int VAR_INSN                = 3;
+	static final        int IMPLVAR_INSN            = 4;
+	static final        int TYPE_INSN               = 5;
+	static final        int FIELDORMETH_INSN        = 6;
+	static final        int ITFMETH_INSN            = 7;
+	static final        int INDYMETH_INSN           = 8;
+	static final        int LABEL_INSN              = 9;
+	static final        int LABELW_INSN             = 10;
+	static final        int LDC_INSN                = 11;
+	static final        int LDCW_INSN               = 12;
+	static final        int IINC_INSN               = 13;
+	static final        int TABL_INSN               = 14;
+	static final        int LOOK_INSN               = 15;
+	static final        int MANA_INSN               = 16;
+	static final        int WIDE_INSN               = 17;
 	
-	static final byte[]	TYPE;
-	static final int	CLASS		= 7;
-	static final int	FIELD		= 9;
-	static final int	METH		= 10;
-	static final int	IMETH		= 11;
-	static final int	STR			= 8;
-	static final int	INT			= 3;
-	static final int	FLOAT		= 4;
-	static final int	LONG		= 5;
-	static final int	DOUBLE		= 6;
-	static final int	NAME_TYPE	= 12;
-	static final int	UTF8		= 1;
-	static final int	MTYPE		= 16;
-	static final int	HANDLE		= 15;
-	static final int	INDY		= 18;
+	static final byte[] TYPE;
+	static final int CLASS     = 7;
+	static final int FIELD     = 9;
+	static final int METH      = 10;
+	static final int IMETH     = 11;
+	static final int STR       = 8;
+	static final int INT       = 3;
+	static final int FLOAT     = 4;
+	static final int LONG      = 5;
+	static final int DOUBLE    = 6;
+	static final int NAME_TYPE = 12;
+	static final int UTF8      = 1;
+	static final int MTYPE     = 16;
+	static final int HANDLE    = 15;
+	static final int INDY      = 18;
 	
-	static final int	HANDLE_BASE	= 20;
-	static final int	TYPE_NORMAL	= 30;
-	static final int	TYPE_UNINIT	= 31;
-	static final int	TYPE_MERGED	= 32;
-	static final int	BSM			= 33;
+	static final int HANDLE_BASE = 20;
+	static final int TYPE_NORMAL = 30;
+	static final int TYPE_UNINIT = 31;
+	static final int TYPE_MERGED = 32;
+	static final int BSM         = 33;
 	
-	ClassReader			cr;
-	int					version;
-	int					index;
-	final ByteVector	pool;
-	Item[]				items;
-	int					threshold;
+	ClassReader cr;
+	int         version;
+	int         index;
+	final ByteVector pool;
+	Item[] items;
+	int    threshold;
 	
-	final Item	key;
-	final Item	key2;
-	final Item	key3;
-	final Item	key4;
+	final Item key;
+	final Item key2;
+	final Item key3;
+	final Item key4;
 	
-	Item[]			typeTable;
-	private short	typeCount;
+	Item[] typeTable;
+	private short typeCount;
 	
-	private int					access;
-	private int					name;
-	String						thisName;
-	private int					signature;
-	private int					superName;
-	private int					interfaceCount;
-	private int[]				interfaces;
-	private int					sourceFile;
-	private ByteVector			sourceDebug;
-	private int					enclosingMethodOwner;
-	private int					enclosingMethod;
-	private AnnotationWriter	anns;
-	private AnnotationWriter	ianns;
-	private AnnotationWriter	tanns;
-	private AnnotationWriter	itanns;
-	private Attribute			attrs;
-	private int					innerClassesCount;
-	private ByteVector			innerClasses;
-	int							bootstrapMethodsCount;
-	ByteVector					bootstrapMethods;
-	FieldWriter					firstField;
-	FieldWriter					lastField;
-	MethodWriter				firstMethod;
-	MethodWriter				lastMethod;
-	private boolean				computeMaxs;
-	private boolean				computeFrames;
-	boolean						invalidFrames;
+	private int access;
+	private int name;
+	String thisName;
+	private int              signature;
+	private int              superName;
+	private int              interfaceCount;
+	private int[]            interfaces;
+	private int              sourceFile;
+	private ByteVector       sourceDebug;
+	private int              enclosingMethodOwner;
+	private int              enclosingMethod;
+	private AnnotationWriter anns;
+	private AnnotationWriter ianns;
+	private AnnotationWriter tanns;
+	private AnnotationWriter itanns;
+	private Attribute        attrs;
+	private int              innerClassesCount;
+	private ByteVector       innerClasses;
+	int          bootstrapMethodsCount;
+	ByteVector   bootstrapMethods;
+	FieldWriter  firstField;
+	FieldWriter  lastField;
+	MethodWriter firstMethod;
+	MethodWriter lastMethod;
+	private boolean computeMaxs;
+	private boolean computeFrames;
+	boolean invalidFrames;
 	
 	static
 	{
 		int i;
 		byte[] b = new byte[220];
-		String s = "AAAAAAAAAAAAAAAABCLMMDDDDDEEEEEEEEEEEEEEEEEEEEAAAAAAAADD" + "DDDEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-				+ "AAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAJJJJJJJJJJJJJJJJDOPAA" + "AAAAGGGGGGGHIFBFAAFFAARQJJKKJJJJJJJJJJJJJJJJJJ";
+		String s = "AAAAAAAAAAAAAAAABCLMMDDDDDEEEEEEEEEEEEEEEEEEEEAAAAAAAADD"
+				+ "DDDEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+				+ "AAAAAAAAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAJJJJJJJJJJJJJJJJDOPAA"
+				+ "AAAAGGGGGGGHIFBFAAFFAARQJJKKJJJJJJJJJJJJJJJJJJ";
 		for (i = 0; i < b.length; ++i)
 		{
 			b[i] = (byte) (s.charAt(i) - 'A');
 		}
 		TYPE = b;
-		
 	}
 	
 	public ClassWriter(final int flags)
@@ -406,7 +407,8 @@ public class ClassWriter implements ClassVisitor
 		ByteVector out = new ByteVector(size);
 		out.putInt(0xCAFEBABE).putInt(this.version);
 		out.putShort(this.index).putByteArray(this.pool.data, 0, this.pool.length);
-		int mask = Opcodes.ACC_DEPRECATED | ACC_SYNTHETIC_ATTRIBUTE | (this.access & ACC_SYNTHETIC_ATTRIBUTE) / TO_ACC_SYNTHETIC;
+		int mask = Opcodes.ACC_DEPRECATED | ACC_SYNTHETIC_ATTRIBUTE
+				| (this.access & ACC_SYNTHETIC_ATTRIBUTE) / TO_ACC_SYNTHETIC;
 		out.putShort(this.access & ~mask).putShort(this.name).putShort(this.superName);
 		out.putShort(this.interfaceCount);
 		for (int i = 0; i < this.interfaceCount; ++i)

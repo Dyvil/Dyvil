@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.statement.exception;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -115,7 +115,8 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 		this.value.check(markers, context);
 		
 		IType type = this.value.getType();
-		if (Types.THROWABLE.isSuperTypeOf(type) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(this.value.getType()))
+		if (Types.THROWABLE.isSuperTypeOf(type) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context
+				.handleException(this.value.getType()))
 		{
 			markers.add(I18n.createMarker(this.value.getPosition(), "method.access.exception", type.toString()));
 		}

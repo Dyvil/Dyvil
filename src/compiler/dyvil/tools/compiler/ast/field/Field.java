@@ -31,8 +31,8 @@ import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
-	protected IClass	theClass;
-	protected IValue	value;
+	protected IClass theClass;
+	protected IValue value;
 	
 	public Field(IClass iclass)
 	{
@@ -150,7 +150,8 @@ public class Field extends Member implements IField
 				}
 				else if (receiver.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "field.access.static.type", this.name, this.theClass.getFullName()));
+					markers.add(I18n.createMarker(position, "field.access.static.type", this.name,
+					                              this.theClass.getFullName()));
 				}
 				receiver = null;
 			}
@@ -263,7 +264,8 @@ public class Field extends Member implements IField
 			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
+				Marker marker = I18n
+						.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
 				marker.addInfo(I18n.getString("field.type", this.type));
 				marker.addInfo(I18n.getString("value.type", this.value.getType()));
 				markers.add(marker);
@@ -315,8 +317,8 @@ public class Field extends Member implements IField
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.FIELD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(
-					I18n.createError(this.position, "modifiers.illegal", I18n.getString("field", this.name), ModifierUtil.methodModifiersToString(illegalModifiers)));
+			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("field", this.name),
+			                             ModifierUtil.methodModifiersToString(illegalModifiers)));
 		}
 	}
 	
@@ -354,9 +356,10 @@ public class Field extends Member implements IField
 			{
 				signature = "()" + signature;
 			}
-			MethodWriter mw = new MethodWriterImpl(writer,
-					writer.visitMethod(modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
-					
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & Modifiers.METHOD_MODIFIERS,
+			                                                                  this.name.qualified, desc, signature,
+			                                                                  null));
+
 			mw.visitAnnotation("Ldyvil/annotation/_internal/lazy;", false);
 			
 			mw.begin();
@@ -366,7 +369,8 @@ public class Field extends Member implements IField
 			return;
 		}
 		
-		FieldVisitor fv = writer.visitField(modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
+		FieldVisitor fv = writer.visitField(modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(),
+		                                    this.type.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.annotations, this.type);
 	}
@@ -377,7 +381,8 @@ public class Field extends Member implements IField
 		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.value.writeExpression(writer, this.type);
-			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified,
+			                      this.getDescription());
 		}
 	}
 	

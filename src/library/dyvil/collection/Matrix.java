@@ -1,5 +1,10 @@
 package dyvil.collection;
 
+import dyvil.lang.Int;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.tuple.Tuple2;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Iterator;
@@ -10,12 +15,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import dyvil.lang.Int;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.tuple.Tuple2;
 
 @NilConvertible
 @ArrayConvertible

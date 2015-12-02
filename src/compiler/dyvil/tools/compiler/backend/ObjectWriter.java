@@ -6,11 +6,11 @@ public class ObjectWriter extends OutputStream implements DataOutput
 {
 	protected static final int FILE_VERSION = 1;
 	
-	private int			constantPoolSize;
-	private String[]	constantPool	= new String[16];
+	private int constantPoolSize;
+	private String[] constantPool = new String[16];
 	
-	private ByteArrayOutputStream	bufferData;
-	private DataOutputStream		buffer;
+	private ByteArrayOutputStream bufferData;
+	private DataOutputStream      buffer;
 	
 	public ObjectWriter()
 	{

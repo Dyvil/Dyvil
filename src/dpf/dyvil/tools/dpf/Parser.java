@@ -1,7 +1,5 @@
 package dyvil.tools.dpf;
 
-import java.io.File;
-
 import dyvil.io.FileUtils;
 import dyvil.tools.dpf.ast.RootNode;
 import dyvil.tools.dpf.visitor.*;
@@ -13,11 +11,13 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;
 
+import java.io.File;
+
 public class Parser
 {
-	private String			code;
-	private TokenIterator	tokens;
-	private MarkerList		markers;
+	private String        code;
+	private TokenIterator tokens;
+	private MarkerList    markers;
 	
 	public Parser(MarkerList markers, String code)
 	{

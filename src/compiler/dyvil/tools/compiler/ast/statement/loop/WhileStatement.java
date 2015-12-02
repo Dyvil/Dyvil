@@ -5,10 +5,10 @@ import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -23,15 +23,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class WhileStatement extends AbstractValue implements IStatement, ILoop
 {
-	public static final Name	$whileStart	= Name.getQualified("$whileStart");
-	public static final Name	$whileEnd	= Name.getQualified("$whileEnd");
+	public static final Name $whileStart = Name.getQualified("$whileStart");
+	public static final Name $whileEnd   = Name.getQualified("$whileEnd");
 	
-	protected IValue	condition;
-	protected IValue	action;
+	protected IValue condition;
+	protected IValue action;
 	
 	// Metadata
-	private Label	startLabel;
-	private Label	endLabel;
+	private Label startLabel;
+	private Label endLabel;
 	
 	public WhileStatement(ICodePosition position)
 	{

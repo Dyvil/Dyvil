@@ -9,15 +9,15 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class MethodInstruction implements IInstruction
 {
-	private int		opcode;
-	private String	owner;
-	private String	name;
-	private String	desc;
-	private boolean	isInterface;
+	private int     opcode;
+	private String  owner;
+	private String  name;
+	private String  desc;
+	private boolean isInterface;
 	
-	private int			argsCount;
-	private String[]	args;
-	private String		returnDesc;
+	private int      argsCount;
+	private String[] args;
+	private String   returnDesc;
 	
 	public MethodInstruction(int opcode)
 	{

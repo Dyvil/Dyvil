@@ -7,9 +7,9 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 
 public class MapValue extends ValueCreator implements Value, MapVisitor
 {
-	private List<Value>	keys	= new ArrayList<Value>();
-	private List<Value>	values	= new ArrayList<Value>();
-	private boolean		valueMode;
+	private List<Value> keys   = new ArrayList<Value>();
+	private List<Value> values = new ArrayList<Value>();
+	private boolean valueMode;
 	
 	public MapValue()
 	{

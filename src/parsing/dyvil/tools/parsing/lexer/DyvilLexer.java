@@ -642,7 +642,9 @@ public final class DyvilLexer
 	
 	private IToken intToken(IToken prev, String s, int line, int start, int len, int radix, boolean isLong)
 	{
-		IToken token = isLong ? new LongToken(prev, line, start, start + len) : new IntToken(prev, line, start, start + len);
+		IToken token = isLong ?
+				new LongToken(prev, line, start, start + len) :
+				new IntToken(prev, line, start, start + len);
 		this.parseInteger(token, s, radix, isLong);
 		return token;
 	}

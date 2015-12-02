@@ -8,13 +8,13 @@ public final class SymbolToken implements IToken
 {
 	private Symbols symbols;
 	
-	private IToken	prev;
-	private IToken	next;
+	private IToken prev;
+	private IToken next;
 	
 	private final int type;
 	
-	private final int	lineNumber;
-	private final int	start;
+	private final int lineNumber;
+	private final int start;
 	
 	public SymbolToken(Symbols symbols, IToken prev, int type, int lineNumber, int start)
 	{

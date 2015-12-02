@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.method;
 
 public final class ConstructorMatchList
 {
-	private IConstructor[]	constructors	= new IConstructor[4];
-	private float[]			values			= new float[4];
-	private int				size;
+	private IConstructor[] constructors = new IConstructor[4];
+	private float[]        values       = new float[4];
+	private int size;
 	
 	public int size()
 	{

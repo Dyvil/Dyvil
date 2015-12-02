@@ -10,9 +10,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class FieldInstructionParser extends Parser implements IInternalTyped
 {
-	private static final int	OWNER	= 1;
-	private static final int	DOT		= 2;
-	private static final int	COLON	= 8;
+	private static final int OWNER = 1;
+	private static final int DOT   = 2;
+	private static final int COLON = 8;
 	
 	protected FieldInstruction fieldInstruction;
 	

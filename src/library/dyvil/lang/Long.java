@@ -1,14 +1,13 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.lang.literal.LongConvertible;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+import dyvil.lang.literal.LongConvertible;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -17,17 +16,17 @@ public class Long implements Integer, Serializable
 {
 	private static final long serialVersionUID = 4495480142241309185L;
 	
-	public static final long	min		= java.lang.Long.MIN_VALUE;
-	public static final long	max		= java.lang.Long.MAX_VALUE;
-	public static final byte	size	= java.lang.Long.SIZE;
+	public static final long min  = java.lang.Long.MIN_VALUE;
+	public static final long max  = java.lang.Long.MAX_VALUE;
+	public static final byte size = java.lang.Long.SIZE;
 	
 	protected long value;
 	
 	private static final class ConstantPool
 	{
-		protected static final int	TABLE_MIN	= -128;
-		protected static final int	TABLE_SIZE	= 256;
-		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		protected static final int TABLE_MIN  = -128;
+		protected static final int TABLE_SIZE = 256;
+		protected static final int TABLE_MAX  = TABLE_MIN + TABLE_SIZE;
 		
 		protected static final Long[] TABLE = new Long[TABLE_SIZE];
 		
@@ -49,7 +48,9 @@ public class Long implements Integer, Serializable
 		return new Long(v);
 	}
 	
-	public static @infix long unapply(Long v)
+	public static
+	@infix
+	long unapply(Long v)
 	{
 		return v == null ? 0L : v.value;
 	}
@@ -521,28 +522,43 @@ public class Long implements Integer, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Long", "toString", "(J)Ljava/lang/String;" })
-	public static @infix @inline String toString(long value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Long", "toString",
+			"(J)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(long value)
 	{
 		return java.lang.Long.toString(value);
 	}
 	
-	public static @infix @inline String toBinaryString(long value)
+	public static
+	@infix
+	@inline
+	String toBinaryString(long value)
 	{
 		return java.lang.Long.toBinaryString(value);
 	}
 	
-	public static @infix @inline String toHexString(long value)
+	public static
+	@infix
+	@inline
+	String toHexString(long value)
 	{
 		return java.lang.Long.toHexString(value);
 	}
 	
-	public static @infix @inline String toOctalString(long value)
+	public static
+	@infix
+	@inline
+	String toOctalString(long value)
 	{
 		return java.lang.Long.toOctalString(value);
 	}
 	
-	public static @infix String toString(long value, int radix)
+	public static
+	@infix
+	String toString(long value, int radix)
 	{
 		switch (radix)
 		{
@@ -564,8 +580,10 @@ public class Long implements Integer, Serializable
 		return java.lang.Long.toString(this.value);
 	}
 	
-	@Intrinsic({ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I })
-	public static @postfix int $hash$hash(long v)
+	@Intrinsic( { LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I })
+	public static
+	@postfix
+	int $hash$hash(long v)
 	{
 		return (int) (v >>> 32 ^ v);
 	}

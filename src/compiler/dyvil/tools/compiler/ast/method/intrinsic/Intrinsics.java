@@ -15,7 +15,8 @@ import dyvil.tools.parsing.Name;
 
 public class Intrinsics
 {
-	private static final MethodParameter STRINGS = new MethodParameter(Name.getQualified("strings"), new ArrayType(Types.STRING));
+	private static final MethodParameter STRINGS = new MethodParameter(Name.getQualified("strings"),
+	                                                                   new ArrayType(Types.STRING));
 	
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
 	{
@@ -47,7 +48,8 @@ public class Intrinsics
 				ints[i + 3] = values.getValue(i + 3).intValue();
 				i += 3;
 			}
-			else if (Opcodes.isJumpOpcode(opcode) || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH)
+			else if (Opcodes.isJumpOpcode(opcode) || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH
+					|| opcode == Opcodes.SIPUSH)
 			{
 				ints[i + 1] = values.getValue(i + 1).intValue();
 				i += 1;

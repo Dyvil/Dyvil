@@ -1,21 +1,20 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
+import dyvil.collection.Set;
+import dyvil.collection.impl.AbstractArrayList;
+import dyvil.lang.literal.ArrayConvertible;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.literal.ArrayConvertible;
-
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
-import dyvil.collection.Set;
-import dyvil.collection.impl.AbstractArrayList;
-
 @ArrayConvertible
-public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E>
+public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = 1107932890158514157L;
 	
@@ -41,8 +40,8 @@ public class ArrayList<E> extends AbstractArrayList<E>implements ImmutableList<E
 	
 	public static class Builder<E> implements ImmutableList.Builder<E>
 	{
-		private Object[]	elements;
-		private int			size;
+		private Object[] elements;
+		private int      size;
 		
 		public Builder()
 		{

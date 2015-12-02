@@ -1,13 +1,12 @@
 package dyvil.collection;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import dyvil.annotation._internal.internal;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
-import dyvil.annotation._internal.internal;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NilConvertible(methodName = "fromNil")
 @ArrayConvertible
@@ -96,12 +95,13 @@ public interface Set<E> extends Collection<E>
 	 * all elements of the given {@code collection} that are not currently
 	 * present in this collection. This operator represents the 'union' Set
 	 * operation.
-	 * 
+	 *
 	 * @param collection
-	 *            the collection of elements to be added
+	 * 		the collection of elements to be added
+	 *
 	 * @return a collection that contains all elements of this collection plus
-	 *         all elements in the given collection that are not present in this
-	 *         collection.
+	 * all elements in the given collection that are not present in this
+	 * collection.
 	 */
 	Set<? extends E> $bar(Collection<? extends E> collection);
 	
@@ -109,11 +109,12 @@ public interface Set<E> extends Collection<E>
 	 * Returns a collection that contains all elements that are present in
 	 * either this or the given {@code collection}, but not in both. This
 	 * operator represents the 'exclusive OR' Set operation.
-	 * 
+	 *
 	 * @param collection
-	 *            the collection
+	 * 		the collection
+	 *
 	 * @return a collection that contains all elements that are present in
-	 *         either this or the given collection, but not in both.
+	 * either this or the given collection, but not in both.
 	 */
 	Set<? extends E> $up(Collection<? extends E> collection);
 	
@@ -131,9 +132,9 @@ public interface Set<E> extends Collection<E>
 	/**
 	 * Adds all elements of the given {@code collection} if they are not already
 	 * present in this set.
-	 * 
+	 *
 	 * @param collection
-	 *            the collection to add
+	 * 		the collection to add
 	 */
 	default void $bar$eq(Collection<? extends E> collection)
 	{
@@ -143,9 +144,9 @@ public interface Set<E> extends Collection<E>
 	/**
 	 * Removes all elements of the given {@code collection} from this collection
 	 * and adds those that are not currently present in this collection.
-	 * 
+	 *
 	 * @param collection
-	 *            the collection to XOR with
+	 * 		the collection to XOR with
 	 */
 	default void $up$eq(Collection<? extends E> collection)
 	{
@@ -251,7 +252,9 @@ public interface Set<E> extends Collection<E>
 		return sum * 31 + product;
 	}
 	
-	static @internal int distinct(Object[] array, int size)
+	static
+	@internal
+	int distinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -271,7 +274,9 @@ public interface Set<E> extends Collection<E>
 		return size;
 	}
 	
-	static @internal int sortDistinct(Object[] array, int size)
+	static
+	@internal
+	int sortDistinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -282,7 +287,9 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 	
-	static @internal <T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
+	static
+	@internal
+	<T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
 	{
 		if (size < 2)
 		{
@@ -294,7 +301,9 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 	
-	static @internal int distinctSorted(Object[] array, int size)
+	static
+	@internal
+	int distinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -319,7 +328,9 @@ public interface Set<E> extends Collection<E>
 		return len + 1;
 	}
 	
-	static @internal boolean isDistinct(Object[] array, int size)
+	static
+	@internal
+	boolean isDistinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -340,7 +351,9 @@ public interface Set<E> extends Collection<E>
 		return true;
 	}
 	
-	static @internal boolean isDistinctSorted(Object[] array, int size)
+	static
+	@internal
+	boolean isDistinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{

@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.sources;
 
-import java.io.File;
-
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.parsing.CodeFile;
+
+import java.io.File;
 
 public interface IFileType
 {

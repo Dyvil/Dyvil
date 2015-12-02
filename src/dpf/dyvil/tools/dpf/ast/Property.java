@@ -9,8 +9,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class Property extends ValueCreator implements NodeElement
 {
-	protected Name	name;
-	protected Value	value;
+	protected Name  name;
+	protected Value value;
 	
 	private ICodePosition position;
 	

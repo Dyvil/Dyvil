@@ -22,9 +22,9 @@ import dyvil.tools.parsing.Name;
 
 public interface IContext
 {
-	byte	VISIBLE		= 0;
-	byte	INVISIBLE	= 1;
-	byte	INTERNAL	= 2;
+	byte VISIBLE   = 0;
+	byte INVISIBLE = 1;
+	byte INTERNAL  = 2;
 	
 	boolean isStatic();
 	

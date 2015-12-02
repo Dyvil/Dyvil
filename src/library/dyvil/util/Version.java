@@ -1,12 +1,12 @@
 package dyvil.util;
 
-import java.io.Serializable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import dyvil.lang.Ordered;
 import dyvil.lang.literal.StringConvertible;
 import dyvil.lang.literal.TupleConvertible;
+
+import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The <b>Version</b> class represents a {@link Comparable comparable} and
@@ -24,14 +24,14 @@ public final class Version implements Ordered<Version>, Immutable, Serializable
 	
 	private static final long serialVersionUID = 2514051844985966173L;
 	
-	private static final String		FORMAT	= "^(?:v)?(?:(\\d+)\\.(\\d+)\\.(\\d+))(?:-([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?(?:\\+([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?$";
-	private static final Pattern	PATTERN	= Pattern.compile(Version.FORMAT);
+	private static final String  FORMAT  = "^(?:v)?(?:(\\d+)\\.(\\d+)\\.(\\d+))(?:-([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?(?:\\+([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?$";
+	private static final Pattern PATTERN = Pattern.compile(Version.FORMAT);
 	
-	private final int		major;
-	private final int		minor;
-	private final int		patch;
-	private final String	prerelease;
-	private final String	build;
+	private final int    major;
+	private final int    minor;
+	private final int    patch;
+	private final String prerelease;
+	private final String build;
 	
 	public static Version apply(String version)
 	{

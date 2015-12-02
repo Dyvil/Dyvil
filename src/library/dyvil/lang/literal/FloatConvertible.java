@@ -8,7 +8,7 @@ package dyvil.lang.literal;
  * single {@code float} parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}FloatConvertible
  * case class Percentage(float value)
@@ -18,13 +18,13 @@ package dyvil.lang.literal;
  *         set: ...
  *     }
  * }
- * 
+ *
  * // ----------
- * 
+ *
  * Percentage p = 100F
  * int i = p.AsInt
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface FloatConvertible

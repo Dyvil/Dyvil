@@ -16,8 +16,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NullCheckOperator implements IValue
 {
-	private IValue	value;
-	private boolean	isNull;
+	private IValue  value;
+	private boolean isNull;
 	
 	public NullCheckOperator(IValue value, boolean isNull)
 	{

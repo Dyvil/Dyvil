@@ -9,16 +9,16 @@ package dyvil.lang.literal;
  * parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}ArrayConvertible
  * case class IntVector([int] value)
- * 
+ *
  * // ----------
- * 
+ *
  * IntVector vec = [ 1, 2, 3 ]
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface ArrayConvertible

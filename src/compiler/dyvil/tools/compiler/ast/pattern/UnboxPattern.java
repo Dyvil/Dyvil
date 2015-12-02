@@ -12,8 +12,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class UnboxPattern implements IPattern
 {
-	private IPattern	pattern;
-	private IMethod		unboxMethod;
+	private IPattern pattern;
+	private IMethod  unboxMethod;
 	
 	public UnboxPattern(IPattern pattern, IMethod boxingMethod)
 	{

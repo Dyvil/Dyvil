@@ -4,8 +4,8 @@ import dyvil.lang.ref.BooleanRef;
 
 public class BooleanArrayRef implements BooleanRef
 {
-	protected final boolean[]	array;
-	protected final int			index;
+	protected final boolean[] array;
+	protected final int       index;
 	
 	public BooleanArrayRef(boolean[] array, int index)
 	{

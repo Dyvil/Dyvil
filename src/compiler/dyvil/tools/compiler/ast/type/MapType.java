@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -27,10 +23,14 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class MapType implements IObjectType
 {
-	private IType	keyType;
-	private IType	valueType;
+	private IType keyType;
+	private IType valueType;
 	
 	public MapType(IType keyType, IType valueType)
 	{
@@ -221,7 +221,7 @@ public class MapType implements IObjectType
 		this.keyType.writeTypeExpression(writer);
 		this.valueType.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/MapType", "apply",
-				"(Ldyvil/lang/Type;Ldyvil/lang/Type;)Ldyvil/reflect/types/MapType;", true);
+		                       "(Ldyvil/lang/Type;Ldyvil/lang/Type;)Ldyvil/reflect/types/MapType;", true);
 	}
 	
 	@Override

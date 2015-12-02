@@ -1,19 +1,18 @@
 package dyvil.collection.impl;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-
-import dyvil.lang.Type;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.lang.Type;
 import dyvil.reflect.EnumReflection;
 import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 {
@@ -61,8 +60,8 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	protected abstract class EnumIterator<E> implements Iterator<E>
 	{
-		private int		index;
-		private boolean	indexValid;
+		private int     index;
+		private boolean indexValid;
 		
 		@Override
 		public boolean hasNext()
@@ -106,10 +105,10 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	private static final long serialVersionUID = 7946242151088885999L;
 	
-	protected transient Class<K>	type;
-	protected transient K[]			keys;
-	protected transient Object[]	values;
-	protected transient int			size;
+	protected transient Class<K> type;
+	protected transient K[]      keys;
+	protected transient Object[] values;
+	protected transient int      size;
 	
 	protected AbstractEnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
@@ -174,7 +173,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	private static <K extends Enum<K>> Class<K> getKeyType(Map<K, ?> map)
 	{
-		for (Iterator<K> keys = map.keyIterator(); keys.hasNext();)
+		for (Iterator<K> keys = map.keyIterator(); keys.hasNext(); )
 		{
 			K key = keys.next();
 			if (key != null)

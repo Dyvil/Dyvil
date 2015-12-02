@@ -16,8 +16,8 @@ import dyvil.tools.parsing.Name;
 
 public class CombiningContext implements IContext
 {
-	private final IContext	inner;
-	private final IContext	outer;
+	private final IContext inner;
+	private final IContext outer;
 	
 	public CombiningContext(IContext context1, IContext context2)
 	{

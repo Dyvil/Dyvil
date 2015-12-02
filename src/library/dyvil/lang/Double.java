@@ -1,30 +1,28 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.lang.literal.DoubleConvertible;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+import dyvil.lang.literal.DoubleConvertible;
+import sun.misc.FloatingDecimal;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
-
-import sun.misc.FloatingDecimal;
 
 @DoubleConvertible
 public class Double implements Number, Serializable
 {
 	private static final long serialVersionUID = 4764381743913068148L;
 	
-	public static final double	min					= java.lang.Double.MIN_VALUE;
-	public static final double	max					= java.lang.Double.MAX_VALUE;
-	public static final double	NaN					= java.lang.Double.NaN;
-	public static final double	infinity			= java.lang.Double.POSITIVE_INFINITY;
-	public static final double	negative_infinity	= java.lang.Double.NEGATIVE_INFINITY;
-	public static final byte	size				= java.lang.Double.SIZE;
+	public static final double min               = java.lang.Double.MIN_VALUE;
+	public static final double max               = java.lang.Double.MAX_VALUE;
+	public static final double NaN               = java.lang.Double.NaN;
+	public static final double infinity          = java.lang.Double.POSITIVE_INFINITY;
+	public static final double negative_infinity = java.lang.Double.NEGATIVE_INFINITY;
+	public static final byte   size              = java.lang.Double.SIZE;
 	
 	protected double value;
 	
@@ -33,7 +31,9 @@ public class Double implements Number, Serializable
 		return new Double(v);
 	}
 	
-	public static @infix double unapply(Double v)
+	public static
+	@infix
+	double unapply(Double v)
 	{
 		return v == null ? 0D : v.value;
 	}
@@ -373,13 +373,20 @@ public class Double implements Number, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Double", "toString", "(D)Ljava/lang/String;" })
-	public static @infix @inline String toString(double value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Double", "toString",
+			"(D)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(double value)
 	{
 		return FloatingDecimal.toJavaFormatString(value);
 	}
 	
-	public static @infix @inline String toHexString(double value)
+	public static
+	@infix
+	@inline
+	String toHexString(double value)
 	{
 		return java.lang.Double.toHexString(value);
 	}
@@ -391,7 +398,9 @@ public class Double implements Number, Serializable
 	}
 	
 	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Double", "hashCode", "(D)I" })
-	public static @postfix int $hash$hash(double d)
+	public static
+	@postfix
+	int $hash$hash(double d)
 	{
 		return java.lang.Double.hashCode(d);
 	}

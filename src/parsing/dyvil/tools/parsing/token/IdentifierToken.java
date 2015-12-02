@@ -6,15 +6,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IdentifierToken implements IToken
 {
-	public IToken	prev;
-	public IToken	next;
+	public IToken prev;
+	public IToken next;
 	
-	public final int	type;
-	public final Name	name;
+	public final int  type;
+	public final Name name;
 	
-	public final int	lineNumber;
-	public final int	start;
-	public final int	end;
+	public final int lineNumber;
+	public final int start;
+	public final int end;
 	
 	public IdentifierToken(IToken prev, Name name, int type, int lineNumber, int start, int end)
 	{

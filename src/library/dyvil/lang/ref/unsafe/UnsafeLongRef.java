@@ -1,15 +1,14 @@
 package dyvil.lang.ref.unsafe;
 
-import java.lang.reflect.Field;
-
 import dyvil.lang.ref.LongRef;
-
 import dyvil.reflect.ReflectUtils;
+
+import java.lang.reflect.Field;
 
 public final class UnsafeLongRef implements LongRef
 {
-	private final Object	base;
-	private final long		offset;
+	private final Object base;
+	private final long   offset;
 	
 	public UnsafeLongRef(Field staticField)
 	{

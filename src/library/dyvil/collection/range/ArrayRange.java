@@ -1,22 +1,21 @@
 package dyvil.collection.range;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.function.Consumer;
-
+import dyvil.collection.Range;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Rangeable;
 import dyvil.lang.literal.TupleConvertible;
 
-import dyvil.collection.Range;
-import dyvil.collection.iterator.ArrayIterator;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.function.Consumer;
 
 @TupleConvertible
 public class ArrayRange<T extends Rangeable<T>> implements Range<T>
 {
 	private static final long serialVersionUID = 3645807463260154912L;
 	
-	protected transient Rangeable[]	array;
-	protected transient int			count;
+	protected transient Rangeable[] array;
+	protected transient int         count;
 	
 	public static <T extends Rangeable<T>> ArrayRange<T> apply(T first, T last)
 	{

@@ -21,38 +21,38 @@ import dyvil.tools.parsing.Name;
 
 public final class ClassFormat
 {
-	public static final int	H_GETFIELD			= Opcodes.H_GETFIELD;
-	public static final int	H_GETSTATIC			= Opcodes.H_GETSTATIC;
-	public static final int	H_PUTFIELD			= Opcodes.H_PUTFIELD;
-	public static final int	H_PUTSTATIC			= Opcodes.H_PUTSTATIC;
-	public static final int	H_INVOKEVIRTUAL		= Opcodes.H_INVOKEVIRTUAL;
-	public static final int	H_INVOKESTATIC		= Opcodes.H_INVOKESTATIC;
-	public static final int	H_INVOKESPECIAL		= Opcodes.H_INVOKESPECIAL;
-	public static final int	H_NEWINVOKESPECIAL	= Opcodes.H_NEWINVOKESPECIAL;
-	public static final int	H_INVOKEINTERFACE	= Opcodes.H_INVOKEINTERFACE;
+	public static final int H_GETFIELD         = Opcodes.H_GETFIELD;
+	public static final int H_GETSTATIC        = Opcodes.H_GETSTATIC;
+	public static final int H_PUTFIELD         = Opcodes.H_PUTFIELD;
+	public static final int H_PUTSTATIC        = Opcodes.H_PUTSTATIC;
+	public static final int H_INVOKEVIRTUAL    = Opcodes.H_INVOKEVIRTUAL;
+	public static final int H_INVOKESTATIC     = Opcodes.H_INVOKESTATIC;
+	public static final int H_INVOKESPECIAL    = Opcodes.H_INVOKESPECIAL;
+	public static final int H_NEWINVOKESPECIAL = Opcodes.H_NEWINVOKESPECIAL;
+	public static final int H_INVOKEINTERFACE  = Opcodes.H_INVOKEINTERFACE;
 	
-	public static final int	T_BOOLEAN	= 4;
-	public static final int	T_CHAR		= 5;
-	public static final int	T_FLOAT		= 6;
-	public static final int	T_DOUBLE	= 7;
-	public static final int	T_BYTE		= 8;
-	public static final int	T_SHORT		= 9;
-	public static final int	T_INT		= 10;
-	public static final int	T_LONG		= 11;
+	public static final int T_BOOLEAN = 4;
+	public static final int T_CHAR    = 5;
+	public static final int T_FLOAT   = 6;
+	public static final int T_DOUBLE  = 7;
+	public static final int T_BYTE    = 8;
+	public static final int T_SHORT   = 9;
+	public static final int T_INT     = 10;
+	public static final int T_LONG    = 11;
 	
 	public static final int ACC_SUPER = Opcodes.ACC_SUPER;
 	
-	public static final Integer	UNINITIALIZED_THIS	= Opcodes.UNINITIALIZED_THIS;
-	public static final Integer	NULL				= Opcodes.NULL;
-	public static final Integer	TOP					= Opcodes.TOP;
-	public static final Integer	BOOLEAN				= new Integer(1);
-	public static final Integer	BYTE				= new Integer(1);
-	public static final Integer	SHORT				= new Integer(1);
-	public static final Integer	CHAR				= new Integer(1);
-	public static final Integer	INT					= Opcodes.INTEGER;
-	public static final Integer	LONG				= Opcodes.LONG;
-	public static final Integer	FLOAT				= Opcodes.FLOAT;
-	public static final Integer	DOUBLE				= Opcodes.DOUBLE;
+	public static final Integer UNINITIALIZED_THIS = Opcodes.UNINITIALIZED_THIS;
+	public static final Integer NULL               = Opcodes.NULL;
+	public static final Integer TOP                = Opcodes.TOP;
+	public static final Integer BOOLEAN            = new Integer(1);
+	public static final Integer BYTE               = new Integer(1);
+	public static final Integer SHORT              = new Integer(1);
+	public static final Integer CHAR               = new Integer(1);
+	public static final Integer INT                = Opcodes.INTEGER;
+	public static final Integer LONG               = Opcodes.LONG;
+	public static final Integer FLOAT              = Opcodes.FLOAT;
+	public static final Integer DOUBLE             = Opcodes.DOUBLE;
 	
 	public static String packageToInternal(String pack)
 	{

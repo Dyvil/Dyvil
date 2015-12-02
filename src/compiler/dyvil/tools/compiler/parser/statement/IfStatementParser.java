@@ -12,10 +12,10 @@ import dyvil.tools.parsing.token.IToken;
 
 public class IfStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	IF				= 1;
-	public static final int	CONDITION_END	= 2;
-	public static final int	THEN			= 4;
-	public static final int	ELSE			= 8;
+	public static final int IF            = 1;
+	public static final int CONDITION_END = 2;
+	public static final int THEN          = 4;
+	public static final int ELSE          = 8;
 	
 	protected IfStatement statement;
 	

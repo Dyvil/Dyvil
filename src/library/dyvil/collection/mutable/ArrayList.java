@@ -1,23 +1,22 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.MutableList;
+import dyvil.collection.Set;
+import dyvil.collection.impl.AbstractArrayList;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
-import dyvil.collection.Set;
-import dyvil.collection.impl.AbstractArrayList;
-
 @NilConvertible
 @ArrayConvertible
-public class ArrayList<E> extends AbstractArrayList<E>implements MutableList<E>
+public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 {
 	private static final long serialVersionUID = 5286872411535856904L;
 	

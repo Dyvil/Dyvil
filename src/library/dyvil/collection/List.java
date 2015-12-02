@@ -150,7 +150,6 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return this.subList(start, length);
 	}
 
-	
 	/**
 	 * Returns the element at the given {@code index}. Unlike
 	 * {@link #subscript(int)}, this method will not throw any exceptions if the

@@ -1,20 +1,19 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.impl.AbstractArraySet;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.util.ImmutableException;
+
 import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.lang.literal.ArrayConvertible;
-
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.impl.AbstractArraySet;
-import dyvil.util.ImmutableException;
-
 @ArrayConvertible
-public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
+public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = 5534347282324757054L;
 	
@@ -40,8 +39,8 @@ public class ArraySet<E> extends AbstractArraySet<E>implements ImmutableSet<E>
 	
 	public static class Builder<E> implements ImmutableSet.Builder<E>
 	{
-		private Object[]	elements;
-		private int			size;
+		private Object[] elements;
+		private int      size;
 		
 		public Builder()
 		{

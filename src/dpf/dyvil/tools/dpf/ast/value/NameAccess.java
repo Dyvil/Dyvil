@@ -6,8 +6,8 @@ import dyvil.tools.parsing.ast.IASTNode;
 
 public class NameAccess extends ValueCreator implements Value
 {
-	public Value	value;
-	public Name		name;
+	public Value value;
+	public Name  name;
 	
 	public NameAccess(Name name)
 	{
