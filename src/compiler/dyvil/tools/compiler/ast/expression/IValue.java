@@ -91,7 +91,7 @@ public interface IValue extends IASTNode, ITyped
 	// Basic Control Statements
 	int RETURN       = 192;
 	int IF           = 193;
-	int SWITCH       = 194;
+	// int SWITCH       = 194;
 	int FOR          = 195;
 	int WHILE        = 196;
 	int DO_WHILE     = 197;
@@ -348,7 +348,7 @@ public interface IValue extends IASTNode, ITyped
 	 * Writes this {@link IValue} to the given {@link MethodWriter}
 	 * {@code writer} as a jump expression to the given {@link Label}
 	 * {@code dest}. By default, this calls
-	 * {@link #writeExpression(MethodWriter)} and then writes an
+	 * {@link #writeExpression(MethodWriter, IType)} and then writes an
 	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
 	 * means the JVM would jump to {@code dest} if the current value on the
 	 * stack equals {@code 0}.

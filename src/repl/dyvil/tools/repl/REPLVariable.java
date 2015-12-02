@@ -7,6 +7,7 @@ import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
@@ -20,7 +21,7 @@ public class REPLVariable extends Field
 	protected String      className;
 	private   Class       theClass;
 	
-	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
+	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, ModifierSet modifiers)
 	{
 		super(null, name, type);
 		this.context = context;
@@ -33,11 +34,7 @@ public class REPLVariable extends Field
 	@Override
 	public boolean hasModifier(int mod)
 	{
-		if (mod == Modifiers.STATIC)
-		{
-			return true;
-		}
-		return (this.modifiers & mod) == mod;
+		return mod == Modifiers.STATIC || this.modifiers.hasIntModifier(mod);
 	}
 	
 	private static boolean isConstant(IValue value)
@@ -128,7 +125,7 @@ public class REPLVariable extends Field
 	
 	private boolean isConstant()
 	{
-		return (this.modifiers & Modifiers.FINAL) != 0 && this.value != null && isConstant(this.value);
+		return this.hasModifier(Modifiers.FINAL) && this.value != null && isConstant(this.value);
 	}
 	
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
@@ -137,14 +134,16 @@ public class REPLVariable extends Field
 		String extendedType = this.type.getExtendedName();
 		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
-		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
+		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className,
+		         null, "java/lang/Object", null);
 		
 		cw.visitSource(className, null);
 		
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
-			cw.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
+			cw.visitField(this.modifiers.toFlags() | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name,
+			              extendedType, null, null);
 		}
 		
 		// Compilables
@@ -154,7 +153,9 @@ public class REPLVariable extends Field
 		}
 		
 		// Generate <clinit> static initializer
-		MethodWriter mw = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
+		MethodWriter mw = new MethodWriterImpl(cw,
+		                                       cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V",
+		                                                      null, null));
 		mw.begin();
 		
 		for (IClassCompilable c : compilableList)
@@ -188,7 +189,8 @@ public class REPLVariable extends Field
 		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
 	}
 	
-	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw) throws BytecodeException
+	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw)
+			throws BytecodeException
 	{
 		if (this.type == Types.VOID)
 		{
@@ -197,7 +199,8 @@ public class REPLVariable extends Field
 		}
 		
 		String methodType = "()" + extendedType;
-		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC, "computeValue", methodType, null, null));
+		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC,
+		                                                                  "computeValue", methodType, null, null));
 		initWriter.begin();
 		this.value.writeExpression(initWriter, this.type);
 		initWriter.end(this.type);

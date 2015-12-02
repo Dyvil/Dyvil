@@ -1,12 +1,5 @@
 package dyvil.tools.repl;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.security.ProtectionDomain;
-
 import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
@@ -29,6 +22,8 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -43,14 +38,21 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.security.ProtectionDomain;
+
 public class REPLMemberClass implements IClass
 {
-	protected static final ClassLoader		CLASS_LOADER		= REPLVariable.class.getClassLoader();
-	private static final ProtectionDomain	PROTECTION_DOMAIN	= REPLVariable.class.getProtectionDomain();
+	protected static final ClassLoader      CLASS_LOADER      = REPLVariable.class.getClassLoader();
+	private static final   ProtectionDomain PROTECTION_DOMAIN = REPLVariable.class.getProtectionDomain();
 	
-	private REPLContext		context;
-	private Name			name;
-	private IClassMember	member;
+	private REPLContext  context;
+	private Name         name;
+	private IClassMember member;
 	
 	public REPLMemberClass(Name name, IClassMember member, REPLContext context)
 	{
@@ -110,25 +112,14 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
+	public ModifierSet getModifiers()
 	{
-		return false;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-	}
-	
-	@Override
-	public int getModifiers()
-	{
-		return 0;
+		return new FlagModifierSet();
 	}
 	
 	@Override
@@ -267,6 +258,12 @@ public class REPLMemberClass implements IClass
 	
 	@Override
 	public boolean isInterface()
+	{
+		return false;
+	}
+
+	@Override
+	public boolean isAnnotation()
 	{
 		return false;
 	}
@@ -612,7 +609,8 @@ public class REPLMemberClass implements IClass
 			dumpClass(repl, name, bytes);
 		}
 		
-		return ReflectUtils.UNSAFE.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+		return ReflectUtils.UNSAFE
+				.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
 	}
 	
 	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
@@ -629,7 +627,8 @@ public class REPLMemberClass implements IClass
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String name = this.name.qualified;
-		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object", null);
+		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object",
+		             null);
 		writer.visitSource(name, null);
 		
 		this.member.write(writer);

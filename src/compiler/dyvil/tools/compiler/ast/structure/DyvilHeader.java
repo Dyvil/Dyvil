@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.ClassType;
@@ -408,7 +409,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		if (this.headerDeclaration == null)
 		{
-			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, Modifiers.PUBLIC, null);
+			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name, new FlagModifierSet(Modifiers.PUBLIC), null);
 		}
 	}
 	
@@ -589,7 +590,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		if (access == Modifiers.PROTECTED || access == Modifiers.PACKAGE)
 		{
 			IDyvilHeader header = iclass.getHeader();
-			if (header == this || this.pack == header.getPackage())
+			if (header != null && (header == this || this.pack == header.getPackage()))
 			{
 				return VISIBLE;
 			}

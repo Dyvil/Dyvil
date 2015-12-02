@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -38,7 +39,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.I18n;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -94,21 +94,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.name = name;
 	}
 	
-	public AbstractMethod(IClass iclass, Name name, IType type, int modifiers)
+	public AbstractMethod(IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
+		super(name, type, modifiers);
 		this.theClass = iclass;
-		this.type = type;
-		this.name = name;
-		this.modifiers = modifiers;
 	}
 	
-	public AbstractMethod(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	public AbstractMethod(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
+		super(name, type, modifiers);
 		this.theClass = iclass;
 		this.position = position;
-		this.type = type;
-		this.name = name;
-		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -192,13 +188,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void setVarargs()
 	{
-		this.modifiers |= Modifiers.VARARGS;
+		this.modifiers.addIntModifier(Modifiers.VARARGS);
 	}
 	
 	@Override
 	public boolean isVarargs()
 	{
-		return (this.modifiers & Modifiers.VARARGS) != 0;
+		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
 	
 	@Override
@@ -254,36 +250,36 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/inline":
-			this.modifiers |= Modifiers.INLINE;
+			this.modifiers.addIntModifier(Modifiers.INLINE);
 			return false;
 		case "dyvil/annotation/_internal/infix":
 		case "dyvil/annotation/_internal/postfix":
-			this.modifiers |= Modifiers.INFIX;
+			this.modifiers.addIntModifier(Modifiers.INFIX);
 			return false;
 		case "dyvil/annotation/_internal/extension":
-			this.modifiers |= Modifiers.EXTENSION;
+			this.modifiers.addIntModifier(Modifiers.EXTENSION);
 			return false;
 		case "dyvil/annotation/_internal/prefix":
-			this.modifiers |= Modifiers.PREFIX;
+			this.modifiers.addIntModifier(Modifiers.PREFIX);
 			return false;
 		case "dyvil/annotation/_internal/internal":
-			this.modifiers |= Modifiers.INTERNAL;
+			this.modifiers.addIntModifier(Modifiers.INTERNAL);
 			return false;
 		case "dyvil/annotation/_internal/sealed":
-			this.modifiers |= Modifiers.SEALED;
+			this.modifiers.addIntModifier(Modifiers.SEALED);
 			return false;
 		case "dyvil/annotation/Native":
-			this.modifiers |= Modifiers.NATIVE;
+			this.modifiers.addIntModifier(Modifiers.NATIVE);
 			return false;
 		case "dyvil/annotation/Strict":
-			this.modifiers |= Modifiers.STRICT;
+			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
-			this.modifiers |= Modifiers.DEPRECATED;
+			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
 		case "java/lang/Override":
-			this.modifiers |= Modifiers.OVERRIDE;
+			this.modifiers.addIntModifier(Modifiers.OVERRIDE);
 			return false;
 		case "dyvil/annotation/Intrinsic":
 			if (annotation != null)
@@ -359,13 +355,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isStatic()
 	{
-		return (this.modifiers & Modifiers.STATIC) != 0;
+		return this.modifiers.hasIntModifier(Modifiers.STATIC);
 	}
 	
 	@Override
 	public boolean isAbstract()
 	{
-		return (this.modifiers & Modifiers.ABSTRACT) != 0 && !this.isObjectMethod();
+		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.isObjectMethod();
 	}
 
 	@Override
@@ -567,7 +563,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// infix modifier implementation
 		if (receiver != null)
 		{
-			int mod = this.modifiers & Modifiers.INFIX;
+			int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 			if (mod != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
 				receiver = null;
@@ -599,7 +595,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				totalMatch += receiverMatch;
 			}
 		}
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if (this.isVarargs())
 		{
 			int varargsStart = this.parameterCount - 1 - parameterStartIndex;
 			
@@ -673,7 +669,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		int len = arguments.size();
 		
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX && !this.isStatic())
+		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
 		{
 			IValue argument = arguments.getFirstValue();
 			arguments.setFirstValue(instance);
@@ -682,7 +678,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		if (instance != null)
 		{
-			int mod = this.modifiers & Modifiers.INFIX;
+			int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
 			{
 				IParameter par = this.parameters[0];
@@ -697,7 +693,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					instance = instance1;
 				}
 				
-				if ((this.modifiers & Modifiers.VARARGS) != 0)
+				if (this.isVarargs())
 				{
 					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1],
 					                            typeContext, markers, context);
@@ -720,7 +716,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return instance;
 			}
 			
-			if ((this.modifiers & Modifiers.STATIC) != 0)
+			if ((mod & Modifiers.STATIC) != 0)
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
@@ -756,7 +752,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 			}
 		}
-		else if ((this.modifiers & Modifiers.STATIC) == 0)
+		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			if (context.isStatic())
 			{
@@ -769,7 +765,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if (this.isVarargs())
 		{
 			len = this.parameterCount - 1;
 			arguments.checkVarargsValue(len, this.parameters[len], typeContext, markers, null);
@@ -802,16 +798,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			genericData.instance = new ThisExpr(this.theClass.getType());
 		}
+
+		int modifiers = this.modifiers.toFlags();
 		
 		int parIndex = 0;
 		IParameter param;
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (instance != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
 			parIndex = 1;
 		}
 		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if ((modifiers & Modifiers.VARARGS) != 0)
 		{
 			int len = this.parameterCount - parIndex - 1;
 			for (int i = 0; i < len; i++)
@@ -1095,7 +1093,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (receiver != null)
 		{
-			if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+			if (this.modifiers.hasIntModifier(Modifiers.INFIX))
 			{
 				receiver.writeExpression(writer, this.parameters[0].getType());
 				return;
@@ -1114,13 +1112,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		int parIndex = 0;
+		int modifiers = this.modifiers.toFlags();
 		
-		if (instance != null && (this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (instance != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			parIndex = 1;
 		}
 		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if ((modifiers & Modifiers.VARARGS) != 0)
 		{
 			int len = this.parameterCount - 1 - parIndex;
 			if (len < 0)
@@ -1162,7 +1161,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		writer.writeLineNumber(lineNumber);
 		
 		int opcode;
-		int modifiers = this.modifiers;
+		int modifiers = this.modifiers.toFlags();
 		
 		String owner = this.theClass.getInternalName();
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
@@ -1190,11 +1189,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public int getInvokeOpcode()
 	{
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		int modifiers = this.modifiers.toFlags();
+		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			return Opcodes.INVOKESTATIC;
 		}
-		if ((this.modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
 		{
 			return Opcodes.INVOKESPECIAL;
 		}
@@ -1210,7 +1210,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		super.toString(prefix, buffer);
 		
-		buffer.append(ModifierTypes.METHOD.toString(this.modifiers));
+		this.modifiers.toString(buffer);
 		if (this.type != null)
 		{
 			this.type.toString("", buffer);

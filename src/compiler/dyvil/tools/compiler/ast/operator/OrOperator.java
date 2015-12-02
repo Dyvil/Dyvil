@@ -36,7 +36,7 @@ public final class OrOperator extends AbstractValue
 	@Override
 	public int valueTag()
 	{
-		return BOOLEAN_AND;
+		return BOOLEAN_OR;
 	}
 	
 	@Override

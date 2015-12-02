@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -32,7 +33,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -61,19 +61,19 @@ public class Constructor extends Member implements IConstructor
 		this.type = iclass.getType();
 	}
 	
-	public Constructor(IClass iclass, int modifiers)
+	public Constructor(IClass iclass, ModifierSet modifiers)
 	{
+		super(null, null, modifiers);
 		this.theClass = iclass;
 		this.type = iclass.getType();
-		this.modifiers = modifiers;
 	}
 	
-	public Constructor(ICodePosition position, IClass iclass, int modifiers)
+	public Constructor(ICodePosition position, IClass iclass, ModifierSet modifiers)
 	{
+		super(null, null, modifiers);
 		this.position = position;
 		this.theClass = iclass;
 		this.type = iclass.getType();
-		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -91,13 +91,13 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void setVarargs()
 	{
-		this.modifiers |= Modifiers.VARARGS;
+		this.modifiers.addIntModifier(Modifiers.VARARGS);
 	}
 	
 	@Override
 	public boolean isVarargs()
 	{
-		return (this.modifiers & Modifiers.VARARGS) != 0;
+		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
 	
 	// Parameters
@@ -155,14 +155,14 @@ public class Constructor extends Member implements IConstructor
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/inline":
-			this.modifiers |= Modifiers.INLINE;
+			this.modifiers.addIntModifier(Modifiers.INLINE);
 			return false;
 		case "dyvil/annotation/_internal/internal":
-			this.modifiers |= Modifiers.INTERNAL;
+			this.modifiers.addIntModifier(Modifiers.INTERNAL);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
-			this.modifiers |= Modifiers.DEPRECATED;
+			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
 		}
 		return true;
@@ -339,17 +339,11 @@ public class Constructor extends Member implements IConstructor
 			this.exceptions[i].checkType(markers, this, TypePosition.RETURN_TYPE);
 		}
 		
-		if (this.value == null)
+		if (this.value != null)
 		{
-			if ((this.modifiers & Modifiers.ABSTRACT) == 0)
-			{
-				this.modifiers |= Modifiers.ABSTRACT;
-			}
-			
-			return;
+			this.value.checkTypes(markers, this);
 		}
-		
-		this.value.checkTypes(markers, this);
+		// TODO Abstract Constructor Error
 	}
 	
 	@Override
@@ -385,7 +379,7 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value.check(markers, this);
 		}
-		else if ((this.modifiers & Modifiers.ABSTRACT) == 0 && !this.theClass.isAbstract())
+		else if (!this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.theClass.isAbstract())
 		{
 			markers.add(I18n.createMarker(this.position, "constructor.unimplemented", this.name));
 		}
@@ -567,7 +561,7 @@ public class Constructor extends Member implements IConstructor
 		int match = 1;
 		int argumentCount = arguments.size();
 		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
 		{
 			int parCount = this.parameterCount - 1;
 			if (argumentCount <= parCount)
@@ -628,7 +622,7 @@ public class Constructor extends Member implements IConstructor
 			}
 		};
 		
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
 		{
 			int index = this.parameterCount - 1;
 			for (int i = 0; i < index; i++)
@@ -662,10 +656,9 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		int len = arguments.size();
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
 		{
-			len = this.parameterCount - 1;
+			int len = this.parameterCount - 1;
 			arguments.checkVarargsValue(len, this.parameters[len], type, markers, context);
 			
 			for (int i = 0; i < len; i++)
@@ -762,7 +755,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
-		int modifiers = this.modifiers & 0xFFFF;
+		int modifiers = this.modifiers.toFlags() & 0xFFFF;
 		if (this.value == null)
 		{
 			modifiers |= Modifiers.ABSTRACT;
@@ -781,15 +774,15 @@ public class Constructor extends Member implements IConstructor
 			}
 		}
 		
-		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
+		if ((modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/inline;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
-		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		if ((modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
@@ -817,7 +810,7 @@ public class Constructor extends Member implements IConstructor
 			mw.end(Types.VOID);
 		}
 		
-		if ((this.modifiers & Modifiers.STATIC) == 0)
+		if ((modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
 		}
@@ -858,7 +851,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.VARARGS) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
 		{
 			int len = this.parameterCount - 1;
 			IParameter param;
@@ -941,8 +934,8 @@ public class Constructor extends Member implements IConstructor
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		
-		buffer.append(ModifierTypes.METHOD.toString(this.modifiers));
+
+		this.modifiers.toString(buffer);
 		buffer.append("new");
 		
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');

@@ -1,26 +1,25 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.member.IModified;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.modifiers.IModified;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.util.I18n;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
 
 public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotated, IObjectCompilable
 {
@@ -28,8 +27,8 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	
 	protected ICodePosition position;
 	
-	protected AnnotationList	annotations;
-	protected int				modifiers;
+	protected AnnotationList annotations;
+	protected ModifierSet    modifiers;
 	
 	protected Name name;
 	
@@ -45,7 +44,7 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		this.name = name;
 	}
 	
-	public HeaderDeclaration(IDyvilHeader header, ICodePosition position, Name name, int modifiers, AnnotationList annotations)
+	public HeaderDeclaration(IDyvilHeader header, ICodePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
 	{
 		this.header = header;
 		this.position = position;
@@ -101,38 +100,15 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 		this.modifiers = modifiers;
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
-	{
-		if ((this.modifiers & mod) == mod)
-		{
-			return false;
-		}
-		this.modifiers |= mod;
-		return true;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.modifiers &= ~mod;
-	}
-	
-	@Override
-	public int getModifiers()
+	public ModifierSet getModifiers()
 	{
 		return this.modifiers;
-	}
-	
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return (this.modifiers & mod) == mod;
 	}
 	
 	@Override
@@ -163,42 +139,18 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeUTF(this.name.unqualified);
-		out.writeInt(this.modifiers);
-		
-		if (this.annotations == null)
-		{
-			out.writeShort(0);
-			return;
-		}
-		
-		int count = this.annotations.annotationCount();
-		out.writeShort(count);
-		for (int i = 0; i < count; i++)
-		{
-			this.annotations.getAnnotation(i).write(out);
-		}
+
+		ModifierSet.write(this.modifiers, out);
+		AnnotationList.write(this.annotations, out);
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.name = Name.get(in.readUTF());
-		this.modifiers = in.readInt();
-		
-		int count = in.readShort();
-		if (count == 0)
-		{
-			this.annotations = null;
-			return;
-		}
-		
-		this.annotations = new AnnotationList(count);
-		for (int i = 0; i < count; i++)
-		{
-			Annotation a = new Annotation();
-			a.read(in);
-			this.annotations.addAnnotation(a);
-		}
+
+		this.modifiers = ModifierSet.read(in);
+		this.annotations = AnnotationList.read(in);
 	}
 	
 	@Override
@@ -208,7 +160,8 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		{
 			this.annotations.toString(prefix, buffer);
 		}
-		buffer.append(ModifierTypes.ACCESS.toString(this.modifiers));
+
+		this.modifiers.toString(buffer);
 		buffer.append("header ").append(this.name);
 	}
 }

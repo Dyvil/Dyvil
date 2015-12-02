@@ -24,7 +24,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	
 	default boolean isEnumConstant()
 	{
-		return (this.getModifiers() & Modifiers.ENUM) != 0;
+		return this.hasModifier(Modifiers.ENUM);
 	}
 	
 	default IClass getTheClass()

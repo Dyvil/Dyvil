@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -27,31 +28,32 @@ import java.lang.annotation.ElementType;
 
 public final class ClassParameter extends Parameter implements IField
 {
-	public IClass theClass;
+	protected IClass theClass;
 	
 	public ClassParameter()
 	{
 	}
 	
-	public ClassParameter(IClass theClass)
+	public ClassParameter(Name name)
 	{
-		this.theClass = theClass;
+		super(name);
 	}
-	
+
 	public ClassParameter(Name name, IType type)
 	{
-		this.name = name;
-		this.type = type;
+		super(name, type);
 	}
-	
-	public ClassParameter(IClass theClass, Name name, IType type, int modifiers)
+
+	public ClassParameter(Name name, IType type, ModifierSet modifiers)
 	{
-		this.theClass = theClass;
-		this.name = name;
-		this.type = type;
-		this.modifiers = modifiers;
+		super(name, type, modifiers);
 	}
-	
+
+	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	{
+		super(position, name, type, modifiers);
+	}
+
 	@Override
 	public boolean isField()
 	{
@@ -100,10 +102,10 @@ public final class ClassParameter extends Parameter implements IField
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/var":
-			this.modifiers |= Modifiers.VAR;
+			this.modifiers.addIntModifier(Modifiers.VAR);
 			return false;
 		case "dyvil/annotation/_internal/lazy":
-			this.modifiers |= Modifiers.LAZY;
+			this.modifiers.addIntModifier(Modifiers.LAZY);
 			return false;
 		}
 		return true;
@@ -120,7 +122,7 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (instance != null)
 		{
-			if ((this.modifiers & Modifiers.STATIC) != 0)
+			if (this.hasModifier(Modifiers.STATIC))
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
@@ -133,7 +135,7 @@ public final class ClassParameter extends Parameter implements IField
 				markers.add(I18n.createMarker(position, "classparameter.access.instance", this.name.unqualified));
 			}
 		}
-		else if ((this.modifiers & Modifiers.STATIC) == 0)
+		else if (!this.hasModifier(Modifiers.STATIC))
 		{
 			markers.add(I18n.createMarker(position, "classparameter.access.unqualified", this.name.unqualified));
 			return new ThisExpr(position, this.theClass.getType(), context, markers);
@@ -149,7 +151,7 @@ public final class ClassParameter extends Parameter implements IField
 		{
 			markers.add(I18n.createError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
-		else if (newValue != null && (this.modifiers & Modifiers.FINAL) != 0)
+		else if (this.hasModifier(Modifiers.FINAL))
 		{
 			markers.add(I18n.createMarker(position, "classparameter.assign.final", this.name.unqualified));
 		}
@@ -222,7 +224,7 @@ public final class ClassParameter extends Parameter implements IField
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String desc = this.getDescription();
-		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
+		FieldVisitor fv = writer.visitField(this.modifiers.toFlags() & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.annotations, this.type);
 	}

@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -36,11 +37,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	private boolean	parametersResolved;
 	private boolean	exceptionsResolved;
 	
-	public ExternalMethod(IClass iclass, Name name, String desc, int modifiers)
+	public ExternalMethod(IClass iclass, Name name, String desc, ModifierSet modifiers)
 	{
-		super(iclass, name);
+		super(iclass, name, null, modifiers);
 		this.name = name;
-		this.modifiers = modifiers;
 		this.descriptor = desc;
 	}
 	

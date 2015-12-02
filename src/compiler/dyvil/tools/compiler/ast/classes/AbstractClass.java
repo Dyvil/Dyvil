@@ -16,6 +16,9 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -27,7 +30,6 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -45,7 +47,7 @@ public abstract class AbstractClass implements IClass
 	// Modifiers and Annotations
 	
 	protected AnnotationList annotations;
-	protected int            modifiers;
+	protected ModifierSet    modifiers;
 	
 	// Signature
 	
@@ -126,23 +128,23 @@ public abstract class AbstractClass implements IClass
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/internal":
-			this.modifiers |= Modifiers.INTERNAL;
+			this.modifiers.addIntModifier(Modifiers.INTERNAL);
 			return false;
 		case "dyvil/annotation/_internal/sealed":
-			this.modifiers |= Modifiers.SEALED;
+			this.modifiers.addModifier(BaseModifiers.INTERNAL);
 			return false;
 		case "dyvil/annotation/Strict":
-			this.modifiers |= Modifiers.STRICT;
+			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case "dyvil/annotation/_internal/object":
-			this.modifiers |= Modifiers.OBJECT_CLASS;
+			this.modifiers.addIntModifier(Modifiers.OBJECT_CLASS);
 			return false;
 		case Deprecation.DYVIL_INTERNAL:
 		case Deprecation.JAVA_INTERNAL:
-			this.modifiers |= Modifiers.DEPRECATED;
+			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
 		case "java/lang/FunctionalInterface":
-			this.modifiers |= Modifiers.FUNCTIONAL;
+			this.modifiers.addIntModifier(Modifiers.FUNCTIONAL);
 			return false;
 		case "dyvil/annotation/_internal/ClassParameters":
 			if (annotation != null)
@@ -167,7 +169,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public ElementType getElementType()
 	{
-		if ((this.modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		if (this.isAnnotation())
 		{
 			return ElementType.ANNOTATION_TYPE;
 		}
@@ -175,59 +177,45 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 		this.modifiers = modifiers;
 	}
 	
 	@Override
-	public int getModifiers()
+	public ModifierSet getModifiers()
 	{
 		return this.modifiers;
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
-	{
-		boolean flag = (this.modifiers & mod) == mod;
-		this.modifiers |= mod;
-		return flag;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.modifiers &= ~mod;
-	}
-	
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return (this.modifiers & mod) == mod;
-	}
-	
-	@Override
 	public boolean isAbstract()
 	{
-		return (this.modifiers & Modifiers.ABSTRACT) != 0;
+		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT);
 	}
 	
 	@Override
 	public boolean isInterface()
 	{
-		return (this.modifiers & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS;
+		return this.modifiers.hasIntModifier(Modifiers.INTERFACE_CLASS);
 	}
-	
+
+	@Override
+	public boolean isAnnotation()
+	{
+		return this.modifiers.hasIntModifier(Modifiers.ANNOTATION);
+	}
+
 	@Override
 	public boolean isObject()
 	{
-		return (this.modifiers & Modifiers.OBJECT_CLASS) != 0;
+		return this.modifiers.hasIntModifier(Modifiers.OBJECT_CLASS);
 	}
 	
 	@Override
 	public int getAccessLevel()
 	{
-		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
+		return this.modifiers.toFlags() & Modifiers.ACCESS_MODIFIERS;
 	}
 	
 	// Names
@@ -355,7 +343,7 @@ public abstract class AbstractClass implements IClass
 		int index = this.parameterCount++;
 		if (this.parameterCount > this.parameters.length)
 		{
-			ClassParameter[] temp = new ClassParameter[this.parameterCount];
+			IParameter[] temp = new IParameter[this.parameterCount];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
@@ -585,7 +573,7 @@ public abstract class AbstractClass implements IClass
 	public IMethod getFunctionalMethod()
 	{
 		// Copy in ExternalClass
-		if ((this.modifiers & Modifiers.ABSTRACT) == 0)
+		if (!this.isAbstract())
 		{
 			return null;
 		}
@@ -970,7 +958,7 @@ public abstract class AbstractClass implements IClass
 		{
 			return VISIBLE;
 		}
-		if (level == Modifiers.PROTECTED || level == Modifiers.DERIVED)
+		if (level == Modifiers.PROTECTED)
 		{
 			if (this.superType != null && this.superType.getTheClass() == iclass)
 			{
@@ -1025,8 +1013,11 @@ public abstract class AbstractClass implements IClass
 			this.annotations.toString(prefix, buffer);
 		}
 		
-		buffer.append(prefix).append(ModifierTypes.CLASS.toString(this.modifiers));
-		buffer.append(ModifierTypes.CLASS_TYPE.toString(this.modifiers)).append(this.name);
+		buffer.append(prefix);
+
+		this.modifiers.toString(buffer);
+		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
+		buffer.append(this.name);
 		
 		if (this.genericCount > 0)
 		{

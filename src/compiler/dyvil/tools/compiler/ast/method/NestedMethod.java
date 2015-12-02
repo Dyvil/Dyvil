@@ -146,7 +146,7 @@ public class NestedMethod extends CodeMethod
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers & 0xFFFF;
+		int modifiers = this.modifiers.toFlags() & 0xFFFF;
 		if (this.value == null)
 		{
 			modifiers |= Modifiers.ABSTRACT;
@@ -160,7 +160,7 @@ public class NestedMethod extends CodeMethod
 			mw.setThisType(this.theClass.getInternalName());
 		}
 		
-		this.writeAnnotations(mw);
+		this.writeAnnotations(mw, modifiers);
 		
 		int index = 0;
 		for (int i = 0; i < this.capturedFieldCount; i++)

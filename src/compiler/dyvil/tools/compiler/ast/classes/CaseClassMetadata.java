@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.Types;
@@ -48,7 +49,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			CodeMethod m = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(), Modifiers.PUBLIC | Modifiers.STATIC);
+			CodeMethod m = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
+			                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
 			IParameter[] parameters = this.theClass.getParameters();
 			int parameterCount = this.theClass.parameterCount();
 			
@@ -86,8 +88,9 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & APPLY) == 0)
 		{
-			mw = new MethodWriterImpl(writer,
-					writer.visitMethod(this.applyMethod.getModifiers(), "apply", this.applyMethod.getDescriptor(), this.applyMethod.getSignature(), null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers().toFlags(), "apply",
+			                                                     this.applyMethod.getDescriptor(),
+			                                                     this.applyMethod.getSignature(), null));
 			mw.begin();
 			mw.writeTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
 			mw.writeInsn(Opcodes.DUP);
@@ -106,7 +109,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		String internal = this.theClass.getInternalName();
 		if ((this.methods & EQUALS) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals", "(Ljava/lang/Object;)Z", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals",
+			                                                     "(Ljava/lang/Object;)Z", null, null));
 			mw.setThisType(internal);
 			mw.registerParameter(1, "obj", Types.OBJECT, 0);
 			mw.begin();
@@ -116,7 +120,9 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & HASHCODE) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I", null, null));
+			mw = new MethodWriterImpl(writer,
+			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I",
+			                                             null, null));
 			mw.setThisType(internal);
 			mw.begin();
 			CaseClasses.writeHashCode(mw, this.theClass);
@@ -125,7 +131,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		
 		if ((this.methods & TOSTRING) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString", "()Ljava/lang/String;", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString",
+			                                                     "()Ljava/lang/String;", null, null));
 			mw.setThisType(internal);
 			mw.begin();
 			CaseClasses.writeToString(mw, this.theClass);

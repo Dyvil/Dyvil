@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.field;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -13,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -22,6 +18,11 @@ import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
 
 public final class CaptureField implements IField
 {
@@ -111,25 +112,13 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 		this.field.setModifiers(modifiers);
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
-	{
-		return this.field.addModifier(mod);
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.field.removeModifier(mod);
-	}
-	
-	@Override
-	public int getModifiers()
+	public ModifierSet getModifiers()
 	{
 		return this.field.getModifiers();
 	}

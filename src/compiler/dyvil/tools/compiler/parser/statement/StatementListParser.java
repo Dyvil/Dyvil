@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.modifiers.*;
 import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -15,7 +16,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -36,7 +36,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	
 	private Name           label;
 	private IType          type;
-	private int            modifiers;
+	private ModifierSet    modifiers;
 	private AnnotationList annotations;
 	
 	public StatementListParser(IValueConsumer consumer)
@@ -59,7 +59,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		this.label = null;
 		this.type = null;
 		
-		this.modifiers = 0;
+		this.modifiers = null;
 		this.annotations = null;
 	}
 	
@@ -125,10 +125,15 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 					return;
 				}
 			}
-			int i;
-			if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
+			Modifier modifier;
+			if ((modifier = BaseModifiers.parseMemberModifier(token, pm)) != null)
 			{
-				this.modifiers |= i;
+				if (this.modifiers == null)
+				{
+					this.modifiers = new ModifierList();
+				}
+
+				this.modifiers.addModifier(modifier);
 				return;
 			}
 			if (type == DyvilSymbols.AT)
@@ -160,7 +165,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.EQUALS)
 			{
 				Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
-				variable.setModifiers(this.modifiers);
+				variable.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
 				variable.setAnnotations(this.annotations);
 
 				FieldInitializer fi = new FieldInitializer(variable);

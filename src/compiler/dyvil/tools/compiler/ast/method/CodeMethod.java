@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -22,7 +23,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
-import dyvil.tools.compiler.util.ModifierTypes;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -51,12 +52,12 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type);
 	}
 	
-	public CodeMethod(IClass iclass, Name name, IType type, int modifiers)
+	public CodeMethod(IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(iclass, name, type, modifiers);
 	}
 	
-	public CodeMethod(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	public CodeMethod(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(position, iclass, name, type, modifiers);
 	}
@@ -65,13 +66,6 @@ public class CodeMethod extends AbstractMethod
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, this);
-		
-		if ((this.modifiers & Modifiers.PREFIX) != 0)
-		{
-			// Static & Prefix will cause errors but does happen, so remove the
-			// prefix modifier
-			this.modifiers &= ~Modifiers.PREFIX;
-		}
 		
 		for (int i = 0; i < this.genericCount; i++)
 		{
@@ -95,11 +89,11 @@ public class CodeMethod extends AbstractMethod
 		}
 		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			this.modifiers |= Modifiers.ABSTRACT | Modifiers.PUBLIC;
+			this.modifiers.addIntModifier(Modifiers.ABSTRACT | Modifiers.PUBLIC);
 		}
 		else if (this.theClass.hasModifier(Modifiers.ABSTRACT))
 		{
-			this.modifiers |= Modifiers.ABSTRACT;
+			this.modifiers.addIntModifier(Modifiers.ABSTRACT);
 		}
 	}
 	
@@ -225,17 +219,17 @@ public class CodeMethod extends AbstractMethod
 		}
 		
 		// Check for illegal modifiers
-		int illegalModifiers = this.modifiers & ~Modifiers.METHOD_MODIFIERS;
+		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.METHOD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
 			markers.add(I18n.createError(this.position, "method.illegal_modifiers", this.name,
-			                             ModifierTypes.FIELD.toString(illegalModifiers)));
+			                             ModifierUtil.fieldModifiersToString(illegalModifiers)));
 		}
 		
 		// Check illegal modifier combinations
-		ModifierTypes.checkMethodModifiers(markers, this, this.modifiers, this.value != null, "method");
+		ModifierUtil.checkMethodModifiers(markers, this, this.modifiers.toFlags(), this.value != null, "method");
 		
-		if ((this.modifiers & Modifiers.STATIC) == 0)
+		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.checkOverride(markers, context);
 		}
@@ -287,14 +281,14 @@ public class CodeMethod extends AbstractMethod
 	{
 		if (this.overrideMethods == null)
 		{
-			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
+			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
 				markers.add(I18n.createMarker(this.position, "method.override", this.name));
 			}
 			return;
 		}
 		
-		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 		{
 			markers.add(I18n.createMarker(this.position, "method.overrides", this.name));
 		}
@@ -381,7 +375,7 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers & 0xFFFF;
+		int modifiers = this.modifiers.toFlags() & 0xFFFF;
 		if (this.value == null)
 		{
 			modifiers |= Modifiers.ABSTRACT;
@@ -396,12 +390,12 @@ public class CodeMethod extends AbstractMethod
 		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
 		                                                          this.getSignature(), exceptions2));
 
-		if ((this.modifiers & Modifiers.STATIC) == 0)
+		if ((modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.setThisType(this.theClass.getInternalName());
 		}
 		
-		this.writeAnnotations(mw);
+		this.writeAnnotations(mw, modifiers);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -427,7 +421,7 @@ public class CodeMethod extends AbstractMethod
 			              param.getSignature(), start, end);
 		}
 		
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			return;
 		}
@@ -493,7 +487,7 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 	
-	protected void writeAnnotations(MethodWriter mw)
+	protected void writeAnnotations(MethodWriter mw, int modifiers)
 	{
 		if (this.annotations != null)
 		{
@@ -504,27 +498,27 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 		
-		if ((this.modifiers & Modifiers.INLINE) == Modifiers.INLINE)
+		if ((modifiers & Modifiers.INLINE) == Modifiers.INLINE)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/inline;", false);
 		}
-		if ((this.modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/extension;", true);
 		}
-		else if ((this.modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		else if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/infix;", false);
 		}
-		if ((this.modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
+		if ((modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/prefix;", false);
 		}
-		if ((this.modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
-		if ((this.modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		if ((modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
 		}
