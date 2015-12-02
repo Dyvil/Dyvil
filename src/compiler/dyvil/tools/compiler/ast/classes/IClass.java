@@ -47,6 +47,8 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	boolean isAbstract();
 	
 	boolean isInterface();
+
+	boolean isAnnotation();
 	
 	boolean isObject();
 	

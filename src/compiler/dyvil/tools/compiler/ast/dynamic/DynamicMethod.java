@@ -14,6 +14,8 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -35,9 +37,10 @@ import java.lang.annotation.ElementType;
 
 public class DynamicMethod implements IMethod, IDefaultContext
 {
-	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker", "linkMethod",
-			"(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
-			
+	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
+	                                                  "linkMethod",
+	                                                  "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+
 	public Name name;
 	
 	public DynamicMethod(Name name)
@@ -172,25 +175,14 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	// Modifiers
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
+	public ModifierSet getModifiers()
 	{
-		return false;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-	}
-	
-	@Override
-	public int getModifiers()
-	{
-		return 0;
+		return EmptyModifiers.INSTANCE;
 	}
 	
 	@Override
@@ -406,7 +398,8 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException
 	{
 		StringBuilder desc = new StringBuilder();
 		desc.append('(');
@@ -429,17 +422,20 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 	}
 	

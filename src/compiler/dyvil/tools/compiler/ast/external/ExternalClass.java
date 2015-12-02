@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -53,18 +54,19 @@ public final class ExternalClass extends AbstractClass
 	
 	private Map<String, String> innerTypes;
 	
-	private boolean	metadataResolved;
-	private boolean	superTypesResolved;
-	private boolean	genericsResolved;
-	private boolean	parametersResolved;
-	private boolean	annotationsResolved;
-	private boolean	innerTypesResolved;
+	private boolean metadataResolved;
+	private boolean superTypesResolved;
+	private boolean genericsResolved;
+	private boolean parametersResolved;
+	private boolean annotationsResolved;
+	private boolean innerTypesResolved;
 	
 	private String[] classParameters;
 	
 	public ExternalClass(Name name)
 	{
 		this.name = name;
+		// this.modifiers = new FlagModifierSet();
 	}
 	
 	@Override
@@ -80,7 +82,7 @@ public final class ExternalClass extends AbstractClass
 	
 	private void resolveMetadata()
 	{
-		this.metadata = IClass.getClassMetadata(this, this.modifiers);
+		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		this.metadata.resolveTypes(null, this);
 		this.metadata.resolveTypesBody(null, this);
 	}
@@ -156,7 +158,6 @@ public final class ExternalClass extends AbstractClass
 			{
 				c.setOuterClass(this);
 				this.body.addClass(c);
-				continue;
 			}
 		}
 		
@@ -304,7 +305,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		if ((this.modifiers & Modifiers.ABSTRACT | Modifiers.INTERFACE_CLASS) == 0)
+		if (!this.isAbstract())
 		{
 			return null;
 		}
@@ -500,7 +501,7 @@ public final class ExternalClass extends AbstractClass
 	
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
-		this.modifiers = access;
+		this.modifiers = new FlagModifierSet(access);
 		this.internalName = name;
 		
 		this.body = new ClassBody(this);
@@ -623,14 +624,14 @@ public final class ExternalClass extends AbstractClass
 			{
 				if (s.equals(name))
 				{
-					ClassParameter param = new ClassParameter(this, Name.get(name), type, access);
+					ClassParameter param = new ClassParameter(Name.get(name), type, new FlagModifierSet(access));
 					this.addParameter(param);
 					return new SimpleFieldVisitor(param);
 				}
 			}
 		}
 		
-		ExternalField field = new ExternalField(this, access, Name.get(name), type);
+		ExternalField field = new ExternalField(this, Name.get(name), type, new FlagModifierSet(access));
 		
 		if (value != null)
 		{
@@ -646,9 +647,10 @@ public final class ExternalClass extends AbstractClass
 	{
 		Name name1 = Name.get(name);
 		
-		if ((this.modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		if (this.isAnnotation())
 		{
-			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc), access);
+			ClassParameter param = new ClassParameter(name1, ClassFormat.readReturnType(desc),
+			                                          new FlagModifierSet(access));
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
 		}
@@ -661,7 +663,7 @@ public final class ExternalClass extends AbstractClass
 		if ("<init>".equals(name))
 		{
 			ExternalConstructor constructor = new ExternalConstructor(this);
-			constructor.setModifiers(access);
+			constructor.setModifiers(new FlagModifierSet(access));
 			
 			if (signature != null)
 			{
@@ -687,7 +689,7 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleMethodVisitor(constructor);
 		}
 		
-		ExternalMethod method = new ExternalMethod(this, name1, desc, access);
+		ExternalMethod method = new ExternalMethod(this, name1, desc, new FlagModifierSet(access));
 		
 		if (signature != null)
 		{
@@ -717,7 +719,7 @@ public final class ExternalClass extends AbstractClass
 	{
 		if (this.innerTypes == null)
 		{
-			this.innerTypes = new ArrayMap(3);
+			this.innerTypes = new ArrayMap<>(3);
 		}
 		
 		this.innerTypes.put(innerName, name);

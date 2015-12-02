@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 
 public interface IProperty extends IField
 {
@@ -8,11 +9,9 @@ public interface IProperty extends IField
 	
 	boolean hasGetter();
 	
-	void setGetterModifiers(int modifiers);
+	void setGetterModifiers(ModifierSet modifiers);
 	
-	void addGetterModifier(int modifier);
-	
-	int getGetterModifiers();
+	ModifierSet getGetterModifiers();
 	
 	void setGetter(IValue get);
 	
@@ -22,11 +21,9 @@ public interface IProperty extends IField
 	
 	boolean hasSetter();
 	
-	void setSetterModifiers(int modifiers);
+	void setSetterModifiers(ModifierSet modifiers);
 	
-	void addSetterModifier(int modifier);
-	
-	int getSetterModifiers();
+	ModifierSet getSetterModifiers();
 	
 	void setSetter(IValue set);
 	

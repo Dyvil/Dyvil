@@ -1,14 +1,13 @@
 package dyvil.tools.compiler.ast.member;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -16,16 +15,19 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public abstract class Member implements IMember
 {
 	protected ICodePosition position;
 	
+	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
-	
-	protected int modifiers;
-	
-	protected IType	type;
-	protected Name	name;
+
+	protected IType type;
+	protected Name  name;
 	
 	protected Member()
 	{
@@ -34,26 +36,37 @@ public abstract class Member implements IMember
 	protected Member(Name name)
 	{
 		this.name = name;
+		this.modifiers = new ModifierList();
 	}
 	
 	public Member(IType type)
 	{
 		this.type = type;
+		this.modifiers = EmptyModifiers.INSTANCE;
 	}
 	
 	public Member(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
+		this.modifiers = EmptyModifiers.INSTANCE;
 	}
 	
-	public Member(Name name, IType type, int modifiers)
+	public Member(Name name, IType type, ModifierSet modifiers)
 	{
 		this.name = name;
 		this.type = type;
 		this.modifiers = modifiers;
 	}
-	
+
+	public Member(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	{
+		this.position = position;
+		this.name = name;
+		this.type = type;
+		this.modifiers = modifiers;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -95,35 +108,21 @@ public abstract class Member implements IMember
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 		this.modifiers = modifiers;
 	}
 	
 	@Override
-	public int getModifiers()
+	public ModifierSet getModifiers()
 	{
 		return this.modifiers;
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
-	{
-		boolean flag = (this.modifiers & mod) != 0;
-		this.modifiers |= mod;
-		return flag;
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.modifiers &= ~mod;
-	}
-	
-	@Override
 	public int getAccessLevel()
 	{
-		return this.modifiers & Modifiers.ACCESS_MODIFIERS;
+		return this.modifiers.toFlags() & Modifiers.ACCESS_MODIFIERS;
 	}
 	
 	@Override
@@ -148,12 +147,6 @@ public abstract class Member implements IMember
 	public Name getName()
 	{
 		return this.name;
-	}
-	
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return (this.modifiers & mod) == mod;
 	}
 	
 	@Override
@@ -248,8 +241,7 @@ public abstract class Member implements IMember
 	
 	protected void writeAnnotations(DataOutput out) throws IOException
 	{
-		out.writeInt(this.modifiers);
-		
+		ModifierSet.write(this.modifiers, out);
 		AnnotationList.write(this.annotations, out);
 	}
 	
@@ -267,7 +259,7 @@ public abstract class Member implements IMember
 	
 	protected void readAnnotations(DataInput in) throws IOException
 	{
-		this.modifiers = in.readInt();
+		this.modifiers = ModifierSet.read(in);
 		this.annotations = AnnotationList.read(in);
 	}
 	

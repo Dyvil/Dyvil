@@ -1,11 +1,8 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -50,16 +47,12 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 				return;
 			}
 		case CLASS:
-			if (type == DyvilSymbols.AT && token.next().type() == DyvilKeywords.INTERFACE)
-			{
-				this.modifiers |= Modifiers.ANNOTATION;
-				return;
-			}
 			int i;
-			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
+			if ((i = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
 			{
-				pm.pushParser(new ClassDeclarationParser(this.unit, this.modifiers | i, this.annotations));
-				this.modifiers = 0;
+				this.modifiers.addIntModifier(i);
+				pm.pushParser(new ClassDeclarationParser(this.unit, this.modifiers, this.annotations));
+				this.modifiers = null;
 				this.annotations = null;
 				return;
 			}
@@ -70,6 +63,5 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			}
 		}
 		pm.report(token, "Invalid Header Element - Invalid " + token);
-		return;
 	}
 }

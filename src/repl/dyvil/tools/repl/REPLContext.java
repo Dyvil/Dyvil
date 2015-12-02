@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -185,7 +186,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		REPLMemberClass iclass = new REPLMemberClass(Name.getQualified(this.className), member, this);
 		member.setTheClass(iclass);
-		member.addModifier(Modifiers.STATIC);
+		member.getModifiers().addIntModifier(Modifiers.STATIC);
 		return iclass;
 	}
 	
@@ -207,7 +208,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void setValue(IValue value)
 	{
 		REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, value, this.className,
-		                                      Modifiers.FINAL);
+		                                      new FlagModifierSet(Modifiers.FINAL));
 		this.memberClass = this.getREPLClass(field);
 		
 		value.resolveTypes(this.markers, this);

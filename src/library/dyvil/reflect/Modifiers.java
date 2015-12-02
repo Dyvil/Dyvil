@@ -38,14 +38,6 @@ public interface Modifiers
 	int PROTECTED = 0x00000004;
 	
 	/**
-	 * <i>Dyvil</i> {@code derived} access modifier. A member declared as
-	 * {@code derived} can only be accessed from the class it is a member of or
-	 * subclasses. Unlike {@code protected}, it cannot be accessed from within
-	 * the same package.
-	 */
-	int DERIVED = PRIVATE | PROTECTED;
-	
-	/**
 	 * {@code static} modifier.
 	 */
 	int STATIC = 0x00000008;

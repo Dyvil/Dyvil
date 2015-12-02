@@ -1,13 +1,5 @@
 package dyvil.tools.compiler;
 
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.*;
-
 import dyvil.io.AppendableOutputStream;
 import dyvil.io.FileUtils;
 import dyvil.tools.asm.Opcodes;
@@ -21,6 +13,14 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.CodeFile;
+
+import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.*;
 
 public final class DyvilCompiler
 {
@@ -55,7 +55,7 @@ public final class DyvilCompiler
 	
 	public static void warn(String message)
 	{
-		System.err.println(message);
+		System.out.println(message);
 		if (logger != null)
 		{
 			logger.warning(message);
@@ -65,7 +65,7 @@ public final class DyvilCompiler
 	public static void error(String message)
 	{
 		compilationFailed = true;
-		System.err.println(message);
+		System.out.println(message);
 		if (logger != null)
 		{
 			logger.severe(message);

@@ -6,6 +6,10 @@ import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
+import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
+import dyvil.tools.compiler.ast.modifiers.Modifier;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -15,7 +19,6 @@ import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -24,15 +27,15 @@ import dyvil.tools.parsing.token.IToken;
 
 public class DyvilHeaderParser extends Parser
 {
-	protected static final int	PACKAGE		= 1;
-	protected static final int	IMPORT		= 2;
-	protected static final int	METADATA	= 4;
+	protected static final int PACKAGE  = 1;
+	protected static final int IMPORT   = 2;
+	protected static final int METADATA = 4;
 	
-	protected IDyvilHeader	unit;
-	protected boolean		unitHeader;
+	protected IDyvilHeader unit;
+	protected boolean      unitHeader;
 	
-	protected int				modifiers;
-	protected AnnotationList	annotations;
+	protected ModifierSet    modifiers;
+	protected AnnotationList annotations;
 	
 	protected IToken lastToken;
 	
@@ -103,10 +106,15 @@ public class DyvilHeaderParser extends Parser
 	
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
-		int i;
-		if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
+		Modifier modifier;
+		if ((modifier = BaseModifiers.parseClassModifier(token, pm)) != null)
 		{
-			this.modifiers |= i;
+			if (this.modifiers == null)
+			{
+				this.modifiers = new ModifierList();
+			}
+
+			this.modifiers.addModifier(modifier);
 			return true;
 		}
 		if (type == DyvilSymbols.AT && token.next().type() != DyvilKeywords.INTERFACE)
@@ -127,8 +135,9 @@ public class DyvilHeaderParser extends Parser
 				}
 				
 				Name name = next.nameValue();
-				this.unit.setHeaderDeclaration(new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
-				this.modifiers = 0;
+				this.unit.setHeaderDeclaration(
+						new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
+				this.modifiers = null;
 				this.annotations = null;
 				this.lastToken = null;
 				this.mode = IMPORT;
@@ -189,7 +198,6 @@ public class DyvilHeaderParser extends Parser
 		}
 		
 		pm.report(token, "Invalid Header Element - Invalid " + token);
-		return;
 	}
 	
 	private void parseAnnotation(IParserManager pm, IToken token)

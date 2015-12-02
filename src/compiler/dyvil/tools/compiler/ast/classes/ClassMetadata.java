@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -149,7 +150,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 		}
 		
-		Constructor constructor = new Constructor(this.theClass, Modifiers.PUBLIC);
+		Constructor constructor = new Constructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
 		int parameterCount = this.theClass.parameterCount();
 		IParameter[] parameters = this.theClass.getParameters();
 		

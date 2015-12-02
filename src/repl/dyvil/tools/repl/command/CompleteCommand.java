@@ -230,7 +230,7 @@ public class CompleteCommand implements ICommand
 			return false;
 		}
 		
-		int modifiers = member.getModifiers();
+		int modifiers = member.getModifiers().toFlags();
 		if ((modifiers & Modifiers.PUBLIC) == 0)
 		{
 			return false;

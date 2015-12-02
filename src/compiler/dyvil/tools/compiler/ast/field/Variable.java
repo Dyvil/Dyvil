@@ -90,7 +90,7 @@ public final class Variable extends Member implements IVariable
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/lazy":
-			this.modifiers |= Modifiers.LAZY;
+			this.modifiers.addIntModifier(Modifiers.LAZY);
 			return false;
 		}
 		return true;
@@ -111,7 +111,7 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if ((this.modifiers & Modifiers.FINAL) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
 			markers.add(I18n.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
