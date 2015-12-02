@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.type.alias;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,7 +16,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends IASTNode, INamed, ITyped, IObjectCompilable
+public interface ITypeAlias extends IASTNode, INamed, ITyped, IGeneric, IObjectCompilable
 {
 	@Override
 	void setName(Name name);
@@ -27,7 +29,31 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped, IObjectCompilable
 	
 	@Override
 	IType getType();
-	
+
+	@Override
+	void addTypeVariable(ITypeVariable var);
+
+	@Override
+	int genericCount();
+
+	@Override
+	ITypeVariable getTypeVariable(int index);
+
+	@Override
+	ITypeVariable[] getTypeVariables();
+
+	@Override
+	boolean isGeneric();
+
+	@Override
+	void setGeneric();
+
+	@Override
+	void setTypeVariable(int index, ITypeVariable var);
+
+	@Override
+	void setTypeVariables(ITypeVariable[] typeVars, int count);
+
 	// Phases
 	
 	void resolveTypes(MarkerList markers, IContext context);
