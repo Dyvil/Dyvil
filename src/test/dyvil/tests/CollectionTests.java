@@ -1,5 +1,6 @@
 package dyvil.tests;
 
+import dyvil.collection.*;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonList;
@@ -11,7 +12,9 @@ import dyvil.util.Immutable;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class CollectionTests
 {
@@ -74,7 +77,7 @@ public class CollectionTests
 		
 		assertTrue("Immutable Collection must be instanceof dyvil.util.Immutable",
 		           isImmutable == collection instanceof Immutable);
-		
+
 		assertEquals("Collection must be equal to it's copy: " + copy.getClass(), collection, copy);
 		assertEquals("Collection must be equal to it's mutable version: " + mutable.getClass(), collection, mutable);
 		assertEquals("Collection must be equal to it's mutable copy: " + mutableCopy.getClass(), collection,

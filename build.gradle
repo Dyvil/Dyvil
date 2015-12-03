@@ -55,6 +55,10 @@ sourceSets {
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
 		}
+
+		test {
+			srcDir 'src/test'
+		}
 	}
 	
 	dpf {

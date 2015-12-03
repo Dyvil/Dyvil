@@ -25,21 +25,24 @@ import java.util.regex.Pattern;
  * @version 1.0
  */
 @Utility(String.class)
-public interface StringUtils
+public final class StringUtils
 {
-	String[] EMPTY_STRING_ARRAY = new String[0];
+	public static final String[] EMPTY_STRING_ARRAY = new String[0];
+
+	private StringUtils()
+	{
+		// no instances
+	}
 	
-	static
 	@infix
 	@inline
-	String $times(int count, String string)
+	public static String $times(int count, String string)
 	{
 		return $times(string, count);
 	}
-	
-	static
+
 	@infix
-	String $times(String string, int count)
+	public static String $times(String string, int count)
 	{
 		switch (count)
 		{
@@ -54,21 +57,21 @@ public interface StringUtils
 			}
 			return string.concat(string);
 		}
-		
+
 		if (string == null)
 		{
 			string = "null";
 		}
-		
+
 		StringBuilder builder = new StringBuilder(string.length() * count);
 		for (int i = 0; i < count; i++)
 		{
 			builder.append(string);
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	/**
 	 * Formats the given {@link String} {@code format} with the given
 	 * {@code Object[] args} using {@link String#format(String, Object...)}.
@@ -80,17 +83,42 @@ public interface StringUtils
 	 *
 	 * @return the formatted String
 	 */
-	static
+
 	@infix
 	@inline
-	String format(String format, Object... args)
+	public static String format(String format, Object... args)
 	{
 		return String.format(format, args);
 	}
-	
-	static
+
 	@infix
-	String[] words(String string)
+	public static String[] split(String string, char character)
+	{
+		int len = string.length();
+		ArrayList<String> list = new ArrayList<>(len >> 4);
+
+		int startIndex = 0;
+		for (int i = 0; i < len; i++)
+		{
+			if (string.charAt(i) == character)
+			{
+				int count = i - startIndex;
+				if (count > 0)
+				{
+					String part = string.substring(startIndex, i);
+					list.add(part);
+				}
+				startIndex = i + 1;
+			}
+		}
+
+		String[] array = new String[list.size()];
+		list.toArray(array);
+		return array;
+	}
+
+	@infix
+	public static String[] words(String string)
 	{
 		List<String> words = wordList(string);
 		String[] array = new String[words.size()];
@@ -109,11 +137,11 @@ public interface StringUtils
 	 *
 	 * @return a list of words in the given string
 	 */
-	static
+
 	@infix
-	List<String> wordList(String string)
+	public static List<String> wordList(String string)
 	{
-		List<String> words = new ArrayList();
+		List<String> words = new ArrayList<>();
 		StringBuilder buffer = new StringBuilder(10);
 		
 		for (int i = 0; i < string.length(); i++)
@@ -147,17 +175,18 @@ public interface StringUtils
 	 * at which point the generated list of lines will be returned.
 	 *
 	 * @param string
+	 * 		the String to trim
 	 * @param maxLength
+	 * 		the maximum line length
 	 *
-	 * @return
+	 * @return a List of trimmed lines
 	 */
-	static
 	@infix
-	List<String> trimLineLength(String string, int maxLength)
+	public static List<String> trimLineLength(String string, int maxLength)
 	{
 		String[] words = string.split("\\s");
 		StringBuilder buffer = new StringBuilder(10);
-		List<String> lines = new ArrayList();
+		List<String> lines = new ArrayList<>();
 		
 		for (String word : words)
 		{
@@ -186,9 +215,8 @@ public interface StringUtils
 	 *
 	 * @return an array of lines
 	 */
-	static
 	@infix
-	String[] lines(String string)
+	public static String[] lines(String string)
 	{
 		if (string == null || string.isEmpty())
 		{
@@ -207,13 +235,13 @@ public interface StringUtils
 	 *
 	 * @return a List of lines
 	 */
-	static List<String> lineList(String string)
+	public static List<String> lineList(String string)
 	{
 		if (string == null)
 		{
-			return new ArrayList();
+			return new ArrayList<>();
 		}
-		return new ArrayList(string.split("\n"), true);
+		return new ArrayList<>(string.split("\n"), true);
 	}
 	
 	/**
@@ -227,9 +255,8 @@ public interface StringUtils
 	 *
 	 * @return the Levenshtein distance between the two strings
 	 */
-	static
 	@infix
-	int distanceTo(String s1, String s2)
+	public static int distanceTo(String s1, String s2)
 	{
 		if (s1.equals(s2))
 		{
@@ -281,9 +308,8 @@ public interface StringUtils
 	 *
 	 * @return the string converted to a valid identifier
 	 */
-	static
 	@infix
-	String toIdentifier(String string)
+	public static String toIdentifier(String string)
 	{
 		int len = string.length();
 		StringBuilder result = new StringBuilder(len);
@@ -320,9 +346,8 @@ public interface StringUtils
 	 *
 	 * @return the acronym of the string
 	 */
-	static
 	@infix
-	String toAcronym(String string)
+	public static String toAcronym(String string)
 	{
 		if (string == null)
 		{
@@ -375,9 +400,8 @@ public interface StringUtils
 	 * @return a readable acronym-like version of the string with most vowels
 	 * removed
 	 */
-	static
 	@infix
-	String removeVowels(String string)
+	public static String removeVowels(String string)
 	{
 		if (string == null)
 		{
@@ -391,8 +415,8 @@ public interface StringUtils
 		}
 		
 		StringBuilder builder = new StringBuilder(len);
-		
-		char prev = 0;
+
+		char prev;
 		char curr = 0;
 		char next = string.charAt(0);
 		for (int i = 1; i < len; i++)
@@ -410,9 +434,8 @@ public interface StringUtils
 		return builder.append(next).toString();
 	}
 	
-	static
 	@infix
-	String toTitleCase(String s)
+	public static String toTitleCase(String s)
 	{
 		if (s == null)
 		{
@@ -450,9 +473,8 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	static
 	@infix
-	String toLowerCamelCase(String s)
+	public static String toLowerCamelCase(String s)
 	{
 		if (s == null)
 		{
@@ -490,9 +512,8 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	static
 	@infix
-	String toUpperCamelCase(String s)
+	public static String toUpperCamelCase(String s)
 	{
 		if (s == null)
 		{
@@ -530,9 +551,8 @@ public interface StringUtils
 		return builder.toString();
 	}
 	
-	static
 	@infix
-	String toInvertedCase(String s)
+	public static String toInvertedCase(String s)
 	{
 		if (s == null)
 		{
@@ -567,7 +587,7 @@ public interface StringUtils
 	 *
 	 * @return the number of times the character appears in the string
 	 */
-	static
+	public static
 	@infix
 	int count(String string, char c)
 	{
@@ -594,9 +614,8 @@ public interface StringUtils
 	 *
 	 * @return true, if the string contains the character
 	 */
-	static
 	@infix
-	boolean contains(String string, char c)
+	public static boolean contains(String string, char c)
 	{
 		return string.indexOf(c) != -1;
 	}
@@ -615,35 +634,20 @@ public interface StringUtils
 	 * @see Pattern
 	 * @see Matcher#find()
 	 */
-	static boolean containsRegex(String string, String regex)
+	@infix
+	public static boolean containsRegex(String string, String regex)
 	{
 		return Pattern.compile(regex).matcher(string).find();
 	}
-	
-	static boolean containsAny(String string, String regex)
-	{
-		return indexOfAny(string, regex) != -1;
-	}
-	
-	static int indexOfRegex(String string, String regex)
+
+	@infix
+	public static int indexOfRegex(String string, String regex)
 	{
 		return Pattern.compile(regex).matcher(string).start();
 	}
-	
-	static int indexOfAny(String string, String regex)
-	{
-		for (int i = 0; i < regex.length(); i++)
-		{
-			int index = string.indexOf(regex.charAt(i));
-			if (index != -1)
-			{
-				return index;
-			}
-		}
-		return -1;
-	}
-	
-	static int indexOfRange(String string, String regex, int min, int max)
+
+	@infix
+	public static int indexOfRange(String string, String regex, int min, int max)
 	{
 		int index = string.indexOf(regex, min);
 		return index < max ? index : -1;
@@ -661,9 +665,8 @@ public interface StringUtils
 	 *
 	 * @return the next random name
 	 */
-	static
 	@infix
-	String nextNoun(java.util.Random random, int minLength, int maxLength)
+	public static String nextNoun(java.util.Random random, int minLength, int maxLength)
 	{
 		int len = RandomUtils.nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);
@@ -711,7 +714,7 @@ public interface StringUtils
 		return buf.toString();
 	}
 	
-	static <T> void prettyPrint(T value, Class<T> type, StringBuilder builder, boolean fieldNames)
+	public static <T> void prettyPrint(T value, Class<T> type, StringBuilder builder, boolean fieldNames)
 	{
 		Field[] fields = type.getFields();
 		builder.append(type.getName());
