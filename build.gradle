@@ -49,18 +49,20 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
+	test {
+		java {
+			srcDir 'src/test'
+		}
+	}
+
 	library {
 		java {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
 		}
-
-		test {
-			srcDir 'src/test'
-		}
 	}
-	
+
 	dpf {
 		java {
 			srcDir 'src/dpf'
@@ -69,7 +71,7 @@ sourceSets {
 			runtimeClasspath += library.output
 		}
 	}
-	
+
 	compiler {
 		java {
 			srcDir 'src/compiler'
@@ -84,7 +86,7 @@ sourceSets {
 		}
 		return
 	}
-	
+
 	repl {
 		java {
 			srcDir 'src/repl'
