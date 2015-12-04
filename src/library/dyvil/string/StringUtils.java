@@ -4,6 +4,7 @@ import dyvil.annotation.Utility;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.List;
+import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.math.MathUtils;
 import dyvil.random.RandomUtils;
@@ -83,7 +84,6 @@ public final class StringUtils
 	 *
 	 * @return the formatted String
 	 */
-
 	@infix
 	@inline
 	public static String format(String format, Object... args)
@@ -94,6 +94,11 @@ public final class StringUtils
 	@infix
 	public static String[] split(String string, char character)
 	{
+		if (string == null || string.isEmpty())
+		{
+			return EMPTY_STRING_ARRAY;
+		}
+
 		int len = string.length();
 		ArrayList<String> list = new ArrayList<>(len >> 4);
 
@@ -102,14 +107,16 @@ public final class StringUtils
 		{
 			if (string.charAt(i) == character)
 			{
-				int count = i - startIndex;
-				if (count > 0)
+				if (i - startIndex > 0)
 				{
-					String part = string.substring(startIndex, i);
-					list.add(part);
+					list.add(string.substring(startIndex, i));
 				}
 				startIndex = i + 1;
 			}
+		}
+		if (len - startIndex > 0)
+		{
+			list.add(string.substring(startIndex, len));
 		}
 
 		String[] array = new String[list.size()];
@@ -120,10 +127,11 @@ public final class StringUtils
 	@infix
 	public static String[] words(String string)
 	{
-		List<String> words = wordList(string);
-		String[] array = new String[words.size()];
-		words.toArray(array);
-		return array;
+		if (string == null || string.isEmpty())
+		{
+			return EMPTY_STRING_ARRAY;
+		}
+		return string.split("\\s");
 	}
 	
 	/**
@@ -141,68 +149,11 @@ public final class StringUtils
 	@infix
 	public static List<String> wordList(String string)
 	{
-		List<String> words = new ArrayList<>();
-		StringBuilder buffer = new StringBuilder(10);
-		
-		for (int i = 0; i < string.length(); i++)
+		if (string == null || string.isEmpty())
 		{
-			char c = string.charAt(i);
-			if (!CharUtils.isLetter(c))
-			{
-				words.add(buffer.toString());
-				buffer.delete(0, buffer.length());
-				continue;
-			}
-			buffer.append(c);
+			return EmptyList.apply();
 		}
-		
-		if (buffer.length() > 0)
-		{
-			words.add(buffer.toString());
-		}
-		
-		return words;
-	}
-	
-	/**
-	 * Trims the given {@code string} to lines of the maximum length
-	 * {@code maxLength}. This is done by {@link String#split(String) splitting}
-	 * the {@code string} into a list of tokens separated by whitespace
-	 * characters, and adding the words separated by a single whitespace to a
-	 * line buffer. As soon as the line buffer reaches the {@code maxLength},
-	 * the algorithm adds the line to a list collecting the lines and proceeds
-	 * with a new, empty line. This is done until all words have been processed,
-	 * at which point the generated list of lines will be returned.
-	 *
-	 * @param string
-	 * 		the String to trim
-	 * @param maxLength
-	 * 		the maximum line length
-	 *
-	 * @return a List of trimmed lines
-	 */
-	@infix
-	public static List<String> trimLineLength(String string, int maxLength)
-	{
-		String[] words = string.split("\\s");
-		StringBuilder buffer = new StringBuilder(10);
-		List<String> lines = new ArrayList<>();
-		
-		for (String word : words)
-		{
-			if (buffer.length() + word.length() >= maxLength)
-			{
-				lines.add(buffer.toString());
-				buffer.delete(0, buffer.length());
-			}
-			buffer.append(word).append(' ');
-		}
-		if (buffer.length() > 0)
-		{
-			lines.add(buffer.toString());
-		}
-		
-		return lines;
+		return List.apply(words(string));
 	}
 	
 	/**
@@ -222,7 +173,7 @@ public final class StringUtils
 		{
 			return EMPTY_STRING_ARRAY;
 		}
-		return string.split("\n");
+		return split(string, '\n');
 	}
 	
 	/**
@@ -235,13 +186,15 @@ public final class StringUtils
 	 *
 	 * @return a List of lines
 	 */
+	@infix
 	public static List<String> lineList(String string)
 	{
-		if (string == null)
+		if (string == null || string.isEmpty())
 		{
-			return new ArrayList<>();
+			return EmptyList.apply();
 		}
-		return new ArrayList<>(string.split("\n"), true);
+
+		return List.apply(lines(string));
 	}
 	
 	/**
@@ -362,7 +315,7 @@ public final class StringUtils
 		
 		StringBuilder builder = new StringBuilder(len >> 2);
 		
-		boolean seperator = true;
+		boolean separator = true;
 		for (int i = 0; i < len; i++)
 		{
 			char c = string.charAt(i);
@@ -372,14 +325,14 @@ public final class StringUtils
 				{
 					builder.append(c);
 				}
-				seperator = true;
+				separator = true;
 				continue;
 			}
 			
-			if (seperator)
+			if (separator)
 			{
 				builder.append(c);
-				seperator = false;
+				separator = false;
 			}
 		}
 		
@@ -558,24 +511,24 @@ public final class StringUtils
 		{
 			return null;
 		}
-		
+
 		int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
-		
+
 		StringBuilder builder = new StringBuilder(len);
-		
+
 		for (int i = 0; i < len; i++)
 		{
 			char c = s.charAt(i);
 			builder.append(CharUtils.invertCase(c));
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	/**
 	 * Counts the number of times the given {@code char c} appears in the given
 	 * {@link String} {@code text}.
@@ -587,9 +540,8 @@ public final class StringUtils
 	 *
 	 * @return the number of times the character appears in the string
 	 */
-	public static
 	@infix
-	int count(String string, char c)
+	public static int count(String string, char c)
 	{
 		int count = 0;
 		int len = string.length();
@@ -602,7 +554,7 @@ public final class StringUtils
 		}
 		return count;
 	}
-	
+
 	/**
 	 * Checks if the given {@link String} {@code text} contains the given
 	 * {@code char c}.
@@ -685,7 +637,7 @@ public final class StringUtils
 			else
 			{
 				int rnd = random.nextInt(6);
-				if (rnd < 4)
+				if (rnd < 2)
 				{
 					// Add a consonant
 					c = CharUtils.nextConsonant(random);

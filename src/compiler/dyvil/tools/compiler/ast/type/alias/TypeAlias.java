@@ -103,7 +103,7 @@ public class TypeAlias implements ITypeAlias
 	public void write(DataOutput dos) throws IOException
 	{
 		dos.writeUTF(this.name.qualified);
-		this.type.write(dos);
+		IType.writeType(this.type, dos);
 	}
 	
 	@Override
