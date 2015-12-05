@@ -9,23 +9,14 @@ import dyvil.lang.Float;
 import dyvil.lang.Int;
 import dyvil.lang.Long;
 import dyvil.util.Immutable;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class CollectionTests
 {
 	private static final Object[] SAMPLES = new Object[] { "abc", "def", "aA", "BB", null, Float.apply(3F),
 			Long.apply(1L), Int.apply(10) };
-	
-	@Before
-	public void init()
-	{
-		assert "aA".hashCode() == "BB".hashCode();
-	}
 	
 	@Test
 	public void testSets()
