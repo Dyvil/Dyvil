@@ -51,7 +51,18 @@ public final class Predef
 	// Closures
 	
 	@Intrinsic([ LOAD_0 ])
-	public static => T closure[T](=> T closure) = closure
+	public static => T function[T](=> T f) = f
+
+	public static java.lang.Runnable runnable(=> void f) = => f()
+
+	public static java.util.concurrent.Callable[T] callable[T](=> T f) = => f()
+
+	public static java.lang.Thread thread(=> void f) = new java.lang.Thread() {
+		public override void run()
+		{
+			f()
+		}
+	}
 	
 	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ],
 			strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
