@@ -26,7 +26,11 @@ public class NamedType implements IRawType, ITypeConsumer
 	protected IType         parent;
 	protected ICodePosition position;
 	protected Name          name;
-	
+
+	public NamedType()
+	{
+	}
+
 	public NamedType(ICodePosition position, Name name)
 	{
 		this.position = position;

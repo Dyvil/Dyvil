@@ -2,6 +2,10 @@ package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public enum Variance
 {
 	INVARIANT
@@ -54,7 +58,26 @@ public enum Variance
 			};
 	
 	public abstract boolean checkCompatible(IType type1, IType type2);
-	
+
+	public static void write(Variance variance, DataOutput out) throws IOException
+	{
+		out.writeByte(variance.ordinal());
+	}
+
+	public static Variance read(DataInput in) throws IOException
+	{
+		switch (in.readByte())
+		{
+		case 0:
+			return INVARIANT;
+		case 1:
+			return COVARIANT;
+		case 2:
+			return CONTRAVARIANT;
+		}
+		return INVARIANT;
+	}
+
 	public void appendPrefix(StringBuilder builder)
 	{
 	}

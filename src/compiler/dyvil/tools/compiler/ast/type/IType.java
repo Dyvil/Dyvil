@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -466,7 +465,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 			type = new ArrayType();
 			break;
 		case TYPE_VAR_TYPE:
-			type = new TypeVarType();
+			type = new NamedType();
 			break;
 		case WILDCARD_TYPE:
 			type = new WildcardType();

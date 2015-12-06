@@ -64,8 +64,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected IncludeDeclaration[] includes;
 	protected int                  includeCount;
 	
-	protected Map<Name, Operator>   operators   = new IdentityHashMap();
-	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap();
+	protected Map<Name, Operator>   operators   = new IdentityHashMap<>();
+	protected Map<Name, ITypeAlias> typeAliases = new IdentityHashMap<>();
 	
 	protected HeaderDeclaration headerDeclaration;
 	
@@ -400,7 +400,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		
 		for (Entry<Name, ITypeAlias> entry : this.typeAliases)
 		{
-			entry.getValue().resolve(this.markers, this);
+			entry.getValue().resolveTypes(this.markers, this);
 		}
 	}
 	

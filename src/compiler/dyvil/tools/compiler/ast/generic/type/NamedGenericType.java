@@ -144,7 +144,8 @@ public class NamedGenericType extends GenericType
 		}
 		
 		/*
-		 * TODO Position handling if (position == TypePosition.CLASS) {
+		 * TODO Position handling
+		 * if (position == TypePosition.CLASS) {
 		 * markers.add(I18n.createMarker(this.position, "type.class.generic"));
 		 * } // If the position is a SUPER_TYPE position if (position ==
 		 * TypePosition.SUPER_TYPE || position ==
