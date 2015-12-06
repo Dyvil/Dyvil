@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.TypeVariable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -216,17 +217,32 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 	
 	@Override
-	public void write(DataOutput dos) throws IOException
+	public void write(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.name.qualified);
-		IType.writeType(this.type, dos);
+		out.writeUTF(this.name.qualified);
+		IType.writeType(this.type, out);
+
+		out.writeShort(this.typeVariableCount);
+
+		for (int i = 0; i < this.typeVariableCount; i++)
+		{
+			this.typeVariables[i].write(out);
+		}
 	}
 	
 	@Override
-	public void read(DataInput dis) throws IOException
+	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.getQualified(dis.readUTF());
-		this.type = IType.readType(dis);
+		this.name = Name.getQualified(in.readUTF());
+		this.type = IType.readType(in);
+
+		this.typeVariableCount = in.readShort();
+
+		for (int i = 0; i < this.typeVariableCount; i++)
+		{
+			ITypeVariable typeVariable = new TypeVariable(this);
+			typeVariable.read(in);
+		}
 	}
 	
 	@Override

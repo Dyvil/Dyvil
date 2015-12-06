@@ -23,6 +23,9 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
 public final class TypeVariable implements ITypeVariable
@@ -514,7 +517,41 @@ public final class TypeVariable implements ITypeVariable
 			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
 		}
 	}
-	
+
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		out.writeUTF(this.name.qualified);
+
+		Variance.write(this.variance, out);
+
+		IType.writeType(this.lowerBound, out);
+
+		out.writeShort(this.upperBoundCount);
+
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			IType.writeType(this.upperBounds[i], out);
+		}
+	}
+
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.name = Name.getQualified(in.readUTF());
+
+		this.variance = Variance.read(in);
+
+		this.lowerBound = IType.readType(in);
+
+		this.upperBoundCount = in.readShort();
+
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i] = IType.readType(in);
+		}
+	}
+
 	@Override
 	public String toString()
 	{
