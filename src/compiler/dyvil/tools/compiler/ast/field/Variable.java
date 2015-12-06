@@ -174,12 +174,9 @@ public final class Variable extends Member implements IVariable
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
-		
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
-		}
-		
+
+		this.value = this.value.resolve(markers, context);
+
 		boolean inferType = false;
 		if (this.type == Types.UNKNOWN)
 		{

@@ -61,14 +61,14 @@ public class LambdaTest
 	}
 
 	private static void closureTest() {
-		() => void closure1 = closure { println "Successful" }
-		() => String closure2 = closure { "Testing..." }
+		() => void function1 = function { println "Successful" }
+		() => String function2 = function { "Testing..." }
 
-		repeat(3) { println(closure2()) }
+		repeat(3) { println(function2()) }
 
 		with ("Still testing...") { println $0 }
 
-		closure1()
+		function1()
 	}
 
 	private static void partialFunctionTest() {

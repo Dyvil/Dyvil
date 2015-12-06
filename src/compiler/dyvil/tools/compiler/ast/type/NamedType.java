@@ -92,7 +92,7 @@ public class NamedType implements IRawType, ITypeConsumer
 	{
 		IType resolved = resolveType0(markers, context);
 		// If the type is not a Type Variable Reference
-		if (resolved.getTypeVariable() == null)
+		if (resolved.getTypeVariable() == null && resolved != Types.UNKNOWN)
 		{
 			// Replace Type Variable References with their default value
 			return resolved.getConcreteType(ITypeContext.DEFAULT);
