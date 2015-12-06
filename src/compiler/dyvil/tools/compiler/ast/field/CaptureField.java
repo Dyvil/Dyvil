@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -174,7 +173,6 @@ public final class CaptureField implements IField
 	{
 		if (instance == null)
 		{
-			markers.add(I18n.createMarker(position, "field.access.unqualified", this.name));
 			return new ThisExpr(position, context.getThisClass().getType(), context, markers);
 		}
 		
