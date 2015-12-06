@@ -235,6 +235,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
+		out.writeUTF(this.typeVar.getName().qualified);
 	}
 	
 	@Override
