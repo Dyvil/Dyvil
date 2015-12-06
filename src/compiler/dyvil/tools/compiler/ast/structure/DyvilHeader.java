@@ -376,7 +376,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		for (int i = 0; i < this.includeCount; i++)
 		{
 			IncludeDeclaration include = this.includes[i];
-			include.resolve(this.markers);
+			include.resolve(this.markers, this);
 		}
 	}
 	

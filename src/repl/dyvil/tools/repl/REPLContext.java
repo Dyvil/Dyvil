@@ -305,7 +305,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addInclude(IncludeDeclaration component)
 	{
-		component.resolve(this.markers);
+		component.resolve(this.markers, this);
 		
 		if (this.hasErrors())
 		{
