@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -139,7 +140,22 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		this.typeVariables = typeVars;
 		this.typeVariableCount = count;
 	}
-	
+
+	@Override
+	public IType resolveType(Name name)
+	{
+		for (int i = 0; i < this.typeVariableCount; i++)
+		{
+			ITypeVariable typeVariable = this.typeVariables[i];
+			if (typeVariable.getName() == name)
+			{
+				return new TypeVarType(typeVariable);
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -237,11 +253,13 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		this.type = IType.readType(in);
 
 		this.typeVariableCount = in.readShort();
+		this.typeVariables = new ITypeVariable[this.typeVariableCount];
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
 			ITypeVariable typeVariable = new TypeVariable(this);
 			typeVariable.read(in);
+			this.typeVariables[i] = typeVariable;
 		}
 	}
 	
