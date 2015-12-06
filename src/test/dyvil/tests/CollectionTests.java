@@ -1,5 +1,6 @@
 package dyvil.tests;
 
+import dyvil.collection.*;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonList;
@@ -8,7 +9,6 @@ import dyvil.lang.Float;
 import dyvil.lang.Int;
 import dyvil.lang.Long;
 import dyvil.util.Immutable;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -17,12 +17,6 @@ public class CollectionTests
 {
 	private static final Object[] SAMPLES = new Object[] { "abc", "def", "aA", "BB", null, Float.apply(3F),
 			Long.apply(1L), Int.apply(10) };
-	
-	@Before
-	public void init()
-	{
-		assert "aA".hashCode() == "BB".hashCode();
-	}
 	
 	@Test
 	public void testSets()
@@ -74,7 +68,7 @@ public class CollectionTests
 		
 		assertTrue("Immutable Collection must be instanceof dyvil.util.Immutable",
 		           isImmutable == collection instanceof Immutable);
-		
+
 		assertEquals("Collection must be equal to it's copy: " + copy.getClass(), collection, copy);
 		assertEquals("Collection must be equal to it's mutable version: " + mutable.getClass(), collection, mutable);
 		assertEquals("Collection must be equal to it's mutable copy: " + mutableCopy.getClass(), collection,

@@ -6,9 +6,11 @@ The Dyvil programming language
 [![In Progress](https://badge.waffle.io/Dyvil/Dyvil.svg?label=In%20Progress&title=In%20Progress)](http://waffle.io/Dyvil/Dyvil)
 [![Ready](https://badge.waffle.io/Dyvil/Dyvil.svg?label=ready&title=Ready)](http://waffle.io/Dyvil/Dyvil)
 
-Dyvil is a multi-paradigm, general purpose programming language that is based on Java and the JVM. It extends the language with several new features including operator overloading, function types, tuples and many more.
+Dyvil is a multi-paradigm, general purpose programming language that is based on Java and the JVM.
+Specifically, it can be classified as strongly typed, object-oriented and parallel, with functional and imperative elements and dynamic typing support.
+Dyvil extends Java with several new language features including operator overloading, function types, tuples and many more.
 
-Dyvil is a C-descendant object-oriented programming language with functional and imperative elements. Some of the language's aims are:
+As a new programming language in active development, the main aims behind Dyvil are the following:
 
 - to **enhance** Java with modern programming language elements
 - to **avoid** common boilerplate code
@@ -20,10 +22,6 @@ Dyvil is a C-descendant object-oriented programming language with functional and
 ###▶ [Feature Overview](https://github.com/Dyvil/Dyvil/wiki/Language-Features)
 
 ###▶ [Language Reference](https://dyvil.gitbooks.io/dyvil-language-reference/content/)
-
-###▶ [Tutorials](https://github.com/Dyvil/Dyvil/wiki#tutorials)
-
-###▶ [Contribution](https://github.com/Dyvil/Dyvil/wiki#contribution)
 
 ###▶ [Dyvil Installer](https://github.com/Dyvil/Dyvil-Installer)
 
