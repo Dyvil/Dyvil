@@ -113,6 +113,8 @@ dependencies {
 	runtime files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
+
+	runtime files("src/resources")
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
