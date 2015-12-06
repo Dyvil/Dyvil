@@ -45,18 +45,18 @@ public class REPLVariable extends Field
 	
 	protected void updateValue()
 	{
-		if (this.type == Types.VOID)
-		{
-			ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
-			return;
-		}
-		
-		java.lang.reflect.Field[] fields = this.theClass.getDeclaredFields();
-		
 		try
 		{
-			Object result = fields[0].get(null);
-			this.value = new REPLResult(result);
+			if (this.type == Types.VOID)
+			{
+				ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
+			}
+			else
+			{
+				java.lang.reflect.Field[] fields = this.theClass.getDeclaredFields();
+				Object result = fields[0].get(null);
+				this.value = new REPLResult(result);
+			}
 		}
 		catch (IllegalAccessException ex)
 		{
@@ -64,15 +64,17 @@ public class REPLVariable extends Field
 		}
 		catch (ExceptionInInitializerError t)
 		{
-			printFilteredTrace(t.getCause());
+			filterStackTrace(t.getCause());
+			t.printStackTrace();
 		}
 		catch (Throwable t)
 		{
-			printFilteredTrace(t);
+			filterStackTrace(t);
+			t.printStackTrace();
 		}
 	}
 
-	private static void printFilteredTrace(Throwable throwable)
+	private static void filterStackTrace(Throwable throwable)
 	{
 		StackTraceElement[] traceElements = throwable.getStackTrace();
 		int count = traceElements.length;
@@ -82,15 +84,26 @@ public class REPLVariable extends Field
 		{
 			if (traceElements[lastIndex].getClassName().startsWith("sun.misc.Unsafe"))
 			{
+				--lastIndex;
 				break;
 			}
 		}
+
 		StackTraceElement[] newTraceElements = new StackTraceElement[lastIndex + 1];
 		System.arraycopy(traceElements, 0, newTraceElements, 0, lastIndex + 1);
 
 		throwable.setStackTrace(newTraceElements);
 
-		throwable.printStackTrace();
+		Throwable cause = throwable.getCause();
+		if (cause != null)
+		{
+			filterStackTrace(cause);
+		}
+
+		for (Throwable suppressed : throwable.getSuppressed())
+		{
+			filterStackTrace(suppressed);
+		}
 	}
 	
 	protected void compute(List<IClassCompilable> compilableList)
