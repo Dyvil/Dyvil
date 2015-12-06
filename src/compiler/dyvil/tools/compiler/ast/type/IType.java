@@ -58,14 +58,16 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		 * Allows Class Types, Parameterized Types and Type Variable Types, but
 		 * the latter cannot be contravariant.
 		 */
-		RETURN_TYPE, /**
-	 * Allows Class Types, Parameterized Types and Type
-	 * Variable Types, but the latter cannot be covariant.
-	 */
-	PARAMETER_TYPE, /**
-	 * Allows all Types.
-	 */
-	GENERIC_ARGUMENT
+		RETURN_TYPE,
+		/**
+		 * Allows Class Types, Parameterized Types and Type
+		 * Variable Types, but the latter cannot be covariant.
+		 */
+		PARAMETER_TYPE,
+		/**
+		 * Allows all Types.
+		 */
+		GENERIC_ARGUMENT
 	}
 	
 	// Basic Types

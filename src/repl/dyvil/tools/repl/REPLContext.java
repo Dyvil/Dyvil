@@ -324,12 +324,19 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
+		typeAlias.resolveTypes(this.markers, this);
 		typeAlias.resolve(this.markers, this);
+		typeAlias.checkTypes(this.markers, this);
+		typeAlias.check(this.markers, this);
+
 		if (this.hasErrors())
 		{
 			return;
 		}
-		
+
+		typeAlias.foldConstants();
+		typeAlias.cleanup(this, this);
+
 		super.addTypeAlias(typeAlias);
 		System.out.println(typeAlias);
 	}

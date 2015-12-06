@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -88,6 +89,19 @@ public class NamedType implements IRawType, ITypeConsumer
 	
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
+	{
+		IType resolved = resolveType0(markers, context);
+		// If the type is not a Type Variable Reference
+		if (resolved.getTypeVariable() == null)
+		{
+			// Replace Type Variable References with their default value
+			return resolved.getConcreteType(ITypeContext.DEFAULT);
+		}
+		// Otherwise, simply return it.
+		return resolved;
+	}
+
+	public IType resolveType0(MarkerList markers, IContext context)
 	{
 		if (this.parent != null)
 		{

@@ -22,7 +22,7 @@ public interface IRawType extends IObjectType
 	{
 		return false;
 	}
-	
+
 	@Override
 	default boolean hasTypeVariables()
 	{
