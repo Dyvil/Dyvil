@@ -9,12 +9,12 @@ apply plugin: 'application'
 
 group = 'dyvil-team'
 
-version = '0.10.1'
+version = '0.11.0'
 
-String libraryVersion = '0.10.0'
-String compilerVersion = '0.10.1'
-String replVersion = '0.6.0'
-String dpfVersion = '0.2.1'
+String libraryVersion = '0.11.0'
+String compilerVersion = '0.11.0'
+String replVersion = '0.6.1'
+String dpfVersion = '0.3.0'
 
 boolean nightly = false
 
