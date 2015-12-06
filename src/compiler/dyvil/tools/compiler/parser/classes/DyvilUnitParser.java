@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -50,6 +51,11 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			int i;
 			if ((i = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
 			{
+				if (this.modifiers == null)
+				{
+					this.modifiers = new ModifierList();
+				}
+
 				this.modifiers.addIntModifier(i);
 				pm.pushParser(new ClassDeclarationParser(this.unit, this.modifiers, this.annotations));
 				this.modifiers = null;

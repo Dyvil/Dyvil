@@ -5,6 +5,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeListParser extends Parser
@@ -20,7 +21,7 @@ public final class TypeListParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (type == BaseSymbols.SEMICOLON && token.isInferred() || type == BaseSymbols.OPEN_CURLY_BRACKET)
+		if (type == BaseSymbols.SEMICOLON && token.isInferred() || type == BaseSymbols.OPEN_CURLY_BRACKET || type == Tokens.EOF)
 		{
 			pm.popParser(true);
 			return;

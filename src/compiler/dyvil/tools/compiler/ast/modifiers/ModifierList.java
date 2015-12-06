@@ -8,6 +8,15 @@ public class ModifierList implements ModifierSet
 	private int count;
 	private int intModifiers;
 
+	public ModifierList()
+	{
+	}
+
+	public ModifierList(int intModifiers)
+	{
+		this.intModifiers = intModifiers;
+	}
+
 	@Override
 	public boolean hasModifier(Modifier modifier)
 	{
