@@ -173,13 +173,14 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		
 		for (int i = oldCapacity; i-- > 0; )
 		{
-			HashElement e = oldMap[i];
-			while (e != null)
+			for (HashElement e = oldMap[i]; e != null;)
 			{
 				int index = index(e.hash, newCapacity);
+				HashElement next = e.next;
+
 				e.next = newMap[index];
 				newMap[index] = e;
-				e = e.next;
+				e = next;
 			}
 		}
 		
