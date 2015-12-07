@@ -18,12 +18,12 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@NilConvertible(methodName = "fromNil")
+@NilConvertible(methodName = "empty")
 @ArrayConvertible
 @MapConvertible
 public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 {
-	static <K, V> ImmutableMap<K, V> fromNil()
+	static <K, V> ImmutableMap<K, V> empty()
 	{
 		return ImmutableMap.apply();
 	}
@@ -73,22 +73,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	default boolean isSorted()
 	{
-		if (this.size() < 2)
-		{
-			return true;
-		}
-		
-		return Collection.iteratorSorted(this.keyIterator());
+		return this.size() < 2 || Collection.iteratorSorted(this.keyIterator());
 	}
 	
 	default boolean isSorted(Comparator<? super K> comparator)
 	{
-		if (this.size() < 2)
-		{
-			return true;
-		}
-		
-		return Collection.iteratorSorted(this.keyIterator(), comparator);
+		return this.size() < 2 || Collection.iteratorSorted(this.keyIterator(), comparator);
 	}
 	
 	/**
@@ -310,8 +300,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Returns true if and if only this map contains a mapping that maps the
 	 * key, as given by the first value of the {@code entry} to the value, as
 	 * given by the second value of the {@code entry}. The default
-	 * implementation of this method delegates to the {@link $qmark(Object,
-	 * Object)} method.
+	 * implementation of this method delegates to the {@link #$minus(Object, Object)} method.
 	 *
 	 * @param entry
 	 * 		the entry
@@ -409,7 +398,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	 * Returns true if and if only this map contains a mapping that maps the
 	 * key, as given by the first value of the {@code entry} to the value, as
 	 * given by the second value of the {@code entry}. The default
-	 * implementation of this method delegates to the {@link $qmark(Object,
+	 * implementation of this method delegates to the {@link #$qmark(Object,
 	 * Object)} method.
 	 *
 	 * @param entry
@@ -649,7 +638,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	default Entry<K, V>[] toArray()
 	{
-		Entry<K, V>[] array = new Entry[this.size()];
+		Entry<K, V>[] array = (Entry<K, V>[]) new Entry[this.size()];
 		this.toArray(0, array);
 		return array;
 	}
@@ -784,12 +773,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	static <K, V> boolean mapEquals(Map<K, V> map, Object obj)
 	{
-		if (!(obj instanceof Map))
-		{
-			return false;
-		}
-		
-		return mapEquals(map, (Map<K, V>) obj);
+		return obj instanceof Map && mapEquals(map, (Map<K, V>) obj);
 	}
 	
 	static <K, V> boolean mapEquals(Map<K, V> map1, Map<K, V> map2)

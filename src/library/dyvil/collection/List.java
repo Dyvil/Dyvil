@@ -46,7 +46,7 @@ import java.util.function.Predicate;
  *
  * @author Clashsoft
  */
-@NilConvertible(methodName = "fromNil")
+@NilConvertible(methodName = "empty")
 @ArrayConvertible
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {
@@ -57,7 +57,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *
 	 * @return an empty, immutable list
 	 */
-	static <E> ImmutableList<E> fromNil()
+	static <E> ImmutableList<E> empty()
 	{
 		return ImmutableList.apply();
 	}

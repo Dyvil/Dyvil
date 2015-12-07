@@ -40,7 +40,7 @@ import java.util.function.Predicate;
  *
  * @author Clashsoft
  */
-@NilConvertible(methodName = "fromNil")
+@NilConvertible(methodName = "empty")
 @ArrayConvertible
 public interface Collection<E> extends Queryable<E>, Serializable
 {
@@ -51,7 +51,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an empty, immutable collection
 	 */
-	static <E> ImmutableCollection<E> fromNil()
+	static <E> ImmutableCollection<E> empty()
 	{
 		return ImmutableSet.apply();
 	}
@@ -78,6 +78,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an immutable collection containing all of the given elements
 	 */
+	@SafeVarargs
 	static <E> ImmutableCollection<E> apply(E... elements)
 	{
 		return ImmutableList.apply(elements);
@@ -129,22 +130,12 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	
 	default boolean isSorted()
 	{
-		if (this.size() < 2)
-		{
-			return true;
-		}
-		
-		return iteratorSorted(this.iterator());
+		return this.size() < 2 || iteratorSorted(this.iterator());
 	}
 	
 	default boolean isSorted(Comparator<? super E> comparator)
 	{
-		if (this.size() < 2)
-		{
-			return true;
-		}
-		
-		return iteratorSorted(this.iterator(), comparator);
+		return this.size() < 2 || iteratorSorted(this.iterator(), comparator);
 	}
 	
 	/**
@@ -809,7 +800,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		
 		for (int i = 1; i < size; i++)
 		{
-			if (((Comparable) array[i - 1]).compareTo(array[i]) > 0)
+			if (((Comparable<E>) array[i - 1]).compareTo(array[i]) > 0)
 			{
 				return false;
 			}

@@ -16,19 +16,20 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 {
 	private static final long serialVersionUID = -5372836862143742212L;
 	
+	@SafeVarargs
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
-		return new TupleMap(entries, true);
+		return new TupleMap<>(entries, true);
 	}
 	
 	public static <K, V> TupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
 	{
-		return new TupleMap(entries);
+		return new TupleMap<>(entries);
 	}
 	
 	public static <K, V> Builder<K, V> builder()
 	{
-		return new Builder();
+		return new Builder<>();
 	}
 	
 	protected TupleMap(int capacity)
@@ -36,36 +37,43 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		super(capacity);
 	}
 	
+	@SafeVarargs
+	public TupleMap(Entry<K, V>... entries)
+	{
+		super(entries);
+	}
+
+	@SafeVarargs
 	public TupleMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
 	}
-	
+
 	public TupleMap(Tuple2<K, V>[] entries, int size)
 	{
 		super(entries, size);
 	}
-	
+
 	public TupleMap(Tuple2<K, V>[] entries, boolean trusted)
 	{
 		super(entries, trusted);
 	}
-	
+
 	public TupleMap(Tuple2<K, V>[] entries, int size, boolean trusted)
 	{
 		super(entries, size, trusted);
 	}
-	
+
 	public TupleMap(Map<K, V> map)
 	{
 		super(map);
 	}
-	
+
 	public TupleMap(AbstractTupleMap<K, V> map)
 	{
 		super(map);
 	}
-	
+
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
 		private Tuple2<K, V>[] entries;

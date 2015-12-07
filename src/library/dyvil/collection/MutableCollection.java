@@ -16,6 +16,7 @@ public interface MutableCollection<E> extends Collection<E>
 		return MutableList.apply();
 	}
 	
+	@SafeVarargs
 	static <E> MutableCollection<E> apply(E... elements)
 	{
 		return MutableList.apply(elements);

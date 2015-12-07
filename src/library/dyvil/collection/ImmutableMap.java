@@ -9,7 +9,6 @@ import dyvil.collection.immutable.TupleMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 import dyvil.util.Immutable;
 import dyvil.util.ImmutableException;
 import dyvil.util.Option;
@@ -52,15 +51,16 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	
 	static <K, V> ImmutableMap<K, V> apply(K key, V value)
 	{
-		return new SingletonMap(key, value);
+		return new SingletonMap<>(key, value);
 	}
 	
 	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		return new SingletonMap(entry.getKey(), entry.getValue());
+		return new SingletonMap<>(entry.getKey(), entry.getValue());
 	}
 	
-	static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
+	@SafeVarargs
+	static <K, V> ImmutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		int len = entries.length;
 		switch (len)
@@ -69,25 +69,26 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 			return EmptyMap.apply();
 		case 1:
 			Entry<? extends K, ? extends V> entry = entries[0];
-			return new SingletonMap(entry.getKey(), entry.getValue());
+			return new SingletonMap<>(entry.getKey(), entry.getValue());
 		default:
-			return new TupleMap(entries, len, true);
+			// Save cast, Entry is covariant
+			return new TupleMap<>((Entry<K, V>[]) entries);
 		}
 	}
 	
 	static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
 	{
-		return new ArrayMap<K, V>(keys, values, true);
+		return new ArrayMap<>(keys, values, true);
 	}
 	
 	static <K, V> Builder<K, V> builder()
 	{
-		return new ArrayMap.Builder<K, V>();
+		return new ArrayMap.Builder<>();
 	}
 	
 	static <K, V> Builder<K, V> builder(int capacity)
 	{
-		return new ArrayMap.Builder<K, V>(capacity);
+		return new ArrayMap.Builder<>(capacity);
 	}
 	
 	// Simple Getters

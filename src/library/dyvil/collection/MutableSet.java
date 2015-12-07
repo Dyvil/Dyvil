@@ -19,14 +19,15 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 		return new HashSet<E>();
 	}
 	
+	@SafeVarargs
 	static <E> MutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet<>(elements, true);
 	}
-	
-	static <E> MutableSet<E> fromArray(E... elements)
+
+	static <E> MutableSet<E> fromArray(E[] elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet<>(elements);
 	}
 	
 	// Accessors
@@ -168,6 +169,6 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	@Override
 	default ImmutableSet<E> view()
 	{
-		return new SetView(this);
+		return new SetView<>(this);
 	}
 }

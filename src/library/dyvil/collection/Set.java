@@ -8,14 +8,14 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible(methodName = "fromNil")
+@NilConvertible(methodName = "empty")
 @ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
 	@internal
 	Object VALUE = new Object();
 	
-	static <E> ImmutableSet<E> fromNil()
+	static <E> ImmutableSet<E> empty()
 	{
 		return ImmutableSet.apply();
 	}
@@ -30,12 +30,13 @@ public interface Set<E> extends Collection<E>
 		return ImmutableSet.apply(element);
 	}
 	
+	@SafeVarargs
 	static <E> ImmutableSet<E> apply(E... elements)
 	{
 		return ImmutableSet.apply(elements);
 	}
 	
-	static <E> ImmutableSet<E> fromArray(E... elements)
+	static <E> ImmutableSet<E> fromArray(E[] elements)
 	{
 		return ImmutableSet.fromArray(elements);
 	}
@@ -222,12 +223,7 @@ public interface Set<E> extends Collection<E>
 	
 	static <E> boolean setEquals(Set<E> set, Object o)
 	{
-		if (!(o instanceof Set))
-		{
-			return false;
-		}
-		
-		return setEquals(set, (Set) o);
+		return o instanceof Set && setEquals(set, (Set<E>) o);
 	}
 	
 	static <E> boolean setEquals(Set<E> c1, Set<E> c2)

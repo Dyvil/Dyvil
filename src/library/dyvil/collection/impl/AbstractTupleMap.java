@@ -24,10 +24,21 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	
 	protected AbstractTupleMap(int capacity)
 	{
-		this.entries = new Tuple2[capacity];
+		this.entries = (Tuple2<K, V>[]) new Tuple2[capacity];
+	}
+
+	@SafeVarargs
+	public AbstractTupleMap(Entry<K, V>... entries)
+	{
+		this(entries.length);
+		for (int i = 0; i < entries.length; i++)
+		{
+			this.entries[i] = entries[i].toTuple();
+		}
 	}
 	
-	public AbstractTupleMap(Tuple2<K, V>[] entries)
+	@SafeVarargs
+	public AbstractTupleMap(Tuple2<K, V>... entries)
 	{
 		this.size = entries.length;
 		this.entries = new Tuple2[this.size];

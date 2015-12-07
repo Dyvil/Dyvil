@@ -21,19 +21,20 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	static <E> MutableList<E> apply(E element)
 	{
-		return new ArrayList(new Object[] { element }, 1, true);
+		return new ArrayList<>((E[]) new Object[] { element }, 1, true);
 	}
 	
 	static <E> MutableList<E> apply(E e1, E e2)
 	{
-		return new ArrayList(new Object[] { e1, e2 }, 2, true);
+		return new ArrayList<>((E[]) new Object[] { e1, e2 }, 2, true);
 	}
 	
 	static <E> MutableList<E> apply(E e1, E e2, E e3)
 	{
-		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
+		return new ArrayList<>((E[]) new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
+	@SafeVarargs
 	static <E> MutableList<E> apply(E... elements)
 	{
 		return new ArrayList<>(elements);
@@ -313,6 +314,6 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	@Override
 	default ImmutableList<E> view()
 	{
-		return new ListView(this);
+		return new ListView<>(this);
 	}
 }
