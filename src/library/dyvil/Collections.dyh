@@ -15,11 +15,11 @@ infix	operator -@=	{ associativity right,	precedence 1200 }
 infix	operator -:		{ associativity none,	precedence 1200 }
 infix	operator -:=	{ associativity right,	precedence 1200 }
 
+// Import all classes from the dyvil.collection package
 import	dyvil.collection._
 
 // Lists
 import	dyvil.collection.immutable.ArrayList		=> ImmutableArrayList
-// TODO import	dyvil.collection.immutable.LinkedList => ImmutableLinkedList
 
 import	dyvil.collection.mutable.ArrayList			=> MutableArrayList
 import	dyvil.collection.mutable.LinkedList			=> MutableLinkedList
@@ -54,5 +54,4 @@ import	dyvil.collection.mutable.TreeMap			=> MutableTreeMap
 import	dyvil.collection.immutable.ArrayMatrix		=> ImmutableArrayMatrix
 import	dyvil.collection.immutable.FlatArrayMatrix	=> ImmutableFlatArrayMatrix
 
-// TODO import	dyvil.collection.mutable.ArrayMatrix => MutableArrayMatrix
 import	dyvil.collection.mutable.FlatArrayMatrix	=> ImmutableFlatArrayMatrix

@@ -27,10 +27,6 @@ import	java.lang._
 // Import the methods from Predef
 using	dyvil.lang.Predef._
 
-// Java Types
-type JList[E] = java.util.List[E]
-type JMap[K, V] = java.util.Map[K, V]
-
 // Print Operators
 prefix	operator print		{ precedence 1 }
 prefix	operator println	{ precedence 1 }
