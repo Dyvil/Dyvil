@@ -11,8 +11,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class Node implements NodeElement, NodeVisitor
 {
 	protected Name name;
-	protected List<Node>        nodes    = new ArrayList<Node>();
-	protected List<NodeElement> elements = new ArrayList<NodeElement>();
+	protected List<Node>       nodes        = new ArrayList<>();
+	protected List<Property>   properties   = new ArrayList<>();
+	protected List<NodeAccess> nodeAccesses = new ArrayList<>();
 	
 	protected ICodePosition position;
 	
@@ -51,7 +52,7 @@ public class Node implements NodeElement, NodeVisitor
 	public ValueVisitor visitProperty(Name name)
 	{
 		Property property = new Property(name);
-		this.elements.add(property);
+		this.properties.add(property);
 		return property;
 	}
 	
@@ -59,23 +60,27 @@ public class Node implements NodeElement, NodeVisitor
 	public NodeVisitor visitNodeAccess(Name name)
 	{
 		NodeAccess access = new NodeAccess(name);
-		this.elements.add(access);
+		this.nodeAccesses.add(access);
 		return access;
 	}
 	
 	@Override
 	public void accept(NodeVisitor visitor)
 	{
-		NodeVisitor v = visitor.visitNode(this.name);
-		for (NodeElement element : this.elements)
+		NodeVisitor nodeVisitor = visitor.visitNode(this.name);
+		for (Property element : this.properties)
 		{
-			element.accept(v);
+			element.accept(nodeVisitor);
 		}
 		for (Node node : this.nodes)
 		{
-			node.accept(v);
+			node.accept(nodeVisitor);
 		}
-		v.visitEnd();
+		for (NodeAccess nodeAccess : this.nodeAccesses)
+		{
+			nodeAccess.accept(nodeVisitor);
+		}
+		nodeVisitor.visitEnd();
 	}
 	
 	@Override
@@ -96,7 +101,7 @@ public class Node implements NodeElement, NodeVisitor
 	
 	public void bodyToString(String prefix, StringBuilder buffer)
 	{
-		for (NodeElement element : this.elements)
+		for (NodeElement element : this.properties)
 		{
 			buffer.append(prefix);
 			element.toString(prefix, buffer);
@@ -107,6 +112,13 @@ public class Node implements NodeElement, NodeVisitor
 		{
 			buffer.append(prefix).append('\n').append(prefix);
 			node.toString(prefix, buffer);
+			buffer.append('\n');
+		}
+
+		for (NodeAccess nodeAccess : this.nodeAccesses)
+		{
+			buffer.append(prefix).append('\n').append(prefix);
+			nodeAccess.toString(prefix, buffer);
 			buffer.append('\n');
 		}
 	}

@@ -13,13 +13,17 @@ public class RootNode extends Node
 	@Override
 	public void accept(NodeVisitor visitor)
 	{
-		for (NodeElement element : this.elements)
+		for (Property property : this.properties)
 		{
-			element.accept(visitor);
+			property.accept(visitor);
 		}
 		for (Node node : this.nodes)
 		{
 			node.accept(visitor);
+		}
+		for (NodeAccess nodeAccess : this.nodeAccesses)
+		{
+			nodeAccess.accept(visitor);
 		}
 	}
 	
