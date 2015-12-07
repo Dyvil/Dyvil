@@ -73,6 +73,7 @@ public final class CompoundCall
 			IValue op = getIncOperator(name, arguments, fieldAccess);
 			if (op != null)
 			{
+				op.setPosition(position);
 				return op;
 			}
 
@@ -108,7 +109,7 @@ public final class CompoundCall
 				{
 					intValue = -intValue;
 				}
-				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, false);
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, true);
 			}
 		}
 		return null;

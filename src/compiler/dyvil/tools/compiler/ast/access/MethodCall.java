@@ -113,7 +113,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		int args = this.arguments.size();
 		if (args == 1 && this.receiver != null)
 		{
-			// Prioritized Infix Operators
+			// Prioritized Infix Operators (namely ==, ===, != and !== for null)
 			IValue op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
 			if (op != null)
 			{
@@ -166,9 +166,11 @@ public final class MethodCall extends AbstractCall implements INamed
 		}
 		if (args == 0 && this.receiver != null)
 		{
+			// Postfix Operators
 			IValue op = Operators.getPostfix(this.receiver, this.name);
 			if (op != null)
 			{
+				op.setPosition(this.position);
 				return op;
 			}
 		}

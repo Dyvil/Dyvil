@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.operator;
 
+import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
@@ -13,6 +14,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class IncOperator extends AbstractValue
@@ -111,6 +113,11 @@ public class IncOperator extends AbstractValue
 		if (this.receiver != null)
 		{
 			this.receiver.check(markers, context);
+		}
+
+		if (this.field.hasModifier(Modifiers.FINAL))
+		{
+			markers.add(I18n.createError(this.position, "field.assign.final", this.field.getName()));
 		}
 	}
 

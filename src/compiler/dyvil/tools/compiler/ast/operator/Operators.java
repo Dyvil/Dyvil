@@ -24,16 +24,21 @@ public interface Operators
 				return new NotOperator(arg1);
 			}
 		}
+		return getIncOperator(name, arg1, true);
+	}
+
+	static IValue getIncOperator(Name name, IValue arg1, boolean prefix)
+	{
 		if (arg1.valueTag() == IValue.FIELD_ACCESS && IncOperator.isIncConvertible(arg1.getType()))
 		{
 			FieldAccess fieldAccess = (FieldAccess) arg1;
 			if (name == Names.plusplus)
 			{
-				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), 1, true);
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), 1, prefix);
 			}
-			if (name == Names.minusminus)
+			else if (name == Names.minusminus)
 			{
-				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), -1, true);
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), -1, prefix);
 			}
 		}
 		return null;
@@ -41,19 +46,7 @@ public interface Operators
 
 	static IValue getPostfix(IValue arg1, Name name)
 	{
-		if (arg1.valueTag() == IValue.FIELD_ACCESS && IncOperator.isIncConvertible(arg1.getType()))
-		{
-			FieldAccess fieldAccess = (FieldAccess) arg1;
-			if (name == Names.plusplus)
-			{
-				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), 1, false);
-			}
-			if (name == Names.minusminus)
-			{
-				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), -1, false);
-			}
-		}
-		return null;
+		return getIncOperator(name, arg1, false);
 	}
 	
 	static IValue getInfix_Priority(IValue arg1, Name name, IValue arg2)
