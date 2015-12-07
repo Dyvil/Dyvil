@@ -63,6 +63,6 @@ public class CodePosition implements ICodePosition
 	public String toString()
 	{
 		return "CodePosition(startIndex: " + this.start + ", endIndex: " + this.end + ", startLine: " + this.startLine
-				+ ", endLine: " + this.endLine;
+				+ ", endLine: " + this.endLine + ")";
 	}
 }

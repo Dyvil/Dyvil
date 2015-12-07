@@ -50,4 +50,10 @@ public class StringInterpolation implements StringInterpolationVisitor, Expandab
 		
 		return builder.toString();
 	}
+
+	@Override
+	public String toString()
+	{
+		return "StringInterpolation(" + this.strings.toString() + ", " + this.values.toString() + ")";
+	}
 }
