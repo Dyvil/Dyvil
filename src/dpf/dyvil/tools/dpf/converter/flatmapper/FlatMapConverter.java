@@ -31,7 +31,7 @@ public class FlatMapConverter implements NodeVisitor
 	private FlatMapConverter(Map<String, Object> map, String name)
 	{
 		this.map = map;
-		this.name = "";
+		this.name = name;
 	}
 	
 	private String getName(Name name)
@@ -60,12 +60,12 @@ public class FlatMapConverter implements NodeVisitor
 	{
 		return new DyvilValueVisitor()
 		{
-			String propertyName = getName(name);
+			String propertyName = FlatMapConverter.this.getName(name);
 			
 			@Override
 			protected void visitObject(Object o)
 			{
-				map.put(propertyName, o);
+				FlatMapConverter.this.map.put(this.propertyName, o);
 			}
 		};
 	}
