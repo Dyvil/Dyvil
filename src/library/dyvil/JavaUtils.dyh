@@ -22,10 +22,5 @@ type	JHashSet[E]		= java.util.HashSet[E]
 
 // Maps
 type	JMap[K, V]		= java.util.Map[K, V]
-<<<<<<< HEAD
 type	JHashMap[K, V]	= java.util.HashMap[K, V]
 type	JTreeMap[K, V]	= java.util.TreeMap[K, V]
-=======
-type	JHashMap[K, V]	= java.util.HashMap[E]
-type	JTreeMap[K, V]	= java.util.TreeMap[E]
->>>>>>> origin/master
