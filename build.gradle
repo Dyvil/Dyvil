@@ -49,12 +49,6 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
-	test {
-		java {
-			srcDir 'src/test'
-		}
-	}
-
 	library {
 		java {
 			srcDir 'src/library'
@@ -95,6 +89,12 @@ sourceSets {
 			runtimeClasspath += library.output + compiler.output + compiler.resources
 		}
 	}
+
+	test {
+		java {
+			srcDir 'src/test'
+		}
+	}
 }
 
 processResources {
@@ -108,13 +108,21 @@ repositories {
 }
 
 dependencies {
-	testCompile 'junit:junit:4.12'
+	// Runtime Dependencies (Resources)
 
 	runtime files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
 
 	runtime files("src/resources")
+
+	// Test Dependencies
+	testCompile 'junit:junit:4.12'
+
+	testCompile sourceSets.library.output
+	testCompile sourceSets.compiler.output
+	testCompile sourceSets.repl.output
+	testCompile sourceSets.dpf.output
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
