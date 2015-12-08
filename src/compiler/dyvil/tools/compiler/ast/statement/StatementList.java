@@ -87,7 +87,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public boolean isResolved()
 	{
-		return this.returnType != null && this.returnType.isResolved();
+		if (this.valueCount == 0)
+		{
+			return true;
+		}
+		return this.values[this.valueCount - 1].isResolved();
 	}
 	
 	@Override
