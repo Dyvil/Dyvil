@@ -112,10 +112,16 @@ public class WildcardValue implements IConstantValue
 
 		this.type.writeDefaultValue(writer);
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return "_";
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("...");
+		buffer.append('_');
 	}
 }
