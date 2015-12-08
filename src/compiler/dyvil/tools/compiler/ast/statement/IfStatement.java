@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
@@ -259,26 +258,6 @@ public class IfStatement extends AbstractValue
 	{
 		if (this.condition != null)
 		{
-			if (this.condition.valueTag() == BOOLEAN)
-			{
-				if (this.condition.booleanValue())
-				{
-					// Condition is true -> Return the action
-					return this.then.foldConstants();
-				}
-				else if (this.elseThen != null)
-				{
-					// Condition is false, else clause exists -> Return else
-					// clause
-					return this.elseThen.foldConstants();
-				}
-				else
-				{
-					// Condition is false, no else clause -> Return empty
-					// statement (VoidValue)
-					return new VoidValue(this.position);
-				}
-			}
 			this.condition = this.condition.foldConstants();
 		}
 		
@@ -298,6 +277,26 @@ public class IfStatement extends AbstractValue
 	{
 		if (this.condition != null)
 		{
+			if (this.condition.valueTag() == BOOLEAN)
+			{
+				if (this.condition.booleanValue())
+				{
+					// Condition is true -> Return the action
+					return this.then.cleanup(context, compilableList);
+				}
+				else if (this.elseThen != null)
+				{
+					// Condition is false, else clause exists -> Return else
+					// clause
+					return this.elseThen.cleanup(context, compilableList);
+				}
+				else
+				{
+					// Condition is false, no else clause -> Return default value
+					return this.commonType.getDefaultValue();
+				}
+			}
+
 			this.condition = this.condition.cleanup(context, compilableList);
 		}
 		
@@ -309,11 +308,7 @@ public class IfStatement extends AbstractValue
 		{
 			this.elseThen = this.elseThen.cleanup(context, compilableList);
 		}
-		
-		if (this.condition.valueTag() == BOOLEAN)
-		{
-			return this.condition.booleanValue() ? this.then : this.elseThen;
-		}
+
 		return this;
 	}
 	
