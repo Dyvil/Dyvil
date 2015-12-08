@@ -58,19 +58,20 @@ public class REPLVariable extends Field
 				this.value = new REPLResult(result);
 			}
 		}
-		catch (IllegalAccessException ex)
+		catch (IllegalAccessException illegalAccess)
 		{
-			ex.printStackTrace();
+			illegalAccess.printStackTrace();
 		}
-		catch (ExceptionInInitializerError t)
+		catch (ExceptionInInitializerError initializerError)
 		{
-			filterStackTrace(t.getCause());
-			t.printStackTrace();
+			Throwable cause = initializerError.getCause();
+			filterStackTrace(cause);
+			cause.printStackTrace();
 		}
-		catch (Throwable t)
+		catch (Throwable throwable)
 		{
-			filterStackTrace(t);
-			t.printStackTrace();
+			filterStackTrace(throwable);
+			throwable.printStackTrace();
 		}
 	}
 
