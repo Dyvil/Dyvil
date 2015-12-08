@@ -196,6 +196,11 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		{
 			return v;
 		}
+
+		if (this.receiver != null && !this.receiver.isResolved())
+		{
+			return this;
+		}
 		
 		Marker marker = I18n.createMarker(this.position, "resolve.field", this.name.unqualified);
 		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));

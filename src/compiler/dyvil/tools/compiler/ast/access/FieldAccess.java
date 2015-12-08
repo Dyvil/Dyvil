@@ -173,6 +173,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		return type.getSubTypeDistance(this.getType());
 	}
 
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
@@ -316,8 +317,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			if (field.isEnumConstant())
 			{
-				EnumValue enumValue = new EnumValue(field.getType(), this.name);
-				return enumValue;
+				return new EnumValue(field.getType(), this.name);
 			}
 			
 			this.field = field;
