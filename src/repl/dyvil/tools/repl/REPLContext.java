@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -42,7 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
-	private static final String REPL$CLASSES = "repl$classes/";
+	private static final String REPL$CLASSES     = "repl$classes/";
+	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
 	
 	protected DyvilREPL repl;
 	protected String    currentCode;
@@ -469,6 +471,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addMethod(IMethod method)
 	{
+		updateModifiers(method.getModifiers());
+
 		REPLMemberClass iclass = this.getREPLClass(method);
 		
 		method.resolveTypes(this.markers, this);
@@ -497,6 +501,15 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		this.registerMethod(method, iclass);
 		
 		this.cleanup();
+	}
+
+	public static void updateModifiers(ModifierSet modifiers)
+	{
+		if ((modifiers.toFlags() & ACCESS_MODIFIERS) == 0)
+		{
+			modifiers.addIntModifier(Modifiers.PUBLIC);
+		}
+		modifiers.addIntModifier(Modifiers.STATIC);
 	}
 	
 	private void registerMethod(IMethod method, REPLMemberClass iclass)

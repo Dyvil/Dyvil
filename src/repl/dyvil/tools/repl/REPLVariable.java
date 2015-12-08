@@ -29,6 +29,8 @@ public class REPLVariable extends Field
 		this.modifiers = modifiers;
 		this.position = position;
 		this.value = value;
+
+		REPLContext.updateModifiers(modifiers);
 	}
 	
 	@Override
@@ -53,8 +55,9 @@ public class REPLVariable extends Field
 			}
 			else
 			{
-				java.lang.reflect.Field[] fields = this.theClass.getDeclaredFields();
-				Object result = fields[0].get(null);
+				java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
+				field.setAccessible(true);
+				Object result = field.get(null);
 				this.value = new REPLResult(result);
 			}
 		}
@@ -156,8 +159,7 @@ public class REPLVariable extends Field
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
-			cw.visitField(this.modifiers.toFlags() | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name,
-			              extendedType, null, null);
+			cw.visitField(this.modifiers.toFlags(), name, extendedType, null, null);
 		}
 		
 		// Compilables
