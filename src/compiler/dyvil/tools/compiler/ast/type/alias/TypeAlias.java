@@ -83,6 +83,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		if (this.typeVariables == null)
 		{
 			this.setGeneric();
+			var.setIndex(0);
 			this.typeVariables[0] = var;
 			this.typeVariableCount = 1;
 			return;
@@ -95,6 +96,8 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			System.arraycopy(this.typeVariables, 0, temp, 0, index);
 			this.typeVariables = temp;
 		}
+
+		var.setIndex(index);
 		this.typeVariables[index] = var;
 	}
 
@@ -131,6 +134,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void setTypeVariable(int index, ITypeVariable var)
 	{
+		var.setIndex(index);
 		this.typeVariables[index] = var;
 	}
 
