@@ -164,8 +164,14 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer, null);
-		writer.writeInsn(this.value.getType().getReturnOpcode());
+		if (type == Types.VOID)
+		{
+			this.value.writeExpression(writer, null);
+			writer.writeInsn(this.value.getType().getReturnOpcode());
+			return;
+		}
+
+		this.value.writeExpression(writer, type);
 	}
 
 	@Override
