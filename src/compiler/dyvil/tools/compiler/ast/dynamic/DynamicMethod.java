@@ -387,7 +387,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public String[] getExceptions()
+	public String[] getInternalExceptions()
 	{
 		return null;
 	}

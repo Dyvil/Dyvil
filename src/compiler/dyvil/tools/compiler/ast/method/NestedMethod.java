@@ -154,7 +154,7 @@ public class NestedMethod extends CodeMethod
 		
 		MethodWriter mw = new MethodWriterImpl(writer,
 		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
-		                                                          this.getSignature(), this.getExceptions()));
+		                                                          this.getSignature(), this.getInternalExceptions()));
 
 		if (this.thisClass != null)
 		{

@@ -375,7 +375,7 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers.toFlags() & 0xFFFF;
+		int modifiers = this.modifiers.toFlags();
 		if (this.value == null)
 		{
 			modifiers |= Modifiers.ABSTRACT;
@@ -385,10 +385,10 @@ public class CodeMethod extends AbstractMethod
 			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
 		}
 		
-		String[] exceptions2 = this.getExceptions();
-		MethodWriter mw = new MethodWriterImpl(writer,
-		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
-		                                                          this.getSignature(), exceptions2));
+		String[] exceptionTypes = this.getInternalExceptions();
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & 0xFFFF, this.name.qualified,
+		                                                                  this.getDescriptor(), this.getSignature(),
+		                                                                  exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
@@ -452,7 +452,7 @@ public class CodeMethod extends AbstractMethod
 			// Generate a bridge method
 			mw = new MethodWriterImpl(writer,
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
-			                                             this.name.qualified, desc, null, exceptions2));
+			                                             this.name.qualified, desc, null, exceptionTypes));
 
 			start = new Label();
 			end = new Label();

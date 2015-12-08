@@ -1018,7 +1018,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public String[] getExceptions()
+	public String[] getInternalExceptions()
 	{
 		if (this.exceptionCount == 0)
 		{

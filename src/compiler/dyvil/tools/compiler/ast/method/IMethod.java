@@ -60,7 +60,7 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	
 	String getSignature();
 	
-	String[] getExceptions();
+	String[] getInternalExceptions();
 	
 	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
 			throws BytecodeException;
