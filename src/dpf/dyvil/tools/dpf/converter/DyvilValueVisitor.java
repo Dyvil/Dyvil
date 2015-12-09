@@ -1,14 +1,14 @@
 package dyvil.tools.dpf.converter;
 
-import dyvil.lang.Double;
-import dyvil.lang.Float;
-import dyvil.lang.Int;
-import dyvil.lang.Long;
+import dyvil.lang.*;
 
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
+import dyvil.lang.Double;
+import dyvil.lang.Float;
+import dyvil.lang.Long;
 import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
 
@@ -67,6 +67,19 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 	@Override
 	public void visitName(Name v)
 	{
+		switch (v.qualified)
+		{
+		case "true":
+			this.visitObject(dyvil.lang.Boolean.apply(true));
+			return;
+		case "false":
+			this.visitObject(dyvil.lang.Boolean.apply(false));
+			return;
+		case "null":
+			this.visitObject(null);
+			return;
+		}
+
 		this.visitObject(new NameAccess(v.qualified));
 	}
 	

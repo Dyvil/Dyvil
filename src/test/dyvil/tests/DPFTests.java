@@ -2,7 +2,6 @@ package dyvil.tests;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.TreeMap;
-import dyvil.lang.Boolean;
 import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.ast.RootNode;
 import dyvil.tools.dpf.converter.flatmapper.FlatMapConverter;
@@ -42,20 +41,18 @@ public class DPFTests
 		Map<String, Object> baseMap = new TreeMap<>();
 		FlatMapConverter.parse(TEST_FILE, baseMap);
 
-		Map<String, Object> mappings = baseMap.$plus("true", Boolean.apply(true));
-
 		// Parse as a Node structure
 		RootNode testNode = RootNode.parse(TEST_FILE);
 
 		// Expand the Node structure
-		RootNode expandedNode = testNode.expand(mappings, false);
+		RootNode expandedNode = testNode.expand(baseMap, false);
 
 		// Convert the Node structure to a Map
 		Map<String, Object> nodeMap = new TreeMap<>();
 		expandedNode.accept(new FlatMapConverter(nodeMap));
 
-		Map<String, Object> expandedMap = (Map<String, Object>) Expandable.expandMap(baseMap, mappings, false);
+		Map<String, Object> expandedMap = (Map<String, Object>) Expandable.expandMap(baseMap, baseMap, false);
 
-		assertEquals(nodeMap.toString(), expandedMap.toString());
+		assertEquals(nodeMap, expandedMap);
 	}
 }
