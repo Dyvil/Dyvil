@@ -1,12 +1,13 @@
 package dyvil.tools.dpf.ast;
 
+import dyvil.collection.Map;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class NodeAccess implements NodeVisitor, NodeElement
+public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 {
 	protected Name        name;
 	protected NodeElement element;
@@ -17,7 +18,13 @@ public class NodeAccess implements NodeVisitor, NodeElement
 	{
 		this.name = name;
 	}
-	
+
+	public NodeAccess(Name name, ICodePosition position)
+	{
+		this.name = name;
+		this.position = position;
+	}
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
@@ -65,7 +72,15 @@ public class NodeAccess implements NodeVisitor, NodeElement
 	{
 		this.element.accept(visitor.visitNodeAccess(this.name));
 	}
-	
+
+	@Override
+	public NodeAccess expand(Map<String, Object> mappings, boolean mutate)
+	{
+		NodeAccess nodeAccess = mutate ? this : new NodeAccess(this.name, this.position);
+		nodeAccess.element = (NodeElement) Expandable.expand(this.element, mappings, mutate);
+		return nodeAccess;
+	}
+
 	@Override
 	public String toString()
 	{

@@ -49,7 +49,7 @@ public abstract class ValueCreator implements ValueVisitor
 	@Override
 	public void visitName(Name name)
 	{
-		this.setValue(new NameValue(name));
+		this.setValue(new NameAccess(name));
 	}
 	
 	@Override

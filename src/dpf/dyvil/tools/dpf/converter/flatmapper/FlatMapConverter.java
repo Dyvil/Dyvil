@@ -13,13 +13,18 @@ public class FlatMapConverter implements NodeVisitor
 	private Map<String, Object>	map;
 	private String				name;
 
-	public static Map<String, Object> convert(String content)
+	public static Map<String, Object> parse(String content)
+	{
+		Map<String, Object> map = new HashMap<String, Object>();
+		parse(content, map);
+		return map;
+	}
+
+	public static void parse(String content, Map<String, Object> map)
 	{
 		Parser parser = new Parser(new MarkerList(), content);
-		Map<String, Object> map = new HashMap<String, Object>();
 		FlatMapConverter converter = new FlatMapConverter(map);
 		parser.accept(converter);
-		return map;
 	}
 
 	public FlatMapConverter(Map<String, Object> map)

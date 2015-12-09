@@ -3,6 +3,7 @@ package dyvil.tools.dpf.converter;
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 
@@ -25,7 +26,7 @@ public class StringInterpolation implements StringInterpolationVisitor, Expandab
 			@Override
 			protected void visitObject(Object o)
 			{
-				values.add(o);
+				StringInterpolation.this.values.add(o);
 			}
 		};
 	}

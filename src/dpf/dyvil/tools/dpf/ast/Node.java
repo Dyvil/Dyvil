@@ -1,6 +1,7 @@
 package dyvil.tools.dpf.ast;
 
 import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
@@ -8,7 +9,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Node implements NodeElement, NodeVisitor
+public class Node implements NodeElement, NodeVisitor, Expandable
 {
 	protected Name name;
 	protected List<Node>       nodes        = new ArrayList<>();
@@ -82,7 +83,46 @@ public class Node implements NodeElement, NodeVisitor
 		}
 		nodeVisitor.visitEnd();
 	}
-	
+
+	@Override
+	public Node expand(Map<String, Object> mappings, boolean mutate)
+	{
+		if (mutate)
+		{
+			this.expandChildren(mappings);
+			return this;
+		}
+		else
+		{
+			Node node = new Node(this.name);
+			this.expand(node, mappings);
+			return node;
+		}
+	}
+
+	protected void expandChildren(Map<String, Object> mappings)
+	{
+		for (Node node : this.nodes)
+		{
+			node.expand(mappings, true);
+		}
+		for (Property property : this.properties)
+		{
+			property.expand(mappings, true);
+		}
+		for (NodeAccess nodeAccess : this.nodeAccesses)
+		{
+			nodeAccess.expand(mappings, true);
+		}
+	}
+
+	protected void expand(Node node, Map<String, Object> mappings)
+	{
+		node.nodes = this.nodes.mapped(childNode -> childNode.expand(mappings, false));
+		node.properties = this.properties.mapped(property -> property.expand(mappings, false));
+		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess -> nodeAccess.expand(mappings, false));
+	}
+
 	@Override
 	public String toString()
 	{

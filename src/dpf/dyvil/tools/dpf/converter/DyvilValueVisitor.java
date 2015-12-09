@@ -92,7 +92,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 			@Override
 			public void visitEnd()
 			{
-				visitObject(list);
+				DyvilValueVisitor.this.visitObject(list);
 			}
 		};
 	}
@@ -134,7 +134,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 			@Override
 			public void visitEnd()
 			{
-				visitObject(map);
+				DyvilValueVisitor.this.visitObject(map);
 			}
 		};
 	}

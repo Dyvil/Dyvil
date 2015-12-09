@@ -1,7 +1,9 @@
 package dyvil.tools.dpf.ast.builder;
 
 import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.ast.Node;
 import dyvil.tools.dpf.ast.value.Value;
 import dyvil.tools.dpf.visitor.BuilderVisitor;
@@ -11,10 +13,10 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Builder implements Value, BuilderVisitor
+public class Builder implements Value, BuilderVisitor, Expandable
 {
 	private Name name;
-	private List<Parameter> parameters = new ArrayList();
+	private List<Parameter> parameters = new ArrayList<>();
 	private Node node;
 	
 	public Builder(Name name)
@@ -67,7 +69,28 @@ public class Builder implements Value, BuilderVisitor
 			this.node.accept(v.visitNode());
 		}
 	}
-	
+
+	@Override
+	public Builder expand(Map<String, Object> mappings, boolean mutate)
+	{
+		if (mutate)
+		{
+			for (Parameter parameter : this.parameters)
+			{
+				parameter.expand(mappings, true);
+			}
+			this.node = this.node.expand(mappings, true);
+			return this;
+		}
+		else
+		{
+			Builder builder = new Builder(this.name);
+			builder.parameters = this.parameters.mapped(parameter -> parameter.expand(mappings, false));
+			builder.node = this.node.expand(mappings, false);
+			return builder;
+		}
+	}
+
 	@Override
 	public String toString()
 	{

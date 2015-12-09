@@ -1,17 +1,41 @@
 package dyvil.tools.dpf.ast.value;
 
+import dyvil.collection.Collection;
 import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.visitor.ListVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.ast.IASTNode;
 
-public class ListValue extends ValueCreator implements Value, ListVisitor
+import java.util.function.Function;
+
+public class ListValue extends ValueCreator implements Value, ListVisitor, Expandable
 {
-	private List<Value> elements = new ArrayList<Value>();
+	protected List<Value> elements;
 	
 	public ListValue()
 	{
+		this.elements = new ArrayList<>();
+	}
+
+	public ListValue(Iterable<?> iterable)
+	{
+		this.elements = new ArrayList<>();
+		for (Object element : iterable)
+		{
+			this.elements.add(Value.wrap(element));
+		}
+	}
+
+	public ListValue(Collection<?> collection)
+	{
+		this.elements = new ArrayList<>(collection.size());
+		for (Object element : collection)
+		{
+			this.elements.add(Value.wrap(element));
+		}
 	}
 	
 	@Override
@@ -62,5 +86,22 @@ public class ListValue extends ValueCreator implements Value, ListVisitor
 			this.elements.get(i).toString(prefix, buffer);
 		}
 		buffer.append(" ]");
+	}
+
+	@Override
+	public ListValue expand(Map<String, Object> mappings, boolean mutate)
+	{
+		final Function<Value, Value> valueFunction = value -> Value.wrap(Expandable.expand(value, mappings, mutate));
+		if (mutate)
+		{
+			this.elements.map(valueFunction);
+			return this;
+		}
+		else
+		{
+			ListValue copy = new ListValue();
+			copy.elements = this.elements.mapped(valueFunction);
+			return copy;
+		}
 	}
 }

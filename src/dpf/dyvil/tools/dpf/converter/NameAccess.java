@@ -1,6 +1,7 @@
 package dyvil.tools.dpf.converter;
 
 import dyvil.collection.Map;
+import dyvil.tools.dpf.ast.Expandable;
 
 public class NameAccess extends DyvilValueVisitor implements Expandable
 {

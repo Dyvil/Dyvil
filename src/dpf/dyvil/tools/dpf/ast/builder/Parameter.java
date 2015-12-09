@@ -1,12 +1,14 @@
 package dyvil.tools.dpf.ast.builder;
 
+import dyvil.collection.Map;
+import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.ast.value.Value;
 import dyvil.tools.dpf.ast.value.ValueCreator;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Parameter extends ValueCreator implements IASTNode
+public class Parameter extends ValueCreator implements IASTNode, Expandable
 {
 	private Name  name;
 	private Value value;
@@ -44,11 +46,19 @@ public class Parameter extends ValueCreator implements IASTNode
 	}
 	
 	@Override
+	public Parameter expand(Map<String, Object> mappings, boolean mutate)
+	{
+		Parameter parameter = mutate ? this : new Parameter(this.name);
+		parameter.value = Value.wrap(Expandable.expand(this.value, mappings, mutate));
+		return parameter;
+	}
+
+	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

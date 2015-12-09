@@ -2,7 +2,7 @@ package dyvil.tools.dpf.ast.value;
 
 import dyvil.tools.dpf.visitor.ValueVisitor;
 
-public class LongValue implements Value
+public class LongValue implements Constant
 {
 	protected long value;
 	
@@ -26,7 +26,19 @@ public class LongValue implements Value
 	{
 		visitor.visitLong(this.value);
 	}
-	
+
+	@Override
+	public Object toObject()
+	{
+		return dyvil.lang.Long.apply(this.value);
+	}
+
+	@Override
+	public void appendString(StringBuilder builder)
+	{
+		builder.append(this.value);
+	}
+
 	@Override
 	public String toString()
 	{
