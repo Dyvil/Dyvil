@@ -1,5 +1,11 @@
 package dyvil.collection.view;
 
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
+import dyvil.collection.MutableList;
+import dyvil.collection.iterator.ImmutableIterator;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -7,12 +13,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.List;
-import dyvil.collection.MutableList;
-import dyvil.collection.iterator.ImmutableIterator;
 
 public class ListView<E> implements ImmutableList<E>
 {
@@ -46,7 +46,9 @@ public class ListView<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> reverseIterator()
 	{
-		return this.list.isImmutable() ? this.list.reverseIterator() : new ImmutableIterator(this.list.reverseIterator());
+		return this.list.isImmutable() ?
+				this.list.reverseIterator() :
+				new ImmutableIterator(this.list.reverseIterator());
 	}
 	
 	@Override

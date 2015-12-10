@@ -11,8 +11,8 @@ import dyvil.tools.parsing.token.IToken;
 
 public class DoStatementParser extends Parser implements IValueConsumer
 {
-	public static final int	DO		= 1;
-	public static final int	WHILE	= 2;
+	public static final int DO    = 1;
+	public static final int WHILE = 2;
 	
 	public DoStatement statement;
 	

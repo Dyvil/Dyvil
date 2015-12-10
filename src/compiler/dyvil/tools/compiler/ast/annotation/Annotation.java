@@ -1,11 +1,5 @@
 package dyvil.tools.compiler.ast.annotation;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.RetentionPolicy;
-
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -35,15 +29,21 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
+
 public final class Annotation implements IAnnotation
 {
 	public static final class Types
 	{
-		public static final IClass	RETENTION_CLASS	= Package.javaLangAnnotation.resolveClass("Retention");
-		public static final IClass	TARGET_CLASS	= Package.javaLangAnnotation.resolveClass("Target");
+		public static final IClass RETENTION_CLASS = Package.javaLangAnnotation.resolveClass("Retention");
+		public static final IClass TARGET_CLASS    = Package.javaLangAnnotation.resolveClass("Target");
 		
-		public static final IClass		ANNOTATION_CLASS	= Package.javaLangAnnotation.resolveClass("Annotation");
-		public static final ClassType	ANNOTATION			= new ClassType(ANNOTATION_CLASS);
+		public static final IClass    ANNOTATION_CLASS = Package.javaLangAnnotation.resolveClass("Annotation");
+		public static final ClassType ANNOTATION       = new ClassType(ANNOTATION_CLASS);
 		
 		private Types()
 		{
@@ -53,8 +53,8 @@ public final class Annotation implements IAnnotation
 	
 	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
 	
-	protected ICodePosition	position;
-	protected IArguments	arguments	= EmptyArguments.INSTANCE;
+	protected ICodePosition position;
+	protected IArguments arguments = EmptyArguments.INSTANCE;
 	
 	// Metadata
 	protected IType type;
@@ -144,7 +144,8 @@ public final class Annotation implements IAnnotation
 			{
 				if (param.getValue() == null)
 				{
-					markers.add(I18n.createMarker(this.position, "annotation.parameter.missing", this.type, param.getName()));
+					markers.add(I18n.createMarker(this.position, "annotation.parameter.missing", this.type,
+					                              param.getName()));
 				}
 				continue;
 			}
@@ -225,7 +226,8 @@ public final class Annotation implements IAnnotation
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitAnnotation(ClassFormat.internalToExtended(this.type.getInternalName()), retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitAnnotation(ClassFormat.internalToExtended(this.type.getInternalName()),
+			                                  retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	
@@ -235,8 +237,9 @@ public final class Annotation implements IAnnotation
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitTypeAnnotation(typeRef, typePath, ClassFormat.internalToExtended(this.type.getInternalName()),
-					retention == RetentionPolicy.RUNTIME));
+			this.write(writer.visitTypeAnnotation(typeRef, typePath,
+			                                      ClassFormat.internalToExtended(this.type.getInternalName()),
+			                                      retention == RetentionPolicy.RUNTIME));
 		}
 	}
 	

@@ -1,32 +1,22 @@
 package dyvil.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import dyvil.lang.Float;
-import dyvil.lang.Int;
-import dyvil.lang.Long;
-
 import dyvil.collection.*;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonList;
 import dyvil.collection.immutable.SingletonSet;
+import dyvil.lang.Float;
+import dyvil.lang.Int;
+import dyvil.lang.Long;
 import dyvil.util.Immutable;
-
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class CollectionTests
 {
-	private static final Object[] SAMPLES = new Object[] { "abc", "def", "aA", "BB", null, Float.apply(3F), Long.apply(1L), Int.apply(10) };
-	
-	@Before
-	public void init()
-	{
-		assert"aA".hashCode() == "BB".hashCode();
-	}
+	private static final Object[] SAMPLES = new Object[] { "abc", "def", "aA", "BB", null, Float.apply(3F),
+			Long.apply(1L), Int.apply(10) };
 	
 	@Test
 	public void testSets()
@@ -54,17 +44,17 @@ public class CollectionTests
 	@Test
 	public void testMaps()
 	{
-	
+
 	}
 	
 	public void testQueryable(Queryable queryable)
 	{
-	
+
 	}
 	
 	public void testBidiQueryable(BidiQueryable queryable)
 	{
-	
+
 	}
 	
 	public void testCollection(Collection collection)
@@ -76,13 +66,17 @@ public class CollectionTests
 		Collection immutable = collection.immutable();
 		Collection immutableCopy = collection.immutableCopy();
 		
-		assertTrue("Immutable Collection must be instanceof dyvil.util.Immutable", isImmutable == collection instanceof Immutable);
-		
+		assertTrue("Immutable Collection must be instanceof dyvil.util.Immutable",
+		           isImmutable == collection instanceof Immutable);
+
 		assertEquals("Collection must be equal to it's copy: " + copy.getClass(), collection, copy);
 		assertEquals("Collection must be equal to it's mutable version: " + mutable.getClass(), collection, mutable);
-		assertEquals("Collection must be equal to it's mutable copy: " + mutableCopy.getClass(), collection, mutableCopy);
-		assertEquals("Collection must be equal to it's immutable version: " + immutable.getClass(), collection, immutable);
-		assertEquals("Collection must be equal to it's immutable copy: " + mutableCopy.getClass(), collection, immutableCopy);
+		assertEquals("Collection must be equal to it's mutable copy: " + mutableCopy.getClass(), collection,
+		             mutableCopy);
+		assertEquals("Collection must be equal to it's immutable version: " + immutable.getClass(), collection,
+		             immutable);
+		assertEquals("Collection must be equal to it's immutable copy: " + mutableCopy.getClass(), collection,
+		             immutableCopy);
 		
 		assertFalse("Mutable Version must be mutable: " + mutable.getClass(), mutable.isImmutable());
 		assertFalse("Mutable Copy must be mutable: " + mutableCopy.getClass(), mutableCopy.isImmutable());
@@ -111,7 +105,6 @@ public class CollectionTests
 	{
 		this.testQueryable(set);
 		this.testCollection(set);
-		
 	}
 	
 	public void testList(List list)
@@ -123,7 +116,7 @@ public class CollectionTests
 	
 	public void testMap(Map map)
 	{
-	
+
 	}
 	
 	public ImmutableList testListBuilder(ImmutableList.Builder builder)
@@ -166,7 +159,8 @@ public class CollectionTests
 	
 	public void testBuilderError(ImmutableCollection.Builder builder)
 	{
-		assertTrue("Repeated invocation of builder.build() has to return null: " + builder.getClass(), builder.build() == null);
+		assertTrue("Repeated invocation of builder.build() has to return null: " + builder.getClass(),
+		           builder.build() == null);
 		
 		try
 		{

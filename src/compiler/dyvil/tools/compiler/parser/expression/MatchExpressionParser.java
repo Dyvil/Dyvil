@@ -14,16 +14,16 @@ import dyvil.tools.parsing.token.IToken;
 
 public class MatchExpressionParser extends Parser implements IValueConsumer
 {
-	private static final int	OPEN_BRACKET	= 1;
-	private static final int	CASE			= 2;
-	private static final int	CONDITION		= 4;
-	private static final int	ACTION			= 8;
-	private static final int	SEPARATOR		= 16;
+	private static final int OPEN_BRACKET = 1;
+	private static final int CASE         = 2;
+	private static final int CONDITION    = 4;
+	private static final int ACTION       = 8;
+	private static final int SEPARATOR    = 16;
 	
 	protected MatchExpr matchExpression;
 	
-	private MatchCase	currentCase;
-	private boolean		singleCase;
+	private MatchCase currentCase;
+	private boolean   singleCase;
 	
 	public MatchExpressionParser(MatchExpr matchExpression)
 	{

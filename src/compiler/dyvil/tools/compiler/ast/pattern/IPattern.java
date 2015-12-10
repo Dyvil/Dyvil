@@ -14,27 +14,27 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IPattern extends IASTNode, ITyped
 {
-	int	NULL	= 0;
-	int	BOOLEAN	= 1;
-	int	BYTE	= 2;
-	int	SHORT	= 3;
-	int	CHAR	= 4;
-	int	INT		= 5;
-	int	LONG	= 6;
-	int	FLOAT	= 7;
-	int	DOUBLE	= 8;
-	int	STRING	= 9;
+	int NULL    = 0;
+	int BOOLEAN = 1;
+	int BYTE    = 2;
+	int SHORT   = 3;
+	int CHAR    = 4;
+	int INT     = 5;
+	int LONG    = 6;
+	int FLOAT   = 7;
+	int DOUBLE  = 8;
+	int STRING  = 9;
 	
-	int	ARRAY	= 16;
-	int	TUPLE	= 17;
-	int	LIST	= 18;
+	int ARRAY = 16;
+	int TUPLE = 17;
+	int LIST  = 18;
 	
 	int CASE_CLASS = 24;
 	
-	int	BINDING		= 32;
-	int	WILDCARD	= 33;
-	int	UNBOX		= 34;
-	int	TYPECHECK	= 35;
+	int BINDING   = 32;
+	int WILDCARD  = 33;
+	int UNBOX     = 34;
+	int TYPECHECK = 35;
 	
 	int getPatternType();
 	
@@ -65,7 +65,8 @@ public interface IPattern extends IASTNode, ITyped
 		}
 		if (type.isSuperTypeOf(primitiveType))
 		{
-			return new TypeCheckPattern(new UnboxPattern(pattern, primitiveType.getUnboxMethod()), primitiveType.getObjectType());
+			return new TypeCheckPattern(new UnboxPattern(pattern, primitiveType.getUnboxMethod()),
+			                            primitiveType.getObjectType());
 		}
 		return null;
 	}

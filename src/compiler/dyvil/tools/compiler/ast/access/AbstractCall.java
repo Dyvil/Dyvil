@@ -98,7 +98,40 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	{
 		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		if (this.method == null)
+		{
+			return true;
+		}
+
+		// No @pure Annotation
+		if (this.method.hasSideEffects())
+		{
+			return true;
+		}
+
+		// Receiver has Side Effects
+		if (this.receiver != null && this.receiver.hasSideEffects())
+		{
+			return true;
+		}
+
+		// Any argument has Side Effects
+		for (int i = 0, count = this.arguments.size(); i < count; i++)
+		{
+			if (this.arguments.getValue(i, null).hasSideEffects())
+			{
+				return true;
+			}
+		}
+
+		// Method Call has no Side Effects
+		return false;
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -260,20 +293,12 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.method.writeCall(writer, this.receiver, this.arguments, this.type, this.getLineNumber());
-		this.getType().writeCast(writer, type, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.method.writeCall(writer, this.receiver, this.arguments, this.type, this.getLineNumber());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.method.writeCall(writer, this.receiver, this.arguments, Types.VOID, this.getLineNumber());
+		if (type == null)
+		{
+			type = this.getType();
+		}
+
+		this.method.writeCall(writer, this.receiver, this.arguments, type, this.getLineNumber());
 	}
 	
 	@Override

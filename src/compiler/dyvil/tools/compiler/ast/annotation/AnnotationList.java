@@ -1,19 +1,19 @@
 package dyvil.tools.compiler.ast.annotation;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+
 public class AnnotationList
 {
-	protected IAnnotation[]	annotations;
-	protected int			annotationCount;
+	protected IAnnotation[] annotations;
+	protected int           annotationCount;
 	
 	public AnnotationList()
 	{

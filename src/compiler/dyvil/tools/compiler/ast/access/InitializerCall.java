@@ -22,8 +22,8 @@ public class InitializerCall implements ICall
 {
 	protected ICodePosition position;
 	
-	protected boolean		isSuper;
-	protected IArguments	arguments	= EmptyArguments.INSTANCE;
+	protected boolean isSuper;
+	protected IArguments arguments = EmptyArguments.INSTANCE;
 	
 	// Metadata
 	protected IConstructor constructor;
@@ -105,7 +105,8 @@ public class InitializerCall implements ICall
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
-		this.constructor.checkArguments(markers, this.position, context, this.constructor.getTheClass().getType(), arguments);
+		this.constructor
+				.checkArguments(markers, this.position, context, this.constructor.getTheClass().getType(), arguments);
 	}
 
 	@Override
@@ -176,14 +177,13 @@ public class InitializerCall implements ICall
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		throw new BytecodeException();
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
+		if (type != Types.VOID)
+		{
+			throw new BytecodeException();
+		}
+
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
 		this.constructor.writeInvoke(writer, this.getLineNumber());

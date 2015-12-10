@@ -2,10 +2,10 @@ package dyvil.tools.parsing.position;
 
 public class CodePosition implements ICodePosition
 {
-	public int	startLine;
-	public int	endLine;
-	public int	start;
-	public int	end;
+	public int startLine;
+	public int endLine;
+	public int start;
+	public int end;
 	
 	public CodePosition(int line, int start, int end)
 	{
@@ -62,6 +62,7 @@ public class CodePosition implements ICodePosition
 	@Override
 	public String toString()
 	{
-		return "CodePosition(startIndex: " + this.start + ", endIndex: " + this.end + ", startLine: " + this.startLine + ", endLine: " + this.endLine;
+		return "CodePosition(startIndex: " + this.start + ", endIndex: " + this.end + ", startLine: " + this.startLine
+				+ ", endLine: " + this.endLine + ")";
 	}
 }

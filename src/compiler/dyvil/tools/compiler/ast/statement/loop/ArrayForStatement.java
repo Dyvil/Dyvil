@@ -14,13 +14,13 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
-	public static final Name	$index	= Name.getQualified("$index");
-	public static final Name	$length	= Name.getQualified("$length");
-	public static final Name	$array	= Name.getQualified("$array");
+	public static final Name $index  = Name.getQualified("$index");
+	public static final Name $length = Name.getQualified("$length");
+	public static final Name $array  = Name.getQualified("$array");
 	
-	protected Variable	indexVar;
-	protected Variable	lengthVar;
-	protected Variable	arrayVar;
+	protected Variable indexVar;
+	protected Variable lengthVar;
+	protected Variable arrayVar;
 	
 	protected IMethod boxMethod;
 	
@@ -94,7 +94,7 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Load the array
-		var.getValue().writeExpression(writer);
+		var.getValue().writeExpression(writer, null);
 		
 		// Local Variables
 		int locals = writer.localCount();
@@ -131,7 +131,7 @@ public class ArrayForStatement extends ForEachStatement
 		// Action
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		
 		writer.writeLabel(updateLabel);

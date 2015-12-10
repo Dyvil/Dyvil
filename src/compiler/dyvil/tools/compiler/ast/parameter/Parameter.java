@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,9 +19,9 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Parameter extends Member implements IParameter
 {
@@ -36,13 +37,22 @@ public abstract class Parameter extends Member implements IParameter
 	
 	public Parameter(Name name)
 	{
-		this.name = name;
+		super(name);
 	}
 	
 	public Parameter(Name name, IType type)
 	{
-		this.name = name;
-		this.type = type;
+		super(name, type);
+	}
+
+	public Parameter(Name name, IType type, ModifierSet modifiers)
+	{
+		super(name, type, modifiers);
+	}
+
+	public Parameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	{
+		super(position, name, type, modifiers);
 	}
 
 	@Override
@@ -111,10 +121,10 @@ public abstract class Parameter extends Member implements IParameter
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/var":
-			this.modifiers |= Modifiers.VAR;
+			this.modifiers.addIntModifier(Modifiers.VAR);
 			return false;
 		case "dyvil/annotation/_internal/lazy":
-			this.modifiers |= Modifiers.LAZY;
+			this.modifiers.addIntModifier(Modifiers.LAZY);
 			return false;
 		}
 		return true;
@@ -281,8 +291,8 @@ public abstract class Parameter extends Member implements IParameter
 				buffer.append(' ');
 			}
 		}
-		
-		buffer.append(ModifierTypes.PARAMETER.toString(this.modifiers));
+
+		this.modifiers.toString(buffer);
 		
 		if (this.varargs)
 		{

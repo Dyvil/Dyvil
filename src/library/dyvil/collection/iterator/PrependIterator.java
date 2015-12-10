@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 public class PrependIterator<E> implements Iterator<E>
 {
-	private final E						head;
-	private final Iterator<? extends E>	tail;
+	private final E                     head;
+	private final Iterator<? extends E> tail;
 	
 	private boolean returned;
 	

@@ -50,8 +50,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 
 	default E findLast(Predicate<? super E> condition)
 	{
-		for (Iterator<E> iterator = this.reverseIterator(); iterator
-				.hasNext(); )
+		for (Iterator<E> iterator = this.reverseIterator(); iterator.hasNext(); )
 		{
 			E element = iterator.next();
 			if (condition.test(element))
@@ -64,8 +63,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 
 	default Option<E> findLastOption(Predicate<? super E> condition)
 	{
-		for (Iterator<E> iterator = this.reverseIterator(); iterator
-				.hasNext(); )
+		for (Iterator<E> iterator = this.reverseIterator(); iterator.hasNext(); )
 		{
 			E element = iterator.next();
 			if (condition.test(element))
@@ -77,8 +75,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 	}
 	
 	@Override
-	default <R> R fold(R initialValue,
-			BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		return this.foldLeft(initialValue, reducer);
 	}
@@ -89,8 +86,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 		return this.reduceLeft(reducer);
 	}
 	
-	default <R> R foldLeft(R initialValue,
-			BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		Iterator<E> iterator = this.iterator();
 		while (iterator.hasNext())
@@ -100,8 +96,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 		return initialValue;
 	}
 	
-	default <R> R foldRight(R initialValue,
-			BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		Iterator<E> iterator = this.reverseIterator();
 		while (iterator.hasNext())
@@ -141,5 +136,25 @@ public interface BidiQueryable<E> extends Queryable<E>
 			initialValue = reducer.apply(initialValue, iterator.next());
 		}
 		return initialValue;
+	}
+
+	default Option<E> reduceLeftOption(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.isEmpty())
+		{
+			return None.instance;
+		}
+
+		return new Some<>(this.reduceLeft(reducer));
+	}
+
+	default Option<E> reduceRightOption(BiFunction<? super E, ? super E, ? extends E> reducer)
+	{
+		if (this.isEmpty())
+		{
+			return None.instance;
+		}
+
+		return new Some<>(this.reduceRight(reducer));
 	}
 }

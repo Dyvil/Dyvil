@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.method.Constructor;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -24,21 +25,21 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
 {
-	protected static final int	CONSTRUCTOR	= 1;
-	protected static final int	APPLY		= 2;
-	protected static final int	EQUALS		= 4;
-	protected static final int	HASHCODE	= 8;
-	protected static final int	TOSTRING	= 16;
+	protected static final int CONSTRUCTOR = 1;
+	protected static final int APPLY       = 2;
+	protected static final int EQUALS      = 4;
+	protected static final int HASHCODE    = 8;
+	protected static final int TOSTRING    = 16;
 	
-	protected static final int	WRITE_OBJECT	= 32;
-	protected static final int	WRITE_REPLACE	= 64;
-	protected static final int	READ_OBJECT		= 128;
-	protected static final int	READ_RESOLVE	= 256;
+	protected static final int WRITE_OBJECT  = 32;
+	protected static final int WRITE_REPLACE = 64;
+	protected static final int READ_OBJECT   = 128;
+	protected static final int READ_RESOLVE  = 256;
 	
 	protected final IClass theClass;
 	
-	protected IConstructor	constructor;
-	protected IConstructor	superConstructor;
+	protected IConstructor constructor;
+	protected IConstructor superConstructor;
 	
 	protected byte methods;
 	
@@ -149,7 +150,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 		}
 		
-		Constructor constructor = new Constructor(this.theClass, Modifiers.PUBLIC);
+		Constructor constructor = new Constructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
 		int parameterCount = this.theClass.parameterCount();
 		IParameter[] parameters = this.theClass.getParameters();
 		

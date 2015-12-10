@@ -1,11 +1,11 @@
 package dyvil.collection;
 
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
 @ArrayConvertible
@@ -16,6 +16,7 @@ public interface MutableCollection<E> extends Collection<E>
 		return MutableList.apply();
 	}
 	
+	@SafeVarargs
 	static <E> MutableCollection<E> apply(E... elements)
 	{
 		return MutableList.apply(elements);

@@ -13,10 +13,10 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements ITypeList, ITypeContext
 {
-	public IMethod	method;
-	public IType[]	generics;
-	public int		genericCount;
-	public IValue	instance;
+	public IMethod method;
+	public IType[] generics;
+	public int     genericCount;
+	public IValue  instance;
 	
 	public GenericData()
 	{

@@ -1,9 +1,8 @@
 package dyvil.lang;
 
+import dyvil.annotation._internal.prefix;
 import dyvil.lang.literal.IntConvertible;
 import dyvil.lang.literal.LongConvertible;
-
-import dyvil.annotation._internal.prefix;
 
 @IntConvertible
 @LongConvertible
@@ -19,7 +18,8 @@ public interface Integer extends Number
 		return Long.apply(v);
 	}
 	
-	@prefix Integer $tilde();
+	@prefix
+	Integer $tilde();
 	
 	Integer $bslash(Integer v);
 	

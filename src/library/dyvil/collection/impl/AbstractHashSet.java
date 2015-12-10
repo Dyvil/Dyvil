@@ -1,26 +1,24 @@
 package dyvil.collection.impl;
 
+import dyvil.collection.Collection;
+import dyvil.collection.Set;
+import dyvil.math.MathUtils;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
-import dyvil.math.MathUtils;
-
-import static dyvil.collection.impl.AbstractHashMap.MAX_ARRAY_SIZE;
-import static dyvil.collection.impl.AbstractHashMap.hash;
-import static dyvil.collection.impl.AbstractHashMap.index;
+import static dyvil.collection.impl.AbstractHashMap.*;
 
 public abstract class AbstractHashSet<E> implements Set<E>
 {
 	protected static final class HashElement<E>
 	{
-		public E				element;
-		public int				hash;
-		public HashElement<E>	next;
+		public E              element;
+		public int            hash;
+		public HashElement<E> next;
 		
 		public HashElement(E element, int hash)
 		{
@@ -38,8 +36,8 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	
 	private static final long serialVersionUID = -2574454530914084132L;
 	
-	protected transient int				size;
-	protected transient HashElement[]	elements;
+	protected transient int           size;
+	protected transient HashElement[] elements;
 	
 	public AbstractHashSet()
 	{
@@ -173,15 +171,16 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		
 		HashElement[] newMap = this.elements = new HashElement[newCapacity];
 		
-		for (int i = oldCapacity; i-- > 0;)
+		for (int i = oldCapacity; i-- > 0; )
 		{
-			HashElement e = oldMap[i];
-			while (e != null)
+			for (HashElement e = oldMap[i]; e != null;)
 			{
 				int index = index(e.hash, newCapacity);
+				HashElement next = e.next;
+
 				e.next = newMap[index];
 				newMap[index] = e;
-				e = e.next;
+				e = next;
 			}
 		}
 		

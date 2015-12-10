@@ -23,7 +23,8 @@ public final class StringInterpolationExpr implements IValue
 {
 	public static final class Types
 	{
-		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("StringInterpolationConvertible");
+		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral
+				.resolveClass("StringInterpolationConvertible");
 		
 		private Types()
 		{
@@ -33,9 +34,9 @@ public final class StringInterpolationExpr implements IValue
 	
 	protected ICodePosition position;
 	
-	private IValue[]	values	= new IValue[1];
-	private String[]	strings	= new String[2];
-	private int			count;
+	private IValue[] values  = new IValue[1];
+	private String[] strings = new String[2];
+	private int count;
 	
 	public StringInterpolationExpr(ICodePosition position)
 	{
@@ -241,7 +242,7 @@ public final class StringInterpolationExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		int len = this.count / 2;
 		String string = this.strings[0];
@@ -263,20 +264,23 @@ public final class StringInterpolationExpr implements IValue
 		for (int i = 0; i < len; i++)
 		{
 			IValue value = this.values[i];
-			value.writeExpression(writer);
+			value.writeExpression(writer, null);
 			CaseClasses.writeStringAppend(writer, value.getType());
 			
 			string = this.strings[i + 1];
 			CaseClasses.writeStringAppend(writer, string);
 		}
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
+		                       false);
+
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			dyvil.tools.compiler.ast.type.Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

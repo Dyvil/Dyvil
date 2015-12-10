@@ -1,20 +1,19 @@
 package dyvil.math;
 
-import java.io.IOException;
-import java.io.Serializable;
-
+import dyvil.annotation._internal.prefix;
 import dyvil.lang.Number;
 import dyvil.lang.literal.TupleConvertible;
 
-import dyvil.annotation._internal.prefix;
+import java.io.IOException;
+import java.io.Serializable;
 
 @TupleConvertible
 public class Complex implements Number, Serializable
 {
 	private static final long serialVersionUID = 9178132461719363395L;
 	
-	protected transient double	real;
-	protected transient double	imag;
+	protected transient double real;
+	protected transient double imag;
 	
 	public static Complex apply(double r, double i)
 	{
@@ -80,18 +79,24 @@ public class Complex implements Number, Serializable
 	}
 	
 	@Override
-	public @prefix Complex $plus()
+	public
+	@prefix
+	Complex $plus()
 	{
 		return this;
 	}
 	
 	@Override
-	public @prefix Complex $minus()
+	public
+	@prefix
+	Complex $minus()
 	{
 		return apply(-this.real, -this.imag);
 	}
 	
-	public @prefix Complex $tilde()
+	public
+	@prefix
+	Complex $tilde()
 	{
 		return apply(-this.real, this.imag);
 	}

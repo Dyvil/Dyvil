@@ -1,15 +1,14 @@
 package dyvil.lang.ref.unsafe;
 
-import java.lang.reflect.Field;
-
 import dyvil.lang.ref.CharRef;
-
 import dyvil.reflect.ReflectUtils;
+
+import java.lang.reflect.Field;
 
 public final class UnsafeCharRef implements CharRef
 {
-	private final Object	base;
-	private final long		offset;
+	private final Object base;
+	private final long   offset;
 	
 	public UnsafeCharRef(Field staticField)
 	{

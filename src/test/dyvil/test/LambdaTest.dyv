@@ -21,10 +21,14 @@ public class LambdaTest
 		basicTest()
 		println "-- Function Chain Test --"
 		chainTest()
+		println "-- Closure Test --"
+		closureTest()
 		println "-- Compound Assignment Test --"
 		compoundAssignmentTest()
 		println "-- Custom SAM Interface Test --"
 		customSAMTest()
+		println "-- Partial Function Test"
+		partialFunctionTest()
 	}
 	
 	private static void basicTest() {
@@ -54,5 +58,26 @@ public class LambdaTest
 				
 		auto fun1 = intF
 		println(fun1(10))
+	}
+
+	private static void closureTest() {
+		() => void function1 = function { println "Successful" }
+		() => String function2 = function { "Testing..." }
+
+		repeat(3) { println(function2()) }
+
+		with ("Still testing...") { println $0 }
+
+		function1()
+	}
+
+	private static void partialFunctionTest() {
+		(int, int) => int compareInts = _ compareTo _;
+		int => void printFun = println _
+
+		printFun(compareInts(1, 2))
+
+		// with ("Test running...") { println _ }
+		with ("Test completed", println _)
 	}
 }

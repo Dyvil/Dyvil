@@ -4,8 +4,8 @@ import dyvil.lang.ref.StringRef;
 
 public class StringArrayRef implements StringRef
 {
-	protected final String[]	array;
-	protected final int			index;
+	protected final String[] array;
+	protected final int      index;
 	
 	public StringArrayRef(String[] array, int index)
 	{

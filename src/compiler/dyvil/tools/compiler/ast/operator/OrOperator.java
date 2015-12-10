@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class OrOperator extends AbstractValue
 {
-	public IValue	left;
-	public IValue	right;
+	public IValue left;
+	public IValue right;
 	
 	public OrOperator(IValue left, IValue right)
 	{
@@ -36,7 +36,7 @@ public final class OrOperator extends AbstractValue
 	@Override
 	public int valueTag()
 	{
-		return BOOLEAN_AND;
+		return BOOLEAN_OR;
 	}
 	
 	@Override
@@ -50,7 +50,13 @@ public final class OrOperator extends AbstractValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.left.hasSideEffects() || this.right.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -113,7 +119,8 @@ public final class OrOperator extends AbstractValue
 	
 	private boolean bothFalse()
 	{
-		return this.left.valueTag() == BOOLEAN && !this.left.booleanValue() && this.right.valueTag() == BOOLEAN && !this.right.booleanValue();
+		return this.left.valueTag() == BOOLEAN && !this.left.booleanValue() && this.right.valueTag() == BOOLEAN
+				&& !this.right.booleanValue();
 	}
 	
 	@Override
@@ -131,7 +138,7 @@ public final class OrOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		Label label = new Label();
 		Label label2 = new Label();
@@ -142,13 +149,15 @@ public final class OrOperator extends AbstractValue
 		writer.writeLabel(label);
 		writer.writeLDC(1);
 		writer.writeLabel(label2);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

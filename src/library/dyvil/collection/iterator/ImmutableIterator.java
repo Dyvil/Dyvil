@@ -1,9 +1,9 @@
 package dyvil.collection.iterator;
 
+import dyvil.util.ImmutableException;
+
 import java.util.Iterator;
 import java.util.function.Consumer;
-
-import dyvil.util.ImmutableException;
 
 public class ImmutableIterator<E> implements Iterator<E>
 {

@@ -1,12 +1,12 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -14,17 +14,17 @@ public class Short implements Integer, Serializable
 {
 	private static final long serialVersionUID = -731503833337870116L;
 	
-	public static final int		min		= java.lang.Short.MIN_VALUE;
-	public static final int		max		= java.lang.Short.MAX_VALUE;
-	public static final byte	size	= java.lang.Short.SIZE;
+	public static final int  min  = java.lang.Short.MIN_VALUE;
+	public static final int  max  = java.lang.Short.MAX_VALUE;
+	public static final byte size = java.lang.Short.SIZE;
 	
 	protected short value;
 	
 	private static final class ConstantPool
 	{
-		protected static final int	TABLE_MIN	= -128;
-		protected static final int	TABLE_SIZE	= 256;
-		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		protected static final int TABLE_MIN  = -128;
+		protected static final int TABLE_SIZE = 256;
+		protected static final int TABLE_MAX  = TABLE_MIN + TABLE_SIZE;
 		
 		protected static final Short[] TABLE = new Short[TABLE_SIZE];
 		
@@ -46,7 +46,9 @@ public class Short implements Integer, Serializable
 		return new Short(v);
 	}
 	
-	public static @infix short unapply(Short v)
+	public static
+	@infix
+	short unapply(Short v)
 	{
 		return v == null ? 0 : v.value;
 	}
@@ -518,28 +520,43 @@ public class Short implements Integer, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString", "(I)Ljava/lang/String;" })
-	public static @infix @inline String toString(short value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString",
+			"(I)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(short value)
 	{
 		return java.lang.Integer.toString(value);
 	}
 	
-	public static @infix @inline String toBinaryString(short value)
+	public static
+	@infix
+	@inline
+	String toBinaryString(short value)
 	{
 		return java.lang.Integer.toBinaryString(value);
 	}
 	
-	public static @infix @inline String toHexString(short value)
+	public static
+	@infix
+	@inline
+	String toHexString(short value)
 	{
 		return java.lang.Integer.toHexString(value);
 	}
 	
-	public static @infix @inline String toOctalString(short value)
+	public static
+	@infix
+	@inline
+	String toOctalString(short value)
 	{
 		return java.lang.Integer.toOctalString(value);
 	}
 	
-	public static @infix String toString(short value, int radix)
+	public static
+	@infix
+	String toString(short value, int radix)
 	{
 		switch (radix)
 		{
@@ -561,8 +578,10 @@ public class Short implements Integer, Serializable
 		return java.lang.Short.toString(this.value);
 	}
 	
-	@Intrinsic({ LOAD_0 })
-	public static @postfix int $hash$hash(short v)
+	@Intrinsic( { LOAD_0 })
+	public static
+	@postfix
+	int $hash$hash(short v)
 	{
 		return v;
 	}

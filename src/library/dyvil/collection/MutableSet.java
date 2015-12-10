@@ -1,15 +1,14 @@
 package dyvil.collection;
 
-import java.util.Iterator;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.view.SetView;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
@@ -20,14 +19,15 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 		return new HashSet<E>();
 	}
 	
+	@SafeVarargs
 	static <E> MutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet<>(elements, true);
 	}
-	
-	static <E> MutableSet<E> fromArray(E... elements)
+
+	static <E> MutableSet<E> fromArray(E[] elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet<>(elements);
 	}
 	
 	// Accessors
@@ -169,6 +169,6 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	@Override
 	default ImmutableSet<E> view()
 	{
-		return new SetView(this);
+		return new SetView<>(this);
 	}
 }

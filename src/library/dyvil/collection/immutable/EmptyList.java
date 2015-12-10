@@ -1,13 +1,5 @@
 package dyvil.collection.immutable;
 
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.annotation._internal.object;
 import dyvil.array.ObjectArray;
 import dyvil.collection.Collection;
@@ -15,9 +7,18 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
+import dyvil.lang.literal.NilConvertible;
+
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NilConvertible
-public @object class EmptyList<E> implements ImmutableList<E>
+public
+@object
+class EmptyList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = -6059901529322971155L;
 	

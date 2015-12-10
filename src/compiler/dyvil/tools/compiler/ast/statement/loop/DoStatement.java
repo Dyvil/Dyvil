@@ -3,10 +3,10 @@ package dyvil.tools.compiler.ast.statement.loop;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -193,18 +193,11 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
-		writer.writeInsn(Opcodes.ACONST_NULL);
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		if (this.action == null)
 		{
-			this.condition.writeStatement(writer);
+			this.condition.writeExpression(writer, Types.VOID);
 		}
 		
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
@@ -214,7 +207,7 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		// Do Block
 		
 		writer.writeTargetLabel(startLabel);
-		this.action.writeStatement(writer);
+		this.action.writeExpression(writer, Types.VOID);
 		// Condition
 		writer.writeLabel(conditionLabel);
 		if (this.condition != null)

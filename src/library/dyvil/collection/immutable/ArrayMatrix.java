@@ -1,24 +1,23 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.ImmutableList;
+import dyvil.collection.ImmutableMatrix;
+import dyvil.collection.Matrix;
+import dyvil.collection.MutableMatrix;
+import dyvil.lang.Int;
+import dyvil.tuple.Tuple2;
+
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import dyvil.lang.Int;
-
-import dyvil.collection.ImmutableList;
-import dyvil.collection.ImmutableMatrix;
-import dyvil.collection.Matrix;
-import dyvil.collection.MutableMatrix;
-import dyvil.tuple.Tuple2;
-
 public class ArrayMatrix<E> implements ImmutableMatrix<E>
 {
 	private static final long serialVersionUID = 7258516530768096953L;
 	
-	private int	rows;
-	private int	columns;
+	private int rows;
+	private int columns;
 	
 	private Object[][] cells;
 	
@@ -155,7 +154,8 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 			@Override
 			public String toString()
 			{
-				return "ArrayMatrixIterator(matrix: " + ArrayMatrix.this + ", row: " + this.row + ", column: " + this.column + ")";
+				return "ArrayMatrixIterator(matrix: " + ArrayMatrix.this + ", row: " + this.row + ", column: "
+						+ this.column + ")";
 			}
 		};
 	}

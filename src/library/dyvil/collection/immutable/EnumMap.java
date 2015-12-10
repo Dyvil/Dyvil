@@ -1,22 +1,21 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation._internal.internal;
+import dyvil.collection.*;
+import dyvil.collection.impl.AbstractEnumMap;
+import dyvil.lang.Type;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.reflect.EnumReflection;
+import dyvil.tuple.Tuple2;
+import dyvil.util.ImmutableException;
+
 import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import dyvil.lang.Type;
-import dyvil.lang.literal.ArrayConvertible;
-
-import dyvil.annotation._internal.internal;
-import dyvil.collection.*;
-import dyvil.collection.impl.AbstractEnumMap;
-import dyvil.reflect.EnumReflection;
-import dyvil.tuple.Tuple2;
-import dyvil.util.ImmutableException;
-
 @ArrayConvertible
-public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements ImmutableMap<K, V>
+public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = -2305035920228304893L;
 	
@@ -35,7 +34,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		return new Builder(type);
 	}
 	
-	private @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	private
+	@internal
+	EnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
 		super(type, keys, values, size);
 	}
@@ -67,9 +68,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 	
 	public static class Builder<K extends Enum<K>, V> implements ImmutableMap.Builder<K, V>
 	{
-		private Class<K>	type;
-		private Object[]	values;
-		private int			size;
+		private Class<K> type;
+		private Object[] values;
+		private int      size;
 		
 		public Builder(Class<K> type)
 		{
@@ -100,7 +101,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		@Override
 		public EnumMap<K, V> build()
 		{
-			EnumMap<K, V> map = new EnumMap(this.type, EnumReflection.getEnumConstants(this.type), this.values, this.size);
+			EnumMap<K, V> map = new EnumMap(this.type, EnumReflection.getEnumConstants(this.type), this.values,
+			                                this.size);
 			this.size = -1;
 			return map;
 		}

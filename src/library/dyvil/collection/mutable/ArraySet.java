@@ -1,19 +1,18 @@
 package dyvil.collection.mutable;
 
-import java.util.Objects;
-import java.util.function.Function;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+
+import java.util.Objects;
+import java.util.function.Function;
 
 @NilConvertible
 @ArrayConvertible
-public class ArraySet<E> extends AbstractArraySet<E>implements MutableSet<E>
+public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -6676561653968567088L;
 	

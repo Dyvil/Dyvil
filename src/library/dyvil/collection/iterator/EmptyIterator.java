@@ -1,10 +1,10 @@
 package dyvil.collection.iterator;
 
+import dyvil.lang.literal.NilConvertible;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
-
-import dyvil.lang.literal.NilConvertible;
 
 @NilConvertible
 public class EmptyIterator<E> implements Iterator<E>

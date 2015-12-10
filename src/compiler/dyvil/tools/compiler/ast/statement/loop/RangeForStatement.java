@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
@@ -17,15 +18,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class RangeForStatement extends ForEachStatement
 {
-	private static final int	INT		= 0, LONG = 1, FLOAT = 2, DOUBLE = 3;
-	private static final int	ORDERED	= 4;
+	private static final int INT = 0, LONG = 1, FLOAT = 2, DOUBLE = 3;
+	private static final int ORDERED = 4;
 	
-	protected IValue	value1;
-	protected IValue	value2;
-	protected boolean	halfOpen;
+	protected IValue  value1;
+	protected IValue  value2;
+	protected boolean halfOpen;
 	
-	private Variable	startVar;
-	private Variable	endVar;
+	private Variable startVar;
+	private Variable endVar;
 	
 	public RangeForStatement(ICodePosition position, Variable var, IValue value1, IValue value2, boolean halfOpen)
 	{
@@ -155,7 +156,8 @@ public class RangeForStatement extends ForEachStatement
 		case ORDERED:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "compareTo", "(Ldyvil/lang/Rangeable;)I", true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "compareTo",
+			                       "(Ldyvil/lang/Rangeable;)I", true);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
 			break;
 		}
@@ -163,7 +165,7 @@ public class RangeForStatement extends ForEachStatement
 		// Action
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		
 		// Increment
@@ -193,7 +195,8 @@ public class RangeForStatement extends ForEachStatement
 			break;
 		case ORDERED:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "next", "()Ldyvil/lang/Rangeable;", true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "next", "()Ldyvil/lang/Rangeable;",
+			                       true);
 			
 			if (rangeType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
 			{

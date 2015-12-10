@@ -8,20 +8,20 @@ package dyvil.lang.literal;
  * single {@code long} parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}LongConvertible
  * case class ID(long value)
  * {
  *     public void print() = System out println value
  * }
- * 
+ *
  * // ----------
- * 
+ *
  * ID id = 0x186592739619239L
  * id print
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface LongConvertible

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -11,6 +12,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
@@ -20,11 +22,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassAccess implements IValue
 {
-	private static final byte	OBJECT_ACCESS	= 1;
-	private static final byte	APPLY_CALL		= 2;
+	private static final byte OBJECT_ACCESS = 1;
+	private static final byte APPLY_CALL    = 2;
 	
-	protected ICodePosition	position;
-	protected IType			type;
+	protected ICodePosition position;
+	protected IType         type;
 	
 	public ClassAccess(IType type)
 	{
@@ -127,7 +129,8 @@ public final class ClassAccess implements IValue
 		
 		if (!this.type.isResolved())
 		{
-			markers.add(I18n.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any", this.type.toString()));
+			markers.add(I18n.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
+			                              this.type.toString()));
 		}
 		
 		return this;
@@ -171,7 +174,7 @@ public final class ClassAccess implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
@@ -182,13 +185,13 @@ public final class ClassAccess implements IValue
 				field.writeGet(writer, null, this.getLineNumber());
 			}
 		}
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
 	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

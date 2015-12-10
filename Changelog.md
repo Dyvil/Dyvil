@@ -1,3 +1,122 @@
+Dyvil v0.11.1
+=============
+
+## Dyvil Library v0.11.1
+
+- Added comments to the `dyvil.Collections` and `dyvil.Math` headers.
+- Added the `dyvil.tools.parsing.position.CodePosition.toString()` implementation.
+- Updated the `dyvil.JavaUtils` header to add type aliases for common Java Collection classes.
+- Fixed the `AbstractHashSet.ensureCapacity()` method creating an infinite loop.
+- Semantically cleaned up the Collection Interfaces by getting rid of various unchecked warnings.
+- Renamed `List.fromNil`, `Set.fromNil`, `Collection.fromNil` and `Map.fromNil` to `.empty`.
+
+## Dyvil Compiler v0.11.1
+
+- Invalid Field Assignments are no longer reported as unresolvable if the receiver cannot be resolved.
+- Fixed generic Type Aliases with multiple Type Variables being expanded incorrectly.
+- Fixed If Expressions without an Else clause being compiled incorrectly.
+- Fixed Increment and Decrement Operators not checking if the field is final.
+- Fixed Compound Operators acting like postfix instead of prefix Increment / Decrement operators.
+- Fixed the `StatementList.isResolved()` method returning false for empty Statement Lists.
+- Fixed Return Statements generating invalid bytecode when used as Expressions.
+- Fixed Dyvil-specific Modifiers on Methods not being compiled to their respective annotations.
+- Fixed the `WildcardValue.toString()` implementation returning `...` instead of `_`.
+- Renamed `IMethod.getExceptions()` to `.getInternalExceptions()`.
+
+## Dyvil REPL v0.6.2
+
+- Fixed REPL method and field access causing JVM errors in some cases.
+- Fixed REPL Exception Stack Trace Filtering working incorrectly in certain situations when an `ExceptionInInitializerError` is thrown.
+
+## Dyvil Property Format v0.3.1
+
+- Made most of the AST Node Classes `Expandable` to integrate more smoothly with FlatMap conversion.
+- Boolean Values supplied to the `DyvilValueVisitor` are now automatically converted to `dyvil.lang.Boolean` instances.
+- Properties and Qualified Nodes / Node Accesses are now stored in separate lists in Nodes.
+- Added `converter.NameAccess.toString()` implementation.
+- Added `converter.StringInterpolation.toString()` implementation.
+- Fixed `FlatMapConverter` working incorrectly for nested and qualified nodes.
+
+Dyvil v0.11.0
+=============
+
+- Added support for prefix and postfix `++` and `--` operators. #140
+- Added support for prefixing method names with the `operator` keyword. #146
+- Added support for generic Type Aliases. #147
+- Closures can no longer be used as anything other than Lambda substitutes.
+- Closures have multiple implicit variables now, named from `$0` to `$n` where n is the number of parameters.
+- Closures can now be used anywhere a Functional Interface is required and are no longer bound to Lambda Types.
+
+## Dyvil Library v0.11.0
+
+- Added a basic Event API with Invariant and Covariant Dispatch support. #141
+- Added the `dyvil.annotation.pure` Annotation to mark pure functions / functions without side effects.
+- Added the `StringUtils.split(String, char)` method.
+- Added `Predef.runnable(=> void)` for easy function → Runnable conversion.
+- Added `Predef.callable(=> T)` for easy function → Callable conversion.
+- Added `Predef.thread(=> void)` for easy function → Thread conversion.
+- Updated `StringUtils.lineList(String)` to use proper Collection API method.
+- Changed the StringUtils class from an interface to a utility class.
+- Renamed `Predef.closure(=> T)` to `.function`.
+- Removed `StringUtils.trimLineLength(String, int)`
+
+## Dyvil Compiler v0.11.0
+
+- Updated the Modifier System.
+- Added a visibility check for Include Declarations. #144
+- Added a callback to check if an expression has side effects.
+- Simplified the CompoundCall class to work as a Factory Class for desugared expressions rather than an actual expression.
+- Improved Intrinsic Operator Resolution.
+- Improved Side Effect handling in Compound Operators
+- Fixed a few type checking errors related to type variable parameters.
+- Fixed Lambda Types being checked incorrectly in some cases.
+- Fixed Interface Lists not allowing EOFs, leading to infinite loops for some class declarations.
+- Fixed Variables captured as Fields (e.g. in Anonymous Classes) generating warnings about being unqualified without 'this'.
+- Removed the non-typed variant of `IValue.writeExpression(MethodWriter, IType)`.
+- Removed the `IValue.writeStatement(MethodWriter)` method.
+
+## Dyvil REPL v0.6.1
+
+- Fixed REPL Variables displaying duplicate and implicit modifiers.
+- Fixed Exception Filtering not being applied for Void results.
+- Fixed Exception Filtering not filtering the 'sun.misc.Unsafe.ensureClassInitialized' call.
+- Fixed Exception Filtering not filtering Cause and Suppressed Exceptions.
+- Fixed Type Aliases not being resolved in the REPL.
+
+## Dyvil Property Format v0.3.0
+
+- Added the FlatMapConverter, a DPF Visitor that converts the tree into a flat Map structure.
+
+Dyvil v0.10.1
+=============
+
+## Dyvil Library v0.10.0
+
+- Added the `List.subscript(Range[int])` method.
+- Added the `List[T].subscript_=(Range[int], T[])` and `List[T].subscript_=(Range[int], List[T])` methods.
+- Added the `Queryable.reduceOption(...)` method.
+- Added the `BidiQueryable.reduceLeftOption(...)` and `.reduceRightOption(...)` methods.
+- Updated the `List.fromArray` methods to take normal array parameters rather than being variadic.
+- Updated the Array Classes to have more concise / idiomatic and efficient method implementations.
+
+## Dyvil Compiler v0.10.1
+
+- Unresolved Method Calls and Field Accesses are no longer reported as such if the receiver or any argument is not resolved.
+- Fixed type mismatch JVM errors when an array of a primitive type is converted to an array of a wrapper type, which is now reported with a proper compiler error.
+- Fixed If Statements with void return values used in Lambda Expressions causing Frame computation errors.
+- Fixed Type Var Types generating unnecessary casts.
+- Fixed Primitive Autoboxing combined with Primitive Widening Conversion causing JVM errors.
+- Fixed Cast Operators generating 'Unnecessary Cast' warning markers where the cast is actually necessary.
+- Fixed Import Aliases not working for methods.
+- Fixed Method Receiver Match Checking using the generic class type rather than the non-generic one.
+- Fixed Array and Varargs Method Match Resolution using incorrect values, leading to the wrong method being marked as the best match.
+- Fixed Semicolon Inference working incorrectly with Wildcard Values.
+- Fixed Nil Literals causing NullPointerExceptions during bytecode generation when they have not been properly typed.
+
+## Dyvil REPL v0.6.0
+
+## Dyvil Property Format v0.2.1
+
 Dyvil v0.10.0
 =============
 

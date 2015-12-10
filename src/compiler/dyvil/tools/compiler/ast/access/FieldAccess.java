@@ -117,7 +117,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		return this.field != null && this.field.hasModifier(Modifiers.CONST);
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.receiver != null && this.receiver.hasSideEffects();
+	}
+
 	@Override
 	public boolean isResolved()
 	{
@@ -156,7 +162,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field == null ? false : type.isSuperTypeOf(this.getType());
+		return this.field != null && type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -166,19 +172,10 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			return 0;
 		}
-		
-		IType type1 = this.getType();
-		if (type.equals(type1))
-		{
-			return 3;
-		}
-		if (type.isSuperTypeOf(type1))
-		{
-			return 2;
-		}
-		return 0;
+
+		return type.getSubTypeDistance(this.getType());
 	}
-	
+
 	@Override
 	public IReference toReference()
 	{
@@ -191,7 +188,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{
@@ -336,8 +333,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			if (field.isEnumConstant())
 			{
-				EnumValue enumValue = new EnumValue(field.getType(), this.name);
-				return enumValue;
+				return new EnumValue(field.getType(), this.name);
 			}
 			
 			this.field = field;
@@ -408,23 +404,23 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		int lineNumber = this.getLineNumber();
 		this.field.writeGet(writer, this.receiver, lineNumber);
-		
-		if (this.type != null)
+
+		if (type == null)
 		{
-			this.field.getType().writeCast(writer, this.type, lineNumber);
+			type = this.type;
 		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		IType t = this.field.getType();
-		this.writeExpression(writer, t);
-		writer.writeInsn(t.getReturnOpcode());
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(this.type.getReturnOpcode());
+		}
+		if (type != null)
+		{
+			this.field.getType().writeCast(writer, type, lineNumber);
+		}
 	}
 	
 	@Override

@@ -18,5 +18,4 @@ public class StackUnderflowException extends BytecodeException
 	{
 		super(cause);
 	}
-	
 }

@@ -1,29 +1,26 @@
 package dyvil.collection.impl;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.function.Consumer;
-
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 
-import static dyvil.collection.impl.AbstractIdentityHashMap.NULL;
-import static dyvil.collection.impl.AbstractIdentityHashMap.index;
-import static dyvil.collection.impl.AbstractIdentityHashMap.maskNull;
-import static dyvil.collection.impl.AbstractIdentityHashMap.unmaskNull;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+
+import static dyvil.collection.impl.AbstractIdentityHashMap.*;
 
 public abstract class AbstractIdentityHashSet<E> implements Set<E>
 {
 	private static final long serialVersionUID = -6688373107015354853L;
 	
-	protected static final int		DEFAULT_CAPACITY	= 12;
-	protected static final float	DEFAULT_LOAD_FACTOR	= 2F / 3F;
+	protected static final int   DEFAULT_CAPACITY    = 12;
+	protected static final float DEFAULT_LOAD_FACTOR = 2F / 3F;
 	
-	protected Object[]	table;
-	protected int		size;
+	protected Object[] table;
+	protected int      size;
 	
 	public AbstractIdentityHashSet()
 	{
@@ -235,7 +232,8 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 					// See closeDeletion for explanation of this conditional
 					if (i < r && (r <= d || d <= i) || r <= d && d <= i)
 					{
-						if (i < deletedSlot && d >= deletedSlot && this.traversalTable == AbstractIdentityHashSet.this.table)
+						if (i < deletedSlot && d >= deletedSlot
+								&& this.traversalTable == AbstractIdentityHashSet.this.table)
 						{
 							int remaining = len - deletedSlot;
 							Object[] newTable = new Object[remaining];

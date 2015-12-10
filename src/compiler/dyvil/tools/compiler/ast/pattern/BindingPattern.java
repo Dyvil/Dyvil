@@ -13,9 +13,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class BindingPattern extends Pattern
 {
-	private Name		name;
-	private Variable	variable;
-	private IType		type	= Types.UNKNOWN;
+	private Name     name;
+	private Variable variable;
+	private IType type = Types.UNKNOWN;
 	
 	public BindingPattern(ICodePosition position, Name name)
 	{

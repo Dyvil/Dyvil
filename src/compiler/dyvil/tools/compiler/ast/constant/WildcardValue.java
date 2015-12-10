@@ -98,19 +98,30 @@ public class WildcardValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (type == Types.VOID)
+		{
+			return;
+		}
+		if (type != null)
+		{
+			type.writeDefaultValue(writer);
+			return;
+		}
+
 		this.type.writeDefaultValue(writer);
 	}
-	
+
 	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
+	public String toString()
 	{
+		return "_";
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("...");
+		buffer.append('_');
 	}
 }

@@ -368,33 +368,23 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		if (this.bound == null)
+		Variance.write(this.variance, out);
+
+		if (this.variance != Variance.INVARIANT)
 		{
-			out.writeByte(0);
-			return;
+			IType.writeType(this.bound, out);
 		}
-		
-		out.writeByte(this.variance.ordinal());
-		IType.writeType(this.bound, out);
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		byte b = in.readByte();
-		switch (b)
+		this.variance = Variance.read(in);
+
+		if (this.variance != Variance.INVARIANT)
 		{
-		case 0:
-			return;
-		case 1:
-			this.variance = Variance.COVARIANT;
-			break;
-		case 2:
-			this.variance = Variance.CONTRAVARIANT;
-			break;
+			this.bound = IType.readType(in);
 		}
-		
-		this.bound = IType.readType(in);
 	}
 	
 	@Override

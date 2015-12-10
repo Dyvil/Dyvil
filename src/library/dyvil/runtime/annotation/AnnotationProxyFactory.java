@@ -1,12 +1,5 @@
 package dyvil.runtime.annotation;
 
-import java.io.File;
-import java.lang.invoke.*;
-import java.lang.reflect.Constructor;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import dyvil.io.FileUtils;
 import dyvil.reflect.MethodReflection;
 import dyvil.reflect.Opcodes;
@@ -15,42 +8,62 @@ import dyvil.tools.asm.ClassWriter;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Type;
+import sun.misc.Unsafe;
+
+import java.io.File;
+import java.lang.invoke.*;
+import java.lang.reflect.Constructor;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
-
-import sun.misc.Unsafe;
 
 public final class AnnotationProxyFactory
 {
 	private static final Unsafe UNSAFE = ReflectUtils.UNSAFE;
 	
-	private static final int	CLASSFILE_VERSION	= 52;
-	private static final String	NAME_FACTORY		= "get$Proxy";
+	private static final int    CLASSFILE_VERSION = 52;
+	private static final String NAME_FACTORY      = "get$Proxy";
 	
 	private static final String[] EMPTY_STRING_ARRAY = new String[0];
 	
-	/** Directory to dump generated class file bytecode. */
+	/**
+	 * Directory to dump generated class file bytecode.
+	 */
 	private static final File dumpDirectory = null;
 	
-	/** Used to ensure that each spun class name is unique */
+	/**
+	 * Used to ensure that each spun class name is unique
+	 */
 	private static final AtomicInteger counter = new AtomicInteger(0);
 	
-	/** Generated class constructor type */
+	/**
+	 * Generated class constructor type
+	 */
 	private final MethodType constructorType;
 	
-	/** ASM class writer */
+	/**
+	 * ASM class writer
+	 */
 	private final ClassWriter cw;
 	
 	private final int parameterCount;
 	
-	/** Generated names for the constructor arguments */
+	/**
+	 * Generated names for the constructor arguments
+	 */
 	private final String[] argNames;
 	
-	/** Type descriptors for the constructor arguments */
+	/**
+	 * Type descriptors for the constructor arguments
+	 */
 	private final String[] argDescs;
 	
-	/** Generated name for the generated class */
+	/**
+	 * Generated name for the generated class
+	 */
 	private final String className;
 	
 	private final Class targetClass;
@@ -59,7 +72,8 @@ public final class AnnotationProxyFactory
 	
 	private final Class annotationType;
 	
-	public AnnotationProxyFactory(MethodHandles.Lookup caller, MethodType invokedType, Object... argumentNames) throws Exception
+	public AnnotationProxyFactory(MethodHandles.Lookup caller, MethodType invokedType, Object... argumentNames)
+			throws Exception
 	{
 		this.invokedType = invokedType;
 		this.constructorType = invokedType.changeReturnType(Void.TYPE);
@@ -107,7 +121,8 @@ public final class AnnotationProxyFactory
 			});
 			if (ctrs.length != 1)
 			{
-				throw new Exception("Expected one lambda constructor for " + innerClass.getCanonicalName() + ", got " + ctrs.length);
+				throw new Exception("Expected one lambda constructor for " + innerClass.getCanonicalName() + ", got "
+						                    + ctrs.length);
 			}
 			
 			try
@@ -135,9 +150,9 @@ public final class AnnotationProxyFactory
 	{
 		String samIntf = this.annotationType.getName().replace('.', '/');
 		
-		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.className, null, "java/lang/Object",
-				new String[] { samIntf });
-				
+		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.className, null,
+		              "java/lang/Object", new String[] { samIntf });
+
 		// Generate final fields to be filled in by constructor
 		for (int i = 0; i < this.argDescs.length; i++)
 		{
@@ -175,7 +190,8 @@ public final class AnnotationProxyFactory
 	
 	private void generateFactory()
 	{
-		MethodVisitor m = this.cw.visitMethod(PRIVATE | STATIC, NAME_FACTORY, this.invokedType.toMethodDescriptorString(), null, null);
+		MethodVisitor m = this.cw
+				.visitMethod(PRIVATE | STATIC, NAME_FACTORY, this.invokedType.toMethodDescriptorString(), null, null);
 		m.visitCode();
 		m.visitTypeInsn(NEW, this.className);
 		m.visitInsn(Opcodes.DUP);
@@ -186,7 +202,8 @@ public final class AnnotationProxyFactory
 			m.visitVarInsn(getLoadOpcode(argType), varIndex);
 			varIndex += getParameterSize(argType);
 		}
-		m.visitMethodInsn(INVOKESPECIAL, this.className, "<init>", this.constructorType.toMethodDescriptorString(), false);
+		m.visitMethodInsn(INVOKESPECIAL, this.className, "<init>", this.constructorType.toMethodDescriptorString(),
+		                  false);
 		m.visitInsn(ARETURN);
 		m.visitMaxs(-1, -1);
 		m.visitEnd();
@@ -195,7 +212,8 @@ public final class AnnotationProxyFactory
 	private void generateConstructor()
 	{
 		// Generate constructor
-		MethodVisitor ctor = this.cw.visitMethod(PRIVATE, "<init>", this.constructorType.toMethodDescriptorString(), null, null);
+		MethodVisitor ctor = this.cw
+				.visitMethod(PRIVATE, "<init>", this.constructorType.toMethodDescriptorString(), null, null);
 		ctor.visitCode();
 		ctor.visitVarInsn(ALOAD, 0);
 		ctor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);

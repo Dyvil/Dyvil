@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,7 +13,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class ReturnStatement extends AbstractValue implements IStatement, IValueConsumer
+public class ReturnStatement extends AbstractValue implements IValueConsumer
 {
 	protected IValue value;
 	
@@ -39,6 +38,12 @@ public class ReturnStatement extends AbstractValue implements IStatement, IValue
 	public boolean isPrimitive()
 	{
 		return this.value.isPrimitive();
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		return this.value.isResolved();
 	}
 	
 	@Override
@@ -157,6 +162,19 @@ public class ReturnStatement extends AbstractValue implements IStatement, IValue
 	}
 	
 	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (type == Types.VOID)
+		{
+			this.value.writeExpression(writer, null);
+			writer.writeInsn(this.value.getType().getReturnOpcode());
+			return;
+		}
+
+		this.value.writeExpression(writer, type);
+	}
+
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.value != null)
@@ -168,31 +186,5 @@ public class ReturnStatement extends AbstractValue implements IStatement, IValue
 		{
 			buffer.append("return");
 		}
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
-	{
-		this.value.writeExpression(writer, type);
-		writer.writeInsn(type.getReturnOpcode());
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.value.writeExpression(writer);
-		writer.writeInsn(this.value.getType().getReturnOpcode());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		if (this.value != null)
-		{
-			this.value.writeExpression(writer);
-			writer.writeInsn(this.value.getType().getReturnOpcode());
-			return;
-		}
-		writer.writeInsn(Opcodes.RETURN);
 	}
 }

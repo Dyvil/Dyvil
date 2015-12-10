@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.IntUnaryOperator;
-
-import dyvil.lang.Int;
-import dyvil.lang.Short;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Int;
+import dyvil.lang.Short;
+
+import java.util.Arrays;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.IntUnaryOperator;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -86,79 +85,97 @@ public interface ShortArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	static @infix int length(short[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	static
+	@infix
+	int length(short[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, SALOAD })
-	static @infix short subscript(short[] array, int i)
+	@Intrinsic( { LOAD_0, LOAD_1, SALOAD })
+	static
+	@infix
+	short subscript(short[] array, int i)
 	{
 		return array[i];
 	}
 	
-	static @infix short[] subscript(short[] array, Range<Int> range)
+	static
+	@infix
+	short[] subscript(short[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		short[] slice = new short[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, SASTORE })
-	static @infix void subscript_$eq(short[] array, int i, short v)
+	@Intrinsic( { LOAD_0, LOAD_1, SASTORE })
+	static
+	@infix
+	void subscript_$eq(short[] array, int i, short v)
 	{
 		array[i] = v;
 	}
 	
-	static @infix void subscript_$eq(short[] array, Range<Int> range, short[] values)
+	static
+	@infix
+	void subscript_$eq(short[] array, Range<Int> range, short[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	static @infix boolean isEmpty(int[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	static
+	@infix
+	boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	static @infix void forEach(int[] array, IntConsumer action)
+	static
+	@infix
+	void forEach(int[] array, IntConsumer action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (int v : array)
 		{
-			action.accept(array[i]);
+			action.accept(v);
 		}
 	}
 	
 	// Operators
 	
-	static @infix @inline boolean $qmark(short[] array, short v)
+	static
+	@infix
+	@inline
+	boolean $qmark(short[] array, short v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	static @infix @inline boolean $eq$eq(short[] array1, short[] array2)
+	static
+	@infix
+	@inline
+	boolean $eq$eq(short[] array1, short[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline boolean $bang$eq(short[] array1, short[] array2)
+	static
+	@infix
+	@inline
+	boolean $bang$eq(short[] array1, short[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	static @infix short[] $plus(short[] array, short v)
+	static
+	@infix
+	short[] $plus(short[] array, short v)
 	{
 		int len = array.length;
 		short[] res = new short[len + 1];
@@ -167,7 +184,9 @@ public interface ShortArray
 		return res;
 	}
 	
-	static @infix short[] $plus$plus(short[] array1, short[] array2)
+	static
+	@infix
+	short[] $plus$plus(short[] array1, short[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -177,7 +196,9 @@ public interface ShortArray
 		return res;
 	}
 	
-	static @infix short[] $minus(short[] array, short v)
+	static
+	@infix
+	short[] $minus(short[] array, short v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -200,15 +221,16 @@ public interface ShortArray
 		return res;
 	}
 	
-	static @infix short[] $minus$minus(short[] array1, short[] array2)
+	static
+	@infix
+	short[] $minus$minus(short[] array1, short[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
 		short[] res = new short[len];
 		
-		for (int i = 0; i < len; i++)
+		for (short v : array1)
 		{
-			short v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -219,15 +241,16 @@ public interface ShortArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix short[] $amp(short[] array1, short[] array2)
+	static
+	@infix
+	short[] $amp(short[] array1, short[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
 		short[] res = new short[len];
 		
-		for (int i = 0; i < len; i++)
+		for (short v : array1)
 		{
-			short v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -238,7 +261,9 @@ public interface ShortArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix short[] mapped(short[] array, IntUnaryOperator mapper)
+	static
+	@infix
+	short[] mapped(short[] array, IntUnaryOperator mapper)
 	{
 		int len = array.length;
 		short[] res = new short[len];
@@ -249,15 +274,17 @@ public interface ShortArray
 		return res;
 	}
 	
-	static @infix short[] flatMapped(short[] array, IntFunction<short[]> mapper)
+	static
+	@infix
+	short[] flatMapped(short[] array, IntFunction<short[]> mapper)
 	{
 		int len = array.length;
 		int size = 0;
 		short[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (short v : array)
 		{
-			short[] a = mapper.apply(array[i]);
+			short[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -273,14 +300,15 @@ public interface ShortArray
 		return res;
 	}
 	
-	static @infix short[] filtered(short[] array, IntPredicate condition)
+	static
+	@infix
+	short[] filtered(short[] array, IntPredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
 		short[] res = new short[len];
-		for (int i = 0; i < len; i++)
+		for (short v : array)
 		{
-			short v = array[i];
 			if (condition.test(v))
 			{
 				res[index++] = v;
@@ -291,7 +319,9 @@ public interface ShortArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix short[] sorted(short[] array)
+	static
+	@infix
+	short[] sorted(short[] array)
 	{
 		short[] res = array.clone();
 		Arrays.sort(res);
@@ -300,12 +330,16 @@ public interface ShortArray
 	
 	// Search Operations
 	
-	static @infix int indexOf(short[] array, short v)
+	static
+	@infix
+	int indexOf(short[] array, short v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	static @infix int indexOf(short[] array, short v, int start)
+	static
+	@infix
+	int indexOf(short[] array, short v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -317,12 +351,16 @@ public interface ShortArray
 		return -1;
 	}
 	
-	static @infix int lastIndexOf(short[] array, short v)
+	static
+	@infix
+	int lastIndexOf(short[] array, short v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	static @infix int lastIndexOf(short[] array, short v, int start)
+	static
+	@infix
+	int lastIndexOf(short[] array, short v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -334,24 +372,34 @@ public interface ShortArray
 		return -1;
 	}
 	
-	static @infix @inline boolean contains(short[] array, short v)
+	static
+	@infix
+	@inline
+	boolean contains(short[] array, short v)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static @infix @inline boolean in(short v, short[] array)
+	static
+	@infix
+	@inline
+	boolean in(short v, short[] array)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying
 	
-	static @infix short[] copy(short[] array)
+	static
+	@infix
+	short[] copy(short[] array)
 	{
 		return array.clone();
 	}
 	
-	static @infix Short[] boxed(short[] array)
+	static
+	@infix
+	Short[] boxed(short[] array)
 	{
 		int len = array.length;
 		Short[] boxed = new Short[len];
@@ -362,24 +410,34 @@ public interface ShortArray
 		return boxed;
 	}
 	
-	static @infix Iterable<Short> toIterable(short[] array)
+	static
+	@infix
+	Iterable<Short> toIterable(short[] array)
 	{
 		return new ArrayList<Short>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	static @infix @inline boolean equals(short[] array1, short[] array2)
+	static
+	@infix
+	@inline
+	boolean equals(short[] array1, short[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline int hashCode(short[] array)
+	static
+	@infix
+	@inline
+	int hashCode(short[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	static @infix String toString(short[] array)
+	static
+	@infix
+	String toString(short[] array)
 	{
 		if (array == null)
 		{
@@ -402,7 +460,9 @@ public interface ShortArray
 		return buf.append(']').toString();
 	}
 	
-	static @infix void toString(short[] array, StringBuilder builder)
+	static
+	@infix
+	void toString(short[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

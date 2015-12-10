@@ -1,21 +1,21 @@
 package dyvil.io;
 
+import dyvil.annotation.Utility;
+import dyvil.annotation._internal.infix;
+import dyvil.collection.List;
+import dyvil.collection.mutable.ArrayList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
-
 /**
  * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for
  * several {@link File} -related operations such as writing or reading the file
  * both as a String or as a List of Strings or recursively deleting directories.
- * 
+ *
  * @author Clashsoft
  * @version 1.0
  */
@@ -36,13 +36,16 @@ public final class FileUtils
 	 * If the file exists or has been created successfully, {@code true} will be
 	 * returned from this method. If any {@link IOException} occurs,
 	 * {@code false} will be returned.
-	 * 
+	 *
 	 * @param file
-	 *            the file to create
+	 * 		the file to create
+	 *
 	 * @return true if the file exists or has been created successfully, false
-	 *         otherwise
+	 * otherwise
 	 */
-	public static @infix boolean create(File file)
+	public static
+	@infix
+	boolean create(File file)
 	{
 		try
 		{
@@ -69,20 +72,25 @@ public final class FileUtils
 	 * creates a new file if no existing file exists. If an {@link IOException}
 	 * occurs, the stack trace of the exception is printed using
 	 * {@link Throwable#printStackTrace()}.
-	 * 
+	 *
 	 * @param file
-	 *            the file
+	 * 		the file
 	 * @param text
-	 *            the text
+	 * 		the text
+	 *
 	 * @return true, if successful
 	 */
 	
-	public static @infix boolean write(File file, String text)
+	public static
+	@infix
+	boolean write(File file, String text)
 	{
 		return write(file, text.getBytes());
 	}
 	
-	public static @infix boolean write(File file, byte[] bytes)
+	public static
+	@infix
+	boolean write(File file, byte[] bytes)
 	{
 		try
 		{
@@ -103,14 +111,17 @@ public final class FileUtils
 	 * creates a new file if no existing file exists. If an {@link IOException}
 	 * occurs, the stack trace of the exception is printed using
 	 * {@link Throwable#printStackTrace()}.
-	 * 
+	 *
 	 * @param file
-	 *            the file
+	 * 		the file
 	 * @param lines
-	 *            the lines
+	 * 		the lines
+	 *
 	 * @return true, if successful
 	 */
-	public static @infix boolean writeLines(File file, List<String> lines)
+	public static
+	@infix
+	boolean writeLines(File file, List<String> lines)
 	{
 		try
 		{
@@ -134,12 +145,15 @@ public final class FileUtils
 	 * it as a {@link String}. If the {@code file} does not exist, it returns
 	 * {@code null}. If any other {@link IOException} occurs, the stack trace of
 	 * the exception is printed using {@link Throwable#printStackTrace()}.
-	 * 
+	 *
 	 * @param file
-	 *            the file
+	 * 		the file
+	 *
 	 * @return the file content
 	 */
-	public static @infix String read(File file)
+	public static
+	@infix
+	String read(File file)
 	{
 		if (!file.exists())
 		{
@@ -162,12 +176,15 @@ public final class FileUtils
 	 * it as a {@link List} of lines. If the {@code file} does not exist, it
 	 * returns {@code null}. If any other {@link IOException} occurs, its stack
 	 * trace is printed.
-	 * 
+	 *
 	 * @param file
-	 *            the file
+	 * 		the file
+	 *
 	 * @return the file content
 	 */
-	public static @infix List<String> readLines(File file)
+	public static
+	@infix
+	List<String> readLines(File file)
 	{
 		if (!file.exists())
 		{
@@ -176,7 +193,7 @@ public final class FileUtils
 		try (BufferedReader reader = Files.newBufferedReader(file.toPath()))
 		{
 			List<String> result = new ArrayList();
-			for (;;)
+			for (; ; )
 			{
 				String line = reader.readLine();
 				if (line == null)
@@ -199,9 +216,9 @@ public final class FileUtils
 	 * {@code file} is a directory, this method deletes all sub-files of that
 	 * directory by calling itself on the sub-file. Otherwise, it simply deletes
 	 * the file using {@link File#delete()}.
-	 * 
+	 *
 	 * @param file
-	 *            the file to delete
+	 * 		the file to delete
 	 */
 	public static void delete(File file)
 	{
@@ -227,11 +244,11 @@ public final class FileUtils
 	 * to limit the recursive process to a maximum directory depth. If it set to
 	 * {@code 0}, it is ignored whether or not the given {@code file} is a
 	 * directory.
-	 * 
+	 *
 	 * @param file
-	 *            the file to delete
+	 * 		the file to delete
 	 * @param maxDepth
-	 *            the maximum recursion depth
+	 * 		the maximum recursion depth
 	 */
 	public static void delete(File file, int maxDepth)
 	{
@@ -260,7 +277,7 @@ public final class FileUtils
 	 * </ul>
 	 * The {@code $username$} variable is acquired via the system property
 	 * {@code user.home}.
-	 * 
+	 *
 	 * @return the user application data directory
 	 */
 	public static String getAppdataDirectory()

@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2011 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -34,32 +34,32 @@ import java.lang.reflect.Method;
 
 public class Type
 {
-	public static final int		VOID			= 0;
-	public static final int		BOOLEAN			= 1;
-	public static final int		CHAR			= 2;
-	public static final int		BYTE			= 3;
-	public static final int		SHORT			= 4;
-	public static final int		INT				= 5;
-	public static final int		FLOAT			= 6;
-	public static final int		LONG			= 7;
-	public static final int		DOUBLE			= 8;
-	public static final int		ARRAY			= 9;
-	public static final int		OBJECT			= 10;
-	public static final int		METHOD			= 11;
-	public static final Type	VOID_TYPE		= new Type(VOID, null, 'V' << 24 | 5 << 16 | 0 << 8 | 0, 1);
-	public static final Type	BOOLEAN_TYPE	= new Type(BOOLEAN, null, 'Z' << 24 | 0 << 16 | 5 << 8 | 1, 1);
-	public static final Type	CHAR_TYPE		= new Type(CHAR, null, 'C' << 24 | 0 << 16 | 6 << 8 | 1, 1);
-	public static final Type	BYTE_TYPE		= new Type(BYTE, null, 'B' << 24 | 0 << 16 | 5 << 8 | 1, 1);
-	public static final Type	SHORT_TYPE		= new Type(SHORT, null, 'S' << 24 | 0 << 16 | 7 << 8 | 1, 1);
-	public static final Type	INT_TYPE		= new Type(INT, null, 'I' << 24 | 0 << 16 | 0 << 8 | 1, 1);
-	public static final Type	FLOAT_TYPE		= new Type(FLOAT, null, 'F' << 24 | 2 << 16 | 2 << 8 | 1, 1);
-	public static final Type	LONG_TYPE		= new Type(LONG, null, 'J' << 24 | 1 << 16 | 1 << 8 | 2, 1);
-	public static final Type	DOUBLE_TYPE		= new Type(DOUBLE, null, 'D' << 24 | 3 << 16 | 3 << 8 | 2, 1);
+	public static final int  VOID         = 0;
+	public static final int  BOOLEAN      = 1;
+	public static final int  CHAR         = 2;
+	public static final int  BYTE         = 3;
+	public static final int  SHORT        = 4;
+	public static final int  INT          = 5;
+	public static final int  FLOAT        = 6;
+	public static final int  LONG         = 7;
+	public static final int  DOUBLE       = 8;
+	public static final int  ARRAY        = 9;
+	public static final int  OBJECT       = 10;
+	public static final int  METHOD       = 11;
+	public static final Type VOID_TYPE    = new Type(VOID, null, 'V' << 24 | 5 << 16 | 0 << 8 | 0, 1);
+	public static final Type BOOLEAN_TYPE = new Type(BOOLEAN, null, 'Z' << 24 | 0 << 16 | 5 << 8 | 1, 1);
+	public static final Type CHAR_TYPE    = new Type(CHAR, null, 'C' << 24 | 0 << 16 | 6 << 8 | 1, 1);
+	public static final Type BYTE_TYPE    = new Type(BYTE, null, 'B' << 24 | 0 << 16 | 5 << 8 | 1, 1);
+	public static final Type SHORT_TYPE   = new Type(SHORT, null, 'S' << 24 | 0 << 16 | 7 << 8 | 1, 1);
+	public static final Type INT_TYPE     = new Type(INT, null, 'I' << 24 | 0 << 16 | 0 << 8 | 1, 1);
+	public static final Type FLOAT_TYPE   = new Type(FLOAT, null, 'F' << 24 | 2 << 16 | 2 << 8 | 1, 1);
+	public static final Type LONG_TYPE    = new Type(LONG, null, 'J' << 24 | 1 << 16 | 1 << 8 | 2, 1);
+	public static final Type DOUBLE_TYPE  = new Type(DOUBLE, null, 'D' << 24 | 3 << 16 | 3 << 8 | 2, 1);
 	
-	private final int		sort;
-	private final char[]	buf;
-	private final int		off;
-	private final int		len;
+	private final int    sort;
+	private final char[] buf;
+	private final int    off;
+	private final int    len;
 	
 	private Type(final int sort, final char[] buf, final int off, final int len)
 	{
@@ -127,7 +127,8 @@ public class Type
 				return FLOAT_TYPE;
 			}
 			else
-			/* if (c == Long.TYPE) */ {
+			/* if (c == Long.TYPE) */
+			{
 				return LONG_TYPE;
 			}
 		}
@@ -489,7 +490,8 @@ public class Type
 					car = 'F';
 				}
 				else
-				/* if (d == Long.TYPE) */ {
+				/* if (d == Long.TYPE) */
+				{
 					car = 'J';
 				}
 				buf.append(car);

@@ -1,17 +1,16 @@
 package dyvil.collection.iterator;
 
-import java.util.Iterator;
-
+import dyvil.array.ObjectArray;
 import dyvil.lang.literal.ArrayConvertible;
 
-import dyvil.array.ObjectArray;
+import java.util.Iterator;
 
 @ArrayConvertible
 public class ArrayIterator<E> implements Iterator<E>
 {
-	private int			index;
-	private final E[]	array;
-	private final int	size;
+	private       int index;
+	private final E[] array;
+	private final int size;
 	
 	public static <E> ArrayIterator<E> apply(E... array)
 	{
@@ -60,6 +59,7 @@ public class ArrayIterator<E> implements Iterator<E>
 	{
 		StringBuilder builder = new StringBuilder("ArrayIterator(array: ");
 		ObjectArray.deepToString(this.array);
-		return builder.append(", index: ").append(this.index).append(", end: ").append(this.size).append(')').toString();
+		return builder.append(", index: ").append(this.index).append(", end: ").append(this.size).append(')')
+		              .toString();
 	}
 }

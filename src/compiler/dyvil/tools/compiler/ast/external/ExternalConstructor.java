@@ -20,10 +20,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalConstructor extends Constructor implements IExternalMethod
 {
-	private boolean	annotationsResolved;
-	private boolean	returnTypeResolved;
-	private boolean	parametersResolved;
-	private boolean	exceptionsResolved;
+	private boolean annotationsResolved;
+	private boolean returnTypeResolved;
+	private boolean parametersResolved;
+	private boolean exceptionsResolved;
 	
 	public ExternalConstructor(IClass iclass)
 	{
@@ -173,7 +173,8 @@ public final class ExternalConstructor extends Constructor implements IExternalM
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
+			this.exceptions[index] = IType
+					.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

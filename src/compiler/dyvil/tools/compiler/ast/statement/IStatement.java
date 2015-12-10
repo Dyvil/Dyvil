@@ -50,4 +50,6 @@ public interface IStatement extends IValue
 			type.writeDefaultValue(writer);
 		}
 	}
+
+	void writeStatement(MethodWriter writer) throws BytecodeException;
 }

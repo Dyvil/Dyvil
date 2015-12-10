@@ -1,40 +1,40 @@
 package dyvil.collection;
 
+import dyvil.tuple.Tuple2;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 
-import dyvil.tuple.Tuple2;
-
 /**
  * An <b>Entry</b> is a union of a Key and Value, as used in {@linkplain Map
  * maps}.
- * 
+ *
  * @param <K>
- *            the type of the key
+ * 		the type of the key
  * @param <V>
- *            the type of the value
+ * 		the type of the value
  */
 public interface Entry<K, V> extends Serializable
 {
 	/**
 	 * Returns the key stored by this entry
-	 * 
+	 *
 	 * @return the key
 	 */
 	K getKey();
 	
 	/**
 	 * Returns the value stored by this entry
-	 * 
+	 *
 	 * @return the value
 	 */
 	V getValue();
 	
 	/**
 	 * Converts this entry to a {@link Tuple2 Tuple}.
-	 * 
+	 *
 	 * @return a tuple with this entry's key and value
 	 */
 	default Tuple2<K, V> toTuple()
@@ -46,7 +46,7 @@ public interface Entry<K, V> extends Serializable
 	 * Returns a comparator that compares entries by key. The ordering is
 	 * defined by the <i>natural order</i> of the key, i.e. the ordering given
 	 * by {@link Comparable#compareTo(Object)}.
-	 * 
+	 *
 	 * @return a comparator that compares entries by key.
 	 */
 	static <K extends Comparable<? super K>, V> Comparator<Entry<K, V>> comparingByKey()
@@ -58,7 +58,7 @@ public interface Entry<K, V> extends Serializable
 	 * Returns a comparator that compares entries by value. The ordering is
 	 * defined by the <i>natural order</i> of the value, i.e. the ordering given
 	 * by {@link Comparable#compareTo(Object)}.
-	 * 
+	 *
 	 * @return a comparator that compares entries by value.
 	 */
 	static <K, V extends Comparable<? super V>> Comparator<Entry<K, V>> comparingByValue()
@@ -69,9 +69,10 @@ public interface Entry<K, V> extends Serializable
 	/**
 	 * Returns a comparator that compares entries by key. The ordering is
 	 * defined by the given {@code comparator}.
-	 * 
+	 *
 	 * @param cmp
-	 *            the comparator the defines the ordering of the keys
+	 * 		the comparator the defines the ordering of the keys
+	 *
 	 * @return a comparator that compares entries by key.
 	 */
 	static <K, V> Comparator<Entry<K, V>> comparingByKey(Comparator<? super K> cmp)
@@ -82,9 +83,10 @@ public interface Entry<K, V> extends Serializable
 	/**
 	 * Returns a comparator that compares entries by value. The ordering is
 	 * defined by the given {@code comparator}.
-	 * 
+	 *
 	 * @param cmp
-	 *            the comparator the defines the ordering of the values
+	 * 		the comparator the defines the ordering of the values
+	 *
 	 * @return a comparator that compares entries by value.
 	 */
 	static <K, V> Comparator<Entry<K, V>> comparingByValue(Comparator<? super V> cmp)

@@ -3,12 +3,10 @@ package dyvil.tools.compiler.config;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 
-import java.lang.Integer;
-
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public class Formatting
+public final class Formatting
 {
 	private static ResourceBundle BUNDLE = ResourceBundle.getBundle("dyvil.tools.compiler.config.Formatting");
 

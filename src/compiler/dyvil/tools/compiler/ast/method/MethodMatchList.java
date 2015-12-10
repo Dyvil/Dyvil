@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.method;
 
 public final class MethodMatchList
 {
-	private IMethod[]	methods	= new IMethod[4];
-	private float[]		values	= new float[4];
-	private int			size;
+	private IMethod[] methods = new IMethod[4];
+	private float[]   values  = new float[4];
+	private int size;
 	
 	public int size()
 	{

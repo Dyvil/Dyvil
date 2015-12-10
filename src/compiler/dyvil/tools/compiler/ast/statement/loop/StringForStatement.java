@@ -13,9 +13,9 @@ public class StringForStatement extends ForEachStatement
 {
 	public static final Name $string = Name.getQualified("$string");
 	
-	protected Variable	indexVar;
-	protected Variable	lengthVar;
-	protected Variable	stringVar;
+	protected Variable indexVar;
+	protected Variable lengthVar;
+	protected Variable stringVar;
 	
 	public StringForStatement(ICodePosition position, Variable var)
 	{
@@ -65,7 +65,7 @@ public class StringForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Load the String
-		var.getValue().writeExpression(writer);
+		var.getValue().writeExpression(writer, null);
 		
 		// Local Variables
 		int locals = writer.localCount();
@@ -96,7 +96,7 @@ public class StringForStatement extends ForEachStatement
 		// Action
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		
 		writer.writeLabel(updateLabel);

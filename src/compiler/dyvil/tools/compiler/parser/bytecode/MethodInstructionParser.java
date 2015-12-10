@@ -11,11 +11,11 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class MethodInstructionParser extends Parser implements IInternalTyped
 {
-	private static final int	OWNER			= 1;
-	private static final int	DOT				= 2;
-	private static final int	PARAMETERS		= 4;
-	private static final int	PARAMETERS_END	= 8;
-	private static final int	COLON			= 16;
+	private static final int OWNER          = 1;
+	private static final int DOT            = 2;
+	private static final int PARAMETERS     = 4;
+	private static final int PARAMETERS_END = 8;
+	private static final int COLON          = 16;
 	
 	protected MethodInstruction methodInstruction;
 	

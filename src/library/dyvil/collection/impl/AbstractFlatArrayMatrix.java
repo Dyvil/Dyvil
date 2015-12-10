@@ -1,21 +1,20 @@
 package dyvil.collection.impl;
 
+import dyvil.collection.Matrix;
+import dyvil.collection.iterator.ArrayIterator;
+import dyvil.lang.Int;
+import dyvil.tuple.Tuple2;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
-
-import dyvil.lang.Int;
-
-import dyvil.collection.Matrix;
-import dyvil.collection.iterator.ArrayIterator;
-import dyvil.tuple.Tuple2;
 
 public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 {
 	private static final long serialVersionUID = -8916701566889184575L;
 	
-	protected transient int	rows;
-	protected transient int	columns;
+	protected transient int rows;
+	protected transient int columns;
 	
 	protected Object[] cells;
 	
@@ -261,7 +260,7 @@ public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 		
 		int cells = this.rows * this.columns;
 		StringBuilder builder = new StringBuilder(cells * 10).append("[[");
-		for (int i = 0, column = 0;;)
+		for (int i = 0, column = 0; ; )
 		{
 			builder.append(this.cells[i]);
 			if (++i < cells)

@@ -18,8 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
-	private AnonymousClass			nestedClass;
-	private AnonymousClassMetadata	metadata;
+	private AnonymousClass         nestedClass;
+	private AnonymousClassMetadata metadata;
 	
 	public ClassConstructor(ICodePosition position)
 	{
@@ -128,16 +128,14 @@ public class ClassConstructor extends ConstructorCall
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.metadata.writeConstructorCall(writer, this.arguments);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.metadata.writeConstructorCall(writer, this.arguments);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
 	}
 	
 	@Override

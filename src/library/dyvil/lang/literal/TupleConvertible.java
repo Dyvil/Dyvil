@@ -10,19 +10,19 @@ package dyvil.lang.literal;
  * example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}TupleConvertible
  * case class Point(int x, int y)
- * 
+ *
  * // generated because this is a case class
  * // public static Point apply(int x, int y) = new Point(x, y)
- * 
+ *
  * // ----------
- * 
+ *
  * Point p = ( 10, 20 ) // generates a call to Point.apply(10, 20)
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface TupleConvertible

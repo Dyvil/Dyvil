@@ -8,10 +8,10 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class TableSwitchInstruction implements IInstruction
 {
-	private int		start;
-	private int		end;
-	private Label	defaultHandler;
-	private Label[]	handlers;
+	private int     start;
+	private int     end;
+	private Label   defaultHandler;
+	private Label[] handlers;
 	
 	public TableSwitchInstruction(int start, int end, Label defaultHandler, Label[] handlers)
 	{

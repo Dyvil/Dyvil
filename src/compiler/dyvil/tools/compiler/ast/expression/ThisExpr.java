@@ -18,8 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ThisExpr implements IValue
 {
-	protected ICodePosition	position;
-	protected IType			type	= Types.UNKNOWN;
+	protected ICodePosition position;
+	protected IType type = Types.UNKNOWN;
 	
 	// Metadata
 	protected IAccessible getter;
@@ -171,16 +171,18 @@ public final class ThisExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.getter.writeGet(writer);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.type.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

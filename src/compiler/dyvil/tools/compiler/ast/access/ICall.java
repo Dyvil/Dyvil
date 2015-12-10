@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -62,7 +63,8 @@ public interface ICall extends IValue
 		IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)
 		{
-			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i));
+			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
+			                                    EmptyModifiers.INSTANCE);
 		}
 
 		int index = 0;

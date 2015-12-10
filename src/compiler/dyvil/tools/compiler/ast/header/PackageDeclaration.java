@@ -5,8 +5,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class PackageDeclaration implements IASTNode
 {
-	protected ICodePosition	position;
-	protected String		thePackage;
+	protected ICodePosition position;
+	protected String        thePackage;
 	
 	public PackageDeclaration(ICodePosition position)
 	{

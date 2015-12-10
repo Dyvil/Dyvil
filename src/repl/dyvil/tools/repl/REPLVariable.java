@@ -7,6 +7,7 @@ import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
@@ -20,7 +21,7 @@ public class REPLVariable extends Field
 	protected String      className;
 	private   Class       theClass;
 	
-	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, int modifiers)
+	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, ModifierSet modifiers)
 	{
 		super(null, name, type);
 		this.context = context;
@@ -28,16 +29,14 @@ public class REPLVariable extends Field
 		this.modifiers = modifiers;
 		this.position = position;
 		this.value = value;
+
+		REPLContext.updateModifiers(modifiers);
 	}
 	
 	@Override
 	public boolean hasModifier(int mod)
 	{
-		if (mod == Modifiers.STATIC)
-		{
-			return true;
-		}
-		return (this.modifiers & mod) == mod;
+		return mod == Modifiers.STATIC || this.modifiers.hasIntModifier(mod);
 	}
 	
 	private static boolean isConstant(IValue value)
@@ -48,34 +47,38 @@ public class REPLVariable extends Field
 	
 	protected void updateValue()
 	{
-		if (this.type == Types.VOID)
-		{
-			ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
-			return;
-		}
-		
-		java.lang.reflect.Field[] fields = this.theClass.getDeclaredFields();
-		
 		try
 		{
-			Object result = fields[0].get(null);
-			this.value = new REPLResult(result);
+			if (this.type == Types.VOID)
+			{
+				ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
+			}
+			else
+			{
+				java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
+				field.setAccessible(true);
+				Object result = field.get(null);
+				this.value = new REPLResult(result);
+			}
 		}
-		catch (IllegalAccessException ex)
+		catch (IllegalAccessException illegalAccess)
 		{
-			ex.printStackTrace();
+			illegalAccess.printStackTrace();
 		}
-		catch (ExceptionInInitializerError t)
+		catch (ExceptionInInitializerError initializerError)
 		{
-			printFilteredTrace(t.getCause());
+			Throwable cause = initializerError.getCause();
+			filterStackTrace(cause);
+			cause.printStackTrace();
 		}
-		catch (Throwable t)
+		catch (Throwable throwable)
 		{
-			printFilteredTrace(t);
+			filterStackTrace(throwable);
+			throwable.printStackTrace();
 		}
 	}
 
-	private static void printFilteredTrace(Throwable throwable)
+	private static void filterStackTrace(Throwable throwable)
 	{
 		StackTraceElement[] traceElements = throwable.getStackTrace();
 		int count = traceElements.length;
@@ -85,15 +88,26 @@ public class REPLVariable extends Field
 		{
 			if (traceElements[lastIndex].getClassName().startsWith("sun.misc.Unsafe"))
 			{
+				--lastIndex;
 				break;
 			}
 		}
+
 		StackTraceElement[] newTraceElements = new StackTraceElement[lastIndex + 1];
 		System.arraycopy(traceElements, 0, newTraceElements, 0, lastIndex + 1);
 
 		throwable.setStackTrace(newTraceElements);
 
-		throwable.printStackTrace();
+		Throwable cause = throwable.getCause();
+		if (cause != null)
+		{
+			filterStackTrace(cause);
+		}
+
+		for (Throwable suppressed : throwable.getSuppressed())
+		{
+			filterStackTrace(suppressed);
+		}
 	}
 	
 	protected void compute(List<IClassCompilable> compilableList)
@@ -128,7 +142,7 @@ public class REPLVariable extends Field
 	
 	private boolean isConstant()
 	{
-		return (this.modifiers & Modifiers.FINAL) != 0 && this.value != null && isConstant(this.value);
+		return this.hasModifier(Modifiers.FINAL) && this.value != null && isConstant(this.value);
 	}
 	
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
@@ -137,14 +151,15 @@ public class REPLVariable extends Field
 		String extendedType = this.type.getExtendedName();
 		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
-		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null, "java/lang/Object", null);
+		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className,
+		         null, "java/lang/Object", null);
 		
 		cw.visitSource(className, null);
 		
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
-			cw.visitField(this.modifiers | Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.SYNTHETIC, name, extendedType, null, null);
+			cw.visitField(this.modifiers.toFlags(), name, extendedType, null, null);
 		}
 		
 		// Compilables
@@ -154,7 +169,9 @@ public class REPLVariable extends Field
 		}
 		
 		// Generate <clinit> static initializer
-		MethodWriter mw = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
+		MethodWriter mw = new MethodWriterImpl(cw,
+		                                       cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V",
+		                                                      null, null));
 		mw.begin();
 		
 		for (IClassCompilable c : compilableList)
@@ -188,16 +205,18 @@ public class REPLVariable extends Field
 		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
 	}
 	
-	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw) throws BytecodeException
+	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw)
+			throws BytecodeException
 	{
 		if (this.type == Types.VOID)
 		{
-			this.value.writeStatement(mw);
+			this.value.writeExpression(mw, Types.VOID);
 			return;
 		}
 		
 		String methodType = "()" + extendedType;
-		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC, "computeValue", methodType, null, null));
+		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC,
+		                                                                  "computeValue", methodType, null, null));
 		initWriter.begin();
 		this.value.writeExpression(initWriter, this.type);
 		initWriter.end(this.type);

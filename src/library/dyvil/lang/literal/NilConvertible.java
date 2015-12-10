@@ -8,16 +8,16 @@ package dyvil.lang.literal;
  * not take any parameters, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}NilConvertible
  * case class Nothing
- * 
+ *
  * // ----------
- * 
+ *
  * Nothing nothing = nil
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface NilConvertible

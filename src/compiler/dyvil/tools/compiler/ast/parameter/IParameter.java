@@ -27,6 +27,11 @@ public interface IParameter extends IVariable, IClassMember
 	default void setMethod(ICallableMember method)
 	{
 	}
+
+	default ICallableMember getMethod()
+	{
+		return null;
+	}
 	
 	int getIndex();
 	

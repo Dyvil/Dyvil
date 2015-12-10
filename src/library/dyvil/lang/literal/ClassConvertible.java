@@ -9,16 +9,16 @@ package dyvil.lang.literal;
  * parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}ClassConvertible
  * case class Type(Class[_] value)
- * 
+ *
  * // ----------
- * 
+ *
  * Type t = class[String]
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface ClassConvertible

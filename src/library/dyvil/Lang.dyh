@@ -31,6 +31,9 @@ using	dyvil.lang.Predef._
 prefix	operator print		{ precedence 1 }
 prefix	operator println	{ precedence 1 }
 
+postfix	operator ++
+postfix	operator --
+
 // Prefix Operators
 prefix	operator +
 prefix	operator -

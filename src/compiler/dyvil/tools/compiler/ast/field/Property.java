@@ -10,6 +10,9 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -24,7 +27,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -39,10 +41,10 @@ public class Property extends Member implements IProperty, IContext
 {
 	protected IClass theClass;
 	
-	protected IValue getter;
-	protected IValue setter;
-	protected int    getterModifiers;
-	protected int    setterModifiers;
+	protected IValue      getter;
+	protected IValue      setter;
+	protected ModifierSet getterModifiers;
+	protected ModifierSet setterModifiers;
 	
 	protected MethodParameter setterParameter;
 	protected IProperty       overrideProperty;
@@ -64,19 +66,17 @@ public class Property extends Member implements IProperty, IContext
 		this.theClass = iclass;
 	}
 	
-	public Property(IClass iclass, Name name, IType type, int modifiers)
+	public Property(IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
-		super(name, type);
+		super(name, type, modifiers);
 		this.theClass = iclass;
-		this.modifiers = modifiers;
 	}
 	
-	public Property(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	public Property(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
-		super(name, type);
+		super(name, type, modifiers);
 		this.position = position;
 		this.theClass = iclass;
-		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -117,23 +117,17 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public boolean hasGetter()
 	{
-		return this.getter != null || this.getterModifiers != 0;
+		return this.getter != null || this.getterModifiers != null;
 	}
 	
 	@Override
-	public void setGetterModifiers(int modifiers)
+	public void setGetterModifiers(ModifierSet modifiers)
 	{
 		this.getterModifiers = modifiers;
 	}
 	
 	@Override
-	public void addGetterModifier(int modifier)
-	{
-		this.getterModifiers |= modifier;
-	}
-	
-	@Override
-	public int getGetterModifiers()
+	public ModifierSet getGetterModifiers()
 	{
 		return this.getterModifiers;
 	}
@@ -153,23 +147,17 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public boolean hasSetter()
 	{
-		return this.setter != null || this.setterModifiers != 0;
+		return this.setter != null || this.setterModifiers != null;
 	}
 	
 	@Override
-	public void setSetterModifiers(int modifiers)
+	public void setSetterModifiers(ModifierSet modifiers)
 	{
 		this.setterModifiers = modifiers;
 	}
 	
 	@Override
-	public void addSetterModifier(int modifier)
-	{
-		this.setterModifiers |= modifier;
-	}
-	
-	@Override
-	public int getSetterModifiers()
+	public ModifierSet getSetterModifiers()
 	{
 		return this.setterModifiers;
 	}
@@ -191,7 +179,7 @@ public class Property extends Member implements IProperty, IContext
 	{
 		if (instance != null)
 		{
-			if ((this.modifiers & Modifiers.STATIC) != 0)
+			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
@@ -217,7 +205,7 @@ public class Property extends Member implements IProperty, IContext
 				instance = type.convertValue(instance, type, markers, context);
 			}
 		}
-		else if ((this.modifiers & Modifiers.STATIC) == 0)
+		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			if (context.isStatic())
 			{
@@ -278,17 +266,17 @@ public class Property extends Member implements IProperty, IContext
 		{
 			this.getter.resolveTypes(markers, this);
 		}
-		else if (this.getterModifiers != 0)
+		else if (this.getterModifiers != null)
 		{
-			this.getterModifiers |= Modifiers.ABSTRACT;
+			this.getterModifiers.addIntModifier(Modifiers.ABSTRACT);
 		}
 		if (this.setter != null)
 		{
 			this.setter.resolveTypes(markers, this);
 		}
-		else if (this.setterModifiers != 0)
+		else if (this.setterModifiers != null)
 		{
-			this.setterModifiers |= Modifiers.ABSTRACT;
+			this.setterModifiers.addIntModifier(Modifiers.ABSTRACT);
 		}
 	}
 	
@@ -297,10 +285,11 @@ public class Property extends Member implements IProperty, IContext
 	{
 		super.resolve(markers, context);
 		
-		if (this.setter != null || this.setterModifiers != 0)
+		if (this.setter != null || this.setterModifiers != null)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
 			this.setterParameter.setIndex(0);
+			this.setterParameter.setModifiers(EmptyModifiers.INSTANCE);
 		}
 		
 		if (this.setter != null)
@@ -376,7 +365,7 @@ public class Property extends Member implements IProperty, IContext
 			this.setter.checkTypes(markers, context);
 		}
 		
-		if ((this.modifiers & Modifiers.STATIC) == 0)
+		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.checkOverride(markers);
 		}
@@ -385,7 +374,7 @@ public class Property extends Member implements IProperty, IContext
 		{
 			if (!setter && !getter)
 			{
-				this.modifiers |= Modifiers.ABSTRACT;
+				this.modifiers.addIntModifier(Modifiers.ABSTRACT);
 			}
 		}
 	}
@@ -395,7 +384,7 @@ public class Property extends Member implements IProperty, IContext
 		IDataMember f = this.theClass.getSuperField(this.name);
 		if (f == null)
 		{
-			if ((this.modifiers & Modifiers.OVERRIDE) != 0)
+			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
 				markers.add(I18n.createMarker(this.position, "property.override", this.name));
 			}
@@ -409,7 +398,7 @@ public class Property extends Member implements IProperty, IContext
 		
 		this.overrideProperty = (IProperty) f;
 		
-		if ((this.modifiers & Modifiers.OVERRIDE) == 0)
+		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 		{
 			markers.add(I18n.createMarker(this.position, "property.overrides", this.name));
 		}
@@ -431,12 +420,12 @@ public class Property extends Member implements IProperty, IContext
 		
 		if (!this.theClass.isAbstract())
 		{
-			if ((this.overrideProperty.getGetterModifiers() & Modifiers.ABSTRACT) != 0 && this.getter == null)
+			if (this.overrideProperty.getGetterModifiers().hasIntModifier(Modifiers.ABSTRACT) && this.getter == null)
 			{
 				markers.add(I18n.createMarker(this.position, "property.getter.abstract", this.name));
 			}
 			
-			if ((this.overrideProperty.getSetterModifiers() & Modifiers.ABSTRACT) != 0 && this.setter == null)
+			if (this.overrideProperty.getSetterModifiers().hasIntModifier(Modifiers.ABSTRACT) && this.setter == null)
 			{
 				markers.add(I18n.createMarker(this.position, "property.setter.abstract", this.name));
 			}
@@ -452,11 +441,10 @@ public class Property extends Member implements IProperty, IContext
 		{
 			this.getter.check(markers, context);
 		}
-		if (this.getterModifiers != 0)
+		if (this.getterModifiers != null)
 		{
-			ModifierTypes
-					.checkMethodModifiers(markers, this, this.getterModifiers | this.modifiers, this.getter != null,
-					                      "property.getter");
+			ModifierUtil.checkMethodModifiers(markers, this, this.getterModifiers.toFlags() | this.modifiers.toFlags(),
+			                                  this.getter != null, "property.getter");
 		}
 		if (this.setter != null)
 		{
@@ -467,15 +455,14 @@ public class Property extends Member implements IProperty, IContext
 				markers.add(I18n.createMarker(this.position, "property.type.void"));
 			}
 		}
-		if (this.setterModifiers != 0)
+		if (this.setterModifiers != null)
 		{
-			ModifierTypes
-					.checkMethodModifiers(markers, this, this.setterModifiers | this.modifiers, this.setter != null,
-					                      "property.setter");
+			ModifierUtil.checkMethodModifiers(markers, this, this.setterModifiers.toFlags() | this.modifiers.toFlags(),
+			                                  this.setter != null, "property.setter");
 		}
 		
 		// No setter and no getter
-		if (this.getter == null && this.setter == null && this.getterModifiers == 0 && this.setterModifiers == 0)
+		if (this.getter == null && this.setter == null && this.getterModifiers == null && this.setterModifiers == null)
 		{
 			markers.add(I18n.createMarker(this.position, "property.empty", this.name));
 		}
@@ -514,7 +501,7 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public boolean isStatic()
 	{
-		return (this.modifiers & Modifiers.STATIC) != 0;
+		return this.modifiers.hasIntModifier(Modifiers.STATIC);
 	}
 	
 	@Override
@@ -649,16 +636,21 @@ public class Property extends Member implements IProperty, IContext
 	{
 		String extended = this.type.getExtendedName();
 		String signature = this.type.getSignature();
-		if (this.getter != null || this.getterModifiers != 0)
+		if (this.getter != null || this.getterModifiers != null)
 		{
-			int modifiers = this.modifiers | this.getterModifiers;
+			int modifiers = this.modifiers.toFlags();
+
+			if (this.getterModifiers != null)
+			{
+				modifiers |= this.getterModifiers.toFlags();
+			}
 			
 			MethodWriter mw = new MethodWriterImpl(writer,
 			                                       writer.visitMethod(modifiers, this.name.qualified, "()" + extended,
 			                                                          signature == null ? null : "()" + signature,
 			                                                          null));
 
-			if ((this.modifiers & Modifiers.STATIC) == 0)
+			if ((modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
 			}
@@ -672,16 +664,21 @@ public class Property extends Member implements IProperty, IContext
 				mw.end(this.type);
 			}
 		}
-		if (this.setter != null || this.setterModifiers != 0)
+		if (this.setter != null || this.setterModifiers != null)
 		{
-			int modifiers = this.modifiers | this.setterModifiers;
+			int modifiers = this.modifiers.toFlags();
+
+			if (this.setterModifiers != null)
+			{
+				modifiers |= this.setterModifiers.toFlags();
+			}
 			
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq",
 			                                                                  "(" + extended + ")V", signature == null ?
 					                                                                  null :
 					                                                                  "(" + signature + ")V", null));
 
-			if ((this.modifiers & Modifiers.STATIC) == 0)
+			if ((modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.theClass.getInternalName());
 			}
@@ -692,7 +689,7 @@ public class Property extends Member implements IProperty, IContext
 			if (this.setter != null)
 			{
 				mw.begin();
-				this.setter.writeStatement(mw);
+				this.setter.writeExpression(mw, Types.VOID);
 				mw.end(Types.VOID);
 			}
 		}
@@ -707,7 +704,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		int opcode;
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
@@ -736,7 +733,7 @@ public class Property extends Member implements IProperty, IContext
 		}
 		
 		int opcode;
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			opcode = Opcodes.INVOKESTATIC;
 		}
@@ -766,8 +763,8 @@ public class Property extends Member implements IProperty, IContext
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		
-		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
+
+		this.modifiers.toString(buffer);
 		this.type.toString("", buffer);
 		buffer.append(' ');
 		buffer.append(this.name);
@@ -784,12 +781,13 @@ public class Property extends Member implements IProperty, IContext
 		buffer.append('{');
 
 		// Getters
-		if (this.getter != null || this.getterModifiers != 0)
+		if (this.getter != null || this.getterModifiers != null)
 		{
 			String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
 
 			buffer.append('\n').append(prefix);
-			buffer.append(ModifierTypes.FIELD.toString(this.getterModifiers)).append("get");
+			this.getterModifiers.toString(buffer);
+			buffer.append("get");
 
 			// Separator
 			if (Formatting.getBoolean("property.getter.separator.space_before"))
@@ -818,12 +816,13 @@ public class Property extends Member implements IProperty, IContext
 		}
 
 		// Setters
-		if (this.setter != null || this.setterModifiers != 0)
+		if (this.setter != null || this.setterModifiers != null)
 		{
 			String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
 
 			buffer.append('\n').append(prefix);
-			buffer.append(ModifierTypes.FIELD.toString(this.setterModifiers)).append("set");
+			this.setterModifiers.toString(buffer);
+			buffer.append("set");
 
 			// Separator
 			if (Formatting.getBoolean("property.setter.separator.space_before"))

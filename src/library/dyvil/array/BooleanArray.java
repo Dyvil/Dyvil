@@ -1,19 +1,18 @@
 package dyvil.array;
 
-import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntPredicate;
-import java.util.function.Predicate;
-
-import dyvil.lang.Boolean;
-import dyvil.lang.Int;
-
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.lang.Boolean;
+import dyvil.lang.Int;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -53,79 +52,97 @@ public interface BooleanArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH })
-	static @infix int length(boolean[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	static
+	@infix
+	int length(boolean[] array)
 	{
 		return array.length;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, BALOAD })
-	static @infix boolean subscript(boolean[] array, int i)
+	@Intrinsic( { LOAD_0, LOAD_1, BALOAD })
+	static
+	@infix
+	boolean subscript(boolean[] array, int i)
 	{
 		return array[i];
 	}
 	
-	static @infix boolean[] subscript(boolean[] array, Range<Int> range)
+	static
+	@infix
+	boolean[] subscript(boolean[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
+		int count = range.count();
 		boolean[] slice = new boolean[count];
-		for (int i = 0; i < count; i++)
-		{
-			slice[i] = array[start + i];
-		}
+		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, BASTORE })
-	static @infix void subscript_$eq(boolean[] array, int i, boolean v)
+	@Intrinsic( { LOAD_0, LOAD_1, BASTORE })
+	static
+	@infix
+	void subscript_$eq(boolean[] array, int i, boolean v)
 	{
 		array[i] = v;
 	}
 	
-	static @infix void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
+	static
+	@infix
+	void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
 	{
 		int start = Int.unapply(range.first());
-		int count = Int.unapply(range.last()) - start + 1;
-		for (int i = 0; i < count; i++)
-		{
-			array[start + i] = values[i];
-		}
+		int count = range.count();
+		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic({ LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	static @infix boolean isEmpty(int[] array)
+	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	static
+	@infix
+	boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	static @infix void forEach(boolean[] array, Consumer<Boolean> action)
+	static
+	@infix
+	void forEach(boolean[] array, Consumer<Boolean> action)
 	{
-		int len = array.length;
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			action.accept(Boolean.apply(array[i]));
+			action.accept(Boolean.apply(v));
 		}
 	}
 	
 	// Operators
 	
-	static @infix @inline boolean $qmark(boolean[] array, boolean v)
+	static
+	@infix
+	@inline
+	boolean $qmark(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static @infix @inline boolean $eq$eq(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	@inline
+	boolean $eq$eq(boolean[] array1, boolean[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline boolean $bang$eq(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	@inline
+	boolean $bang$eq(boolean[] array1, boolean[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	static @infix boolean[] $plus(boolean[] array, boolean v)
+	static
+	@infix
+	boolean[] $plus(boolean[] array, boolean v)
 	{
 		int len = array.length;
 		boolean[] res = new boolean[len + 1];
@@ -134,7 +151,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] $plus$plus(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	boolean[] $plus$plus(boolean[] array1, boolean[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -144,7 +163,9 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] $minus(boolean[] array, boolean v)
+	static
+	@infix
+	boolean[] $minus(boolean[] array, boolean v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -167,15 +188,16 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] $minus$minus(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	boolean[] $minus$minus(boolean[] array1, boolean[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
 		boolean[] res = new boolean[len];
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array1)
 		{
-			boolean v = array1[i];
 			if (indexOf(array2, v, 0) < 0)
 			{
 				res[index++] = v;
@@ -186,15 +208,16 @@ public interface BooleanArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix boolean[] $amp(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	boolean[] $amp(boolean[] array1, boolean[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
 		boolean[] res = new boolean[len];
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array1)
 		{
-			boolean v = array1[i];
 			if (indexOf(array2, v, 0) >= 0)
 			{
 				res[index++] = v;
@@ -205,7 +228,9 @@ public interface BooleanArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix boolean[] mapped(boolean[] array, Predicate<Boolean> mapper)
+	static
+	@infix
+	boolean[] mapped(boolean[] array, Predicate<Boolean> mapper)
 	{
 		int len = array.length;
 		boolean[] res = new boolean[len];
@@ -216,15 +241,16 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] flatMapped(boolean[] array, Function<Boolean, boolean[]> mapper)
+	static
+	@infix
+	boolean[] flatMapped(boolean[] array, Function<Boolean, boolean[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		boolean[] res = EMPTY;
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			boolean[] a = mapper.apply(Boolean.apply(array[i]));
+			boolean[] a = mapper.apply(Boolean.apply(v));
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -240,14 +266,15 @@ public interface BooleanArray
 		return res;
 	}
 	
-	static @infix boolean[] filtered(boolean[] array, Predicate<Boolean> condition)
+	static
+	@infix
+	boolean[] filtered(boolean[] array, Predicate<Boolean> condition)
 	{
 		int index = 0;
 		int len = array.length;
 		boolean[] res = new boolean[len];
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			boolean v = array[i];
 			if (condition.test(Boolean.apply(v)))
 			{
 				res[index++] = v;
@@ -258,7 +285,9 @@ public interface BooleanArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static @infix boolean[] sorted(boolean[] array)
+	static
+	@infix
+	boolean[] sorted(boolean[] array)
 	{
 		int len = array.length;
 		if (len <= 0)
@@ -269,32 +298,36 @@ public interface BooleanArray
 		boolean[] res = new boolean[len];
 		
 		// Count the number of 'false' in the array
-		int f = 0;
+		int falseEntries = 0;
 		
-		for (int i = 0; i < len; i++)
+		for (boolean v : array)
 		{
-			if (!array[i])
+			if (!v)
 			{
-				f++;
+				falseEntries++;
 			}
 		}
 		
 		// Make the remaining elements of the result true
-		for (; f < len; f++)
+		for (; falseEntries < len; falseEntries++)
 		{
-			res[f] = true;
+			res[falseEntries] = true;
 		}
 		return res;
 	}
 	
 	// Search Operations
 	
-	static @infix int indexOf(boolean[] array, boolean v)
+	static
+	@infix
+	int indexOf(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	static @infix int indexOf(boolean[] array, boolean v, int start)
+	static
+	@infix
+	int indexOf(boolean[] array, boolean v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -306,12 +339,16 @@ public interface BooleanArray
 		return -1;
 	}
 	
-	static @infix int lastIndexOf(boolean[] array, boolean v)
+	static
+	@infix
+	int lastIndexOf(boolean[] array, boolean v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	static @infix int lastIndexOf(boolean[] array, boolean v, int start)
+	static
+	@infix
+	int lastIndexOf(boolean[] array, boolean v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -323,24 +360,35 @@ public interface BooleanArray
 		return -1;
 	}
 	
-	static @infix @inline boolean contains(boolean[] array, boolean v)
+	static
+	@infix
+	@inline
+	boolean contains(boolean[] array, boolean v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static @infix @inline boolean in(boolean v, boolean[] array)
+	static
+	@infix
+	@inline
+	boolean in(boolean v, boolean[] array)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying
 	
-	static @infix @inline boolean[] copy(boolean[] array)
+	static
+	@infix
+	@inline
+	boolean[] copy(boolean[] array)
 	{
 		return array.clone();
 	}
 	
-	static @infix Boolean[] boxed(boolean[] array)
+	static
+	@infix
+	Boolean[] boxed(boolean[] array)
 	{
 		int len = array.length;
 		Boolean[] boxed = new Boolean[len];
@@ -351,24 +399,34 @@ public interface BooleanArray
 		return boxed;
 	}
 	
-	static @infix Iterable<Boolean> toIterable(boolean[] array)
+	static
+	@infix
+	Iterable<Boolean> toIterable(boolean[] array)
 	{
 		return new ArrayList<Boolean>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	static @infix @inline boolean equals(boolean[] array1, boolean[] array2)
+	static
+	@infix
+	@inline
+	boolean equals(boolean[] array1, boolean[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static @infix @inline int hashCode(boolean[] array)
+	static
+	@infix
+	@inline
+	int hashCode(boolean[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	static @infix String toString(boolean[] array)
+	static
+	@infix
+	String toString(boolean[] array)
 	{
 		if (array == null)
 		{
@@ -391,7 +449,9 @@ public interface BooleanArray
 		return buf.append(']').toString();
 	}
 	
-	static @infix void toString(boolean[] array, StringBuilder builder)
+	static
+	@infix
+	void toString(boolean[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{

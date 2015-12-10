@@ -2,7 +2,7 @@ package dyvil.tools.dpf.ast.value;
 
 import dyvil.tools.dpf.visitor.ValueVisitor;
 
-public class FloatValue implements Value
+public class FloatValue implements Constant
 {
 	protected float value;
 	
@@ -26,7 +26,19 @@ public class FloatValue implements Value
 	{
 		visitor.visitFloat(this.value);
 	}
-	
+
+	@Override
+	public Object toObject()
+	{
+		return dyvil.lang.Float.apply(this.value);
+	}
+
+	@Override
+	public void appendString(StringBuilder builder)
+	{
+		builder.append(this);
+	}
+
 	@Override
 	public String toString()
 	{

@@ -1,19 +1,18 @@
 package dyvil.collection;
 
-import java.util.Iterator;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.MapConvertible;
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.mutable.ArrayMap;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.MapConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 import dyvil.util.Option;
+
+import java.util.Iterator;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
@@ -22,24 +21,25 @@ public interface MutableMap<K, V> extends Map<K, V>
 {
 	static <K, V> MutableMap<K, V> apply()
 	{
-		return new HashMap();
+		return new HashMap<>();
 	}
 	
 	static <K, V> MutableMap<K, V> apply(K key, V value)
 	{
-		return apply(new Tuple2<K, V>(key, value));
+		return apply(new Tuple2<>(key, value));
 	}
 	
 	static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		TupleMap<K, V> map = new TupleMap<K, V>();
+		TupleMap<K, V> map = new TupleMap<>();
 		map.$plus$eq(entry);
 		return map;
 	}
 	
+	@SafeVarargs
 	static <K, V> MutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
-		TupleMap<K, V> map = new TupleMap<K, V>();
+		TupleMap<K, V> map = new TupleMap<>();
 		for (Entry<? extends K, ? extends V> entry : entries)
 		{
 			map.$plus$eq(entry);
@@ -49,7 +49,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	static <K, V> MutableMap<K, V> apply(K[] keys, V[] values)
 	{
-		return new ArrayMap<K, V>(keys, values, true);
+		return new ArrayMap<>(keys, values, true);
 	}
 	
 	// Simple Getters
@@ -396,7 +396,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	@Override
 	default ImmutableMap<K, V> view()
 	{
-		return new MapView(this);
+		return new MapView<>(this);
 	}
 	
 	@Override

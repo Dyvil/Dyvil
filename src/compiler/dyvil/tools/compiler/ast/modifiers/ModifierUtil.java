@@ -1,117 +1,38 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.token.IToken;
 
-public enum ModifierTypes
+public final class ModifierUtil
 {
-	ACCESS, CLASS_TYPE, CLASS, MEMBER, FIELD_OR_METHOD, FIELD, METHOD, PARAMETER;
-	
-	public String toString(int mod)
+	private ModifierUtil()
 	{
-		StringBuilder sb = new StringBuilder();
-		switch (this)
-		{
-		case ACCESS:
-			writeAccessModifiers(mod, sb);
-			break;
-		case CLASS_TYPE:
-			writeClassTypeModifiers(mod, sb);
-			break;
-		case CLASS:
-			writeAccessModifiers(mod, sb);
-			writeClassModifiers(mod, sb);
-			break;
-		case MEMBER:
-		case FIELD_OR_METHOD:
-			// Do not write any Modifiers as this should never be called
-			break;
-		case FIELD:
-			writeAccessModifiers(mod, sb);
-			writeFieldModifiers(mod, sb);
-			break;
-		case METHOD:
-			writeAccessModifiers(mod, sb);
-			writeMethodModifiers(mod, sb);
-			break;
-		case PARAMETER:
-			writeParameterModifier(mod, sb);
-			break;
-		}
-		return sb.toString();
 	}
 	
-	public int parse(int mod)
-	{
-		int m = 0;
-		switch (this)
-		{
-		case ACCESS:
-			m = readAccessModifier(mod);
-			break;
-		case CLASS_TYPE:
-			m = readClassTypeModifier(mod);
-			break;
-		case CLASS:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				m = readClassModifier(mod);
-			}
-			break;
-		case MEMBER:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				if ((m = readClassModifier(mod)) == -1)
-				{
-					if ((m = readFieldModifier(mod)) == -1)
-					{
-						m = readMethodModifier(mod);
-					}
-				}
-			}
-			break;
-		case FIELD_OR_METHOD:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				if ((m = readFieldModifier(mod)) == -1)
-				{
-					m = readMethodModifier(mod);
-				}
-			}
-			break;
-		case FIELD:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				m = readFieldModifier(mod);
-			}
-			break;
-		case METHOD:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				m = readMethodModifier(mod);
-			}
-			break;
-		case PARAMETER:
-			if ((m = readAccessModifier(mod)) == -1)
-			{
-				m = readParameterModifier(mod);
-			}
-			break;
-		}
-		return m;
-	}
-	
-	private static void writeAccessModifiers(int mod, StringBuilder sb)
+	public static void writeAccessModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.PUBLIC) == Modifiers.PUBLIC)
 		{
 			sb.append("public ");
 		}
+		if ((mod & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		{
+			sb.append("private ");
+		}
+		if ((mod & Modifiers.PROTECTED) == Modifiers.PROTECTED)
+		{
+			sb.append("protected ");
+		}
 		
-		switch (mod & Modifiers.DERIVED)
+		switch (mod & 3)
 		{
 		case Modifiers.PACKAGE:
 			break;
@@ -121,9 +42,6 @@ public enum ModifierTypes
 		case Modifiers.PRIVATE:
 			sb.append("private ");
 			break;
-		case Modifiers.DERIVED:
-			sb.append("private protected ");
-			break;
 		}
 		
 		if ((mod & Modifiers.INTERNAL) == Modifiers.INTERNAL)
@@ -131,8 +49,15 @@ public enum ModifierTypes
 			sb.append("internal ");
 		}
 	}
-	
-	private static void writeClassTypeModifiers(int mod, StringBuilder sb)
+
+	public static String classTypeToString(int mod)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		writeClassType(mod, stringBuilder);
+		return stringBuilder.toString();
+	}
+
+	public static void writeClassType(int mod, StringBuilder sb)
 	{
 		if (mod == 0)
 		{
@@ -159,8 +84,15 @@ public enum ModifierTypes
 			sb.append("class ");
 		}
 	}
+
+	public static String classModifiersToString(int mod)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		writeClassModifiers(mod, stringBuilder);
+		return stringBuilder.toString();
+	}
 	
-	private static void writeClassModifiers(int mod, StringBuilder sb)
+	public static void writeClassModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.STATIC) == Modifiers.STATIC)
 		{
@@ -191,8 +123,15 @@ public enum ModifierTypes
 			sb.append("case ");
 		}
 	}
+
+	public static String fieldModifiersToString(int mod)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		writeFieldModifiers(mod, stringBuilder);
+		return stringBuilder.toString();
+	}
 	
-	private static void writeFieldModifiers(int mod, StringBuilder sb)
+	public static void writeFieldModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.LAZY) == Modifiers.LAZY)
 		{
@@ -223,8 +162,15 @@ public enum ModifierTypes
 			sb.append("@Volatile ");
 		}
 	}
+
+	public static String methodModifiersToString(int mod)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		writeMethodModifiers(mod, stringBuilder);
+		return stringBuilder.toString();
+	}
 	
-	private static void writeMethodModifiers(int mod, StringBuilder sb)
+	public static void writeMethodModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
@@ -278,7 +224,7 @@ public enum ModifierTypes
 		}
 	}
 	
-	private static void writeParameterModifier(int mod, StringBuilder sb)
+	public static void writeParameterModifier(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.LAZY) == Modifiers.LAZY)
 		{
@@ -294,28 +240,31 @@ public enum ModifierTypes
 		}
 	}
 	
-	private static int readAccessModifier(int mod)
+	public static int readClassTypeModifier(IToken token, IParserManager parserManager)
 	{
-		switch (mod)
+		switch (token.type())
 		{
-		case DyvilKeywords.PACKAGE:
-			return Modifiers.PACKAGE;
-		case DyvilKeywords.PUBLIC:
-			return Modifiers.PUBLIC;
-		case DyvilKeywords.PRIVATE:
-			return Modifiers.PRIVATE;
-		case DyvilKeywords.PROTECTED:
-			return Modifiers.PROTECTED;
-		case DyvilKeywords.INTERNAL:
-			return Modifiers.INTERNAL;
-		}
-		return -1;
-	}
-	
-	private static int readClassTypeModifier(int mod)
-	{
-		switch (mod)
-		{
+		case DyvilSymbols.AT:
+			// @interface
+			if (token.next().type() == DyvilKeywords.INTERFACE)
+			{
+				parserManager.skip();
+				return Modifiers.ANNOTATION;
+			}
+			return -1;
+		case DyvilKeywords.CASE:
+			switch (token.next().type())
+			{
+			// case class
+			case DyvilKeywords.CLASS:
+				parserManager.skip();
+				return Modifiers.CASE_CLASS;
+			// case object
+			case DyvilKeywords.OBJECT:
+				parserManager.skip();
+				return Modifiers.OBJECT_CLASS | Modifiers.CASE_CLASS;
+			}
+			return -1;
 		case DyvilKeywords.CLASS:
 			return 0;
 		case DyvilKeywords.INTERFACE:
@@ -324,82 +273,6 @@ public enum ModifierTypes
 			return Modifiers.ENUM;
 		case DyvilKeywords.OBJECT:
 			return Modifiers.OBJECT_CLASS;
-		}
-		return -1;
-	}
-	
-	private static int readClassModifier(int mod)
-	{
-		switch (mod)
-		{
-		case DyvilKeywords.STATIC:
-			return Modifiers.STATIC;
-		case DyvilKeywords.ABSTRACT:
-			return Modifiers.ABSTRACT;
-		case DyvilKeywords.FINAL:
-			return Modifiers.FINAL;
-		case DyvilKeywords.FUNCTIONAL:
-			return Modifiers.FUNCTIONAL;
-		case DyvilKeywords.CASE:
-			return Modifiers.CASE_CLASS;
-		}
-		return -1;
-	}
-	
-	private static int readFieldModifier(int mod)
-	{
-		switch (mod)
-		{
-		case DyvilKeywords.STATIC:
-			return Modifiers.STATIC;
-		case DyvilKeywords.FINAL:
-			return Modifiers.FINAL;
-		case DyvilKeywords.CONST:
-			return Modifiers.CONST;
-		case DyvilKeywords.LAZY:
-			return Modifiers.LAZY;
-		}
-		return -1;
-	}
-	
-	private static int readMethodModifier(int mod)
-	{
-		switch (mod)
-		{
-		case DyvilKeywords.STATIC:
-			return Modifiers.STATIC;
-		case DyvilKeywords.FINAL:
-			return Modifiers.FINAL;
-		case DyvilKeywords.CONST:
-			return Modifiers.CONST;
-		case DyvilKeywords.SYNCHRONIZED:
-			return Modifiers.SYNCHRONIZED;
-		case DyvilKeywords.ABSTRACT:
-			return Modifiers.ABSTRACT;
-		case DyvilKeywords.INLINE:
-			return Modifiers.INLINE;
-		case DyvilKeywords.INFIX:
-			return Modifiers.INFIX;
-		case DyvilKeywords.EXTENSION:
-			return Modifiers.EXTENSION;
-		case DyvilKeywords.POSTFIX:
-			return Modifiers.INFIX;
-		case DyvilKeywords.PREFIX:
-			return Modifiers.PREFIX;
-		case DyvilKeywords.OVERRIDE:
-			return Modifiers.OVERRIDE;
-		}
-		return -1;
-	}
-	
-	private static int readParameterModifier(int mod)
-	{
-		switch (mod)
-		{
-		case DyvilKeywords.FINAL:
-			return Modifiers.FINAL;
-		case DyvilKeywords.VAR:
-			return Modifiers.VAR;
 		}
 		return -1;
 	}
@@ -413,11 +286,13 @@ public enum ModifierTypes
 		// If the method does not have an implementation and is static
 		if (isStatic && isAbstract)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.static.abstract", Util.toString(member, type)));
+			markers.add(
+					I18n.createError(member.getPosition(), "modifiers.static.abstract", Util.toString(member, type)));
 		}
 		else if (isAbstract && isNative)
 		{
-			markers.add(I18n.createError(member.getPosition(), "modifiers.native.abstract", Util.toString(member, type)));
+			markers.add(
+					I18n.createError(member.getPosition(), "modifiers.native.abstract", Util.toString(member, type)));
 		}
 		else
 		{

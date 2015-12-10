@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2011 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,90 +31,89 @@ package dyvil.tools.asm;
 
 class MethodWriter implements MethodVisitor
 {
-	static final int	ACC_CONSTRUCTOR							= 0x80000;
-	static final int	SAME_FRAME								= 0;
-	static final int	SAME_LOCALS_1_STACK_ITEM_FRAME			= 64;
-	static final int	RESERVED								= 128;
-	static final int	SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED	= 247;
-	static final int	CHOP_FRAME								= 248;
-	static final int	SAME_FRAME_EXTENDED						= 251;
-	static final int	APPEND_FRAME							= 252;
-	static final int	FULL_FRAME								= 255;
+	static final int ACC_CONSTRUCTOR                         = 0x80000;
+	static final int SAME_FRAME                              = 0;
+	static final int SAME_LOCALS_1_STACK_ITEM_FRAME          = 64;
+	static final int RESERVED                                = 128;
+	static final int SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED = 247;
+	static final int CHOP_FRAME                              = 248;
+	static final int SAME_FRAME_EXTENDED                     = 251;
+	static final int APPEND_FRAME                            = 252;
+	static final int FULL_FRAME                              = 255;
 	
-	private static final int	FRAMES	= 0;
-	private static final int	MAXS	= 1;
-	private static final int	NOTHING	= 2;
+	private static final int FRAMES  = 0;
+	private static final int MAXS    = 1;
+	private static final int NOTHING = 2;
 	
-	final ClassWriter		cw;
-	private int				access;
-	private final int		name;
-	private final int		desc;
-	private final String	descriptor;
-	String					signature;
-	int						classReaderOffset;
-	int						classReaderLength;
-	int						exceptionCount;
-	int[]					exceptions;
+	final         ClassWriter cw;
+	private       int         access;
+	private final int         name;
+	private final int         desc;
+	private final String      descriptor;
+	String signature;
+	int    classReaderOffset;
+	int    classReaderLength;
+	int    exceptionCount;
+	int[]  exceptions;
 	
-	private ByteVector			annd;
-	private AnnotationWriter	anns;
-	private AnnotationWriter	ianns;
-	private AnnotationWriter	tanns;
-	private AnnotationWriter	itanns;
-	private AnnotationWriter[]	panns;
-	private AnnotationWriter[]	ipanns;
+	private ByteVector         annd;
+	private AnnotationWriter   anns;
+	private AnnotationWriter   ianns;
+	private AnnotationWriter   tanns;
+	private AnnotationWriter   itanns;
+	private AnnotationWriter[] panns;
+	private AnnotationWriter[] ipanns;
 	
 	private int synthetics;
 	
-	private Attribute	attrs;
-	private ByteVector	code	= new ByteVector();
+	private Attribute attrs;
+	private ByteVector code = new ByteVector();
 	
-	private int	maxStack;
-	private int	maxLocals;
-	private int	currentLocals;
+	private int maxStack;
+	private int maxLocals;
+	private int currentLocals;
 	
-	private int			frameCount;
-	private ByteVector	stackMap;
-	private int			previousFrameOffset;
-	private int[]		previousFrame;
-	private int[]		frame;
+	private int        frameCount;
+	private ByteVector stackMap;
+	private int        previousFrameOffset;
+	private int[]      previousFrame;
+	private int[]      frame;
 	
-	private int		handlerCount;
-	private Handler	firstHandler;
-	private Handler	lastHandler;
+	private int     handlerCount;
+	private Handler firstHandler;
+	private Handler lastHandler;
 	
-	private int			methodParametersCount;
-	private ByteVector	methodParameters;
+	private int        methodParametersCount;
+	private ByteVector methodParameters;
 	
-	private int			localVarCount;
-	private ByteVector	localVar;
-	private int			localVarTypeCount;
-	private ByteVector	localVarType;
+	private int        localVarCount;
+	private ByteVector localVar;
+	private int        localVarTypeCount;
+	private ByteVector localVarType;
 	
-	private int			lineNumberCount;
-	private ByteVector	lineNumber;
+	private int        lineNumberCount;
+	private ByteVector lineNumber;
 	
 	private int lastCodeOffset;
 	
-	private AnnotationWriter	ctanns;
-	private AnnotationWriter	ictanns;
-	private Attribute			cattrs;
+	private AnnotationWriter ctanns;
+	private AnnotationWriter ictanns;
+	private Attribute        cattrs;
 	
-	private boolean	resize;
-	private int		subroutines;
+	private boolean resize;
+	private int     subroutines;
 	
 	private final int compute;
 	
-	private Label	labels;
-	private Label	previousBlock;
-	private Label	currentBlock;
-	private int		stackSize;
-	private int		maxStackSize;
+	private Label labels;
+	private Label previousBlock;
+	private Label currentBlock;
+	private int   stackSize;
+	private int   maxStackSize;
 	
 	MethodWriter next;
 	
-	MethodWriter(final ClassWriter cw, final int access, final String name, final String desc, final String signature, final String[] exceptions,
-			final boolean computeMaxs, final boolean computeFrames)
+	MethodWriter(final ClassWriter cw, final int access, final String name, final String desc, final String signature, final String[] exceptions, final boolean computeMaxs, final boolean computeFrames)
 	{
 		if (cw.firstMethod == null)
 		{
@@ -325,7 +324,8 @@ class MethodWriter implements MethodVisitor
 				}
 				else
 				{
-					this.frame[frameIndex++] = Frame.UNINITIALIZED | this.cw.addUninitializedType("", ((Label) local[i]).position);
+					this.frame[frameIndex++] =
+							Frame.UNINITIALIZED | this.cw.addUninitializedType("", ((Label) local[i]).position);
 				}
 			}
 			for (int i = 0; i < nStack; ++i)
@@ -340,7 +340,8 @@ class MethodWriter implements MethodVisitor
 				}
 				else
 				{
-					this.frame[frameIndex++] = Frame.UNINITIALIZED | this.cw.addUninitializedType("", ((Label) stack[i]).position);
+					this.frame[frameIndex++] =
+							Frame.UNINITIALIZED | this.cw.addUninitializedType("", ((Label) stack[i]).position);
 				}
 			}
 			this.endFrame();
@@ -528,7 +529,8 @@ class MethodWriter implements MethodVisitor
 		{
 			// updates max locals
 			int n;
-			if (opcode == Opcodes.LLOAD || opcode == Opcodes.DLOAD || opcode == Opcodes.LSTORE || opcode == Opcodes.DSTORE)
+			if (opcode == Opcodes.LLOAD || opcode == Opcodes.DLOAD || opcode == Opcodes.LSTORE
+					|| opcode == Opcodes.DSTORE)
 			{
 				n = var + 2;
 			}
@@ -1190,16 +1192,16 @@ class MethodWriter implements MethodVisitor
 				this.localVarType = new ByteVector();
 			}
 			++this.localVarTypeCount;
-			this.localVarType.putShort(start.position).putShort(end.position - start.position).putShort(this.cw.newUTF8(name))
-					.putShort(this.cw.newUTF8(signature)).putShort(index);
+			this.localVarType.putShort(start.position).putShort(end.position - start.position)
+			                 .putShort(this.cw.newUTF8(name)).putShort(this.cw.newUTF8(signature)).putShort(index);
 		}
 		if (this.localVar == null)
 		{
 			this.localVar = new ByteVector();
 		}
 		++this.localVarCount;
-		this.localVar.putShort(start.position).putShort(end.position - start.position).putShort(this.cw.newUTF8(name)).putShort(this.cw.newUTF8(desc))
-				.putShort(index);
+		this.localVar.putShort(start.position).putShort(end.position - start.position).putShort(this.cw.newUTF8(name))
+		             .putShort(this.cw.newUTF8(desc)).putShort(index);
 		if (this.compute != NOTHING)
 		{
 			// updates max locals
@@ -2160,7 +2162,8 @@ class MethodWriter implements MethodVisitor
 				Handler h = this.firstHandler;
 				while (h != null)
 				{
-					out.putShort(h.start.position).putShort(h.end.position).putShort(h.handler.position).putShort(h.type);
+					out.putShort(h.start.position).putShort(h.end.position).putShort(h.handler.position)
+					   .putShort(h.type);
 					h = h.next;
 				}
 			}

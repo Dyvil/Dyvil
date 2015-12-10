@@ -8,8 +8,8 @@ public final class Name
 {
 	private static final Map<String, Name> map = new HashMap();
 	
-	public final String	qualified;
-	public final String	unqualified;
+	public final String qualified;
+	public final String unqualified;
 	
 	public Name(String name)
 	{

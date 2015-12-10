@@ -9,6 +9,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -19,7 +21,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.I18n;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -30,8 +31,8 @@ import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
-	protected IClass	theClass;
-	protected IValue	value;
+	protected IClass theClass;
+	protected IValue value;
 	
 	public Field(IClass iclass)
 	{
@@ -50,19 +51,17 @@ public class Field extends Member implements IField
 		this.theClass = iclass;
 	}
 	
-	public Field(IClass iclass, Name name, IType type, int modifiers)
+	public Field(IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
-		super(name, type);
+		super(name, type, modifiers);
 		this.theClass = iclass;
-		this.modifiers = modifiers;
 	}
 	
-	public Field(ICodePosition position, IClass iclass, Name name, IType type, int modifiers)
+	public Field(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
-		super(name, type);
+		super(name, type, modifiers);
 		this.position = position;
 		this.theClass = iclass;
-		this.modifiers = modifiers;
 	}
 	
 	@Override
@@ -113,20 +112,20 @@ public class Field extends Member implements IField
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/lazy":
-			this.modifiers |= Modifiers.LAZY;
+			this.modifiers.addIntModifier(Modifiers.LAZY);
 			return false;
 		case "dyvil/annotation/_internal/internal":
-			this.modifiers |= Modifiers.INTERNAL;
+			this.modifiers.addIntModifier(Modifiers.INTERNAL);
 			return false;
 		case "dyvil/annotation/Transient":
-			this.modifiers |= Modifiers.TRANSIENT;
+			this.modifiers.addIntModifier(Modifiers.TRANSIENT);
 			return false;
 		case "dyvil/annotation/Volatile":
-			this.modifiers |= Modifiers.VOLATILE;
+			this.modifiers.addIntModifier(Modifiers.VOLATILE);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
-			this.modifiers |= Modifiers.DEPRECATED;
+			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
 		}
 		return true;
@@ -139,25 +138,26 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		if (instance != null)
+		if (receiver != null)
 		{
-			if ((this.modifiers & Modifiers.STATIC) != 0)
+			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 			{
-				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(I18n.createMarker(position, "field.access.static", this.name));
 				}
-				else if (instance.getType().getTheClass() != this.theClass)
+				else if (receiver.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "field.access.static.type", this.name, this.theClass.getFullName()));
+					markers.add(I18n.createMarker(position, "field.access.static.type", this.name,
+					                              this.theClass.getFullName()));
 				}
-				instance = null;
+				receiver = null;
 			}
-			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
-				if (!instance.getType().getTheClass().isObject())
+				if (!receiver.getType().getTheClass().isObject())
 				{
 					markers.add(I18n.createMarker(position, "field.access.instance", this.name));
 				}
@@ -165,19 +165,19 @@ public class Field extends Member implements IField
 			else
 			{
 				IType type = this.theClass.getClassType();
-				IValue instance1 = IType.convertValue(instance, type, type, markers, context);
+				IValue typedReceiver = IType.convertValue(receiver, type, type, markers, context);
 				
-				if (instance1 == null)
+				if (typedReceiver == null)
 				{
-					Util.createTypeError(markers, instance, type, type, "field.access.receiver_type", this.name);
+					Util.createTypeError(markers, receiver, type, type, "field.access.receiver_type", this.name);
 				}
 				else
 				{
-					instance = instance1;
+					receiver = typedReceiver;
 				}
 			}
 		}
-		else if ((this.modifiers & Modifiers.STATIC) == 0)
+		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			if (context.isStatic())
 			{
@@ -186,7 +186,7 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(I18n.createMarker(position, "field.access.unqualified", this.name.unqualified));
-				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
@@ -202,13 +202,13 @@ public class Field extends Member implements IField
 			break;
 		}
 		
-		return instance;
+		return receiver;
 	}
 	
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if ((this.modifiers & Modifiers.FINAL) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
 			markers.add(I18n.createMarker(position, "field.assign.final", this.name.unqualified));
 		}
@@ -264,7 +264,8 @@ public class Field extends Member implements IField
 			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
+				Marker marker = I18n
+						.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
 				marker.addInfo(I18n.getString("field.type", this.type));
 				marker.addInfo(I18n.getString("value.type", this.value.getType()));
 				markers.add(marker);
@@ -313,11 +314,11 @@ public class Field extends Member implements IField
 			markers.add(I18n.createMarker(this.position, "field.type.void"));
 		}
 		
-		int illegalModifiers = this.modifiers & ~Modifiers.FIELD_MODIFIERS;
+		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.FIELD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(
-					I18n.createError(this.position, "modifiers.illegal", I18n.getString("field", this.name), ModifierTypes.METHOD.toString(illegalModifiers)));
+			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("field", this.name),
+			                             ModifierUtil.methodModifiersToString(illegalModifiers)));
 		}
 	}
 	
@@ -346,7 +347,8 @@ public class Field extends Member implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if ((this.modifiers & Modifiers.LAZY) == Modifiers.LAZY)
+		int modifiers = this.modifiers.toFlags();
+		if ((modifiers & Modifiers.LAZY) == Modifiers.LAZY)
 		{
 			String desc = "()" + this.getDescription();
 			String signature = this.getSignature();
@@ -354,9 +356,10 @@ public class Field extends Member implements IField
 			{
 				signature = "()" + signature;
 			}
-			MethodWriter mw = new MethodWriterImpl(writer,
-					writer.visitMethod(this.modifiers & Modifiers.METHOD_MODIFIERS, this.name.qualified, desc, signature, null));
-					
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & Modifiers.METHOD_MODIFIERS,
+			                                                                  this.name.qualified, desc, signature,
+			                                                                  null));
+
 			mw.visitAnnotation("Ldyvil/annotation/_internal/lazy;", false);
 			
 			mw.begin();
@@ -366,7 +369,8 @@ public class Field extends Member implements IField
 			return;
 		}
 		
-		FieldVisitor fv = writer.visitField(this.modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(), this.type.getSignature(), null);
+		FieldVisitor fv = writer.visitField(modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(),
+		                                    this.type.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.annotations, this.type);
 	}
@@ -374,10 +378,11 @@ public class Field extends Member implements IField
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && (this.modifiers & Modifiers.STATIC) != 0)
+		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.value.writeExpression(writer, this.type);
-			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified, this.getDescription());
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified,
+			                      this.getDescription());
 		}
 	}
 	
@@ -392,7 +397,7 @@ public class Field extends Member implements IField
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 		}
@@ -418,7 +423,7 @@ public class Field extends Member implements IField
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		if ((this.modifiers & Modifiers.STATIC) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
 		}
@@ -433,8 +438,8 @@ public class Field extends Member implements IField
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		
-		buffer.append(ModifierTypes.FIELD.toString(this.modifiers));
+
+		this.modifiers.toString(buffer);
 		this.type.toString("", buffer);
 		buffer.append(' ');
 		buffer.append(this.name);

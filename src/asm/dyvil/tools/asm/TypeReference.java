@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2013 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,32 +31,32 @@ package dyvil.tools.asm;
 
 public class TypeReference
 {
-	public final static int	CLASS_TYPE_PARAMETER		= 0x00;
-	public final static int	METHOD_TYPE_PARAMETER		= 0x01;
-	public final static int	CLASS_EXTENDS				= 0x10;
-	public final static int	CLASS_TYPE_PARAMETER_BOUND	= 0x11;
-	public final static int	METHOD_TYPE_PARAMETER_BOUND	= 0x12;
+	public final static int CLASS_TYPE_PARAMETER        = 0x00;
+	public final static int METHOD_TYPE_PARAMETER       = 0x01;
+	public final static int CLASS_EXTENDS               = 0x10;
+	public final static int CLASS_TYPE_PARAMETER_BOUND  = 0x11;
+	public final static int METHOD_TYPE_PARAMETER_BOUND = 0x12;
 	
 	public final static int FIELD = 0x13;
 	
-	public final static int	METHOD_RETURN			= 0x14;
-	public final static int	METHOD_RECEIVER			= 0x15;
-	public final static int	METHOD_FORMAL_PARAMETER	= 0x16;
-	public final static int	THROWS					= 0x17;
+	public final static int METHOD_RETURN           = 0x14;
+	public final static int METHOD_RECEIVER         = 0x15;
+	public final static int METHOD_FORMAL_PARAMETER = 0x16;
+	public final static int THROWS                  = 0x17;
 	
-	public final static int	LOCAL_VARIABLE		= 0x40;
-	public final static int	RESOURCE_VARIABLE	= 0x41;
-	public final static int	EXCEPTION_PARAMETER	= 0x42;
+	public final static int LOCAL_VARIABLE      = 0x40;
+	public final static int RESOURCE_VARIABLE   = 0x41;
+	public final static int EXCEPTION_PARAMETER = 0x42;
 	
-	public final static int	INSTANCEOF								= 0x43;
-	public final static int	NEW										= 0x44;
-	public final static int	CONSTRUCTOR_REFERENCE					= 0x45;
-	public final static int	METHOD_REFERENCE						= 0x46;
-	public final static int	CAST									= 0x47;
-	public final static int	CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT	= 0x48;
-	public final static int	METHOD_INVOCATION_TYPE_ARGUMENT			= 0x49;
-	public final static int	CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT		= 0x4A;
-	public final static int	METHOD_REFERENCE_TYPE_ARGUMENT			= 0x4B;
+	public final static int INSTANCEOF                           = 0x43;
+	public final static int NEW                                  = 0x44;
+	public final static int CONSTRUCTOR_REFERENCE                = 0x45;
+	public final static int METHOD_REFERENCE                     = 0x46;
+	public final static int CAST                                 = 0x47;
+	public final static int CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT = 0x48;
+	public final static int METHOD_INVOCATION_TYPE_ARGUMENT      = 0x49;
+	public final static int CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT  = 0x4A;
+	public final static int METHOD_REFERENCE_TYPE_ARGUMENT       = 0x4B;
 	
 	public static int newTypeReference(int sort)
 	{

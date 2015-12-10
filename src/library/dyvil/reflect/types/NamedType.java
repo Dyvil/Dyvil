@@ -8,8 +8,8 @@ import dyvil.lang.literal.StringConvertible;
 @ClassConvertible
 public class NamedType<T> implements Type<T>
 {
-	protected final String	name;
-	protected Class<T>		theClass;
+	protected final String   name;
+	protected       Class<T> theClass;
 	
 	public static <T> NamedType<T> apply(String className)
 	{

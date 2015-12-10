@@ -7,8 +7,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class IntInstruction implements IInstruction
 {
-	private int	opcode;
-	private int	operand;
+	private int opcode;
+	private int operand;
 	
 	public IntInstruction(int opcode, int operand)
 	{

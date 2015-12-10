@@ -4,6 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.ICallableMember;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -21,7 +22,7 @@ import java.lang.annotation.ElementType;
 
 public final class MethodParameter extends Parameter
 {
-	public ICallableMember method;
+	protected ICallableMember method;
 	
 	protected ReferenceType refType;
 	
@@ -29,30 +30,32 @@ public final class MethodParameter extends Parameter
 	{
 	}
 	
-	public MethodParameter(ICodePosition position, Name name)
-	{
-		this.position = position;
-		this.name = name;
-		this.type = Types.UNKNOWN;
-	}
-	
 	public MethodParameter(Name name)
 	{
-		this.name = name;
+		super(name);
 	}
-	
+
 	public MethodParameter(Name name, IType type)
 	{
-		this.name = name;
-		this.type = type;
+		super(name, type);
 	}
-	
+
+	public MethodParameter(Name name, IType type, ModifierSet modifierSet)
+	{
+		super(name, type, modifierSet);
+	}
+
+	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	{
+		super(position, name, type, modifiers);
+	}
+
 	@Override
 	public boolean isField()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isVariable()
 	{
@@ -70,7 +73,13 @@ public final class MethodParameter extends Parameter
 	{
 		this.method = method;
 	}
-	
+
+	@Override
+	public ICallableMember getMethod()
+	{
+		return this.method;
+	}
+
 	@Override
 	public IType getActualType()
 	{
@@ -98,7 +107,7 @@ public final class MethodParameter extends Parameter
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if ((this.modifiers & Modifiers.FINAL) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
 			markers.add(I18n.createMarker(position, "parameter.assign.final", this.name.unqualified));
 		}
@@ -124,7 +133,7 @@ public final class MethodParameter extends Parameter
 	{
 		super.resolveTypes(markers, context);
 		
-		if ((this.modifiers & Modifiers.VAR) != 0)
+		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.VAR))
 		{
 			this.refType = this.type.getRefType();
 		}
@@ -142,7 +151,8 @@ public final class MethodParameter extends Parameter
 			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type.incompatible", this.name.unqualified);
+				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type.incompatible",
+				                                  this.name.unqualified);
 				marker.addInfo(I18n.getString("parameter.type", this.type));
 				marker.addInfo(I18n.getString("value.type", this.defaultValue.getType()));
 				markers.add(marker);
@@ -153,7 +163,6 @@ public final class MethodParameter extends Parameter
 			}
 			
 			this.defaultValue = Util.constant(this.defaultValue, markers);
-			return;
 		}
 	}
 	
@@ -179,7 +188,7 @@ public final class MethodParameter extends Parameter
 		this.localIndex = writer.localCount();
 		writer.registerParameter(this.localIndex, this.name.qualified, this.getActualType(), 0);
 		
-		if ((this.modifiers & Modifiers.VAR) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.VAR))
 		{
 			writer.visitParameterAnnotation(this.index, "Ldyvil/annotation/_internal/var;", true);
 		}

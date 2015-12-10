@@ -18,9 +18,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class AnonymousClassMetadata implements IClassMetadata
 {
-	private AnonymousClass	theClass;
-	private IConstructor	constructor;
-	private String			desc;
+	private AnonymousClass theClass;
+	private IConstructor   constructor;
+	private String         desc;
 	
 	public AnonymousClassMetadata(AnonymousClass theClass, IConstructor constructor)
 	{
@@ -111,7 +111,9 @@ public class AnonymousClassMetadata implements IClassMetadata
 		CaptureField[] capturedFields = this.theClass.capturedFields;
 		int capturedFieldCount = this.theClass.capturedFieldCount;
 		
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.MANDATED, "<init>", this.getDesc(), null, null));
+		MethodWriter mw = new MethodWriterImpl(writer,
+		                                       writer.visitMethod(Modifiers.MANDATED, "<init>", this.getDesc(), null,
+		                                                          null));
 		int params = this.constructor.parameterCount();
 		
 		mw.setThisType(this.theClass.getInternalName());
@@ -128,7 +130,8 @@ public class AnonymousClassMetadata implements IClassMetadata
 		if (thisField != null)
 		{
 			thisField.writeField(writer);
-			index = mw.registerParameter(index, thisField.getName(), thisField.getTheClass().getType(), Modifiers.MANDATED);
+			index = mw.registerParameter(index, thisField.getName(), thisField.getTheClass().getType(),
+			                             Modifiers.MANDATED);
 		}
 		
 		int[] indexes = null;
@@ -158,7 +161,8 @@ public class AnonymousClassMetadata implements IClassMetadata
 		{
 			mw.writeVarInsn(Opcodes.ALOAD, 0);
 			mw.writeVarInsn(Opcodes.ALOAD, thisIndex);
-			mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(), thisField.getDescription());
+			mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(),
+			                  thisField.getDescription());
 		}
 		
 		if (capturedFieldCount > 0)
@@ -168,7 +172,8 @@ public class AnonymousClassMetadata implements IClassMetadata
 				CaptureField field = capturedFields[i];
 				mw.writeVarInsn(Opcodes.ALOAD, 0);
 				mw.writeVarInsn(field.getType().getLoadOpcode(), indexes[i]);
-				mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), field.name, field.getDescription());
+				mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), field.name,
+				                  field.getDescription());
 			}
 		}
 		

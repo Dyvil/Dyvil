@@ -15,8 +15,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringConcatExpr implements IValue
 {
-	private IValue[]	values	= new IValue[3];
-	private int			valueCount;
+	private IValue[] values = new IValue[3];
+	private int valueCount;
 	
 	public StringConcatExpr()
 	{
@@ -155,13 +155,14 @@ public class StringConcatExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		if (this.valueCount == 2 && this.values[0].isType(Types.STRING) && this.values[1].isType(Types.STRING))
 		{
-			this.values[0].writeExpression(writer);
-			this.values[1].writeExpression(writer);
-			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;", false);
+			this.values[0].writeExpression(writer, Types.STRING);
+			this.values[1].writeExpression(writer, Types.STRING);
+			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat",
+			                       "(Ljava/lang/String;)Ljava/lang/String;", false);
 			return;
 		}
 		
@@ -186,18 +187,21 @@ public class StringConcatExpr implements IValue
 				continue;
 			}
 			
-			value.writeExpression(writer);
+			value.writeExpression(writer, null);
 			CaseClasses.writeStringAppend(writer, value.getType());
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
+		                       false);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -128,18 +128,7 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.write(writer, true);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.write(writer, false);
-	}
-	
-	private void write(MethodWriter writer, boolean expression) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
@@ -155,14 +144,7 @@ public final class SyncStatement extends AbstractValue implements IStatement
 		writer.writeInsn(Opcodes.MONITORENTER);
 		
 		writer.writeLabel(start);
-		if (expression)
-		{
-			this.action.writeExpression(writer);
-		}
-		else
-		{
-			this.action.writeStatement(writer);
-		}
+		this.action.writeExpression(writer, type);
 		writer.endSync();
 		
 		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
@@ -176,7 +158,7 @@ public final class SyncStatement extends AbstractValue implements IStatement
 		writer.writeInsn(Opcodes.MONITOREXIT);
 		writer.writeLabel(throwLabel);
 		writer.writeInsn(Opcodes.ATHROW);
-		if (expression)
+		if (type != Types.VOID)
 		{
 			this.action.getType().writeDefaultValue(writer);
 		}
@@ -187,7 +169,13 @@ public final class SyncStatement extends AbstractValue implements IStatement
 		writer.writeFinallyBlock(start, end, handlerStart);
 		writer.writeFinallyBlock(handlerStart, throwLabel, handlerStart);
 	}
-	
+
+	@Override
+	public void writeStatement(MethodWriter writer) throws BytecodeException
+	{
+		this.writeExpression(writer, Types.VOID);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

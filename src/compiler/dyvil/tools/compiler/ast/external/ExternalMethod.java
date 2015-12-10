@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -30,17 +31,16 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalMethod extends AbstractMethod implements IExternalMethod
 {
-	private boolean	annotationsResolved;
-	private boolean	returnTypeResolved;
-	private boolean	genericsResolved;
-	private boolean	parametersResolved;
-	private boolean	exceptionsResolved;
+	private boolean annotationsResolved;
+	private boolean returnTypeResolved;
+	private boolean genericsResolved;
+	private boolean parametersResolved;
+	private boolean exceptionsResolved;
 	
-	public ExternalMethod(IClass iclass, Name name, String desc, int modifiers)
+	public ExternalMethod(IClass iclass, Name name, String desc, ModifierSet modifiers)
 	{
-		super(iclass, name);
+		super(iclass, name, null, modifiers);
 		this.name = name;
-		this.modifiers = modifiers;
 		this.descriptor = desc;
 	}
 	
@@ -148,7 +148,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public float getSignatureMatch(Name name, IValue instance, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
 		if (name != this.name)
 		{
@@ -163,7 +163,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		{
 			this.resolveParameters();
 		}
-		return super.getSignatureMatch(name, instance, arguments);
+		return super.getSignatureMatch(name, receiver, arguments);
 	}
 	
 	@Override
@@ -261,7 +261,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -271,7 +272,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -281,7 +283,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -319,7 +322,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
+			this.exceptions[index] = IType
+					.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

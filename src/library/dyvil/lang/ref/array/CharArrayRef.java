@@ -4,8 +4,8 @@ import dyvil.lang.ref.CharRef;
 
 public class CharArrayRef implements CharRef
 {
-	protected final char[]	array;
-	protected final int		index;
+	protected final char[] array;
+	protected final int    index;
 	
 	public CharArrayRef(char[] array, int index)
 	{

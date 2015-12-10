@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -13,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.*;
+import dyvil.tools.compiler.ast.modifiers.*;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -23,29 +23,29 @@ import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.ModifierTypes;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ClassBodyParser extends Parser implements ITypeConsumer
 {
-	public static final int	TYPE			= 1;
-	public static final int	NAME			= 2;
-	public static final int	GENERICS_END	= 4;
-	public static final int	PARAMETERS		= 8;
-	public static final int	PARAMETERS_END	= 16;
-	public static final int	FIELD_END		= 32;
-	public static final int	PROPERTY_END	= 64;
-	public static final int	METHOD_VALUE	= 128;
-	public static final int	METHOD_END		= 256;
+	protected static final int TYPE           = 1;
+	protected static final int NAME_OPERATOR  = 2;
+	protected static final int NAME           = 4;
+	protected static final int GENERICS_END   = 8;
+	protected static final int PARAMETERS     = 16;
+	protected static final int PARAMETERS_END = 32;
+	protected static final int FIELD_END      = 64;
+	protected static final int PROPERTY_END   = 128;
+	protected static final int METHOD_VALUE   = 256;
+	protected static final int METHOD_END     = 512;
 	
-	protected IClass				theClass;
-	protected IClassBodyConsumer	consumer;
+	protected IClass             theClass;
+	protected IClassBodyConsumer consumer;
 	
-	private IType			type;
-	private int				modifiers;
-	private AnnotationList	annotations;
+	private IType type;
+	private ModifierSet modifiers = new ModifierList();
+	private AnnotationList annotations;
 	
 	private IMember member;
 	
@@ -65,7 +65,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	private void reset()
 	{
 		this.mode = TYPE;
-		this.modifiers = 0;
+		this.modifiers = new ModifierList();
 		this.annotations = null;
 		this.type = null;
 		this.member = null;
@@ -108,13 +108,15 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.mode = PARAMETERS;
 				return;
 			}
-			int i = 0;
-			if ((i = ModifierTypes.MEMBER.parse(type)) != -1)
+			Modifier modifier;
+			if ((modifier = BaseModifiers.parseMemberModifier(token, pm)) != null)
 			{
-				this.modifiers |= i;
+				this.modifiers.addModifier(modifier);
 				return;
 			}
-			if ((i = ModifierTypes.CLASS_TYPE.parse(type)) != -1)
+
+			int classType;
+			if ((classType = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
 			{
 				if (this.theClass == null)
 				{
@@ -122,20 +124,16 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					pm.report(token, "Cannot define a class in this context");
 					return;
 				}
-				
-				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass, this.modifiers | i, this.annotations);
+
+				this.modifiers.addIntModifier(classType);
+				ClassDeclarationParser parser = new ClassDeclarationParser(this.theClass, this.modifiers,
+				                                                           this.annotations);
 				pm.pushParser(parser);
 				this.reset();
 				return;
 			}
 			if (type == DyvilSymbols.AT)
 			{
-				if (token.next().type() == DyvilKeywords.INTERFACE)
-				{
-					this.modifiers |= Modifiers.ANNOTATION;
-					return;
-				}
-				
 				if (this.annotations == null)
 				{
 					this.annotations = new AnnotationList();
@@ -147,8 +145,15 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			pm.pushParser(pm.newTypeParser(this), true);
-			this.mode = NAME;
+			this.mode = NAME_OPERATOR;
 			return;
+		case NAME_OPERATOR:
+			if (type == DyvilKeywords.OPERATOR)
+			{
+				this.mode = NAME;
+				return;
+			}
+			// Fallthrough
 		case NAME:
 			if (!ParserUtil.isIdentifier(type))
 			{
@@ -178,7 +183,8 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			{
 				this.mode = PARAMETERS;
 				
-				AbstractMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
+				AbstractMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type,
+				                                  this.modifiers);
 				m.setAnnotations(this.annotations);
 				this.member = m;
 				return;

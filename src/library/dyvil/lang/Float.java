@@ -1,30 +1,28 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.lang.literal.FloatConvertible;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+import dyvil.lang.literal.FloatConvertible;
+import sun.misc.FloatingDecimal;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
-
-import sun.misc.FloatingDecimal;
 
 @FloatConvertible
 public class Float implements Number, Serializable
 {
 	private static final long serialVersionUID = 2128649158072690759L;
 	
-	public static final float	min					= java.lang.Float.MIN_VALUE;
-	public static final float	max					= java.lang.Float.MAX_VALUE;
-	public static final float	NaN					= java.lang.Float.NaN;
-	public static final float	infinity			= java.lang.Float.POSITIVE_INFINITY;
-	public static final float	negative_infinity	= java.lang.Float.NEGATIVE_INFINITY;
-	public static final byte	size				= java.lang.Float.SIZE;
+	public static final float min               = java.lang.Float.MIN_VALUE;
+	public static final float max               = java.lang.Float.MAX_VALUE;
+	public static final float NaN               = java.lang.Float.NaN;
+	public static final float infinity          = java.lang.Float.POSITIVE_INFINITY;
+	public static final float negative_infinity = java.lang.Float.NEGATIVE_INFINITY;
+	public static final byte  size              = java.lang.Float.SIZE;
 	
 	protected float value;
 	
@@ -33,7 +31,9 @@ public class Float implements Number, Serializable
 		return new Float(v);
 	}
 	
-	public static @infix float unapply(Float v)
+	public static
+	@infix
+	float unapply(Float v)
 	{
 		return v == null ? 0F : v.value;
 	}
@@ -373,13 +373,20 @@ public class Float implements Number, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Float", "toString", "(F)Ljava/lang/String;" })
-	public static @infix @inline String toString(float value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Float", "toString",
+			"(F)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(float value)
 	{
 		return FloatingDecimal.toJavaFormatString(value);
 	}
 	
-	public static @infix @inline String toHexString(float value)
+	public static
+	@infix
+	@inline
+	String toHexString(float value)
 	{
 		return java.lang.Double.toHexString(value);
 	}
@@ -391,7 +398,9 @@ public class Float implements Number, Serializable
 	}
 	
 	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Float", "hashCode", "(F)I" })
-	public static @postfix int $hash$hash(float f)
+	public static
+	@postfix
+	int $hash$hash(float f)
 	{
 		return java.lang.Float.floatToIntBits(f);
 	}

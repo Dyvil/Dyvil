@@ -28,6 +28,10 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	// Misc
 	
 	boolean isAbstract();
+
+	boolean hasSideEffects();
+
+	void setHasSideEffects(boolean sideEffects);
 	
 	void setParameters(IParameter[] parameters, int parameterCount);
 	
@@ -56,13 +60,17 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	
 	String getSignature();
 	
-	String[] getExceptions();
+	String[] getInternalExceptions();
 	
-	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
+	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+			throws BytecodeException;
 	
-	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException;
 	
-	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException;
 	
-	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException;
+	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException;
 }

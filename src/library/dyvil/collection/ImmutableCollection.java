@@ -1,15 +1,15 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.mutating;
+import dyvil.util.Immutable;
+import dyvil.util.ImmutableException;
+
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.annotation.mutating;
-import dyvil.annotation._internal.Covariant;
-import dyvil.util.Immutable;
-import dyvil.util.ImmutableException;
 
 public interface ImmutableCollection<@Covariant E> extends Collection<E>, Immutable
 {

@@ -1,5 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.*;
+import dyvil.collection.iterator.SingletonIterator;
+import dyvil.tuple.Tuple2;
+import dyvil.util.None;
+import dyvil.util.Option;
+import dyvil.util.Some;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -9,19 +16,12 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import dyvil.collection.*;
-import dyvil.collection.iterator.SingletonIterator;
-import dyvil.tuple.Tuple2;
-import dyvil.util.None;
-import dyvil.util.Option;
-import dyvil.util.Some;
-
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
 	private static final long serialVersionUID = 2791619158507681686L;
 	
-	private transient K	key;
-	private transient V	value;
+	private transient K key;
+	private transient V value;
 	
 	public static <K, V> SingletonMap<K, V> apply(K key, V value)
 	{

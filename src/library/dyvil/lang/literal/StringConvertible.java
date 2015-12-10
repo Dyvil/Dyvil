@@ -8,7 +8,7 @@ package dyvil.lang.literal;
  * single {@code String} parameter, as shown in the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}StringConvertible
  * case class Name(String value)
@@ -18,13 +18,13 @@ package dyvil.lang.literal;
  *         set: ...
  *     }
  * }
- * 
+ *
  * // ----------
- * 
+ *
  * Name name = "Dyvil"
  * String s = name.Qualified
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface StringConvertible

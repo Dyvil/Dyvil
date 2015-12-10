@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -59,14 +58,16 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		 * Allows Class Types, Parameterized Types and Type Variable Types, but
 		 * the latter cannot be contravariant.
 		 */
-		RETURN_TYPE, /**
-	 * Allows Class Types, Parameterized Types and Type
-	 * Variable Types, but the latter cannot be covariant.
-	 */
-	PARAMETER_TYPE, /**
-	 * Allows all Types.
-	 */
-	GENERIC_ARGUMENT
+		RETURN_TYPE,
+		/**
+		 * Allows Class Types, Parameterized Types and Type
+		 * Variable Types, but the latter cannot be covariant.
+		 */
+		PARAMETER_TYPE,
+		/**
+		 * Allows all Types.
+		 */
+		GENERIC_ARGUMENT
 	}
 	
 	// Basic Types
@@ -168,6 +169,10 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	default float getSubTypeDistance(IType subtype)
 	{
+		if (subtype.isArrayType() && this.getTheClass() == Types.OBJECT_CLASS)
+		{
+			return ArrayType.OBJECT_DISTANCE;
+		}
 		return subtype.getSuperTypeDistance(this);
 	}
 	
@@ -462,7 +467,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 			type = new ArrayType();
 			break;
 		case TYPE_VAR_TYPE:
-			type = new TypeVarType();
+			type = new NamedType();
 			break;
 		case WILDCARD_TYPE:
 			type = new WildcardType();

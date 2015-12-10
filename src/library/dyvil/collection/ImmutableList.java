@@ -40,14 +40,15 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	static <E> ImmutableList<E> apply(E e1, E e2)
 	{
-		return new ArrayList(new Object[] { e1, e2 }, 2, true);
+		return new ArrayList<>((E[]) new Object[] { e1, e2 }, 2, true);
 	}
 	
 	static <E> ImmutableList<E> apply(E e1, E e2, E e3)
 	{
-		return new ArrayList(new Object[] { e1, e2, e3 }, 3, true);
+		return new ArrayList<>((E[]) new Object[] { e1, e2, e3 }, 3, true);
 	}
 	
+	@SafeVarargs
 	static <E> ImmutableList<E> apply(E... elements)
 	{
 		return new ArrayList<>(elements, true);
@@ -55,22 +56,22 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
-		Object[] elements = new Object[count];
+		E[] elements = (E[]) new Object[count];
 		for (int i = 0; i < count; i++)
 		{
 			elements[i] = repeatedValue;
 		}
-		return new ArrayList(elements, count, true);
+		return new ArrayList<>(elements, count, true);
 	}
 	
 	static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
 	{
-		Object[] elements = new Object[count];
+		E[] elements = (E[]) new Object[count];
 		for (int i = 0; i < count; i++)
 		{
 			elements[i] = generator.apply(i);
 		}
-		return new ArrayList(elements, count, true);
+		return new ArrayList<>(elements, count, true);
 	}
 	
 	static <E> ImmutableList<E> fromArray(E[] elements)
@@ -78,34 +79,35 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList<>(elements);
 	}
 	
+	@SafeVarargs
 	static <E> ImmutableList<E> linked(E... elements)
 	{
-		ImmutableList<E> list = EmptyList.instance;
+		ImmutableList<E> list = EmptyList.apply();
 		for (E element : elements)
 		{
-			list = new AppendList(list, element);
+			list = new AppendList<>(list, element);
 		}
 		return list;
 	}
 	
 	static <E> ImmutableList<E> linked(Iterable<E> iterable)
 	{
-		ImmutableList<E> list = EmptyList.instance;
+		ImmutableList<E> list = EmptyList.apply();
 		for (E element : iterable)
 		{
-			list = new AppendList(list, element);
+			list = new AppendList<>(list, element);
 		}
 		return list;
 	}
 	
 	static <E> Builder<E> builder()
 	{
-		return new ArrayList.Builder();
+		return new ArrayList.Builder<>();
 	}
 	
 	static <E> Builder<E> builder(int capacity)
 	{
-		return new ArrayList.Builder(capacity);
+		return new ArrayList.Builder<>(capacity);
 	}
 	
 	// Accessors

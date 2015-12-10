@@ -15,7 +15,7 @@ public interface Operators
 {
 	Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
 	
-	static IValue getPriority(Name name, IValue arg1)
+	static IValue getPrefix(Name name, IValue arg1)
 	{
 		if (name == Names.bang)
 		{
@@ -24,10 +24,32 @@ public interface Operators
 				return new NotOperator(arg1);
 			}
 		}
+		return getIncOperator(name, arg1, true);
+	}
+
+	static IValue getIncOperator(Name name, IValue arg1, boolean prefix)
+	{
+		if (arg1.valueTag() == IValue.FIELD_ACCESS && IncOperator.isIncConvertible(arg1.getType()))
+		{
+			FieldAccess fieldAccess = (FieldAccess) arg1;
+			if (name == Names.plusplus)
+			{
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), 1, prefix);
+			}
+			else if (name == Names.minusminus)
+			{
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), -1, prefix);
+			}
+		}
 		return null;
 	}
+
+	static IValue getPostfix(IValue arg1, Name name)
+	{
+		return getIncOperator(name, arg1, false);
+	}
 	
-	static IValue getPriority(IValue arg1, Name name, IValue arg2)
+	static IValue getInfix_Priority(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.eqeq || name == Names.eqeqeq)
 		{
@@ -140,7 +162,8 @@ public interface Operators
 		{
 			return false;
 		}
-		switch (arg1.valueTag()) {
+		switch (arg1.valueTag())
+		{
 		case IValue.NULL:
 		case IntValue.WILDCARD:
 			return false;

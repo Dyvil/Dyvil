@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,8 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class InstanceOfOperator extends AbstractValue
 {
-	protected IValue	value;
-	protected IType		type;
+	protected IValue value;
+	protected IType  type;
 	
 	public InstanceOfOperator(ICodePosition position, IValue value)
 	{
@@ -147,17 +147,19 @@ public final class InstanceOfOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, Types.OBJECT);
 		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

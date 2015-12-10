@@ -218,7 +218,8 @@ public class CompleteCommand implements ICommand
 			IType superInterface = iclass.getInterface(i);
 			if (superInterface != null)
 			{
-				this.findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, false, dejaVu);
+				this.findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, false,
+				                     dejaVu);
 			}
 		}
 	}
@@ -230,7 +231,7 @@ public class CompleteCommand implements ICommand
 			return false;
 		}
 		
-		int modifiers = member.getModifiers();
+		int modifiers = member.getModifiers().toFlags();
 		if ((modifiers & Modifiers.PUBLIC) == 0)
 		{
 			return false;

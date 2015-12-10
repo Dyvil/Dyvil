@@ -4,20 +4,20 @@ import dyvil.lang.Type;
 
 public class PrimitiveType implements Type
 {
-	public static final int	VOID_CODE		= 0;
-	public static final int	BOOLEAN_CODE	= 1;
-	public static final int	BYTE_CODE		= 2;
-	public static final int	SHORT_CODE		= 3;
-	public static final int	CHAR_CODE		= 4;
-	public static final int	INT_CODE		= 5;
-	public static final int	LONG_CODE		= 6;
-	public static final int	FLOAT_CODE		= 7;
-	public static final int	DOUBLE_CODE		= 8;
+	public static final int VOID_CODE    = 0;
+	public static final int BOOLEAN_CODE = 1;
+	public static final int BYTE_CODE    = 2;
+	public static final int SHORT_CODE   = 3;
+	public static final int CHAR_CODE    = 4;
+	public static final int INT_CODE     = 5;
+	public static final int LONG_CODE    = 6;
+	public static final int FLOAT_CODE   = 7;
+	public static final int DOUBLE_CODE  = 8;
 	
 	private static final PrimitiveType[] LOOKUP = new PrimitiveType[9];
 	
-	private final int	id;
-	private final Class	theClass;
+	private final int   id;
+	private final Class theClass;
 	
 	static
 	{

@@ -9,20 +9,20 @@ package dyvil.lang.literal;
  * below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}IntConvertible
  * case class ID(int value)
  * {
  *     public void print() = System out println value
  * }
- * 
+ *
  * // ----------
- * 
+ *
  * ID id = 15
  * id print
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface IntConvertible

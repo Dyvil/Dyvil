@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -14,8 +15,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class EnumValue implements IConstantValue, INamed
 {
-	public IType	type;
-	public Name		name;
+	public IType type;
+	public Name  name;
 	
 	public EnumValue()
 	{
@@ -109,19 +110,21 @@ public class EnumValue implements IConstantValue, INamed
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		String owner = this.type.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
 		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.type.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

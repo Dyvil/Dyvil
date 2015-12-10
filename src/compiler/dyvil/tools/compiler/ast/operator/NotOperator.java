@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -40,7 +40,13 @@ public final class NotOperator extends AbstractValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.value.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -97,7 +103,7 @@ public final class NotOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		Label label = new Label();
 		Label label2 = new Label();
@@ -107,13 +113,15 @@ public final class NotOperator extends AbstractValue
 		writer.writeLabel(label);
 		writer.writeLDC(1);
 		writer.writeLabel(label2);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

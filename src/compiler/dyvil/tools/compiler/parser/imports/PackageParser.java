@@ -9,8 +9,8 @@ import dyvil.tools.parsing.token.IToken;
 
 public class PackageParser extends Parser
 {
-	protected PackageDeclaration	packageDeclaration;
-	private StringBuilder			buffer	= new StringBuilder();
+	protected PackageDeclaration packageDeclaration;
+	private StringBuilder buffer = new StringBuilder();
 	
 	public PackageParser(PackageDeclaration pack)
 	{

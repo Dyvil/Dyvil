@@ -22,7 +22,7 @@ public class Util
 {
 	public static void fieldSignatureToString(IField field, StringBuilder buf)
 	{
-		buf.append(ModifierTypes.FIELD.toString(field.getModifiers()));
+		field.getModifiers().toString(buf);
 		field.getType().toString("", buf);
 		buf.append(' ').append(field.getName());
 	}
@@ -34,7 +34,7 @@ public class Util
 	
 	public static void methodSignatureToString(IMethod method, StringBuilder buf)
 	{
-		buf.append(ModifierTypes.METHOD.toString(method.getModifiers()));
+		method.getModifiers().toString(buf);
 		method.getType().toString("", buf);
 		buf.append(' ').append(method.getName());
 		
@@ -69,7 +69,7 @@ public class Util
 	
 	public static void classSignatureToString(IClass iclass, StringBuilder buf)
 	{
-		buf.append(ModifierTypes.CLASS_TYPE.toString(iclass.getModifiers()));
+		iclass.getModifiers().toString(buf);
 		buf.append(iclass.getName());
 		
 		int typeVariables = iclass.genericCount();

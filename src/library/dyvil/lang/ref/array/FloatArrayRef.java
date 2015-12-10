@@ -4,8 +4,8 @@ import dyvil.lang.ref.FloatRef;
 
 public class FloatArrayRef implements FloatRef
 {
-	protected final float[]	array;
-	protected final int		index;
+	protected final float[] array;
+	protected final int     index;
 	
 	public FloatArrayRef(float[] array, int index)
 	{

@@ -1,14 +1,13 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.lang.literal.IntConvertible;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+import dyvil.lang.literal.IntConvertible;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -17,17 +16,17 @@ public class Int implements Integer, Serializable
 {
 	private static final long serialVersionUID = -2779746531375152610L;
 	
-	public static final int		min		= java.lang.Integer.MIN_VALUE;
-	public static final int		max		= java.lang.Integer.MAX_VALUE;
-	public static final byte	size	= java.lang.Integer.SIZE;
+	public static final int  min  = java.lang.Integer.MIN_VALUE;
+	public static final int  max  = java.lang.Integer.MAX_VALUE;
+	public static final byte size = java.lang.Integer.SIZE;
 	
 	protected int value;
 	
 	private static final class ConstantPool
 	{
-		protected static final int	TABLE_MIN	= -128;
-		protected static final int	TABLE_SIZE	= 256;
-		protected static final int	TABLE_MAX	= TABLE_MIN + TABLE_SIZE;
+		protected static final int TABLE_MIN  = -128;
+		protected static final int TABLE_SIZE = 256;
+		protected static final int TABLE_MAX  = TABLE_MIN + TABLE_SIZE;
 		
 		protected static final Int[] TABLE = new Int[TABLE_SIZE];
 		
@@ -49,7 +48,9 @@ public class Int implements Integer, Serializable
 		return new Int(v);
 	}
 	
-	public static @infix int unapply(Int v)
+	public static
+	@infix
+	int unapply(Int v)
 	{
 		return v == null ? 0 : v.value;
 	}
@@ -521,28 +522,43 @@ public class Int implements Integer, Serializable
 	
 	// Object methods
 	
-	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString", "(I)Ljava/lang/String;" })
-	public static @infix @inline String toString(int value)
+	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString",
+			"(I)Ljava/lang/String;" })
+	public static
+	@infix
+	@inline
+	String toString(int value)
 	{
 		return java.lang.Integer.toString(value);
 	}
 	
-	public static @infix @inline String toBinaryString(int value)
+	public static
+	@infix
+	@inline
+	String toBinaryString(int value)
 	{
 		return java.lang.Integer.toBinaryString(value);
 	}
 	
-	public static @infix @inline String toHexString(int value)
+	public static
+	@infix
+	@inline
+	String toHexString(int value)
 	{
 		return java.lang.Integer.toHexString(value);
 	}
 	
-	public static @infix @inline String toOctalString(int value)
+	public static
+	@infix
+	@inline
+	String toOctalString(int value)
 	{
 		return java.lang.Integer.toOctalString(value);
 	}
 	
-	public static @infix String toString(int value, int radix)
+	public static
+	@infix
+	String toString(int value, int radix)
 	{
 		switch (radix)
 		{
@@ -568,8 +584,10 @@ public class Int implements Integer, Serializable
 	
 	// Object methods
 	
-	@Intrinsic({ LOAD_0 })
-	public static @postfix int $hash$hash(int v)
+	@Intrinsic( { LOAD_0 })
+	public static
+	@postfix
+	int $hash$hash(int v)
 	{
 		return v;
 	}

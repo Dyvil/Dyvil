@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.field;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -13,22 +8,27 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+
 public final class CaptureField implements IField
 {
-	public IClass		theClass;
-	public String		name;
-	public IDataMember	field;
-	private IType		type;
+	public  IClass      theClass;
+	public  String      name;
+	public  IDataMember field;
+	private IType       type;
 	
 	public CaptureField(IClass iclass)
 	{
@@ -111,25 +111,13 @@ public final class CaptureField implements IField
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 		this.field.setModifiers(modifiers);
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
-	{
-		return this.field.addModifier(mod);
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.field.removeModifier(mod);
-	}
-	
-	@Override
-	public int getModifiers()
+	public ModifierSet getModifiers()
 	{
 		return this.field.getModifiers();
 	}
@@ -185,7 +173,6 @@ public final class CaptureField implements IField
 	{
 		if (instance == null)
 		{
-			markers.add(I18n.createMarker(position, "field.access.unqualified", this.name));
 			return new ThisExpr(position, context.getThisClass().getType(), context, markers);
 		}
 		
@@ -243,7 +230,8 @@ public final class CaptureField implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED, this.name, this.type.getExtendedName(), this.type.getSignature(), null);
+		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED, this.name, this.type.getExtendedName(),
+		                  this.type.getSignature(), null);
 	}
 	
 	@Override

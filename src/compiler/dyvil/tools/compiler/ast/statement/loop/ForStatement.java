@@ -271,13 +271,6 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
-		writer.writeInsn(Opcodes.ACONST_NULL);
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
@@ -298,16 +291,16 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		{
 			this.condition.writeInvJump(writer, endLabel);
 		}
-		// Then
+		// Action
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		// Update
 		writer.writeLabel(updateLabel);
 		if (this.update != null)
 		{
-			this.update.writeStatement(writer);
+			this.update.writeExpression(writer, Types.VOID);
 		}
 		// Go back to Condition
 		writer.writeJumpInsn(Opcodes.GOTO, startLabel);

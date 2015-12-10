@@ -23,6 +23,7 @@ public class InvalidTypeException extends BytecodeException
 	
 	public InvalidTypeException(int opcode, String location, String expected, String actual)
 	{
-		super("Invalid Type on " + Opcodes.toString(opcode) + " Instruction at " + location + ": Expected: " + expected + ", Actual: " + actual);
+		super("Invalid Type on " + Opcodes.toString(opcode) + " Instruction at " + location + ": Expected: " + expected
+				      + ", Actual: " + actual);
 	}
 }

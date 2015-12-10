@@ -1,11 +1,11 @@
 package dyvil.annotation._internal;
 
+import dyvil.reflect.Modifiers;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import dyvil.reflect.Modifiers;
 
 /**
  * Annotation for <b>lazy</b> fields, variables and parameters. The behavior of
@@ -24,12 +24,11 @@ import dyvil.reflect.Modifiers;
  * call-site.
  * </ul>
  *
- * @see Modifiers#LAZY
  * @author Clashsoft
  * @version 1.0
+ * @see Modifiers#LAZY
  */
 @Retention(RetentionPolicy.CLASS)
-@Target({ ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER })
+@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER })
 public @interface lazy
-{
-}
+{}

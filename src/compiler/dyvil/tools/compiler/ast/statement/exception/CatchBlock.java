@@ -12,10 +12,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 {
-	public ICodePosition	position;
-	public IType			type;
-	public Name				varName;
-	public IValue			action;
+	public ICodePosition position;
+	public IType         type;
+	public Name          varName;
+	public IValue        action;
 	
 	protected Variable variable;
 	

@@ -25,21 +25,21 @@ public class RangeOperator implements IValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass			RANGE_CLASS		= Package.dyvilCollection.resolveClass("Range");
-		public static final ClassType		RANGE			= new ClassType(RANGE_CLASS);
-		public static final IClass			RANGEABLE_CLASS	= Package.dyvilLang.resolveClass("Ordered");
-		public static final ClassType		RANGEABLE		= new ClassType(RANGEABLE_CLASS);
-		public static final ITypeVariable	RANGEABLE_TYPE	= RANGEABLE_CLASS.getTypeVariable(0);
+		public static final IClass        RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
+		public static final ClassType     RANGE           = new ClassType(RANGE_CLASS);
+		public static final IClass        RANGEABLE_CLASS = Package.dyvilLang.resolveClass("Ordered");
+		public static final ClassType     RANGEABLE       = new ClassType(RANGEABLE_CLASS);
+		public static final ITypeVariable RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeVariable(0);
 	}
 	
-	protected ICodePosition	position;
-	protected IValue		firstValue;
-	protected IValue		lastValue;
+	protected ICodePosition position;
+	protected IValue        firstValue;
+	protected IValue        lastValue;
 	
 	// Metadata
-	private boolean	halfOpen;
-	private IType	elementType	= Types.UNKNOWN;
-	private IType	type;
+	private boolean halfOpen;
+	private IType elementType = Types.UNKNOWN;
+	private IType type;
 	
 	public RangeOperator(IValue value1, IValue value2)
 	{
@@ -112,7 +112,13 @@ public class RangeOperator implements IValue
 	{
 		return this.type != null && this.type.isResolved();
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.firstValue.hasSideEffects() || this.lastValue.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -258,8 +264,19 @@ public class RangeOperator implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (type == Types.VOID)
+		{
+			this.writeExpression(writer, this.type);
+			writer.writeInsn(Opcodes.ARETURN);
+			return;
+		}
+		if (type == null)
+		{
+			type = this.type;
+		}
+
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
@@ -267,7 +284,7 @@ public class RangeOperator implements IValue
 			this.lastValue.writeExpression(writer, LazyFields.RANGEABLE);
 			
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", this.halfOpen ? "halfOpen" : "apply",
-					"(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)Ldyvil/collection/Range;", false);
+			                       "(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)Ldyvil/collection/Range;", false);
 			return;
 		}
 		
@@ -286,7 +303,8 @@ public class RangeOperator implements IValue
 			writer.writeLDC(Type.getType(extended));
 			
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
-					"(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;Ljava/lang/Class;)[Ldyvil/lang/Rangeable;", false);
+			                       "(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;Ljava/lang/Class;)[Ldyvil/lang/Rangeable;",
+			                       false);
 			
 			// CheckCast so the verifier doesn't complain about mismatching types
 			writer.writeTypeInsn(Opcodes.CHECKCAST, '[' + extended);
@@ -320,13 +338,6 @@ public class RangeOperator implements IValue
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
 			return;
 		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.ARETURN);
 	}
 	
 	@Override

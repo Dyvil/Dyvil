@@ -1,11 +1,11 @@
 package dyvil.annotation._internal;
 
+import dyvil.reflect.Modifiers;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import dyvil.reflect.Modifiers;
 
 /**
  * Annotation for <b>infix</b> methods. When calling the infix method
@@ -30,12 +30,11 @@ import dyvil.reflect.Modifiers;
  * </code>
  * <p>
  *
- * @see Modifiers#INFIX
  * @author Clashsoft
  * @version 1.0
+ * @see Modifiers#INFIX
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)
 public @interface infix
-{
-}
+{}

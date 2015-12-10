@@ -16,10 +16,10 @@ import java.io.File;
 
 public class DyvilUnit extends DyvilHeader
 {
-	private IClass[]			classes			= new IClass[1];
-	private int					classCount;
-	private IClassCompilable[]	innerClasses	= new IClassCompilable[2];
-	private int					innerClassCount;
+	private IClass[] classes = new IClass[1];
+	private int classCount;
+	private IClassCompilable[] innerClasses = new IClassCompilable[2];
+	private int innerClassCount;
 	
 	public DyvilUnit(Package pack, CodeFile input, File output)
 	{

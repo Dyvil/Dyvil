@@ -1,12 +1,11 @@
 package dyvil.tools.compiler.ast.field;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -16,11 +15,13 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.lang.annotation.ElementType;
+
 public class CaptureVariable implements IVariable
 {
-	public int			index;
-	public IVariable	variable;
-	public IType		type;
+	public int       index;
+	public IVariable variable;
+	public IType     type;
 	
 	public CaptureVariable()
 	{
@@ -74,25 +75,13 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public void setModifiers(int modifiers)
+	public void setModifiers(ModifierSet modifiers)
 	{
 		this.variable.setModifiers(modifiers);
 	}
 	
 	@Override
-	public boolean addModifier(int mod)
-	{
-		return this.variable.addModifier(mod);
-	}
-	
-	@Override
-	public void removeModifier(int mod)
-	{
-		this.variable.removeModifier(mod);
-	}
-	
-	@Override
-	public int getModifiers()
+	public ModifierSet getModifiers()
 	{
 		return this.variable.getModifiers();
 	}

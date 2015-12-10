@@ -1,84 +1,120 @@
 package dyvil.tools.dpf.ast.value;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.Entry;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayMap;
+import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.visitor.MapVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tuple.Tuple2;
 
-public class MapValue extends ValueCreator implements Value, MapVisitor
+import java.util.function.BiFunction;
+
+public class MapValue extends ValueCreator implements Value, MapVisitor, Expandable
 {
-	private List<Value>	keys	= new ArrayList<Value>();
-	private List<Value>	values	= new ArrayList<Value>();
-	private boolean		valueMode;
+	protected Map<Value, Value> entries = new ArrayMap<>();
+
+	private Value tempKey;
 	
 	public MapValue()
 	{
+	}
+
+	public MapValue(Map<?, ?> map)
+	{
+		final int size = map.size();
+		this.entries = new ArrayMap<>(size);
+
+		for (Entry<?, ?> entry : map)
+		{
+			this.entries.put(Value.wrap(entry.getKey()), Value.wrap(entry.getValue()));
+		}
 	}
 	
 	@Override
 	protected void setValue(Value value)
 	{
-		if (this.valueMode)
+		if (this.tempKey == null)
 		{
-			this.values.add(value);
+			this.tempKey = value;
 		}
 		else
 		{
-			this.keys.add(value);
+			this.entries.put(this.tempKey, value);
+			this.tempKey = null;
 		}
 	}
 	
 	@Override
 	public ValueVisitor visitKey()
 	{
-		this.valueMode = false;
 		return this;
 	}
 	
 	@Override
 	public ValueVisitor visitValue()
 	{
-		this.valueMode = true;
 		return this;
 	}
 	
 	@Override
 	public void accept(ValueVisitor visitor)
 	{
-		MapVisitor v = visitor.visitMap();
-		
-		int len = this.values.size();
-		for (int i = 0; i < len; i++)
+		MapVisitor mapVisitor = visitor.visitMap();
+
+		for (Entry<Value, Value> entry : this.entries)
 		{
-			this.keys.get(i).accept(v.visitKey());
-			this.values.get(i).accept(v.visitValue());
+			entry.getKey().accept(mapVisitor.visitKey());
+			entry.getValue().accept(mapVisitor.visitValue());
 		}
 		
-		v.visitEnd();
+		mapVisitor.visitEnd();
 	}
-	
+
+	@Override
+	public MapValue expand(Map<String, Object> mappings, boolean mutate)
+	{
+		final BiFunction<Value, Value, Entry<? extends Value, ? extends Value>> entryBiFunction = (k, v) -> new Tuple2<>(
+				Value.wrap(Expandable.expand(k, mappings, true)), Value.wrap(Expandable.expand(v, mappings, mutate)));
+
+		if (mutate)
+		{
+			this.entries.mapEntries(entryBiFunction);
+			return this;
+		}
+		else
+		{
+			MapValue copy = new MapValue();
+			copy.entries = this.entries.entryMapped(entryBiFunction);
+			return copy;
+		}
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		int len = this.values.size();
+		int len = this.entries.size();
 		if (len <= 0)
 		{
 			buffer.append("{}");
 			return;
 		}
+
+		Value[] keys = this.entries.toKeyArray(Value.class);
+		Value[] values = this.entries.toValueArray(Value.class);
 		
 		String prefix1 = prefix + "\t";
 		
 		buffer.append("{\n").append(prefix1);
-		this.keys.get(0).toString(prefix1, buffer);
+		keys[0].toString(prefix1, buffer);
 		buffer.append(" : ");
-		this.values.get(0).toString(prefix1, buffer);
+		values[0].toString(prefix1, buffer);
 		for (int i = 1; i < len; i++)
 		{
 			buffer.append(",\n").append(prefix1);
-			this.keys.get(i).toString(prefix1, buffer);
+			keys[i].toString(prefix1, buffer);
 			buffer.append(" : ");
-			this.values.get(i).toString(prefix1, buffer);
+			values[i].toString(prefix1, buffer);
 		}
 		buffer.append('\n').append(prefix).append('}');
 	}

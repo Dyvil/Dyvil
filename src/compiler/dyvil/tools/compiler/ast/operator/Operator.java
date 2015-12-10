@@ -1,24 +1,24 @@
 package dyvil.tools.compiler.ast.operator;
 
+import dyvil.tools.parsing.Name;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import dyvil.tools.parsing.Name;
-
 public final class Operator
 {
-	public static final int	PREFIX		= 0;
-	public static final int	INFIX_LEFT	= 1;
-	public static final int	INFIX_NONE	= 2;
-	public static final int	INFIX_RIGHT	= 3;
-	public static final int	POSTFIX		= 4;
+	public static final int PREFIX      = 0;
+	public static final int INFIX_LEFT  = 1;
+	public static final int INFIX_NONE  = 2;
+	public static final int INFIX_RIGHT = 3;
+	public static final int POSTFIX     = 4;
 	
 	public static final int PREFIX_PRECEDENCE = 1000;
 	
-	public final Name	name;
-	public int			precedence;
-	public int			type;
+	public final Name name;
+	public       int  precedence;
+	public       int  type;
 	
 	public Operator(Name name)
 	{
@@ -95,10 +95,12 @@ public final class Operator
 			}
 			return;
 		case INFIX_LEFT:
-			buffer.append("infix operator ").append(this.name).append(" { associativity left, precedence ").append(this.precedence).append(" }");
+			buffer.append("infix operator ").append(this.name).append(" { associativity left, precedence ")
+			      .append(this.precedence).append(" }");
 			return;
 		case INFIX_RIGHT:
-			buffer.append("infix operator ").append(this.name).append(" { associativity right, precedence ").append(this.precedence).append(" }");
+			buffer.append("infix operator ").append(this.name).append(" { associativity right, precedence ")
+			      .append(this.precedence).append(" }");
 			return;
 		}
 		

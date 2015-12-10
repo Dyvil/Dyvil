@@ -1,17 +1,17 @@
 package dyvil.tools.parsing.marker;
 
+import dyvil.collection.iterator.ArrayIterator;
+
 import java.util.Arrays;
 import java.util.Iterator;
 
-import dyvil.collection.iterator.ArrayIterator;
-
 public final class MarkerList implements Iterable<Marker>
 {
-	private Marker[]	markers;
-	private int			markerCount;
+	private Marker[] markers;
+	private int      markerCount;
 	
-	private int	warnings;
-	private int	errors;
+	private int warnings;
+	private int errors;
 	
 	public MarkerList()
 	{

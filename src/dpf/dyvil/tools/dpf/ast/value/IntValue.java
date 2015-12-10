@@ -2,7 +2,7 @@ package dyvil.tools.dpf.ast.value;
 
 import dyvil.tools.dpf.visitor.ValueVisitor;
 
-public class IntValue implements Value
+public class IntValue implements Constant
 {
 	protected int value;
 	
@@ -28,11 +28,23 @@ public class IntValue implements Value
 	}
 	
 	@Override
+	public Object toObject()
+	{
+		return dyvil.lang.Int.apply(this.value);
+	}
+
+	@Override
+	public void appendString(StringBuilder builder)
+	{
+		builder.append(this.value);
+	}
+
+	@Override
 	public String toString()
 	{
 		return Integer.toString(this.value);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -4,8 +4,8 @@ import dyvil.lang.ref.IntRef;
 
 public class IntArrayRef implements IntRef
 {
-	protected final int[]	array;
-	protected final int		index;
+	protected final int[] array;
+	protected final int   index;
 	
 	public IntArrayRef(int[] array, int index)
 	{

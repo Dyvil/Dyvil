@@ -13,11 +13,12 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface ITypeVariable extends IASTNode, INamed, IAnnotated
+public interface ITypeVariable extends IASTNode, INamed, IAnnotated, IObjectCompilable
 {
 	IGeneric getGeneric();
 	

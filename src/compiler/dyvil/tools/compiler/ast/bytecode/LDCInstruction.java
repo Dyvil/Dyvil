@@ -27,7 +27,7 @@ public class LDCInstruction implements IInstruction
 	@Override
 	public void write(MethodWriter writer) throws BytecodeException
 	{
-		this.argument.writeExpression(writer);
+		this.argument.writeExpression(writer, null);
 	}
 	
 	@Override

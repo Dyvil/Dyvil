@@ -1,15 +1,14 @@
 package dyvil.lang.ref.unsafe;
 
-import java.lang.reflect.Field;
-
 import dyvil.lang.ref.IntRef;
-
 import dyvil.reflect.ReflectUtils;
+
+import java.lang.reflect.Field;
 
 public final class UnsafeIntRef implements IntRef
 {
-	private final Object	base;
-	private final long		offset;
+	private final Object base;
+	private final long   offset;
 	
 	public UnsafeIntRef(Field staticField)
 	{

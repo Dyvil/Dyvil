@@ -1,11 +1,11 @@
 package dyvil.collection.immutable;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Set;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class SortedArrayList<E> extends ArrayList<E>
 {
@@ -91,7 +91,9 @@ public class SortedArrayList<E> extends ArrayList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = this.comparator != null ? Set.sortDistinct((E[]) array, this.size, this.comparator) : Set.distinctSorted(array, this.size);
+		int size = this.comparator != null ?
+				Set.sortDistinct((E[]) array, this.size, this.comparator) :
+				Set.distinctSorted(array, this.size);
 		return new SortedArrayList(array, size, true, this.comparator);
 	}
 	
@@ -100,7 +102,9 @@ public class SortedArrayList<E> extends ArrayList<E>
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
-		int size = this.comparator != comparator ? Set.sortDistinct((E[]) array, this.size, comparator) : Set.distinctSorted(array, this.size);
+		int size = this.comparator != comparator ?
+				Set.sortDistinct((E[]) array, this.size, comparator) :
+				Set.distinctSorted(array, this.size);
 		return new SortedArrayList(array, size, true, comparator);
 	}
 	

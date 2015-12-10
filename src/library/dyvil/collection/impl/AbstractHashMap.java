@@ -1,12 +1,5 @@
 package dyvil.collection.impl;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.math.MathUtils;
@@ -15,16 +8,23 @@ import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 public abstract class AbstractHashMap<K, V> implements Map<K, V>
 {
 	protected static final class HashEntry<K, V> implements Entry<K, V>
 	{
 		private static final long serialVersionUID = 6421167357975687099L;
 		
-		public transient K			key;
-		public transient V			value;
-		public transient int		hash;
-		public transient HashEntry	next;
+		public transient K         key;
+		public transient V         value;
+		public transient int       hash;
+		public transient HashEntry next;
 		
 		public HashEntry(K key, V value, int hash)
 		{
@@ -93,9 +93,9 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	
 	protected abstract class EntryIterator<E> implements Iterator<E>
 	{
-		HashEntry<K, V>	next;		// next entry to return
-		HashEntry<K, V>	current;	// current entry
-		int				index;		// current slot
+		HashEntry<K, V> next;        // next entry to return
+		HashEntry<K, V> current;    // current entry
+		int             index;        // current slot
 		
 		EntryIterator()
 		{
@@ -152,13 +152,13 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	
 	private static final long serialVersionUID = 408161126967974108L;
 	
-	public static final float	GROWTH_FACTOR		= 1.125F;
-	public static final int		DEFAULT_CAPACITY	= 16;
-	public static final float	DEFAULT_LOAD_FACTOR	= 0.75F;
-	public static final int		MAX_ARRAY_SIZE		= Integer.MAX_VALUE - 8;
+	public static final float GROWTH_FACTOR       = 1.125F;
+	public static final int   DEFAULT_CAPACITY    = 16;
+	public static final float DEFAULT_LOAD_FACTOR = 0.75F;
+	public static final int   MAX_ARRAY_SIZE      = Integer.MAX_VALUE - 8;
 	
-	protected transient int			size;
-	protected transient HashEntry[]	entries;
+	protected transient int         size;
+	protected transient HashEntry[] entries;
 	
 	public AbstractHashMap()
 	{
@@ -291,7 +291,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 		
 		HashEntry[] newMap = this.entries = new HashEntry[newCapacity];
-		for (int i = oldCapacity; i-- > 0;)
+		for (int i = oldCapacity; i-- > 0; )
 		{
 			HashEntry e = oldMap[i];
 			while (e != null)

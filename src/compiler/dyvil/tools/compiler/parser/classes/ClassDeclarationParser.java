@@ -4,6 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.*;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -18,22 +19,23 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
 {
-	private static final int	NAME			= 1;
-	private static final int	GENERICS		= 2;
-	private static final int	GENERICS_END	= 4;
-	private static final int	PARAMETERS		= 8;
-	private static final int	PARAMETERS_END	= 16;
-	private static final int	EXTENDS			= 32;
-	private static final int	IMPLEMENTS		= 64;
-	private static final int	BODY			= 128;
-	private static final int	BODY_END		= 256;
+	private static final int NAME           = 1;
+	private static final int GENERICS       = 2;
+	private static final int GENERICS_END   = 4;
+	private static final int PARAMETERS     = 8;
+	private static final int PARAMETERS_END = 16;
+	private static final int EXTENDS        = 32;
+	private static final int IMPLEMENTS     = 64;
+	private static final int BODY           = 128;
+	private static final int BODY_END       = 256;
 	
-	protected IDyvilHeader	header;
-	protected IClass		outerClass;
-	protected IClassList	classList;
-	
-	protected int				modifiers;
-	protected AnnotationList	annotations;
+	protected IDyvilHeader header;
+	protected IClass       outerClass;
+	protected IClassList   classList;
+
+	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
+	protected ModifierSet    modifiers;
+	protected AnnotationList annotations;
 	
 	private CodeClass theClass;
 	
@@ -44,7 +46,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		this.mode = NAME;
 	}
 	
-	public ClassDeclarationParser(IDyvilHeader header, int modifiers, AnnotationList annotations)
+	public ClassDeclarationParser(IDyvilHeader header, ModifierSet modifiers, AnnotationList annotations)
 	{
 		this.header = header;
 		this.classList = header;
@@ -54,7 +56,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		this.mode = NAME;
 	}
 	
-	public ClassDeclarationParser(IClass outerClass, int modifiers, AnnotationList annotations)
+	public ClassDeclarationParser(IClass outerClass, ModifierSet modifiers, AnnotationList annotations)
 	{
 		this.outerClass = outerClass;
 		this.header = outerClass.getHeader();

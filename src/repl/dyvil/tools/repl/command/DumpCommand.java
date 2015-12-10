@@ -1,9 +1,9 @@
 package dyvil.tools.repl.command;
 
+import dyvil.tools.repl.DyvilREPL;
+
 import java.io.File;
 import java.io.IOException;
-
-import dyvil.tools.repl.DyvilREPL;
 
 public class DumpCommand implements ICommand
 {
@@ -44,5 +44,4 @@ public class DumpCommand implements ICommand
 			System.err.println("Invalid Dumping Path: " + absolute);
 		}
 	}
-	
 }

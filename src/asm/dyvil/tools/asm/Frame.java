@@ -2,19 +2,19 @@
  * ASM: a very small and fast Java bytecode manipulation framework
  * Copyright (c) 2000-2011 INRIA, France Telecom
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ * notice, this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,37 +31,38 @@ package dyvil.tools.asm;
 
 final class Frame
 {
-	static final int			DIM						= 0xF0000000;
-	static final int			ARRAY_OF				= 0x10000000;
-	static final int			ELEMENT_OF				= 0xF0000000;
-	static final int			KIND					= 0xF000000;
-	static final int			TOP_IF_LONG_OR_DOUBLE	= 0x800000;
-	static final int			VALUE					= 0x7FFFFF;
-	static final int			BASE_KIND				= 0xFF00000;
-	static final int			BASE_VALUE				= 0xFFFFF;
-	static final int			BASE					= 0x1000000;
-	static final int			OBJECT					= BASE | 0x700000;
-	static final int			UNINITIALIZED			= BASE | 0x800000;
-	private static final int	LOCAL					= 0x2000000;
-	private static final int	STACK					= 0x3000000;
-	static final int			TOP						= BASE | 0;
-	static final int			BOOLEAN					= BASE | 9;
-	static final int			BYTE					= BASE | 10;
-	static final int			CHAR					= BASE | 11;
-	static final int			SHORT					= BASE | 12;
-	static final int			INTEGER					= BASE | 1;
-	static final int			FLOAT					= BASE | 2;
-	static final int			DOUBLE					= BASE | 3;
-	static final int			LONG					= BASE | 4;
-	static final int			NULL					= BASE | 5;
-	static final int			UNINITIALIZED_THIS		= BASE | 6;
-	static final int[]			SIZE;
+	static final         int DIM                   = 0xF0000000;
+	static final         int ARRAY_OF              = 0x10000000;
+	static final         int ELEMENT_OF            = 0xF0000000;
+	static final         int KIND                  = 0xF000000;
+	static final         int TOP_IF_LONG_OR_DOUBLE = 0x800000;
+	static final         int VALUE                 = 0x7FFFFF;
+	static final         int BASE_KIND             = 0xFF00000;
+	static final         int BASE_VALUE            = 0xFFFFF;
+	static final         int BASE                  = 0x1000000;
+	static final         int OBJECT                = BASE | 0x700000;
+	static final         int UNINITIALIZED         = BASE | 0x800000;
+	private static final int LOCAL                 = 0x2000000;
+	private static final int STACK                 = 0x3000000;
+	static final         int TOP                   = BASE | 0;
+	static final         int BOOLEAN               = BASE | 9;
+	static final         int BYTE                  = BASE | 10;
+	static final         int CHAR                  = BASE | 11;
+	static final         int SHORT                 = BASE | 12;
+	static final         int INTEGER               = BASE | 1;
+	static final         int FLOAT                 = BASE | 2;
+	static final         int DOUBLE                = BASE | 3;
+	static final         int LONG                  = BASE | 4;
+	static final         int NULL                  = BASE | 5;
+	static final         int UNINITIALIZED_THIS    = BASE | 6;
+	static final int[] SIZE;
 	
 	static
 	{
 		int i;
 		int[] b = new int[202];
-		String s = "EFFFFFFFFGGFFFGGFFFEEFGFGFEEEEEEEEEEEEEEEEEEEEDEDEDDDDD" + "CDCDEEEEEEEEEEEEEEEEEEEEBABABBBBDCFFFGGGEDCDCDCDCDCDCDCDCD"
+		String s = "EFFFFFFFFGGFFFGGFFFEEFGFGFEEEEEEEEEEEEEEEEEEEEDEDEDDDDD"
+				+ "CDCDEEEEEEEEEEEEEEEEEEEEBABABBBBDCFFFGGGEDCDCDCDCDCDCDCDCD"
 				+ "CDCEEEEDDDDDDDCDCDCEFEFDDEEFFDEDEEEBDDBBDDDDDDCCCCCCCCEFED" + "DDCDCDEEEEEEEEEEFEEEEEEDDEEDDEE";
 		for (i = 0; i < b.length; ++i)
 		{
@@ -70,14 +71,14 @@ final class Frame
 		SIZE = b;
 	}
 	
-	Label			owner;
-	int[]			inputLocals;
-	int[]			inputStack;
-	private int[]	outputLocals;
-	private int[]	outputStack;
-	private int		outputStackTop;
-	private int		initializationCount;
-	private int[]	initializations;
+	Label owner;
+	int[] inputLocals;
+	int[] inputStack;
+	private int[] outputLocals;
+	private int[] outputStack;
+	private int   outputStackTop;
+	private int   initializationCount;
+	private int[] initializations;
 	
 	private int get(final int local)
 	{

@@ -18,9 +18,9 @@ import java.io.IOException;
 
 public interface IImport extends IASTNode
 {
-	int	SINGLE		= 1;
-	int	WILDCARD	= 2;
-	int	MULTI		= 3;
+	int SINGLE   = 1;
+	int WILDCARD = 2;
+	int MULTI    = 3;
 	
 	static IImport fromTag(int tag)
 	{

@@ -11,9 +11,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class JumpInstruction implements IInstruction
 {
-	private ICodePosition	position;
-	private int				opcode;
-	private Label			target;
+	private ICodePosition position;
+	private int           opcode;
+	private Label         target;
 	
 	public JumpInstruction(int opcode, Label target)
 	{

@@ -1,13 +1,13 @@
 package dyvil.collection.impl;
 
+import dyvil.collection.Collection;
+import dyvil.collection.Set;
+
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Function;
-
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
 
 public abstract class AbstractArraySet<E> implements Set<E>
 {
@@ -15,8 +15,8 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	
 	protected static final int DEFAULT_CAPACITY = 10;
 	
-	protected transient Object[]	elements;
-	protected transient int			size;
+	protected transient Object[] elements;
+	protected transient int      size;
 	
 	public AbstractArraySet(Object... elements)
 	{

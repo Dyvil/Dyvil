@@ -291,7 +291,7 @@ public final class TupleExpr implements IValue, IValueList
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		String internal = this.tupleType.getInternalName();
 		writer.writeTypeInsn(Opcodes.NEW, internal);
@@ -306,14 +306,14 @@ public final class TupleExpr implements IValue, IValueList
 		String owner = internal;
 		String desc = TupleType.getConstructorDescriptor(this.valueCount);
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		for (int i = 0; i < this.valueCount; i++)
+
+		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
 		{
-			this.values[i].writeStatement(writer);
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.tupleType.writeCast(writer, type, this.getLineNumber());
 		}
 	}
 	

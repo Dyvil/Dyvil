@@ -16,8 +16,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class SuperExpr implements IValue
 {
-	protected ICodePosition	position;
-	protected IType			type	= Types.UNKNOWN;
+	protected ICodePosition position;
+	protected IType type = Types.UNKNOWN;
 	
 	public SuperExpr(ICodePosition position)
 	{
@@ -153,16 +153,18 @@ public final class SuperExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeInsn(Opcodes.ARETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.ARETURN);
+		}
+		else if (type != null)
+		{
+			this.type.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

@@ -18,12 +18,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CharValue implements IConstantValue
 {
-	private static final byte	UNDEFINED	= 0;
-	private static final byte	CHAR		= 1;
-	private static final byte	STRING		= 2;
+	private static final byte UNDEFINED = 0;
+	private static final byte CHAR      = 1;
+	private static final byte STRING    = 2;
 	
-	protected ICodePosition	position;
-	protected String		value;
+	protected ICodePosition position;
+	protected String        value;
 	
 	private byte type;
 	
@@ -228,27 +228,32 @@ public final class CharValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		if (this.type == CHAR)
 		{
 			writer.writeLDC(this.value.charAt(0));
+
+			if (type == Types.VOID)
+			{
+				writer.writeInsn(Opcodes.IRETURN);
+			}
+			else if (type != null)
+			{
+				Types.CHAR.writeCast(writer, type, this.getLineNumber());
+			}
 			return;
 		}
+
 		writer.writeLDC(this.value);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		if (this.type == CHAR)
+		if (type == Types.VOID)
 		{
-			writer.writeLDC(this.value.charAt(0));
-			writer.writeInsn(Opcodes.IRETURN);
-			return;
+			writer.writeInsn(Opcodes.ARETURN);
 		}
-		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.ARETURN);
+		else if (type != null)
+		{
+			Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

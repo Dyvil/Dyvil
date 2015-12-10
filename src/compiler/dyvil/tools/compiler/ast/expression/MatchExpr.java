@@ -324,28 +324,23 @@ public final class MatchExpr implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (type == null)
+		{
+			type = this.type;
+		}
+
+		// type.getFrameType() returns null for void. This is specially handled in the implementations, so we don't need
+		// to handle void here
+
 		if (this.canGenerateSwitch())
 		{
-			this.generateSwitch(writer, true, this.type.getFrameType());
+			this.generateSwitch(writer, true, type.getFrameType());
 		}
 		else
 		{
-			this.generateBranched(writer, true, this.type.getFrameType());
-		}
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		if (this.canGenerateSwitch())
-		{
-			this.generateSwitch(writer, false, null);
-		}
-		else
-		{
-			this.generateBranched(writer, false, null);
+			this.generateBranched(writer, true, type.getFrameType());
 		}
 	}
 	
@@ -433,7 +428,7 @@ public final class MatchExpr implements IValue
 			}
 			else
 			{
-				value.writeStatement(writer);
+				value.writeExpression(writer, Types.VOID);
 			}
 		}
 		else if (expr)
@@ -509,7 +504,7 @@ public final class MatchExpr implements IValue
 		
 		// Write the value
 		IType type = this.value.getType();
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, null);
 		
 		int varIndex = -1;
 		if (switchVar)

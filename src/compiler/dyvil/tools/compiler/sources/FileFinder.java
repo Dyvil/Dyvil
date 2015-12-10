@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.sources;
 
-import java.io.File;
-
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
@@ -9,10 +7,12 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.parsing.CodeFile;
 
+import java.io.File;
+
 public class FileFinder
 {
-	public final List<File>				files	= new ArrayList();
-	public final List<ICompilationUnit>	units	= new ArrayList();
+	public final List<File>             files = new ArrayList();
+	public final List<ICompilationUnit> units = new ArrayList();
 	
 	public void process(File source, File output, Package pack)
 	{

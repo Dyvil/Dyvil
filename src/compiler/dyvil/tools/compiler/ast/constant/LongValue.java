@@ -17,8 +17,8 @@ public class LongValue implements IConstantValue
 {
 	private static LongValue NULL;
 	
-	protected ICodePosition	position;
-	protected long			value;
+	protected ICodePosition position;
+	protected long          value;
 	
 	public LongValue(long value)
 	{
@@ -88,7 +88,8 @@ public class LongValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.LONG || type.isSuperTypeOf(Types.LONG) || type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null;
+		return type == Types.LONG || type.isSuperTypeOf(Types.LONG)
+				|| type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
@@ -132,7 +133,7 @@ public class LongValue implements IConstantValue
 	@Override
 	public Long toObject()
 	{
-		return Long.valueOf(this.value);
+		return this.value;
 	}
 	
 	@Override
@@ -149,16 +150,18 @@ public class LongValue implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeLDC(this.value);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeLDC(this.value);
-		writer.writeInsn(Opcodes.LRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.LRETURN);
+		}
+		else if (type != null)
+		{
+			Types.LONG.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

@@ -9,10 +9,10 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class InvokeDynamicInstruction implements IInstruction
 {
-	private String		name;
-	private String		type;
-	private Handle		bsm;
-	private Object[]	bsmArguments;
+	private String   name;
+	private String   type;
+	private Handle   bsm;
+	private Object[] bsmArguments;
 	
 	public InvokeDynamicInstruction(String name, String type, Handle bsm, Object[] bsmArguments)
 	{
@@ -38,7 +38,8 @@ public class InvokeDynamicInstruction implements IInstruction
 	{
 		buffer.append("INVOKEDYNAMIC ").append(this.name).append(':').append(this.type).append(' ');
 		buffer.append(Printer.HANDLE_TAG[this.bsm.getTag()]).append(' ');
-		buffer.append(this.bsm.getOwner()).append('.').append(this.bsm.getDesc()).append(':').append(this.bsm.getDesc());
+		buffer.append(this.bsm.getOwner()).append('.').append(this.bsm.getDesc()).append(':')
+		      .append(this.bsm.getDesc());
 		
 		int len = this.bsmArguments.length;
 		if (len > 0)

@@ -1,19 +1,19 @@
 package dyvil.tuple;
 
-import java.util.Objects;
-
 import dyvil.annotation._internal.ClassParameters;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.Cell;
+
+import java.util.Objects;
 
 @ClassParameters(names = { "_1", "_2", "_3" })
 public class Tuple3<@Covariant A, @Covariant B, @Covariant C> implements Cell<A, B, C>
 {
 	private static final long serialVersionUID = -1770703458034946695L;
 	
-	public final A	_1;
-	public final B	_2;
-	public final C	_3;
+	public final A _1;
+	public final B _2;
+	public final C _3;
 	
 	public static <A, B, C> Tuple3<A, B, C> apply(A _1, B _2, C _3)
 	{
@@ -65,7 +65,8 @@ public class Tuple3<@Covariant A, @Covariant B, @Covariant C> implements Cell<A,
 			return false;
 		}
 		Cell cell = (Cell) obj;
-		return Objects.equals(this._1, cell.getRow()) && Objects.equals(this._2, cell.getColumn()) && Objects.equals(this._3, cell.getValue());
+		return Objects.equals(this._1, cell.getRow()) && Objects.equals(this._2, cell.getColumn()) && Objects
+				.equals(this._3, cell.getValue());
 	}
 	
 	@Override

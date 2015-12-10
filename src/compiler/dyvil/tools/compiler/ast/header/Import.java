@@ -4,8 +4,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Import implements IImport
 {
-	protected ICodePosition	position;
-	protected IImport		parent;
+	protected ICodePosition position;
+	protected IImport       parent;
 	
 	public Import(ICodePosition position)
 	{

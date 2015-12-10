@@ -1,12 +1,11 @@
 package dyvil.collection.immutable;
 
-import java.util.Comparator;
-
-import dyvil.lang.literal.ArrayConvertible;
-
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.Set;
+import dyvil.lang.literal.ArrayConvertible;
+
+import java.util.Comparator;
 
 @ArrayConvertible
 public class TreeSet<E> extends MapBasedSet<E>

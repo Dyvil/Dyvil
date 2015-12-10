@@ -1,17 +1,16 @@
 package dyvil.collection.view;
 
-import java.util.Iterator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import dyvil.lang.Int;
-
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.Matrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.iterator.ImmutableIterator;
+import dyvil.lang.Int;
 import dyvil.tuple.Tuple2;
+
+import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class MatrixView<E> implements ImmutableMatrix<E>
 {

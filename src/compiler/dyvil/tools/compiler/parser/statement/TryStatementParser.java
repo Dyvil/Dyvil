@@ -13,14 +13,14 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class TryStatementParser extends Parser implements IValueConsumer
 {
-	private static final int	ACTION		= 1;
-	private static final int	CATCH		= 2;
-	private static final int	CATCH_OPEN	= 4;
-	private static final int	CATCH_VAR	= 16;
-	private static final int	CATCH_CLOSE	= 32;
+	private static final int ACTION      = 1;
+	private static final int CATCH       = 2;
+	private static final int CATCH_OPEN  = 4;
+	private static final int CATCH_VAR   = 16;
+	private static final int CATCH_CLOSE = 32;
 	
-	protected TryStatement	statement;
-	private CatchBlock		catchBlock;
+	protected TryStatement statement;
+	private   CatchBlock   catchBlock;
 	
 	public TryStatementParser(TryStatement statement)
 	{

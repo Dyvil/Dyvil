@@ -1,15 +1,13 @@
 package dyvil.tools.compiler.ast.operator;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.I18n;
@@ -17,10 +15,10 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class SwapOperator extends AbstractValue
+public class SwapOperator extends AbstractValue implements IStatement
 {
-	public FieldAccess	left;
-	public FieldAccess	right;
+	public FieldAccess left;
+	public FieldAccess right;
 	
 	public SwapOperator(FieldAccess left, FieldAccess right)
 	{
@@ -45,30 +43,6 @@ public class SwapOperator extends AbstractValue
 	public boolean isPrimitive()
 	{
 		return false;
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return true;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
 	}
 	
 	@Override
@@ -121,14 +95,7 @@ public class SwapOperator extends AbstractValue
 	{
 		return this;
 	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
-	{
-		this.writeStatement(writer);
-		writer.writeInsn(Opcodes.ACONST_NULL);
-	}
-	
+
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
@@ -137,25 +104,25 @@ public class SwapOperator extends AbstractValue
 		IDataMember leftField = this.left.getField();
 		IValue rightInstance = this.right.getInstance();
 		IDataMember rightField = this.right.getField();
-		
+
 		if (leftInstance != null)
 		{
 			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
 		leftField.writeGet(writer, null, lineNumber);
-		
+
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer, rightField.getTheClass().getType());
 		}
 		rightField.writeGet(writer, null, lineNumber);
-		
+
 		if (leftInstance != null)
 		{
 			leftInstance.writeExpression(writer, leftField.getTheClass().getType());
 		}
 		leftField.writeSet(writer, null, null, lineNumber);
-		
+
 		if (rightInstance != null)
 		{
 			rightInstance.writeExpression(writer, rightField.getTheClass().getType());

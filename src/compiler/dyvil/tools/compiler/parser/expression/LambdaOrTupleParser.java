@@ -4,9 +4,11 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.expression.TupleExpr;
+import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
@@ -17,19 +19,19 @@ import dyvil.tools.parsing.token.IToken;
 
 public class LambdaOrTupleParser extends EmulatorParser implements IParameterList
 {
-	protected static final int	START			= 1;
-	protected static final int	PARAMETERS		= 2;
-	protected static final int	PARAMETER_NAME	= 3;
-	protected static final int	SEPARATOR		= 4;
-	protected static final int	TUPLE			= 5;
-	protected static final int	TUPLE_END		= 6;
-	protected static final int	ARROW			= 7;
-	protected static final int	END				= 8;
+	protected static final int START          = 1;
+	protected static final int PARAMETERS     = 2;
+	protected static final int PARAMETER_NAME = 3;
+	protected static final int SEPARATOR      = 4;
+	protected static final int TUPLE          = 5;
+	protected static final int TUPLE_END      = 6;
+	protected static final int ARROW          = 7;
+	protected static final int END            = 8;
 	
 	protected IValueConsumer consumer;
 	
-	private IParameter[]	params;
-	private int				parameterCount;
+	private IParameter[] params;
+	private int          parameterCount;
 	
 	private IValue value;
 	
@@ -86,7 +88,9 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			this.mode = SEPARATOR;
-			this.addParameter(new MethodParameter(token.raw(), token.nameValue()));
+			final MethodParameter methodParameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
+			                                                            EmptyModifiers.INSTANCE);
+			this.addParameter(methodParameter);
 			return;
 		case SEPARATOR:
 			int type = token.type();

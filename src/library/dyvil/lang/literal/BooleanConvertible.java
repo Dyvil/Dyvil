@@ -9,17 +9,17 @@ package dyvil.lang.literal;
  * the below example.
  * <p>
  * Example:
- * 
+ * <p>
  * <pre>
  * {@literal @}BooleanConvertible
  * case class BooleanOption(boolean b)
- * 
+ *
  * // ----------
- * 
+ *
  * BooleanOption option1 = true
  * BooleanOption option2 = false
  * </pre>
- * 
+ *
  * @author Clashsoft
  */
 public @interface BooleanConvertible

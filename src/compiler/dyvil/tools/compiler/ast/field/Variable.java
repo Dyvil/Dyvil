@@ -26,8 +26,8 @@ import java.lang.annotation.ElementType;
 
 public final class Variable extends Member implements IVariable
 {
-	protected int		localIndex;
-	protected IValue	value;
+	protected int    localIndex;
+	protected IValue value;
 	
 	// Metadata
 	private IType refType;
@@ -90,7 +90,7 @@ public final class Variable extends Member implements IVariable
 		switch (type)
 		{
 		case "dyvil/annotation/_internal/lazy":
-			this.modifiers |= Modifiers.LAZY;
+			this.modifiers.addIntModifier(Modifiers.LAZY);
 			return false;
 		}
 		return true;
@@ -111,7 +111,7 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if ((this.modifiers & Modifiers.FINAL) != 0)
+		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
 			markers.add(I18n.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
@@ -174,12 +174,9 @@ public final class Variable extends Member implements IVariable
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
-		
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
-		}
-		
+
+		this.value = this.value.resolve(markers, context);
+
 		boolean inferType = false;
 		if (this.type == Types.UNKNOWN)
 		{
@@ -262,7 +259,8 @@ public final class Variable extends Member implements IVariable
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		IType type = this.refType != null ? this.refType : this.type;
-		writer.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+		writer.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start,
+		                  end);
 	}
 	
 	public void writeInit(MethodWriter writer) throws BytecodeException

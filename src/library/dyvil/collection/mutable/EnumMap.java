@@ -1,27 +1,26 @@
 package dyvil.collection.mutable;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-
-import dyvil.lang.Type;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ClassConvertible;
-import dyvil.lang.literal.TypeConvertible;
-
 import dyvil.annotation._internal.internal;
 import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
+import dyvil.lang.Type;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ClassConvertible;
+import dyvil.lang.literal.TypeConvertible;
 import dyvil.tuple.Tuple2;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 @ClassConvertible
 @TypeConvertible
 @ArrayConvertible
-public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implements MutableMap<K, V>
+public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 1734016065128722262L;
 	
@@ -40,7 +39,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V>implemen
 		return new EnumMap(entries);
 	}
 	
-	public @internal EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	public
+	@internal
+	EnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
 		super(type, keys, values, size);
 	}

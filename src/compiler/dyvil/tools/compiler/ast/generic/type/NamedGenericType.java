@@ -114,37 +114,70 @@ public class NamedGenericType extends GenericType
 			}
 		}
 
-		IType resolved = new NamedType(this.position, this.name, this.parent).resolveType(markers, context);
-		
-		IClass iclass = resolved.getTheClass();
-		if (iclass == null)
+		// resolveType0 is used to avoid Type Variable -> Default Value replacement done be replaceType
+		IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
+
+		if (!resolved.isResolved())
 		{
 			this.resolveTypeArguments(markers, context);
 			return this;
 		}
 
-		if (this.typeArgumentCount == 0)
+		this.resolveTypeArguments(markers, context);
+
+		IClass iClass = resolved.getTheClass();
+		ITypeVariable[] typeVariables;
+		IType concrete;
+
+		// Convert the non-generic class type to a generic one
+		if (!resolved.isGenericType())
 		{
-			return new ClassType(iclass);
+			resolved = iClass.getType();
+			typeVariables = iClass.getTypeVariables();
+
+			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
+		}
+		else
+		{
+			typeVariables = new ITypeVariable[this.typeArgumentCount];
+
+			// Create a concrete type and save Type Variables in the above array
+			concrete = resolved.getConcreteType(typeVar -> {
+				int index = typeVar.getIndex();
+
+				if (index >= this.typeArgumentCount)
+				{
+					return null;
+				}
+				typeVariables[index] = typeVar;
+				return this.typeArguments[index];
+			});
 		}
 
-		int varCount = iclass.genericCount();
-		if (varCount == 0)
+		// Check if the Type Variable Bounds accept the supplied Type Arguments
+		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			if (this.typeArgumentCount != 0)
+			ITypeVariable typeVariable = typeVariables[i];
+			IType type = this.typeArguments[i];
+			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
 			{
-				markers.add(I18n.createMarker(this.position, "generic.not_generic", this.name.qualified));
+				Marker marker = I18n.createMarker(type.getPosition(), "generic.type.incompatible",
+				                                  typeVariable.getName().qualified);
+				marker.addInfo(I18n.getString("generic.type", type));
+				marker.addInfo(I18n.getString("typevariable", typeVariable));
+				markers.add(marker);
 			}
-			return new ClassType(iclass);
 		}
-		if (varCount != this.typeArgumentCount)
-		{
-			markers.add(I18n.createMarker(this.position, "generic.count"));
-			return new ClassType(iclass);
-		}
-		
+
+		return concrete;
+	}
+	
+	@Override
+	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	{
 		/*
-		 * TODO Position handling if (position == TypePosition.CLASS) {
+		 * TODO Position handling
+		 * if (position == TypePosition.CLASS) {
 		 * markers.add(I18n.createMarker(this.position, "type.class.generic"));
 		 * } // If the position is a SUPER_TYPE position if (position ==
 		 * TypePosition.SUPER_TYPE || position ==
@@ -153,29 +186,8 @@ public class NamedGenericType extends GenericType
 		 * type arguments with a GENERIC_ARGUMENT // position position =
 		 * TypePosition.GENERIC_ARGUMENT; }
 		 */
-		
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			IType resolvedType = this.typeArguments[i].resolveType(markers, context);
-			
-			this.typeArguments[i] = resolvedType;
-			
-			ITypeVariable typeVariable = iclass.getTypeVariable(i);
-			if (!typeVariable.isAssignableFrom(resolvedType))
-			{
-				Marker marker = I18n.createMarker(resolvedType.getPosition(), "generic.type.incompatible",
-				                                  typeVariable.getName().qualified);
-				marker.addInfo(I18n.getString("generic.type", resolvedType));
-				marker.addInfo(I18n.getString("typevariable", typeVariable));
-				markers.add(marker);
-			}
-		}
-		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
-	}
-	
-	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
+
+		super.checkType(markers, context, position);
 	}
 	
 	@Override

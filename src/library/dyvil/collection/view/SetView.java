@@ -1,16 +1,16 @@
 package dyvil.collection.view;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.iterator.ImmutableIterator;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class SetView<E> implements ImmutableSet<E>
 {

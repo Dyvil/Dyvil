@@ -1,11 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -259,26 +258,6 @@ public class IfStatement extends AbstractValue
 	{
 		if (this.condition != null)
 		{
-			if (this.condition.valueTag() == BOOLEAN)
-			{
-				if (this.condition.booleanValue())
-				{
-					// Condition is true -> Return the action
-					return this.then.foldConstants();
-				}
-				else if (this.elseThen != null)
-				{
-					// Condition is false, else clause exists -> Return else
-					// clause
-					return this.elseThen.foldConstants();
-				}
-				else
-				{
-					// Condition is false, no else clause -> Return empty
-					// statement (VoidValue)
-					return new VoidValue(this.position);
-				}
-			}
 			this.condition = this.condition.foldConstants();
 		}
 		
@@ -298,6 +277,26 @@ public class IfStatement extends AbstractValue
 	{
 		if (this.condition != null)
 		{
+			if (this.condition.valueTag() == BOOLEAN)
+			{
+				if (this.condition.booleanValue())
+				{
+					// Condition is true -> Return the action
+					return this.then.cleanup(context, compilableList);
+				}
+				else if (this.elseThen != null)
+				{
+					// Condition is false, else clause exists -> Return else
+					// clause
+					return this.elseThen.cleanup(context, compilableList);
+				}
+				else
+				{
+					// Condition is false, no else clause -> Return default value
+					return this.commonType.getDefaultValue();
+				}
+			}
+
 			this.condition = this.condition.cleanup(context, compilableList);
 		}
 		
@@ -309,17 +308,19 @@ public class IfStatement extends AbstractValue
 		{
 			this.elseThen = this.elseThen.cleanup(context, compilableList);
 		}
-		
-		if (this.condition.valueTag() == BOOLEAN)
-		{
-			return this.condition.booleanValue() ? this.then : this.elseThen;
-		}
+
 		return this;
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (type == Types.VOID)
+		{
+			this.writeStatement(writer);
+			return;
+		}
+
 		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
 		Object commonFrameType = this.commonType.getFrameType();
@@ -354,13 +355,12 @@ public class IfStatement extends AbstractValue
 		
 		writer.writeTargetLabel(elseEnd);
 	}
-	
-	@Override
+
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		if (this.then == null)
 		{
-			this.condition.writeExpression(writer);
+			this.condition.writeExpression(writer, Types.BOOLEAN);
 			writer.writeInsn(Opcodes.POP);
 			return;
 		}
@@ -373,11 +373,11 @@ public class IfStatement extends AbstractValue
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
-			this.then.writeStatement(writer);
+			this.then.writeExpression(writer, Types.VOID);
 			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
 			writer.writeTargetLabel(elseStart);
 			// Else Block
-			this.elseThen.writeStatement(writer);
+			this.elseThen.writeExpression(writer, Types.VOID);
 			writer.writeTargetLabel(elseEnd);
 		}
 		else
@@ -385,7 +385,7 @@ public class IfStatement extends AbstractValue
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
-			this.then.writeStatement(writer);
+			this.then.writeExpression(writer, Types.VOID);
 			writer.writeTargetLabel(elseStart);
 		}
 	}

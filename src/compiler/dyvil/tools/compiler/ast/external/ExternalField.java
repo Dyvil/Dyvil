@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
@@ -11,13 +12,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalField extends Field
 {
-	private boolean	annotationsResolved;
-	private boolean	returnTypeResolved;
+	private boolean annotationsResolved;
+	private boolean returnTypeResolved;
 	
-	public ExternalField(IClass iclass, int access, Name name, IType type)
+	public ExternalField(IClass iclass, Name name, IType type, ModifierSet modifierSet)
 	{
-		super(iclass, name, type);
-		this.modifiers = access;
+		super(iclass, name, type, modifierSet);
 	}
 	
 	private void resolveAnnotations()

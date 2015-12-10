@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.type.TypeVariableListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
@@ -13,12 +14,15 @@ import dyvil.tools.parsing.token.IToken;
 
 public class TypeAliasParser extends Parser
 {
-	private static final int	TYPE	= 1;
-	private static final int	NAME	= 2;
-	private static final int	EQUAL	= 4;
+	private static final int END                 = -1;
+	private static final int TYPE                = 1;
+	private static final int NAME                = 2;
+	private static final int TYPE_PARAMETERS     = 4;
+	private static final int TYPE_PARAMETERS_END = 8;
+	private static final int EQUAL               = 16;
 	
-	protected ITypeAliasMap	map;
-	protected ITypeAlias	typeAlias;
+	protected ITypeAliasMap map;
+	protected ITypeAlias    typeAlias;
 	
 	public TypeAliasParser(ITypeAliasMap map)
 	{
@@ -36,43 +40,60 @@ public class TypeAliasParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
+		int type = token.type();
 		switch (this.mode)
 		{
-		case 0:
+		case END:
 			this.map.addTypeAlias(this.typeAlias);
 			pm.popParser(true);
 			return;
 		case TYPE:
 			this.mode = NAME;
-			this.typeAlias = new TypeAlias();
-			if (token.type() == DyvilKeywords.TYPE)
+
+			if (type != DyvilKeywords.TYPE)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "Invalid Type Alias - 'type' expected");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Type Alias - 'type' expected");
 			return;
 		case NAME:
-			if (ParserUtil.isIdentifier(token.type()))
+			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.typeAlias.setName(name);
-				this.mode = EQUAL;
+				this.typeAlias = new TypeAlias(name);
+				this.mode = TYPE_PARAMETERS;
 				return;
 			}
-			pm.skip();
+
 			pm.popParser();
 			pm.report(token, "Invalid Type Alias - Identifier expected");
 			return;
-		case EQUAL:
-			this.mode = 0;
-			pm.pushParser(pm.newTypeParser(this.typeAlias));
-			if (token.type() == BaseSymbols.EQUALS)
+		case TYPE_PARAMETERS:
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
+				this.typeAlias.setGeneric();
+				this.mode = TYPE_PARAMETERS_END;
+				pm.pushParser(new TypeVariableListParser(this.typeAlias));
 				return;
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Type Alias - '=' expected");
+			// Fallthrough
+		case EQUAL:
+			this.mode = END;
+			pm.pushParser(pm.newTypeParser(this.typeAlias));
+
+			if (type != BaseSymbols.EQUALS)
+			{
+				pm.reparse();
+				pm.report(token, "Invalid Type Alias - '=' expected");
+			}
+			return;
+		case TYPE_PARAMETERS_END:
+			this.mode = EQUAL;
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
+			{
+				pm.reparse();
+				pm.report(token, "Invalid Type Alias - ']' expected");
+			}
 			return;
 		}
 	}

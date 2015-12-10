@@ -1,12 +1,9 @@
 package dyvil.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import dyvil.string.CharUtils;
-
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class CharTests
 {
@@ -38,7 +35,8 @@ public class CharTests
 			char c = (char) i;
 			boolean b1 = CharUtils.isWhitespace(c);
 			boolean b2 = Character.isWhitespace(c);
-			assertTrue(c + " (" + Integer.toHexString(c) + ") " + (b2 ? "is" : "is not") + " a whitespace character", b1 == b2);
+			assertTrue(c + " (" + Integer.toHexString(c) + ") " + (b2 ? "is" : "is not") + " a whitespace character",
+			           b1 == b2);
 		}
 	}
 	

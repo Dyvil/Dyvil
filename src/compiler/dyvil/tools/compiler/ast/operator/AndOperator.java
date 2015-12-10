@@ -4,8 +4,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class AndOperator extends AbstractValue
 {
-	public IValue	left;
-	public IValue	right;
+	public IValue left;
+	public IValue right;
 	
 	public AndOperator(IValue left, IValue right)
 	{
@@ -50,7 +50,13 @@ public final class AndOperator extends AbstractValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.left.hasSideEffects() || this.right.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -122,7 +128,8 @@ public final class AndOperator extends AbstractValue
 	
 	private boolean bothTrue()
 	{
-		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN && this.right.booleanValue();
+		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN
+				&& this.right.booleanValue();
 	}
 	
 	@Override
@@ -140,7 +147,7 @@ public final class AndOperator extends AbstractValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		Label label = new Label();
 		Label label2 = new Label();
@@ -151,13 +158,15 @@ public final class AndOperator extends AbstractValue
 		writer.writeLabel(label);
 		writer.writeLDC(0);
 		writer.writeLabel(label2);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer, Types.BOOLEAN);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override

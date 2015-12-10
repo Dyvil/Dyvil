@@ -1,5 +1,10 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.*;
+import dyvil.collection.iterator.AppendIterator;
+import dyvil.collection.iterator.PrependIterator;
+import dyvil.collection.mutable.LinkedList;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -8,17 +13,12 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import dyvil.collection.*;
-import dyvil.collection.iterator.AppendIterator;
-import dyvil.collection.iterator.PrependIterator;
-import dyvil.collection.mutable.LinkedList;
-
 public class AppendList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = 2683270385507677394L;
 	
-	private transient ImmutableList<E>	head;
-	private transient E					tail;
+	private transient ImmutableList<E> head;
+	private transient E                tail;
 	
 	private transient int size;
 	

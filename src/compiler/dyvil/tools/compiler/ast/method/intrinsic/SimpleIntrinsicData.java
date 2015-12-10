@@ -10,8 +10,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class SimpleIntrinsicData implements IntrinsicData
 {
-	private final IMethod	method;
-	private final int[]		opcodes;
+	private final IMethod method;
+	private final int[]   opcodes;
 	
 	public SimpleIntrinsicData(IMethod method, int[] opcodes)
 	{
@@ -20,7 +20,8 @@ public class SimpleIntrinsicData implements IntrinsicData
 	}
 	
 	@Override
-	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		for (int insn : this.opcodes)
 		{
@@ -28,12 +29,13 @@ public class SimpleIntrinsicData implements IntrinsicData
 		}
 	}
 	
-	private void writeInsn(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber, int insn) throws BytecodeException
+	private void writeInsn(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber, int insn)
+			throws BytecodeException
 	{
 		if (insn < 0)
 		{
 			IntrinsicData.writeArgument(writer, this.method, ~insn, // = -insn+1
-					instance, arguments);
+			                            instance, arguments);
 			return;
 		}
 		
@@ -41,7 +43,8 @@ public class SimpleIntrinsicData implements IntrinsicData
 	}
 	
 	@Override
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		int count = this.opcodes.length - 1;
 		for (int i = 0; i < count; i++)
@@ -62,7 +65,8 @@ public class SimpleIntrinsicData implements IntrinsicData
 	}
 	
 	@Override
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		int count = this.opcodes.length - 1;
 		for (int i = 0; i < count; i++)

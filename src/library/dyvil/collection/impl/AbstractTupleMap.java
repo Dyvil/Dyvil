@@ -1,11 +1,5 @@
 package dyvil.collection.impl;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.tuple.Tuple2;
@@ -13,21 +7,38 @@ import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 {
 	private static final long serialVersionUID = 1636602530347500387L;
 	
 	protected static final int DEFAULT_CAPACITY = 10;
 	
-	protected transient int				size;
-	protected transient Tuple2<K, V>[]	entries;
+	protected transient int            size;
+	protected transient Tuple2<K, V>[] entries;
 	
 	protected AbstractTupleMap(int capacity)
 	{
-		this.entries = new Tuple2[capacity];
+		this.entries = (Tuple2<K, V>[]) new Tuple2[capacity];
+	}
+
+	@SafeVarargs
+	public AbstractTupleMap(Entry<K, V>... entries)
+	{
+		this(entries.length);
+		for (int i = 0; i < entries.length; i++)
+		{
+			this.entries[i] = entries[i].toTuple();
+		}
 	}
 	
-	public AbstractTupleMap(Tuple2<K, V>[] entries)
+	@SafeVarargs
+	public AbstractTupleMap(Tuple2<K, V>... entries)
 	{
 		this.size = entries.length;
 		this.entries = new Tuple2[this.size];

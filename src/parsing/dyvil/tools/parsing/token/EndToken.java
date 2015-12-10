@@ -5,9 +5,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class EndToken implements IToken
 {
-	private int		index;
-	private int		line;
-	private IToken	prev;
+	private int    index;
+	private int    line;
+	private IToken prev;
 	
 	public EndToken(int index, int line)
 	{

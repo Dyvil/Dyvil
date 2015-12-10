@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.classes;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.RetentionPolicy;
-import java.util.Set;
-
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -16,6 +12,10 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Set;
 
 public interface IClassMetadata
 {

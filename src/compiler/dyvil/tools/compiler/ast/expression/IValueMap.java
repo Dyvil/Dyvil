@@ -10,8 +10,8 @@ public interface IValueMap
 	
 	class KeyValuePair
 	{
-		public Name		key;
-		public IValue	value;
+		public Name   key;
+		public IValue value;
 		
 		public KeyValuePair(Name key, IValue value)
 		{

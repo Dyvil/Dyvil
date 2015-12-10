@@ -15,21 +15,23 @@ public class Main
 		AnnotationTest.main(args)
 		println "- Bridge Methods -"
 		BridgeTest.main(args)
-		println "- Capture Test -"
+		println "- Capture -"
 		CaptureTest.main(args)
-		println "- Extension Test -"
+		println "- Extensions -"
 		ExtensionTest.main(args)
-		println "- For Test -"
+		println "- For Statements -"
 		ForTest.main(args)
+		println "- Inc Operators -"
+		IncTest.main(args)
 		println "- Inheritance -"
 		InheritanceTest.main(args)
 		println "- Intrinsics -"
 		IntrinsicTest.main(args)
-		println "- Lambdas -"
+		println "- Lambda Expressions -"
 		LambdaTest.main(args)
-		println "- Match Test -"
+		println "- Match Expressions -"
 		MatchTest.main(args)
-		println "- Range Test -"
+		println "- Range Expressions -"
 		RangeTest.main(args)
 	}
 }

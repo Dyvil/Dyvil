@@ -1,11 +1,10 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -18,12 +17,16 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class IncludeDeclaration implements IASTNode
 {
 	private ICodePosition position;
 	
-	private Name[]	nameParts	= new Name[3];
-	private int		namePartCount;
+	private Name[] nameParts = new Name[3];
+	private int namePartCount;
 	
 	private IDyvilHeader header;
 	
@@ -84,7 +87,7 @@ public class IncludeDeclaration implements IASTNode
 		}
 	}
 	
-	public void resolve(MarkerList markers)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		Package pack = Package.rootPackage;
 		int count = this.namePartCount - 1;
@@ -99,16 +102,53 @@ public class IncludeDeclaration implements IASTNode
 		}
 		
 		this.header = pack.resolveHeader(this.nameParts[count].qualified);
+
+		if (markers == null)
+		{
+			return;
+		}
 		
 		if (this.header == null)
 		{
 			markers.add(I18n.createMarker(this.position, "resolve.header", this.nameParts[count]));
 			return;
 		}
-		
-		if (!this.header.isHeader())
+
+		// Check if the included Unit is a Header or has a Header Declaration
+		if (!this.getHeader().isHeader())
 		{
-			markers.add(I18n.createMarker(this.position, "include.unit"));
+			markers.add(I18n.createMarker(this.position, "include.unit", this.header.getName()));
+			return;
+		}
+
+		// Check if the Header has a Header Declaration
+		HeaderDeclaration headerDeclaration = this.header.getHeaderDeclaration();
+		if (headerDeclaration == null)
+		{
+			return;
+		}
+
+		// Header Access Check
+		int accessLevel = headerDeclaration.getModifiers().toFlags() & Modifiers.ACCESS_MODIFIERS;
+		if ((accessLevel & Modifiers.INTERNAL) != 0)
+		{
+			if (this.header instanceof ExternalHeader)
+			{
+				markers.add(I18n.createError(this.position, "include.internal", this.header.getName()));
+			}
+			accessLevel &= 0b1111;
+		}
+
+		if (accessLevel == Modifiers.PRIVATE)
+		{
+			markers.add(I18n.createError(this.position, "include.invisible", this.header.getName()));
+		}
+		if (accessLevel == Modifiers.PACKAGE || accessLevel == Modifiers.PROTECTED)
+		{
+			if (this.header.getPackage() != context.getHeader().getPackage())
+			{
+				markers.add(I18n.createError(this.position, "include.invisible", this.header.getName()));
+			}
 		}
 	}
 	

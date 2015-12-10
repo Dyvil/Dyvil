@@ -16,8 +16,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NullCheckOperator implements IValue
 {
-	private IValue	value;
-	private boolean	isNull;
+	private IValue  value;
+	private boolean isNull;
 	
 	public NullCheckOperator(IValue value, boolean isNull)
 	{
@@ -47,7 +47,13 @@ public final class NullCheckOperator implements IValue
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean hasSideEffects()
+	{
+		return this.value.hasSideEffects();
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -105,9 +111,9 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, Types.OBJECT);
 		Label label1 = new Label();
 		Label label2 = new Label();
 		
@@ -117,26 +123,28 @@ public final class NullCheckOperator implements IValue
 		writer.writeLabel(label1);
 		writer.writeLDC(1);
 		writer.writeLabel(label2);
-	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-		this.writeExpression(writer);
-		writer.writeInsn(Opcodes.IRETURN);
+
+		if (type == Types.VOID)
+		{
+			writer.writeInsn(Opcodes.IRETURN);
+		}
+		else if (type != null)
+		{
+			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+		}
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, Types.OBJECT);
 		writer.writeJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.value.writeExpression(writer);
+		this.value.writeExpression(writer, Types.OBJECT);
 		writer.writeJumpInsn(this.isNull ? Opcodes.IFNONNULL : Opcodes.IFNULL, dest);
 	}
 	

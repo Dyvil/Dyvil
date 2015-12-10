@@ -1,19 +1,18 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
+import dyvil.collection.immutable.ArraySet;
+import dyvil.collection.immutable.EmptySet;
+import dyvil.collection.immutable.SingletonSet;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.util.ImmutableException;
+
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
-import dyvil.annotation._internal.Covariant;
-import dyvil.collection.immutable.ArraySet;
-import dyvil.collection.immutable.EmptySet;
-import dyvil.collection.immutable.SingletonSet;
-import dyvil.util.ImmutableException;
 
 @NilConvertible
 @ArrayConvertible
@@ -27,27 +26,28 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	
 	static <E> ImmutableSet<E> apply()
 	{
-		return EmptySet.instance;
+		return EmptySet.apply();
 	}
 	
 	static <E> ImmutableSet<E> apply(E element)
 	{
-		return new SingletonSet(element);
+		return new SingletonSet<>(element);
 	}
 	
+	@SafeVarargs
 	static <E> ImmutableSet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet<>(elements, true);
 	}
 	
-	static <E> ImmutableSet<E> fromArray(E... elements)
+	static <E> ImmutableSet<E> fromArray(E[] elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet<>(elements);
 	}
 	
 	static <E> Builder<E> builder()
 	{
-		return new ArraySet.Builder();
+		return new ArraySet.Builder<>();
 	}
 	
 	// Accessors

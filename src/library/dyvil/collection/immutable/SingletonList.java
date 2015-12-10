@@ -1,5 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
+import dyvil.collection.MutableList;
+import dyvil.collection.iterator.SingletonIterator;
+import dyvil.lang.literal.TupleConvertible;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.Collections;
@@ -10,14 +17,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import dyvil.lang.literal.TupleConvertible;
-
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.List;
-import dyvil.collection.MutableList;
-import dyvil.collection.iterator.SingletonIterator;
 
 @TupleConvertible
 public class SingletonList<E> implements ImmutableList<E>

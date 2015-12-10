@@ -83,15 +83,10 @@ public class REPLResult implements IConstantValue
 	}
 	
 	@Override
-	public void writeExpression(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 	}
-	
-	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
-	{
-	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

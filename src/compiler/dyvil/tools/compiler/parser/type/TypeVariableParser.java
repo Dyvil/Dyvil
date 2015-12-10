@@ -15,16 +15,16 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class TypeVariableParser extends Parser implements ITyped
 {
-	public static final int	NAME			= 1;
-	public static final int	TYPE_VARIABLE	= 16;
+	public static final int NAME          = 1;
+	public static final int TYPE_VARIABLE = 16;
 	
-	public static final int	UPPER	= 1;
-	public static final int	LOWER	= 2;
+	public static final int UPPER = 1;
+	public static final int LOWER = 2;
 	
 	protected IGeneric generic;
 	
-	private byte			boundMode;
-	private ITypeVariable	variable;
+	private byte          boundMode;
+	private ITypeVariable variable;
 	
 	public TypeVariableParser(IGeneric typed)
 	{

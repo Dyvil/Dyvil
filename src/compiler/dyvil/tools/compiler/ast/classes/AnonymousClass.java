@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
@@ -11,8 +12,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class AnonymousClass extends CodeClass
 {
-	protected CaptureField[]	capturedFields;
-	protected int				capturedFieldCount;
+	protected CaptureField[] capturedFields;
+	protected int            capturedFieldCount;
 	
 	protected FieldThis thisField;
 	
@@ -23,6 +24,7 @@ public class AnonymousClass extends CodeClass
 		this.interfaces = new IType[1];
 		this.body = new ClassBody(this);
 		this.position = position;
+		this.modifiers = EmptyModifiers.INSTANCE;
 	}
 	
 	@Override

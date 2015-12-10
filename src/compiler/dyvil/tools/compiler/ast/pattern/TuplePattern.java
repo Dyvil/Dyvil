@@ -194,7 +194,8 @@ public final class TuplePattern extends Pattern implements IPatternList
 			buffer.append(' ');
 		}
 
-		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.getSeparator("tuple.separator", ','), buffer);
+		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.getSeparator("tuple.separator", ','),
+		                 buffer);
 
 		if (Formatting.getBoolean("tuple.close_paren.space_before"))
 		{

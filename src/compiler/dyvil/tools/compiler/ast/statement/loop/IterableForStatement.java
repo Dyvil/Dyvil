@@ -17,13 +17,13 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IterableForStatement extends ForEachStatement
 {
-	public static final ITypeVariable	ITERABLE_TYPE	= Types.ITERABLE.getTheClass().getTypeVariable(0);
-	public static final IClass			ITERATOR_CLASS	= Package.javaUtil.resolveClass("Iterator");
+	public static final ITypeVariable ITERABLE_TYPE  = Types.ITERABLE.getTheClass().getTypeVariable(0);
+	public static final IClass        ITERATOR_CLASS = Package.javaUtil.resolveClass("Iterator");
 	
 	public static final Name $iterator = Name.getQualified("$iterator");
 	
-	protected Variable	iteratorVar;
-	protected IMethod	boxMethod;
+	protected Variable iteratorVar;
+	protected IMethod  boxMethod;
 	
 	public IterableForStatement(ICodePosition position, Variable variable)
 	{
@@ -39,7 +39,8 @@ public class IterableForStatement extends ForEachStatement
 	{
 		super(position, variable);
 		
-		this.iteratorVar = new Variable($iterator, new ClassGenericType(ITERATOR_CLASS, new IType[] { elementType }, 1));
+		this.iteratorVar = new Variable($iterator,
+		                                new ClassGenericType(ITERATOR_CLASS, new IType[] { elementType }, 1));
 		
 		IType varType = variable.getType();
 		boolean primitive = varType.isPrimitive();
@@ -88,9 +89,10 @@ public class IterableForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 		
 		// Get the iterator
-		var.getValue().writeExpression(writer);
+		var.getValue().writeExpression(writer, null);
 		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;", true);
+		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;",
+		                       true);
 		
 		// Local Variables
 		int locals = writer.localCount();
@@ -126,7 +128,7 @@ public class IterableForStatement extends ForEachStatement
 		// Action
 		if (this.action != null)
 		{
-			this.action.writeStatement(writer);
+			this.action.writeExpression(writer, Types.VOID);
 		}
 		
 		writer.writeLabel(updateLabel);

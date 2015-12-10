@@ -10,7 +10,7 @@ import java.util.function.Predicate;
  * therefore representing both a {@link Stack} and a {@link Queue}.
  *
  * @param <E>
- *            the element type
+ * 		the element type
  */
 public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 {
@@ -24,7 +24,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	
 	/**
 	 * Returns the number of elements in this deque.
-	 * 
+	 *
 	 * @return ths number of elements in this deque.
 	 */
 	@Override
@@ -46,44 +46,44 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	
 	/**
 	 * Adds the given element to the front of this deque.
-	 * 
+	 *
 	 * @param e
-	 *            the element to add.
+	 * 		the element to add.
 	 */
 	void addFirst(E e);
 	
 	/**
 	 * Adds the given element to the end of this deque.
-	 * 
+	 *
 	 * @param e
-	 *            the element to add.
+	 * 		the element to add.
 	 */
 	void addLast(E e);
 	
 	/**
 	 * Removes and returns the first element in this deque.
-	 * 
+	 *
 	 * @return the first element in this deque.
 	 */
 	E removeFirst();
 	
 	/**
 	 * Removes and returns the last element in this deque.
-	 * 
+	 *
 	 * @return the last element in this deque.
 	 */
 	E removeLast();
 	
 	/**
 	 * Returns, but does not remove, the first element in this deque.
-	 * 
+	 *
 	 * @return the first element in this deque.
 	 */
 	E getFirst();
 	
 	/**
 	 * Returns, but does not remove, the last element in this deque.
-	 * 
+	 *
 	 * @return the last element in this deque.
 	 */
 	E getLast();
@@ -92,9 +92,10 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * Removes the first occurence of the given {@code element} from this deque
 	 * and returns {@code true} if the element was removed. If the element could
 	 * not be removed or was not found, {@code false} is returned.
-	 * 
+	 *
 	 * @param element
-	 *            the element to remove
+	 * 		the element to remove
+	 *
 	 * @return true, if the element was removed successfully
 	 */
 	boolean removeFirst(Object o);
@@ -103,9 +104,10 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 * Removes the last occurence of the given {@code element} from this deque
 	 * and returns {@code true} if the element was removed. If the element could
 	 * not be removed or was not found, {@code false} is returned.
-	 * 
+	 *
 	 * @param element
-	 *            the element to remove
+	 * 		the element to remove
+	 *
 	 * @return true, if the element was removed successfully
 	 */
 	boolean removeLast(Object o);
@@ -162,7 +164,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	/**
 	 * Returns a copy of this deque that contains the same elements as this
 	 * deque in the same order.
-	 * 
+	 *
 	 * @return a copy of this deque.
 	 */
 	@Override

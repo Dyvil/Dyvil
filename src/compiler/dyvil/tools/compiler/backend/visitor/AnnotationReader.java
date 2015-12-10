@@ -15,9 +15,9 @@ import dyvil.tools.parsing.Name;
 
 public class AnnotationReader implements AnnotationVisitor
 {
-	private IAnnotationConsumer	consumer;
-	private IAnnotation			annotation;
-	private ArgumentMap			arguments;
+	private IAnnotationConsumer consumer;
+	private IAnnotation         annotation;
+	private ArgumentMap         arguments;
 	
 	public AnnotationReader(IAnnotationConsumer consumer, IAnnotation annotation)
 	{

@@ -16,9 +16,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public class AnnotationParser extends Parser
 {
-	public static final int	NAME				= 1;
-	public static final int	PARAMETERS_START	= 2;
-	public static final int	PARAMETERS_END		= 4;
+	public static final int NAME             = 1;
+	public static final int PARAMETERS_START = 2;
+	public static final int PARAMETERS_END   = 4;
 	
 	private IAnnotation annotation;
 	

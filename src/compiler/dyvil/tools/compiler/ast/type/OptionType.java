@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -26,12 +22,16 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class OptionType implements IObjectType
 {
 	public static final class Types
 	{
-		public static final IClass			OPTION_CLASS	= Package.dyvilUtil.resolveClass("Option");
-		public static final ITypeVariable	OPTION_TYPE		= OPTION_CLASS.getTypeVariable(0);
+		public static final IClass        OPTION_CLASS = Package.dyvilUtil.resolveClass("Option");
+		public static final ITypeVariable OPTION_TYPE  = OPTION_CLASS.getTypeVariable(0);
 		
 		private Types()
 		{

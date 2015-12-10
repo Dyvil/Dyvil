@@ -1,19 +1,18 @@
 package dyvil.collection.mutable;
 
-import java.util.BitSet;
-import java.util.function.Function;
-import java.util.function.UnaryOperator;
-
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
+import dyvil.lang.literal.NilConvertible;
+
+import java.util.BitSet;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 @NilConvertible
-public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements MutableMatrix<E>
+public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
 {
 	private static final long serialVersionUID = -2034131178592900520L;
 	
@@ -215,7 +214,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements Mut
 		int oldRows = this.rows;
 		int cellIndex = this.columns * index;
 		this.resize(this.rows + 1, this.columns);
-		System.arraycopy(this.cells, cellIndex, this.cells, cellIndex + this.columns, oldRows * this.columns - cellIndex);
+		System.arraycopy(this.cells, cellIndex, this.cells, cellIndex + this.columns,
+		                 oldRows * this.columns - cellIndex);
 		row.toArray(cellIndex, this.cells);
 	}
 	
@@ -249,7 +249,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements Mut
 				System.arraycopy(this.cells, i * this.columns, newCells, i * newColumns, index);
 			}
 			newCells[i * newColumns + index] = column.get(i);
-			System.arraycopy(this.cells, i * this.columns + index, newCells, i * newColumns + index + 1, this.columns - index);
+			System.arraycopy(this.cells, i * this.columns + index, newCells, i * newColumns + index + 1,
+			                 this.columns - index);
 		}
 		this.columns = newColumns;
 		this.cells = newCells;
@@ -301,7 +302,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements Mut
 			{
 				System.arraycopy(this.cells, i * this.columns, newCells, i * newColumns, column);
 			}
-			System.arraycopy(this.cells, i * this.columns + column + 1, newCells, i * newColumns + column, this.columns - column - 1);
+			System.arraycopy(this.cells, i * this.columns + column + 1, newCells, i * newColumns + column,
+			                 this.columns - column - 1);
 		}
 		this.columns = newColumns;
 		this.cells = newCells;
@@ -349,7 +351,7 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E>implements Mut
 		cycle.set(0);
 		cycle.set(size);
 		
-		for (int i = 1; i < size;)
+		for (int i = 1; i < size; )
 		{
 			cycleBegin = i;
 			prev = i;

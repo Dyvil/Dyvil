@@ -15,9 +15,9 @@ public class SpecialIntrinsicData implements IntrinsicData
 {
 	private IMethod method;
 	
-	private int[]		instructions;
-	private String[]	strings;
-	private Label[]		targets;
+	private int[]    instructions;
+	private String[] strings;
+	private Label[]  targets;
 	
 	public SpecialIntrinsicData(IMethod method, int[] instructions, String[] strings, Label[] targets)
 	{
@@ -28,7 +28,8 @@ public class SpecialIntrinsicData implements IntrinsicData
 	}
 	
 	@Override
-	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		int[] ints = this.instructions;
 		int insn = 0;
@@ -99,14 +100,16 @@ public class SpecialIntrinsicData implements IntrinsicData
 	}
 	
 	@Override
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		this.writeIntrinsic(writer, instance, arguments, lineNumber);
 		writer.writeJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	@Override
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber) throws BytecodeException
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+			throws BytecodeException
 	{
 		this.writeIntrinsic(writer, instance, arguments, lineNumber);
 		writer.writeJumpInsn(Opcodes.IFEQ, dest);

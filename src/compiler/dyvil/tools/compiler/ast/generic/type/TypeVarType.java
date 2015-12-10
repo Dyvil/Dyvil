@@ -228,13 +228,14 @@ public class TypeVarType implements IRawType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typeVar.getName().qualified);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TypeArgument", "apply", "(Ljava/lang/String;)Ldyvil/reflect/types/TypeArgument;",
-				false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TypeArgument", "apply",
+		                       "(Ljava/lang/String;)Ldyvil/reflect/types/TypeArgument;", false);
 	}
 	
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
+		out.writeUTF(this.typeVar.getName().qualified);
 	}
 	
 	@Override

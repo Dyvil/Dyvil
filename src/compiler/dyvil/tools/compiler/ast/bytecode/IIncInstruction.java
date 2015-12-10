@@ -6,8 +6,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class IIncInstruction implements IInstruction
 {
-	private int	index;
-	private int	value;
+	private int index;
+	private int value;
 	
 	public IIncInstruction(int index, int value)
 	{

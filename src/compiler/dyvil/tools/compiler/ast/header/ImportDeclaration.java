@@ -1,9 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -18,14 +14,18 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public final class ImportDeclaration implements IASTNode, IObjectCompilable
 {
-	public static final int	IMPORT	= 0;
-	public static final int	USING	= 1;
+	public static final int IMPORT = 0;
+	public static final int USING  = 1;
 	
-	protected ICodePosition	position;
-	protected IImport		theImport;
-	protected boolean		isStatic;
+	protected ICodePosition position;
+	protected IImport       theImport;
+	protected boolean       isStatic;
 	
 	public ImportDeclaration(ICodePosition position)
 	{

@@ -10,10 +10,10 @@ public class DynamicLinker
 	{
 		private static final int MAX_DEPTH = 3;
 		
-		final Lookup		lookup;
-		final String		name;
-		final MethodHandle	fallback;
-		int					depth;
+		final Lookup       lookup;
+		final String       name;
+		final MethodHandle fallback;
+		int depth;
 		
 		InliningCacheCallSite(Lookup lookup, String name, MethodType type, MethodHandle fallback)
 		{
@@ -24,16 +24,18 @@ public class DynamicLinker
 		}
 	}
 	
-	private static final MethodHandle	CHECK_CLASS;
-	private static final MethodHandle	FALLBACK;
+	private static final MethodHandle CHECK_CLASS;
+	private static final MethodHandle FALLBACK;
 	
 	static
 	{
 		Lookup lookup = MethodHandles.lookup();
 		try
 		{
-			CHECK_CLASS = lookup.findStatic(DynamicLinker.class, "checkClass", MethodType.methodType(boolean.class, Class.class, Object.class));
-			FALLBACK = lookup.findStatic(DynamicLinker.class, "fallback", MethodType.methodType(Object.class, InliningCacheCallSite.class, Object[].class));
+			CHECK_CLASS = lookup.findStatic(DynamicLinker.class, "checkClass",
+			                                MethodType.methodType(boolean.class, Class.class, Object.class));
+			FALLBACK = lookup.findStatic(DynamicLinker.class, "fallback", MethodType
+					.methodType(Object.class, InliningCacheCallSite.class, Object[].class));
 		}
 		catch (ReflectiveOperationException e)
 		{
@@ -75,7 +77,8 @@ public class DynamicLinker
 		if (callSite.depth >= InliningCacheCallSite.MAX_DEPTH)
 		{
 			// revert to a vtable call
-			MethodHandle target = callSite.lookup.findVirtual(type.parameterType(0), callSite.name, type.dropParameterTypes(0, 1));
+			MethodHandle target = callSite.lookup
+					.findVirtual(type.parameterType(0), callSite.name, type.dropParameterTypes(0, 1));
 			callSite.setTarget(target);
 			return target.invokeWithArguments(args);
 		}

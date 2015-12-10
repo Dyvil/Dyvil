@@ -4,7 +4,7 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 
-public class StringValue implements Value
+public class StringValue implements Constant
 {
 	protected String value;
 	
@@ -28,7 +28,19 @@ public class StringValue implements Value
 	{
 		visitor.visitString(this.value);
 	}
-	
+
+	@Override
+	public Object toObject()
+	{
+		return this.value;
+	}
+
+	@Override
+	public void appendString(StringBuilder builder)
+	{
+		builder.append(this.value);
+	}
+
 	@Override
 	public String toString()
 	{

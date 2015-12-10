@@ -1,18 +1,18 @@
 package dyvil.tuple;
 
-import java.util.Objects;
-
 import dyvil.annotation._internal.ClassParameters;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.Entry;
+
+import java.util.Objects;
 
 @ClassParameters(names = { "_1", "_2" })
 public class Tuple2<@Covariant A, @Covariant B> implements Entry<A, B>
 {
 	private static final long serialVersionUID = -5140899078103651408L;
 	
-	public final A	_1;
-	public final B	_2;
+	public final A _1;
+	public final B _2;
 	
 	public static <A, B> Tuple2<A, B> apply(A _1, B _2)
 	{

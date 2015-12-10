@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.IClassCompilable;
@@ -22,9 +21,9 @@ import dyvil.tools.parsing.Name;
 
 public interface IContext
 {
-	byte	VISIBLE		= 0;
-	byte	INVISIBLE	= 1;
-	byte	INTERNAL	= 2;
+	byte VISIBLE   = 0;
+	byte INVISIBLE = 1;
+	byte INTERNAL  = 2;
 	
 	boolean isStatic();
 	
@@ -87,14 +86,8 @@ public interface IContext
 		{
 			return itype;
 		}
-		
-		IClass iclass = Types.LANG_HEADER.resolveClass(name);
-		if (iclass != null)
-		{
-			return new ClassType(iclass);
-		}
-		
-		return null;
+
+		return Types.LANG_HEADER.resolveType(name);
 	}
 	
 	static IConstructor resolveConstructor(IContext context, IArguments arguments)

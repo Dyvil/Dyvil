@@ -1,8 +1,12 @@
 package dyvil
 
+// Math Utilities
 using	dyvil.math.MathUtils._
+
+// Complex Numbers
 import	dyvil.math.Complex
 
+// BigInteger and BigDecimal and Dyvil-style apply methods
 import	java.math.{ BigInteger, BigDecimal }
 
 using	java.math.BigInteger.valueOf => apply

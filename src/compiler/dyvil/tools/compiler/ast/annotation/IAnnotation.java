@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.annotation;
 
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
@@ -13,6 +11,8 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.lang.annotation.ElementType;
 
 public interface IAnnotation extends IASTNode, ITyped, IObjectCompilable
 {

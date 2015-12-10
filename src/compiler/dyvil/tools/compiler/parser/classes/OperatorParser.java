@@ -12,23 +12,23 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class OperatorParser extends Parser
 {
-	private static final int	TYPE			= 1;
-	private static final int	OPERATOR		= 2;
-	private static final int	OPEN_BRACKET	= 4;
-	private static final int	PROPERTY		= 8;
-	private static final int	PRECEDENCE		= 16;
-	private static final int	ASSOCIATIVITY	= 32;
-	private static final int	COMMA			= 64;
+	private static final int TYPE          = 1;
+	private static final int OPERATOR      = 2;
+	private static final int OPEN_BRACKET  = 4;
+	private static final int PROPERTY      = 8;
+	private static final int PRECEDENCE    = 16;
+	private static final int ASSOCIATIVITY = 32;
+	private static final int COMMA         = 64;
 	
-	public static final Name	associativity	= Name.getQualified("associativity");
-	public static final Name	precedence		= Name.getQualified("precedence");
-	public static final Name	none			= Name.getQualified("none");
-	public static final Name	left			= Name.getQualified("left");
-	public static final Name	right			= Name.getQualified("right");
+	public static final Name associativity = Name.getQualified("associativity");
+	public static final Name precedence    = Name.getQualified("precedence");
+	public static final Name none          = Name.getQualified("none");
+	public static final Name left          = Name.getQualified("left");
+	public static final Name right         = Name.getQualified("right");
 	
-	protected IOperatorMap	map;
-	private int				type;
-	private Operator		operator;
+	protected IOperatorMap map;
+	private   int          type;
+	private   Operator     operator;
 	
 	public OperatorParser(IOperatorMap map, boolean typeParsed)
 	{

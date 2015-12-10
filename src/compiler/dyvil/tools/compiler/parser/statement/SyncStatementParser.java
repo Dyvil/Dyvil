@@ -11,10 +11,10 @@ import dyvil.tools.parsing.token.IToken;
 
 public class SyncStatementParser extends Parser implements IValueConsumer
 {
-	private static final int	END			= 0;
-	private static final int	LOCK		= 1;
-	private static final int	LOCK_END	= 2;
-	private static final int	ACTION		= 4;
+	private static final int END      = 0;
+	private static final int LOCK     = 1;
+	private static final int LOCK_END = 2;
+	private static final int ACTION   = 4;
 	
 	protected SyncStatement statement;
 	

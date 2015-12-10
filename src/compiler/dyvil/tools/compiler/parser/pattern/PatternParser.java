@@ -16,11 +16,11 @@ import dyvil.tools.parsing.token.IToken;
 
 public class PatternParser extends Parser
 {
-	private static final int	END				= 0;
-	private static final int	PATTERN			= 1;
-	private static final int	ARRAY_END		= 2;
-	private static final int	TUPLE_END		= 4;
-	private static final int	CASE_CLASS_END	= 8;
+	private static final int END            = 0;
+	private static final int PATTERN        = 1;
+	private static final int ARRAY_END      = 2;
+	private static final int TUPLE_END      = 4;
+	private static final int CASE_CLASS_END = 8;
 	
 	protected IPatternConsumer consumer;
 	

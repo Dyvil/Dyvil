@@ -10,7 +10,9 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @NilConvertible
-public final @object class None implements Option
+public final
+@object
+class None implements Option
 {
 	private static final long serialVersionUID = 1853796001996785317L;
 	

@@ -21,6 +21,9 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
@@ -40,7 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
 {
-	private static final String REPL$CLASSES = "repl$classes/";
+	private static final String REPL$CLASSES     = "repl$classes/";
+	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
 	
 	protected DyvilREPL repl;
 	protected String    currentCode;
@@ -185,7 +189,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		REPLMemberClass iclass = new REPLMemberClass(Name.getQualified(this.className), member, this);
 		member.setTheClass(iclass);
-		member.addModifier(Modifiers.STATIC);
+		member.getModifiers().addIntModifier(Modifiers.STATIC);
 		return iclass;
 	}
 	
@@ -206,8 +210,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void setValue(IValue value)
 	{
+		ModifierList modifierList = new ModifierList();
+		modifierList.addModifier(BaseModifiers.FINAL);
+
 		REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, value, this.className,
-		                                      Modifiers.FINAL);
+		                                      modifierList);
 		this.memberClass = this.getREPLClass(field);
 		
 		value.resolveTypes(this.markers, this);
@@ -225,10 +232,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		IType type = value.getType();
-		value = value.withType(type, type, this.markers, this);
-		if (value == null)
+		IValue typedValue = value.withType(type, type, this.markers, this);
+		if (typedValue != null)
 		{
-			throw new Error("Invalid Value - Invalid Type " + type);
+			value = typedValue;
 		}
 		
 		type = value.getType();
@@ -304,7 +311,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addInclude(IncludeDeclaration component)
 	{
-		component.resolve(this.markers);
+		component.resolve(this.markers, this);
 		
 		if (this.hasErrors())
 		{
@@ -319,12 +326,19 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
+		typeAlias.resolveTypes(this.markers, this);
 		typeAlias.resolve(this.markers, this);
+		typeAlias.checkTypes(this.markers, this);
+		typeAlias.check(this.markers, this);
+
 		if (this.hasErrors())
 		{
 			return;
 		}
-		
+
+		typeAlias.foldConstants();
+		typeAlias.cleanup(this, this);
+
 		super.addTypeAlias(typeAlias);
 		System.out.println(typeAlias);
 	}
@@ -457,6 +471,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	@Override
 	public void addMethod(IMethod method)
 	{
+		updateModifiers(method.getModifiers());
+
 		REPLMemberClass iclass = this.getREPLClass(method);
 		
 		method.resolveTypes(this.markers, this);
@@ -485,6 +501,15 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		this.registerMethod(method, iclass);
 		
 		this.cleanup();
+	}
+
+	public static void updateModifiers(ModifierSet modifiers)
+	{
+		if ((modifiers.toFlags() & ACCESS_MODIFIERS) == 0)
+		{
+			modifiers.addIntModifier(Modifiers.PUBLIC);
+		}
+		modifiers.addIntModifier(Modifiers.STATIC);
 	}
 	
 	private void registerMethod(IMethod method, REPLMemberClass iclass)

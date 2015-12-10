@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.config;
 
-import java.io.File;
-
 import dyvil.string.CharUtils;
+
+import java.io.File;
 
 public final class ConfigParser
 {
-	public static final int	KEY		= 1;
-	public static final int	EQUALS	= 2;
-	public static final int	VALUE	= 4;
-	public static final int	ARRAY	= 8;
+	public static final int KEY    = 1;
+	public static final int EQUALS = 2;
+	public static final int VALUE  = 4;
+	public static final int ARRAY  = 8;
 	
 	public static void parse(String source, CompilerConfig config)
 	{
@@ -23,7 +23,7 @@ public final class ConfigParser
 			{
 			case KEY:
 			{
-				for (; CharUtils.isWhitespace(source.charAt(i));)
+				for (; CharUtils.isWhitespace(source.charAt(i)); )
 				{
 					if (++i >= len)
 					{
@@ -31,7 +31,7 @@ public final class ConfigParser
 					}
 				}
 				int l = i;
-				for (char c; CharUtils.isLetter(c = source.charAt(i)) || c == '_';)
+				for (char c; CharUtils.isLetter(c = source.charAt(i)) || c == '_'; )
 				{
 					if (++i >= len)
 					{
@@ -43,7 +43,7 @@ public final class ConfigParser
 				continue;
 			}
 			case EQUALS:
-				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == '=';)
+				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == '='; )
 				{
 					if (++i >= len)
 					{
@@ -61,7 +61,7 @@ public final class ConfigParser
 					continue;
 				}
 				int l = i;
-				for (; !CharUtils.isWhitespace(source.charAt(i));)
+				for (; !CharUtils.isWhitespace(source.charAt(i)); )
 				{
 					if (++i >= len)
 					{
@@ -78,7 +78,7 @@ public final class ConfigParser
 				continue;
 			}
 			case ARRAY:
-				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == ',' || c == '[';)
+				for (char c; CharUtils.isWhitespace(c = source.charAt(i)) || c == ',' || c == '['; )
 				{
 					if (++i >= len)
 					{
@@ -91,7 +91,7 @@ public final class ConfigParser
 					continue;
 				}
 				int l = i;
-				for (char c; !CharUtils.isWhitespace(c = source.charAt(i)) && c != ',' && c != ']';)
+				for (char c; !CharUtils.isWhitespace(c = source.charAt(i)) && c != ',' && c != ']'; )
 				{
 					if (++i >= len)
 					{

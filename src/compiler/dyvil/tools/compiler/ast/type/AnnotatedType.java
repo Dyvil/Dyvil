@@ -1,10 +1,5 @@
 package dyvil.tools.compiler.ast.type;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.lang.annotation.ElementType;
-
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -28,10 +23,15 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.annotation.ElementType;
+
 public class AnnotatedType implements IType, ITyped
 {
-	private IType		type;
-	private IAnnotation	annotation;
+	private IType       type;
+	private IAnnotation annotation;
 	
 	public AnnotatedType(IAnnotation annotation)
 	{

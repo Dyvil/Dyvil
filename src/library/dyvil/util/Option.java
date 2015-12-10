@@ -1,20 +1,20 @@
 package dyvil.util;
 
+import dyvil.annotation._internal.sealed;
+import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.literal.TupleConvertible;
+
 import java.io.Serializable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
-
-import dyvil.annotation._internal.sealed;
-
 @NilConvertible
 @TupleConvertible
 public
-@sealed interface Option<T> extends Serializable
+@sealed
+interface Option<T> extends Serializable
 {
 	static <T> Option<T> of(T t)
 	{

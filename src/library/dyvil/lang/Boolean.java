@@ -1,14 +1,13 @@
 package dyvil.lang;
 
-import java.io.Serializable;
-
-import dyvil.lang.literal.BooleanConvertible;
-
-import dyvil.annotation.*;
+import dyvil.annotation.Intrinsic;
 import dyvil.annotation._internal.infix;
 import dyvil.annotation._internal.inline;
 import dyvil.annotation._internal.postfix;
 import dyvil.annotation._internal.prefix;
+import dyvil.lang.literal.BooleanConvertible;
+
+import java.io.Serializable;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -17,8 +16,8 @@ public class Boolean implements Comparable<Boolean>, Serializable
 {
 	private static final long serialVersionUID = -4115545030218876277L;
 	
-	protected static final Boolean	TRUE	= new Boolean(true);
-	protected static final Boolean	FALSE	= new Boolean(false);
+	protected static final Boolean TRUE  = new Boolean(true);
+	protected static final Boolean FALSE = new Boolean(false);
 	
 	protected boolean value;
 	
@@ -27,7 +26,9 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return value ? TRUE : FALSE;
 	}
 	
-	public static @infix boolean unapply(Boolean v)
+	public static
+	@infix
+	boolean unapply(Boolean v)
 	{
 		return v == null ? false : v.value;
 	}
@@ -95,7 +96,10 @@ public class Boolean implements Comparable<Boolean>, Serializable
 	
 	// Object methods
 	
-	public static @infix @inline String toString(boolean value)
+	public static
+	@infix
+	@inline
+	String toString(boolean value)
 	{
 		return value ? "true" : "false";
 	}
@@ -106,7 +110,9 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return this.value ? "true" : "false";
 	}
 	
-	public static @postfix int $hash$hash(boolean v)
+	public static
+	@postfix
+	int $hash$hash(boolean v)
 	{
 		return v ? 1231 : 1237;
 	}

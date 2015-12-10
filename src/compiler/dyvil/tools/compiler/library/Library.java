@@ -15,12 +15,12 @@ import java.nio.file.LinkOption;
 
 public abstract class Library
 {
-	public static final File	javaLibraryLocation;
-	public static final File	dyvilLibraryLocation;
+	public static final File javaLibraryLocation;
+	public static final File dyvilLibraryLocation;
 	
-	public static final Library	dyvilLibrary;
-	public static final Library	dyvilBinLibrary;
-	public static final Library	javaLibrary;
+	public static final Library dyvilLibrary;
+	public static final Library dyvilBinLibrary;
+	public static final Library javaLibrary;
 	
 	private static File getFileLocation(Class<?> klass)
 	{
@@ -87,11 +87,11 @@ public abstract class Library
 	
 	protected static final Map<String, String> env = ImmutableMap.apply("create", "true");
 	
-	protected static final String[]		emptyStrings		= {};
-	protected static final LinkOption[]	emptyLinkOptions	= {};
+	protected static final String[]     emptyStrings     = {};
+	protected static final LinkOption[] emptyLinkOptions = {};
 	
-	protected final File					file;
-	protected final Map<String, Package>	packages	= new HashMap();
+	protected final File file;
+	protected final Map<String, Package> packages = new HashMap();
 	
 	protected Library(File file)
 	{

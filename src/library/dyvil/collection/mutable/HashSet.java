@@ -1,28 +1,27 @@
 package dyvil.collection.mutable;
 
-import java.util.Objects;
-import java.util.function.Function;
-
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
-
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractHashSet;
+import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.math.MathUtils;
+
+import java.util.Objects;
+import java.util.function.Function;
 
 import static dyvil.collection.impl.AbstractHashMap.*;
 
 @NilConvertible
 @ArrayConvertible
-public class HashSet<E> extends AbstractHashSet<E>implements MutableSet<E>
+public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -993127062150101200L;
 	
-	private float			loadFactor;
-	private transient int	threshold;
+	private           float loadFactor;
+	private transient int   threshold;
 	
 	public static <E> HashSet<E> apply()
 	{
