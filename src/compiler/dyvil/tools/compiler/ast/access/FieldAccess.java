@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -184,6 +185,10 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			if (this.field.hasModifier(Modifiers.STATIC))
 			{
 				return new StaticFieldReference((IField) this.field);
+			}
+			else
+			{
+				return new InstanceFieldReference(this.receiver, (IField) this.field);
 			}
 		}
 		return null;
