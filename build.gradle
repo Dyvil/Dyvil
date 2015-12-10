@@ -9,12 +9,12 @@ apply plugin: 'application'
 
 group = 'dyvil-team'
 
-version = '0.11.0'
+version = '0.11.1'
 
-String libraryVersion = '0.11.0'
-String compilerVersion = '0.11.0'
-String replVersion = '0.6.1'
-String dpfVersion = '0.3.0'
+String libraryVersion = '0.11.1'
+String compilerVersion = '0.11.1'
+String replVersion = '0.6.2'
+String dpfVersion = '0.3.1'
 
 boolean nightly = false
 
@@ -307,6 +307,13 @@ task prepareRelease(type: Copy) {
 		include 'template.dyp'
 		rename 'template\\.dyp', "v${ version }.dyp"
 	}
+
+	println("Release v$version")
+	println()
+	println("Dyvil Library v$libraryVersion")
+	println("Dyvil Compiler v$compilerVersion")
+	println("Dyvil REPL v$replVersion")
+	println("Dyvil Property Format v$dpfVersion")
 	
 	filter {
 		it.replace('$$version$$', version)

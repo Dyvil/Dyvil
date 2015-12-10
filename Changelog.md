@@ -1,3 +1,42 @@
+Dyvil v0.11.1
+=============
+
+## Dyvil Library v0.11.1
+
+- Added comments to the `dyvil.Collections` and `dyvil.Math` headers.
+- Added the `dyvil.tools.parsing.position.CodePosition.toString()` implementation.
+- Updated the `dyvil.JavaUtils` header to add type aliases for common Java Collection classes.
+- Fixed the `AbstractHashSet.ensureCapacity()` method creating an infinite loop.
+- Semantically cleaned up the Collection Interfaces by getting rid of various unchecked warnings.
+- Renamed `List.fromNil`, `Set.fromNil`, `Collection.fromNil` and `Map.fromNil` to `.empty`.
+
+## Dyvil Compiler v0.11.1
+
+- Invalid Field Assignments are no longer reported as unresolvable if the receiver cannot be resolved.
+- Fixed generic Type Aliases with multiple Type Variables being expanded incorrectly.
+- Fixed If Expressions without an Else clause being compiled incorrectly.
+- Fixed Increment and Decrement Operators not checking if the field is final.
+- Fixed Compound Operators acting like postfix instead of prefix Increment / Decrement operators.
+- Fixed the `StatementList.isResolved()` method returning false for empty Statement Lists.
+- Fixed Return Statements generating invalid bytecode when used as Expressions.
+- Fixed Dyvil-specific Modifiers on Methods not being compiled to their respective annotations.
+- Fixed the `WildcardValue.toString()` implementation returning `...` instead of `_`.
+- Renamed `IMethod.getExceptions()` to `.getInternalExceptions()`.
+
+## Dyvil REPL v0.6.2
+
+- Fixed REPL method and field access causing JVM errors in some cases.
+- Fixed REPL Exception Stack Trace Filtering working incorrectly in certain situations when an `ExceptionInInitializerError` is thrown.
+
+## Dyvil Property Format v0.3.1
+
+- Made most of the AST Node Classes `Expandable` to integrate more smoothly with FlatMap conversion.
+- Boolean Values supplied to the `DyvilValueVisitor` are now automatically converted to `dyvil.lang.Boolean` instances.
+- Properties and Qualified Nodes / Node Accesses are now stored in separate lists in Nodes.
+- Added `converter.NameAccess.toString()` implementation.
+- Added `converter.StringInterpolation.toString()` implementation.
+- Fixed `FlatMapConverter` working incorrectly for nested and qualified nodes.
+
 Dyvil v0.11.0
 =============
 
