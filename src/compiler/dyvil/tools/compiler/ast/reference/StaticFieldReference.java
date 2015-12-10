@@ -71,7 +71,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	{
 		if (this.fieldName != null)
 		{
-			return fieldName;
+			return this.fieldName;
 		}
 
 		return this.fieldName = this.field.getName().qualified;
@@ -140,14 +140,14 @@ public class StaticFieldReference implements IReference, IClassCompilable
 			return;
 		}
 
-		String fieldName = this.getFieldName();
-		String fieldOriginClassName = this.getFieldOriginClassName();
+		final String fieldName = this.getFieldName();
+		final String fieldOriginClassName = this.getFieldOriginClassName();
 		
-		String refFieldName = this.getRefFieldName();
-		String refFieldType = this.getRefFieldType();
+		final String refFieldName = this.getRefFieldName();
+		final String refFieldType = this.getRefFieldType();
 
-		String factoryMethodName = Types.getAccessFactoryName(this.field.getType(), true);
-		String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
+		final String factoryMethodName = Types.getAccessFactoryName(this.field.getType(), true);
+		final String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
 
 		// Load the field class
 		writer.writeLDC(Type.getObjectType(fieldOriginClassName));
