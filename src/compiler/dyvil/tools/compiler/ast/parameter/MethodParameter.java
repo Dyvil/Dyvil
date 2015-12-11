@@ -87,7 +87,7 @@ public final class MethodParameter extends Parameter
 	}
 	
 	@Override
-	public boolean isCapturable()
+	public boolean isReferenceCapturable()
 	{
 		return this.refType != null;
 	}

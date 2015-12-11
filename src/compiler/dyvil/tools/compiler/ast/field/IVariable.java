@@ -21,7 +21,7 @@ public interface IVariable extends IDataMember
 	
 	void setLocalIndex(int index);
 	
-	default boolean isCapturable()
+	default boolean isReferenceCapturable()
 	{
 		return false;
 	}
