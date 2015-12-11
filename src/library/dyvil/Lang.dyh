@@ -31,6 +31,10 @@ using	dyvil.lang.Predef._
 prefix	operator print		{ precedence 1 }
 prefix	operator println	{ precedence 1 }
 
+// Assert Operator
+prefix	operator assert		{ precedence 1 }
+
+// Postfix Operators
 postfix	operator ++
 postfix	operator --
 

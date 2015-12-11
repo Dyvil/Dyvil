@@ -127,6 +127,12 @@ public final class Predef
 	}
 	
 	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
+
+	// Assertions
+
+	public static void assert(boolean condition) = if (!condition) throw new AssertionError()
+
+	public static void assert(boolean condition, => any message) = if (!condition) throw new AssertionError(message)
 	
 	// Print
 	
