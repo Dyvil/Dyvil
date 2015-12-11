@@ -114,11 +114,10 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	{
 		this.value.check(markers, context);
 		
-		IType type = this.value.getType();
-		if (Types.THROWABLE.isSuperTypeOf(type) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context
-				.handleException(this.value.getType()))
+		IType exceptionType = this.value.getType();
+		if (IContext.isUnhandled(context, exceptionType))
 		{
-			markers.add(I18n.createMarker(this.value.getPosition(), "method.access.exception", type.toString()));
+			markers.add(I18n.createMarker(this.value.getPosition(), "exception.unhandled", exceptionType.toString()));
 		}
 	}
 	

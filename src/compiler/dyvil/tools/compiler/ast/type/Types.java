@@ -50,6 +50,7 @@ public final class Types
 	public static final ClassType STRING            = new ClassType();
 	public static final ClassType ITERABLE          = new ClassType();
 	public static final ClassType THROWABLE         = new ClassType();
+	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
 	public static final ClassType IMMUTABLE         = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
@@ -69,6 +70,7 @@ public final class Types
 	public static IClass NULL_CLASS;
 	public static IClass ITERABLE_CLASS;
 	public static IClass THROWABLE_CLASS;
+	public static IClass EXCEPTION_CLASS;
 	public static IClass RUNTIME_EXCEPTION_CLASS;
 	public static IClass IMMUTABLE_CLASS;
 	public static IClass SERIALIZABLE_CLASS;
@@ -122,6 +124,7 @@ public final class Types
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		ITERABLE.theClass = ITERABLE_CLASS = Package.javaLang.resolveClass("Iterable");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
+		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
 		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
 		SERIALIZABLE.theClass = SERIALIZABLE_CLASS = Package.javaIO.resolveClass("Serializable");

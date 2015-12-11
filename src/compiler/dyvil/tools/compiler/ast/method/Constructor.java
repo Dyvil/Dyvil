@@ -130,7 +130,7 @@ public class Constructor extends Member implements IConstructor
 		int index = this.parameterCount++;
 		if (index >= this.parameters.length)
 		{
-			MethodParameter[] temp = new MethodParameter[this.parameterCount];
+			IParameter[] temp = new IParameter[this.parameterCount];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
@@ -366,11 +366,13 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			IType t = this.exceptions[i];
-			if (!Types.THROWABLE.isSuperTypeOf(t))
+			IType exceptionType = this.exceptions[i];
+			exceptionType.check(markers, context);
+
+			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
 			{
-				Marker marker = I18n.createMarker(t.getPosition(), "method.exception.type");
-				marker.addInfo(I18n.getString("exception.type", t));
+				Marker marker = I18n.createMarker(exceptionType.getPosition(), "method.exception.type");
+				marker.addInfo(I18n.getString("exception.type", exceptionType));
 				markers.add(marker);
 			}
 		}
@@ -691,10 +693,10 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			IType type = this.exceptions[i];
-			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
+			IType exceptionType = this.exceptions[i];
+			if (IContext.isUnhandled(context, exceptionType))
 			{
-				markers.add(I18n.createMarker(position, "method.access.exception", type.toString()));
+				markers.add(I18n.createMarker(position, "exception.unhandled", exceptionType.toString()));
 			}
 		}
 	}

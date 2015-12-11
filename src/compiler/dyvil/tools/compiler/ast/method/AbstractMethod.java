@@ -866,10 +866,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			IType type = this.exceptions[i];
-			if (!Types.RUNTIME_EXCEPTION.isSuperTypeOf(type) && !context.handleException(type))
+			IType exceptionType = this.exceptions[i];
+			if (IContext.isUnhandled(context, exceptionType))
 			{
-				markers.add(I18n.createMarker(position, "method.access.exception", type.toString()));
+				markers.add(I18n.createMarker(position, "exception.unhandled", exceptionType.toString()));
 			}
 		}
 	}

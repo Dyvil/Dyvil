@@ -114,4 +114,10 @@ public interface IContext
 		
 		return context.getHeader().getVisibility(member);
 	}
+
+	static boolean isUnhandled(IContext context, IType exceptionType)
+	{
+		return Types.EXCEPTION.isSuperTypeOf(exceptionType) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(exceptionType)
+				&& !context.handleException(exceptionType);
+	}
 }

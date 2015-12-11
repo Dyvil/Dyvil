@@ -202,13 +202,13 @@ public class CodeMethod extends AbstractMethod
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			IType t = this.exceptions[i];
-			t.check(markers, this);
+			IType exceptionType = this.exceptions[i];
+			exceptionType.check(markers, this);
 			
-			if (!Types.THROWABLE.isSuperTypeOf(t))
+			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
 			{
-				Marker marker = I18n.createMarker(t.getPosition(), "method.exception.type");
-				marker.addInfo(I18n.getString("exception.type", t));
+				Marker marker = I18n.createMarker(exceptionType.getPosition(), "method.exception.type");
+				marker.addInfo(I18n.getString("exception.type", exceptionType));
 				markers.add(marker);
 			}
 		}
