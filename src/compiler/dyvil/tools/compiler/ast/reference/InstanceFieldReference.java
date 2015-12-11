@@ -1,14 +1,17 @@
 package dyvil.tools.compiler.ast.reference;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -23,9 +26,18 @@ public class InstanceFieldReference implements IReference
 		this.field = field;
 	}
 
+	public static void checkFinalAccess(IDataMember field, ICodePosition position, MarkerList markers)
+	{
+		if (field.hasModifier(Modifiers.FINAL))
+		{
+			markers.add(I18n.createError(position, "reference.field.final", field.getName()));
+		}
+	}
+
 	@Override
 	public void check(ICodePosition position, MarkerList markers)
 	{
+		checkFinalAccess(this.field, position, markers);
 	}
 
 	@Override

@@ -53,8 +53,10 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	public void check(ICodePosition position, MarkerList markers)
 	{
 		map.clear();
+
+		InstanceFieldReference.checkFinalAccess(field, position, markers);
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
