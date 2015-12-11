@@ -1,0 +1,30 @@
+package dyvil.test
+
+public class ReferenceTest
+{
+	static void inc(var int i) { i = i + 1 }
+
+	static int staticField = 0
+
+	static class Holder
+	{
+		public int instanceField = 0
+	}
+
+	public static void main([String] args)
+	{
+		inc staticField
+		println "Static: expected: 1 - actual: " + staticField
+
+		Holder holder = new Holder
+		inc holder.instanceField
+		println "Instance: expected: 1 - actual: " + holder.instanceField
+
+		int variable = 0
+		inc variable
+		println "Variable: expected: 1 - actual: " + variable
+
+		repeat(3) { inc variable }
+		println "Variable (captured): expected: 4 - actual: " + variable
+	}
+}
