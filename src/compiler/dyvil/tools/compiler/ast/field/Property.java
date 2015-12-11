@@ -94,7 +94,7 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public boolean isField()
 	{
-		return true;
+		return false;
 	}
 	
 	@Override

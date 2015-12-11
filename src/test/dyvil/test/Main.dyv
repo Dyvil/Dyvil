@@ -33,5 +33,7 @@ public class Main
 		MatchTest.main(args)
 		println "- Range Expressions -"
 		RangeTest.main(args)
+		println "- Reference Parameters -"
+		ReferenceTest.main(args)
 	}
 }

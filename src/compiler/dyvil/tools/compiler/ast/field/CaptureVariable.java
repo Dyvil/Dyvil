@@ -164,7 +164,7 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public boolean isCapturable()
+	public boolean isReferenceCapturable()
 	{
 		return true;
 	}
@@ -178,9 +178,9 @@ public class CaptureVariable implements IVariable
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if (!this.variable.isCapturable())
+		if (!this.variable.isReferenceCapturable())
 		{
-			markers.add(I18n.createMarker(position, "capture.variable", this.variable.getName()));
+			markers.add(I18n.createMarker(position, "variable.capture", this.variable.getName()));
 		}
 		else
 		{

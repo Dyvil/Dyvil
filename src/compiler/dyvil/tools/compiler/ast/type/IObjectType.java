@@ -40,13 +40,13 @@ public interface IObjectType extends IType
 	@Override
 	default IType getSimpleRefType()
 	{
-		return Types.getSimpleRef(this);
+		return Types.getObjectSimpleRef(this);
 	}
 	
 	@Override
 	default ReferenceType getRefType()
 	{
-		return Types.getRef(this);
+		return Types.getObjectRef(this);
 	}
 	
 	@Override

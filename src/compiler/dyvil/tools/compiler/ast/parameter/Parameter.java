@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -293,7 +292,7 @@ public abstract class Parameter extends Member implements IParameter
 			}
 		}
 
-		ModifierUtil.writeParameterModifier(this.modifiers.toFlags(), buffer);
+		this.modifiers.toString(buffer);
 		
 		if (this.varargs)
 		{

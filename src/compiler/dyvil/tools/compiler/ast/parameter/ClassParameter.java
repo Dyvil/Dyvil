@@ -67,7 +67,7 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public boolean isCapturable()
+	public boolean isReferenceCapturable()
 	{
 		return false;
 	}

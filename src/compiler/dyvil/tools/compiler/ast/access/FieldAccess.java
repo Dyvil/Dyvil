@@ -7,10 +7,16 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
+import dyvil.tools.compiler.ast.reference.StaticFieldReference;
+import dyvil.tools.compiler.ast.reference.IReference;
+import dyvil.tools.compiler.ast.reference.VariableReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -169,8 +175,30 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			return 0;
 		}
-		
+
 		return type.getSubTypeDistance(this.getType());
+	}
+
+	@Override
+	public IReference toReference()
+	{
+		if (this.field.isField())
+		{
+			if (this.field.hasModifier(Modifiers.STATIC))
+			{
+				return new StaticFieldReference((IField) this.field);
+			}
+			else
+			{
+				return new InstanceFieldReference(this.receiver, (IField) this.field);
+			}
+		}
+		if (this.field.isVariable() && this.field instanceof IVariable)
+		{
+			// We have to pass the actual FieldAccess here because variable access are sometimes replaced with captures
+			return new VariableReference(this);
+		}
+		return null;
 	}
 
 	@Override

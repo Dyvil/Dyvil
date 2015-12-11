@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -22,6 +23,8 @@ import java.lang.annotation.ElementType;
 public final class MethodParameter extends Parameter
 {
 	protected ICallableMember method;
+	
+	protected ReferenceType refType;
 	
 	public MethodParameter()
 	{
@@ -78,6 +81,24 @@ public final class MethodParameter extends Parameter
 	}
 
 	@Override
+	public IType getActualType()
+	{
+		return this.refType != null ? this.refType : this.type;
+	}
+	
+	@Override
+	public boolean isReferenceCapturable()
+	{
+		return this.refType != null;
+	}
+	
+	@Override
+	public boolean isReferenceType()
+	{
+		return this.refType != null;
+	}
+	
+	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return instance;
@@ -105,6 +126,17 @@ public final class MethodParameter extends Parameter
 		}
 		
 		return newValue;
+	}
+	
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		super.resolveTypes(markers, context);
+		
+		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.VAR))
+		{
+			this.refType = this.type.getRefType();
+		}
 	}
 	
 	@Override
@@ -154,7 +186,7 @@ public final class MethodParameter extends Parameter
 	public void write(MethodWriter writer)
 	{
 		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.type, 0);
+		writer.registerParameter(this.localIndex, this.name.qualified, this.getActualType(), 0);
 		
 		if (this.modifiers.hasIntModifier(Modifiers.VAR))
 		{
@@ -167,12 +199,24 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
 	{
+		if (this.refType != null)
+		{
+			this.refType.writeGet(writer, this.localIndex);
+			return;
+		}
+		
 		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 	
 	@Override
 	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
 	{
+		if (this.refType != null)
+		{
+			this.refType.writeSet(writer, this.localIndex, value);
+			return;
+		}
+		
 		if (value != null)
 		{
 			value.writeExpression(writer, this.type);

@@ -133,7 +133,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public boolean isCapturable()
+	public boolean isReferenceCapturable()
 	{
 		return true;
 	}

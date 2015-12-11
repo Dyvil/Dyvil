@@ -197,7 +197,7 @@ public final class Types
 		return OBJECT_ARRAY_CLASS;
 	}
 	
-	protected static ReferenceType getRef(IType type)
+	public static ReferenceType getObjectRef(IType type)
 	{
 		if (OBJECT_REF_CLASS == null)
 		{
@@ -207,24 +207,48 @@ public final class Types
 		return new ReferenceType(OBJECT_REF_CLASS, type);
 	}
 	
-	protected static IType getSimpleRef(IType type)
+	protected static IType getObjectSimpleRef(IType type)
 	{
 		if (OBJECT_SIMPLE_REF_CLASS == null)
 		{
 			OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
 		}
-		
+
 		ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
 		gt.addType(type);
 		return gt;
 	}
-	
+
+	public static String getTypeRefKeyword(IType type)
+	{
+		if (type.isPrimitive())
+		{
+			return type.getTheClass().getName().qualified;
+		}
+		return "Object";
+	}
+
+	public static String getInternalRef(IType type, String prefix)
+	{
+		return "dyvil/lang/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
+	}
+
+	public static String getAccessFactoryName(IType type, boolean isStatic)
+	{
+		return (isStatic ? "newStatic" : "new") + getTypeRefKeyword(type) + "Ref";
+	}
+
 	public static IType combine(IType type1, IType type2)
 	{
 		if (type1.isSameType(type2))
 		{
 			return type1;
 		}
+		return type1;
+	}
+
+	public static IType findCommonSuperType(IType type1, IType type2)
+	{
 		if (type1 == Types.VOID || type2 == Types.VOID)
 		{
 			return Types.VOID;
