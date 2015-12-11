@@ -195,7 +195,8 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		if (this.field.isVariable() && this.field instanceof IVariable)
 		{
-			return new VariableReference((IVariable) this.field);
+			// We have to pass the actual FieldAccess here because variable access are sometimes replaced with captures
+			return new VariableReference(this);
 		}
 		return null;
 	}
