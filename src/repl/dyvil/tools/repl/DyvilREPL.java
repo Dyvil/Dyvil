@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class DyvilREPL
+public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
 	
@@ -231,15 +231,23 @@ public class DyvilREPL
 	private static synchronized void loop()
 	{
 		System.out.print("> ");
+		String currentCode;
 		
 		try
 		{
-			String currentCode = readLine();
+			currentCode = readLine();
 			if (currentCode == null)
 			{
 				return;
 			}
+		}
+		catch (IOException ignored)
+		{
+			return;
+		}
 
+		try
+		{
 			String trim = currentCode.trim();
 			if (trim.length() > 1 && trim.charAt(0) == ':' && trim.charAt(1) != ':')
 			{
