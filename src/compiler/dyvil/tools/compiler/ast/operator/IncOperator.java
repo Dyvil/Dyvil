@@ -105,6 +105,8 @@ public class IncOperator extends AbstractValue
 		{
 			this.receiver.checkTypes(markers, context);
 		}
+		this.field = this.field.capture(context);
+		this.field.checkAssign(markers, context, this.position, null, this);
 	}
 
 	@Override
@@ -250,6 +252,11 @@ public class IncOperator extends AbstractValue
 		}
 		if (this.field.isVariable())
 		{
+			if (((IVariable) this.field).isReferenceType())
+			{
+				return false;
+			}
+			
 			switch (typecode)
 			{
 			case PrimitiveType.BYTE_CODE:

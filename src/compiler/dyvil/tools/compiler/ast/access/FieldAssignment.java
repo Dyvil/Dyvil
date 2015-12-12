@@ -79,7 +79,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.field == null ? false : this.field.getType().isPrimitive();
+		return this.field != null && this.field.getType().isPrimitive();
 	}
 	
 	@Override
@@ -217,7 +217,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			IValue value = this.resolveField(markers, context);
+			IValue value = this.resolveField(context);
 			if (value != null)
 			{
 				return value;
@@ -235,7 +235,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			{
 				return value;
 			}
-			value = this.resolveField(markers, context);
+			value = this.resolveField(context);
 			if (value != null)
 			{
 				return value;
@@ -245,7 +245,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		return null;
 	}
 	
-	private IValue resolveField(MarkerList markers, IContext context)
+	private IValue resolveField(IContext context)
 	{
 		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
 		if (field != null)
