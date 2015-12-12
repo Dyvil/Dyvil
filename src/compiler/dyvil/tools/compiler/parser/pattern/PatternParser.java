@@ -18,7 +18,7 @@ public class PatternParser extends Parser
 {
 	private static final int END            = 0;
 	private static final int PATTERN        = 1;
-	private static final int ARRAY_END      = 2;
+	private static final int NEGATIVE_NUMBER = 2;
 	private static final int TUPLE_END      = 4;
 	private static final int CASE_CLASS_END = 8;
 	
@@ -36,7 +36,7 @@ public class PatternParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		int type = token.type();
-		if (this.mode == END || type == BaseSymbols.COLON)
+		if (this.mode == END)
 		{
 			if (type == DyvilKeywords.AS)
 			{
@@ -59,34 +59,13 @@ public class PatternParser extends Parser
 		case PATTERN:
 			if (ParserUtil.isIdentifier(type))
 			{
-				IToken next = token.next();
 				if (token.nameValue() == Names.minus)
 				{
-					switch (next.type())
-					{
-					case Tokens.INT:
-						pm.skip();
-						this.pattern = new IntPattern(token.to(next), -next.intValue());
-						this.mode = END;
-						return;
-					case Tokens.LONG:
-						pm.skip();
-						this.pattern = new LongPattern(token.to(next), -next.intValue());
-						this.mode = END;
-						return;
-					case Tokens.FLOAT:
-						pm.skip();
-						this.pattern = new FloatPattern(token.to(next), -next.intValue());
-						this.mode = END;
-						return;
-					case Tokens.DOUBLE:
-						pm.skip();
-						this.pattern = new DoublePattern(token.to(next), -next.intValue());
-						this.mode = END;
-						return;
-					}
+					this.mode = NEGATIVE_NUMBER;
+					return;
 				}
-				
+
+				final IToken next = token.next();
 				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
 					CaseClassPattern ccp = new CaseClassPattern(token.raw());
@@ -106,19 +85,13 @@ public class PatternParser extends Parser
 				IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
 				{
-					BindingPattern bp = new BindingPattern(next.raw(), next.nameValue());
-					this.pattern = bp;
+					this.pattern = new BindingPattern(next.raw(), next.nameValue());
 					this.mode = END;
 					pm.skip();
 					return;
 				}
 				
 				pm.report(next, "Invalid Binding Pattern - Identifier expected");
-				return;
-			}
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				this.mode = ARRAY_END;
 				return;
 			}
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
@@ -138,19 +111,31 @@ public class PatternParser extends Parser
 			}
 			pm.report(token, "Invalid Pattern");
 			return;
-		case ARRAY_END:
-			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+		case NEGATIVE_NUMBER:
+			switch (type)
 			{
-				this.pattern.expandPosition(token);
-				this.consumer.setPattern(this.pattern);
-				pm.popParser();
+			case Tokens.INT:
+				this.pattern = new IntPattern(token.prev().to(token), -token.intValue());
+				this.mode = END;
+				return;
+			case Tokens.LONG:
+				this.pattern = new LongPattern(token.prev().to(token), -token.intValue());
+				this.mode = END;
+				return;
+			case Tokens.FLOAT:
+				this.pattern = new FloatPattern(token.prev().to(token), -token.intValue());
+				this.mode = END;
+				return;
+			case Tokens.DOUBLE:
+				this.pattern = new DoublePattern(token.prev().to(token), -token.intValue());
+				this.mode = END;
+				return;
+			default:
+				pm.report(token, "Invalid Number Literal Pattern - Number expected after '-'");
+				this.mode = END;
+				pm.reparse();
 				return;
 			}
-			this.pattern.expandPosition(token.prev());
-			this.consumer.setPattern(this.pattern);
-			pm.popParser(true);
-			pm.report(token, "Invalid Array Pattern - '}' expected");
-			return;
 		case TUPLE_END:
 			if (type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
@@ -174,7 +159,6 @@ public class PatternParser extends Parser
 			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
 			pm.report(token, "Invalid Case Class Pattern - ')' expected");
-			return;
 		}
 	}
 	

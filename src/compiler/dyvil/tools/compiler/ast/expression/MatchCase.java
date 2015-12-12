@@ -98,7 +98,7 @@ public class MatchCase implements ICase, IDefaultContext
 			IPattern pattern1 = this.pattern.withType(type, markers);
 			if (pattern1 == null)
 			{
-				Marker marker = I18n.createMarker(this.pattern.getPosition(), "pattern.type.incompatible");
+				Marker marker = I18n.createError(this.pattern.getPosition(), "pattern.type.incompatible");
 				marker.addInfo(I18n.getString("pattern.type", this.pattern.getType()));
 				marker.addInfo(I18n.getString("value.type", type));
 				markers.add(marker);

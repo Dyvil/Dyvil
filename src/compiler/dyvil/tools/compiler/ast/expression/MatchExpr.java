@@ -250,7 +250,7 @@ public final class MatchExpr implements IValue
 			type = Types.ANY;
 			markers.add(I18n.createMarker(this.position, "match.invalid"));
 		}
-		
+
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			MatchCase c = this.cases[i];
@@ -260,7 +260,7 @@ public final class MatchExpr implements IValue
 			}
 			
 			c.resolve(markers, type, context);
-			if (c.isExhaustive())
+			if (c.pattern != null && c.isExhaustive())
 			{
 				this.exhaustive = true;
 			}
@@ -276,6 +276,7 @@ public final class MatchExpr implements IValue
 		{
 			this.value.checkTypes(markers, context);
 		}
+
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].checkTypes(markers, context);
@@ -289,6 +290,7 @@ public final class MatchExpr implements IValue
 		{
 			this.value.check(markers, context);
 		}
+
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			this.cases[i].check(markers, context);
