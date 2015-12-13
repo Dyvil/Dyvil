@@ -58,6 +58,8 @@ public final class DyvilREPL
 		command = new CompleteCommand();
 		commands.put("c", command);
 		commands.put("complete", command);
+
+		commands.put("javap", new JavapCommand());
 	}
 	
 	public static void main(String[] args) throws Exception
