@@ -40,18 +40,18 @@ public class StringInterpolation extends ValueCreator implements Value, StringIn
 	@Override
 	public void accept(ValueVisitor visitor)
 	{
-		StringInterpolationVisitor v = visitor.visitStringInterpolation();
-		int len = this.values.size();
-		String s = this.strings.get(0);
-		v.visitStringPart(s);
+		StringInterpolationVisitor stringVisitor = visitor.visitStringInterpolation();
+		final int len = this.values.size();
+
+		stringVisitor.visitStringPart(this.strings.get(0));
 		
 		for (int i = 0; i < len; i++)
 		{
-			this.values.get(i).accept(v.visitValue());
-			v.visitStringPart(s);
+			this.values.get(i).accept(stringVisitor.visitValue());
+			stringVisitor.visitStringPart(this.strings.get(i + 1));
 		}
 		
-		v.visitEnd();
+		stringVisitor.visitEnd();
 	}
 	
 	@Override
@@ -79,7 +79,6 @@ public class StringInterpolation extends ValueCreator implements Value, StringIn
 			}
 			else if (o instanceof Value)
 			{
-				// TODO What now?
 				return this;
 			}
 			else
@@ -104,17 +103,15 @@ public class StringInterpolation extends ValueCreator implements Value, StringIn
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int len = this.values.size();
-		String s = this.strings.get(0);
 		buffer.append('"');
-		LexerUtil.appendStringLiteralBody(s, buffer);
+		LexerUtil.appendStringLiteralBody(this.strings.get(0), buffer);
 
 		for (int i = 0; i < len; i++)
 		{
 			buffer.append("\\(");
 			this.values.get(i).toString(prefix, buffer);
-			s = this.strings.get(i + 1);
 			buffer.append(')');
-			LexerUtil.appendStringLiteralBody(s, buffer);
+			LexerUtil.appendStringLiteralBody(this.strings.get(i + 1), buffer);
 		}
 		buffer.append('"');
 	}
