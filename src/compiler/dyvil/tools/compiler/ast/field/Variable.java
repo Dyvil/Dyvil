@@ -111,7 +111,7 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
+		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
 			markers.add(I18n.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
@@ -298,8 +298,8 @@ public final class Variable extends Member implements IVariable
 			value.writeExpression(writer, this.type);
 		}
 		this.localIndex = writer.localCount();
-		writer.setLocalType(this.localIndex, this.type.getFrameType());
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		writer.setLocalType(this.localIndex, this.type.getFrameType());
 	}
 	
 	@Override
