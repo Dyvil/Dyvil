@@ -357,7 +357,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 		this.field.writeSet(writer, null, null, lineNumber);
 
-		if (type != null)
+		if (type != null && type != Types.VOID)
 		{
 			fieldType.writeCast(writer, type, lineNumber);
 		}
