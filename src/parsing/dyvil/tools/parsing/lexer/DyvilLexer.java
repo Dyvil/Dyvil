@@ -652,7 +652,6 @@ public final class DyvilLexer
 	private void parseInteger(IToken token, String str, int radix, boolean isLong)
 	{
 		long result = 0;
-		boolean negative = false;
 		int from = radix != 10 ? 2 : 0;
 		int to = str.length();
 		long limit = isLong ? -Long.MAX_VALUE : -Integer.MAX_VALUE;
@@ -671,8 +670,8 @@ public final class DyvilLexer
 			}
 			result -= digit;
 		}
-		
-		token.setLong(negative ? result : -result);
+
+		token.setLong(-result);
 	}
 	
 	private IToken addToken(IToken prev, StringBuilder buf, int type, int line, int start)

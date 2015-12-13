@@ -17,7 +17,7 @@ public abstract class Marker implements Comparable<Marker>
 	{
 		if (position == null)
 		{
-			throw new IllegalArgumentException("Marker Position cannot be null");
+			position = ICodePosition.ORIGIN;
 		}
 		
 		this.message = message;
