@@ -23,7 +23,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -128,7 +128,7 @@ public class CodeMethod extends AbstractMethod
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(I18n.createMarker(this.position, "method.type.infer", this.name.unqualified));
+					markers.add(MarkerMessages.createMarker(this.position, "method.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -136,9 +136,9 @@ public class CodeMethod extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.position, "method.type.incompatible", this.name.unqualified);
-				marker.addInfo(I18n.getString("method.type", this.type));
-				marker.addInfo(I18n.getString("value.type", this.value.getType()));
+				Marker marker = MarkerMessages.createMarker(this.position, "method.type.incompatible", this.name.unqualified);
+				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
+				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -153,7 +153,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(I18n.createMarker(this.position, "method.type.abstract", this.name.unqualified));
+			markers.add(MarkerMessages.createMarker(this.position, "method.type.abstract", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -207,8 +207,8 @@ public class CodeMethod extends AbstractMethod
 			
 			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
 			{
-				Marker marker = I18n.createMarker(exceptionType.getPosition(), "method.exception.type");
-				marker.addInfo(I18n.getString("exception.type", exceptionType));
+				Marker marker = MarkerMessages.createMarker(exceptionType.getPosition(), "method.exception.type");
+				marker.addInfo(MarkerMessages.getMarker("exception.type", exceptionType));
 				markers.add(marker);
 			}
 		}
@@ -222,8 +222,8 @@ public class CodeMethod extends AbstractMethod
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.METHOD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(I18n.createError(this.position, "method.illegal_modifiers", this.name,
-			                             ModifierUtil.fieldModifiersToString(illegalModifiers)));
+			markers.add(MarkerMessages.createError(this.position, "method.illegal_modifiers", this.name,
+			                                       ModifierUtil.fieldModifiersToString(illegalModifiers)));
 		}
 		
 		// Check illegal modifier combinations
@@ -257,7 +257,7 @@ public class CodeMethod extends AbstractMethod
 			
 			if (m.getDescriptor().equals(desc))
 			{
-				markers.add(I18n.createMarker(this.position, "method.duplicate", this.name, desc));
+				markers.add(MarkerMessages.createMarker(this.position, "method.duplicate", this.name, desc));
 			}
 		}
 	}
@@ -283,29 +283,29 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
-				markers.add(I18n.createMarker(this.position, "method.override", this.name));
+				markers.add(MarkerMessages.createMarker(this.position, "method.override", this.name));
 			}
 			return;
 		}
 		
 		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 		{
-			markers.add(I18n.createMarker(this.position, "method.overrides", this.name));
+			markers.add(MarkerMessages.createMarker(this.position, "method.overrides", this.name));
 		}
 		
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
 			if (overrideMethod.hasModifier(Modifiers.FINAL))
 			{
-				markers.add(I18n.createMarker(this.position, "method.override.final", this.name));
+				markers.add(MarkerMessages.createMarker(this.position, "method.override.final", this.name));
 			}
 			
 			IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = I18n.createMarker(this.position, "method.override.type.incompatible", this.name);
-				marker.addInfo(I18n.getString("method.type", this.type));
-				marker.addInfo(I18n.getString("method.override.type", type));
+				Marker marker = MarkerMessages.createMarker(this.position, "method.override.type.incompatible", this.name);
+				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
+				marker.addInfo(MarkerMessages.getMarker("method.override.type", type));
 				markers.add(marker);
 			}
 		}

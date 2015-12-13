@@ -4,8 +4,10 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;
@@ -37,9 +39,15 @@ public class ParserManager implements IParserManager
 	@Override
 	public void report(IToken token, String message)
 	{
-		this.markers.add(new SyntaxError(token, message));
+		this.report(MarkerMessages.createSyntaxError(token, message));
 	}
-	
+
+	@Override
+	public void report(Marker error)
+	{
+		this.markers.add(error);
+	}
+
 	@Override
 	public void setOperatorMap(IOperatorMap operators)
 	{

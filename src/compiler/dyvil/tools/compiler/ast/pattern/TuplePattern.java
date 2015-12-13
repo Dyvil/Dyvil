@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -68,9 +68,9 @@ public final class TuplePattern extends Pattern implements IPatternList
 			IPattern typedPattern = pattern.withType(elementType, markers);
 			if (typedPattern == null)
 			{
-				Marker m = I18n.createMarker(pattern.getPosition(), "pattern.tuple.element.type");
-				m.addInfo(I18n.getString("pattern.type", pattern.getType()));
-				m.addInfo(I18n.getString("tuple.element.type", elementType));
+				Marker m = MarkerMessages.createMarker(pattern.getPosition(), "pattern.tuple.element.type");
+				m.addInfo(MarkerMessages.getMarker("pattern.type", pattern.getType()));
+				m.addInfo(MarkerMessages.getMarker("tuple.element.type", elementType));
 				markers.add(m);
 			}
 			else

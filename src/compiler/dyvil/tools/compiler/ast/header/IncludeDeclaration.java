@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -96,7 +96,7 @@ public class IncludeDeclaration implements IASTNode
 			pack = pack.resolvePackage(this.nameParts[i]);
 			if (pack == null)
 			{
-				markers.add(I18n.createMarker(this.position, "resolve.package", this.nameParts[i]));
+				markers.add(MarkerMessages.createMarker(this.position, "resolve.package", this.nameParts[i]));
 				return;
 			}
 		}
@@ -110,14 +110,14 @@ public class IncludeDeclaration implements IASTNode
 		
 		if (this.header == null)
 		{
-			markers.add(I18n.createMarker(this.position, "resolve.header", this.nameParts[count]));
+			markers.add(MarkerMessages.createMarker(this.position, "resolve.header", this.nameParts[count]));
 			return;
 		}
 
 		// Check if the included Unit is a Header or has a Header Declaration
 		if (!this.getHeader().isHeader())
 		{
-			markers.add(I18n.createMarker(this.position, "include.unit", this.header.getName()));
+			markers.add(MarkerMessages.createMarker(this.position, "include.unit", this.header.getName()));
 			return;
 		}
 
@@ -134,20 +134,20 @@ public class IncludeDeclaration implements IASTNode
 		{
 			if (this.header instanceof ExternalHeader)
 			{
-				markers.add(I18n.createError(this.position, "include.internal", this.header.getName()));
+				markers.add(MarkerMessages.createError(this.position, "include.internal", this.header.getName()));
 			}
 			accessLevel &= 0b1111;
 		}
 
 		if (accessLevel == Modifiers.PRIVATE)
 		{
-			markers.add(I18n.createError(this.position, "include.invisible", this.header.getName()));
+			markers.add(MarkerMessages.createError(this.position, "include.invisible", this.header.getName()));
 		}
 		if (accessLevel == Modifiers.PACKAGE || accessLevel == Modifiers.PROTECTED)
 		{
 			if (this.header.getPackage() != context.getHeader().getPackage())
 			{
-				markers.add(I18n.createError(this.position, "include.invisible", this.header.getName()));
+				markers.add(MarkerMessages.createError(this.position, "include.invisible", this.header.getName()));
 			}
 		}
 	}

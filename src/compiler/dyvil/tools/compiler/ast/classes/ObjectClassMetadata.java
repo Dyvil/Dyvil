@@ -17,7 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -59,8 +59,8 @@ public final class ObjectClassMetadata extends ClassMetadata
 		{
 			if (markers != null && body.constructorCount() > 0)
 			{
-				markers.add(I18n.createMarker(this.theClass.getPosition(), "class.object.constructor",
-				                              this.theClass.getName().qualified));
+				markers.add(MarkerMessages.createMarker(this.theClass.getPosition(), "class.object.constructor",
+				                                        this.theClass.getName().qualified));
 			}
 			
 			IField f = body.getField(Names.instance);

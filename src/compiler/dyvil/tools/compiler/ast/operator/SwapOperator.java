@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -70,9 +70,9 @@ public class SwapOperator extends AbstractValue implements IStatement
 		IType rightType = this.right.getType();
 		if (!leftType.isSameType(rightType))
 		{
-			Marker marker = I18n.createMarker(this.position, "swap.type.incompatible");
-			marker.addInfo(I18n.getString("swap.type.left", leftType));
-			marker.addInfo(I18n.getString("swap.type.right", rightType));
+			Marker marker = MarkerMessages.createMarker(this.position, "swap.type.incompatible");
+			marker.addInfo(MarkerMessages.getMarker("swap.type.left", leftType));
+			marker.addInfo(MarkerMessages.getMarker("swap.type.right", rightType));
 			markers.add(marker);
 		}
 	}

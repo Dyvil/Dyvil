@@ -7,7 +7,6 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;
 
 public class REPLParser extends ParserManager
@@ -26,7 +25,7 @@ public class REPLParser extends ParserManager
 		this.syntaxErrors = true;
 		if (this.markers != null)
 		{
-			this.markers.add(new SyntaxError(token, message));
+			super.report(token, message);
 		}
 	}
 	

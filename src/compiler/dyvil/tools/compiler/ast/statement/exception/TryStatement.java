@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -272,8 +272,8 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 			
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
-				Marker marker = I18n.createMarker(block.position, "try.catch.type");
-				marker.addInfo(I18n.getString("exception.type", block.type));
+				Marker marker = MarkerMessages.createMarker(block.position, "try.catch.type");
+				marker.addInfo(MarkerMessages.getMarker("exception.type", block.type));
 				markers.add(marker);
 			}
 			

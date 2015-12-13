@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -49,7 +49,7 @@ public final class WildcardImport extends Import
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(I18n.createMarker(this.position, "using.wildcard.invalid"));
+				markers.add(MarkerMessages.createMarker(this.position, "using.wildcard.invalid"));
 				return;
 			}
 			
@@ -59,7 +59,7 @@ public final class WildcardImport extends Import
 		
 		if (!(context instanceof Package))
 		{
-			markers.add(I18n.createMarker(this.position, "import.wildcard.invalid"));
+			markers.add(MarkerMessages.createMarker(this.position, "import.wildcard.invalid"));
 			return;
 		}
 		this.context = context;

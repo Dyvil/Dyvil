@@ -21,7 +21,7 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -144,8 +144,8 @@ public final class Annotation implements IAnnotation
 			{
 				if (param.getValue() == null)
 				{
-					markers.add(I18n.createMarker(this.position, "annotation.parameter.missing", this.type,
-					                              param.getName()));
+					markers.add(MarkerMessages.createMarker(this.position, "annotation.parameter.missing", this.type,
+					                                        param.getName()));
 				}
 				continue;
 			}
@@ -184,7 +184,7 @@ public final class Annotation implements IAnnotation
 		IClass theClass = this.type.getTheClass();
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(I18n.createMarker(this.position, "annotation.type", this.type.getName()));
+			markers.add(MarkerMessages.createMarker(this.position, "annotation.type", this.type.getName()));
 			return;
 		}
 		
@@ -196,9 +196,9 @@ public final class Annotation implements IAnnotation
 		IClassMetadata metadata = theClass.getMetadata();
 		if (!metadata.isTarget(target))
 		{
-			Marker error = I18n.createMarker(this.position, "annotation.target", this.type.getName());
-			error.addInfo(I18n.getString("annotation.target.element", target));
-			error.addInfo(I18n.getString("annotation.target.allows", metadata.getTargets()));
+			Marker error = MarkerMessages.createMarker(this.position, "annotation.target", this.type.getName());
+			error.addInfo(MarkerMessages.getMarker("annotation.target.element", target));
+			error.addInfo(MarkerMessages.getMarker("annotation.target.allows", metadata.getTargets()));
 			markers.add(error);
 		}
 	}

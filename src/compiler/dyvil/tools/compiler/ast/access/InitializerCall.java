@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -133,7 +133,7 @@ public class InitializerCall implements ICall
 	public void reportResolve(MarkerList markers, IContext context)
 	{
 		IClass iclass = context.getThisClass();
-		Marker marker = I18n.createMarker(this.position, "resolve.constructor", iclass.getName().qualified);
+		Marker marker = MarkerMessages.createMarker(this.position, "resolve.constructor", iclass.getName().qualified);
 		if (!this.arguments.isEmpty())
 		{
 			StringBuilder builder = new StringBuilder("Argument Types: ");

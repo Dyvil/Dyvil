@@ -38,7 +38,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -720,12 +720,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(I18n.createMarker(position, "method.access.static", this.name));
+					markers.add(MarkerMessages.createMarker(position, "method.access.static", this.name));
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(I18n.createMarker(position, "method.access.static.type", this.name,
-					                              this.theClass.getFullName()));
+					markers.add(MarkerMessages.createMarker(position, "method.access.static.type", this.name,
+					                                        this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -733,7 +733,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(I18n.createMarker(position, "method.access.instance", this.name));
+					markers.add(MarkerMessages.createMarker(position, "method.access.instance", this.name));
 				}
 			}
 			else
@@ -756,11 +756,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (context.isStatic())
 			{
-				markers.add(I18n.createMarker(position, "method.access.instance", this.name));
+				markers.add(MarkerMessages.createMarker(position, "method.access.instance", this.name));
 			}
 			else
 			{
-				markers.add(I18n.createMarker(position, "method.access.unqualified", this.name.unqualified));
+				markers.add(MarkerMessages.createMarker(position, "method.access.unqualified", this.name.unqualified));
 				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
@@ -838,7 +838,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			IType type = typeContext.resolveType(typeVar);
 			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
 			{
-				markers.add(I18n.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
+				markers.add(MarkerMessages.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
 				typeContext.addMapping(typeVar, Types.ANY);
 			}
 		}
@@ -852,10 +852,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
-			markers.add(I18n.createMarker(position, "method.access.internal", this.name));
+			markers.add(MarkerMessages.createMarker(position, "method.access.internal", this.name));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(I18n.createMarker(position, "method.access.invisible", this.name));
+			markers.add(MarkerMessages.createMarker(position, "method.access.invisible", this.name));
 			break;
 		}
 		
@@ -869,7 +869,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			IType exceptionType = this.exceptions[i];
 			if (IContext.isUnhandled(context, exceptionType))
 			{
-				markers.add(I18n.createMarker(position, "exception.unhandled", exceptionType.toString()));
+				markers.add(MarkerMessages.createMarker(position, "exception.unhandled", exceptionType.toString()));
 			}
 		}
 	}

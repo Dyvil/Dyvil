@@ -23,7 +23,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -240,7 +240,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			if (depth-- < 0)
 			{
-				markers.add(I18n.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
+				markers.add(MarkerMessages.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
 				return this;
 			}
 			
@@ -286,11 +286,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			return this;
 		}
 
-		Marker marker = I18n.createMarker(this.position, "resolve.method_field", this.name.unqualified);
-		marker.addInfo(I18n.getString("name.qualified", this.name.qualified));
+		Marker marker = MarkerMessages.createMarker(this.position, "resolve.method_field", this.name.unqualified);
+		marker.addInfo(MarkerMessages.getMarker("name.qualified", this.name.qualified));
 		if (this.receiver != null)
 		{
-			marker.addInfo(I18n.getString("receiver.type", this.receiver.getType()));
+			marker.addInfo(MarkerMessages.getMarker("receiver.type", this.receiver.getType()));
 		}
 		
 		markers.add(marker);

@@ -31,7 +31,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -263,8 +263,9 @@ public class CodeClass extends AbstractClass
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.CLASS_MODIFIERS & ~Modifiers.CLASS_TYPE_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(I18n.createError(this.position, "modifiers.illegal", I18n.getString("class", this.name),
-			                             ModifierUtil.classModifiersToString(illegalModifiers)));
+			markers.add(MarkerMessages
+					            .createError(this.position, "modifiers.illegal", MarkerMessages.getMarker("class", this.name),
+					                         ModifierUtil.classModifiersToString(illegalModifiers)));
 		}
 		
 		if (this.annotations != null)
@@ -296,8 +297,8 @@ public class CodeClass extends AbstractClass
 			int modifiers = iclass.getModifiers().toFlags();
 			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
 			{
-				markers.add(I18n.createMarker(this.position, "class.implement.type",
-				                              ModifierUtil.classModifiersToString(modifiers), iclass.getName()));
+				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
+				                                        ModifierUtil.classModifiersToString(modifiers), iclass.getName()));
 				continue;
 			}
 		}
@@ -312,12 +313,12 @@ public class CodeClass extends AbstractClass
 				int modifiers = superClass.getModifiers().toFlags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(I18n.createMarker(this.position, "class.extend.type",
-					                              ModifierUtil.classTypeToString(modifiers), superClass.getName()));
+					markers.add(MarkerMessages.createMarker(this.position, "class.extend.type",
+					                                        ModifierUtil.classTypeToString(modifiers), superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(I18n.createMarker(this.position, "class.extend.final", superClass.getName()));
+					markers.add(MarkerMessages.createMarker(this.position, "class.extend.final", superClass.getName()));
 				}
 			}
 		}

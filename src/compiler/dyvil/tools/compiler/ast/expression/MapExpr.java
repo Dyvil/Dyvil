@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -140,9 +140,9 @@ public class MapExpr implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(value.getPosition(), "map.key.type.incompatible");
-				marker.addInfo(I18n.getString("type.expected", keyType.getConcreteType(typeContext)));
-				marker.addInfo(I18n.getString("map.key.type", value.getType()));
+				Marker marker = MarkerMessages.createMarker(value.getPosition(), "map.key.type.incompatible");
+				marker.addInfo(MarkerMessages.getMarker("type.expected", keyType.getConcreteType(typeContext)));
+				marker.addInfo(MarkerMessages.getMarker("map.key.type", value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -156,9 +156,9 @@ public class MapExpr implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(value.getPosition(), "map.value.type.incompatible");
-				marker.addInfo(I18n.getString("type.expected", valueType.getConcreteType(typeContext)));
-				marker.addInfo(I18n.getString("map.value.type", value.getType()));
+				Marker marker = MarkerMessages.createMarker(value.getPosition(), "map.value.type.incompatible");
+				marker.addInfo(MarkerMessages.getMarker("type.expected", valueType.getConcreteType(typeContext)));
+				marker.addInfo(MarkerMessages.getMarker("map.value.type", value.getType()));
 				markers.add(marker);
 			}
 			else

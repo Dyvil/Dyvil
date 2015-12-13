@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -483,8 +483,8 @@ public class ClassBody implements IClassBody
 			
 			if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
 			{
-				markers.add(I18n.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(),
-				                              candidate.getName(), this.theClass.getName()));
+				markers.add(MarkerMessages.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(),
+				                                        candidate.getName(), this.theClass.getName()));
 			}
 		}
 	}

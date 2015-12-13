@@ -1,9 +1,6 @@
 package dyvil.tools.compiler.util;
 
-import dyvil.tools.parsing.marker.Info;
-import dyvil.tools.parsing.marker.Marker;
-import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.marker.Warning;
+import dyvil.tools.parsing.marker.*;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.MarkerLevel;
 
@@ -12,9 +9,9 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-public class I18n
+public final class MarkerMessages
 {
-	private I18n()
+	private MarkerMessages()
 	{
 		// do not instantiate
 	}
@@ -23,29 +20,43 @@ public class I18n
 			.getBundle("dyvil.tools.compiler.lang.MarkerMessages");
 	private static final ResourceBundle MARKER_BUNDLE       = ResourceBundle
 			.getBundle("dyvil.tools.compiler.config.MarkerLevels");
+	private static final ResourceBundle SYNTAX_BUNDLE       = ResourceBundle
+			.getBundle("dyvil.tools.compiler.config.SyntaxErrors");
 
-	public static String getString(String key)
+	public static String getMarker(String key)
 	{
 		try
 		{
 			return LOCALIZATION_BUNDLE.getString(key);
 		}
-		catch (MissingResourceException e)
+		catch (MissingResourceException ex)
 		{
 			return "!" + key + "!";
 		}
 	}
 	
-	public static String getString(String key, Object... args)
+	public static String getMarker(String key, Object... args)
 	{
-		return String.format(getString(key), args);
+		return String.format(getMarker(key), args);
+	}
+
+	public static String getSyntax(String key)
+	{
+		try
+		{
+			return SYNTAX_BUNDLE.getString(key);
+		}
+		catch (MissingResourceException ex)
+		{
+			return "!" + key + "!";
+		}
 	}
 	
-	static final Map<String, MarkerLevel> map = new HashMap<>();
+	static final Map<String, MarkerLevel> markerLevelMap = new HashMap<>();
 	
 	private static MarkerLevel getMarkerLevel(String key)
 	{
-		MarkerLevel m = map.get(key);
+		MarkerLevel m = markerLevelMap.get(key);
 		if (m == null)
 		{
 			try
@@ -71,7 +82,7 @@ public class I18n
 				m = MarkerLevel.ERROR;
 			}
 			
-			map.put(key, m);
+			markerLevelMap.put(key, m);
 		}
 		return m;
 	}
@@ -83,7 +94,7 @@ public class I18n
 		case ERROR:
 			return new SemanticError(position, text);
 		case INFO:
-			return new Info(position, text);
+			return new InfoMarker(position, text);
 		case WARNING:
 			return new Warning(position, text);
 		default:
@@ -93,31 +104,36 @@ public class I18n
 	
 	public static Marker createMarker(ICodePosition position, String key)
 	{
-		return createTextMarker(position, getMarkerLevel(key), getString(key));
+		return createTextMarker(position, getMarkerLevel(key), getMarker(key));
 	}
 	
 	public static Marker createMarker(ICodePosition position, MarkerLevel level, String key)
 	{
-		return createTextMarker(position, level, getString(key));
+		return createTextMarker(position, level, getMarker(key));
 	}
 	
 	public static Marker createMarker(ICodePosition position, String key, Object... args)
 	{
-		return createTextMarker(position, getMarkerLevel(key), getString(key, args));
+		return createTextMarker(position, getMarkerLevel(key), getMarker(key, args));
 	}
 	
 	public static Marker createMarker(ICodePosition position, MarkerLevel level, String key, Object... args)
 	{
-		return createTextMarker(position, level, getString(key, args));
+		return createTextMarker(position, level, getMarker(key, args));
 	}
 	
 	public static Marker createError(ICodePosition position, String key)
 	{
-		return new SemanticError(position, getString(key));
+		return new SemanticError(position, getMarker(key));
 	}
 	
 	public static Marker createError(ICodePosition position, String key, Object... args)
 	{
-		return new SemanticError(position, getString(key, args));
+		return new SemanticError(position, getMarker(key, args));
+	}
+
+	public static Marker createSyntaxError(ICodePosition position, String key)
+	{
+		return new SyntaxError(position, getSyntax(key));
 	}
 }

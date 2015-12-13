@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -57,7 +57,7 @@ public class ContinueStatement extends AbstractValue implements IStatement
 			ILoop loop = context.getEnclosingLoop();
 			if (loop == null)
 			{
-				markers.add(I18n.createMarker(this.position, "continue.invalid"));
+				markers.add(MarkerMessages.createMarker(this.position, "continue.invalid"));
 				return;
 			}
 			
@@ -69,7 +69,7 @@ public class ContinueStatement extends AbstractValue implements IStatement
 		
 		if (!(this.label.value instanceof ILoop))
 		{
-			markers.add(I18n.createMarker(this.position, "continue.invalid.type", this.name));
+			markers.add(MarkerMessages.createMarker(this.position, "continue.invalid.type", this.name));
 			return;
 		}
 		
@@ -83,11 +83,11 @@ public class ContinueStatement extends AbstractValue implements IStatement
 		{
 			if (this.name == null)
 			{
-				markers.add(I18n.createMarker(this.position, "continue.invalid"));
+				markers.add(MarkerMessages.createMarker(this.position, "continue.invalid"));
 			}
 			else
 			{
-				markers.add(I18n.createMarker(this.position, "resolve.label", this.name));
+				markers.add(MarkerMessages.createMarker(this.position, "resolve.label", this.name));
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -215,8 +215,8 @@ public class IfStatement extends AbstractValue
 			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = I18n.createMarker(this.condition.getPosition(), "if.condition.type");
-				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
+				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "if.condition.type");
+				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else
@@ -241,7 +241,7 @@ public class IfStatement extends AbstractValue
 		}
 		else
 		{
-			markers.add(I18n.createMarker(this.position, "if.condition.invalid"));
+			markers.add(MarkerMessages.createMarker(this.position, "if.condition.invalid"));
 		}
 		if (this.then != null)
 		{

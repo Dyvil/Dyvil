@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -113,15 +113,15 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
-			markers.add(I18n.createMarker(position, "variable.assign.final", this.name.unqualified));
+			markers.add(MarkerMessages.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = I18n.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
-			marker.addInfo(I18n.getString("variable.type", this.type));
-			marker.addInfo(I18n.getString("value.type", newValue.getType()));
+			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+			marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
+			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -184,7 +184,7 @@ public final class Variable extends Member implements IVariable
 			this.type = this.value.getType();
 			if (this.type == Types.UNKNOWN)
 			{
-				markers.add(I18n.createMarker(this.position, "variable.type.infer", this.name.unqualified));
+				markers.add(MarkerMessages.createMarker(this.position, "variable.type.infer", this.name.unqualified));
 				this.type = Types.ANY;
 			}
 		}
@@ -192,9 +192,9 @@ public final class Variable extends Member implements IVariable
 		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = I18n.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
-			marker.addInfo(I18n.getString("variable.type", this.type));
-			marker.addInfo(I18n.getString("value.type", this.value.getType()));
+			Marker marker = MarkerMessages.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
+			marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
+			marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
 			markers.add(marker);
 		}
 		else
@@ -224,7 +224,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(I18n.createMarker(this.position, "variable.type.void"));
+			markers.add(MarkerMessages.createMarker(this.position, "variable.type.void"));
 		}
 	}
 	

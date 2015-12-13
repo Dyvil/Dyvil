@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -123,8 +123,8 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = I18n.createMarker(this.condition.getPosition(), "while.condition.type");
-				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
+				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "while.condition.type");
+				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else
@@ -148,7 +148,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		}
 		else
 		{
-			markers.add(I18n.createMarker(this.position, "while.condition.invalid"));
+			markers.add(MarkerMessages.createMarker(this.position, "while.condition.invalid"));
 		}
 		if (this.action != null)
 		{

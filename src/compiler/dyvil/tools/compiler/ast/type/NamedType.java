@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -124,7 +124,7 @@ public class NamedType implements IRawType, ITypeConsumer
 				return new PackageType(thePackage);
 			}
 
-			markers.add(I18n.createError(this.position, "resolve.type.package", this.name, this.parent));
+			markers.add(MarkerMessages.createError(this.position, "resolve.type.package", this.name, this.parent));
 			return this;
 		}
 
@@ -146,7 +146,7 @@ public class NamedType implements IRawType, ITypeConsumer
 			return new PackageType(thePackage);
 		}
 
-		markers.add(I18n.createError(this.position, "resolve.type", this.name));
+		markers.add(MarkerMessages.createError(this.position, "resolve.type", this.name));
 		return this;
 	}
 	

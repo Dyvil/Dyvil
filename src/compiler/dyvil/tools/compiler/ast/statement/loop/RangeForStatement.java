@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -50,9 +50,9 @@ public class RangeForStatement extends ForEachStatement
 		IValue v = this.value1.withType(rangeType, typeContext, markers, context);
 		if (v == null)
 		{
-			Marker marker = I18n.createMarker(this.value1.getPosition(), "for.range.type");
-			marker.addInfo(I18n.getString("value.type", this.value1.getType()));
-			marker.addInfo(I18n.getString("variable.type", rangeType));
+			Marker marker = MarkerMessages.createMarker(this.value1.getPosition(), "for.range.type");
+			marker.addInfo(MarkerMessages.getMarker("value.type", this.value1.getType()));
+			marker.addInfo(MarkerMessages.getMarker("variable.type", rangeType));
 			markers.add(marker);
 		}
 		else
@@ -63,9 +63,9 @@ public class RangeForStatement extends ForEachStatement
 		v = this.value2.withType(rangeType, typeContext, markers, context);
 		if (v == null)
 		{
-			Marker marker = I18n.createMarker(this.value2.getPosition(), "for.range.type");
-			marker.addInfo(I18n.getString("value.type", this.value2.getType()));
-			marker.addInfo(I18n.getString("variable.type", rangeType));
+			Marker marker = MarkerMessages.createMarker(this.value2.getPosition(), "for.range.type");
+			marker.addInfo(MarkerMessages.getMarker("value.type", this.value2.getType()));
+			marker.addInfo(MarkerMessages.getMarker("variable.type", rangeType));
 			markers.add(marker);
 		}
 		else

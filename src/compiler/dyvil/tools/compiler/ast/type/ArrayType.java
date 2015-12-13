@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -250,7 +250,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(I18n.createMarker(this.type.getPosition(), "type.super.array"));
+			markers.add(MarkerMessages.createMarker(this.type.getPosition(), "type.super.array"));
 		}
 		
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);

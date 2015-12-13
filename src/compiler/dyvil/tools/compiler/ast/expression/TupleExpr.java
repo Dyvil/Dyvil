@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -184,9 +184,9 @@ public final class TupleExpr implements IValue, IValueList
 			
 			if (value1 == null)
 			{
-				Marker m = I18n.createMarker(value.getPosition(), "tuple.element.type.incompatible");
-				m.addInfo(I18n.getString("value.type", value.getType()));
-				m.addInfo(I18n.getString("tuple.element.type", elementType.getConcreteType(typeContext)));
+				Marker m = MarkerMessages.createMarker(value.getPosition(), "tuple.element.type.incompatible");
+				m.addInfo(MarkerMessages.getMarker("value.type", value.getType()));
+				m.addInfo(MarkerMessages.getMarker("tuple.element.type", elementType.getConcreteType(typeContext)));
 				markers.add(m);
 			}
 			else

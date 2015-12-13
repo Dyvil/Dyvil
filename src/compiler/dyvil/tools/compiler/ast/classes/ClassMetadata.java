@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -186,7 +186,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 		
-		markers.add(I18n.createMarker(this.theClass.getPosition(), "constructor.super", superType.toString()));
+		markers.add(MarkerMessages.createMarker(this.theClass.getPosition(), "constructor.super", superType.toString()));
 	}
 	
 	@Override

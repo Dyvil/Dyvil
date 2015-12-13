@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -87,7 +87,7 @@ public final class CastOperator extends AbstractValue
 		this.value = this.value.resolve(markers, context);
 		if (this.type == Types.VOID)
 		{
-			markers.add(I18n.createMarker(this.position, "cast.void"));
+			markers.add(MarkerMessages.createMarker(this.position, "cast.void"));
 			return this;
 		}
 		
@@ -120,13 +120,13 @@ public final class CastOperator extends AbstractValue
 		
 		if (value1 == null && !(primitiveType && primitiveValue) && !prevType.isSuperClassOf(this.type))
 		{
-			markers.add(I18n.createMarker(this.position, "cast.incompatible", prevType, this.type));
+			markers.add(MarkerMessages.createMarker(this.position, "cast.incompatible", prevType, this.type));
 			return this;
 		}
 		
 		if (!this.typeHint && this.type.isSameType(prevType) && primitiveType == primitiveValue)
 		{
-			markers.add(I18n.createMarker(this.position, "cast.unnecessary"));
+			markers.add(MarkerMessages.createMarker(this.position, "cast.unnecessary"));
 			this.typeHint = true;
 		}
 		

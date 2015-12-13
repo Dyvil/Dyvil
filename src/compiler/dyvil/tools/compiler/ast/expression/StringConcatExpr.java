@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -127,7 +127,7 @@ public class StringConcatExpr implements IValue
 			
 			if (value.getType() == Types.VOID)
 			{
-				markers.add(I18n.createMarker(value.getPosition(), "string.concat.void"));
+				markers.add(MarkerMessages.createMarker(value.getPosition(), "string.concat.void"));
 			}
 		}
 	}

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -102,12 +102,12 @@ public class TypeCheckPattern implements IPattern
 			
 			if (this.type.isPrimitive())
 			{
-				markers.add(I18n.createMarker(this.position, "pattern.typecheck.primitive"));
+				markers.add(MarkerMessages.createMarker(this.position, "pattern.typecheck.primitive"));
 			}
 		}
 		else
 		{
-			markers.add(I18n.createMarker(this.position, "pattern.typecheck.invalid"));
+			markers.add(MarkerMessages.createMarker(this.position, "pattern.typecheck.invalid"));
 		}
 		
 		return this;

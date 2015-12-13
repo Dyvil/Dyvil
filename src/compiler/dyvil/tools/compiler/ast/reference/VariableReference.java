@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -31,7 +31,7 @@ public class VariableReference implements IReference
 		IVariable variable = this.getVariable();
 		if (!variable.isReferenceCapturable())
 		{
-			markers.add(I18n.createError(position, "reference.parameter.capture", this.fieldAccess.getName()));
+			markers.add(MarkerMessages.createError(position, "reference.parameter.capture", this.fieldAccess.getName()));
 
 			// Return to avoid two errors
 			return;

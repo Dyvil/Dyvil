@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -63,9 +63,9 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		int paramCount = iclass.parameterCount();
 		if (this.patternCount != paramCount)
 		{
-			Marker m = I18n.createMarker(this.position, "pattern.class.count", this.type.toString());
-			m.addInfo(I18n.getString("pattern.class.count.pattern", this.patternCount));
-			m.addInfo(I18n.getString("pattern.class.count.class", paramCount));
+			Marker m = MarkerMessages.createMarker(this.position, "pattern.class.count", this.type.toString());
+			m.addInfo(MarkerMessages.getMarker("pattern.class.count.pattern", this.patternCount));
+			m.addInfo(MarkerMessages.getMarker("pattern.class.count.class", paramCount));
 			markers.add(m);
 			return this;
 		}
@@ -79,9 +79,9 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			
 			if (typedPattern == null)
 			{
-				Marker m = I18n.createMarker(this.position, "pattern.class.type", param.getName());
-				m.addInfo(I18n.getString("pattern.type", pattern.getType()));
-				m.addInfo(I18n.getString("classparameter.type", paramType));
+				Marker m = MarkerMessages.createMarker(this.position, "pattern.class.type", param.getName());
+				m.addInfo(MarkerMessages.getMarker("pattern.type", pattern.getType()));
+				m.addInfo(MarkerMessages.getMarker("classparameter.type", paramType));
 				markers.add(m);
 			}
 			else

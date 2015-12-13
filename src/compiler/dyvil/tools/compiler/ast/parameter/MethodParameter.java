@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -109,15 +109,15 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
-			markers.add(I18n.createMarker(position, "parameter.assign.final", this.name.unqualified));
+			markers.add(MarkerMessages.createMarker(position, "parameter.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = I18n.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
-			marker.addInfo(I18n.getString("parameter.type", this.type));
-			marker.addInfo(I18n.getString("value.type", newValue.getType()));
+			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
+			marker.addInfo(MarkerMessages.getMarker("parameter.type", this.type));
+			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -151,10 +151,11 @@ public final class MethodParameter extends Parameter
 			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.defaultValue.getPosition(), "parameter.type.incompatible",
-				                                  this.name.unqualified);
-				marker.addInfo(I18n.getString("parameter.type", this.type));
-				marker.addInfo(I18n.getString("value.type", this.defaultValue.getType()));
+				Marker marker = MarkerMessages
+						.createMarker(this.defaultValue.getPosition(), "parameter.type.incompatible",
+						              this.name.unqualified);
+				marker.addInfo(MarkerMessages.getMarker("parameter.type", this.type));
+				marker.addInfo(MarkerMessages.getMarker("value.type", this.defaultValue.getType()));
 				markers.add(marker);
 			}
 			else
@@ -178,7 +179,7 @@ public final class MethodParameter extends Parameter
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(I18n.createMarker(this.position, "parameter.type.void"));
+			markers.add(MarkerMessages.createMarker(this.position, "parameter.type.void"));
 		}
 	}
 	

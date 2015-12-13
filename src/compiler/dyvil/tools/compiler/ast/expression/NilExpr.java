@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -103,11 +103,11 @@ public final class NilExpr implements IValue
 
 		if (type != dyvil.tools.compiler.ast.type.Types.UNKNOWN)
 		{
-			markers.add(I18n.createMarker(this.position, "nil.type", type));
+			markers.add(MarkerMessages.createMarker(this.position, "nil.type", type));
 		}
 		else
 		{
-			markers.add(I18n.createMarker(this.position, "nil.untyped", type));
+			markers.add(MarkerMessages.createMarker(this.position, "nil.untyped", type));
 		}
 		return this;
 	}
@@ -146,7 +146,7 @@ public final class NilExpr implements IValue
 	{
 		if (this.requiredType == null)
 		{
-			// markers.add(I18n.createError(this.position, "nil.untyped"));
+			// markers.add(MarkerMessages.createError(this.position, "nil.untyped"));
 			return;
 		}
 		
@@ -158,7 +158,7 @@ public final class NilExpr implements IValue
 		IMethod match = IContext.resolveMethod(this.requiredType, null, this.methodName, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(I18n.createMarker(this.position, "nil.method", this.requiredType.toString(), this.methodName));
+			markers.add(MarkerMessages.createMarker(this.position, "nil.method", this.requiredType.toString(), this.methodName));
 		}
 		else
 		{

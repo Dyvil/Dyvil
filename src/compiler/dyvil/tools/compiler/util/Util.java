@@ -177,7 +177,7 @@ public class Util
 		IValue value1 = value.toConstant(markers);
 		if (value1 == null)
 		{
-			markers.add(I18n.createMarker(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
+			markers.add(MarkerMessages.createMarker(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
 			return value.getType().getDefaultValue();
 		}
 		
@@ -220,9 +220,9 @@ public class Util
 	
 	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
 	{
-		Marker marker = I18n.createMarker(value.getPosition(), key, args);
-		marker.addInfo(I18n.getString("type.expected", type.getConcreteType(typeContext)));
-		marker.addInfo(I18n.getString("value.type", value.getType()));
+		Marker marker = MarkerMessages.createMarker(value.getPosition(), key, args);
+		marker.addInfo(MarkerMessages.getMarker("type.expected", type.getConcreteType(typeContext)));
+		marker.addInfo(MarkerMessages.getMarker("value.type", value.getType()));
 		markers.add(marker);
 	}
 	
@@ -235,7 +235,7 @@ public class Util
 
 	public static String toString(IClassMember member, String type)
 	{
-		return I18n.getString("member.named", I18n.getString("member." + type), member.getName());
+		return MarkerMessages.getMarker("member.named", MarkerMessages.getMarker("member." + type), member.getName());
 	}
 
 	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)

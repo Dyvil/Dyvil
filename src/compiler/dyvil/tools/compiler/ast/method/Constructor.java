@@ -32,7 +32,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -279,8 +279,8 @@ public class Constructor extends Member implements IConstructor
 			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.position, "constructor.return.type");
-				marker.addInfo(I18n.getString("return.type", this.value.getType()));
+				Marker marker = MarkerMessages.createMarker(this.position, "constructor.return.type");
+				marker.addInfo(MarkerMessages.getMarker("return.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -313,7 +313,7 @@ public class Constructor extends Member implements IConstructor
 		IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
-			markers.add(I18n.createMarker(this.position, "constructor.super"));
+			markers.add(MarkerMessages.createMarker(this.position, "constructor.super"));
 			return;
 		}
 		
@@ -371,8 +371,8 @@ public class Constructor extends Member implements IConstructor
 
 			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
 			{
-				Marker marker = I18n.createMarker(exceptionType.getPosition(), "method.exception.type");
-				marker.addInfo(I18n.getString("exception.type", exceptionType));
+				Marker marker = MarkerMessages.createMarker(exceptionType.getPosition(), "method.exception.type");
+				marker.addInfo(MarkerMessages.getMarker("exception.type", exceptionType));
 				markers.add(marker);
 			}
 		}
@@ -383,12 +383,12 @@ public class Constructor extends Member implements IConstructor
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.theClass.isAbstract())
 		{
-			markers.add(I18n.createMarker(this.position, "constructor.unimplemented", this.name));
+			markers.add(MarkerMessages.createMarker(this.position, "constructor.unimplemented", this.name));
 		}
 		
 		if (this.isStatic())
 		{
-			markers.add(I18n.createMarker(this.position, "constructor.static", this.name));
+			markers.add(MarkerMessages.createMarker(this.position, "constructor.static", this.name));
 		}
 	}
 	
@@ -647,8 +647,8 @@ public class Constructor extends Member implements IConstructor
 			{
 				gt.setType(i, Types.ANY);
 				
-				markers.add(I18n.createMarker(position, "constructor.typevar.infer",
-				                              this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
+				markers.add(MarkerMessages.createMarker(position, "constructor.typevar.infer",
+				                                        this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
 			}
 		}
 		
@@ -684,10 +684,10 @@ public class Constructor extends Member implements IConstructor
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
-			markers.add(I18n.createMarker(position, "constructor.access.internal", this.theClass.getName()));
+			markers.add(MarkerMessages.createMarker(position, "constructor.access.internal", this.theClass.getName()));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(I18n.createMarker(position, "constructor.access.invisible", this.theClass.getName()));
+			markers.add(MarkerMessages.createMarker(position, "constructor.access.invisible", this.theClass.getName()));
 			break;
 		}
 		
@@ -696,7 +696,7 @@ public class Constructor extends Member implements IConstructor
 			IType exceptionType = this.exceptions[i];
 			if (IContext.isUnhandled(context, exceptionType))
 			{
-				markers.add(I18n.createMarker(position, "exception.unhandled", exceptionType.toString()));
+				markers.add(MarkerMessages.createMarker(position, "exception.unhandled", exceptionType.toString()));
 			}
 		}
 	}

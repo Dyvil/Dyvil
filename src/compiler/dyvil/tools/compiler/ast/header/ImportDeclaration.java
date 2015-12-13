@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.IObjectCompilable;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -64,7 +64,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		if (this.theImport == null)
 		{
-			markers.add(I18n.createMarker(this.position, isStatic ? "using.invalid" : "import.invalid"));
+			markers.add(MarkerMessages.createMarker(this.position, isStatic ? "using.invalid" : "import.invalid"));
 			return;
 		}
 		

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -180,7 +180,7 @@ public class CaptureVariable implements IVariable
 	{
 		if (!this.variable.isReferenceCapturable())
 		{
-			markers.add(I18n.createMarker(position, "variable.capture", this.variable.getName()));
+			markers.add(MarkerMessages.createMarker(position, "variable.capture", this.variable.getName()));
 		}
 		else
 		{

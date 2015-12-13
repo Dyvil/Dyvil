@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -98,9 +98,9 @@ public class MatchCase implements ICase, IDefaultContext
 			IPattern pattern1 = this.pattern.withType(type, markers);
 			if (pattern1 == null)
 			{
-				Marker marker = I18n.createError(this.pattern.getPosition(), "pattern.type.incompatible");
-				marker.addInfo(I18n.getString("pattern.type", this.pattern.getType()));
-				marker.addInfo(I18n.getString("value.type", type));
+				Marker marker = MarkerMessages.createError(this.pattern.getPosition(), "pattern.type.incompatible");
+				marker.addInfo(MarkerMessages.getMarker("pattern.type", this.pattern.getType()));
+				marker.addInfo(MarkerMessages.getMarker("value.type", type));
 				markers.add(marker);
 			}
 			else
@@ -117,8 +117,8 @@ public class MatchCase implements ICase, IDefaultContext
 			IValue value1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context1);
 			if (value1 == null)
 			{
-				Marker marker = I18n.createMarker(this.condition.getPosition(), "match.condition.type");
-				marker.addInfo(I18n.getString("value.type", this.condition.getType()));
+				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "match.condition.type");
+				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else

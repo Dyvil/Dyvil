@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.I18n;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -129,8 +129,9 @@ public final class ClassAccess implements IValue
 		
 		if (!this.type.isResolved())
 		{
-			markers.add(I18n.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
-			                              this.type.toString()));
+			markers.add(
+					MarkerMessages.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
+					                            this.type.toString()));
 		}
 		
 		return this;
@@ -158,7 +159,7 @@ public final class ClassAccess implements IValue
 			return;
 		}
 		
-		markers.add(I18n.createMarker(this.position, "type.access.invalid", this.type.toString()));
+		markers.add(MarkerMessages.createMarker(this.position, "type.access.invalid", this.type.toString()));
 	}
 	
 	@Override
