@@ -17,30 +17,28 @@ public class LambdaTest
 	
 	public static void main([String] args)
 	{
-		println "-- Basic Lambda Test --"
 		basicTest()
-		println "-- Function Chain Test --"
 		chainTest()
-		println "-- Closure Test --"
 		closureTest()
-		println "-- Compound Assignment Test --"
 		compoundAssignmentTest()
-		println "-- Custom SAM Interface Test --"
 		customSAMTest()
-		println "-- Partial Function Test"
 		partialFunctionTest()
 	}
 	
 	private static void basicTest() {
+		auto expected = [ 1 : "A", 10 : "a", 2 : "B", 20 : "b" ]
 		auto map = [ 1 : "a", 2 : "b" ].flatMapped((i, s) => [ (i, s.toUpperCase), (i * 10, s) ])
-		println map
+
+		Main.test("Basic Lambda", map, expected)
 	}
 	
 	private static void chainTest() {
 		auto fun1 = (int i) => i + 1
 		auto fun2 = (int i) => i * 2
 		auto fun12 = fun1 andThen fun2
-		println(fun12(7))
+		auto result = (fun12(7))
+
+		Main.test("Function Chain", 16, result)
 	}
 	
 	private static void compoundAssignmentTest() {
@@ -48,36 +46,40 @@ public class LambdaTest
 		auto list = List(1, 2, 3)
 		list.forEach(i => localSum += i)
 		list.forEach(i => staticSum += i)
-		println localSum
-		println staticSum
+
+		Main.test("Compound Assignment (Local)", 6, localSum)
+		Main.test("Compound Assignment (Static)", 6, staticSum)
 	}
 	
 	private static void customSAMTest() {
 		IntFunction intF = i => i * i
-		println(intF(7))
-				
-		auto fun1 = intF
-		println(fun1(10))
+		int result = intF(7)
+
+		Main.test("Custom SAM Interface", 49, result)
 	}
 
 	private static void closureTest() {
-		() => void function1 = function { println "Successful" }
-		() => String function2 = function { "Testing..." }
+		List[String] result = List.[String]
 
-		repeat(3) { println(function2()) }
+		() => void function1 = function { result += "a" }
+		() => String function2 = function { "b" }
 
-		with ("Still testing...") { println $0 }
+		repeat(3) { result += function2() }
+
+		with ("c") { result += $0 }
 
 		function1()
+
+		List[String] expected = [ "b", "b", "b", "c", "a" ]
+		Main.test("Closures", expected, result)
 	}
 
 	private static void partialFunctionTest() {
 		(int, int) => int compareInts = _ compareTo _;
-		int => void printFun = println _
+		any => void printFun1 = Main.test("Partial Function Test 1", -1, _)
 
-		printFun(compareInts(1, 2))
+		printFun1(compareInts(1, 2))
 
-		// with ("Test running...") { println _ }
-		with ("Test completed", println _)
+		with ("A", Main.test("Partial Function Test 2", "A", _))
 	}
 }

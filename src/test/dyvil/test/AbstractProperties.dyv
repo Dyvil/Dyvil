@@ -12,7 +12,7 @@ public class AbstractProperties
 	class C implements A
 	{
 	    public override int myProp {
-	    	set : println myProp
+	    	set : {}
 	    	get : 1
 	    }
 	}
@@ -20,7 +20,9 @@ public class AbstractProperties
 	public static void main([String] args)
 	{
 		auto c = new C
-		println c.myProp
-		c.myProp = 10
+		Main.test("Property Getter", 1, c.myProp)
+
+		auto result = c.myProp = 10
+		Main.test("Property Setter", 10, result)
 	}
 }

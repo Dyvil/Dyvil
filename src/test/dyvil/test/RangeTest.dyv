@@ -4,56 +4,69 @@ public class RangeTest
 {
 	public static void main([String] args)
 	{
-		println "-- Int Test --"
 		testInts()
-		
-		println "-- Ordered Test --"
 		testOrdered()
 	}
 	
 	private static void testInts()
 	{
-		auto range1 = 1 .. 3
-		auto range2 = 1 ..< 3
-		
+		auto range1 = 1 .. 4
+		auto range2 = 1 ..< 4
+
+		List[int] rangeInclusive = List.[int]
 		for (auto i : range1) {
-			println i
+			rangeInclusive += i
 		}
-		
+		Main.test("Int Range (inclusive)", List(1, 2, 3, 4), rangeInclusive)
+
+		List[int] rangeExclusive = List.[int]
 		for (auto i : range2) {
-			println i
+			rangeExclusive += i
 		}
-		
-		for (auto i : 1 .. 3) {
-			println i
+		Main.test("Int Range (exclusive)", List(1, 2, 3), rangeExclusive)
+
+		List[int] forInclusive = List.[int]
+		for (auto i : 1 .. 4) {
+			forInclusive += i
 		}
-		
-		for (auto i : 1 ..< 3) {
-			println i
+		Main.test("Int Range For (inclusive)", List(1, 2, 3, 4), forInclusive)
+
+		List[int] forExclusive = List.[int]
+		for (auto i : 1 ..< 4) {
+			forExclusive += i
 		}
+		Main.test("Int Range For (exclusive)", List(1, 2, 3), forExclusive)
 	}
 	
 	private static void testOrdered()
 	{
 		Ordered[int] one = 1
-		Ordered[int] three = 3
-		auto range1 = one .. three
-		auto range2 = one ..< three
+		Ordered[int] four = 4
+		auto range1 = one .. four
+		auto range2 = one ..< four
 		
+		List[Ordered] rangeInclusive = List.[Ordered]
 		for (auto i : range1) {
-			println i
+			rangeInclusive += i
 		}
-		
+		Main.test("Ordered Range (inclusive)", List(1, 2, 3, 4), rangeInclusive)
+
+		List[Ordered] rangeExclusive = List.[Ordered]
 		for (auto i : range2) {
-			println i
+			rangeExclusive += i
 		}
-		
-		for (auto i : one .. three) {
-			println i
+		Main.test("Ordered Range (exclusive)", List(1, 2, 3), rangeExclusive)
+
+		List[Ordered] forInclusive = List.[Ordered]
+		for (auto i : one .. four) {
+			forInclusive += i
 		}
-		
-		for (auto i : one ..< three) {
-			println i
+		Main.test("Ordered Range For (inclusive)", List(1, 2, 3, 4), forInclusive)
+
+		List[Ordered] forExclusive = List.[Ordered]
+		for (auto i : one ..< four) {
+			forExclusive += i
 		}
+		Main.test("Ordered Range For (exclusive)", List(1, 2, 3), forExclusive)
 	}
 }

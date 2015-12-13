@@ -5,22 +5,18 @@ public class ExtensionTest
 	class SuperClass
 	
 	class SubClass extends SuperClass {
-		public void foo() {
-			println "SubClass.foo"
-		}
+		public String foo() = "SubClass.foo"
 	}
 	
-	public extension void foo(SuperClass superClass) {
-		println "extension.foo"
-	}
+	public extension String foo(SuperClass superClass) = "extension.foo"
 	
 	public static void main([String] args) {
 		SuperClass sup = new SuperClass
 		SubClass sub = new SubClass
 		SuperClass sub1 = sub
-		
-		sup.foo
-		sub.foo
-		sub1.foo
+
+		Main.test("Super Class Extension", "extension.foo", sup.foo)
+		Main.test("Sub Class Extension", "SubClass.foo", sub.foo)
+		Main.test("Sub Class Extension (Compile-Time Super Class)", "SubClass.foo", sub1.foo)
 	}
 }

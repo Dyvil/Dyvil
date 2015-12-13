@@ -2,7 +2,7 @@ package dyvil.test
 
 public class ReferenceTest
 {
-	static void inc(var int i) { i = i + 1 }
+	static void inc(var int i) { i++ }
 
 	static int staticField = 0
 
@@ -14,17 +14,18 @@ public class ReferenceTest
 	public static void main([String] args)
 	{
 		inc staticField
-		println "Static: expected: 1 - actual: " + staticField
+		Main.test("Static Field Reference", 1, staticField)
 
 		Holder holder = new Holder
 		inc holder.instanceField
-		println "Instance: expected: 1 - actual: " + holder.instanceField
+		Main.test("Instance Field Reference", 1, holder.instanceField)
 
 		int variable = 0
 		inc variable
-		println "Variable: expected: 1 - actual: " + variable
+		Main.test("Variable Reference", 1, variable)
 
-		repeat(3) { inc variable }
-		println "Variable (captured): expected: 4 - actual: " + variable
+		int capturedVariable = 0
+		repeat(3) { inc capturedVariable }
+		Main.test("Captured Variable Reference", 3, capturedVariable)
 	}
 }

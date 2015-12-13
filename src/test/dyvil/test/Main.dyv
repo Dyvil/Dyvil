@@ -9,31 +9,32 @@ public class Main
 		
 	private static void runTests([String] args)
 	{
-		println "- Abstract Properties -"
 		AbstractProperties.main(args)
-		println "- Annotations -"
 		AnnotationTest.main(args)
-		println "- Bridge Methods -"
 		BridgeTest.main(args)
-		println "- Capture -"
 		CaptureTest.main(args)
-		println "- Extensions -"
 		ExtensionTest.main(args)
-		println "- For Statements -"
 		ForTest.main(args)
-		println "- Inc Operators -"
 		IncTest.main(args)
-		println "- Inheritance -"
 		InheritanceTest.main(args)
-		println "- Intrinsics -"
 		IntrinsicTest.main(args)
-		println "- Lambda Expressions -"
 		LambdaTest.main(args)
-		println "- Match Expressions -"
 		MatchTest.main(args)
-		println "- Range Expressions -"
 		RangeTest.main(args)
-		println "- Reference Parameters -"
 		ReferenceTest.main(args)
+	}
+
+	public static void test(String testName, any expected, any actual)
+	{
+		test(testName, expected, actual, expected == actual)
+	}
+
+	public static void test(String testName, any expected, any actual, boolean condition)
+	{
+		if (!condition)
+		{
+			String text = testName + " FAILED: expected: " + expected + " - actual: " + actual
+			throw new AssertionError(text as Object)
+		}
 	}
 }

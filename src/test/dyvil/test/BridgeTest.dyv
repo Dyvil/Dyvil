@@ -6,14 +6,14 @@ public class BridgeTest
 	{
 		public T get()
 		
-		public void put(T value)
+		public void set(T value)
 	}
 	
 	public case class IntContainer(int value) implements Container[int]
 	{
 		public override int get() = this.value
 		
-		public override void put(int value)
+		public override void set(int value)
 		{
 			this.value = value
 		}
@@ -23,7 +23,7 @@ public class BridgeTest
 	{
 		public override long get() = this.value
 				
-		public override void put(long value)
+		public override void set(long value)
 		{
 			this.value = value
 		}
@@ -32,15 +32,17 @@ public class BridgeTest
 	public static void main([String] args)
 	{
 		IntContainer ic = IntContainer(1)
+		Main.test("IntContainer", 1, ic.get)
+
 		Container[int] intContainer = ic
-		
-		println ic.get
-		println intContainer.get
+		ic.set(3)
+		Main.test("Container[int]", 3, intContainer.get)
 		
 		LongContainer lc = LongContainer(2L)
+		Main.test("LongContainer", 2, lc.get)
+
 		Container[long] longContainer = lc
-		
-		println lc.get
-		println longContainer.get
+		lc.set(4L)
+		Main.test("Container[long]", 4, longContainer.get)
 	}
 }

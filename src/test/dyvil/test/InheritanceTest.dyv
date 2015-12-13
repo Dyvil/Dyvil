@@ -18,17 +18,16 @@ public class InheritanceTest
 		public override String bar() = "FooBar.bar"
 	}
 	
-	interface IFoo2 {
-		public String foo() = "IFoo2.foo"
-	}
-	
 	class FooFoo implements IFoo[Object] {
 		public override Object foo() = "FooFoo.foo"
 	}
 	
 	public static void main([String] args)
 	{
-		println(new FooFoo().foo)
-		println(new FooBar().foo)
+		auto ff = new FooFoo().foo
+		auto fb = new FooBar().foo
+
+		Main.test("Simple Interface Test", ff, "FooFoo.foo")
+		Main.test("Double-Layer Interface Test", fb, "FooBar.foo")
 	}
 }

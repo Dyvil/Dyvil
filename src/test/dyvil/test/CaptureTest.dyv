@@ -2,51 +2,58 @@ package dyvil.test
 
 public class CaptureTest
 {
-	public static void main([String] args) {
-		println "-- Lambda Capture --"
+	public static void main([String] args)
+	{
 		lambdaCapture()
-		println "-- Lambda This Capture"
 		lambdaThisCapture()
-		println "-- Anonymous Class Capture --"
 		anonClassCapture()
-		println "-- Anonymous Class This Capture --"
 		anonClassThisCapture()
 	}
 	
-	private static void lambdaCapture() {
+	private static void lambdaCapture()
+	{
 		int abc = -1
 		auto fun = (int i) => (int j) => (int k) => (i, j, k, abc)
 		auto res = fun(1)(2)(3)
-		println "Expected: (1, 2, 3, -1), Actual: " + res
+
+		Main.test("Lambda Capture", (1, 2, 3, -1), res)
 	}
 	
-	private class ThisCapture {
+	private class ThisCapture
+	{
 		public Object anonymous() = new Object {
 			public override String toString() = this[ThisCapture].toString
 		}
 		
 		public => ThisCapture lambda() = => this
+
+		public override String toString() = System.identityHashCode(this).toHexString
 	}
 	
-	private static void lambdaThisCapture() {
+	private static void lambdaThisCapture()
+	{
 		auto instance = new ThisCapture
 		auto lambda = instance.lambda
 		auto res = lambda()
-		println "Expected: " + instance + ", Actual: " + res
+
+		Main.test("Lambda This Capture", instance, res)
 	}
 	
-	private static void anonClassCapture() {
+	private static void anonClassCapture()
+	{
 		int abc = 123
 		auto obj = new Object {
-			public override String toString() = this.abc.toString
+			public override String toString() = abc.toString
 		}
 		
-		println "Expected: " + abc + ", Actual: " + obj
+		Main.test("Anonymous Class Capture", abc.toString, obj.toString)
 	}
 	
-	private static void anonClassThisCapture() {
+	private static void anonClassThisCapture()
+	{
 		auto instance = new ThisCapture
 		auto obj = instance.anonymous
-		println "Expected: " + instance + ", Actual: " + obj
+
+		Main.test("Anonymous Class This Capture", instance, obj, instance.toString == obj.toString)
 	}
 }

@@ -7,55 +7,84 @@ public class MatchTest
 		table()
 		tableHoles()
 		lookup()
-		string()
-		stringCollision()
+		stringTable()
+		stringLookup
+		// stringCollision()
 		expression()
 	}
 	
-	private static void table() {
+	private static void table()
+	{
+		String value = _
+
 		1 match {
-			case 0: println "zero"
-			case 1: println "one"
-			case 2: println "two"
-			case _ : println "something else"
+			case 0: value = "zero"
+			case 1: value = "one"
+			case 2: value = "two"
+			case _ : value = "something else"
 		};
+
+		Main.test("Match -> TableSwitch", "one", value)
 	}
 	
-	private static void tableHoles() {
+	private static void tableHoles()
+	{
+		String value = _
+
 		2 match {
-			case 0: println "null"
-			case 1: println "one"
-			case 2: println "two"
-			case 5: println "five"
-			case 6: println "six"
+			case 0: value = "null"
+			case 1: value = "one"
+			case 2: value = "two"
+			case 5: value = "five"
+			case 6: value = "six"
 		};
+
+		Main.test("Match -> TableSwitch (with holes)", "two", value)
 	}
 	
-	private static void lookup() {
+	private static void lookup()
+	{
+		String value = _
+
 		10 match {
-			case 1: println "1"
-			case 10: println "10"
-			case 100: println "100"
-			case _ : println "something else"
+			case 1: value = "1"
+			case 10: value = "10"
+			case 100: value = "100"
+			case _ : value = "something else"
 		};
+
+		Main.test("Match -> LookupSwitch", "10", value)
+	}
+
+	private static void stringTable()
+	{
+		String value = _
+
+		"a" match {
+			case "a" : value = "A"
+			case "b": value = "B"
+			case "c": value = "C"
+			case _ : value = "..."
+		};
+
+		Main.test("Match String -> TableSwitch", "A", value)
 	}
 	
-	private static void string() {
+	private static void stringLookup()
+	{
+		String value = _
+
 		"abc" match {
-			case "abc": println "ABC"
-			case "def": println "DEF"
-			case _ : println "..."
+			case "abc": value = "ABC"
+			case "def": value = "DEF"
+			case _ : value = "..."
 		};
 		
-		"a" match {
-			case "a" : println "A"
-			case "b": println "B"
-			case "c": println "C"
-			case _ : println "..."
-		};
+		Main.test("Match String -> LookupSwitch", "ABC", value)
 	}
 	
-	private static void stringCollision() {
+	private static void stringCollision()
+	{
 		/* "BBBB" match {
 			case "AaAa": println "1"
 			case "AaBB": println "2"
@@ -65,11 +94,14 @@ public class MatchTest
 		}*/
 	}
 	
-	private static void expression() {
-		println 10 match {
+	private static void expression()
+	{
+		auto result = 10 match {
 			case 0: "a"
 			case 1: "b"
 			case var x: x.toString
 		}
+
+		Main.test("Match Expression", "10", result)
 	}
 }	

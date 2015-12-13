@@ -2,33 +2,35 @@ package dyvil.test
 
 public class IncTest {
 	public static void main([String] args) {
-		println "-- Local Int Test --"
 		localIntTest
-		println "-- Local Long Test --"
 		localLongTest
-		println "-- Static Test --"
 		staticTest
-		println "-- Instance Test --"
 		instanceTest
 	}
 
 	private static void localIntTest() {
 		int i = 0
         i += 2
-        println(i += 1)
+        int result = i += 1
+
+        Main.test("Local Int Increment", 3, result)
 	}
 
 	private static void localLongTest() {
 		long l = 0
     	l += 3
-    	println(l += 1)
+    	int result = l += 1
+
+    	Main.test("Local Long Increment", 4, result)
 	}
 
 	private static int counter = 0
 
 	private static void staticTest() {
 		counter += 4
-		println(counter += 1)
+		int result = counter += 1
+
+		Main.test("Static Increment", 5, counter)
 	}
 
 	private static class Counter {
@@ -36,16 +38,19 @@ public class IncTest {
 	}
 
 	private static void instanceTest() {
-		Counter counter = new Counter
-		instanceStatementTest(counter)
-		instanceExpressionTest(counter)
+		instanceStatementTest(new Counter)
+		instanceExpressionTest(new Counter)
 	}
 
 	private static void instanceStatementTest(Counter counter) {
 		counter.value += 2
+
+		Main.test("Instance Statement Increment", 2, counter.value)
 	}
 
 	private static void instanceExpressionTest(Counter counter) {
-		println(counter.value += 2)
+		int result = counter.value += 5
+
+		Main.test("Instance Expression Increment", 5, counter.value)
 	}
 }
