@@ -786,7 +786,10 @@ public class Property extends Member implements IProperty, IContext
 			String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
 
 			buffer.append('\n').append(prefix);
-			this.getterModifiers.toString(buffer);
+			if (this.getterModifiers != null)
+			{
+				this.getterModifiers.toString(buffer);
+			}
 			buffer.append("get");
 
 			// Separator
@@ -821,7 +824,10 @@ public class Property extends Member implements IProperty, IContext
 			String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
 
 			buffer.append('\n').append(prefix);
-			this.setterModifiers.toString(buffer);
+			if (this.setterModifiers != null)
+			{
+				this.setterModifiers.toString(buffer);
+			}
 			buffer.append("set");
 
 			// Separator
