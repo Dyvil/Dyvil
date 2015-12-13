@@ -128,7 +128,7 @@ dependencies {
 // ---------------------------------------- Copy Tasks ----------------------------------------
 
 task clearCopyDir(type: Delete) {
-	delete fileTree("${ buildDir }/src/")
+	delete fileTree("$buildDir/src/")
 }
 
 // Library
@@ -140,15 +140,14 @@ task copyLibraryJava(type: Copy, dependsOn: clearCopyDir) {
 	include javaFilters
 }
 
-compileLibraryJava.dependsOn(copyLibraryJava)
-compileLibraryJava.source = "${ buildDir }/src/java/library"
+compileLibraryJava.dependsOn copyLibraryJava
+compileLibraryJava.source = "$buildDir/src/java/library"
 
 task copyLibraryDyvil(type: Copy, dependsOn: clearCopyDir) {
 	from 'src/library'
-	into "${ buildDir }/src/dyvil/library"
+	into "$buildDir/src/dyvil/library"
 	
 	includeEmptyDirs = false
-	
 	include dyvilFilters
 }
 
@@ -156,10 +155,11 @@ task copyLibraryDyvil(type: Copy, dependsOn: clearCopyDir) {
 
 task copyCompilerJava(type: Copy, dependsOn: clearCopyDir) {
 	from sourceSets.compiler.java
-	into "${ buildDir }/src/java/compiler"
+	into "$buildDir/src/java/compiler"
 	
 	include javaFilters
-	
+
+	includeEmptyDirs = false
 	filter {
 		it.replace('$$version$$', version)
 				.replace('$$libraryVersion$$', libraryVersion)
@@ -167,15 +167,16 @@ task copyCompilerJava(type: Copy, dependsOn: clearCopyDir) {
 	}
 }
 
-compileCompilerJava.dependsOn(copyCompilerJava)
-compileCompilerJava.source = "${ buildDir }/src/java/compiler"
+compileCompilerJava.dependsOn copyCompilerJava
+compileCompilerJava.source = "$buildDir/src/java/compiler"
 
 // REPL
 
 task copyReplJava(type: Copy, dependsOn: clearCopyDir) {
 	from sourceSets.repl.java
-	into "${ buildDir }/src/java/repl"
-	
+	into "$buildDir/src/java/repl"
+
+	includeEmptyDirs = false
 	include javaFilters
 	
 	filter {
@@ -183,42 +184,68 @@ task copyReplJava(type: Copy, dependsOn: clearCopyDir) {
 	}
 }
 
-compileReplJava.dependsOn(copyReplJava)
-compileReplJava.source = "${ buildDir }/src/java/repl"
+compileReplJava.dependsOn copyReplJava
+compileReplJava.source = "$buildDir/src/java/repl"
 
 // DPF
 
 task copyDpfJava(type: Copy, dependsOn: clearCopyDir) {
 	from sourceSets.dpf.java
-	into "${ buildDir }/src/java/dpf"
-	
+	into "$buildDir/src/java/dpf"
+
+	includeEmptyDirs = false
 	include javaFilters
 }
 
 compileDpfJava.dependsOn(copyDpfJava)
-compileDpfJava.source = "${ buildDir }/src/java/dpf"
+compileDpfJava.source = "$buildDir/src/java/dpf"
+
+// Tests
+
+task copyTestDyvil(type: Copy, dependsOn: clearCopyDir) {
+	from 'src/test'
+	into "$buildDir/src/dyvil/test"
+
+	includeEmptyDirs = false
+	include dyvilFilters
+}
 
 // ---------------------------------------- Compilation Tasks ----------------------------------------
 
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
-task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) {
-	// Required to make UP-TO-DATE work
-	outputs.upToDateSpec = new AndSpec()
+task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
+	runCompiler exec, "build/src/dyvil/library", "build/dyvilbin"
+}
 
-	String src = "build/src/dyvil/library"
-	String bin = "build/dyvilbin"
+private void runCompiler(JavaExec exec, String src, String bin)
+{
+	// Required to make UP-TO-DATE work
+	exec.outputs.upToDateSpec = new AndSpec()
 
 	// All Dyvil Class and Header files
-	inputs.dir src
+	exec.inputs.dir src
 	// All possible Output Files (.class, .dyo)
-	outputs.dir bin
-	
-	main = 'dyvil.tools.compiler.DyvilCompiler'
-	classpath = sourceSets.compiler.runtimeClasspath
-	args = [ "source_dir=${ src }", "output_dir=${ bin }", 'compile' ]
+	exec.outputs.dir bin
+
+	exec.main = 'dyvil.tools.compiler.DyvilCompiler'
+	exec.classpath = sourceSets.compiler.runtimeClasspath
+	exec.args = [ "source_dir=$src", "output_dir=$bin", 'compile' ]
 }
+
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyTestDyvil' ]) { JavaExec exec ->
+	runCompiler exec, "build/src/dyvil/test", "build/dyviltestbin"
+}
+
+// ---------------------------------------- Test Tasks ----------------------------------------
+
+task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
+	main = 'dyvil.test.Main'
+	classpath = files("build/dyviltestbin") + sourceSets.library.runtimeClasspath + files("build/dyvilbin")
+}
+
+test.dependsOn testDyvil
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 
