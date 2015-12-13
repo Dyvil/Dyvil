@@ -6,6 +6,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
 
@@ -18,17 +19,17 @@ public class REPLParser extends ParserManager
 	{
 		this.context = context;
 	}
-	
+
 	@Override
-	public void report(IToken token, String message)
+	public void report(Marker error)
 	{
 		this.syntaxErrors = true;
 		if (this.markers != null)
 		{
-			super.report(token, message);
+			super.report(error);
 		}
 	}
-	
+
 	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser)
 	{
 		this.tokens = tokens;
