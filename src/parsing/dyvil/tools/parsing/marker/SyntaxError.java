@@ -6,11 +6,6 @@ public class SyntaxError extends Marker
 {
 	private static final long serialVersionUID = -2234451954260010124L;
 	
-	public SyntaxError(ICodePosition position)
-	{
-		super(position);
-	}
-	
 	public SyntaxError(ICodePosition position, String message)
 	{
 		super(position, message);

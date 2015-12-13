@@ -2,16 +2,11 @@ package dyvil.tools.parsing.marker;
 
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Info extends Marker
+public class InfoMarker extends Marker
 {
 	private static final long serialVersionUID = 8238564164743045522L;
-	
-	protected Info(ICodePosition position)
-	{
-		super(position);
-	}
-	
-	public Info(ICodePosition position, String message)
+
+	public InfoMarker(ICodePosition position, String message)
 	{
 		super(position, message);
 	}

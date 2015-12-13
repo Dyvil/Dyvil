@@ -8,24 +8,10 @@ public abstract class Marker implements Comparable<Marker>
 {
 	private static final long serialVersionUID = 8313691845679541217L;
 	
-	protected ICodePosition position;
+	protected final ICodePosition position;
 	
-	private String       message;
-	private List<String> info;
-	
-	protected Marker()
-	{
-	}
-	
-	public Marker(ICodePosition position)
-	{
-		if (position == null)
-		{
-			throw new IllegalArgumentException("Marker Position cannot be null");
-		}
-		
-		this.position = position;
-	}
+	private final String       message;
+	private       List<String> info;
 	
 	public Marker(ICodePosition position, String message)
 	{
@@ -37,7 +23,17 @@ public abstract class Marker implements Comparable<Marker>
 		this.message = message;
 		this.position = position;
 	}
-	
+
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	public String getMessage()
+	{
+		return this.message;
+	}
+
 	public void addInfo(String info)
 	{
 		if (this.info == null)

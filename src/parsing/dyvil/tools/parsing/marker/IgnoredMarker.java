@@ -1,5 +1,7 @@
 package dyvil.tools.parsing.marker;
 
+import dyvil.tools.parsing.position.ICodePosition;
+
 public class IgnoredMarker extends Marker
 {
 	private static final long serialVersionUID = 6339084541799017767L;
@@ -8,6 +10,7 @@ public class IgnoredMarker extends Marker
 	
 	private IgnoredMarker()
 	{
+		super(ICodePosition.ORIGIN, "");
 	}
 	
 	@Override

@@ -6,11 +6,6 @@ public class SemanticError extends Marker
 {
 	private static final long serialVersionUID = -2234451954260010124L;
 	
-	public SemanticError(ICodePosition position)
-	{
-		super(position);
-	}
-	
 	public SemanticError(ICodePosition position, String message)
 	{
 		super(position, message);
