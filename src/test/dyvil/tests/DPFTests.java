@@ -11,7 +11,9 @@ import static org.junit.Assert.assertEquals;
 
 public class DPFTests
 {
-	private static final String TEST_FILE = "\nnode1\n" + "{\n" + "\tintProperty = 10\n" + "\tstringProperty = \"abc\"\n"
+	private static final String TEST_FILE = "\n" + "node1\n" + "{\n" + "\tintProperty = 10\n"
+			+ "\tstringProperty = \"abc\"\n"
+			+ "\tstringProperty2 = \"String Interpolation: \\(node1.stringProperty) where intProperty = \\(node1.intProperty)\"\n"
 			+ "\tlistProperty = [ 1, \"a\", true ]\n" + "\tmapProperty = {\n" + "\t\t1 : \"a\",\n" + "\t\t2 : \"b\"\n"
 			+ "\t}\n" + "}\n" + "\n" + "node2.subNode\n" + "{\n" + "\tsubProperty1 = 42\n" + "\t\n" + "\tsubNode2\n"
 			+ "\t{\n" + "\t\tsubProperty2 = 13\n" + "\t}\n" + "}\n";
