@@ -12,10 +12,11 @@ import dyvil.tools.parsing.token.IToken;
 
 public class IfStatementParser extends Parser implements IValueConsumer
 {
-	public static final int IF            = 1;
-	public static final int CONDITION_END = 2;
-	public static final int THEN          = 4;
-	public static final int ELSE          = 8;
+	private static final   int END           = -1;
+	protected static final int IF            = 0;
+	protected static final int CONDITION_END = 1;
+	protected static final int THEN          = 2;
+	protected static final int ELSE          = 4;
 	
 	protected IfStatement statement;
 	
@@ -28,52 +29,43 @@ public class IfStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		if (this.mode == -1)
+		final int type = token.type();
+		switch (this.mode)
 		{
+		case END:
 			pm.popParser(true);
 			return;
-		}
-		
-		int type = token.type();
-		if (this.mode == IF)
-		{
+		case IF:
 			this.mode = CONDITION_END;
 			pm.pushParser(pm.newExpressionParser(this));
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid if statement - '(' expected");
+				pm.report(token, "if.open_paren");
 			}
 			return;
-		}
-		if (this.mode == CONDITION_END)
-		{
+		case CONDITION_END:
 			this.mode = THEN;
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid if statement - ')' expected");
+				pm.report(token, "if.close_paren");
 			}
 			return;
-		}
-		if (this.mode == THEN)
-		{
+		case THEN:
 			if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
 				return;
 			}
-			
+
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = ELSE;
 			return;
-		}
-		if (this.mode == ELSE)
-		{
+		case ELSE:
 			if (ParserUtil.isTerminator(type))
 			{
-				IToken next = token.next();
-				if (next != null && next.type() == DyvilKeywords.ELSE)
+				if (token.next().type() == DyvilKeywords.ELSE)
 				{
 					return;
 				}
@@ -84,7 +76,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			if (type == DyvilKeywords.ELSE)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
-				this.mode = -1;
+				this.mode = END;
 				return;
 			}
 			

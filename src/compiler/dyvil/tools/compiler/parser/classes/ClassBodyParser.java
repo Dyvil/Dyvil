@@ -121,7 +121,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				if (this.theClass == null)
 				{
 					this.reset();
-					pm.report(token, "Cannot define a class in this context");
+					pm.report(token, "class.invalid");
 					return;
 				}
 
@@ -158,7 +158,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			if (!ParserUtil.isIdentifier(type))
 			{
 				this.reset();
-				pm.report(token, "Invalid Member Declaration - Name expected");
+				pm.report(token, "member.identifier");
 				return;
 			}
 			IToken next = token.next();
@@ -224,16 +224,15 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			pm.report(token, "Invalid Declaration - ';', '=', '(', '[' or '{' expected");
+			pm.report(token, "class.body.declaration.invalid");
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
-			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "method.generic.close_bracket");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Generic Type Parameter List - ']' expected");
 			return;
 		case PARAMETERS:
 			this.mode = PARAMETERS_END;
@@ -243,7 +242,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Parameter List - '(' expected");
+			pm.report(token, "method.parameters.open_paren");
 			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_VALUE;
@@ -253,7 +252,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			pm.reparse();
-			pm.report(token, "Invalid Parameter List - ')' expected");
+			pm.report(token, "method.parameters.close_paren");
 			return;
 		case METHOD_VALUE:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
@@ -286,7 +285,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			}
 			
 			this.mode = TYPE;
-			pm.report(token, "Invalid Method Declaration - ';', '=', '{' or 'throws' expected");
+			pm.report(token, "method.body.separator");
 			return;
 		case METHOD_END:
 			if (this.member instanceof IMethod)

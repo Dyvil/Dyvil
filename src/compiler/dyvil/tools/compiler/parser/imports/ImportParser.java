@@ -91,7 +91,7 @@ public final class ImportParser extends Parser
 			}
 			}
 			pm.popParser();
-			pm.report(token, "Invalid Import Declaration - Identifier expected");
+			pm.report(token, "import.identifier");
 			return;
 		case DOT_ALIAS:
 			switch (type)
@@ -109,14 +109,14 @@ public final class ImportParser extends Parser
 					pm.skip();
 					return;
 				}
-				pm.report(next, "Invalid Import Alias");
+				pm.report(next, "import.alias.identifier");
 				return;
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				this.consumer.setImport(this.theImport);
 				pm.popParser(true);
 				return;
 			}
-			pm.report(token, "Invalid Import Declaration - '.' expected");
+			pm.report(token, "import.dot");
 			return;
 		case MULTIIMPORT:
 			this.theImport.expandPosition(token);
@@ -125,7 +125,7 @@ public final class ImportParser extends Parser
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Multi-Import - '}' expected");
+				pm.report(token, "import.multi.close_brace");
 			}
 			return;
 		}

@@ -20,7 +20,7 @@ public final class StingInterpolationParser extends Parser implements IValueCons
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (type)
 		{
 		case Tokens.STRING_START:
@@ -29,7 +29,7 @@ public final class StingInterpolationParser extends Parser implements IValueCons
 			int nextType = token.next().type();
 			if (nextType == Tokens.STRING_PART || nextType == Tokens.STRING_END)
 			{
-				pm.report(token.next(), "Invalid Format String - Expression expected");
+				pm.report(token.next(), "stringinterpolation.expression");
 				return;
 			}
 			this.value.addString(token.stringValue());
@@ -42,7 +42,7 @@ public final class StingInterpolationParser extends Parser implements IValueCons
 			return;
 		}
 		pm.reparse();
-		pm.report(token, "Invalid Format String - String part expected");
+		pm.report(token, "stringinterpolation.part");
 		return;
 	}
 	

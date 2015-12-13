@@ -37,7 +37,7 @@ public class ImportListParser extends Parser
 			if (type != BaseSymbols.COMMA)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Import List - ',' expected");
+				pm.report(token, "import.multi.comma");
 			}
 			return;
 		}

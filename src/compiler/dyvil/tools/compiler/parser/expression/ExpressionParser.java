@@ -37,6 +37,7 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -110,7 +111,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 		case Tokens.EOF:
 		case BaseSymbols.SEMICOLON:
-		case BaseSymbols.COLON:
 		case BaseSymbols.COMMA:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_END:
@@ -239,21 +239,21 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = PATTERN_END;
 			if (type == DyvilKeywords.IF)
 			{
-				pm.pushParser(pm.newExpressionParser(v -> ((ICase) this.value).setCondition(v)));
+				pm.pushParser(pm.newExpressionParser(((ICase) this.value)::setCondition));
 				return;
 			}
 			//$FALL-THROUGH$
 		case PATTERN_END:
-			if (type == BaseSymbols.COLON || type == DyvilSymbols.ARROW_OPERATOR)
+			if (type == DyvilSymbols.ARROW_OPERATOR || type == BaseSymbols.COLON)
 			{
 				this.mode = END;
 				if (token.next().type() != DyvilKeywords.CASE)
 				{
-					pm.pushParser(pm.newExpressionParser(v -> ((ICase) this.value).setAction(v)));
+					pm.pushParser(pm.newExpressionParser(((ICase) this.value)::setAction));
 				}
 				return;
 			}
-			pm.report(token, "Invalid Pattern - ':' expected");
+			pm.report(token, "match.");
 			return;
 		case ANONYMOUS_CLASS_END:
 			this.value.expandPosition(token);
@@ -262,7 +262,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Anonymous Class List - '}' expected");
+				pm.report(token, "class.anonymous.body.end");
 			}
 			
 			return;
@@ -273,7 +273,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Argument List - ')' expected");
+				pm.report(token, "method.call.close_paren");
 			}
 			
 			return;
@@ -284,7 +284,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Subscript Arguments - ']' expected");
+				pm.report(token, "method.subscript.close_bracket");
 			}
 			
 			return;
@@ -332,7 +332,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Constructor Argument List - ')' expected");
+				pm.report(token, "constructor.call.close_paren");
 			}
 			this.value.expandPosition(token);
 			this.mode = ACCESS;
@@ -344,20 +344,18 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 			return;
 		case BYTECODE_END:
-			this.valueConsumer.setValue(this.value);
-			pm.popParser();
-			this.value.expandPosition(token);
+			this.mode = END;
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Bytecode Expression - '}' expected");
+				pm.report(token, "bytecode.expression.close_brace");
 			}
 			return;
 		case TYPE_ARGUMENTS_END:
 		{
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				pm.report(token, "Invalid Method Type Parameter List - ']' expected");
+				pm.report(token, "method.call.generics.close_bracket");
 			}
 			
 			MethodCall mc = (MethodCall) this.value;
@@ -418,19 +416,19 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.mode = ACCESS;
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				pm.report(token, "Invalid this Expression - ']' expected");
+				pm.report(token, "this.close_bracket");
 			}
 			return;
 		case PARAMETERIZED_SUPER_END:
 			this.mode = ACCESS;
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				pm.report(token, "Invalid super Expression - ']' expected");
+				pm.report(token, "super.close_bracket");
 			}
 			return;
 		}
 		
-		if (ParserUtil.isCloseBracket(type))
+		if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.COLON)
 		{
 			// Close bracket, end expression
 			if (this.value != null)
@@ -489,9 +487,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			case BaseSymbols.OPEN_PARENTHESIS:
 				// Parse an apply call
 				// e.g. 1("a"), this("stuff"), "myString"(2)
-				ApplyMethodCall amc = new ApplyMethodCall(this.value.getPosition(), this.value,
-				                                          this.parseArguments(pm, token.next()));
-				this.value = amc;
+				this.value = new ApplyMethodCall(this.value.getPosition(), this.value,
+				                                 this.parseArguments(pm, token.next()));
 				this.mode = PARAMETERS_END;
 				return;
 			}
@@ -502,7 +499,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			if (this.value != null && type != 0)
+			if (this.value != null)
 			{
 				if (this.operator != null)
 				{
@@ -536,11 +533,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			pm.report(token, "Invalid Dot Access - Unexpected " + token);
+			pm.report(MarkerMessages.createError(token, "expression.dot.invalid", token.toString()));
 			return;
 		}
 		
-		pm.report(token, "Invalid Expression - Unexpected " + token);
+		pm.report(MarkerMessages.createError(token, "expression.invalid", token.toString()));
 		return;
 	}
 	
@@ -760,8 +757,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					pm.popParser(true);
 					return;
 				case Operator.INFIX_NONE:
-					pm.report(token, "Invalid Operator " + name
-							+ " - Operator without associativity is not allowed at this location");
+					pm.report(MarkerMessages.createError(token, "expression.operator.invalid", name.toString()));
 					return;
 				case Operator.INFIX_RIGHT:
 				}
@@ -819,53 +815,51 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	 */
 	private void parseAssignment(IParserManager pm, IToken token)
 	{
-		if (this.value == null)
+		if (this.value != null)
 		{
-			this.mode = VALUE;
-			pm.report(token, "Invalid Assignment - Delete this token");
-			return;
+			ICodePosition position = this.value.getPosition();
+			int valueType = this.value.valueTag();
+			switch (valueType)
+			{
+			case IValue.FIELD_ACCESS:
+			{
+				FieldAccess fa = (FieldAccess) this.value;
+				FieldAssignment assign = new FieldAssignment(position, fa.getInstance(), fa.getName());
+				this.value = assign;
+				pm.pushParser(pm.newExpressionParser(assign));
+				return;
+			}
+			case IValue.APPLY_CALL:
+			{
+				ApplyMethodCall call = (ApplyMethodCall) this.value;
+				UpdateMethodCall updateCall = new UpdateMethodCall(position, call.getReceiver(), call.getArguments());
+				this.value = updateCall;
+				pm.pushParser(pm.newExpressionParser(updateCall));
+				return;
+			}
+			case IValue.METHOD_CALL:
+			{
+				MethodCall call = (MethodCall) this.value;
+				FieldAccess fa = new FieldAccess(position, call.getReceiver(), call.getName());
+				UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.getArguments());
+				this.value = updateCall;
+				pm.pushParser(pm.newExpressionParser(updateCall));
+				return;
+			}
+			case IValue.SUBSCRIPT_GET:
+			{
+				SubscriptGetter getter = (SubscriptGetter) this.value;
+				SubscriptSetter setter = new SubscriptSetter(position, getter.getReceiver(), getter.getArguments());
+				this.value = setter;
+				pm.pushParser(pm.newExpressionParser(setter));
+				return;
+			}
+			}
 		}
-		
-		ICodePosition position = this.value.getPosition();
-		int valueType = this.value.valueTag();
-		switch (valueType)
-		{
-		case IValue.FIELD_ACCESS:
-		{
-			FieldAccess fa = (FieldAccess) this.value;
-			FieldAssignment assign = new FieldAssignment(position, fa.getInstance(), fa.getName());
-			this.value = assign;
-			pm.pushParser(pm.newExpressionParser(assign));
-			return;
-		}
-		case IValue.APPLY_CALL:
-		{
-			ApplyMethodCall call = (ApplyMethodCall) this.value;
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, call.getReceiver(), call.getArguments());
-			this.value = updateCall;
-			pm.pushParser(pm.newExpressionParser(updateCall));
-			return;
-		}
-		case IValue.METHOD_CALL:
-		{
-			MethodCall call = (MethodCall) this.value;
-			FieldAccess fa = new FieldAccess(position, call.getReceiver(), call.getName());
-			UpdateMethodCall updateCall = new UpdateMethodCall(position, fa, call.getArguments());
-			this.value = updateCall;
-			pm.pushParser(pm.newExpressionParser(updateCall));
-			return;
-		}
-		case IValue.SUBSCRIPT_GET:
-		{
-			SubscriptGetter getter = (SubscriptGetter) this.value;
-			SubscriptSetter setter = new SubscriptSetter(position, getter.getReceiver(), getter.getArguments());
-			this.value = setter;
-			pm.pushParser(pm.newExpressionParser(setter));
-			return;
-		}
-		}
-		
-		pm.report(token, "Invalid Assignment - Unexpected " + token);
+
+		pm.report(MarkerMessages.createSyntaxError(token, "assignment.invalid", token));
+		this.mode = VALUE;
+		this.value = null;
 		return;
 	}
 	
@@ -988,7 +982,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof IfStatementParser))
 			{
-				pm.report(token, "Invalid Expression - 'else' not allowed at this location");
+				pm.report(token, "expression.else");
 				return true;
 			}
 			this.valueConsumer.setValue(this.value);
@@ -1074,7 +1068,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				pm.report(token, "Invalid Expression - 'catch' not allowed at this location");
+				pm.report(token, "expression.catch");
 				return true;
 			}
 			this.valueConsumer.setValue(this.value);
@@ -1085,7 +1079,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (!(this.parent instanceof TryStatementParser))
 			{
-				pm.report(token, "Invalid Expression - 'finally' not allowed at this location");
+				pm.report(token, "expression.finally");
 				return true;
 			}
 			this.valueConsumer.setValue(this.value);

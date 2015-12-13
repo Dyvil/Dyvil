@@ -41,14 +41,14 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		case DOT:
 			if (type != BaseSymbols.DOT)
 			{
-				pm.report(token, "Invalid Field Instruction - '.' expected");
+				pm.report(token, "bytecode.field.dot");
 				return;
 			}
 			this.mode = COLON;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(next, "Invalid Field Instruction - Field Name expected");
+				pm.report(next, "bytecode.field.identifier");
 				return;
 			}
 			pm.skip();
@@ -57,11 +57,10 @@ public final class FieldInstructionParser extends Parser implements IInternalTyp
 		case COLON:
 			if (type != BaseSymbols.COLON)
 			{
-				pm.report(token, "Invalid Field Instruction - ':' expected");
+				pm.report(token, "bytecode.field.colon");
 				return;
 			}
 			pm.pushParser(new InternalTypeParser(this));
-			return;
 		}
 	}
 	

@@ -19,9 +19,9 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 	
 	private IToken startPosition;
 	
-	private IValue[] values = new IValue[3];
-	private int      valueCount;
-	private IValue[] values2;
+	private IValue[] keys = new IValue[3];
+	private int      keyCount;
+	private IValue[] values;
 	private boolean  map;
 	
 	public ArrayLiteralParser(IValueConsumer consumer)
@@ -44,34 +44,20 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			if (type != BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Array Literal - '[' expected");
+				pm.report(token, "array.open_bracket");
 			}
 			return;
 		case SEPARATOR | COLON:
-			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.popParser();
-				this.end(token);
-				return;
-			}
-			
 			if (type == BaseSymbols.COLON)
 			{
 				this.mode = SEPARATOR;
 				this.map = true;
-				this.values2 = new IValue[this.valueCount];
+				this.values = new IValue[this.keyCount];
 				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
-			
-			this.mode = SEPARATOR;
-			pm.pushParser(new ExpressionParser(this));
-			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
-			{
-				pm.reparse();
-				pm.report(token, "Invalid Array Literal - ',' expected");
-			}
-			return;
+			this.map = false;
+			// Fallthrough
 		case SEPARATOR:
 			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
@@ -84,14 +70,14 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			pm.pushParser(new ExpressionParser(this));
 			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
-				pm.report(token, "Invalid Array Literal - ',' expected");
+				pm.report(token, "array.separator");
 			}
 			return;
 		case COLON:
 			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				this.end(token);
 				pm.popParser();
+				this.end(token);
 				return;
 			}
 			
@@ -100,7 +86,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			if (type != BaseSymbols.COLON)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Map Literal - ':' expected");
+				pm.report(token, "array.map.colon");
 			}
 			return;
 		}
@@ -110,52 +96,52 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 	{
 		if (this.map)
 		{
-			MapExpr map = new MapExpr(this.startPosition.to(token), this.values, this.values2, this.valueCount);
+			MapExpr map = new MapExpr(this.startPosition.to(token), this.keys, this.values, this.keyCount);
 			this.consumer.setValue(map);
 			return;
 		}
 		
-		ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.values, this.valueCount);
+		ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.keys, this.keyCount);
 		this.consumer.setValue(array);
 	}
 	
 	private void ensureCapacity(int cap)
 	{
-		if (cap > this.values.length)
+		if (cap > this.keys.length)
 		{
 			IValue[] newValues = new IValue[cap];
-			System.arraycopy(this.values, 0, newValues, 0, this.valueCount);
-			this.values = newValues;
+			System.arraycopy(this.keys, 0, newValues, 0, this.keyCount);
+			this.keys = newValues;
 		}
 		
-		if (this.map && cap > this.values2.length)
+		if (this.map && cap > this.values.length)
 		{
 			IValue[] newValues = new IValue[cap];
-			System.arraycopy(this.values2, 0, newValues, 0, this.valueCount);
-			this.values2 = newValues;
+			System.arraycopy(this.values, 0, newValues, 0, this.keyCount);
+			this.values = newValues;
 		}
 	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		this.ensureCapacity(this.valueCount + 1);
+		this.ensureCapacity(this.keyCount + 1);
 		switch (this.mode)
 		{
 		case COLON:
 		case SEPARATOR | COLON:
-			this.values[this.valueCount] = value;
-			this.valueCount++;
+			this.keys[this.keyCount] = value;
+			this.keyCount++;
 			return;
 		case SEPARATOR:
 			if (this.map)
 			{
-				this.values2[this.valueCount - 1] = value;
+				this.values[this.keyCount - 1] = value;
 			}
 			else
 			{
-				this.values[this.valueCount] = value;
-				this.valueCount++;
+				this.keys[this.keyCount] = value;
+				this.keyCount++;
 			}
 		}
 	}

@@ -31,11 +31,10 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case ACTION:
-			// TODO Try-With-Resource
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = CATCH;
 			return;
@@ -75,7 +74,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Catch Expression - '(' expected");
+				pm.report(token, "try.catch.open_paren");
 			}
 			return;
 		case CATCH_VAR:
@@ -86,14 +85,14 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Catch Expression - Name expected");
+			pm.report(token, "try.catch.identifier");
 			return;
 		case CATCH_CLOSE:
 			this.mode = CATCH;
 			pm.pushParser(pm.newExpressionParser(this.catchBlock));
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				pm.report(token, "Invalid Catch Expression - ')' expected");
+				pm.report(token, "try.catch.close_paren");
 			}
 			return;
 		}

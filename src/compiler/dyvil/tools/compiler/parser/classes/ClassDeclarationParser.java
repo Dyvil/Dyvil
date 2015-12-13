@@ -83,7 +83,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = GENERICS;
 				return;
 			}
-			pm.report(token, "Invalid Class Declaration - Name expected");
+			pm.report(token, "class.identifier");
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
@@ -92,7 +92,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Generic Type Variable List - ']' expected");
+			pm.report(token, "class.generic.close_bracket");
 			return;
 		case PARAMETERS_END:
 			this.mode = EXTENDS;
@@ -101,7 +101,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Class Parameter List - ')' expected");
+			pm.report(token, "class.parameters.close_paren");
 			return;
 		case GENERICS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
@@ -140,7 +140,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				
 				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
-					pm.report(token, "Interfaces cannot implement other interfaces - Use 'extends' instead");
+					pm.report(token, "class.interface.implements");
 					return;
 				}
 				return;
@@ -185,7 +185,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				return;
 			}
 			this.mode = BODY_END;
-			pm.report(token, "Invalid Class Declaration - '{' or ';' expected");
+			pm.report(token, "class.body.separator");
 			return;
 		case BODY_END:
 			pm.popParser();
@@ -193,7 +193,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Class Declaration - '}' expected");
+				pm.report(token, "class.body.end");
 			}
 			return;
 		}

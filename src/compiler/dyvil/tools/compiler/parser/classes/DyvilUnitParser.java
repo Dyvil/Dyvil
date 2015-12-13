@@ -68,6 +68,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 				return;
 			}
 		}
-		pm.report(token, "Invalid Header Element - Invalid " + token);
+
+		reportInvalidElement(pm, token);
 	}
 }

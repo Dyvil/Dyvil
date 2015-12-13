@@ -11,6 +11,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class PatternListParser extends Parser implements IPatternConsumer
 {
+	private static final int PATTERN = 0;
+	private static final int COMMA = 1;
+
 	protected IPatternList patternList;
 	
 	private IPattern pattern;
@@ -18,6 +21,7 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 	public PatternListParser(IPatternList list)
 	{
 		this.patternList = list;
+		this.mode = PATTERN;
 	}
 	
 	@Override
@@ -36,18 +40,18 @@ public final class PatternListParser extends Parser implements IPatternConsumer
 		
 		switch (this.mode)
 		{
-		case 0:
-			this.mode = 1;
+		case PATTERN:
+			this.mode = COMMA;
 			pm.pushParser(new PatternParser(this), true);
 			return;
-		case 1:
-			this.mode = 0;
+		case COMMA:
+			this.mode = PATTERN;
 			if (type == BaseSymbols.COMMA)
 			{
 				this.patternList.addPattern(this.pattern);
 				return;
 			}
-			pm.report(token, "Invalid Pattern List - ',' expected");
+			pm.report(token, "pattern.list.comma");
 			return;
 		}
 	}

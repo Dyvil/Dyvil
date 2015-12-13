@@ -19,6 +19,7 @@ import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -130,7 +131,7 @@ public class DyvilHeaderParser extends Parser
 				pm.skip();
 				if (this.unit.getHeaderDeclaration() != null)
 				{
-					pm.report(token, "Duplicate Header Declaration");
+					pm.report(token, "header.declaration.duplicate");
 					return true;
 				}
 				
@@ -197,7 +198,12 @@ public class DyvilHeaderParser extends Parser
 			return;
 		}
 		
-		pm.report(token, "Invalid Header Element - Invalid " + token);
+		reportInvalidElement(pm, token);
+	}
+
+	protected static void reportInvalidElement(IParserManager pm, IToken token)
+	{
+		pm.report(MarkerMessages.createSyntaxError(token, "header.element.invalid", token.toString()));
 	}
 	
 	private void parseAnnotation(IParserManager pm, IToken token)

@@ -18,10 +18,10 @@ public final class MarkerMessages
 	
 	private static final ResourceBundle LOCALIZATION_BUNDLE = ResourceBundle
 			.getBundle("dyvil.tools.compiler.lang.MarkerMessages");
+	private static final ResourceBundle SYNTAX_BUNDLE       = ResourceBundle
+			.getBundle("dyvil.tools.compiler.lang.SyntaxErrors");
 	private static final ResourceBundle MARKER_BUNDLE       = ResourceBundle
 			.getBundle("dyvil.tools.compiler.config.MarkerLevels");
-	private static final ResourceBundle SYNTAX_BUNDLE       = ResourceBundle
-			.getBundle("dyvil.tools.compiler.config.SyntaxErrors");
 
 	public static String getMarker(String key)
 	{
@@ -50,6 +50,11 @@ public final class MarkerMessages
 		{
 			return "!" + key + "!";
 		}
+	}
+
+	public static String getSyntax(String key, Object... args)
+	{
+		return String.format(getSyntax(key), args);
 	}
 	
 	static final Map<String, MarkerLevel> markerLevelMap = new HashMap<>();
@@ -135,5 +140,10 @@ public final class MarkerMessages
 	public static Marker createSyntaxError(ICodePosition position, String key)
 	{
 		return new SyntaxError(position, getSyntax(key));
+	}
+
+	public static Marker createSyntaxError(ICodePosition position, String key, Object... args)
+	{
+		return new SyntaxError(position, getSyntax(key, args));
 	}
 }

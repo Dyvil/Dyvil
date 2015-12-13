@@ -48,7 +48,8 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 				return;
 			}
 			this.key = Names.update;
-			return;
+			this.mode = VALUE;
+			// Fallthrough
 		case VALUE:
 			this.mode = SEPERATOR;
 			pm.pushParser(pm.newExpressionParser(this), true);
@@ -58,7 +59,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Expression Map - ',' expected");
+				pm.report(token, "expression.named_list.comma");
 			}
 			return;
 		}

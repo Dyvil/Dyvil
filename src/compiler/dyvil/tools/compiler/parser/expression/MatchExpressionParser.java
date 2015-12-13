@@ -46,7 +46,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			}
 			if (type != DyvilKeywords.CASE)
 			{
-				pm.report(token, "Invalid Match Expression - '{' or 'case' expected");
+				pm.report(token, "match.invalid");
 				return;
 			}
 			this.singleCase = true;
@@ -67,7 +67,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.popParser();
 				return;
 			}
-			pm.report(token, "Invalid Match Expression - 'case' or '}' expected expected");
+			pm.report(token, "match.case");
 			return;
 		case CONDITION:
 			if (type == DyvilKeywords.IF)
@@ -83,7 +83,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			{
 				return;
 			}
-			pm.report(token, "Invalid Match Case - ':' or '=>' expected");
+			pm.report(token, "match.case.action");
 			return;
 		case SEPARATOR:
 			this.matchExpression.addCase(this.currentCase);
@@ -100,12 +100,11 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 			this.mode = CASE;
-			if (type == BaseSymbols.SEMICOLON)
+			if (type != BaseSymbols.SEMICOLON)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "match.case.end");
 			}
-			pm.reparse();
-			pm.report(token, "Invalid Match Case - ';' expected");
 			return;
 		}
 	}

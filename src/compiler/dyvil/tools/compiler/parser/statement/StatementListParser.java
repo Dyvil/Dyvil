@@ -19,6 +19,7 @@ import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
@@ -97,7 +98,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.statementList = this.applied ? new Closure(token) : new StatementList(token);
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(token, "Invalid Statement List - '{' expected");
+				pm.report(token, "statementlist.close_brace");
 				pm.reparse();
 			}
 			return;
@@ -193,14 +194,14 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				return;
 			}
 			
-			if (type == 0)
+			if (type == Tokens.EOF)
 			{
 				this.consumer.setValue(this.statementList);
 				pm.popParser();
-				pm.report(token, "Invalid Statement List - '}' expected");
+				pm.report(token, "statementlist.close_brace");
 				return;
 			}
-			pm.report(token, "Invalid Statement List - ';' expected");
+			pm.report(token, "statementlist.semicolon");
 			return;
 		}
 	}

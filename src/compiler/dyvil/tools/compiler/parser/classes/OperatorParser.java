@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -64,7 +65,7 @@ public final class OperatorParser extends Parser
 				this.type = Operator.INFIX_NONE;
 				return;
 			}
-			pm.report(token, "Invalid Operator - 'infix', 'prefix' or 'postfix' expected");
+			pm.report(token, "operator.type.invalid");
 			return;
 		case OPERATOR:
 			this.mode = OPEN_BRACKET;
@@ -75,7 +76,7 @@ public final class OperatorParser extends Parser
 				pm.skip();
 				if (name == null)
 				{
-					pm.report(next, "Invalid Operator - Identifier expected");
+					pm.report(next, "operator.identifier");
 					return;
 				}
 				
@@ -88,7 +89,7 @@ public final class OperatorParser extends Parser
 				}
 				return;
 			}
-			pm.report(token, "Invalid Operator - 'operator' expected");
+			pm.report(token, "operator.operator");
 			return;
 		case OPEN_BRACKET:
 			switch (this.type)
@@ -103,7 +104,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				if (type != BaseSymbols.SEMICOLON && type != Tokens.EOF)
 				{
-					pm.report(token, "Invalid Prefix Operator - ';' expected");
+					pm.report(token, "operator.prefix.semicolon");
 					return;
 				}
 				return;
@@ -117,7 +118,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				if (type != BaseSymbols.SEMICOLON && type != Tokens.EOF)
 				{
-					pm.report(token, "Invalid Postfix Operator - ';' expected");
+					pm.report(token, "operator.postfix.semicolon");
 					return;
 				}
 				return;
@@ -126,7 +127,7 @@ public final class OperatorParser extends Parser
 				if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 				{
 					pm.reparse();
-					pm.report(token, "Invalid Infix Operator - '{' expected");
+					pm.report(token, "operator.infix.open_brace");
 					return;
 				}
 				return;
@@ -176,7 +177,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				return;
 			}
-			pm.report(token, "Invalid Operator Property - Unexpected " + token);
+			pm.report(MarkerMessages.createSyntaxError(token, "operator.property.invalid", token));
 			return;
 		case COMMA:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
@@ -189,7 +190,7 @@ public final class OperatorParser extends Parser
 			if (type != BaseSymbols.COMMA)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Infix Operator - ',' expected");
+				pm.report(token, "operator.property.comma");
 				return;
 			}
 			return;
@@ -198,7 +199,7 @@ public final class OperatorParser extends Parser
 			if ((type & Tokens.INT) == 0)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Operator Precedence - Integer expected");
+				pm.report(token, "operator.property.precedence");
 				return;
 			}
 			this.operator.precedence = token.intValue();
@@ -226,7 +227,7 @@ public final class OperatorParser extends Parser
 			}
 			
 			pm.reparse();
-			pm.report(token, "Invalid Operator Associativity - 'left', 'none' or 'right' expected");
+			pm.report(token, "operator.property.associativity");
 			return;
 		}
 	}
@@ -236,10 +237,10 @@ public final class OperatorParser extends Parser
 		switch (this.operator.type)
 		{
 		case Operator.POSTFIX:
-			pm.report(token, "Invalid Postfix Operator - Postfix Operators cannot have an associativity");
+			pm.report(token, "operator.postfix.associativity");
 			return;
 		case Operator.PREFIX:
-			pm.report(token, "Invalid Prefix Operator - Prefix Operators cannot have an associativity");
+			pm.report(token, "operator.prefix.associativity");
 			return;
 		}
 		

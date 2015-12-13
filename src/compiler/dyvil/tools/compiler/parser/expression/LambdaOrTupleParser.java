@@ -128,7 +128,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Tuple - ')' expected");
+			pm.report(token, "tuple.close_paren");
 			return;
 		case ARROW:
 			if (token.type() != DyvilSymbols.ARROW_OPERATOR)

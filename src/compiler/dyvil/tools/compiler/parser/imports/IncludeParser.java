@@ -35,7 +35,7 @@ public class IncludeParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case INCLUDE:
@@ -45,7 +45,7 @@ public class IncludeParser extends Parser
 				this.includeDeclaration = new IncludeDeclaration(token.raw());
 				return;
 			}
-			pm.report(token, "Invalid Include Declaration - 'include' expected");
+			pm.report(token, "include.include");
 			return;
 		case NAME:
 			this.mode = DOT;
@@ -55,7 +55,7 @@ public class IncludeParser extends Parser
 				this.includeDeclaration.addNamePart(name);
 				return;
 			}
-			pm.report(token, "Invalid Include Declaration - Identifier expected");
+			pm.report(token, "include.identifier");
 			return;
 		case DOT:
 			if (type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
@@ -69,7 +69,7 @@ public class IncludeParser extends Parser
 				this.mode = NAME;
 				return;
 			}
-			pm.report(token, "Invalid Include Declaration - '.' expected");
+			pm.report(token, "include.dot");
 			return;
 		}
 	}

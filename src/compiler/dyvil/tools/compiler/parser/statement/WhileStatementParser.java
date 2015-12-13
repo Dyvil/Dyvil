@@ -11,9 +11,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class WhileStatementParser extends Parser implements IValueConsumer
 {
-	public static final int CONDITION     = 1;
-	public static final int CONDITION_END = 2;
-	public static final int BLOCK         = 4;
+	protected static final int CONDITION     = 1;
+	protected static final int CONDITION_END = 2;
+	protected static final int BLOCK         = 4;
 	
 	protected WhileStatement statement;
 	
@@ -37,14 +37,14 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid While Statement - '(' expected");
+			pm.report(token, "while.open_paren");
 			return;
 		case CONDITION_END:
 			this.mode = BLOCK;
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid While Statement - ')' expected");
+				pm.report(token, "while.close_paren");
 			}
 			return;
 		case BLOCK:

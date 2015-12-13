@@ -51,7 +51,7 @@ public final class InternalTypeParser extends Parser
 				this.mode = SLASH;
 				return;
 			}
-			pm.report(token, "Invalid Type - Identifier expected");
+			pm.report(token, "bytecode.type.identifier");
 			return;
 		case SLASH:
 			if (ParserUtil.isIdentifier(type))
@@ -67,7 +67,6 @@ public final class InternalTypeParser extends Parser
 			String s = this.builder.toString();
 			this.typed.setInternalType(s);
 			pm.popParser(true);
-			return;
 		}
 	}
 	

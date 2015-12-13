@@ -53,7 +53,7 @@ public class TypeAliasParser extends Parser
 			if (type != DyvilKeywords.TYPE)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Type Alias - 'type' expected");
+				pm.report(token, "typealias.type");
 			}
 			return;
 		case NAME:
@@ -66,7 +66,7 @@ public class TypeAliasParser extends Parser
 			}
 
 			pm.popParser();
-			pm.report(token, "Invalid Type Alias - Identifier expected");
+			pm.report(token, "typealias.identifier");
 			return;
 		case TYPE_PARAMETERS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
@@ -84,7 +84,7 @@ public class TypeAliasParser extends Parser
 			if (type != BaseSymbols.EQUALS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Type Alias - '=' expected");
+				pm.report(token, "typealias.equals");
 			}
 			return;
 		case TYPE_PARAMETERS_END:
@@ -92,7 +92,7 @@ public class TypeAliasParser extends Parser
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Type Alias - ']' expected");
+				pm.report(token, "typealias.generic.close_bracket");
 			}
 			return;
 		}

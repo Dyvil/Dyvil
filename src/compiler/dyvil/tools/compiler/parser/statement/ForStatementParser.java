@@ -73,7 +73,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			if (type != DyvilKeywords.FOR)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid For Statement - 'for' expected");
+				pm.report(token, "for.for");
 			}
 			return;
 		case FOR_START:
@@ -81,7 +81,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid For Statement - '(' expected");
+				pm.report(token, "for.open_paren");
 			}
 			return;
 		case TYPE:
@@ -105,7 +105,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid For statement - Variable Name expected");
+			pm.report(token, "for.variable.identifier");
 			return;
 		case SEPERATOR:
 			if (type == BaseSymbols.COLON)
@@ -122,7 +122,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid For Statement - ';' or ':' expected");
+			pm.report(token, "for.variable.separator");
 			return;
 		case VARIABLE_END:
 			this.mode = CONDITION_END;
@@ -137,14 +137,14 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid for statement - ';' expected");
+			pm.report(token, "for.variable.semicolon");
 			return;
 		case CONDITION_END:
 			this.mode = FOR_END;
 			if (type != BaseSymbols.SEMICOLON)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid for statement - ';' expected");
+				pm.report(token, "for.condition.semicolon");
 				return;
 			}
 			
@@ -159,7 +159,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid for statement - ')' expected");
+				pm.report(token, "for.close_paren");
 			}
 			return;
 		case STATEMENT:

@@ -55,7 +55,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case TYPE:
@@ -64,7 +64,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			Modifier modifier;
+			final Modifier modifier;
 			if ((modifier = BaseModifiers.parseParameterModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
@@ -83,7 +83,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					this.annotations = new AnnotationList();
 				}
 				
-				Annotation annotation = new Annotation(token.raw());
+				final Annotation annotation = new Annotation(token.raw());
 				this.annotations.addAnnotation(annotation);
 				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
@@ -117,15 +117,15 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.parameter.setPosition(token.raw());
 				this.parameter.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
 				this.parameter.setAnnotations(this.annotations);
-				this.annotations = null;
 				this.parameter.setVarargs(this.varargs);
 				this.paramList.addParameter(this.parameter);
-				
+
+				this.annotations = null;
 				this.varargs = false;
 				
 				return;
 			}
-			pm.report(token, "Invalid Parameter Declaration - Name expected");
+			pm.report(token, "parameter.identifier");
 			return;
 		case SEPERATOR:
 			if (ParserUtil.isCloseBracket(type))
@@ -143,7 +143,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				return;
 			}
-			pm.report(token, "Invalid Parameter Declaration - ',' expected");
+			pm.report(token, "parameter.comma");
 			return;
 		}
 	}

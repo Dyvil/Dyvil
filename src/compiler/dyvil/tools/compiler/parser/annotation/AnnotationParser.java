@@ -50,7 +50,7 @@ public class AnnotationParser extends Parser
 				this.mode = PARAMETERS_START;
 				return;
 			}
-			pm.report(token, "Invalid Annotation - Name expected");
+			pm.report(token, "annotation.name");
 			return;
 		case PARAMETERS_START:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
@@ -81,7 +81,7 @@ public class AnnotationParser extends Parser
 				pm.popParser();
 				return;
 			}
-			pm.report(token, "Invalid Annotation - ')' expected");
+			pm.report(token, "annotation.parenthesis");
 			return;
 		}
 	}

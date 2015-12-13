@@ -11,11 +11,15 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ExpressionListParser extends Parser implements IValueConsumer
 {
+	private static final int EXPRESSION = 0;
+	private static final int COMMA = 1;
+
 	protected IValueList valueList;
 	
 	public ExpressionListParser(IValueList valueList)
 	{
 		this.valueList = valueList;
+		this.mode = EXPRESSION;
 	}
 	
 	@Override
@@ -30,17 +34,17 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 		
 		switch (this.mode)
 		{
-		case 0:
-			this.mode = 1;
+		case EXPRESSION:
+			this.mode = COMMA;
 			pm.pushParser(pm.newExpressionParser(this), true);
 			return;
-		case 1:
-			if (type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON)
+		case COMMA:
+			if (type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON && token.isInferred())
 			{
-				this.mode = 0;
+				this.mode = EXPRESSION;
 				return;
 			}
-			pm.report(token, "Invalid Expression List - ',' expected");
+			pm.report(token, "expression.list.comma");
 			return;
 		}
 	}

@@ -24,7 +24,7 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (type)
 		{
 		case BaseSymbols.OPEN_CURLY_BRACKET:
@@ -41,12 +41,13 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:
-			if (type == BaseSymbols.COMMA)
+			this.mode = TYPE;
+			if (type != BaseSymbols.COMMA)
 			{
-				this.mode = TYPE;
-				return;
+				pm.report(token, "method.throws.comma");
+				pm.reparse();
 			}
-			pm.popParser(true);
+
 			return;
 		}
 	}

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -77,7 +78,7 @@ public class PatternParser extends Parser
 					return;
 				}
 				
-				pm.report(next, "Invalid Case Class Pattern - '(' expected");
+				pm.report(next, "pattern.case_class.open_paren");
 				return;
 			}
 			if (type == DyvilKeywords.VAR)
@@ -91,7 +92,7 @@ public class PatternParser extends Parser
 					return;
 				}
 				
-				pm.report(next, "Invalid Binding Pattern - Identifier expected");
+				pm.report(next, "pattern.binding.identifier");
 				return;
 			}
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
@@ -109,7 +110,7 @@ public class PatternParser extends Parser
 				this.mode = END;
 				return;
 			}
-			pm.report(token, "Invalid Pattern");
+			pm.report(MarkerMessages.createSyntaxError(token, "pattern.invalid", token.toString()));
 			return;
 		case NEGATIVE_NUMBER:
 			switch (type)
@@ -131,7 +132,7 @@ public class PatternParser extends Parser
 				this.mode = END;
 				return;
 			default:
-				pm.report(token, "Invalid Number Literal Pattern - Number expected after '-'");
+				pm.report(token, "pattern.number.negative");
 				this.mode = END;
 				pm.reparse();
 				return;
@@ -147,7 +148,7 @@ public class PatternParser extends Parser
 			this.pattern.expandPosition(token.prev());
 			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
-			pm.report(token, "Invalid Tuple Pattern - ')' expected");
+			pm.report(token, "pattern.tuple.close_paren");
 			return;
 		case CASE_CLASS_END:
 			if (type == BaseSymbols.CLOSE_PARENTHESIS)
@@ -158,7 +159,7 @@ public class PatternParser extends Parser
 			}
 			this.consumer.setPattern(this.pattern);
 			pm.popParser(true);
-			pm.report(token, "Invalid Case Class Pattern - ')' expected");
+			pm.report(token, "pattern.case_class.close_paren");
 		}
 	}
 	

@@ -48,14 +48,14 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 		case DOT:
 			if (type != BaseSymbols.DOT)
 			{
-				pm.report(token, "Invalid Method Instruction - '.' expected");
+				pm.report(token, "bytecode.method.dot");
 				return;
 			}
 			this.mode = PARAMETERS;
 			IToken next = token.next();
 			if (!ParserUtil.isIdentifier(next.type()))
 			{
-				pm.report(next, "Invalid Method Instruction - Identifier expected");
+				pm.report(next, "bytecode.method.identifier");
 				return;
 			}
 			pm.skip();
@@ -68,7 +68,7 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			pm.report(token, "Invalid Method Instruction - '(' expected");
+			pm.report(token, "bytecode.method.open_paren");
 			return;
 		case PARAMETERS_END:
 			if (type == BaseSymbols.COMMA)
@@ -81,12 +81,12 @@ public final class MethodInstructionParser extends Parser implements IInternalTy
 				this.mode = COLON;
 				return;
 			}
-			pm.report(token, "Invalid Method Instruction - ',' or ')' expected");
+			pm.report(token, "bytecode.method.separator");
 			break;
 		case COLON:
 			if (type != BaseSymbols.COLON)
 			{
-				pm.report(token, "Invalid Method Instruction - ':' expected");
+				pm.report(token, "bytecode.method.colon");
 				return;
 			}
 			pm.pushParser(new InternalTypeParser(this));

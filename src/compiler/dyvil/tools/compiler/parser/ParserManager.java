@@ -100,7 +100,7 @@ public class ParserManager implements IParserManager
 			
 			if (this.parser == null)
 			{
-				if (!token.isInferred())
+				if (token != null && !token.isInferred())
 				{
 					this.report(token, "Unexpected Token: " + token);
 				}

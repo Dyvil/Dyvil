@@ -104,7 +104,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 				this.mode = GET_OR_SET;
 				return;
 			}
-			pm.report(token, "Invalid Property Declaration - ':' expected");
+			pm.report(token, "property.colon");
 			return;
 		}
 	}

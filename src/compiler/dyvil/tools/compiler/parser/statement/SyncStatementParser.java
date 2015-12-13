@@ -37,14 +37,14 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.reparse();
-			pm.report(token, "Invalid Synchronized Block - '(' expected");
+			pm.report(token, "sync.open_paren");
 			return;
 		case LOCK_END:
 			this.mode = ACTION;
 			if (token.type() != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "Invalid Synchronized Block - ')' expected");
+				pm.report(token, "sync.close_paren");
 			}
 			return;
 		case ACTION:
