@@ -150,7 +150,7 @@ public class Package implements INamed, IDefaultContext
 	{
 		if (packageDecl == null)
 		{
-			markers.add(MarkerMessages.createMarker(new CodePosition(0, 0, 1), "package.missing"));
+			markers.add(MarkerMessages.createMarker(CodePosition.ORIGIN, "package.missing"));
 			return;
 		}
 		
