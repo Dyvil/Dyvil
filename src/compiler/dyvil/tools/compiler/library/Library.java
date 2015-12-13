@@ -3,13 +3,13 @@ package dyvil.tools.compiler.library;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
+import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.LinkOption;
 
@@ -21,43 +21,17 @@ public abstract class Library
 	public static final Library dyvilLibrary;
 	public static final Library dyvilBinLibrary;
 	public static final Library javaLibrary;
-	
+
 	private static File getFileLocation(Class<?> klass)
 	{
-		String classLocation = '/' + klass.getName().replace('.', '/') + ".class";
-		URL url = klass.getResource(classLocation);
-		String path = url.toString().replace(File.separatorChar, '/');
-		int index = path.lastIndexOf(classLocation);
-		
-		if (index < 0)
+		try
+		{
+			return ReflectUtils.getFileLocation(klass);
+		}
+		catch (ClassNotFoundException ex)
 		{
 			return null;
 		}
-		
-		int startIndex = 0;
-		if (path.charAt(index - 1) == '!')
-		{
-			index--;
-			startIndex = 4; // strip leading 'jar:'
-		}
-		else
-		{
-			index++;
-		}
-		
-		String newPath = path.substring(startIndex, index);
-		try
-		{
-			return new File(new URI(newPath));
-		}
-		catch (Exception ex)
-		{
-			System.err.println("Failed to get Library location for " + klass.getName());
-			System.err.println("URL: " + url);
-			System.err.println("Path: " + newPath + " (" + path + ")");
-			ex.printStackTrace();
-		}
-		return null;
 	}
 	
 	static
@@ -91,7 +65,7 @@ public abstract class Library
 	protected static final LinkOption[] emptyLinkOptions = {};
 	
 	protected final File file;
-	protected final Map<String, Package> packages = new HashMap();
+	protected final Map<String, Package> packages = new HashMap<>();
 	
 	protected Library(File file)
 	{

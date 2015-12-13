@@ -3,7 +3,11 @@ package dyvil.reflect;
 import sun.misc.JavaLangAccess;
 import sun.misc.SharedSecrets;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 public final class ReflectUtils
 {
@@ -55,6 +59,46 @@ public final class ReflectUtils
 		catch (ClassNotFoundException ex)
 		{
 			return null;
+		}
+	}
+
+	public static File getFileLocation(Class<?> klass) throws ClassNotFoundException
+	{
+		final String classLocation = '/' + klass.getName().replace('.', '/') + ".class";
+		final URL url = klass.getResource(classLocation);
+
+		if (url == null)
+		{
+			throw new ClassNotFoundException("Location not found: " + classLocation);
+		}
+
+		final String path = url.toString().replace(File.separatorChar, '/');
+		int index = path.lastIndexOf(classLocation);
+
+		if (index < 0)
+		{
+			throw new ClassNotFoundException("Invalid Path: " + path);
+		}
+
+		int startIndex = 0;
+		if (path.charAt(index - 1) == '!')
+		{
+			index--;
+			startIndex = 4; // strip leading 'jar:'
+		}
+		else
+		{
+			index++;
+		}
+
+		final String newPath = path.substring(startIndex, index);
+		try
+		{
+			return new File(new URI(newPath));
+		}
+		catch (URISyntaxException ex)
+		{
+			throw new ClassNotFoundException("Invalid URI: " + newPath, ex);
 		}
 	}
 }
