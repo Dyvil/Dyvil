@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -551,21 +552,41 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
+		if (checkedClasses.contains(this))
+		{
+			return;
+		}
+		checkedClasses.add(this);
+
 		if (this.body != null)
 		{
 			this.body.checkMethods(markers, iclass, typeContext);
 		}
 		
+		this.checkSuperMethods(markers, iclass, typeContext, checkedClasses);
+	}
+
+	public void checkSuperMethods(MarkerList markers, IClass thisClass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	{
 		if (this.superType != null)
 		{
-			this.superType.getTheClass().checkMethods(markers, iclass, this.superType.getConcreteType(typeContext));
+			final IClass superClass = this.superType.getTheClass();
+			if (superClass != null)
+			{
+				superClass
+						.checkMethods(markers, thisClass, this.superType.getConcreteType(typeContext), checkedClasses);
+			}
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType type = this.interfaces[i];
-			type.getTheClass().checkMethods(markers, iclass, type.getConcreteType(typeContext));
+			final IType type = this.interfaces[i];
+			final IClass iClass = type.getTheClass();
+			if (iClass != null && iClass != this)
+			{
+				iClass.checkMethods(markers, thisClass, type.getConcreteType(typeContext), checkedClasses);
+			}
 		}
 	}
 	

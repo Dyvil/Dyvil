@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
+import dyvil.collection.Set;
 import dyvil.collection.mutable.ArrayMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
@@ -357,7 +358,7 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
 		if (!this.genericsResolved)
 		{
@@ -367,7 +368,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
-		super.checkMethods(markers, iclass, typeContext);
+		super.checkMethods(markers, iclass, typeContext, checkedClasses);
 	}
 	
 	@Override

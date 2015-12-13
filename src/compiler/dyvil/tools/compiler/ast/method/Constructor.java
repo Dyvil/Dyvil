@@ -240,8 +240,7 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			param.resolveTypes(markers, this);
+			this.parameters[i].resolveTypes(markers, this);
 		}
 		
 		if (this.value != null)

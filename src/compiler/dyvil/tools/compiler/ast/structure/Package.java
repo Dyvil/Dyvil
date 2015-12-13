@@ -51,9 +51,9 @@ public class Package implements INamed, IDefaultContext
 	protected String  fullName;
 	private   String  internalName;
 	
-	private   List<IClass>         classes     = new ArrayList();
-	protected List<IDyvilHeader>   headers     = new ArrayList();
-	protected Map<String, Package> subPackages = new HashMap();
+	private   List<IClass>         classes     = new ArrayList<>();
+	protected List<IDyvilHeader>   headers     = new ArrayList<>();
+	protected Map<String, Package> subPackages = new HashMap<>();
 	
 	protected Package()
 	{

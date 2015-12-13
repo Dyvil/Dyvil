@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -109,7 +110,7 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	
 	boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
 	
-	void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
+	void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses);
 	
 	// Other Compilables (Lambda Expressions, ...)
 	

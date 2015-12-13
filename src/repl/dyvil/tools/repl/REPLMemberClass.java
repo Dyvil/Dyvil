@@ -1,5 +1,6 @@
 package dyvil.tools.repl;
 
+import dyvil.collection.Set;
 import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
@@ -379,7 +380,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
 	}
 	
