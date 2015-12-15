@@ -1,7 +1,8 @@
 package dyvil.string;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
 
 /**
  * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used
@@ -26,16 +27,14 @@ public final class StringConversions
 		// no instances
 	}
 	
-	public static
-	@infix
-	boolean toBoolean(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean toBoolean(String s)
 	{
 		return s != null && s.equalsIgnoreCase("true");
 	}
 	
-	public static
-	@infix
-	byte toByte(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static byte toByte(String s)
 	{
 		try
 		{
@@ -47,9 +46,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	byte toByte(String s, byte _default)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static byte toByte(String s, byte _default)
 	{
 		try
 		{
@@ -61,9 +59,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	byte toByte(String s, byte _default, int radix)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static byte toByte(String s, byte _default, int radix)
 	{
 		try
 		{
@@ -75,9 +72,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	short toShort(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static short toShort(String s)
 	{
 		try
 		{
@@ -89,9 +85,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	short toShort(String s, short _default)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static short toShort(String s, short _default)
 	{
 		try
 		{
@@ -103,9 +98,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	short toShort(String s, short _default, int radix)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static short toShort(String s, short _default, int radix)
 	{
 		try
 		{
@@ -117,9 +111,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	int toInt(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int toInt(String s)
 	{
 		try
 		{
@@ -131,9 +124,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	int toInt(String s, int _default)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int toInt(String s, int _default)
 	{
 		try
 		{
@@ -145,9 +137,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	int toInt(String s, int _default, int radix)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int toInt(String s, int _default, int radix)
 	{
 		try
 		{
@@ -159,9 +150,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	long toLong(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long toLong(String s)
 	{
 		try
 		{
@@ -173,9 +163,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	long toLong(String s, long _default)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long toLong(String s, long _default)
 	{
 		try
 		{
@@ -187,9 +176,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	long toLong(String s, long _default, int radix)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long toLong(String s, long _default, int radix)
 	{
 		try
 		{
@@ -201,9 +189,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	float toFloat(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float toFloat(String s)
 	{
 		try
 		{
@@ -215,9 +202,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	float toFloat(String s, float _default)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float toFloat(String s, float _default)
 	{
 		try
 		{
@@ -229,9 +215,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	double toDouble(String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double toDouble(String s)
 	{
 		try
 		{
@@ -243,9 +228,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	double toDouble(String s, double _default)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double toDouble(String s, double _default)
 	{
 		try
 		{
@@ -257,9 +241,8 @@ public final class StringConversions
 		}
 	}
 	
-	public static
-	@infix
-	String toRomanString(int number)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static String toRomanString(int number)
 	{
 		if (number < 0)
 		{
@@ -288,9 +271,8 @@ public final class StringConversions
 		return builder.toString();
 	}
 	
-	public static
-	@infix
-	String toRomanString(long number)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static String toRomanString(long number)
 	{
 		if (number < 0L)
 		{

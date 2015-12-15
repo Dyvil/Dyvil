@@ -1,8 +1,9 @@
 package dyvil.util;
 
-import dyvil.annotation._internal.sealed;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.io.Serializable;
 import java.util.function.Consumer;
@@ -12,13 +13,13 @@ import java.util.function.Supplier;
 
 @NilConvertible
 @TupleConvertible
+@DyvilModifiers(Modifiers.SEALED)
 public
-@sealed
 interface Option<T> extends Serializable
 {
 	static <T> Option<T> of(T t)
 	{
-		return t == null ? None.instance : new Some(t);
+		return t == null ? None.instance : new Some<>(t);
 	}
 	
 	static <T> Option<T> apply()
@@ -28,7 +29,7 @@ interface Option<T> extends Serializable
 	
 	static <T> Option<T> apply(T t)
 	{
-		return new Some(t);
+		return new Some<>(t);
 	}
 	
 	T $bang();

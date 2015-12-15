@@ -1,0 +1,9 @@
+
+@infix\n\t@inline
+@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+
+@infix
+@DyvilModifiers(Modifiers.INFIX)
+
+static\n\t(@\w*\([^)]*\))\n
+$1\n\tstatic

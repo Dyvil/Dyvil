@@ -1,8 +1,9 @@
 package dyvil.collection;
 
-import dyvil.annotation._internal.internal;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.util.*;
 import java.util.function.Function;
@@ -12,7 +13,7 @@ import java.util.function.Predicate;
 @ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
-	@internal
+	@DyvilModifiers(Modifiers.INTERNAL)
 	Object VALUE = new Object();
 	
 	static <E> ImmutableSet<E> empty()
@@ -247,10 +248,9 @@ public interface Set<E> extends Collection<E>
 		}
 		return sum * 31 + product;
 	}
-	
-	static
-	@internal
-	int distinct(Object[] array, int size)
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	static int distinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -269,10 +269,9 @@ public interface Set<E> extends Collection<E>
 		}
 		return size;
 	}
-	
-	static
-	@internal
-	int sortDistinct(Object[] array, int size)
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	static int sortDistinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -282,10 +281,9 @@ public interface Set<E> extends Collection<E>
 		Arrays.sort(array);
 		return distinctSorted(array, size);
 	}
-	
-	static
-	@internal
-	<T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	static <T> int sortDistinct(T[] array, int size, Comparator<? super T> comparator)
 	{
 		if (size < 2)
 		{
@@ -296,10 +294,9 @@ public interface Set<E> extends Collection<E>
 		
 		return distinctSorted(array, size);
 	}
-	
-	static
-	@internal
-	int distinctSorted(Object[] array, int size)
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	static int distinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -323,10 +320,9 @@ public interface Set<E> extends Collection<E>
 		
 		return len + 1;
 	}
-	
-	static
-	@internal
-	boolean isDistinct(Object[] array, int size)
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	static boolean isDistinct(Object[] array, int size)
 	{
 		if (size < 2)
 		{
@@ -346,10 +342,9 @@ public interface Set<E> extends Collection<E>
 		}
 		return true;
 	}
-	
-	static
-	@internal
-	boolean isDistinctSorted(Object[] array, int size)
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	static boolean isDistinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
 		{

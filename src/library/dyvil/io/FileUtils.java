@@ -1,9 +1,10 @@
 package dyvil.io;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.reflect.Modifiers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,9 +44,8 @@ public final class FileUtils
 	 * @return true if the file exists or has been created successfully, false
 	 * otherwise
 	 */
-	public static
-	@infix
-	boolean create(File file)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean create(File file)
 	{
 		try
 		{
@@ -81,16 +81,14 @@ public final class FileUtils
 	 * @return true, if successful
 	 */
 	
-	public static
-	@infix
-	boolean write(File file, String text)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean write(File file, String text)
 	{
 		return write(file, text.getBytes());
 	}
 	
-	public static
-	@infix
-	boolean write(File file, byte[] bytes)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean write(File file, byte[] bytes)
 	{
 		try
 		{
@@ -119,9 +117,8 @@ public final class FileUtils
 	 *
 	 * @return true, if successful
 	 */
-	public static
-	@infix
-	boolean writeLines(File file, List<String> lines)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean writeLines(File file, List<String> lines)
 	{
 		try
 		{
@@ -151,9 +148,8 @@ public final class FileUtils
 	 *
 	 * @return the file content
 	 */
-	public static
-	@infix
-	String read(File file)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static String read(File file)
 	{
 		if (!file.exists())
 		{
@@ -182,9 +178,8 @@ public final class FileUtils
 	 *
 	 * @return the file content
 	 */
-	public static
-	@infix
-	List<String> readLines(File file)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static List<String> readLines(File file)
 	{
 		if (!file.exists())
 		{

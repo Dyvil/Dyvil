@@ -1,6 +1,6 @@
 package dyvil.collection.immutable;
 
-import dyvil.annotation._internal.object;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
@@ -8,6 +8,7 @@ import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -16,9 +17,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @NilConvertible
-public
-@object
-class EmptyList<E> implements ImmutableList<E>
+@DyvilModifiers(Modifiers.OBJECT_CLASS)
+public final class EmptyList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = -6059901529322971155L;
 	
@@ -135,13 +135,13 @@ class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> $plus(E element)
 	{
-		return new SingletonList(element);
+		return new SingletonList<>(element);
 	}
 	
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return new ArrayList(collection);
+		return new ArrayList<>(collection);
 	}
 	
 	@Override

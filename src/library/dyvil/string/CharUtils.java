@@ -1,7 +1,8 @@
 package dyvil.string;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
 
 import java.util.Random;
 
@@ -42,9 +43,8 @@ public final class CharUtils
 		// no instances
 	}
 	
-	public static
-	@infix
-	boolean isAsciiDigit(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isAsciiDigit(char c)
 	{
 		return c >= '0' && c <= '9';
 	}
@@ -59,9 +59,8 @@ public final class CharUtils
 	 *
 	 * @see Character#isDigit(char)
 	 */
-	public static
-	@infix
-	boolean isDigit(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isDigit(char c)
 	{
 		if (c < 128)
 		{
@@ -70,9 +69,8 @@ public final class CharUtils
 		return Character.isDigit((int) c);
 	}
 	
-	public static
-	@infix
-	boolean isAsciiLetter(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isAsciiLetter(char c)
 	{
 		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
 	}
@@ -87,9 +85,8 @@ public final class CharUtils
 	 *
 	 * @see Character#isLetter(char)
 	 */
-	public static
-	@infix
-	boolean isLetter(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isLetter(char c)
 	{
 		if (c < 128)
 		{
@@ -109,9 +106,8 @@ public final class CharUtils
 	 *
 	 * @return true, if the character is an identifier character
 	 */
-	public static
-	@infix
-	boolean isIdentifier(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isIdentifier(char c)
 	{
 		return isLetter(c) || isDigit(c) || c == '$' || c == '_';
 	}
@@ -126,9 +122,8 @@ public final class CharUtils
 	 *
 	 * @see Character#isWhitespace(char)
 	 */
-	public static
-	@infix
-	boolean isWhitespace(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isWhitespace(char c)
 	{
 		if (c < 128)
 		{
@@ -147,9 +142,8 @@ public final class CharUtils
 	 *
 	 * @see Character#isLowerCase(char)
 	 */
-	public static
-	@infix
-	boolean isLowerCase(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isLowerCase(char c)
 	{
 		if (c < 128)
 		{
@@ -168,9 +162,8 @@ public final class CharUtils
 	 *
 	 * @see Character#isUpperCase(char)
 	 */
-	public static
-	@infix
-	boolean isUpperCase(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isUpperCase(char c)
 	{
 		if (c < 128)
 		{
@@ -189,9 +182,8 @@ public final class CharUtils
 	 *
 	 * @see Character#toLowerCase(char)
 	 */
-	public static
-	@infix
-	char toLowerCase(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char toLowerCase(char c)
 	{
 		if (c >= 'A' && c <= 'Z')
 		{
@@ -214,9 +206,8 @@ public final class CharUtils
 	 *
 	 * @see Character#toUpperCase(char)
 	 */
-	public static
-	@infix
-	char toUpperCase(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char toUpperCase(char c)
 	{
 		if (c >= 'a' && c <= 'z')
 		{
@@ -247,9 +238,8 @@ public final class CharUtils
 	 * @see Character#toLowerCase(char)
 	 * @see Character#toUpperCase(char)
 	 */
-	public static
-	@infix
-	char invertCase(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char invertCase(char c)
 	{
 		if (c >= 'a' && c <= 'z')
 		{
@@ -275,9 +265,8 @@ public final class CharUtils
 	 *
 	 * @return true, if the character is a vowel
 	 */
-	public static
-	@infix
-	boolean isVowel(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isVowel(char c)
 	{
 		// upper case
 		if (c >= 'A' && c <= 'Z')
@@ -295,9 +284,8 @@ public final class CharUtils
 	 *
 	 * @return true, if the character is a consonant
 	 */
-	public static
-	@infix
-	boolean isConsonant(char c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isConsonant(char c)
 	{
 		// upper case
 		if (c > 'A' && c <= 'Z')
@@ -316,9 +304,8 @@ public final class CharUtils
 	 *
 	 * @return the random letter
 	 */
-	public static
-	@infix
-	char nextLetter(Random random)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextLetter(Random random)
 	{
 		return LOWER_ALPHABET[random.nextInt(26)];
 	}
@@ -332,9 +319,8 @@ public final class CharUtils
 	 *
 	 * @return the random letter
 	 */
-	public static
-	@infix
-	char nextUppercaseLetter(Random random)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextUppercaseLetter(Random random)
 	{
 		return UPPER_ALPHABET[random.nextInt(26)];
 	}
@@ -348,9 +334,8 @@ public final class CharUtils
 	 *
 	 * @return the random vowel
 	 */
-	public static
-	@infix
-	char nextVowel(Random random)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextVowel(Random random)
 	{
 		return LOWER_VOWELS[random.nextInt(5)];
 	}
@@ -364,9 +349,8 @@ public final class CharUtils
 	 *
 	 * @return the random vowel
 	 */
-	public static
-	@infix
-	char nextUppercaseVowel(Random random)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextUppercaseVowel(Random random)
 	{
 		return UPPER_VOWELS[random.nextInt(5)];
 	}
@@ -380,9 +364,8 @@ public final class CharUtils
 	 *
 	 * @return the random consonant
 	 */
-	public static
-	@infix
-	char nextConsonant(Random random)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextConsonant(Random random)
 	{
 		return LOWER_CONSONANTS[random.nextInt(21)];
 	}
@@ -396,9 +379,8 @@ public final class CharUtils
 	 *
 	 * @return the random consonant
 	 */
-	public static
-	@infix
-	char nextUppercaseConsonant(Random random)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextUppercaseConsonant(Random random)
 	{
 		return UPPER_CONSONANTS[random.nextInt(21)];
 	}

@@ -1,13 +1,13 @@
 package dyvil.reflect.types;
 
-import dyvil.annotation._internal.object;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.Type;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.reflect.Modifiers;
 
 @NilConvertible
-public
-@object
-class NullType implements Type<Object>
+@DyvilModifiers(Modifiers.OBJECT_CLASS)
+public class NullType implements Type<Object>
 {
 	public static final NullType instance = new NullType();
 	

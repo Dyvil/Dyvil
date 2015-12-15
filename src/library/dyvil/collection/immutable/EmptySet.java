@@ -1,6 +1,6 @@
 package dyvil.collection.immutable;
 
-import dyvil.annotation._internal.object;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
@@ -8,6 +8,7 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -18,9 +19,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @NilConvertible
-public
-@object
-class EmptySet<E> implements ImmutableSet<E>
+@DyvilModifiers(Modifiers.OBJECT_CLASS)
+public final class EmptySet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -6445525479912514756L;
 	
@@ -73,7 +73,7 @@ class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<E> $plus(E element)
 	{
-		return new SingletonSet(element);
+		return new SingletonSet<>(element);
 	}
 	
 	@Override
@@ -97,13 +97,13 @@ class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
-		return new ArraySet(collection);
+		return new ArraySet<>(collection);
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
 	{
-		return new ArraySet(collection);
+		return new ArraySet<>(collection);
 	}
 	
 	@Override

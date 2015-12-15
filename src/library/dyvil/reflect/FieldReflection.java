@@ -1,6 +1,6 @@
 package dyvil.reflect;
 
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
@@ -41,9 +41,8 @@ public class FieldReflection
 	 * @param flag
 	 * 		add or remove
 	 */
-	public static
-	@infix
-	void setModifier(Field field, int mod, boolean flag)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static void setModifier(Field field, int mod, boolean flag)
 	{
 		try
 		{
@@ -64,10 +63,9 @@ public class FieldReflection
 			ex.printStackTrace();
 		}
 	}
-	
-	public static
-	@infix
-	void setAssignable(Field field)
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static void setAssignable(Field field)
 	{
 		try
 		{

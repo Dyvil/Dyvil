@@ -1,8 +1,9 @@
 package dyvil.random;
 
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
 
-public class RandomUtils
+public final class RandomUtils
 {
 	private RandomUtils()
 	{
@@ -22,16 +23,14 @@ public class RandomUtils
 	 *
 	 * @return true, if a randomly generated float is less than the given chance
 	 */
-	public static
-	@infix
-	boolean nextBoolean(java.util.Random random, float chance)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean nextBoolean(java.util.Random random, float chance)
 	{
 		return random.nextFloat() < chance;
 	}
 	
-	public static
-	@infix
-	int nextInt(java.util.Random random, float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nextInt(java.util.Random random, float f)
 	{
 		int i = (int) f;
 		f -= i;
@@ -42,9 +41,8 @@ public class RandomUtils
 		return i;
 	}
 	
-	public static
-	@infix
-	int nextInt(java.util.Random random, int min, int max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nextInt(java.util.Random random, int min, int max)
 	{
 		if (min >= max)
 		{
@@ -53,9 +51,8 @@ public class RandomUtils
 		return min + random.nextInt(max - min + 1);
 	}
 	
-	public static
-	@infix
-	long nextLong(java.util.Random random, long min, long max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long nextLong(java.util.Random random, long min, long max)
 	{
 		if (min >= max)
 		{
@@ -64,9 +61,8 @@ public class RandomUtils
 		return min + (random.nextLong() & max - min + 1);
 	}
 	
-	public static
-	@infix
-	float nextFloat(java.util.Random random, float min, float max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float nextFloat(java.util.Random random, float min, float max)
 	{
 		if (min >= max)
 		{
@@ -75,9 +71,8 @@ public class RandomUtils
 		return random.nextFloat() * (max - min) + min;
 	}
 	
-	public static
-	@infix
-	double nextDouble(java.util.Random random, double min, double max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double nextDouble(java.util.Random random, double min, double max)
 	{
 		if (min >= max)
 		{
@@ -86,65 +81,56 @@ public class RandomUtils
 		return random.nextDouble() * (max - min) + min;
 	}
 	
-	public static
-	@infix
-	char nextChar(java.util.Random random, String s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextChar(java.util.Random random, String s)
 	{
 		return s.charAt(random.nextInt(s.length()));
 	}
 	
-	public static
-	@infix
-	byte nextElement(java.util.Random random, byte[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static byte nextElement(java.util.Random random, byte[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	short nextElement(java.util.Random random, short[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static short nextElement(java.util.Random random, short[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	char nextElement(java.util.Random random, char[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static char nextElement(java.util.Random random, char[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	int nextElement(java.util.Random random, int[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nextElement(java.util.Random random, int[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	long nextElement(java.util.Random random, long[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long nextElement(java.util.Random random, long[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	float nextElement(java.util.Random random, float[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float nextElement(java.util.Random random, float[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	double nextElement(java.util.Random random, double[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double nextElement(java.util.Random random, double[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}
 	
-	public static
-	@infix
-	<T> T nextElement(java.util.Random random, T[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> T nextElement(java.util.Random random, T[] array)
 	{
 		return array[random.nextInt(array.length)];
 	}

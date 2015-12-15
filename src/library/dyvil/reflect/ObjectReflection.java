@@ -1,6 +1,6 @@
 package dyvil.reflect;
 
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -25,9 +25,8 @@ public class ObjectReflection
 		}
 	}
 	
-	public static
-	@infix
-	<T> T createInstance(Class<T> c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> T createInstance(Class<T> c)
 	{
 		try
 		{
@@ -39,9 +38,8 @@ public class ObjectReflection
 		}
 	}
 	
-	public static
-	@infix
-	<T> T createInstance(Class<T> c, Object... parameters)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> T createInstance(Class<T> c, Object... parameters)
 	{
 		Class[] parameterTypes = new Class[parameters.length];
 		for (int i = 0; i < parameters.length; i++)
@@ -55,9 +53,8 @@ public class ObjectReflection
 		return createInstance(c, parameterTypes, parameters);
 	}
 	
-	public static
-	@infix
-	<T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
 	{
 		try
 		{
@@ -70,9 +67,8 @@ public class ObjectReflection
 		}
 	}
 	
-	public static
-	@infix
-	<T> T allocateInstance(Class<T> c)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> T allocateInstance(Class<T> c)
 	{
 		try
 		{
@@ -84,9 +80,8 @@ public class ObjectReflection
 		}
 	}
 	
-	public static
-	@infix
-	<T> void copyFields(T from, T to)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> void copyFields(T from, T to)
 	{
 		try
 		{

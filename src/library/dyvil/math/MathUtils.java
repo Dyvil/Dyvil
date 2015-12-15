@@ -1,8 +1,8 @@
 package dyvil.math;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.postfix;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
 
 /**
  * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for
@@ -122,10 +122,8 @@ public final class MathUtils
 		return c <= d ? c : d;
 	}
 	
-	public static
-	@infix
-	@postfix
-	int min(int... ints)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int min(int... ints)
 	{
 		int min = Integer.MAX_VALUE;
 		for (int i : ints)
@@ -138,10 +136,8 @@ public final class MathUtils
 		return min;
 	}
 	
-	public static
-	@infix
-	@postfix
-	long min(long... longs)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long min(long... longs)
 	{
 		long min = Long.MAX_VALUE;
 		for (long i : longs)
@@ -154,10 +150,8 @@ public final class MathUtils
 		return min;
 	}
 	
-	public static
-	@infix
-	@postfix
-	float min(float... floats)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float min(float... floats)
 	{
 		float min = Float.POSITIVE_INFINITY;
 		for (float i : floats)
@@ -170,10 +164,8 @@ public final class MathUtils
 		return min;
 	}
 	
-	public static
-	@infix
-	@postfix
-	double min(double... doubles)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double min(double... doubles)
 	{
 		double min = Double.NEGATIVE_INFINITY;
 		for (double i : doubles)
@@ -210,10 +202,8 @@ public final class MathUtils
 		return c > d ? c : d;
 	}
 	
-	public static
-	@infix
-	@postfix
-	int max(int... ints)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int max(int... ints)
 	{
 		int max = Integer.MIN_VALUE;
 		for (int i : ints)
@@ -226,10 +216,8 @@ public final class MathUtils
 		return max;
 	}
 	
-	public static
-	@infix
-	@postfix
-	long max(long... longs)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long max(long... longs)
 	{
 		long max = Long.MIN_VALUE;
 		for (long i : longs)
@@ -242,10 +230,8 @@ public final class MathUtils
 		return max;
 	}
 	
-	public static
-	@infix
-	@postfix
-	float max(float... floats)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float max(float... floats)
 	{
 		float max = Float.NEGATIVE_INFINITY;
 		for (float i : floats)
@@ -258,10 +244,8 @@ public final class MathUtils
 		return max;
 	}
 	
-	public static
-	@infix
-	@postfix
-	double max(double... doubles)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double max(double... doubles)
 	{
 		double max = Double.NEGATIVE_INFINITY;
 		for (double i : doubles)
@@ -281,9 +265,8 @@ public final class MathUtils
 	 *
 	 * @return the abs value
 	 */
-	public static
-	@infix
-	int abs(int i)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int abs(int i)
 	{
 		return i < 0 ? -i : i;
 	}
@@ -295,9 +278,8 @@ public final class MathUtils
 	 *
 	 * @return the abs value
 	 */
-	public static
-	@infix
-	long abs(long l)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long abs(long l)
 	{
 		return l < 0 ? -l : l;
 	}
@@ -309,9 +291,8 @@ public final class MathUtils
 	 *
 	 * @return the abs value
 	 */
-	public static
-	@infix
-	float abs(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float abs(float f)
 	{
 		return f < 0F ? -f : f;
 	}
@@ -323,90 +304,78 @@ public final class MathUtils
 	 *
 	 * @return the abs value
 	 */
-	public static
-	@infix
-	double abs(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double abs(double d)
 	{
 		return d < 0D ? -d : d;
 	}
 	
-	public static
-	@infix
-	int floor(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int floor(float f)
 	{
 		int i = (int) f;
 		return f < i ? i - 1 : i;
 	}
 	
-	public static
-	@infix
-	int floor(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int floor(double d)
 	{
 		int i = (int) d;
 		return d < i ? i - 1 : i;
 	}
 	
-	public static
-	@infix
-	int ceil(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int ceil(float f)
 	{
 		int i = (int) f;
 		return f > i ? i + 1 : i;
 	}
 	
-	public static
-	@infix
-	int ceil(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int ceil(double d)
 	{
 		int i = (int) d;
 		return d > i ? i + 1 : i;
 	}
 	
-	public static
-	@infix
-	float sin(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float sin(float f)
 	{
 		return SinHolder.sinTable[(int) (f * SinHolder.sinFactor2) & 0xFFFF];
 	}
 	
-	public static
-	@infix
-	float cos(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float cos(float f)
 	{
 		return SinHolder.sinTable[(int) (f * 10430.378F + 16384F) & 0xFFFF];
 	}
 	
-	public static
-	@infix
-	float tan(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float tan(float f)
 	{
 		return sin(f) / cos(f);
 	}
 	
-	public static
-	@infix
-	double sin(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double sin(double d)
 	{
 		return Math.sin(d);
 	}
 	
-	public static
-	@infix
-	double cos(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double cos(double d)
 	{
 		return Math.cos(d);
 	}
 	
-	public static
-	@infix
-	double tan(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double tan(double d)
 	{
 		return Math.tan(d);
 	}
 	
-	public static
-	@infix
-	byte sqrt(byte b)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static byte sqrt(byte b)
 	{
 		if (b >= 0)
 		{
@@ -415,9 +384,8 @@ public final class MathUtils
 		return 0;
 	}
 	
-	public static
-	@infix
-	short sqrt(short s)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static short sqrt(short s)
 	{
 		int xn;
 		
@@ -453,9 +421,8 @@ public final class MathUtils
 		return 0;
 	}
 	
-	public static
-	@infix
-	int sqrt(int i)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int sqrt(int i)
 	{
 		int xn;
 		
@@ -543,51 +510,44 @@ public final class MathUtils
 		return 0;
 	}
 	
-	public static
-	@infix
-	long sqrt(long l)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long sqrt(long l)
 	{
 		return (long) Math.sqrt(l);
 	}
 	
-	public static
-	@infix
-	float sqrt(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float sqrt(float f)
 	{
 		return (float) Math.sqrt(f);
 	}
 	
-	public static
-	@infix
-	double sqrt(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double sqrt(double d)
 	{
 		return Math.sqrt(d);
 	}
 	
-	public static
-	@infix
-	int truncate(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int truncate(double d)
 	{
 		return (int) (d + 1024D) - 1024;
 	}
 	
-	public static
-	@infix
-	int bucket(int i, int factor)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int bucket(int i, int factor)
 	{
 		return i < 0 ? ~(~i / factor) : i / factor;
 	}
 	
-	public static
-	@infix
-	long bucket(long l, long factor)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long bucket(long l, long factor)
 	{
 		return l < 0 ? ~(~l / factor) : l / factor;
 	}
 	
-	public static
-	@infix
-	int clamp(int i, int min, int max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int clamp(int i, int min, int max)
 	{
 		if (i <= min)
 		{
@@ -600,9 +560,8 @@ public final class MathUtils
 		return i;
 	}
 	
-	public static
-	@infix
-	long clamp(long l, long min, long max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long clamp(long l, long min, long max)
 	{
 		if (l <= min)
 		{
@@ -615,9 +574,8 @@ public final class MathUtils
 		return l;
 	}
 	
-	public static
-	@infix
-	float clamp(float f, float min, float max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float clamp(float f, float min, float max)
 	{
 		if (f <= min)
 		{
@@ -630,9 +588,8 @@ public final class MathUtils
 		return f;
 	}
 	
-	public static
-	@infix
-	double clamp(double d, double min, double max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double clamp(double d, double min, double max)
 	{
 		if (d <= min)
 		{
@@ -645,9 +602,8 @@ public final class MathUtils
 		return d;
 	}
 	
-	public static
-	@infix
-	int interpolate(float f, int min, int max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int interpolate(float f, int min, int max)
 	{
 		if (f <= 0F)
 		{
@@ -660,9 +616,8 @@ public final class MathUtils
 		return min + (int) ((max - min) * f);
 	}
 	
-	public static
-	@infix
-	long interpolate(double d, long min, long max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long interpolate(double d, long min, long max)
 	{
 		if (d <= 0D)
 		{
@@ -675,9 +630,8 @@ public final class MathUtils
 		return min + (long) ((max - min) * d);
 	}
 	
-	public static
-	@infix
-	float interpolate(float f, float min, float max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float interpolate(float f, float min, float max)
 	{
 		if (f <= 0F)
 		{
@@ -690,9 +644,8 @@ public final class MathUtils
 		return min + (max - min) * f;
 	}
 	
-	public static
-	@infix
-	double interpolate(double d, double min, double max)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double interpolate(double d, double min, double max)
 	{
 		if (d <= 0D)
 		{
@@ -705,9 +658,8 @@ public final class MathUtils
 		return min + (max - min) * d;
 	}
 	
-	public static
-	@postfix
-	int $bang(int v)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int $bang(int v)
 	{
 		int j = v;
 		while (v > 1)
@@ -717,9 +669,8 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static
-	@postfix
-	long $bang(long v)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long $bang(long v)
 	{
 		long j = v;
 		while (v > 1L)
@@ -729,9 +680,8 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static
-	@postfix
-	float $bang(float v)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float $bang(float v)
 	{
 		float j = v;
 		while (v > 1F)
@@ -741,9 +691,8 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static
-	@postfix
-	double $bang(double v)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double $bang(double v)
 	{
 		double j = v;
 		while (v > 1D)
@@ -753,9 +702,8 @@ public final class MathUtils
 		return j;
 	}
 	
-	public static
-	@infix
-	int nPr(int n)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nPr(int n)
 	{
 		return $bang(n);
 	}
@@ -773,9 +721,8 @@ public final class MathUtils
 	 *
 	 * @return the number of combinations
 	 */
-	public static
-	@infix
-	int nPr(int n, int k)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nPr(int n, int k)
 	{
 		return $bang(n) / $bang(n - k);
 	}
@@ -789,9 +736,8 @@ public final class MathUtils
 	 *
 	 * @return the number of combinations
 	 */
-	public static
-	@infix
-	int nCr(int n)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nCr(int n)
 	{
 		return 1;
 	}
@@ -810,16 +756,14 @@ public final class MathUtils
 	 *
 	 * @return the number of combinations
 	 */
-	public static
-	@infix
-	int nCr(int n, int k)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int nCr(int n, int k)
 	{
 		return $bang(n) / ($bang(k) * $bang(n - k));
 	}
 	
-	public static
-	@infix
-	int sum(int... ints)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int sum(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -829,9 +773,8 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static
-	@infix
-	long sum(long... longs)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long sum(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -841,9 +784,8 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static
-	@infix
-	float sum(float... floats)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float sum(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -853,9 +795,8 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static
-	@infix
-	double sum(double... doubles)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double sum(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -865,9 +806,8 @@ public final class MathUtils
 		return total;
 	}
 	
-	public static
-	@infix
-	float average(int... ints)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float average(int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -877,9 +817,8 @@ public final class MathUtils
 		return total / (float) ints.length;
 	}
 	
-	public static
-	@infix
-	double average(long... longs)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double average(long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -889,9 +828,8 @@ public final class MathUtils
 		return total / (double) longs.length;
 	}
 	
-	public static
-	@infix
-	float average(float... floats)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float average(float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -901,9 +839,8 @@ public final class MathUtils
 		return total / floats.length;
 	}
 	
-	public static
-	@infix
-	double average(double... doubles)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double average(double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -913,9 +850,8 @@ public final class MathUtils
 		return total / doubles.length;
 	}
 	
-	public static
-	@infix
-	float angle(float f)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static float angle(float f)
 	{
 		f %= 360F;
 		if (f >= 180F)
@@ -929,9 +865,8 @@ public final class MathUtils
 		return f;
 	}
 	
-	public static
-	@infix
-	double angle(double d)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static double angle(double d)
 	{
 		d %= 360D;
 		if (d >= 180D)
@@ -945,9 +880,8 @@ public final class MathUtils
 		return d;
 	}
 	
-	public static
-	@infix
-	int powerOfTwo(int i)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int powerOfTwo(int i)
 	{
 		int j = i - 1;
 		j |= j >> 1;
@@ -958,16 +892,14 @@ public final class MathUtils
 		return j + 1;
 	}
 	
-	public static
-	@infix
-	boolean isPowerOfTwo(int i)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isPowerOfTwo(int i)
 	{
 		return (i & -i) != 0;
 	}
 	
-	public static
-	@infix
-	int logBaseTwo(int i)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int logBaseTwo(int i)
 	{
 		if (isPowerOfTwo(i))
 		{
@@ -976,58 +908,50 @@ public final class MathUtils
 		return deBruijnBits[(int) (powerOfTwo(i) * 125613361L >> 27) & 0x1F] - 1;
 	}
 	
-	public static
-	@infix
-	boolean apply(int i, byte bit)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean apply(int i, byte bit)
 	{
 		return (i & 1 << bit) != 0;
 	}
 	
-	public static
-	@infix
-	int update(int i, byte bit, boolean set)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int update(int i, byte bit, boolean set)
 	{
 		return set ? i | 1 << bit : i ^ ~(1 << bit);
 	}
 	
-	public static
-	@infix
-	int setBit(int i, byte bit)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int setBit(int i, byte bit)
 	{
 		return i | 1 << bit;
 	}
 	
-	public static
-	@infix
-	int clearBit(int i, byte bit)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int clearBit(int i, byte bit)
 	{
 		return i & ~(1 << bit);
 	}
 	
-	public static
-	@infix
-	boolean apply(long l, byte bit)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean apply(long l, byte bit)
 	{
 		return (l & 1L << bit) != 0;
 	}
 	
-	public static
-	@infix
-	long update(long l, byte bit, boolean set)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long update(long l, byte bit, boolean set)
 	{
 		return set ? l | 1L << bit : l ^ ~(1L << bit);
 	}
 	
-	public static
-	@infix
-	long setBit(long l, byte bit)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long setBit(long l, byte bit)
 	{
 		return l | 1L << bit;
 	}
 	
-	public static
-	@infix
-	long clearBit(long l, byte bit)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static long clearBit(long l, byte bit)
 	{
 		return l & ~(1 << bit);
 	}

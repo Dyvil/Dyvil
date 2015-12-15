@@ -1,8 +1,9 @@
 package dyvil.math;
 
-import dyvil.annotation._internal.prefix;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.Number;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -79,23 +80,23 @@ public class Complex implements Number, Serializable
 	}
 	
 	@Override
+	@DyvilModifiers(Modifiers.PREFIX)
 	public
-	@prefix
 	Complex $plus()
 	{
 		return this;
 	}
 	
 	@Override
+	@DyvilModifiers(Modifiers.PREFIX)
 	public
-	@prefix
 	Complex $minus()
 	{
 		return apply(-this.real, -this.imag);
 	}
-	
+
+	@DyvilModifiers(Modifiers.PREFIX)
 	public
-	@prefix
 	Complex $tilde()
 	{
 		return apply(-this.real, this.imag);

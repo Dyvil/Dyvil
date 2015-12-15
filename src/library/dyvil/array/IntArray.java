@@ -1,11 +1,11 @@
 package dyvil.array;
 
 import dyvil.annotation.Intrinsic;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.inline;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Int;
+import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
 import java.util.function.IntConsumer;
@@ -75,7 +75,7 @@ public interface IntArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int length(int[] array)
 	{
 		return array.length;
@@ -83,14 +83,14 @@ public interface IntArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, IALOAD })
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int subscript(int[] array, int i)
 	{
 		return array[i];
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] subscript(int[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
@@ -102,14 +102,14 @@ public interface IntArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, IASTORE })
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	void subscript_$eq(int[] array, int i, int v)
 	{
 		array[i] = v;
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	void subscript_$eq(int[] array, Range<Int> range, int[] values)
 	{
 		int start = Int.unapply(range.first());
@@ -119,14 +119,14 @@ public interface IntArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	void forEach(int[] array, IntConsumer action)
 	{
 		for (int v : array)
@@ -137,32 +137,28 @@ public interface IntArray
 	
 	// Operators
 	
-	static
-	@infix
-	@inline
-	boolean $qmark(int[] array, int v)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static boolean $qmark(int[] array, int v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	boolean $eq$eq(int[] array1, int[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	boolean $bang$eq(int[] array1, int[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] $plus(int[] array, int v)
 	{
 		int len = array.length;
@@ -173,7 +169,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] $plus$plus(int[] array1, int[] array2)
 	{
 		int len1 = array1.length;
@@ -185,7 +181,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] $minus(int[] array, int v)
 	{
 		int index = indexOf(array, v, 0);
@@ -210,7 +206,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] $minus$minus(int[] array1, int[] array2)
 	{
 		int index = 0;
@@ -230,7 +226,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] $amp(int[] array1, int[] array2)
 	{
 		int index = 0;
@@ -250,7 +246,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] mapped(int[] array, IntUnaryOperator mapper)
 	{
 		int len = array.length;
@@ -263,7 +259,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] flatMapped(int[] array, IntFunction<int[]> mapper)
 	{
 		int size = 0;
@@ -288,7 +284,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] filtered(int[] array, IntPredicate condition)
 	{
 		int index = 0;
@@ -307,7 +303,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int[] sorted(int[] array)
 	{
 		int[] res = array.clone();
@@ -318,14 +314,14 @@ public interface IntArray
 	// Search Operations
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int indexOf(int[] array, int v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int indexOf(int[] array, int v, int start)
 	{
 		for (; start < array.length; start++)
@@ -339,14 +335,14 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int lastIndexOf(int[] array, int v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	int lastIndexOf(int[] array, int v, int start)
 	{
 		for (; start >= 0; start--)
@@ -360,16 +356,14 @@ public interface IntArray
 	}
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	boolean contains(int[] array, int v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	boolean in(int v, int[] array)
 	{
 		return indexOf(array, v, 0) >= 0;
@@ -378,15 +372,14 @@ public interface IntArray
 	// Copying
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	int[] copy(int[] array)
 	{
 		return array.clone();
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	Int[] boxed(int[] array)
 	{
 		int len = array.length;
@@ -399,7 +392,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	Iterable<Int> toIterable(int[] array)
 	{
 		return new ArrayList<Int>(boxed(array), true);
@@ -408,23 +401,21 @@ public interface IntArray
 	// equals, hashCode and toString
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	boolean equals(int[] array1, int[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
 	static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	int hashCode(int[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	String toString(int[] array)
 	{
 		if (array == null)
@@ -449,7 +440,7 @@ public interface IntArray
 	}
 	
 	static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	void toString(int[] array, StringBuilder builder)
 	{
 		if (array == null)

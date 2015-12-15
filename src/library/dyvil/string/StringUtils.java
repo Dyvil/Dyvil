@@ -1,8 +1,7 @@
 package dyvil.string;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.inline;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
@@ -35,14 +34,13 @@ public final class StringUtils
 		// no instances
 	}
 	
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static String $times(int count, String string)
 	{
 		return $times(string, count);
 	}
 
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String $times(String string, int count)
 	{
 		switch (count)
@@ -84,14 +82,13 @@ public final class StringUtils
 	 *
 	 * @return the formatted String
 	 */
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static String format(String format, Object... args)
 	{
 		return String.format(format, args);
 	}
 
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String[] split(String string, char character)
 	{
 		if (string == null || string.isEmpty())
@@ -124,7 +121,7 @@ public final class StringUtils
 		return array;
 	}
 
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String[] words(String string)
 	{
 		if (string == null || string.isEmpty())
@@ -146,7 +143,7 @@ public final class StringUtils
 	 * @return a list of words in the given string
 	 */
 
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static List<String> wordList(String string)
 	{
 		if (string == null || string.isEmpty())
@@ -166,7 +163,7 @@ public final class StringUtils
 	 *
 	 * @return an array of lines
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String[] lines(String string)
 	{
 		if (string == null || string.isEmpty())
@@ -186,7 +183,7 @@ public final class StringUtils
 	 *
 	 * @return a List of lines
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static List<String> lineList(String string)
 	{
 		if (string == null || string.isEmpty())
@@ -208,7 +205,7 @@ public final class StringUtils
 	 *
 	 * @return the Levenshtein distance between the two strings
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static int distanceTo(String s1, String s2)
 	{
 		if (s1.equals(s2))
@@ -261,7 +258,7 @@ public final class StringUtils
 	 *
 	 * @return the string converted to a valid identifier
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String toIdentifier(String string)
 	{
 		int len = string.length();
@@ -299,7 +296,7 @@ public final class StringUtils
 	 *
 	 * @return the acronym of the string
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String toAcronym(String string)
 	{
 		if (string == null)
@@ -353,7 +350,7 @@ public final class StringUtils
 	 * @return a readable acronym-like version of the string with most vowels
 	 * removed
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String removeVowels(String string)
 	{
 		if (string == null)
@@ -387,7 +384,7 @@ public final class StringUtils
 		return builder.append(next).toString();
 	}
 	
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String toTitleCase(String s)
 	{
 		if (s == null)
@@ -426,7 +423,7 @@ public final class StringUtils
 		return builder.toString();
 	}
 	
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String toLowerCamelCase(String s)
 	{
 		if (s == null)
@@ -465,7 +462,7 @@ public final class StringUtils
 		return builder.toString();
 	}
 	
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String toUpperCamelCase(String s)
 	{
 		if (s == null)
@@ -504,7 +501,7 @@ public final class StringUtils
 		return builder.toString();
 	}
 	
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String toInvertedCase(String s)
 	{
 		if (s == null)
@@ -540,7 +537,7 @@ public final class StringUtils
 	 *
 	 * @return the number of times the character appears in the string
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static int count(String string, char c)
 	{
 		int count = 0;
@@ -566,7 +563,7 @@ public final class StringUtils
 	 *
 	 * @return true, if the string contains the character
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean contains(String string, char c)
 	{
 		return string.indexOf(c) != -1;
@@ -586,19 +583,19 @@ public final class StringUtils
 	 * @see Pattern
 	 * @see Matcher#find()
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean containsRegex(String string, String regex)
 	{
 		return Pattern.compile(regex).matcher(string).find();
 	}
 
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static int indexOfRegex(String string, String regex)
 	{
 		return Pattern.compile(regex).matcher(string).start();
 	}
 
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static int indexOfRange(String string, String regex, int min, int max)
 	{
 		int index = string.indexOf(regex, min);
@@ -617,7 +614,7 @@ public final class StringUtils
 	 *
 	 * @return the next random name
 	 */
-	@infix
+	@DyvilModifiers(Modifiers.INFIX)
 	public static String nextNoun(java.util.Random random, int minLength, int maxLength)
 	{
 		int len = RandomUtils.nextInt(random, minLength, maxLength);

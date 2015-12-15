@@ -1,10 +1,11 @@
 package dyvil.collection.immutable;
 
-import dyvil.annotation._internal.object;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.reflect.Modifiers;
 import dyvil.util.None;
 import dyvil.util.Option;
 
@@ -16,9 +17,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 @NilConvertible
-public
-@object
-class EmptyMap<K, V> implements ImmutableMap<K, V>
+@DyvilModifiers(Modifiers.OBJECT_CLASS)
+public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 4719096668028950933L;
 	

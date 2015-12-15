@@ -1,17 +1,17 @@
 package dyvil.collection.range;
 
-import dyvil.annotation._internal.object;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
 
 @NilConvertible
-public
-@object
-class EmptyRange<T> implements Range<T>
+@DyvilModifiers(Modifiers.OBJECT_CLASS)
+public final class EmptyRange<T> implements Range<T>
 {
 	private static final long serialVersionUID = 5914222536371440711L;
 	

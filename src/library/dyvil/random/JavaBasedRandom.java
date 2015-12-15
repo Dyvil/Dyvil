@@ -1,9 +1,10 @@
 package dyvil.random;
 
-import dyvil.annotation._internal.internal;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
 
+@DyvilModifiers(Modifiers.INTERNAL)
 public final
-@internal
 class JavaBasedRandom extends java.util.Random implements Random
 {
 	private static final long serialVersionUID = -6648049590269700311L;

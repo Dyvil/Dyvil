@@ -1,8 +1,9 @@
 package dyvil.io;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.infix;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ByteArray;
+import dyvil.reflect.Modifiers;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +55,7 @@ public final class WebUtils
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Checks if the website at the given {@link URL} {@code url} is available
 	 * using the HTTP request {@code HEAD}. The created
@@ -68,16 +69,15 @@ public final class WebUtils
 	 * @throws IOException
 	 * 		if an IOException occurred.
 	 */
-	public static
-	@infix
-	boolean isAvailable(URL url) throws IOException
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isAvailable(URL url) throws IOException
 	{
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setInstanceFollowRedirects(false);
 		con.setRequestMethod("HEAD");
 		return con.getResponseCode() == HttpURLConnection.HTTP_OK;
 	}
-	
+
 	/**
 	 * Downloads the website at the given {@link String} {@code url} and stores
 	 * it in a {@code byte} array. If the website is formatted as a sequence of

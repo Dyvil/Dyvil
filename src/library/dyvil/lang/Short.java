@@ -1,10 +1,8 @@
 package dyvil.lang;
 
 import dyvil.annotation.Intrinsic;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.inline;
-import dyvil.annotation._internal.postfix;
-import dyvil.annotation._internal.prefix;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
 
 import java.io.Serializable;
 
@@ -46,8 +44,7 @@ public class Short implements Integer, Serializable
 		return new Short(v);
 	}
 	
-	public static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX) public static
 	short unapply(Short v)
 	{
 		return v == null ? 0 : v.value;
@@ -84,374 +81,374 @@ public class Short implements Integer, Serializable
 	// Unary operators
 	
 	@Intrinsic({ LOAD_0 })
-	public static @prefix int $plus(short v) { return v; }
+	@DyvilModifiers(Modifiers.PREFIX) public static int $plus(short v) { return v; }
 	
 	@Intrinsic({ LOAD_0, INEG })
-	public static @prefix int $minus(short v) { return -v; }
+	@DyvilModifiers(Modifiers.PREFIX) public static int $minus(short v) { return -v; }
 	
 	@Intrinsic({ LOAD_0, ICONST_M1, IXOR })
-	public static @prefix int $tilde(short v) { return ~v; }
+	@DyvilModifiers(Modifiers.PREFIX) public static int $tilde(short v) { return ~v; }
 	
 	// byte operators
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static @infix boolean $eq$eq(short v1, byte v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, byte v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public static @infix boolean $bang$eq(short v1, byte v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, byte v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
-	public static @infix boolean $lt(short v1, byte v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, byte v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
-	public static @infix boolean $lt$eq(short v1, byte v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, byte v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
-	public static @infix boolean $gt(short v1, byte v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, byte v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
-	public static @infix boolean $gt$eq(short v1, byte v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, byte v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IADD })
-	public static @infix int $plus(short v1, byte v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $plus(short v1, byte v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISUB })
-	public static @infix int $minus(short v1, byte v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $minus(short v1, byte v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IMUL })
-	public static @infix int $times(short v1, byte v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $times(short v1, byte v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, I2F, FDIV })
-	public static @infix float $div(short v1, byte v2) { return (float) v1 / (float) v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $div(short v1, byte v2) { return (float) v1 / (float) v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IREM })
-	public static @infix int $percent(short v1, byte v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $percent(short v1, byte v2) { return v1 % v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IDIV })
-	public static @infix int $bslash(short v1, byte v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bslash(short v1, byte v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public static @infix int $amp(short v1, byte v2) { return v1 & v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $amp(short v1, byte v2) { return v1 & v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public static @infix int $bar(short v1, byte v2) { return v1 | v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bar(short v1, byte v2) { return v1 | v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public static @infix int $up(short v1, byte v2) { return v1 ^ v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $up(short v1, byte v2) { return v1 ^ v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHL })
-	public static @infix int $lt$lt(short v1, byte v2) { return v1 << v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $lt$lt(short v1, byte v2) { return v1 << v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHR })
-	public static @infix int $gt$gt(short v1, byte v2) { return v1 >> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt(short v1, byte v2) { return v1 >> v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IUSHR })
-	public static @infix int $gt$gt$gt(short v1, byte v2) { return v1 >>> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt$gt(short v1, byte v2) { return v1 >>> v2; }
 	
 	// short operators
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static @infix boolean $eq$eq(short v1, short v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, short v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public static @infix boolean $bang$eq(short v1, short v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, short v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
-	public static @infix boolean $lt(short v1, short v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, short v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
-	public static @infix boolean $lt$eq(short v1, short v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, short v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
-	public static @infix boolean $gt(short v1, short v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, short v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
-	public static @infix boolean $gt$eq(short v1, short v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, short v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IADD })
-	public static @infix int $plus(short v1, short v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $plus(short v1, short v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISUB })
-	public static @infix int $minus(short v1, short v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $minus(short v1, short v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IMUL })
-	public static @infix int $times(short v1, short v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $times(short v1, short v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, I2F, FDIV })
-	public static @infix float $div(short v1, short v2) { return (float) v1 / (float) v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $div(short v1, short v2) { return (float) v1 / (float) v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IREM })
-	public static @infix int $percent(short v1, short v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $percent(short v1, short v2) { return v1 % v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IDIV })
-	public static @infix int $bslash(short v1, short v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bslash(short v1, short v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public static @infix int $amp(short v1, short v2) { return v1 & v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $amp(short v1, short v2) { return v1 & v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public static @infix int $bar(short v1, short v2) { return v1 | v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bar(short v1, short v2) { return v1 | v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public static @infix int $up(short v1, short v2) { return v1 ^ v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $up(short v1, short v2) { return v1 ^ v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHL })
-	public static @infix int $lt$lt(short v1, short v2) { return v1 << v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $lt$lt(short v1, short v2) { return v1 << v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHR })
-	public static @infix int $gt$gt(short v1, short v2) { return v1 >> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt(short v1, short v2) { return v1 >> v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IUSHR })
-	public static @infix int $gt$gt$gt(short v1, short v2) { return v1 >>> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt$gt(short v1, short v2) { return v1 >>> v2; }
 	
 	// char operators
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static @infix boolean $eq$eq(short v1, char v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, char v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public static @infix boolean $bang$eq(short v1, char v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, char v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
-	public static @infix boolean $lt(short v1, char v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, char v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
-	public static @infix boolean $lt$eq(short v1, char v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, char v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
-	public static @infix boolean $gt(short v1, char v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, char v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
-	public static @infix boolean $gt$eq(short v1, char v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, char v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IADD })
-	public static @infix int $plus(short v1, char v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $plus(short v1, char v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISUB })
-	public static @infix int $minus(short v1, char v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $minus(short v1, char v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IMUL })
-	public static @infix int $times(short v1, char v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $times(short v1, char v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, I2F, FDIV })
-	public static @infix float $div(short v1, char v2) { return (float) v1 / (float) v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $div(short v1, char v2) { return (float) v1 / (float) v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IREM })
-	public static @infix int $percent(short v1, char v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $percent(short v1, char v2) { return v1 % v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IDIV })
-	public static @infix int $bslash(short v1, char v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bslash(short v1, char v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public static @infix int $amp(short v1, char v2) { return v1 & v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $amp(short v1, char v2) { return v1 & v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public static @infix int $bar(short v1, char v2) { return v1 | v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bar(short v1, char v2) { return v1 | v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public static @infix int $up(short v1, char v2) { return v1 ^ v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $up(short v1, char v2) { return v1 ^ v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHL })
-	public static @infix int $lt$lt(short v1, char v2) { return v1 << v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $lt$lt(short v1, char v2) { return v1 << v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHR })
-	public static @infix int $gt$gt(short v1, char v2) { return v1 >> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt(short v1, char v2) { return v1 >> v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IUSHR })
-	public static @infix int $gt$gt$gt(short v1, char v2) { return v1 >>> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt$gt(short v1, char v2) { return v1 >>> v2; }
 	
 	// int operators
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static @infix boolean $eq$eq(short v1, int v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, int v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public static @infix boolean $bang$eq(short v1, int v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, int v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLT })
-	public static @infix boolean $lt(short v1, int v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, int v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPLE })
-	public static @infix boolean $lt$eq(short v1, int v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, int v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGT })
-	public static @infix boolean $gt(short v1, int v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, int v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPGE })
-	public static @infix boolean $gt$eq(short v1, int v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, int v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IADD })
-	public static @infix int $plus(short v1, int v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $plus(short v1, int v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISUB })
-	public static @infix int $minus(short v1, int v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $minus(short v1, int v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IMUL })
-	public static @infix int $times(short v1, int v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $times(short v1, int v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, I2F, FDIV })
-	public static @infix float $div(short v1, int v2) { return (float) v1 / (float) v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $div(short v1, int v2) { return (float) v1 / (float) v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IREM })
-	public static @infix int $percent(short v1, int v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $percent(short v1, int v2) { return v1 % v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IDIV })
-	public static @infix int $bslash(short v1, int v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bslash(short v1, int v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public static @infix int $amp(short v1, int v2) { return v1 & v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $amp(short v1, int v2) { return v1 & v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public static @infix int $bar(short v1, int v2) { return v1 | v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $bar(short v1, int v2) { return v1 | v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public static @infix int $up(short v1, int v2) { return v1 ^ v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $up(short v1, int v2) { return v1 ^ v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHL })
-	public static @infix int $lt$lt(short v1, int v2) { return v1 << v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $lt$lt(short v1, int v2) { return v1 << v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ISHR })
-	public static @infix int $gt$gt(short v1, int v2) { return v1 >> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt(short v1, int v2) { return v1 >> v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IUSHR })
-	public static @infix int $gt$gt$gt(short v1, int v2) { return v1 >>> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt$gt(short v1, int v2) { return v1 >>> v2; }
 	
 	// long operators
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPEQ })
-	public static @infix boolean $eq$eq(short v1, long v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, long v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPNE })
-	public static @infix boolean $bang$eq(short v1, long v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, long v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPLT })
-	public static @infix boolean $lt(short v1, long v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, long v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPLE })
-	public static @infix boolean $lt$eq(short v1, long v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, long v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPGT })
-	public static @infix boolean $gt(short v1, long v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, long v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LCMPGE })
-	public static @infix boolean $gt$eq(short v1, long v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, long v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LADD })
-	public static @infix long $plus(short v1, long v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $plus(short v1, long v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LSUB })
-	public static @infix long $minus(short v1, long v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $minus(short v1, long v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LMUL })
-	public static @infix long $times(short v1, long v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $times(short v1, long v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, L2D, DDIV })
-	public static @infix double $div(short v1, long v2) { return (double) v1 / (double) v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static double $div(short v1, long v2) { return (double) v1 / (double) v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LREM })
-	public static @infix long $percent(short v1, long v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $percent(short v1, long v2) { return v1 % v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LDIV })
-	public static @infix long $bslash(short v1, long v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $bslash(short v1, long v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LAND })
-	public static @infix long $amp(short v1, long v2) { return v1 & v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $amp(short v1, long v2) { return v1 & v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LOR })
-	public static @infix long $bar(short v1, long v2) { return v1 | v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $bar(short v1, long v2) { return v1 | v2; }
 	
 	@Intrinsic({ LOAD_0, I2L, LOAD_1, LXOR })
-	public static @infix long $up(short v1, long v2) { return v1 ^ v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static long $up(short v1, long v2) { return v1 ^ v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, L2I, ISHL })
-	public static @infix int $lt$lt(short v1, long v2) { return v1 << v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $lt$lt(short v1, long v2) { return v1 << v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, L2I, ISHR })
-	public static @infix int $gt$gt(short v1, long v2) { return v1 >> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt(short v1, long v2) { return v1 >> v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, L2I, IUSHR })
-	public static @infix int $gt$gt$gt(short v1, long v2) { return v1 >>> v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static int $gt$gt$gt(short v1, long v2) { return v1 >>> v2; }
 	
 	// float operators
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPEQ })
-	public static @infix boolean $eq$eq(short v1, float v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, float v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPNE })
-	public static @infix boolean $bang$eq(short v1, float v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, float v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPLT })
-	public static @infix boolean $lt(short v1, float v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, float v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPLE })
-	public static @infix boolean $lt$eq(short v1, float v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, float v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPGT })
-	public static @infix boolean $gt(short v1, float v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, float v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FCMPGE })
-	public static @infix boolean $gt$eq(short v1, float v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, float v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FADD })
-	public static @infix float $plus(short v1, float v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $plus(short v1, float v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FSUB })
-	public static @infix float $minus(short v1, float v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $minus(short v1, float v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FMUL })
-	public static @infix float $times(short v1, float v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $times(short v1, float v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FDIV })
-	public static @infix float $div(short v1, float v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $div(short v1, float v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, I2F, LOAD_1, FREM })
-	public static @infix float $percent(short v1, float v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static float $percent(short v1, float v2) { return v1 % v2; }
 	
 	// double operators
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPEQ })
-	public static @infix boolean $eq$eq(short v1, double v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(short v1, double v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPNE })
-	public static @infix boolean $bang$eq(short v1, double v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(short v1, double v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPLT })
-	public static @infix boolean $lt(short v1, double v2) { return v1 < v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt(short v1, double v2) { return v1 < v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPLE })
-	public static @infix boolean $lt$eq(short v1, double v2) { return v1 <= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq(short v1, double v2) { return v1 <= v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPGT })
-	public static @infix boolean $gt(short v1, double v2) { return v1 > v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt(short v1, double v2) { return v1 > v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DCMPGE })
-	public static @infix boolean $gt$eq(short v1, double v2) { return v1 >= v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $gt$eq(short v1, double v2) { return v1 >= v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DADD })
-	public static @infix double $plus(short v1, double v2) { return v1 + v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static double $plus(short v1, double v2) { return v1 + v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DSUB })
-	public static @infix double $minus(short v1, double v2) { return v1 - v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static double $minus(short v1, double v2) { return v1 - v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DMUL })
-	public static @infix double $times(short v1, double v2) { return v1 * v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static double $times(short v1, double v2) { return v1 * v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DDIV })
-	public static @infix double $div(short v1, double v2) { return v1 / v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static double $div(short v1, double v2) { return v1 / v2; }
 	
 	@Intrinsic({ LOAD_0, I2D, LOAD_1, DREM })
-	public static @infix double $percent(short v1, double v2) { return v1 % v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static double $percent(short v1, double v2) { return v1 % v2; }
 	
 	// generic operators
 	
 	@Override
-	public @prefix Int $plus() { return Int.apply(this.value); }
+	@DyvilModifiers(Modifiers.PREFIX) public Int $plus() { return Int.apply(this.value); }
 	
 	@Override
-	public @prefix Int $minus() { return Int.apply(-this.value); }
+	@DyvilModifiers(Modifiers.PREFIX) public Int $minus() { return Int.apply(-this.value); }
 	
 	@Override
-	public @prefix Int $tilde() { return Int.apply(~this.value); }
+	@DyvilModifiers(Modifiers.PREFIX) public Int $tilde() { return Int.apply(~this.value); }
 	
 	@Override
 	public boolean $eq$eq(Number v) { return this.value == v.byteValue(); }
@@ -522,40 +519,31 @@ public class Short implements Integer, Serializable
 	
 	@Intrinsic(value = { LOAD_0, INVOKESTATIC, 0, 1, 2 }, strings = { "java/lang/Integer", "toString",
 			"(I)Ljava/lang/String;" })
-	public static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE) public static
 	String toString(short value)
 	{
 		return java.lang.Integer.toString(value);
 	}
 	
-	public static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE) public static
 	String toBinaryString(short value)
 	{
 		return java.lang.Integer.toBinaryString(value);
 	}
 	
-	public static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE) public static
 	String toHexString(short value)
 	{
 		return java.lang.Integer.toHexString(value);
 	}
 	
-	public static
-	@infix
-	@inline
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE) public static
 	String toOctalString(short value)
 	{
 		return java.lang.Integer.toOctalString(value);
 	}
 	
-	public static
-	@infix
+	@DyvilModifiers(Modifiers.INFIX) public static
 	String toString(short value, int radix)
 	{
 		switch (radix)
@@ -579,8 +567,7 @@ public class Short implements Integer, Serializable
 	}
 	
 	@Intrinsic( { LOAD_0 })
-	public static
-	@postfix
+	@DyvilModifiers(Modifiers.INFIX) public static
 	int $hash$hash(short v)
 	{
 		return v;

@@ -1,11 +1,9 @@
 package dyvil.lang;
 
 import dyvil.annotation.Intrinsic;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.inline;
-import dyvil.annotation._internal.postfix;
-import dyvil.annotation._internal.prefix;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.literal.BooleanConvertible;
+import dyvil.reflect.Modifiers;
 
 import java.io.Serializable;
 
@@ -26,11 +24,10 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return value ? TRUE : FALSE;
 	}
 	
-	public static
-	@infix
-	boolean unapply(Boolean v)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean unapply(Boolean v)
 	{
-		return v == null ? false : v.value;
+		return v != null && v.value;
 	}
 	
 	protected Boolean(boolean value)
@@ -43,35 +40,36 @@ public class Boolean implements Comparable<Boolean>, Serializable
 	public boolean booleanValue() { return this.value; }
 	
 	@Intrinsic({ LOAD_0, BNOT })
-	public static @prefix boolean $bang(boolean v) { return !v; }
+	@DyvilModifiers(Modifiers.PREFIX) public static boolean $bang(boolean v) { return !v; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static @infix boolean $eq$eq(boolean v1, boolean v2) { return v1 == v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq(boolean v1, boolean v2) { return v1 == v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPNE })
-	public static @infix boolean $bang$eq(boolean v1, boolean v2) { return v1 != v2; }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bang$eq(boolean v1, boolean v2) { return v1 != v2; }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IAND })
-	public static @infix boolean $amp(boolean v1, boolean v2) { return (v1 && v2); }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $amp(boolean v1, boolean v2) { return (v1 && v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IOR })
-	public static @infix boolean $bar(boolean v1, boolean v2) { return (v1 || v2); }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $bar(boolean v1, boolean v2) { return (v1 || v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, IXOR })
-	public static @infix boolean $up(boolean v1, boolean v2) { return (v1 ^ v2); }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $up(boolean v1, boolean v2) { return (v1 ^ v2); }
 	
 	@Intrinsic({ LOAD_0, BNOT, LOAD_1, IOR })
-	public static @infix boolean $eq$eq$gt(boolean v1, boolean v2) { return (!v1 || v2); }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $eq$eq$gt(boolean v1, boolean v2) { return (!v1 || v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, BNOT, IOR })
-	public static @infix boolean $lt$eq$eq(boolean v1, boolean v2) { return (v1 || !v2); }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq$eq(boolean v1, boolean v2) { return (v1 || !v2); }
 	
 	@Intrinsic({ LOAD_0, LOAD_1, ICMPEQ })
-	public static @infix boolean $lt$eq$gt(boolean v1, boolean v2) { return (v1 == v2); }
+	@DyvilModifiers(Modifiers.INFIX) public static boolean $lt$eq$gt(boolean v1, boolean v2) { return (v1 == v2); }
 	
-	public static @infix int compareTo(boolean b1, boolean b2) { return b1 == b2 ? 0 : b1 ? 1 : -1; }
-	
-	public @prefix Boolean $bang() { return Boolean.apply(!this.value); }
+	@DyvilModifiers(Modifiers.INFIX) public static int compareTo(boolean b1, boolean b2) { return b1 == b2 ? 0 : b1 ? 1 : -1; }
+
+	@DyvilModifiers(Modifiers.PREFIX)
+	public Boolean $bang() { return Boolean.apply(!this.value); }
 	
 	public Boolean $eq$eq(Boolean v) { return Boolean.apply(this.value == v.value); }
 	
@@ -96,10 +94,8 @@ public class Boolean implements Comparable<Boolean>, Serializable
 	
 	// Object methods
 	
-	public static
-	@infix
-	@inline
-	String toString(boolean value)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static String toString(boolean value)
 	{
 		return value ? "true" : "false";
 	}
@@ -110,9 +106,8 @@ public class Boolean implements Comparable<Boolean>, Serializable
 		return this.value ? "true" : "false";
 	}
 	
-	public static
-	@postfix
-	int $hash$hash(boolean v)
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int $hash$hash(boolean v)
 	{
 		return v ? 1231 : 1237;
 	}

@@ -1,12 +1,12 @@
 package dyvil.array;
 
 import dyvil.annotation.Intrinsic;
-import dyvil.annotation._internal.infix;
-import dyvil.annotation._internal.inline;
+import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Float;
 import dyvil.lang.Int;
+import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
 import java.util.function.DoubleFunction;
@@ -86,24 +86,21 @@ public interface FloatArray
 	// Basic Array Operations
 	
 	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
-	static
-	@infix
-	int length(float[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	int length(float[] array)
 	{
 		return array.length;
 	}
 	
 	@Intrinsic( { LOAD_0, LOAD_1, FALOAD })
-	static
-	@infix
-	float subscript(float[] array, int i)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float subscript(float[] array, int i)
 	{
 		return array[i];
 	}
 	
-	static
-	@infix
-	float[] subscript(float[] array, Range<Int> range)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] subscript(float[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
@@ -113,16 +110,14 @@ public interface FloatArray
 	}
 	
 	@Intrinsic( { LOAD_0, LOAD_1, FASTORE })
-	static
-	@infix
-	void subscript_$eq(float[] array, int i, float v)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	void subscript_$eq(float[] array, int i, float v)
 	{
 		array[i] = v;
 	}
 	
-	static
-	@infix
-	void subscript_$eq(float[] array, Range<Int> range, float[] values)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	void subscript_$eq(float[] array, Range<Int> range, float[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
@@ -130,16 +125,14 @@ public interface FloatArray
 	}
 	
 	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
-	static
-	@infix
-	boolean isEmpty(int[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
-	static
-	@infix
-	void forEach(int[] array, IntConsumer action)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	void forEach(int[] array, IntConsumer action)
 	{
 		for (int v : array)
 		{
@@ -149,33 +142,26 @@ public interface FloatArray
 	
 	// Operators
 	
-	static
-	@infix
-	@inline
-	boolean $qmark(float[] array, float v)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	boolean $qmark(float[] array, float v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
-	static
-	@infix
-	@inline
-	boolean $eq$eq(float[] array1, float[] array2)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	boolean $eq$eq(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static
-	@infix
-	@inline
-	boolean $bang$eq(float[] array1, float[] array2)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	boolean $bang$eq(float[] array1, float[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
-	static
-	@infix
-	float[] $plus(float[] array, float v)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] $plus(float[] array, float v)
 	{
 		int len = array.length;
 		float[] res = new float[len + 1];
@@ -184,9 +170,8 @@ public interface FloatArray
 		return res;
 	}
 	
-	static
-	@infix
-	float[] $plus$plus(float[] array1, float[] array2)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] $plus$plus(float[] array1, float[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -196,9 +181,8 @@ public interface FloatArray
 		return res;
 	}
 	
-	static
-	@infix
-	float[] $minus(float[] array, float v)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] $minus(float[] array, float v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -221,9 +205,8 @@ public interface FloatArray
 		return res;
 	}
 	
-	static
-	@infix
-	float[] $minus$minus(float[] array1, float[] array2)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] $minus$minus(float[] array1, float[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -241,9 +224,8 @@ public interface FloatArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static
-	@infix
-	float[] $amp(float[] array1, float[] array2)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] $amp(float[] array1, float[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -261,9 +243,8 @@ public interface FloatArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static
-	@infix
-	float[] mapped(float[] array, DoubleUnaryOperator mapper)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] mapped(float[] array, DoubleUnaryOperator mapper)
 	{
 		int len = array.length;
 		float[] res = new float[len];
@@ -274,9 +255,8 @@ public interface FloatArray
 		return res;
 	}
 	
-	static
-	@infix
-	float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
 	{
 		int size = 0;
 		float[] res = EMPTY;
@@ -299,9 +279,8 @@ public interface FloatArray
 		return res;
 	}
 	
-	static
-	@infix
-	float[] filtered(float[] array, DoublePredicate condition)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] filtered(float[] array, DoublePredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -318,9 +297,8 @@ public interface FloatArray
 		return Arrays.copyOf(res, index);
 	}
 	
-	static
-	@infix
-	float[] sorted(float[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	float[] sorted(float[] array)
 	{
 		float[] res = array.clone();
 		Arrays.sort(res);
@@ -329,16 +307,14 @@ public interface FloatArray
 	
 	// Search Operations
 	
-	static
-	@infix
-	int indexOf(float[] array, float v)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	int indexOf(float[] array, float v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
-	static
-	@infix
-	int indexOf(float[] array, float v, int start)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	int indexOf(float[] array, float v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -350,16 +326,14 @@ public interface FloatArray
 		return -1;
 	}
 	
-	static
-	@infix
-	int lastIndexOf(float[] array, float v)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	int lastIndexOf(float[] array, float v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
-	static
-	@infix
-	int lastIndexOf(float[] array, float v, int start)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	int lastIndexOf(float[] array, float v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -371,35 +345,28 @@ public interface FloatArray
 		return -1;
 	}
 	
-	static
-	@infix
-	@inline
-	boolean contains(float[] array, float v)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	boolean contains(float[] array, float v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
-	static
-	@infix
-	@inline
-	boolean in(float v, float[] array)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	boolean in(float v, float[] array)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
 	// Copying
 	
-	static
-	@infix
-	@inline
-	float[] copy(float[] array)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	float[] copy(float[] array)
 	{
 		return array.clone();
 	}
 	
-	static
-	@infix
-	Float[] boxed(float[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	Float[] boxed(float[] array)
 	{
 		int len = array.length;
 		Float[] boxed = new Float[len];
@@ -410,34 +377,28 @@ public interface FloatArray
 		return boxed;
 	}
 	
-	static
-	@infix
-	Iterable<Float> toIterable(float[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	Iterable<Float> toIterable(float[] array)
 	{
 		return new ArrayList<Float>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
 	
-	static
-	@infix
-	@inline
-	boolean equals(float[] array1, float[] array2)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	boolean equals(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
-	static
-	@infix
-	@inline
-	int hashCode(float[] array)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	static	int hashCode(float[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
-	static
-	@infix
-	String toString(float[] array)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	String toString(float[] array)
 	{
 		if (array == null)
 		{
@@ -460,9 +421,8 @@ public interface FloatArray
 		return buf.append(']').toString();
 	}
 	
-	static
-	@infix
-	void toString(float[] array, StringBuilder builder)
+	@DyvilModifiers(Modifiers.INFIX)
+	static	void toString(float[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
