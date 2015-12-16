@@ -355,7 +355,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		{
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				pm.report(token, "method.call.generics.close_bracket");
+				pm.report(token, "method.call.generic.close_bracket");
 			}
 			
 			MethodCall mc = (MethodCall) this.value;
@@ -533,11 +533,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			pm.report(MarkerMessages.createError(token, "expression.dot.invalid", token.toString()));
+			pm.report(MarkerMessages.createSyntaxError(token, "expression.dot.invalid", token.toString()));
 			return;
 		}
 		
-		pm.report(MarkerMessages.createError(token, "expression.invalid", token.toString()));
+		pm.report(MarkerMessages.createSyntaxError(token, "expression.invalid", token.toString()));
 		return;
 	}
 	
