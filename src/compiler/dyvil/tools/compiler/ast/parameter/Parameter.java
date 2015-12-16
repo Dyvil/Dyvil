@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
@@ -10,6 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -53,6 +53,17 @@ public abstract class Parameter extends Member implements IParameter
 	public Parameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
 	{
 		super(position, name, type, modifiers);
+	}
+
+	@Override
+	public ModifierSet getModifiers()
+	{
+		if (this.modifiers == null)
+		{
+			this.modifiers = new FlagModifierSet();
+		}
+
+		return this.modifiers;
 	}
 
 	@Override
@@ -118,15 +129,6 @@ public abstract class Parameter extends Member implements IParameter
 	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
-		switch (type)
-		{
-		case "dyvil/annotation/_internal/var":
-			this.modifiers.addIntModifier(Modifiers.VAR);
-			return false;
-		case "dyvil/annotation/_internal/lazy":
-			this.modifiers.addIntModifier(Modifiers.LAZY);
-			return false;
-		}
 		return true;
 	}
 

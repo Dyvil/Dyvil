@@ -111,12 +111,6 @@ public class Field extends Member implements IField
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/_internal/lazy":
-			this.modifiers.addIntModifier(Modifiers.LAZY);
-			return false;
-		case "dyvil/annotation/_internal/internal":
-			this.modifiers.addIntModifier(Modifiers.INTERNAL);
-			return false;
 		case "dyvil/annotation/Transient":
 			this.modifiers.addIntModifier(Modifiers.TRANSIENT);
 			return false;
@@ -361,8 +355,6 @@ public class Field extends Member implements IField
 			                                                                  this.name.qualified, desc, signature,
 			                                                                  null));
 
-			mw.visitAnnotation("Ldyvil/annotation/_internal/lazy;", false);
-			
 			mw.begin();
 			this.value.writeExpression(mw, this.type);
 			mw.end(this.type);
@@ -373,7 +365,7 @@ public class Field extends Member implements IField
 		FieldVisitor fv = writer.visitField(modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(),
 		                                    this.type.getSignature(), null);
 		
-		IField.writeAnnotations(fv, this.annotations, this.type);
+		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}
 	
 	@Override

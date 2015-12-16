@@ -17,7 +17,6 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
@@ -128,17 +127,8 @@ public abstract class AbstractClass implements IClass
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/_internal/internal":
-			this.modifiers.addIntModifier(Modifiers.INTERNAL);
-			return false;
-		case "dyvil/annotation/_internal/sealed":
-			this.modifiers.addModifier(BaseModifiers.INTERNAL);
-			return false;
 		case "dyvil/annotation/Strict":
 			this.modifiers.addIntModifier(Modifiers.STRICT);
-			return false;
-		case "dyvil/annotation/_internal/object":
-			this.modifiers.addIntModifier(Modifiers.OBJECT_CLASS);
 			return false;
 		case Deprecation.DYVIL_INTERNAL:
 		case Deprecation.JAVA_INTERNAL:

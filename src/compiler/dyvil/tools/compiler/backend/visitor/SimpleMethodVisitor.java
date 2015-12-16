@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor
@@ -26,16 +27,26 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	}
 	
 	@Override
-	public AnnotationVisitor visitParameterAnnotation(int parameter, String desc, boolean visible)
+	public AnnotationVisitor visitParameterAnnotation(int parameter, String type, boolean visible)
 	{
-		String internal = ClassFormat.extendedToInternal(desc);
 		IParameter param = this.method.getParameter_(parameter);
+		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
+		{
+			return new ModifierVisitor(param.getModifiers());
+		}
+
+		String internal = ClassFormat.extendedToInternal(type);
 		return param.visitAnnotation(internal);
 	}
 	
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
+		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
+		{
+			return new ModifierVisitor(this.method.getModifiers());
+		}
+
 		String internal = ClassFormat.extendedToInternal(type);
 		if (this.method.addRawAnnotation(internal, null))
 		{

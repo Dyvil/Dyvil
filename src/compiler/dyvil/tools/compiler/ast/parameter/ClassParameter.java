@@ -99,15 +99,6 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
-		switch (type)
-		{
-		case "dyvil/annotation/_internal/var":
-			this.modifiers.addIntModifier(Modifiers.VAR);
-			return false;
-		case "dyvil/annotation/_internal/lazy":
-			this.modifiers.addIntModifier(Modifiers.LAZY);
-			return false;
-		}
 		return true;
 	}
 	
@@ -230,7 +221,7 @@ public final class ClassParameter extends Parameter implements IField
 		FieldVisitor fv = writer
 				.visitField(this.modifiers.toFlags() & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
 		
-		IField.writeAnnotations(fv, this.annotations, this.type);
+		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}
 	
 	@Override

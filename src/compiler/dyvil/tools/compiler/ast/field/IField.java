@@ -5,7 +5,9 @@ import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.util.AnnotationUtils;
 
 public interface IField extends IClassMember, IDataMember
 {
@@ -24,8 +26,10 @@ public interface IField extends IClassMember, IDataMember
 		return false;
 	}
 	
-	static void writeAnnotations(FieldVisitor fv, AnnotationList annotations, IType type)
+	static void writeAnnotations(FieldVisitor fv, ModifierSet modifierSet, AnnotationList annotations, IType type)
 	{
+		AnnotationUtils.writeModifiers(fv, modifierSet);
+
 		if (annotations != null)
 		{
 			int count = annotations.annotationCount();

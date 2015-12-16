@@ -188,12 +188,7 @@ public final class MethodParameter extends Parameter
 	{
 		this.localIndex = writer.localCount();
 		writer.registerParameter(this.localIndex, this.name.qualified, this.getActualType(), 0);
-		
-		if (this.modifiers.hasIntModifier(Modifiers.VAR))
-		{
-			writer.visitParameterAnnotation(this.index, "Ldyvil/annotation/_internal/var;", true);
-		}
-		
+
 		this.writeAnnotations(writer);
 	}
 	

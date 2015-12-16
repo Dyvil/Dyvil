@@ -551,14 +551,6 @@ public class CodeClass extends AbstractClass
 	
 	private void writeAnnotations(ClassWriter writer, int modifiers)
 	{
-		if ((modifiers & Modifiers.OBJECT_CLASS) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/_internal/object;", true);
-		}
-		if ((modifiers & Modifiers.INTERNAL) != 0)
-		{
-			writer.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
-		}
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);

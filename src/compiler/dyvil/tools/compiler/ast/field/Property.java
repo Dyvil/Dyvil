@@ -626,10 +626,6 @@ public class Property extends Member implements IProperty, IContext
 		{
 			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
-		if ((modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
-		{
-			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
-		}
 	}
 	
 	@Override

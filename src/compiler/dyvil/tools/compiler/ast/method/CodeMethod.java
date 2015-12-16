@@ -23,6 +23,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -136,7 +137,8 @@ public class CodeMethod extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages.createMarker(this.position, "method.type.incompatible", this.name.unqualified);
+				Marker marker = MarkerMessages
+						.createMarker(this.position, "method.type.incompatible", this.name.unqualified);
 				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
 				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
 				markers.add(marker);
@@ -231,14 +233,14 @@ public class CodeMethod extends AbstractMethod
 		
 		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
-			this.checkOverride(markers, context);
+			this.checkOverride(markers);
 		}
 		
 		// Check for duplicate methods
-		this.checkDuplicates(markers, context);
+		this.checkDuplicates(markers);
 	}
 	
-	private void checkDuplicates(MarkerList markers, IContext context)
+	private void checkDuplicates(MarkerList markers)
 	{
 		String desc = this.getDescriptor();
 		IClassBody body = this.theClass.getBody();
@@ -277,7 +279,7 @@ public class CodeMethod extends AbstractMethod
 		this.overrideMethods = overrideMethods;
 	}
 	
-	private void checkOverride(MarkerList markers, IContext context)
+	private void checkOverride(MarkerList markers)
 	{
 		if (this.overrideMethods == null)
 		{
@@ -303,7 +305,8 @@ public class CodeMethod extends AbstractMethod
 			IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = MarkerMessages.createMarker(this.position, "method.override.type.incompatible", this.name);
+				Marker marker = MarkerMessages
+						.createMarker(this.position, "method.override.type.incompatible", this.name);
 				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
 				marker.addInfo(MarkerMessages.getMarker("method.override.type", type));
 				markers.add(marker);
@@ -453,9 +456,6 @@ public class CodeMethod extends AbstractMethod
 			mw = new MethodWriterImpl(writer,
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
 			                                             this.name.qualified, desc, null, exceptionTypes));
-
-			start = new Label();
-			end = new Label();
 			
 			mw.begin();
 			mw.setThisType(this.theClass.getInternalName());
@@ -497,39 +497,21 @@ public class CodeMethod extends AbstractMethod
 				this.annotations.getAnnotation(i).write(mw);
 			}
 		}
-		
-		if ((modifiers & Modifiers.INLINE) == Modifiers.INLINE)
-		{
-			mw.visitAnnotation("Ldyvil/annotation/_internal/inline;", false);
-		}
-		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
-		{
-			mw.visitAnnotation("Ldyvil/annotation/_internal/extension;", true);
-		}
-		else if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			mw.visitAnnotation("Ldyvil/annotation/_internal/infix;", false);
-		}
-		if ((modifiers & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			mw.visitAnnotation("Ldyvil/annotation/_internal/prefix;", false);
-		}
+
+		AnnotationUtils.writeModifiers(mw, this.modifiers);
+
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
-		if ((modifiers & Modifiers.INTERNAL) == Modifiers.INTERNAL)
-		{
-			mw.visitAnnotation("Ldyvil/annotation/_internal/internal;", false);
-		}
-		
+
 		this.type.writeAnnotations(mw, TypeReference.METHOD_RETURN, "");
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i].writeAnnotations(mw, TypeReference.newExceptionReference(i), "");
 		}
 	}
-	
+
 	@Override
 	public void writeSignature(DataOutput out) throws IOException
 	{

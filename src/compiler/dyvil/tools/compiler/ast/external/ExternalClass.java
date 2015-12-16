@@ -36,11 +36,9 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.backend.visitor.AnnotationClassVisitor;
-import dyvil.tools.compiler.backend.visitor.AnnotationReader;
-import dyvil.tools.compiler.backend.visitor.SimpleFieldVisitor;
-import dyvil.tools.compiler.backend.visitor.SimpleMethodVisitor;
+import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -561,6 +559,11 @@ public final class ExternalClass extends AbstractClass
 	
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
+		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
+		{
+			return new ModifierVisitor(this.modifiers);
+		}
+
 		String internal = ClassFormat.extendedToInternal(type);
 		if (this.addRawAnnotation(internal, null))
 		{
