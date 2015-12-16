@@ -487,7 +487,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		if (this.capturedFieldCount == 0)
 		{
-			if (this.value instanceof AbstractCall && this.value.valueTag() != COMPOUND_CALL)
+			if (this.value instanceof AbstractCall)
 			{
 				AbstractCall call = (AbstractCall) this.value;
 				
@@ -544,11 +544,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		if (instance != null)
 		{
-			if (instance.isPrimitive())
-			{
-				return false;
-			}
-			
 			if (this.parameterCount <= 0)
 			{
 				return false;
@@ -593,11 +588,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		if (receiver)
 		{
-			if (instance.isPrimitive())
-			{
-				return false;
-			}
-			
 			this.value = instance;
 			this.thisClass = instance.getType().getTheClass();
 		}

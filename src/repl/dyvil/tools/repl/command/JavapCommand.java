@@ -27,6 +27,7 @@ public class JavapCommand implements ICommand
 	{
 		if (args.length == 0)
 		{
+			System.out.println("No class name given");
 			return;
 		}
 

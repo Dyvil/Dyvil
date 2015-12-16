@@ -74,7 +74,6 @@ public interface IValue extends IASTNode, ITyped
 	
 	// Assignments
 	int FIELD_ASSIGN  = 120;
-	int COMPOUND_CALL = 121;
 	
 	// Special Operators and Intrinsics
 	int SWAP_OPERATOR  = 128;
