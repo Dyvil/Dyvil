@@ -11,17 +11,18 @@ import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class PatternParser extends Parser
 {
-	private static final int END            = 0;
-	private static final int PATTERN        = 1;
+	private static final int END             = 0;
+	private static final int PATTERN         = 1;
 	private static final int NEGATIVE_NUMBER = 2;
-	private static final int TUPLE_END      = 4;
-	private static final int CASE_CLASS_END = 8;
+	private static final int TUPLE_END       = 4;
+	private static final int CASE_CLASS_END  = 8;
 	
 	protected IPatternConsumer consumer;
 	
@@ -45,6 +46,18 @@ public class PatternParser extends Parser
 				this.pattern = tcp;
 				pm.pushParser(pm.newTypeParser(tcp));
 				return;
+			}
+
+			if (ParserUtil.isIdentifier(type))
+			{
+				final Name name = token.nameValue();
+				if (name == Names.bar)
+				{
+					OrPattern orPattern = new OrPattern(this.pattern, token, null);
+					this.pattern = orPattern;
+					pm.pushParser(new PatternParser(orPattern::setRight));
+					return;
+				}
 			}
 			
 			pm.popParser(true);
