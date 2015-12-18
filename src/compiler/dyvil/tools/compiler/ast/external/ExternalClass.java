@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -162,7 +161,12 @@ public final class ExternalClass extends AbstractClass
 		
 		this.innerTypes = null;
 	}
-	
+
+	public void setClassParameters(String[] classParameters)
+	{
+		this.classParameters = classParameters;
+	}
+
 	@Override
 	public IDyvilHeader getHeader()
 	{
@@ -252,19 +256,6 @@ public final class ExternalClass extends AbstractClass
 			this.resolveAnnotations();
 		}
 		return super.getAnnotation(type);
-	}
-	
-	@Override
-	protected void readClassParameters(IAnnotation annotation)
-	{
-		ArrayExpr array = (ArrayExpr) annotation.getArguments().getFirstValue();
-		int params = array.valueCount();
-		this.classParameters = new String[params];
-		for (int i = 0; i < params; i++)
-		{
-			IValue value = array.getValue(i);
-			this.classParameters[i] = value.stringValue();
-		}
 	}
 	
 	@Override
@@ -559,9 +550,12 @@ public final class ExternalClass extends AbstractClass
 	
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
+		switch (type)
 		{
+		case AnnotationUtils.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.modifiers);
+		case AnnotationUtils.CLASS_PARAMETERS:
+			return new ClassParameterAnnotationVisitor(this);
 		}
 
 		String internal = ClassFormat.extendedToInternal(type);

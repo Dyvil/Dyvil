@@ -137,18 +137,8 @@ public abstract class AbstractClass implements IClass
 		case "java/lang/FunctionalInterface":
 			this.modifiers.addIntModifier(Modifiers.FUNCTIONAL);
 			return false;
-		case "dyvil/annotation/_internal/ClassParameters":
-			if (annotation != null)
-			{
-				this.readClassParameters(annotation);
-				return false;
-			}
 		}
 		return true;
-	}
-	
-	protected void readClassParameters(IAnnotation annotation)
-	{
 	}
 	
 	@Override
