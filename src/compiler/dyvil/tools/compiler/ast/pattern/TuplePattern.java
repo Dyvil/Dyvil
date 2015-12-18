@@ -136,6 +136,11 @@ public final class TuplePattern extends Pattern implements IPatternList
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
+		if (this.patternCount == 1)
+		{
+			return this.patterns[0].resolve(markers, context);
+		}
+
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			this.patterns[i] = this.patterns[i].resolve(markers, context);

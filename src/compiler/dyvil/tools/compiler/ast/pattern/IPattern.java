@@ -35,6 +35,9 @@ public interface IPattern extends IASTNode, ITyped
 	int WILDCARD  = 33;
 	int UNBOX     = 34;
 	int TYPECHECK = 35;
+
+	int OR        = 48;
+	int AND       = 49;
 	
 	int getPatternType();
 	
