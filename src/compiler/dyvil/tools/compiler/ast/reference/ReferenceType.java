@@ -26,8 +26,13 @@ public class ReferenceType extends ClassType
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IValue value1 = value.withType(this.type, typeContext, markers, context);
-		if (value1 == null)
+		IValue typedValue = value.withType(this.type, typeContext, markers, context);
+		if (typedValue == null)
+		{
+			return null;
+		}
+
+		if (!typedValue.getType().isSameType(this.type))
 		{
 			return null;
 		}
@@ -39,7 +44,7 @@ public class ReferenceType extends ClassType
 		}
 		
 		markers.add(MarkerMessages.createMarker(value.getPosition(), "value.reference"));
-		return value1;
+		return typedValue;
 	}
 	
 	public void writeGet(MethodWriter writer, int index) throws BytecodeException
@@ -93,5 +98,18 @@ public class ReferenceType extends ClassType
 		this.type.appendExtendedName(sb);
 		sb.append(")V");
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", sb.toString(), true);
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.type + "*";
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		this.type.toString(prefix, buffer);
+		buffer.append('*');
 	}
 }

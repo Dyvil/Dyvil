@@ -60,7 +60,7 @@ public class ClassType implements IRawType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.theClass == type.getTheClass();
+		return this.theClass == type.getTheClass() && this.isPrimitive() == type.isPrimitive();
 	}
 	
 	@Override

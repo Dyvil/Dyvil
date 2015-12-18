@@ -133,11 +133,7 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public boolean isSameType(IType type)
 	{
-		if (!type.isArrayType())
-		{
-			return false;
-		}
-		return this.type.isSameType(type.getElementType());
+		return type.isArrayType() && this.type.isSameType(type.getElementType());
 	}
 	
 	@Override
