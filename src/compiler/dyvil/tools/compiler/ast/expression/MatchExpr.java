@@ -364,7 +364,7 @@ public final class MatchExpr implements IValue
 	{
 		int varIndex = writer.localCount();
 		IType type = this.value.getType();
-		this.value.writeExpression(writer, this.type);
+		this.value.writeExpression(writer, null);
 		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
 		int localCount = writer.localCount();
 		
