@@ -3,6 +3,8 @@ package dyvil.tools.compiler.parser.pattern;
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.pattern.*;
 import dyvil.tools.compiler.ast.pattern.constant.*;
+import dyvil.tools.compiler.ast.pattern.operator.AndPattern;
+import dyvil.tools.compiler.ast.pattern.operator.OrPattern;
 import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -37,25 +39,35 @@ public class PatternParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		if (this.mode == END)
 		{
 			if (type == DyvilKeywords.AS)
 			{
-				TypeCheckPattern tcp = new TypeCheckPattern(token.raw(), this.pattern);
-				this.pattern = tcp;
-				pm.pushParser(pm.newTypeParser(tcp));
+				final TypeCheckPattern typeCheck = new TypeCheckPattern(token.raw(), this.pattern);
+				this.pattern = typeCheck;
+				pm.pushParser(pm.newTypeParser(typeCheck));
 				return;
 			}
 
 			if (ParserUtil.isIdentifier(type))
 			{
+				// TODO Operator Precedence
+
 				final Name name = token.nameValue();
 				if (name == Names.bar)
 				{
-					OrPattern orPattern = new OrPattern(this.pattern, token, null);
+					final OrPattern orPattern = new OrPattern(this.pattern, token.raw(), null);
 					this.pattern = orPattern;
 					pm.pushParser(new PatternParser(orPattern::setRight));
+					return;
+				}
+
+				if (name == Names.amp)
+				{
+					final AndPattern andPattern = new AndPattern(this.pattern, token.raw(), null);
+					this.pattern = andPattern;
+					pm.pushParser(new PatternParser(andPattern::setRight));
 					return;
 				}
 			}
@@ -79,8 +91,8 @@ public class PatternParser extends Parser
 					return;
 				}
 
-				final IToken next = token.next();
-				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
+				final IToken nextToken = token.next();
+				if (nextToken.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
 					CaseClassPattern ccp = new CaseClassPattern(token.raw());
 					ccp.setType(new NamedType(token.raw(), token.nameValue()));
@@ -91,35 +103,35 @@ public class PatternParser extends Parser
 					return;
 				}
 				
-				pm.report(next, "pattern.case_class.open_paren");
+				pm.report(nextToken, "pattern.case_class.open_paren");
 				return;
 			}
 			if (type == DyvilKeywords.VAR)
 			{
-				IToken next = token.next();
-				if (ParserUtil.isIdentifier(next.type()))
+				final IToken nextToken = token.next();
+				if (ParserUtil.isIdentifier(nextToken.type()))
 				{
-					this.pattern = new BindingPattern(next.raw(), next.nameValue());
+					this.pattern = new BindingPattern(nextToken.raw(), nextToken.nameValue());
 					this.mode = END;
 					pm.skip();
 					return;
 				}
 				
-				pm.report(next, "pattern.binding.identifier");
+				pm.report(nextToken, "pattern.binding.identifier");
 				return;
 			}
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				TuplePattern tp = new TuplePattern(token);
-				this.pattern = tp;
+				final TuplePattern tuplePattern = new TuplePattern(token);
+				this.pattern = tuplePattern;
 				this.mode = TUPLE_END;
-				pm.pushParser(new PatternListParser(tp));
+				pm.pushParser(new PatternListParser(tuplePattern));
 				return;
 			}
-			IPattern p = parsePrimitive(token, type);
-			if (p != null)
+			final IPattern primitive = parsePrimitive(token, type);
+			if (primitive != null)
 			{
-				this.pattern = p;
+				this.pattern = primitive;
 				this.mode = END;
 				return;
 			}
@@ -151,28 +163,19 @@ public class PatternParser extends Parser
 				return;
 			}
 		case TUPLE_END:
-			if (type == BaseSymbols.CLOSE_PARENTHESIS)
+			this.mode = END;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				this.pattern.expandPosition(token);
-				this.consumer.setPattern(this.pattern);
-				pm.popParser();
-				return;
+				pm.report(token, "pattern.tuple.close_paren");
 			}
-			this.pattern.expandPosition(token.prev());
-			this.consumer.setPattern(this.pattern);
-			pm.popParser(true);
-			pm.report(token, "pattern.tuple.close_paren");
 			return;
 		case CASE_CLASS_END:
-			if (type == BaseSymbols.CLOSE_PARENTHESIS)
+			this.mode = END;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				this.consumer.setPattern(this.pattern);
-				pm.popParser();
-				return;
+				pm.report(token, "pattern.case_class.close_paren");
 			}
-			this.consumer.setPattern(this.pattern);
-			pm.popParser(true);
-			pm.report(token, "pattern.case_class.close_paren");
+			return;
 		}
 	}
 	

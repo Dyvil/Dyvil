@@ -1,25 +1,18 @@
-package dyvil.tools.compiler.ast.pattern;
+package dyvil.tools.compiler.ast.pattern.operator;
 
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class OrPattern implements IPattern
+public class OrPattern extends BinaryPattern
 {
-	protected IPattern      left;
-	protected IPattern      right;
-	protected ICodePosition position;
-
-	public OrPattern(IPattern left, ICodePosition token, IPattern right) {
-
-		this.left = left;
-		this.position = token;
-		this.right = right;
+	public OrPattern(IPattern left, ICodePosition token, IPattern right)
+	{
+		super(left, token, right);
 	}
 
 	@Override
@@ -28,48 +21,10 @@ public class OrPattern implements IPattern
 		return OR;
 	}
 
-	public IPattern getLeft()
-	{
-		return this.left;
-	}
-
-	public void setLeft(IPattern left)
-	{
-		this.left = left;
-	}
-
-	public IPattern getRight()
-	{
-		return this.right;
-	}
-
-	public void setRight(IPattern right)
-	{
-		this.right = right;
-	}
-
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
-	public ICodePosition getPosition()
-	{
-		return this.position;
-	}
-
 	@Override
 	public boolean isExhaustive()
 	{
-		return this.left.isExhaustive() | this.right.isExhaustive();
-	}
-
-	@Override
-	public IType getType()
-	{
-		return Types.findCommonSuperType(this.left.getType(), this.right.getType());
+		return this.left.isExhaustive() || this.right.isExhaustive();
 	}
 
 	@Override
@@ -77,20 +32,6 @@ public class OrPattern implements IPattern
 	{
 		this.left = this.left.withType(type, markers);
 		this.right = this.right.withType(type, markers);
-		return this;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return this.left.isType(type) && this.right.isType(type);
-	}
-
-	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
-	{
-		this.left = this.left.resolve(markers, context);
-		this.right = this.right.resolve(markers, context);
 		return this;
 	}
 
@@ -116,7 +57,8 @@ public class OrPattern implements IPattern
 	public int switchValue(int index)
 	{
 		final int leftCount = this.left.switchCases();
-		if (index < leftCount) {
+		if (index < leftCount)
+		{
 			return this.left.switchValue(index);
 		}
 		return this.right.switchValue(index - leftCount);
@@ -137,7 +79,10 @@ public class OrPattern implements IPattern
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
 	{
+		varIndex = this.checkVar(writer, varIndex);
+
 		final Label rightLabel = new Label();
+
 		this.left.writeInvJump(writer, varIndex, rightLabel);
 		writer.writeLabel(rightLabel);
 		this.right.writeInvJump(writer, varIndex, elseLabel);
