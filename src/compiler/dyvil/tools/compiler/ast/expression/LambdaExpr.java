@@ -544,6 +544,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		if (instance != null)
 		{
+			// Non-Static method in primitive wrapper class -> boxing required
+			if (instance.isPrimitive() && !p.hasModifier(Modifiers.STATIC))
+			{
+				return false;
+			}
+
 			if (this.parameterCount <= 0)
 			{
 				return false;
