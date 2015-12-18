@@ -84,7 +84,7 @@ public final class BindingPattern extends Pattern
 	@Override
 	public boolean switchCheck()
 	{
-		return true;
+		return this.variable != null;
 	}
 	
 	@Override

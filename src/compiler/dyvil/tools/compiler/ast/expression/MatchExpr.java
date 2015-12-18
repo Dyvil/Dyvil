@@ -601,6 +601,11 @@ public final class MatchExpr implements IValue
 	 */
 	private void writeLookupSwitch(MethodWriter writer, Label defaultLabel, int cases) throws BytecodeException
 	{
+		if (cases <= 0)
+		{
+			return;
+		}
+
 		// Generate a LOOKUPSWITCH instruction
 		int[] keys = new int[cases];
 		Label[] handlers = new Label[cases];

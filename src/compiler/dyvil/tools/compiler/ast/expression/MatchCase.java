@@ -68,13 +68,8 @@ public class MatchCase implements ICase, IDefaultContext
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		IDataMember field = this.pattern.resolveField(name);
-		if (field != null)
-		{
-			return field;
-		}
-		
-		return null;
+		final IDataMember field = this.pattern.resolveField(name);
+		return field != null ? field : null;
 	}
 	
 	public void resolveTypes(MarkerList markers, IContext context)
@@ -95,8 +90,8 @@ public class MatchCase implements ICase, IDefaultContext
 		{
 			this.pattern = this.pattern.resolve(markers, context);
 			
-			IPattern pattern1 = this.pattern.withType(type, markers);
-			if (pattern1 == null)
+			final IPattern typedPattern = this.pattern.withType(type, markers);
+			if (typedPattern == null)
 			{
 				Marker marker = MarkerMessages.createError(this.pattern.getPosition(), "pattern.type.incompatible");
 				marker.addInfo(MarkerMessages.getMarker("pattern.type", this.pattern.getType()));
@@ -105,17 +100,17 @@ public class MatchCase implements ICase, IDefaultContext
 			}
 			else
 			{
-				this.pattern = pattern1;
+				this.pattern = typedPattern;
 			}
 		}
 		
-		IContext context1 = new CombiningContext(this, context);
+		final IContext combinedContext = new CombiningContext(this, context);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, context1);
+			this.condition = this.condition.resolve(markers, combinedContext);
 			
-			IValue value1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context1);
-			if (value1 == null)
+			final IValue typedCondition = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, combinedContext);
+			if (typedCondition == null)
 			{
 				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "match.condition.type");
 				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
@@ -123,13 +118,13 @@ public class MatchCase implements ICase, IDefaultContext
 			}
 			else
 			{
-				this.condition = value1;
+				this.condition = typedCondition;
 			}
 		}
 		
 		if (this.action != null)
 		{
-			this.action = this.action.resolve(markers, context1);
+			this.action = this.action.resolve(markers, combinedContext);
 		}
 	}
 	
