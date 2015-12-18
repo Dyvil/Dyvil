@@ -1,10 +1,13 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -22,6 +25,8 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	private IType type;
 	private IPattern[] patterns = new IPattern[2];
 	private int patternCount;
+
+	private IMethod[] getterMethods;
 	
 	public CaseClassPattern(ICodePosition position)
 	{
@@ -54,35 +59,42 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			return null;
 		}
 		
-		IClass iclass = this.type.getTheClass();
-		if (iclass == null)
+		final IClass caseClass = this.type.getTheClass();
+		if (caseClass == null)
 		{
 			return this; // skip
 		}
 		
-		int paramCount = iclass.parameterCount();
+		final int paramCount = caseClass.parameterCount();
 		if (this.patternCount != paramCount)
 		{
-			Marker m = MarkerMessages.createMarker(this.position, "pattern.class.count", this.type.toString());
-			m.addInfo(MarkerMessages.getMarker("pattern.class.count.pattern", this.patternCount));
-			m.addInfo(MarkerMessages.getMarker("pattern.class.count.class", paramCount));
-			markers.add(m);
+			final Marker marker = MarkerMessages
+					.createMarker(this.position, "pattern.class.count", this.type.toString());
+			marker.addInfo(MarkerMessages.getMarker("pattern.class.count.pattern", this.patternCount));
+			marker.addInfo(MarkerMessages.getMarker("pattern.class.count.class", paramCount));
+			markers.add(marker);
 			return this;
 		}
 		
 		for (int i = 0; i < paramCount; i++)
 		{
-			IParameter param = iclass.getParameter(i);
-			IType paramType = param.getType().getConcreteType(this.type);
-			IPattern pattern = this.patterns[i];
-			IPattern typedPattern = pattern.withType(paramType, markers);
+			final IPattern pattern = this.patterns[i];
+			final IParameter param = caseClass.getParameter(i);
+
+			if (param.getAccessLevel() != Modifiers.PUBLIC)
+			{
+				this.checkMethodAccess(markers, caseClass, param, i, paramCount, pattern);
+			}
+
+			final IType paramType = param.getType().getConcreteType(type);
+			final IPattern typedPattern = pattern.withType(paramType, markers);
 			
 			if (typedPattern == null)
 			{
-				Marker m = MarkerMessages.createMarker(this.position, "pattern.class.type", param.getName());
-				m.addInfo(MarkerMessages.getMarker("pattern.type", pattern.getType()));
-				m.addInfo(MarkerMessages.getMarker("classparameter.type", paramType));
-				markers.add(m);
+				final Marker marker = MarkerMessages.createMarker(this.position, "pattern.class.type", param.getName());
+				marker.addInfo(MarkerMessages.getMarker("pattern.type", pattern.getType()));
+				marker.addInfo(MarkerMessages.getMarker("classparameter.type", paramType));
+				markers.add(marker);
 			}
 			else
 			{
@@ -92,9 +104,31 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		
 		if (type.classEquals(this.type))
 		{
+			// No additional type check required
 			return this;
 		}
 		return new TypeCheckPattern(this, this.type);
+	}
+
+	public void checkMethodAccess(MarkerList markers, IClass caseClass, IParameter param, int paramIndex, int paramCount, IPattern pattern)
+	{
+		final IMethod accessMethod = IContext.resolveMethod(caseClass, null, param.getName(), null); // find by name
+		if (accessMethod != null)
+		{
+			if (this.getterMethods == null)
+			{
+				this.getterMethods = new IMethod[paramCount];
+			}
+
+			this.getterMethods[paramIndex] = accessMethod;
+		}
+		else
+		{
+			Marker marker = MarkerMessages
+					.createError(pattern.getPosition(), "pattern.class.access", param.getName());
+			marker.addInfo(MarkerMessages.getMarker("pattern.class.access.type", caseClass.getFullName()));
+			markers.add(marker);
+		}
 	}
 	
 	@Override
@@ -118,10 +152,10 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	@Override
 	public void addPattern(IPattern pattern)
 	{
-		int index = this.patternCount++;
+		final int index = this.patternCount++;
 		if (index >= this.patterns.length)
 		{
-			IPattern[] temp = new IPattern[index + 1];
+			final IPattern[] temp = new IPattern[index + 1];
 			System.arraycopy(this.patterns, 0, temp, 0, this.patterns.length);
 			this.patterns = temp;
 		}
@@ -139,10 +173,10 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	{
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IDataMember f = this.patterns[i].resolveField(name);
-			if (f != null)
+			final IDataMember field = this.patterns[i].resolveField(name);
+			if (field != null)
 			{
-				return f;
+				return field;
 			}
 		}
 		return null;
@@ -170,7 +204,9 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
 		}
 		
-		IClass iclass = this.type.getTheClass();
+		final IClass caseClass = this.type.getTheClass();
+		final int lineNumber = this.getLineNumber();
+
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			if (this.patterns[i].getPatternType() == WILDCARD)
@@ -178,10 +214,29 @@ public class CaseClassPattern extends Pattern implements IPatternList
 				// Skip wildcard patterns
 				continue;
 			}
-			
-			IDataMember field = iclass.getParameter(i);
+
+			// Load the instance
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			field.writeGet(writer, null, this.getLineNumber());
+
+			final IType patternType = this.patterns[i].getType();
+			final IMethod method = this.getterMethods[i];
+
+			if (method != null)
+			{
+				// Invoke the getter method
+				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+				method.getType().writeCast(writer, patternType, lineNumber);
+			}
+			else
+			{
+				final IDataMember field = caseClass.getParameter(i);
+
+				// Get the field value
+				field.writeGet(writer, null, lineNumber);
+				field.getType().writeCast(writer, patternType, lineNumber);
+			}
+
+			// Check the pattern
 			this.patterns[i].writeInvJump(writer, -1, elseLabel);
 		}
 	}
@@ -191,6 +246,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	{
 		this.type.toString(prefix, buffer);
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+
 		Util.astToString(prefix, this.patterns, this.patternCount, Formatting.getSeparator("parameters.separator", ','),
 		                 buffer);
 

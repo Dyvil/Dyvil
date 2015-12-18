@@ -19,12 +19,17 @@ public final class Some<T> implements Option<T>
 	
 	public static <T> Some<T> apply(T value)
 	{
-		return new Some(value);
+		return new Some<>(value);
 	}
 	
 	public Some(T value)
 	{
 		this.value = value;
+	}
+
+	public T value()
+	{
+		return this.value;
 	}
 	
 	@Override
@@ -54,7 +59,7 @@ public final class Some<T> implements Option<T>
 	@Override
 	public <U> Option<U> map(Function<? super T, ? extends U> mapper)
 	{
-		return new Some(mapper.apply(this.value));
+		return new Some<>(mapper.apply(this.value));
 	}
 	
 	@Override
