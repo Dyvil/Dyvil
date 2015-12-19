@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -51,11 +52,12 @@ public class InstanceFieldReference implements IReference
 		// Write the receiver
 		this.receiver.writeExpression(writer, null);
 
+		final IType fieldType = this.field.getType();
 		final String fieldClassName = this.field.getTheClass().getInternalName();
 		final String fieldName = this.field.getName().qualified;
-		final String factoryMethodName = Types.getAccessFactoryName(this.field.getType(), false);
+		final String factoryMethodName = Types.getReferenceFactoryName(fieldType, "");
 		final String factoryMethodType = "(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)L" + Types
-				.getInternalRef(this.field.getType(), "") + ';';
+				.getInternalRef(fieldType, "") + ';';
 
 		writer.writeLDC(Type.getObjectType(fieldClassName));
 		writer.writeLDC(fieldName);

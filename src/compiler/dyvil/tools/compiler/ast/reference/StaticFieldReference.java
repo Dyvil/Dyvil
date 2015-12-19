@@ -148,7 +148,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		final String refFieldName = this.getRefFieldName();
 		final String refFieldType = this.getRefFieldType();
 
-		final String factoryMethodName = Types.getAccessFactoryName(this.field.getType(), true);
+		final String factoryMethodName = Types.getReferenceFactoryName(this.field.getType(), "Static");
 		final String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
 
 		// Load the field class

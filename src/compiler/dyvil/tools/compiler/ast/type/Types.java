@@ -244,9 +244,9 @@ public final class Types
 		return "dyvil/lang/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
 	}
 
-	public static String getAccessFactoryName(IType type, boolean isStatic)
+	public static String getReferenceFactoryName(IType type, String prefix)
 	{
-		return (isStatic ? "newStatic" : "new") + getTypeRefKeyword(type) + "Ref";
+		return "new" + prefix + getTypeRefKeyword(type) + "Ref";
 	}
 
 	public static IType combine(IType type1, IType type2)
