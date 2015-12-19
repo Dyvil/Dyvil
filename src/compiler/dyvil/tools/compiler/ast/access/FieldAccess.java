@@ -182,6 +182,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public IReference toReference()
 	{
+		if (this.field == null)
+		{
+			return null;
+		}
+
 		if (this.field.isField())
 		{
 			if (this.field.hasModifier(Modifiers.STATIC))

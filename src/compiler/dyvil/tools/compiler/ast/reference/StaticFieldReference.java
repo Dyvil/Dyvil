@@ -54,15 +54,15 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	{
 		map.clear();
 
-		InstanceFieldReference.checkFinalAccess(field, position, markers);
+		InstanceFieldReference.checkFinalAccess(this.field, position, markers);
 	}
 
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		compilableList.addCompilable(this);
 		if (addToMap(this.className, this.field))
 		{
-			compilableList.addCompilable(this);
 			this.isUnique = true;
 		}
 	}

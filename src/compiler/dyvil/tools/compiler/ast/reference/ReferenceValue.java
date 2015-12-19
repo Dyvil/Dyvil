@@ -60,7 +60,7 @@ public class ReferenceValue implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.value.isResolved();
+		return this.reference != null;
 	}
 	
 	@Override
@@ -120,7 +120,7 @@ public class ReferenceValue implements IValue
 		{
 			final IReference reference = this.value.toReference();
 
-			if (reference == null)
+			if (reference == null && this.value.isResolved())
 			{
 				markers.add(MarkerMessages.createError(this.value.getPosition(), "reference.expression.invalid"));
 			}
