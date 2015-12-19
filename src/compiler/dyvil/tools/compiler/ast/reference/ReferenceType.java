@@ -52,7 +52,7 @@ public class ReferenceType extends ClassType
 		writer.writeVarInsn(Opcodes.ALOAD, index);
 		
 		String internal = this.theClass.getInternalName();
-		if (this.theClass == Types.OBJECT_REF_CLASS)
+		if (this.theClass == Types.getObjectRefClass())
 		{
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
 			
@@ -88,7 +88,7 @@ public class ReferenceType extends ClassType
 		writeGetRef(writer, value, index);
 		
 		String internal = this.theClass.getInternalName();
-		if (this.theClass == Types.OBJECT_REF_CLASS)
+		if (this.theClass == Types.getObjectRefClass())
 		{
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
 			return;

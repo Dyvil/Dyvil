@@ -303,17 +303,13 @@ public final class Variable extends Member implements IVariable
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
 			
-			IClass c = this.refType.getTheClass();
-			IDataMember f = c.getBody().getField(0);
-			f.writeGet(writer, null, lineNumber);
+			final IClass refClass = this.refType.getTheClass();
+			final IDataMember refField = refClass.getBody().getField(0);
+			refField.writeGet(writer, null, lineNumber);
 			
-			if (c == Types.OBJECT_REF_CLASS)
+			if (refClass == Types.getObjectSimpleRefClass())
 			{
-				c = this.type.getTheClass();
-				if (c != Types.OBJECT_CLASS)
-				{
-					writer.writeTypeInsn(Opcodes.CHECKCAST, c.getInternalName());
-				}
+				Types.OBJECT.writeCast(writer, this.type, lineNumber);
 			}
 			return;
 		}

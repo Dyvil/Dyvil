@@ -214,7 +214,13 @@ public final class PrimitiveType implements IType
 		}
 		return refType;
 	}
-	
+
+	@Override
+	public IClass getRefClass()
+	{
+		return this.getRefType().getTheClass();
+	}
+
 	@Override
 	public IType getSimpleRefType()
 	{
@@ -292,12 +298,7 @@ public final class PrimitiveType implements IType
 		{
 			return type.isSameType(this);
 		}
-		if (type.isArrayType())
-		{
-			return false;
-		}
-		
-		return this.isSuperClassOf(type);
+		return !type.isArrayType() && this.isSuperClassOf(type);
 	}
 	
 	@Override
@@ -308,12 +309,7 @@ public final class PrimitiveType implements IType
 			return true;
 		}
 		
-		if (that.isPrimitive())
-		{
-			return isPromotable(that.getTypecode(), this.typecode);
-		}
-		
-		return false;
+		return that.isPrimitive() && isPromotable(that.getTypecode(), this.typecode);
 	}
 	
 	@Override

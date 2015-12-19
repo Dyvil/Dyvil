@@ -89,11 +89,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int GENERIC_INTERNAL = 26;
 	
 	// Compound Types
-	int TUPLE    = 32;
-	int LAMBDA   = 33;
-	int ARRAY    = 34;
-	int MAP      = 35;
-	int OPTIONAL = 36;
+	int TUPLE     = 32;
+	int LAMBDA    = 33;
+	int ARRAY     = 34;
+	int MAP       = 35;
+	int OPTIONAL  = 36;
+	int REFERENCE = 38;
 	
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
@@ -146,6 +147,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	}
 	
 	ReferenceType getRefType();
+
+	IClass getRefClass();
 	
 	IType getSimpleRefType();
 	

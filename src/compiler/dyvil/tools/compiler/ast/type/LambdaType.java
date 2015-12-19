@@ -157,7 +157,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				parameterTypes[i] = this.parameterTypes[i].getParameterType();
 			}
 			IType returnType = this.returnType.getParameterType();
-			return new LambdaType(parameterTypes, parameterCount, returnType);
+			return new LambdaType(parameterTypes, this.parameterCount, returnType);
 		}
 
 		return this;
@@ -174,10 +174,10 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (this.parameterCount == 0)
 		{
-			int i = this.returnType.getSubClassDistance(subtype);
-			if (i != 0)
+			final int returnDistance = this.returnType.getSubClassDistance(subtype);
+			if (returnDistance != 0)
 			{
-				return i;
+				return returnDistance;
 			}
 		}
 
@@ -189,10 +189,10 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (this.parameterCount == 0)
 		{
-			float f = this.returnType.getSubTypeDistance(subtype);
-			if (f != 0)
+			final float returnDistance = this.returnType.getSubTypeDistance(subtype);
+			if (returnDistance != 0)
 			{
-				return f;
+				return returnDistance;
 			}
 		}
 
@@ -212,23 +212,24 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			return false;
 		}
 
-		IClass iclass = this.getTheClass();
-		ITypeVariable typeVar = iclass.getTypeVariable(this.parameterCount);
-		IType type1 = type.resolveTypeSafely(typeVar);
+		final IClass functionClass = this.getTheClass();
+
+		ITypeVariable typeVar = functionClass.getTypeVariable(this.parameterCount);
+		IType resolvedType = type.resolveTypeSafely(typeVar);
 
 		// Return type is Covariant
-		if (!this.returnType.isSuperTypeOf(type1))
+		if (!this.returnType.isSuperTypeOf(resolvedType))
 		{
 			return false;
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			typeVar = iclass.getTypeVariable(i);
-			type1 = type.resolveType(typeVar);
+			typeVar = functionClass.getTypeVariable(i);
+			resolvedType = type.resolveType(typeVar);
 
 			// Contravariance
-			if (!type1.isSuperTypeOf(this.parameterTypes[i]))
+			if (!resolvedType.isSuperTypeOf(this.parameterTypes[i]))
 			{
 				return false;
 			}
@@ -245,16 +246,16 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			return value.withType(this, typeContext, markers, context);
 		}
 
-		IType type = value.getType();
-		if (type == Types.UNKNOWN || IObjectType.super.isSuperTypeOf(type))
+		final IType valueType = value.getType();
+		if (valueType == Types.UNKNOWN || IObjectType.super.isSuperTypeOf(valueType))
 		{
 			return value.withType(this, typeContext, markers, context);
 		}
 
-		IValue value1 = IType.convertValue(value, this.returnType, typeContext, markers, context);
-		if (value1 != null)
+		final IValue typedReturnValue = IType.convertValue(value, this.returnType, typeContext, markers, context);
+		if (typedReturnValue != null)
 		{
-			return this.wrapLambda(value1, typeContext);
+			return this.wrapLambda(typedReturnValue, typeContext);
 		}
 		return null;
 	}
@@ -275,9 +276,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		// See TupleType.resolveType(ITypeVariable) for a note about supertype
-		// checking
-		int index = typeVar.getIndex();
+		if (typeVar.getGeneric() != this.getTheClass())
+		{
+			return null;
+		}
+
+		final int index = typeVar.getIndex();
 		if (index == this.parameterCount)
 		{
 			return this.returnType;

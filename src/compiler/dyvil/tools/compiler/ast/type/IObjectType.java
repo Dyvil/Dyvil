@@ -48,7 +48,13 @@ public interface IObjectType extends IType
 	{
 		return Types.getObjectRef(this);
 	}
-	
+
+	@Override
+	default IClass getRefClass()
+	{
+		return Types.getObjectRefClass();
+	}
+
 	@Override
 	default boolean isArrayType()
 	{
@@ -126,7 +132,19 @@ public interface IObjectType extends IType
 	{
 		return this.getInternalName();
 	}
-	
+
+	@Override
+	default String getExtendedName()
+	{
+		return 'L' + this.getInternalName() + ';';
+	}
+
+	@Override
+	default void appendExtendedName(StringBuilder buffer)
+	{
+		buffer.append('L').append(this.getInternalName()).append(';');
+	}
+
 	@Override
 	default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{

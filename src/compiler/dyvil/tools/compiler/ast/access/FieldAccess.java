@@ -240,7 +240,8 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			if (depth-- < 0)
 			{
-				markers.add(MarkerMessages.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
+				markers.add(
+						MarkerMessages.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
 				return this;
 			}
 			
@@ -418,20 +419,18 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		int lineNumber = this.getLineNumber();
+		final int lineNumber = this.getLineNumber();
 		this.field.writeGet(writer, this.receiver, lineNumber);
 
 		if (type == null)
 		{
-			type = this.type;
+			type = this.getType();
 		}
+		this.field.getType().writeCast(writer, type, lineNumber);
+
 		if (type == Types.VOID)
 		{
 			writer.writeInsn(this.type.getReturnOpcode());
-		}
-		if (type != null)
-		{
-			this.field.getType().writeCast(writer, type, lineNumber);
 		}
 	}
 	

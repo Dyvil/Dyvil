@@ -88,8 +88,8 @@ public final class Types
 	public static IClass STRING_CONVERTIBLE_CLASS;
 	
 	private static IClass OBJECT_ARRAY_CLASS;
-	public static  IClass OBJECT_SIMPLE_REF_CLASS;
-	public static  IClass OBJECT_REF_CLASS;
+	private static IClass OBJECT_SIMPLE_REF_CLASS;
+	private static IClass OBJECT_REF_CLASS;
 	
 	public static void initHeaders()
 	{
@@ -199,25 +199,33 @@ public final class Types
 		}
 		return OBJECT_ARRAY_CLASS;
 	}
-	
-	public static ReferenceType getObjectRef(IType type)
+
+	public static IClass getObjectRefClass()
 	{
 		if (OBJECT_REF_CLASS == null)
 		{
-			OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
+			return OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
 		}
-		
-		return new ReferenceType(OBJECT_REF_CLASS, type);
+		return OBJECT_REF_CLASS;
+	}
+	
+	public static ReferenceType getObjectRef(IType type)
+	{
+		return new ReferenceType(getObjectRefClass(), type);
+	}
+
+	public static IClass getObjectSimpleRefClass()
+	{
+		if (OBJECT_SIMPLE_REF_CLASS == null)
+		{
+			return OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
+		}
+		return OBJECT_SIMPLE_REF_CLASS;
 	}
 	
 	protected static IType getObjectSimpleRef(IType type)
 	{
-		if (OBJECT_SIMPLE_REF_CLASS == null)
-		{
-			OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
-		}
-
-		ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
+		ClassGenericType gt = new ClassGenericType(getObjectSimpleRefClass());
 		gt.addType(type);
 		return gt;
 	}

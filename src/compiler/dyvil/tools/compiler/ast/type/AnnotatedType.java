@@ -119,7 +119,13 @@ public class AnnotatedType implements IType, ITyped
 	{
 		return this.type.getRefType();
 	}
-	
+
+	@Override
+	public IClass getRefClass()
+	{
+		return this.type.getRefClass();
+	}
+
 	@Override
 	public IType getSimpleRefType()
 	{
