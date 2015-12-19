@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -191,6 +192,12 @@ public final class ClassAccess implements IValue
 		{
 			writer.writeInsn(Opcodes.ARETURN);
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override

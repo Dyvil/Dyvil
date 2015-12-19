@@ -70,10 +70,10 @@ public interface IContext
 	
 	static IClass resolveClass(IContext context, Name name)
 	{
-		IClass iclass = context.resolveClass(name);
-		if (iclass != null)
+		final IClass theClass = context.resolveClass(name);
+		if (theClass != null)
 		{
-			return iclass;
+			return theClass;
 		}
 		
 		return Types.LANG_HEADER.resolveClass(name);

@@ -18,7 +18,10 @@ import dyvil.tools.compiler.ast.reference.StaticFieldReference;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.VariableReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PackageType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -331,14 +334,35 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 				return value;
 			}
 		}
-		
+
+		// Qualified Type Name Resolution
+
+		final IContext typeContext;
+		final IContext packageContext;
 		if (this.receiver == null)
 		{
-			IClass iclass = IContext.resolveClass(context, this.name);
-			if (iclass != null)
-			{
-				return new ClassAccess(this.position, iclass.getType());
-			}
+			typeContext = context;
+			packageContext = RootPackage.rootPackage;
+		}
+		else if (this.receiver.valueTag() == IValue.CLASS_ACCESS)
+		{
+			typeContext = packageContext = this.receiver.getType();
+		}
+		else
+		{
+			return null;
+		}
+
+		final IClass iclass = IContext.resolveClass(typeContext, this.name);
+		if (iclass != null)
+		{
+			return new ClassAccess(this.position, iclass.getType());
+		}
+
+		final Package thePackage = packageContext.resolvePackage(this.name);
+		if (thePackage != null)
+		{
+			return new ClassAccess(this.position, new PackageType(thePackage));
 		}
 		
 		return null;
