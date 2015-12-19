@@ -97,7 +97,7 @@ public interface Opcodes
 	 * Pushes a byte onto the stack.
 	 *
 	 * @param operand1
-	 *            the byte
+	 * the byte
 	 */
 	int BIPUSH = 16;
 	
@@ -105,9 +105,9 @@ public interface Opcodes
 	 * Pushes a short onto the stack.
 	 *
 	 * @param operand1
-	 *            the first 8 bits of the short
+	 * the first 8 bits of the short
 	 * @param operand2
-	 *            the second 8 bits of the short
+	 * the second 8 bits of the short
 	 */
 	int SIPUSH = 17;
 	
@@ -116,7 +116,7 @@ public interface Opcodes
 	 * {@code float}, {@code double}, {@link String} or {@link Class}.
 	 *
 	 * @param operand1
-	 *            the constant
+	 * the constant
 	 */
 	int LDC = 18;
 	
@@ -125,7 +125,7 @@ public interface Opcodes
 	 * stack.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int ILOAD = 21;
 	
@@ -134,7 +134,7 @@ public interface Opcodes
 	 * stack.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int LLOAD = 22;
 	
@@ -143,7 +143,7 @@ public interface Opcodes
 	 * stack.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int FLOAD = 23;
 	
@@ -152,7 +152,7 @@ public interface Opcodes
 	 * stack.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int DLOAD = 24;
 	
@@ -161,7 +161,7 @@ public interface Opcodes
 	 * stack.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int ALOAD = 25;
 	
@@ -186,7 +186,7 @@ public interface Opcodes
 	 * variable.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int ISTORE = 54;
 	
@@ -195,7 +195,7 @@ public interface Opcodes
 	 * variable.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int LSTORE = 55;
 	
@@ -204,7 +204,7 @@ public interface Opcodes
 	 * variable.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int FSTORE = 56;
 	
@@ -213,7 +213,7 @@ public interface Opcodes
 	 * variable.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int DSTORE = 57;
 	
@@ -222,7 +222,7 @@ public interface Opcodes
 	 * variable.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 */
 	int ASTORE = 58;
 	
@@ -537,9 +537,9 @@ public interface Opcodes
 	 * Increments a local variable.
 	 *
 	 * @param operand1
-	 *            the local variable index
+	 * the local variable index
 	 * @param operand2
-	 *            the value
+	 * the value
 	 */
 	int IINC = 132;
 	
@@ -668,7 +668,7 @@ public interface Opcodes
 	 * {@link Label} if it equals {@code 0}.
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFEQ = 153;
 	
@@ -677,7 +677,7 @@ public interface Opcodes
 	 * {@link Label} if it does not equal {@code 0}.
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFNE = 154;
 	
@@ -686,7 +686,7 @@ public interface Opcodes
 	 * {@link Label} if it is less than {@code 0}.
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFLT = 155;
 	
@@ -695,7 +695,7 @@ public interface Opcodes
 	 * {@link Label} if it is greater than or equal to {@code 0}.
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFGE = 156;
 	
@@ -704,7 +704,7 @@ public interface Opcodes
 	 * {@link Label} if it is greater than {@code 0}.
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFGT = 157;
 	
@@ -713,7 +713,7 @@ public interface Opcodes
 	 * {@link Label} if it is less than {@code 0}.
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFLE = 158;
 	
@@ -788,7 +788,7 @@ public interface Opcodes
 	 * and throws a {@link ClassCastException} otherwise.
 	 *
 	 * @param type
-	 *            the type
+	 * the type
 	 */
 	int CHECKCAST = 192;
 	
@@ -799,7 +799,7 @@ public interface Opcodes
 	 * top value on the stack way {@code null}, the result is {@code 0}.
 	 *
 	 * @param type
-	 *            the type
+	 * the type
 	 */
 	int INSTANCEOF = 193;
 	
@@ -814,7 +814,7 @@ public interface Opcodes
 	 * if it is a {@code null} reference
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFNULL = 198;
 	
@@ -823,7 +823,7 @@ public interface Opcodes
 	 * if it is not a {@code null} reference
 	 *
 	 * @param label
-	 *            the label
+	 * the label
 	 */
 	int IFNONNULL = 199;
 	
@@ -941,6 +941,13 @@ public interface Opcodes
 	int IF_DCMPGE = 345;
 	int IF_DCMPGT = 346;
 	int IF_DCMPLE = 347;
+
+	int EQ0 = 348;
+	int NE0 = 349;
+	int LT0 = 350;
+	int GE0 = 351;
+	int GT0 = 352;
+	int LE0 = 355;
 	
 	int SWAP2 = 400;
 	
@@ -1067,6 +1074,12 @@ public interface Opcodes
 		// @formatter:off
 		switch (opcode)
 		{
+		case EQ0: return NE0;
+		case NE0: return EQ0;
+		case LT0: return GE0;
+		case GE0: return LT0;
+		case GT0: return LE0;
+		case LE0: return GT0;
 		case IFEQ: return IFNE;
 		case IFNE: return IFEQ;
 		case IFLT: return IFGE;
@@ -1145,6 +1158,13 @@ public interface Opcodes
 		// @formatter:off
 		switch (opcode)
 		{
+		case EQ0: return IFEQ;
+		case NE0: return IFNE;
+		case GE0: return IFGE;
+		case LT0: return IFLT;
+		case LE0: return IFLE;
+		case GT0: return IFGT;
+
 		case ICMPEQ: return IF_ICMPEQ;
 		case ICMPNE: return IF_ICMPNE;
 		case ICMPGE: return IF_ICMPGE;
@@ -1190,6 +1210,13 @@ public interface Opcodes
 		// @formatter:off
 		switch (opcode)
 		{
+		case EQ0: return IFNE;
+		case NE0: return IFEQ;
+		case GE0: return IFLT;
+		case LT0: return IFGE;
+		case LE0: return IFGT;
+		case GT0: return IFLE;
+
 		case ICMPEQ: return IF_ICMPNE;
 		case ICMPNE: return IF_ICMPEQ;
 		case ICMPGE: return IF_ICMPLT;

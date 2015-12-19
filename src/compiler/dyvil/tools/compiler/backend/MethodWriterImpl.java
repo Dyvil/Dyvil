@@ -458,15 +458,19 @@ public final class MethodWriterImpl implements MethodWriter
 				BackendUtil.dupX1(this);
 				return;
 			}
-			
+
+			if (opcode >= EQ0 && opcode <= LE0)
+			{
+				this.writeBoolJump(IFEQ + opcode - EQ0);
+			}
 			if (opcode >= ICMPEQ && opcode <= ICMPLE)
 			{
-				this.writeBoolJump(Opcodes.IF_ICMPEQ + opcode - ICMPEQ);
+				this.writeBoolJump(IF_ICMPEQ + opcode - ICMPEQ);
 				return;
 			}
 			if (opcode >= LCMPEQ && opcode <= DCMPLE)
 			{
-				this.writeBoolJump(Opcodes.IF_LCMPEQ + opcode - LCMPEQ);
+				this.writeBoolJump(IF_LCMPEQ + opcode - LCMPEQ);
 				return;
 			}
 			return;
