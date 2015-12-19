@@ -27,10 +27,4 @@ public class SimpleObjectRef<T> implements ObjectRef<T>
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return this.value == null ? "null" : this.value.toString();
-	}
 }

@@ -29,10 +29,4 @@ public class SimpleDoubleRef implements DoubleRef
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Double.toString(this.value);
-	}
 }

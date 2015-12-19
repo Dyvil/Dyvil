@@ -29,10 +29,4 @@ public class SimpleFloatRef implements FloatRef
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Float.toString(this.value);
-	}
 }

@@ -29,10 +29,4 @@ public class SimpleByteRef implements ByteRef
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Byte.toString(this.value);
-	}
 }

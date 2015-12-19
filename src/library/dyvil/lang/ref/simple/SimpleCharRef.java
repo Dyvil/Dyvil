@@ -29,10 +29,4 @@ public class SimpleCharRef implements CharRef
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Character.toString(this.value);
-	}
 }

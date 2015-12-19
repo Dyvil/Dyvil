@@ -29,10 +29,4 @@ public class SimpleLongRef implements LongRef
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Long.toString(this.value);
-	}
 }

@@ -29,10 +29,4 @@ public class SimpleShortRef implements ShortRef
 	{
 		this.value = value;
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Short.toString(this.value);
-	}
 }
