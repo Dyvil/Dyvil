@@ -52,7 +52,7 @@ public interface BooleanArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	static int length(boolean[] array)
 	{
@@ -76,7 +76,7 @@ public interface BooleanArray
 		return slice;
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, BASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, BASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	static void subscript_$eq(boolean[] array, int i, boolean v)
 	{
@@ -91,9 +91,9 @@ public interface BooleanArray
 		System.arraycopy(values, 0, array, start, count);
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	static boolean isEmpty(int[] array)
+	static boolean isEmpty(boolean[] array)
 	{
 		return array.length == 0;
 	}

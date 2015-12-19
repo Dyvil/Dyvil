@@ -74,7 +74,7 @@ public interface CharArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	static int length(char[] array)
 	{
@@ -98,7 +98,7 @@ public interface CharArray
 		return slice;
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, CASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, CASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	static void subscript_$eq(char[] array, int i, char v)
 	{
@@ -113,7 +113,7 @@ public interface CharArray
 		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
 	static boolean isEmpty(char[] array)
 	{

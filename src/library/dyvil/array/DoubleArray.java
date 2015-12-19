@@ -74,7 +74,7 @@ public interface DoubleArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	static int length(double[] array)
 	{
@@ -98,7 +98,7 @@ public interface DoubleArray
 		return slice;
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, DASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, DASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	static void subscript_$eq(double[] array, int i, double v)
 	{
@@ -113,7 +113,7 @@ public interface DoubleArray
 		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
 	static boolean isEmpty(int[] array)
 	{

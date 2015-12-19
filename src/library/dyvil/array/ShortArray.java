@@ -85,22 +85,22 @@ public interface ShortArray
 	
 	// Basic Array Operations
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	static	int length(short[] array)
+	static int length(short[] array)
 	{
 		return array.length;
 	}
 	
 	@Intrinsic( { LOAD_0, LOAD_1, SALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short subscript(short[] array, int i)
+	static short subscript(short[] array, int i)
 	{
 		return array[i];
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] subscript(short[] array, Range<Int> range)
+	static short[] subscript(short[] array, Range<Int> range)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
@@ -109,30 +109,30 @@ public interface ShortArray
 		return slice;
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, SASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, SASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
-	static	void subscript_$eq(short[] array, int i, short v)
+	static void subscript_$eq(short[] array, int i, short v)
 	{
 		array[i] = v;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	void subscript_$eq(short[] array, Range<Int> range, short[] values)
+	static void subscript_$eq(short[] array, Range<Int> range, short[] values)
 	{
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
 	
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAYLENGTH, IFEQ })
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	static	boolean isEmpty(int[] array)
+	static boolean isEmpty(int[] array)
 	{
 		return array.length == 0;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	void forEach(int[] array, IntConsumer action)
+	static void forEach(int[] array, IntConsumer action)
 	{
 		for (int v : array)
 		{
@@ -143,25 +143,25 @@ public interface ShortArray
 	// Operators
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	boolean $qmark(short[] array, short v)
+	static boolean $qmark(short[] array, short v)
 	{
 		return Arrays.binarySearch(array, v) >= 0;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	boolean $eq$eq(short[] array1, short[] array2)
+	static boolean $eq$eq(short[] array1, short[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	boolean $bang$eq(short[] array1, short[] array2)
+	static boolean $bang$eq(short[] array1, short[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] $plus(short[] array, short v)
+	static short[] $plus(short[] array, short v)
 	{
 		int len = array.length;
 		short[] res = new short[len + 1];
@@ -171,7 +171,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] $plus$plus(short[] array1, short[] array2)
+	static short[] $plus$plus(short[] array1, short[] array2)
 	{
 		int len1 = array1.length;
 		int len2 = array2.length;
@@ -182,7 +182,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] $minus(short[] array, short v)
+	static short[] $minus(short[] array, short v)
 	{
 		int index = indexOf(array, v, 0);
 		if (index < 0)
@@ -206,7 +206,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] $minus$minus(short[] array1, short[] array2)
+	static short[] $minus$minus(short[] array1, short[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -225,7 +225,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] $amp(short[] array1, short[] array2)
+	static short[] $amp(short[] array1, short[] array2)
 	{
 		int index = 0;
 		int len = array1.length;
@@ -244,7 +244,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] mapped(short[] array, IntUnaryOperator mapper)
+	static short[] mapped(short[] array, IntUnaryOperator mapper)
 	{
 		int len = array.length;
 		short[] res = new short[len];
@@ -256,7 +256,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] flatMapped(short[] array, IntFunction<short[]> mapper)
+	static short[] flatMapped(short[] array, IntFunction<short[]> mapper)
 	{
 		int len = array.length;
 		int size = 0;
@@ -281,7 +281,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] filtered(short[] array, IntPredicate condition)
+	static short[] filtered(short[] array, IntPredicate condition)
 	{
 		int index = 0;
 		int len = array.length;
@@ -299,7 +299,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] sorted(short[] array)
+	static short[] sorted(short[] array)
 	{
 		short[] res = array.clone();
 		Arrays.sort(res);
@@ -309,13 +309,13 @@ public interface ShortArray
 	// Search Operations
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	int indexOf(short[] array, short v)
+	static int indexOf(short[] array, short v)
 	{
 		return indexOf(array, v, 0);
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	int indexOf(short[] array, short v, int start)
+	static int indexOf(short[] array, short v, int start)
 	{
 		for (; start < array.length; start++)
 		{
@@ -328,13 +328,13 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	int lastIndexOf(short[] array, short v)
+	static int lastIndexOf(short[] array, short v)
 	{
 		return lastIndexOf(array, v, array.length - 1);
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	int lastIndexOf(short[] array, short v, int start)
+	static int lastIndexOf(short[] array, short v, int start)
 	{
 		for (; start >= 0; start--)
 		{
@@ -347,13 +347,13 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	boolean contains(short[] array, short v)
+	static boolean contains(short[] array, short v)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	boolean in(short v, short[] array)
+	static boolean in(short v, short[] array)
 	{
 		return indexOf(array, v, 0) >= 0;
 	}
@@ -361,13 +361,13 @@ public interface ShortArray
 	// Copying
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	short[] copy(short[] array)
+	static short[] copy(short[] array)
 	{
 		return array.clone();
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	Short[] boxed(short[] array)
+	static Short[] boxed(short[] array)
 	{
 		int len = array.length;
 		Short[] boxed = new Short[len];
@@ -379,7 +379,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	Iterable<Short> toIterable(short[] array)
+	static Iterable<Short> toIterable(short[] array)
 	{
 		return new ArrayList<Short>(boxed(array), true);
 	}
@@ -387,19 +387,19 @@ public interface ShortArray
 	// equals, hashCode and toString
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	boolean equals(short[] array1, short[] array2)
+	static boolean equals(short[] array1, short[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static	int hashCode(short[] array)
+	static int hashCode(short[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	String toString(short[] array)
+	static String toString(short[] array)
 	{
 		if (array == null)
 		{
@@ -423,7 +423,7 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static	void toString(short[] array, StringBuilder builder)
+	static void toString(short[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
