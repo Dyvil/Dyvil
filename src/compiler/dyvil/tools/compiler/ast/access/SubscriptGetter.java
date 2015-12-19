@@ -43,15 +43,15 @@ public class SubscriptGetter extends AbstractCall
 	}
 	
 	@Override
-	public ArgumentList getArguments()
+	public IArguments getArguments()
 	{
-		return (ArgumentList) this.arguments;
+		return this.arguments;
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.receiver instanceof ICall && this.arguments instanceof ArgumentList)
+		if (this.receiver instanceof ICall)
 		// false if receiver == null
 		{
 			ICall call = (ICall) this.receiver;
@@ -62,8 +62,12 @@ public class SubscriptGetter extends AbstractCall
 			
 			IArguments oldArgs = call.getArguments();
 			
-			ArrayExpr array = new ArrayExpr(this.position, ((ArgumentList) this.arguments).getValues(),
-			                                this.arguments.size());
+			ArrayExpr array = new ArrayExpr(this.position, this.arguments.size());
+			for (IValue v : this.arguments)
+			{
+				array.addValue(v);
+			}
+
 			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
 			
 			IValue resolvedCall = call.resolveCall(markers, context);

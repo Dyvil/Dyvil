@@ -482,7 +482,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				SubscriptGetter getter = new SubscriptGetter(token, this.value);
 				this.value = getter;
 				this.mode = SUBSCRIPT_END;
-				pm.pushParser(new ExpressionListParser(getter.getArguments()));
+				pm.pushParser(new ExpressionListParser((IValueList) getter.getArguments()));
 				return;
 			case BaseSymbols.OPEN_PARENTHESIS:
 				// Parse an apply call
@@ -676,7 +676,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = getter;
 				this.mode = SUBSCRIPT_END;
 				pm.skip();
-				pm.pushParser(new ExpressionListParser(getter.getArguments()));
+				pm.pushParser(new ExpressionListParser((IValueList) getter.getArguments()));
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
 				MethodParameter parameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,

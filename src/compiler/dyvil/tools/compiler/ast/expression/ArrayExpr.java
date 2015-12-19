@@ -60,7 +60,13 @@ public final class ArrayExpr implements IValue, IValueList
 		this.values = values;
 		this.valueCount = valueCount;
 	}
-	
+
+	public ArrayExpr(ICodePosition position, int valueCount)
+	{
+		this.position = position;
+		this.values = new IValue[valueCount];
+	}
+
 	public ArrayExpr(ICodePosition position, IValue[] values, int valueCount)
 	{
 		this.position = position;
