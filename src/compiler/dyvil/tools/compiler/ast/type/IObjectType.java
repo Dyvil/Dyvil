@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
@@ -41,12 +40,6 @@ public interface IObjectType extends IType
 	default IType getSimpleRefType()
 	{
 		return Types.getObjectSimpleRef(this);
-	}
-	
-	@Override
-	default ReferenceType getRefType()
-	{
-		return Types.getObjectRef(this);
 	}
 
 	@Override

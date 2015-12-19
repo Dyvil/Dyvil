@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -135,7 +136,7 @@ public final class MethodParameter extends Parameter
 		
 		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.VAR))
 		{
-			this.refType = this.type.getRefType();
+			this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
 		}
 	}
 	

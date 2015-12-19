@@ -16,7 +16,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -82,9 +81,9 @@ public final class PrimitiveType implements IType
 	protected IMethod boxMethod;
 	protected IMethod unboxMethod;
 	
-	private IClass        arrayClass;
-	private ReferenceType refType;
-	private IType         simpleRefType;
+	private IClass arrayClass;
+	private IClass refClass;
+	private IType  simpleRefType;
 	
 	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
@@ -202,23 +201,16 @@ public final class PrimitiveType implements IType
 	{
 		return new ClassType(this.theClass);
 	}
-	
-	@Override
-	public ReferenceType getRefType()
-	{
-		ReferenceType refType = this.refType;
-		if (refType == null)
-		{
-			String className = this.theClass.getName().qualified + "Ref";
-			return this.refType = new ReferenceType(Package.dyvilLangRef.resolveClass(className), this);
-		}
-		return refType;
-	}
 
 	@Override
 	public IClass getRefClass()
 	{
-		return this.getRefType().getTheClass();
+		if (this.refClass == null)
+		{
+			final String className = this.theClass.getName().qualified + "Ref";
+			return this.refClass = Package.dyvilLangRef.resolveClass(className);
+		}
+		return this.refClass;
 	}
 
 	@Override
@@ -304,12 +296,8 @@ public final class PrimitiveType implements IType
 	@Override
 	public boolean isSuperClassOf(IType that)
 	{
-		if (this.theClass == that.getTheClass())
-		{
-			return true;
-		}
-		
-		return that.isPrimitive() && isPromotable(that.getTypecode(), this.typecode);
+		return this.theClass == that.getTheClass() || that.isPrimitive() && isPromotable(that.getTypecode(),
+		                                                                                 this.typecode);
 	}
 	
 	@Override

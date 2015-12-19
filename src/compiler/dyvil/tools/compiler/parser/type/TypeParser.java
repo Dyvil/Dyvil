@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
 import dyvil.tools.compiler.ast.generic.type.NamedGenericType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -52,11 +53,15 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case END:
 			if (type == Tokens.SYMBOL_IDENTIFIER)
 			{
-				Name name = token.nameValue();
+				final Name name = token.nameValue();
 				if (name == Names.qmark)
 				{
-					this.consumer.setType(new OptionType(this.type));
-					pm.popParser();
+					this.type = new OptionType(this.type);
+					return;
+				}
+				if (name == Names.times)
+				{
+					this.type = new ReferenceType(this.type);
 					return;
 				}
 			}

@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -112,12 +111,6 @@ public class AnnotatedType implements IType, ITyped
 			return new AnnotatedType(this.type.getObjectType(), this.annotation);
 		}
 		return this;
-	}
-	
-	@Override
-	public ReferenceType getRefType()
-	{
-		return this.type.getRefType();
 	}
 
 	@Override

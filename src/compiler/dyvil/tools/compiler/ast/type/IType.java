@@ -145,8 +145,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	{
 		return this;
 	}
-	
-	ReferenceType getRefType();
 
 	IClass getRefClass();
 	
