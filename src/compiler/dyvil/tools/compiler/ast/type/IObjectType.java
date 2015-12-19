@@ -129,7 +129,9 @@ public interface IObjectType extends IType
 	@Override
 	default String getExtendedName()
 	{
-		return 'L' + this.getInternalName() + ';';
+		final StringBuilder stringBuilder = new StringBuilder();
+		this.appendExtendedName(stringBuilder);
+		return stringBuilder.toString();
 	}
 
 	@Override
