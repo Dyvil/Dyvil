@@ -46,7 +46,7 @@ public class ImplicitReferenceType extends ReferenceType
 			return new ReferenceValue(value, ref);
 		}
 
-		markers.add(MarkerMessages.createMarker(value.getPosition(), "value.reference"));
+		markers.add(MarkerMessages.createMarker(value.getPosition(), "reference.expression.invalid"));
 		return typedValue;
 	}
 }

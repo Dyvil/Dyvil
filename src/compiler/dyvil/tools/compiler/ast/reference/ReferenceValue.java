@@ -122,7 +122,7 @@ public class ReferenceValue implements IValue
 
 			if (reference == null)
 			{
-				markers.add(MarkerMessages.createError(this.value.getPosition(), "value.reference"));
+				markers.add(MarkerMessages.createError(this.value.getPosition(), "reference.expression.invalid"));
 			}
 
 			this.reference = reference;
