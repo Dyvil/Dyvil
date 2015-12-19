@@ -110,11 +110,21 @@ public final class MethodCall extends AbstractCall implements INamed
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		int args = this.arguments.size();
-		if (args == 1 && this.receiver != null)
+		final int args = this.arguments.size();
+		if (args == 1)
 		{
-			// Prioritized Infix Operators (namely ==, ===, != and !== for null)
-			IValue op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
+			IValue op;
+			if (this.receiver == null)
+			{
+				// Prefix Operators (! and *)
+				op = Operators.getPrefix(this.name, this.arguments.getFirstValue());
+			}
+			else
+			{
+				// Prioritized Infix Operators (namely ==, ===, != and !== for null)
+				op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
+			}
+
 			if (op != null)
 			{
 				op.setPosition(this.position);
@@ -130,30 +140,33 @@ public final class MethodCall extends AbstractCall implements INamed
 			this.checkArguments(markers, context);
 			return this;
 		}
-		
-		if (args == 1)
+
+		if (this.receiver != null)
 		{
-			IValue op;
-			if (this.receiver == null)
+			switch (args)
 			{
-				// Prefix Operators
-				op = Operators.getPrefix(this.name, this.arguments.getFirstValue());
+			case 0:
+			{
+				// Postfix Operators
+				IValue op = Operators.getPostfix(this.receiver, this.name);
 				if (op != null)
 				{
 					op.setPosition(this.position);
 					return op;
 				}
+				break;
 			}
-			else
+			case 1:
 			{
 				// Infix Operators
-				op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
+				IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
 				if (op != null)
 				{
 					op.setPosition(this.position);
 					return op;
 				}
 
+				// Compound Operators
 				String qualified = this.name.qualified;
 				if (qualified.endsWith("$eq"))
 				{
@@ -162,23 +175,16 @@ public final class MethodCall extends AbstractCall implements INamed
 					return CompoundCall
 							.resolveCall(markers, context, this.position, this.receiver, name, this.arguments);
 				}
+				break;
+			}
 			}
 		}
-		if (args == 0 && this.receiver != null)
+		else
 		{
-			// Postfix Operators
-			IValue op = Operators.getPostfix(this.receiver, this.name);
-			if (op != null)
-			{
-				op.setPosition(this.position);
-				return op;
-			}
-		}
-		
-		// Resolve Apply Method
-		if (this.receiver == null)
-		{
-			return ApplyMethodCall.resolveApply(markers, context, position, receiver, name, arguments, genericData);
+			// Resolve Apply Method
+			return ApplyMethodCall
+					.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
+					              this.genericData);
 		}
 		
 		return null;
