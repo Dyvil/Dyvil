@@ -47,6 +47,16 @@ public final class Predef
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ],
 			strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
 	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+
+	// Increments
+
+	public static void inc(var int i, int n = 1) = i += n
+
+	public static void inc(var long l, long n = 1L) = l += n
+
+	public static void inc(var float f, float n = 1F) = f += n
+
+	public static void inc(var double d, double n = 1D) = d += n
 	
 	// Closures
 	
