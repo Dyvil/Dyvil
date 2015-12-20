@@ -19,6 +19,8 @@ As a new programming language in active development, the main aims behind Dyvil 
 
 [![Throughput Graph](https://graphs.waffle.io/Dyvil/Dyvil/throughput.svg)](https://waffle.io/Dyvil/Dyvil/metrics)
 
+### [Download the Latest Installer](https://github.com/Dyvil/Dyvil-Installer/releases)
+
 ###▶ [Feature Overview](https://github.com/Dyvil/Dyvil/wiki/Language-Features)
 
 ###▶ [Language Reference](https://dyvil.gitbooks.io/dyvil-language-reference/content/)
