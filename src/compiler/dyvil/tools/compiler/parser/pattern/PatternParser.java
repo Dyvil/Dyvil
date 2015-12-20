@@ -94,16 +94,24 @@ public class PatternParser extends Parser
 				}
 
 				final IToken nextToken = token.next();
+				final int nextType = nextToken.type();
 				final ICodePosition position = token.raw();
 				final IType namedType = new NamedType(position, token.nameValue());
-				if (nextToken.type() == BaseSymbols.OPEN_PARENTHESIS)
+
+				if (nextType == BaseSymbols.OPEN_PARENTHESIS)
 				{
-					final CaseClassPattern ccp = new CaseClassPattern(position,
-					                                                  namedType);
+					final CaseClassPattern ccp = new CaseClassPattern(position, namedType);
 					pm.pushParser(new PatternListParser(ccp));
 					pm.skip();
 					this.pattern = ccp;
 					this.mode = CASE_CLASS_END;
+					return;
+				}
+				if (ParserUtil.isIdentifier(nextType))
+				{
+					this.pattern = new BindingPattern(nextToken.raw(), namedType, nextToken.nameValue());
+					pm.skip();
+					this.mode = END;
 					return;
 				}
 

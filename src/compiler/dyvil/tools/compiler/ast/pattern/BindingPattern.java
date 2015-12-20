@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.type.IType;
@@ -13,16 +14,25 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class BindingPattern extends Pattern
 {
-	private Name     name;
+	protected IType type = Types.UNKNOWN;
+	protected Name name;
+
+	// Metadata
 	private Variable variable;
-	private IType type = Types.UNKNOWN;
-	
+
 	public BindingPattern(ICodePosition position, Name name)
 	{
 		this.name = name;
 		this.position = position;
 	}
-	
+
+	public BindingPattern(ICodePosition position, IType type, Name name)
+	{
+		this.position = position;
+		this.name = name;
+		this.type = type;
+	}
+
 	@Override
 	public int getPatternType()
 	{
@@ -40,16 +50,31 @@ public final class BindingPattern extends Pattern
 	{
 		return this.type;
 	}
-	
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (this.type == Types.ANY || this.type == Types.UNKNOWN)
+		if (this.type == Types.UNKNOWN)
 		{
 			this.type = type;
 			return this;
 		}
-		return type.isSuperTypeOf(this.type) ? this : null;
+		if (type.isSameType(this.type))
+		{
+			return this;
+		}
+		if (type.isSuperTypeOf(this.type))
+		{
+			return new TypeCheckPattern(this, type, this.type);
+		}
+
+		return null;
 	}
 	
 	@Override
@@ -57,7 +82,14 @@ public final class BindingPattern extends Pattern
 	{
 		return true;
 	}
-	
+
+	@Override
+	public IPattern resolve(MarkerList markers, IContext context)
+	{
+		this.type = this.type.resolveType(markers, context);
+		return this;
+	}
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -104,7 +136,15 @@ public final class BindingPattern extends Pattern
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("var ");
+		if (this.type == Types.UNKNOWN)
+		{
+			buffer.append("var ");
+		}
+		else
+		{
+			this.type.toString(prefix, buffer);
+			buffer.append(' ');
+		}
 		buffer.append(this.name);
 	}
 }
