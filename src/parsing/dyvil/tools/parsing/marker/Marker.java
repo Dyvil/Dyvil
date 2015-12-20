@@ -59,8 +59,8 @@ public abstract class Marker implements Comparable<Marker>
 	
 	public void log(String code, StringBuilder buf)
 	{
-		String type = this.getMarkerType();
-		String message = this.message;
+		final String type = this.getMarkerType();
+		final String message = this.message;
 		
 		buf.append("line ").append(this.position.startLine()).append(": ").append(type);
 		if (message != null)
@@ -70,7 +70,7 @@ public abstract class Marker implements Comparable<Marker>
 		
 		int startIndex = this.position.startIndex();
 		int endIndex = this.position.endIndex();
-		int codeLength = code.length();
+		final int codeLength = code.length();
 		if (startIndex >= codeLength)
 		{
 			startIndex = codeLength - 1;
@@ -80,9 +80,9 @@ public abstract class Marker implements Comparable<Marker>
 			endIndex = codeLength - 1;
 		}
 		
-		int prevNL = prevNL(code, startIndex);
-		int nextNL = nextNL(code, endIndex);
-		String line = code.substring(prevNL, nextNL);
+		final int prevNL = prevNL(code, startIndex);
+		final int nextNL = nextNL(code, endIndex);
+		final String line = code.substring(prevNL, nextNL);
 		
 		// Append Line
 		buf.append('\n').append(line).append('\n');
@@ -100,7 +100,10 @@ public abstract class Marker implements Comparable<Marker>
 				buf.append(' ');
 			}
 		}
-		buf.append('^');
+		for (int i = startIndex; i < endIndex; i++)
+		{
+			buf.append('¯');
+		}
 		
 		// Append Info (if any)
 		if (this.info != null)
