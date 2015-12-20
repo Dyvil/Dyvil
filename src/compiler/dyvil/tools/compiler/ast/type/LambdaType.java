@@ -370,6 +370,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).getParameterType();
 		}
+		if (this.returnType == null)
+		{
+			this.returnType = Types.UNKNOWN;
+			markers.add(MarkerMessages.createError(this.getPosition(), "type.lambda.return"));
+		}
 		this.returnType = this.returnType.resolveType(markers, context).getReturnType();
 		
 		return this;
