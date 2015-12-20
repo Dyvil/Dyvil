@@ -63,6 +63,12 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
+	public IType getElementType()
+	{
+		return this.type;
+	}
+
+	@Override
 	public Name getName()
 	{
 		return this.theClass.getName();
@@ -96,7 +102,7 @@ public class ReferenceType implements IObjectType
 		final IType concreteType = this.type.getConcreteType(context);
 		if (concreteType != null && concreteType != this.type)
 		{
-			return new ReferenceType(this.theClass, this.type);
+			return concreteType.getRefType();
 		}
 		return this;
 	}
@@ -104,6 +110,11 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
+		if (!this.theClass.isGeneric())
+		{
+			return;
+		}
+
 		final ITypeVariable typeVariable = this.theClass.getTypeVariable(0);
 		if (typeVariable != null)
 		{
@@ -191,6 +202,11 @@ public class ReferenceType implements IObjectType
 	@Override
 	public String getSignature()
 	{
+		if (this.theClass != Types.getObjectRefClass())
+		{
+			return null;
+		}
+
 		StringBuilder stringBuilder = new StringBuilder();
 		this.appendSignature(stringBuilder);
 		return stringBuilder.toString();
@@ -199,9 +215,14 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		buffer.append('L').append(this.getInternalName()).append('<');
-		this.type.appendSignature(buffer);
-		buffer.append(">;");
+		buffer.append('L').append(this.getInternalName());
+		if (this.theClass == Types.getObjectRefClass())
+		{
+			buffer.append('<');
+			this.type.appendSignature(buffer);
+			buffer.append('>');
+		}
+		buffer.append(';');
 	}
 
 	@Override

@@ -147,6 +147,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	}
 
 	IClass getRefClass();
+
+	default IType getRefType()
+	{
+		return new ReferenceType(this.getRefClass(), this);
+	}
 	
 	IType getSimpleRefType();
 	

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
@@ -23,7 +24,6 @@ import java.lang.annotation.ElementType;
 
 public final class MethodParameter extends Parameter
 {
-
 	protected ICallableMember method;
 	
 	protected ReferenceType refType;
@@ -149,6 +149,10 @@ public final class MethodParameter extends Parameter
 		
 		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.VAR))
 		{
+			if (this.method instanceof ExternalMethod)
+			{
+				this.type = this.type.getElementType();
+			}
 			this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
 		}
 	}

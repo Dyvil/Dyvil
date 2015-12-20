@@ -110,12 +110,10 @@ public class ReferenceValue implements IValue
 
 		return this;
 	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.value.checkTypes(markers, context);
 
+	@Override
+	public void resolveOperator(MarkerList markers, IContext context)
+	{
 		if (this.reference == null)
 		{
 			final IReference reference = this.value.toReference();
@@ -127,6 +125,12 @@ public class ReferenceValue implements IValue
 
 			this.reference = reference;
 		}
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.value.checkTypes(markers, context);
 	}
 	
 	@Override

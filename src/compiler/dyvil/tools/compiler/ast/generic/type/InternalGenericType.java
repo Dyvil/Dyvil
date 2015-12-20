@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.parsing.Name;
@@ -82,14 +83,17 @@ public class InternalGenericType extends GenericType
 			this.typeArguments[i] = null;
 			return new LambdaType(this.typeArguments, i, returnType);
 		}
+
 		switch (this.internalName)
 		{
+		case "dyvil/lang/ref/ObjectRef":
+			return new ReferenceType(Types.getObjectRefClass(), this.typeArguments[0]);
 		case "dyvil/collection/ImmutableMap":
 		case "dyvil/collection/Map":
 			return new MapType(this.typeArguments[0], this.typeArguments[1]);
 		}
-		
-		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
+
+		final IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
 		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
 	}
 	
