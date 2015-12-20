@@ -24,6 +24,7 @@ import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -31,12 +32,15 @@ import java.io.IOException;
 
 public final class LambdaType implements IObjectType, ITyped, ITypeList
 {
-	public static final IClass[] functionClasses = new IClass[22];
+	private static final IClass[] functionClasses = new IClass[22];
 
 	protected IType returnType;
 
 	protected IType[] parameterTypes;
 	protected int     parameterCount;
+
+	// Metadata
+	protected ICodePosition position;
 
 	public LambdaType()
 	{
@@ -109,6 +113,18 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public IType getType()
 	{
 		return this.returnType;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
 	}
 
 	// ITypeList Overrides
@@ -373,10 +389,13 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		if (this.returnType == null)
 		{
 			this.returnType = Types.UNKNOWN;
-			markers.add(MarkerMessages.createError(this.getPosition(), "type.lambda.return"));
+			markers.add(MarkerMessages.createError(this.position, "type.lambda.return"));
 		}
-		this.returnType = this.returnType.resolveType(markers, context).getReturnType();
-		
+		else
+		{
+			this.returnType = this.returnType.resolveType(markers, context).getReturnType();
+		}
+
 		return this;
 	}
 	
@@ -395,7 +414,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(MarkerMessages.createMarker(this.returnType.getPosition(), "type.class.lambda"));
+			markers.add(MarkerMessages.createMarker(this.position, "type.class.lambda"));
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

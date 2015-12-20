@@ -95,6 +95,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
 				LambdaType lt = new LambdaType();
+				lt.setPosition(token.raw());
 				this.type = lt;
 				pm.pushParser(pm.newTypeParser(lt));
 				this.mode = LAMBDA_END;
@@ -121,6 +122,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					if (this.parentType == null)
 					{
 						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
+						lt.setPosition(next.raw());
 						this.type = lt;
 						this.mode = LAMBDA_END;
 						pm.skip();
@@ -162,6 +164,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			{
 				TupleType tupleType = (TupleType) this.type;
 				this.type = new LambdaType(tupleType);
+				this.type.setPosition(next.raw());
 				this.mode = LAMBDA_TYPE;
 				return;
 			}
