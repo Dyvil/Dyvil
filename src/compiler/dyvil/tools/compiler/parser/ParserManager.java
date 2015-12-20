@@ -9,7 +9,6 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.IToken;
 
 public class ParserManager implements IParserManager
@@ -102,7 +101,7 @@ public class ParserManager implements IParserManager
 			{
 				if (token != null && !token.isInferred())
 				{
-					this.report(token, "Unexpected Token: " + token);
+					this.report(MarkerMessages.createSyntaxError(token, "parser.unexpected", token));
 				}
 				continue;
 			}
@@ -114,7 +113,7 @@ public class ParserManager implements IParserManager
 			catch (Exception ex)
 			{
 				DyvilCompiler.error("ParserManager", "parseToken", ex);
-				this.markers.add(new SyntaxError(token, "Failed to parse token '" + token + "': " + ex.getMessage()));
+				this.markers.add(MarkerMessages.createSyntaxError(token, "parser.error", token, ex.getMessage()));
 			}
 		}
 		
