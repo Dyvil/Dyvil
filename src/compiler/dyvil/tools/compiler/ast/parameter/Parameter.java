@@ -297,8 +297,11 @@ public abstract class Parameter extends Member implements IParameter
 			}
 		}
 
-		this.modifiers.toString(buffer);
-		
+		if (this.modifiers != null)
+		{
+			this.modifiers.toString(buffer);
+		}
+
 		if (this.varargs)
 		{
 			this.type.getElementType().toString(prefix, buffer);
