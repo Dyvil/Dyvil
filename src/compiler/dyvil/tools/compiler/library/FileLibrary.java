@@ -31,7 +31,7 @@ public final class FileLibrary extends Library
 		Option<File> option = this.fileMap.getOption(name);
 		if (option != None.instance)
 		{
-			return option.$bang();
+			return option.get();
 		}
 		
 		String path = name.replace('/', File.separatorChar);

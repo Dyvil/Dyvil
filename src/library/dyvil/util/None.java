@@ -24,13 +24,13 @@ public final class None implements Option
 	}
 	
 	@Override
-	public Object $bang()
+	public Object get()
 	{
 		throw new NoSuchElementException("None");
 	}
 	
 	@Override
-	public boolean $qmark()
+	public boolean isPresent()
 	{
 		return false;
 	}

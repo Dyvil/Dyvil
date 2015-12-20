@@ -14,8 +14,7 @@ import java.util.function.Supplier;
 @NilConvertible
 @TupleConvertible
 @DyvilModifiers(Modifiers.SEALED)
-public
-interface Option<T> extends Serializable
+public interface Option<T> extends Serializable
 {
 	static <T> Option<T> of(T t)
 	{
@@ -32,19 +31,39 @@ interface Option<T> extends Serializable
 		return new Some<>(t);
 	}
 	
-	T $bang();
+	T get();
+
+	default T $bang()
+	{
+		return this.get();
+	}
 	
-	boolean $qmark();
+	boolean isPresent();
+
+	default boolean $qmark()
+	{
+		return this.isPresent();
+	}
 	
-	void forEach(Consumer<? super T> paramConsumer);
+	void forEach(Consumer<? super T> consumer);
 	
-	Option<T> filter(Predicate<? super T> paramPredicate);
+	Option<T> filter(Predicate<? super T> predicate);
 	
-	<U> Option<U> map(Function<? super T, ? extends U> paramFunction);
+	<U> Option<U> map(Function<? super T, ? extends U> function);
 	
-	<U> Option<U> flatMap(Function<? super T, Option<U>> paramFunction);
+	<U> Option<U> flatMap(Function<? super T, Option<U>> function);
 	
-	T orElse(T paramT);
+	T orElse(T elseValue);
+
+	default T $qmark$qmark(T elseValue)
+	{
+		return this.orElse(elseValue);
+	}
 	
-	T orElse(Supplier<? extends T> paramSupplier);
+	T orElse(Supplier<? extends T> elseSupplier);
+
+	default T $qmark$qmark(Supplier<? extends T> elseSupplier)
+	{
+		return this.orElse(elseSupplier);
+	}
 }

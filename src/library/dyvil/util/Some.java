@@ -33,13 +33,13 @@ public final class Some<T> implements Option<T>
 	}
 	
 	@Override
-	public T $bang()
+	public T get()
 	{
 		return this.value;
 	}
 	
 	@Override
-	public boolean $qmark()
+	public boolean isPresent()
 	{
 		return true;
 	}
