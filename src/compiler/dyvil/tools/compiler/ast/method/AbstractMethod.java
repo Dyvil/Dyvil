@@ -214,15 +214,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void setParameter(int index, IParameter param)
 	{
 		param.setMethod(this);
+		param.setIndex(index);
 		this.parameters[index] = param;
 	}
 	
 	@Override
 	public void addParameter(IParameter param)
 	{
+		final int index = this.parameterCount++;
+
 		param.setMethod(this);
-		
-		int index = this.parameterCount++;
+		param.setIndex(index);
+
 		if (index >= this.parameters.length)
 		{
 			MethodParameter[] temp = new MethodParameter[this.parameterCount];

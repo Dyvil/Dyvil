@@ -305,6 +305,7 @@ public abstract class AbstractClass implements IClass
 	public void setParameter(int index, IParameter param)
 	{
 		param.setTheClass(this);
+		param.setIndex(index);
 		this.parameters[index] = param;
 	}
 	
@@ -315,13 +316,18 @@ public abstract class AbstractClass implements IClass
 		
 		if (this.parameters == null)
 		{
+			param.setIndex(0);
+
 			this.parameters = new ClassParameter[2];
 			this.parameters[0] = param;
 			this.parameterCount = 1;
 			return;
 		}
 		
-		int index = this.parameterCount++;
+		final int index = this.parameterCount++;
+
+		param.setIndex(index);
+
 		if (this.parameterCount > this.parameters.length)
 		{
 			IParameter[] temp = new IParameter[this.parameterCount];
@@ -329,7 +335,6 @@ public abstract class AbstractClass implements IClass
 			this.parameters = temp;
 		}
 		this.parameters[index] = param;
-		param.setIndex(index);
 	}
 	
 	@Override

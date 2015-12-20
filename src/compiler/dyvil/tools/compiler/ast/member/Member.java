@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -42,14 +41,12 @@ public abstract class Member implements IMember
 	public Member(IType type)
 	{
 		this.type = type;
-		this.modifiers = EmptyModifiers.INSTANCE;
 	}
 	
 	public Member(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
-		this.modifiers = EmptyModifiers.INSTANCE;
 	}
 	
 	public Member(Name name, IType type, ModifierSet modifiers)

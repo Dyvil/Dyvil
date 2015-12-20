@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -261,17 +262,19 @@ public abstract class Parameter extends Member implements IParameter
 	
 	protected void writeAnnotations(MethodWriter writer)
 	{
+		final AnnotatableVisitor visitor = (desc, visible) -> writer
+				.visitParameterAnnotation(Parameter.this.index, desc, visible);
+
 		if (this.annotations != null)
 		{
-			AnnotatableVisitor visitor = (desc, visible) -> writer
-					.visitParameterAnnotation(Parameter.this.index, desc, visible);
-			
-			int count = this.annotations.annotationCount();
+			final int count = this.annotations.annotationCount();
 			for (int i = 0; i < count; i++)
 			{
 				this.annotations.getAnnotation(i).write(visitor);
 			}
 		}
+
+		AnnotationUtils.writeModifiers(visitor, this.modifiers);
 		
 		this.type.writeAnnotations(writer, TypeReference.newFormalParameterReference(this.index), "");
 

@@ -75,8 +75,7 @@ public class CodeMethod extends AbstractMethod
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			param.resolveTypes(markers, this);
+			this.parameters[i].resolveTypes(markers, this);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)

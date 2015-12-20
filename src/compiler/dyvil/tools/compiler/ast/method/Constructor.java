@@ -119,6 +119,7 @@ public class Constructor extends Member implements IConstructor
 	public void setParameter(int index, IParameter param)
 	{
 		param.setMethod(this);
+		param.setIndex(index);
 		this.parameters[index] = param;
 	}
 	
@@ -127,7 +128,10 @@ public class Constructor extends Member implements IConstructor
 	{
 		param.setMethod(this);
 		
-		int index = this.parameterCount++;
+		final int index = this.parameterCount++;
+
+		param.setIndex(index);
+
 		if (index >= this.parameters.length)
 		{
 			IParameter[] temp = new IParameter[this.parameterCount];

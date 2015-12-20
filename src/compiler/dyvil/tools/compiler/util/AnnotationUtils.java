@@ -16,7 +16,8 @@ public final class AnnotationUtils
 
 	public static void writeModifiers(AnnotatableVisitor mw, ModifierSet modifiers)
 	{
-		if (modifiers == null) {
+		if (modifiers == null)
+		{
 			return;
 		}
 
