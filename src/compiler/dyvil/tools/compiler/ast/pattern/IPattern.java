@@ -30,14 +30,15 @@ public interface IPattern extends IASTNode, ITyped
 	int LIST  = 18;
 	
 	int CASE_CLASS = 24;
+	int OBJECT     = 25;
 	
 	int BINDING   = 32;
 	int WILDCARD  = 33;
 	int UNBOX     = 34;
 	int TYPECHECK = 35;
 
-	int OR        = 48;
-	int AND       = 49;
+	int OR  = 48;
+	int AND = 49;
 	
 	int getPatternType();
 	

@@ -22,17 +22,24 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class CaseClassPattern extends Pattern implements IPatternList
 {
-	private IType type;
-	private IPattern[] patterns = new IPattern[2];
-	private int patternCount;
+	protected IType type;
+	protected IPattern[] patterns = new IPattern[2];
+	protected int patternCount;
 
+	// Metadata
 	private IMethod[] getterMethods;
 	
 	public CaseClassPattern(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
+	public CaseClassPattern(ICodePosition position, IType type)
+	{
+		this.position = position;
+		this.type = type;
+	}
+
 	@Override
 	public int getPatternType()
 	{
@@ -124,8 +131,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		}
 		else
 		{
-			Marker marker = MarkerMessages
-					.createError(pattern.getPosition(), "pattern.class.access", param.getName());
+			Marker marker = MarkerMessages.createError(pattern.getPosition(), "pattern.class.access", param.getName());
 			marker.addInfo(MarkerMessages.getMarker("pattern.class.access.type", caseClass.getFullName()));
 			markers.add(marker);
 		}

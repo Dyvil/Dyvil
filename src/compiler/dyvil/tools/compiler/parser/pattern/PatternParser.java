@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.pattern.*;
 import dyvil.tools.compiler.ast.pattern.constant.*;
 import dyvil.tools.compiler.ast.pattern.operator.AndPattern;
 import dyvil.tools.compiler.ast.pattern.operator.OrPattern;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public class PatternParser extends Parser
@@ -92,18 +94,22 @@ public class PatternParser extends Parser
 				}
 
 				final IToken nextToken = token.next();
+				final ICodePosition position = token.raw();
+				final IType namedType = new NamedType(position, token.nameValue());
 				if (nextToken.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
-					CaseClassPattern ccp = new CaseClassPattern(token.raw());
-					ccp.setType(new NamedType(token.raw(), token.nameValue()));
+					final CaseClassPattern ccp = new CaseClassPattern(position,
+					                                                  namedType);
 					pm.pushParser(new PatternListParser(ccp));
 					pm.skip();
 					this.pattern = ccp;
 					this.mode = CASE_CLASS_END;
 					return;
 				}
-				
-				pm.report(nextToken, "pattern.case_class.open_paren");
+
+				this.pattern = new ObjectPattern(token.raw(), namedType);
+				this.mode = END;
+
 				return;
 			}
 			if (type == DyvilKeywords.VAR)
