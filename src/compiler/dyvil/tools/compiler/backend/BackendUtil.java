@@ -34,8 +34,8 @@ public interface BackendUtil
 			{
 				// { value3, value2 }, value1 ->
 				// value1, { value3, value2 }
-				writer.mv.visitInsn(DUP2_X1);
-				writer.mv.visitInsn(POP2);
+				writer.mv.visitInsn(DUP_X2);
+				writer.mv.visitInsn(POP);
 			}
 		}
 		else
@@ -44,8 +44,8 @@ public interface BackendUtil
 			{
 				// value3, { value2, value1 } ->
 				// { value2, value1 }, value3
-				writer.mv.visitInsn(DUP_X2);
-				writer.mv.visitInsn(POP);
+				writer.mv.visitInsn(DUP2_X1);
+				writer.mv.visitInsn(POP2);
 			}
 			else
 			{
