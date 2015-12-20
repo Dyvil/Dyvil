@@ -31,6 +31,11 @@ public final class Variable extends Member implements IVariable
 	
 	// Metadata
 	private IType refType;
+
+	/**
+	 * Marks if this variable is assigned anywhere. This is used to check if it is effectively final.
+	 */
+	private boolean assigned;
 	
 	public Variable()
 	{
@@ -83,7 +88,13 @@ public final class Variable extends Member implements IVariable
 	{
 		return this.localIndex;
 	}
-	
+
+	@Override
+	public boolean isAssigned()
+	{
+		return this.assigned;
+	}
+
 	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
@@ -109,18 +120,23 @@ public final class Variable extends Member implements IVariable
 		{
 			markers.add(MarkerMessages.createMarker(position, "variable.assign.final", this.name.unqualified));
 		}
-		
-		IValue value1 = this.type.convertValue(newValue, this.type, markers, context);
-		if (value1 == null)
+		else
 		{
-			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+			this.assigned = true;
+		}
+		
+		final IValue typedValue = this.type.convertValue(newValue, this.type, markers, context);
+		if (typedValue == null)
+		{
+			Marker marker = MarkerMessages
+					.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
 			marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
 			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
 		{
-			newValue = value1;
+			newValue = typedValue;
 		}
 		
 		return newValue;
@@ -186,7 +202,8 @@ public final class Variable extends Member implements IVariable
 		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
+			Marker marker = MarkerMessages
+					.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
 			marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
 			marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
 			markers.add(marker);

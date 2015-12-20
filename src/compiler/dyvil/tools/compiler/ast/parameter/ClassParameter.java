@@ -65,7 +65,13 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		return false;
 	}
-	
+
+	@Override
+	public boolean isAssigned()
+	{
+		return true;
+	}
+
 	@Override
 	public boolean isReferenceCapturable()
 	{

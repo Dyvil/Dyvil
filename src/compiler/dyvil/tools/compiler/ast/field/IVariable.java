@@ -16,6 +16,8 @@ public interface IVariable extends IDataMember
 	{
 		return true;
 	}
+
+	boolean isAssigned();
 	
 	int getLocalIndex();
 	

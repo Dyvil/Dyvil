@@ -424,7 +424,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			if (var.variable == variable)
+			if (var.getVariable() == variable)
 			{
 				// If yes, return the match and skip adding the variable
 				// again.
@@ -465,6 +465,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.value.checkTypes(markers, new CombiningContext(this, context));
+
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			// Check captures
+			this.capturedFields[i].checkTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -630,7 +636,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			for (int i = 0; i < this.capturedFieldCount; i++)
 			{
 				CaptureVariable var = this.capturedFields[i];
-				writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getLocalIndex());
+				writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.getVariable().getLocalIndex());
 			}
 		}
 		else
@@ -764,8 +770,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable capture = this.capturedFields[i];
-			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getActualType(), 0);
+			capture.setLocalIndex(index);
+			index = mw.registerParameter(index, capture.getName().qualified, capture.getActualType(), 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

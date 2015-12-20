@@ -113,7 +113,7 @@ public class NestedMethod extends CodeMethod
 		// Check if the variable is already in the array
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			if (this.capturedFields[i].variable == match)
+			if (this.capturedFields[i].getVariable() == match)
 			{
 				// If yes, return the match and skip adding the variable
 				// again.
@@ -167,8 +167,8 @@ public class NestedMethod extends CodeMethod
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable capture = this.capturedFields[i];
-			capture.index = index;
-			index = mw.registerParameter(index, capture.variable.getName().qualified, capture.getActualType(), 0);
+			capture.setLocalIndex(index);
+			index = mw.registerParameter(index, capture.getName().qualified, capture.getActualType(), 0);
 		}
 		
 		index = 0;
@@ -209,7 +209,7 @@ public class NestedMethod extends CodeMethod
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.variable.getLocalIndex());
+			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.getVariable().getLocalIndex());
 		}
 	}
 	

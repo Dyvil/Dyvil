@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -19,9 +20,10 @@ import java.lang.annotation.ElementType;
 
 public class CaptureVariable implements IVariable
 {
-	public int       index;
-	public IVariable variable;
-	public IType     type;
+	protected int           index;
+	protected IVariable     variable;
+	protected IType         type;
+	protected ICodePosition accessPosition;
 	
 	public CaptureVariable()
 	{
@@ -32,11 +34,16 @@ public class CaptureVariable implements IVariable
 		this.variable = variable;
 		this.type = variable.getType();
 	}
-	
+
+	public IVariable getVariable()
+	{
+		return this.variable;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
-		return this.variable.getPosition();
+		return this.accessPosition;
 	}
 	
 	@Override
@@ -144,7 +151,13 @@ public class CaptureVariable implements IVariable
 	{
 		return this.index;
 	}
-	
+
+	@Override
+	public boolean isAssigned()
+	{
+		return this.variable.isAssigned();
+	}
+
 	@Override
 	public boolean isReferenceType()
 	{
@@ -172,6 +185,11 @@ public class CaptureVariable implements IVariable
 	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
+		if (this.accessPosition == null)
+		{
+			this.accessPosition = position;
+		}
+
 		return this.variable.checkAccess(markers, position, instance, context);
 	}
 	
@@ -180,7 +198,7 @@ public class CaptureVariable implements IVariable
 	{
 		if (!this.variable.isReferenceCapturable())
 		{
-			markers.add(MarkerMessages.createMarker(position, "variable.capture", this.variable.getName()));
+			markers.add(MarkerMessages.createMarker(position, "variable.assign.capture", this.variable.getName()));
 		}
 		else
 		{
@@ -204,6 +222,21 @@ public class CaptureVariable implements IVariable
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		// Check if the variable is neither final nor effectively final
+		if (this.variable.isAssigned() && !this.variable.hasModifier(Modifiers.FINAL))
+		{
+			if (!this.variable.isReferenceCapturable())
+			{
+				markers.add(MarkerMessages.createError(this.accessPosition, "variable.access.capture",
+				                                       this.variable.getName()));
+			}
+			else
+			{
+				// Reference Capture is required
+				this.variable.setReferenceType();
+				this.type = this.variable.getActualType();
+			}
+		}
 	}
 	
 	@Override

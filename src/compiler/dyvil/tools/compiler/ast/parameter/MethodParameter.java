@@ -23,9 +23,11 @@ import java.lang.annotation.ElementType;
 
 public final class MethodParameter extends Parameter
 {
+
 	protected ICallableMember method;
 	
 	protected ReferenceType refType;
+	protected boolean       assigned;
 	
 	public MethodParameter()
 	{
@@ -62,7 +64,13 @@ public final class MethodParameter extends Parameter
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean isAssigned()
+	{
+		return this.assigned;
+	}
+
 	@Override
 	public ElementType getElementType()
 	{
@@ -112,11 +120,16 @@ public final class MethodParameter extends Parameter
 		{
 			markers.add(MarkerMessages.createMarker(position, "parameter.assign.final", this.name.unqualified));
 		}
+		else
+		{
+			this.assigned = true;
+		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
+			Marker marker = MarkerMessages
+					.createMarker(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
 			marker.addInfo(MarkerMessages.getMarker("parameter.type", this.type));
 			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
 			markers.add(marker);
