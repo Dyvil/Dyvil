@@ -114,7 +114,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			// No additional type check required
 			return this;
 		}
-		return new TypeCheckPattern(this, this.type);
+		return new TypeCheckPattern(this, type, this.type);
 	}
 
 	public void checkMethodAccess(MarkerList markers, IClass caseClass, IParameter param, int paramIndex, int paramCount, IPattern pattern)

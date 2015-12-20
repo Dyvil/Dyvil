@@ -14,20 +14,24 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class TypeCheckPattern implements IPattern
 {
+	private IPattern pattern;
+	private IType    type;
+
+	// Metadata
+	private IType         fromType;
 	private ICodePosition position;
-	private IPattern      pattern;
-	private IType         type;
-	
+
 	public TypeCheckPattern(ICodePosition position, IPattern pattern)
 	{
 		this.position = position;
 		this.pattern = pattern;
 	}
-	
-	public TypeCheckPattern(IPattern pattern, IType type)
+
+	public TypeCheckPattern(IPattern pattern, IType fromType, IType toType)
 	{
 		this.pattern = pattern;
-		this.type = type;
+		this.fromType = fromType;
+		this.type = toType;
 	}
 	
 	@Override
@@ -63,11 +67,7 @@ public class TypeCheckPattern implements IPattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (type.isPrimitive())
-		{
-			return null;
-		}
-		
+		this.fromType = type;
 		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 	
@@ -99,11 +99,6 @@ public class TypeCheckPattern implements IPattern
 			{
 				this.pattern = this.pattern.withType(this.type, markers);
 			}
-			
-			if (this.type.isPrimitive())
-			{
-				markers.add(MarkerMessages.createMarker(this.position, "pattern.typecheck.primitive"));
-			}
 		}
 		else
 		{
@@ -119,17 +114,20 @@ public class TypeCheckPattern implements IPattern
 		if (varIndex < 0)
 		{
 			varIndex = writer.localCount();
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
+			writer.writeVarInsn(this.fromType.getStoreOpcode(), varIndex);
 		}
-		
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
-		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
-		
-		if (this.pattern.getPatternType() != WILDCARD)
+
+		if (!this.fromType.isPrimitive())
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+			writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
+			writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+		}
+
+		if (this.pattern.getPatternType() != WILDCARD)
+		{
+			writer.writeVarInsn(this.fromType.getLoadOpcode(), varIndex);
+			this.fromType.writeCast(writer, this.type, this.getLineNumber());
 			this.pattern.writeInvJump(writer, -1, elseLabel);
 		}
 	}
@@ -140,12 +138,13 @@ public class TypeCheckPattern implements IPattern
 		if (this.pattern != null)
 		{
 			this.pattern.toString(prefix, buffer);
-		}
-		int patternType = this.pattern.getPatternType();
-		if (patternType == BINDING || patternType != CASE_CLASS && !this.pattern.isType(this.type))
-		{
-			buffer.append(" as ");
-			this.type.toString(prefix, buffer);
+			int patternType = this.pattern.getPatternType();
+
+			if (patternType == BINDING || patternType != CASE_CLASS && !this.pattern.isType(this.type))
+			{
+				buffer.append(" as ");
+				this.type.toString(prefix, buffer);
+			}
 		}
 	}
 }

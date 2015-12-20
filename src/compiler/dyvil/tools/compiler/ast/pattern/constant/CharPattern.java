@@ -59,7 +59,7 @@ public final class CharPattern extends Pattern
 		}
 		if (type.isSuperTypeOf(Types.STRING))
 		{
-			return new TypeCheckPattern(this, Types.STRING);
+			return new TypeCheckPattern(this, type, Types.STRING);
 		}
 		return null;
 	}
