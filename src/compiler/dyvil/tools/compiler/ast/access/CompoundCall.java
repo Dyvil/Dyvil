@@ -68,41 +68,42 @@ public final class CompoundCall
 		}
 		else if (type == IValue.FIELD_ACCESS)
 		{
-			FieldAccess fieldAccess = (FieldAccess) receiver;
+			final FieldAccess fieldAccess = (FieldAccess) receiver;
 
-			IValue op = getIncOperator(name, arguments, fieldAccess);
+			final IncOperator op = getIncOperator(name, arguments, fieldAccess);
 			if (op != null)
 			{
 				op.setPosition(position);
+				op.resolveOperator(markers, context);
 				return op;
 			}
 
 			// x op= z
 			// -> x = x.op(z)
 
-			SideEffectHelper helper = new SideEffectHelper();
+			final SideEffectHelper helper = new SideEffectHelper();
 
-			IValue fieldReceiver = fieldAccess.receiver = helper.processValue(fieldAccess.receiver);
+			final IValue fieldReceiver = fieldAccess.receiver = helper.processValue(fieldAccess.receiver);
 
-			IValue methodCall = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			final IValue methodCall = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
 			if (methodCall == null)
 			{
 				return null;
 			}
 
-			FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.field, methodCall);
+			final FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.field, methodCall);
 			return helper.finish(assignment);
 		}
 
 		return null;
 	}
 	
-	private static IValue getIncOperator(Name name, IArguments arguments, FieldAccess fieldAccess)
+	private static IncOperator getIncOperator(Name name, IArguments arguments, FieldAccess fieldAccess)
 	{
 		if ((name == Names.plus || name == Names.minus) && IncOperator.isIncConvertible(fieldAccess.getType()))
 		{
-			IValue value = arguments.getLastValue();
-			if (IValue.isNumeric(value.valueTag()))
+			final IValue value = arguments.getLastValue();
+			if (value.valueTag() == IValue.INT)
 			{
 				int intValue = value.intValue();
 				if (name == Names.minus)

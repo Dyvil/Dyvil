@@ -113,7 +113,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		final int args = this.arguments.size();
 		if (args == 1)
 		{
-			IValue op;
+			final IValue op;
 			if (this.receiver == null)
 			{
 				// Prefix Operators (! and *)
@@ -128,12 +128,13 @@ public final class MethodCall extends AbstractCall implements INamed
 			if (op != null)
 			{
 				op.setPosition(this.position);
+				op.resolveOperator(markers, context);
 				return op;
 			}
 		}
 
 		// Normal Method Resolution
-		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
+		final IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
 		if (method != null)
 		{
 			this.method = method;
@@ -148,10 +149,11 @@ public final class MethodCall extends AbstractCall implements INamed
 			case 0:
 			{
 				// Postfix Operators
-				IValue op = Operators.getPostfix(this.receiver, this.name);
+				final IValue op = Operators.getPostfix(this.receiver, this.name);
 				if (op != null)
 				{
 					op.setPosition(this.position);
+					op.resolveOperator(markers, context);
 					return op;
 				}
 				break;
@@ -159,15 +161,16 @@ public final class MethodCall extends AbstractCall implements INamed
 			case 1:
 			{
 				// Infix Operators
-				IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
+				final IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
 				if (op != null)
 				{
 					op.setPosition(this.position);
+					op.resolveOperator(markers, context);
 					return op;
 				}
 
 				// Compound Operators
-				String qualified = this.name.qualified;
+				final String qualified = this.name.qualified;
 				if (qualified.endsWith("$eq"))
 				{
 					Name name = Util.stripEq(this.name);

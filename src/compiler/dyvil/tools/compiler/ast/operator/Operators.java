@@ -32,11 +32,11 @@ public interface Operators
 		return getIncOperator(name, arg1, true);
 	}
 
-	static IValue getIncOperator(Name name, IValue arg1, boolean prefix)
+	static IncOperator getIncOperator(Name name, IValue arg1, boolean prefix)
 	{
 		if (arg1.valueTag() == IValue.FIELD_ACCESS && IncOperator.isIncConvertible(arg1.getType()))
 		{
-			FieldAccess fieldAccess = (FieldAccess) arg1;
+			final FieldAccess fieldAccess = (FieldAccess) arg1;
 			if (name == Names.plusplus)
 			{
 				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), 1, prefix);

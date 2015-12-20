@@ -188,6 +188,10 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	IValue resolve(MarkerList markers, IContext context);
+
+	default void resolveOperator(MarkerList markers, IContext context)
+	{
+	}
 	
 	void checkTypes(MarkerList markers, IContext context);
 	
