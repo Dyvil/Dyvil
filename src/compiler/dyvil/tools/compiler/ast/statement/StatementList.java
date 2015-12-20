@@ -267,7 +267,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.variables.containsValue(variable);
+		return this.variables != null && this.variables.containsValue(variable);
 	}
 	
 	@Override
