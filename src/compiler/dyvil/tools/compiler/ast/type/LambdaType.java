@@ -41,6 +41,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 
 	// Metadata
 	protected ICodePosition position;
+	protected boolean       extension;
 
 	public LambdaType()
 	{
@@ -127,6 +128,18 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		return this.position;
 	}
 
+	@Override
+	public void setExtension(boolean extension)
+	{
+		this.extension = extension;
+	}
+
+	@Override
+	public boolean isExtension()
+	{
+		return this.extension;
+	}
+
 	// ITypeList Overrides
 
 	@Override
@@ -167,13 +180,15 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (this.hasTypeVariables())
 		{
-			IType[] parameterTypes = new IType[this.parameterCount];
+			final IType[] parameterTypes = new IType[this.parameterCount];
 			for (int i = 0; i < this.parameterCount; i++)
 			{
 				parameterTypes[i] = this.parameterTypes[i].getParameterType();
 			}
-			IType returnType = this.returnType.getParameterType();
-			return new LambdaType(parameterTypes, this.parameterCount, returnType);
+			final IType returnType = this.returnType.getParameterType();
+			final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
+			lambdaType.setExtension(this.extension);
+			return lambdaType;
 		}
 
 		return this;
@@ -330,13 +345,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		LambdaType lt = new LambdaType(this.parameterCount);
+		final LambdaType lt = new LambdaType(this.parameterCount);
 		lt.parameterCount = this.parameterCount;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			lt.parameterTypes[i] = this.parameterTypes[i].getConcreteType(context);
 		}
 		lt.returnType = this.returnType.getConcreteType(context);
+		lt.extension = this.extension;
 		return lt;
 	}
 	
@@ -657,10 +673,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IType clone()
 	{
-		LambdaType lt = new LambdaType(this.parameterCount);
+		final LambdaType lt = new LambdaType(this.parameterCount);
 		lt.parameterCount = this.parameterCount;
 		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, this.parameterCount);
 		lt.returnType = this.returnType;
+		lt.extension = this.extension;
 		return lt;
 	}
 }

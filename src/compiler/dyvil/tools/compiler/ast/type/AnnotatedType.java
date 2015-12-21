@@ -148,7 +148,19 @@ public class AnnotatedType implements IType, ITyped
 	{
 		return this.type.getArrayClass();
 	}
-	
+
+	@Override
+	public boolean isExtension()
+	{
+		return this.type.isExtension();
+	}
+
+	@Override
+	public void setExtension(boolean extension)
+	{
+		this.type.setExtension(extension);
+	}
+
 	@Override
 	public IMethod getBoxMethod()
 	{

@@ -65,7 +65,18 @@ public interface IObjectType extends IType
 	{
 		return this;
 	}
-	
+
+	@Override
+	default boolean isExtension()
+	{
+		return false;
+	}
+
+	@Override
+	default void setExtension(boolean extension)
+	{
+	}
+
 	@Override
 	default IClass getArrayClass()
 	{

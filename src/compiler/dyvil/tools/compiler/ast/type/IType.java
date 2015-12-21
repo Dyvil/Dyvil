@@ -164,6 +164,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	IType getElementType();
 	
 	IClass getArrayClass();
+
+	// Lambda Types
+
+	boolean isExtension();
+
+	void setExtension(boolean extension);
 	
 	// Super Type
 	
