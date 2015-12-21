@@ -67,12 +67,12 @@ public class ClassMetadata implements IClassMetadata
 		}
 	}
 	
-	private void checkMethod(IMethod m)
+	private void checkMethod(IMethod method)
 	{
-		Name name = m.getName();
+		Name name = method.getName();
 		if (name == Names.equals)
 		{
-			if (m.parameterCount() == 1 && m.getParameter(0).getType().isSameType(Types.OBJECT))
+			if (method.parameterCount() == 1 && method.getParameter(0).getType().isSameType(Types.OBJECT))
 			{
 				this.methods |= EQUALS;
 			}
@@ -80,7 +80,7 @@ public class ClassMetadata implements IClassMetadata
 		}
 		if (name == Names.hashCode)
 		{
-			if (m.parameterCount() == 0)
+			if (method.parameterCount() == 0)
 			{
 				this.methods |= HASHCODE;
 			}
@@ -88,7 +88,7 @@ public class ClassMetadata implements IClassMetadata
 		}
 		if (name == Names.toString)
 		{
-			if (m.parameterCount() == 0)
+			if (method.parameterCount() == 0)
 			{
 				this.methods |= TOSTRING;
 			}
@@ -96,14 +96,14 @@ public class ClassMetadata implements IClassMetadata
 		}
 		if (name == Names.apply)
 		{
-			if (m.parameterCount() == this.theClass.parameterCount())
+			if (method.parameterCount() == this.theClass.parameterCount())
 			{
-				int len = this.theClass.parameterCount();
+				final int len = this.theClass.parameterCount();
 				for (int i = 0; i < len; i++)
 				{
-					IType t1 = m.getParameter(i).getType();
-					IType t2 = m.getParameter(i).getType();
-					if (!t1.isSameType(t2))
+					final IType methodParameterType = method.getParameter(i).getType();
+					final IType classParameterType = this.theClass.getParameter(i).getType();
+					if (!methodParameterType.isSameType(classParameterType))
 					{
 						return;
 					}
@@ -115,7 +115,7 @@ public class ClassMetadata implements IClassMetadata
 		}
 		if (name == Names.readResolve || name == Names.writeReplace)
 		{
-			if (m.parameterCount() == 0 && m.getType().getTheClass() == Types.OBJECT_CLASS)
+			if (method.parameterCount() == 0 && method.getType().isSameType(Types.OBJECT))
 			{
 				this.methods |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
 				return;
