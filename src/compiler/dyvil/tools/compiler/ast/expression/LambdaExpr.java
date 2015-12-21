@@ -26,6 +26,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
@@ -64,10 +65,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 * The abstract method this lambda expression implements
 	 */
 	protected IMethod method;
-	
-	private CaptureVariable[] capturedFields;
-	private int               capturedFieldCount;
-	private IClass            thisClass;
+
+	protected CaptureHelper captureHelper = new CaptureHelper();
 	
 	private String owner;
 	private String name;
@@ -373,7 +372,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		this.thisClass = type;
+		this.captureHelper.setThisClass(type);
 		return VariableThis.DEFAULT;
 	}
 	
@@ -413,33 +412,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return variable;
 		}
 		
-		if (this.capturedFields == null)
-		{
-			this.capturedFields = new CaptureVariable[2];
-			this.capturedFieldCount = 1;
-			return this.capturedFields[0] = new CaptureVariable(variable);
-		}
-		
-		// Check if the variable is already in the array
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			CaptureVariable var = this.capturedFields[i];
-			if (var.getVariable() == variable)
-			{
-				// If yes, return the match and skip adding the variable
-				// again.
-				return variable;
-			}
-		}
-		
-		int index = this.capturedFieldCount++;
-		if (this.capturedFieldCount > this.capturedFields.length)
-		{
-			CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
-			System.arraycopy(this.capturedFields, 0, temp, 0, index);
-			this.capturedFields = temp;
-		}
-		return this.capturedFields[index] = new CaptureVariable(variable);
+		return this.captureHelper.capture(variable);
 	}
 	
 	@Override
@@ -466,11 +439,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		this.value.checkTypes(markers, new CombiningContext(this, context));
 
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			// Check captures
-			this.capturedFields[i].checkTypes(markers, context);
-		}
+		this.captureHelper.checkCaptures(markers, context);
 	}
 	
 	@Override
@@ -491,7 +460,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		this.value = this.value.cleanup(context, compilableList);
 		
-		if (this.capturedFieldCount == 0)
+		if (!this.captureHelper.hasCaptures())
 		{
 			if (this.value instanceof AbstractCall)
 			{
@@ -601,7 +570,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		if (receiver)
 		{
 			this.value = instance;
-			this.thisClass = instance.getType().getTheClass();
+			this.captureHelper.setThisClass(instance.getType().getTheClass());
 		}
 		else
 		{
@@ -623,21 +592,16 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		if (this.directInvokeOpcode == 0)
 		{
-			if (this.thisClass != null)
+			if (this.captureHelper.isThisCaptured())
 			{
-				writer.writeVarInsn(Opcodes.ALOAD, 0);
 				handleType = ClassFormat.H_INVOKESPECIAL;
 			}
 			else
 			{
 				handleType = ClassFormat.H_INVOKESTATIC;
 			}
-			
-			for (int i = 0; i < this.capturedFieldCount; i++)
-			{
-				CaptureVariable var = this.capturedFields[i];
-				writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.getVariable().getLocalIndex());
-			}
+
+			this.captureHelper.writeCaptures(writer);
 		}
 		else
 		{
@@ -679,14 +643,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
-		if (this.thisClass != null)
-		{
-			buffer.append('L').append(this.thisClass.getInternalName()).append(';');
-		}
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			this.capturedFields[i].getActualType().appendExtendedName(buffer);
-		}
+		this.captureHelper.appendThisCaptureType(buffer);
+		this.captureHelper.appendCaptureTypes(buffer);
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
 		return buffer.toString();
@@ -723,16 +681,16 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			this.capturedFields[i].getActualType().appendExtendedName(buffer);
-		}
+
+		this.captureHelper.appendCaptureTypes(buffer);
 		for (int i = this.directInvokeOpcode != 0 && this.directInvokeOpcode != Opcodes.INVOKESTATIC ? 1 : 0;
 		     i < this.parameterCount; i++)
 		{
 			this.parameters[i].getType().appendExtendedName(buffer);
 		}
+
 		buffer.append(')');
+
 		if (this.directInvokeOpcode == ClassFormat.H_NEWINVOKESPECIAL)
 		{
 			buffer.append('V');
@@ -741,6 +699,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			this.returnType.appendExtendedName(buffer);
 		}
+
 		return this.lambdaDesc = buffer.toString();
 	}
 	
@@ -751,32 +710,19 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			return;
 		}
-		
-		boolean instance = this.thisClass != null;
-		int modifiers = instance ?
+
+		final int modifiers = this.captureHelper.isThisCaptured() ?
 				Modifiers.PRIVATE | Modifiers.SYNTHETIC :
 				Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		MethodWriter mw = new MethodWriterImpl(writer,
 		                                       writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(),
 		                                                          null, null));
 		
-		int index = 0;
-		if (instance)
-		{
-			mw.setThisType(this.thisClass.getInternalName());
-			index = 1;
-		}
-		
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			CaptureVariable capture = this.capturedFields[i];
-			capture.setLocalIndex(index);
-			index = mw.registerParameter(index, capture.getName().qualified, capture.getActualType(), 0);
-		}
+		int index = this.captureHelper.writeCaptureParameters(mw);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
+			final IParameter param = this.parameters[i];
 			param.setLocalIndex(index);
 			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
 		}
