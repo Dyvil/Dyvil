@@ -108,7 +108,7 @@ public class DyvilHeaderParser extends Parser
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
 		Modifier modifier;
-		if ((modifier = BaseModifiers.parseClassModifier(token, pm)) != null)
+		if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 		{
 			if (this.modifiers == null)
 			{

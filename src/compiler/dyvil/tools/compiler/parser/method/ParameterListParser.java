@@ -65,7 +65,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 
 			final Modifier modifier;
-			if ((modifier = BaseModifiers.parseParameterModifier(token, pm)) != null)
+			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{
