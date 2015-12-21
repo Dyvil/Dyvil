@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -232,10 +234,16 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 					{
 						return value;
 					}
+
+					value = this.resolveMethod(implicit, markers, context);
+					if (value != null)
+					{
+						return value;
+					}
 				}
 			}
 
-			value = this.resolveMethod(markers, context);
+			value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -243,7 +251,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		}
 		else
 		{
-			IValue value = this.resolveMethod(markers, context);
+			IValue value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -270,12 +278,21 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		return null;
 	}
 	
-	private IValue resolveMethod(MarkerList markers, IContext context)
+	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
 		final Name name = Name.getQualified(this.name.qualified + "_$eq");
-		final MethodCall methodCall = new MethodCall(this.position, this.receiver, name,
-		                                             new SingleArgument(this.value));
-		return methodCall.resolveCall(markers, context);
+		final IArguments arg = new SingleArgument(this.value);
+		final IMethod m = ICall.resolveMethod(context, receiver, name, arg);
+		if (m != null)
+		{
+			MethodCall mc = new MethodCall(this.position, receiver, name);
+			mc.arguments = arg;
+			mc.method = m;
+			mc.checkArguments(markers, context);
+			return mc;
+		}
+
+		return null;
 	}
 	
 	@Override

@@ -335,10 +335,16 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 					{
 						return value;
 					}
+
+					value = this.resolveMethod(implicit, markers, context);
+					if (value != null)
+					{
+						return value;
+					}
 				}
 			}
 
-			value = this.resolveMethod(markers, context);
+			value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -346,7 +352,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		else
 		{
-			IValue value = this.resolveMethod(markers, context);
+			IValue value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -414,9 +420,17 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		return null;
 	}
 	
-	private IValue resolveMethod(MarkerList markers, IContext context)
+	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
-		return this.toMethodCall(null).resolveCall(markers, context);
+		final IMethod method = ICall.resolveMethod(context, receiver, this.name, EmptyArguments.INSTANCE);
+		if (method != null)
+		{
+			final AbstractCall mc = this.toMethodCall(method);
+			mc.setReceiver(receiver);
+			mc.checkArguments(markers, context);
+			return mc;
+		}
+		return null;
 	}
 
 	@Override
