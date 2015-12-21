@@ -576,7 +576,7 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public IAccessible getAccessibleImplicit()
+	public IValue getImplicit()
 	{
 		return null;
 	}

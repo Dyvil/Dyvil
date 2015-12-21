@@ -83,7 +83,7 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	default IAccessible getAccessibleImplicit()
+	default IValue getImplicit()
 	{
 		return null;
 	}

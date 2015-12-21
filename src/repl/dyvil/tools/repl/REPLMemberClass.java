@@ -499,7 +499,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public IAccessible getAccessibleImplicit()
+	public IValue getImplicit()
 	{
 		return null;
 	}

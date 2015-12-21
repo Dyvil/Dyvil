@@ -53,7 +53,7 @@ public interface IContext
 	
 	IAccessible getAccessibleThis(IClass type);
 	
-	IAccessible getAccessibleImplicit();
+	IValue getImplicit();
 	
 	static void addCompilable(IContext context, IClassCompilable compilable)
 	{

@@ -26,7 +26,6 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -375,21 +374,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		this.thisClass = type;
 		return VariableThis.DEFAULT;
-	}
-	
-	@Override
-	public IAccessible getAccessibleImplicit()
-	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter parameter = this.parameters[i];
-			if (parameter.getName() == Names.$it)
-			{
-				return parameter;
-			}
-		}
-		
-		return null;
 	}
 	
 	@Override
