@@ -95,7 +95,11 @@ public class CaptureHelper
 
 	public void writeCaptures(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		if (this.thisClass != null)
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, 0);
+		}
+
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			CaptureVariable var = this.capturedFields[i];

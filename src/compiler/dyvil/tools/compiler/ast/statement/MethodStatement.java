@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -12,7 +13,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class MethodStatement implements IStatement
 {
-	private NestedMethod method;
+	protected NestedMethod method;
 	
 	public MethodStatement(NestedMethod method)
 	{
@@ -41,6 +42,11 @@ public class MethodStatement implements IStatement
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.method.setTheClass(context.getThisClass());
+
+		if (context.isStatic())
+		{
+			this.method.getModifiers().addIntModifier(Modifiers.STATIC);
+		}
 
 		this.method.resolveTypes(markers, new CombiningContext(this.method, context));
 	}

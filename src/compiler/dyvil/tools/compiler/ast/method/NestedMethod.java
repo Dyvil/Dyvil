@@ -30,18 +30,6 @@ public class NestedMethod extends CodeMethod
 	}
 	
 	@Override
-	public boolean isStatic()
-	{
-		return false;
-	}
-	
-	@Override
-	public IClass getThisClass()
-	{
-		return null;
-	}
-	
-	@Override
 	public Package resolvePackage(Name name)
 	{
 		return null;
@@ -85,6 +73,11 @@ public class NestedMethod extends CodeMethod
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
+		if (this.isMember(variable))
+		{
+			return variable;
+		}
+
 		return this.captureHelper.capture(variable);
 	}
 
@@ -127,8 +120,8 @@ public class NestedMethod extends CodeMethod
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
 			param.setLocalIndex(index);
+			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
 		}
 		
 		Label start = new Label();
