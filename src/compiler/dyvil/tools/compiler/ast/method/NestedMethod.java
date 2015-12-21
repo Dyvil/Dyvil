@@ -3,12 +3,11 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -17,15 +16,13 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class NestedMethod extends CodeMethod
 {
-	private IClass            thisClass;
-	private CaptureVariable[] capturedFields;
-	private int               capturedFieldCount;
-	
-	public transient IContext context;
+	private CaptureHelper captureHelper = new CaptureHelper();
 	
 	public NestedMethod(ICodePosition position, Name name, IType type, ModifierSet modifierSet)
 	{
@@ -35,25 +32,25 @@ public class NestedMethod extends CodeMethod
 	@Override
 	public boolean isStatic()
 	{
-		return this.context.isStatic();
+		return false;
 	}
 	
 	@Override
 	public IClass getThisClass()
 	{
-		return this.thisClass = this.context.getThisClass();
+		return null;
 	}
 	
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		return this.context.resolvePackage(name);
+		return null;
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.context.resolveClass(name);
+		return null;
 	}
 	
 	@Override
@@ -68,7 +65,7 @@ public class NestedMethod extends CodeMethod
 			}
 		}
 		
-		return this.context.resolveTypeVariable(name);
+		return null;
 	}
 	
 	@Override
@@ -82,86 +79,51 @@ public class NestedMethod extends CodeMethod
 				return param;
 			}
 		}
-		
-		IDataMember match = this.context.resolveField(name);
-		if (match == null)
-		{
-			return null;
-		}
-		
-		if (!match.isVariable())
-		{
-			return match;
-		}
-		if (this.capturedFields == null)
-		{
-			this.capturedFields = new CaptureVariable[2];
-			this.capturedFieldCount = 1;
-			return this.capturedFields[0] = new CaptureVariable((IVariable) match);
-		}
-		
-		// Check if the variable is already in the array
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			if (this.capturedFields[i].getVariable() == match)
-			{
-				// If yes, return the match and skip adding the variable
-				// again.
-				return match;
-			}
-		}
-		
-		int index = this.capturedFieldCount++;
-		if (this.capturedFieldCount > this.capturedFields.length)
-		{
-			CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
-			System.arraycopy(this.capturedFields, 0, temp, 0, index);
-			this.capturedFields = temp;
-		}
-		return this.capturedFields[index] = new CaptureVariable((IVariable) match);
+		return null;
 	}
-	
+
+	@Override
+	public IDataMember capture(IVariable variable)
+	{
+		return this.captureHelper.capture(variable);
+	}
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		this.context.getMethodMatches(list, instance, name, arguments);
+		final float signatureMatch = this.getSignatureMatch(name, instance, arguments);
+		if (signatureMatch > 0)
+		{
+			list.add(this, signatureMatch);
+		}
 	}
 	
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		this.context.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers.toFlags() & 0xFFFF;
-		if (this.value == null)
+		final int modifiers;
+		if (this.captureHelper.isThisCaptured())
 		{
-			modifiers |= Modifiers.ABSTRACT;
+			modifiers = Modifiers.PRIVATE;
+		}
+		else
+		{
+			modifiers = Modifiers.PRIVATE | Modifiers.STATIC;
 		}
 		
 		MethodWriter mw = new MethodWriterImpl(writer,
 		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
 		                                                          this.getSignature(), this.getInternalExceptions()));
 
-		if (this.thisClass != null)
-		{
-			mw.setThisType(this.theClass.getInternalName());
-		}
-		
 		this.writeAnnotations(mw, modifiers);
-		
-		int index = 0;
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			CaptureVariable capture = this.capturedFields[i];
-			capture.setLocalIndex(index);
-			index = mw.registerParameter(index, capture.getName().qualified, capture.getActualType(), 0);
-		}
-		
-		index = 0;
+
+		int index = this.captureHelper.writeCaptureParameters(mw);
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
@@ -181,11 +143,6 @@ public class NestedMethod extends CodeMethod
 			mw.end(this.type);
 		}
 		
-		if (this.thisClass != null)
-		{
-			mw.writeLocal(0, "this", this.theClass.getInternalName(), null, start, end);
-		}
-		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
@@ -194,20 +151,11 @@ public class NestedMethod extends CodeMethod
 		}
 	}
 	
-	private void writeCaptures(MethodWriter writer) throws BytecodeException
-	{
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.getVariable().getLocalIndex());
-		}
-	}
-	
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
 			throws BytecodeException
 	{
-		this.writeCaptures(writer);
+		this.captureHelper.writeCaptures(writer);
 		super.writeCall(writer, instance, arguments, type, lineNumber);
 	}
 	
@@ -215,7 +163,7 @@ public class NestedMethod extends CodeMethod
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
 			throws BytecodeException
 	{
-		this.writeCaptures(writer);
+		this.captureHelper.writeCaptures(writer);
 		super.writeJump(writer, dest, instance, arguments, lineNumber);
 	}
 	
@@ -223,7 +171,7 @@ public class NestedMethod extends CodeMethod
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
 			throws BytecodeException
 	{
-		this.writeCaptures(writer);
+		this.captureHelper.writeCaptures(writer);
 		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
 	}
 }

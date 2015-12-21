@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.NestedMethod;
@@ -39,34 +40,28 @@ public class MethodStatement implements IStatement
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.method.context = context;
-		this.method.resolveTypes(markers, context);
-		this.method.context = null;
+		this.method.setTheClass(context.getThisClass());
+
+		this.method.resolveTypes(markers, new CombiningContext(this.method, context));
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.method.context = context;
-		this.method.resolve(markers, context);
-		this.method.context = null;
+		this.method.resolve(markers, new CombiningContext(this.method, context));
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.method.context = context;
-		this.method.checkTypes(markers, context);
-		this.method.context = null;
+		this.method.checkTypes(markers, new CombiningContext(this.method, context));
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.method.context = context;
-		this.method.check(markers, context);
-		this.method.context = null;
+		this.method.check(markers, new CombiningContext(this.method, context));
 	}
 	
 	@Override
@@ -80,10 +75,8 @@ public class MethodStatement implements IStatement
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		compilableList.addCompilable(this.method);
-		
-		this.method.context = context;
-		this.method.cleanup(context, compilableList);
-		this.method.context = null;
+
+		this.method.cleanup(new CombiningContext(this.method, context), compilableList);
 		return this;
 	}
 	
