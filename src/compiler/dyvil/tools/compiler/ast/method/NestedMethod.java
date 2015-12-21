@@ -27,19 +27,9 @@ public class NestedMethod extends CodeMethod
 	
 	public transient IContext context;
 	
-	public NestedMethod(IClass iclass)
+	public NestedMethod(ICodePosition position, Name name, IType type, ModifierSet modifierSet)
 	{
-		super(iclass);
-	}
-	
-	public NestedMethod(IClass iclass, Name name)
-	{
-		super(iclass, name);
-	}
-	
-	public NestedMethod(IClass iclass, Name name, IType type)
-	{
-		super(iclass, name, type);
+		super(position, null, name, type, modifierSet);
 	}
 	
 	@Override

@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -246,13 +245,12 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_VALUE;
-			if (type == BaseSymbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "method.parameters.close_paren");
 			}
-			
-			pm.reparse();
-			pm.report(token, "method.parameters.close_paren");
+
 			return;
 		case METHOD_VALUE:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
@@ -267,25 +265,16 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-			this.mode = METHOD_END;
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+
+			if (parseMethodBody(pm, type, (IMethod) this.member))
 			{
-				pm.pushParser(new StatementListParser((IValueConsumer) this.member), true);
+				this.mode = METHOD_END;
 				return;
 			}
-			if (type == BaseSymbols.EQUALS)
-			{
-				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
-				return;
-			}
-			if (type == DyvilKeywords.THROWS)
-			{
-				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
-				return;
-			}
-			
-			this.mode = TYPE;
+
+			pm.reparse();
 			pm.report(token, "method.body.separator");
+			this.mode = TYPE;
 			return;
 		case METHOD_END:
 			if (this.member instanceof IMethod)
@@ -310,6 +299,26 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			this.reset();
 			return;
 		}
+	}
+
+	public static boolean parseMethodBody(IParserManager pm, int type, IMethod member)
+	{
+		if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+		{
+			pm.pushParser(new StatementListParser(member), true);
+			return true;
+		}
+		if (type == BaseSymbols.EQUALS)
+		{
+			pm.pushParser(pm.newExpressionParser(member));
+			return true;
+		}
+		if (type == DyvilKeywords.THROWS)
+		{
+			pm.pushParser(new ExceptionListParser(member));
+			return true;
+		}
+		return false;
 	}
 	
 	@Override

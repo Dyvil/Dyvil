@@ -7,14 +7,19 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.NestedMethod;
 import dyvil.tools.compiler.ast.modifiers.*;
 import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
+import dyvil.tools.compiler.ast.statement.MethodStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
+import dyvil.tools.compiler.parser.classes.ClassBodyParser;
+import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
@@ -24,11 +29,13 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class StatementListParser extends EmulatorParser implements IValueConsumer, ITypeConsumer
 {
-	private static final int OPEN_BRACKET  = 1;
-	private static final int EXPRESSION    = 2;
-	private static final int TYPE          = 4;
-	private static final int VARIABLE_NAME = 8;
-	private static final int SEPARATOR     = 16;
+	private static final int OPEN_BRACKET          = 1;
+	private static final int EXPRESSION            = 2;
+	private static final int TYPE                  = 4;
+	private static final int VARIABLE_NAME         = 8;
+	private static final int METHOD_PARAMETERS_END = 16;
+	private static final int METHOD_VALUE          = 32;
+	private static final int SEPARATOR             = 64;
 	
 	protected IValueConsumer consumer;
 	
@@ -39,6 +46,8 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	private IType          type;
 	private ModifierSet    modifiers;
 	private AnnotationList annotations;
+
+	private IMethod method;
 	
 	public StatementListParser(IValueConsumer consumer)
 	{
@@ -73,7 +82,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		
 		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
@@ -152,7 +161,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			
 			this.tryParser(pm, token, pm.newTypeParser(this));
 			this.mode = TYPE;
-			//$FALL-THROUGH$
+			// Fallthrough
 		case TYPE:
 			if (this.parser == null)
 			{
@@ -163,24 +172,69 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.parser.parse(this, token);
 			return;
 		case VARIABLE_NAME:
-			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.EQUALS)
+		{
+			final int nextType = token.next().type();
+			if (ParserUtil.isIdentifier(type))
 			{
-				Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
-				variable.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
-				variable.setAnnotations(this.annotations);
+				if (nextType == BaseSymbols.EQUALS)
+				{
+					final Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
+					variable.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
+					variable.setAnnotations(this.annotations);
 
-				FieldInitializer fi = new FieldInitializer(variable);
-				this.setValue(fi);
+					final FieldInitializer fieldInitializer = new FieldInitializer(variable);
+					this.setValue(fieldInitializer);
 
-				pm.skip();
-				pm.pushParser(pm.newExpressionParser(variable));
+					pm.skip();
+					pm.pushParser(pm.newExpressionParser(variable));
 
-				this.reset();
+					this.reset();
+					this.mode = SEPARATOR;
+					return;
+				}
+				else if (nextType == BaseSymbols.OPEN_PARENTHESIS)
+				{
+					final NestedMethod nestedMethod = new NestedMethod(token.raw(), token.nameValue(), this.type,
+					                                                   this.modifiers == null ?
+							                                                   new ModifierList() :
+							                                                   this.modifiers);
+					nestedMethod.setAnnotations(this.annotations);
+
+					final MethodStatement methodStatement = new MethodStatement(nestedMethod);
+					this.setValue(methodStatement);
+
+					pm.skip();
+					pm.pushParser(new ParameterListParser(nestedMethod));
+
+					this.reset();
+					this.method = nestedMethod;
+					this.mode = METHOD_PARAMETERS_END;
+					return;
+				}
+			}
+
+			this.revertExpression(pm);
+			return;
+		}
+		case METHOD_PARAMETERS_END:
+		{
+			this.mode = METHOD_VALUE;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.report(token, "method.parameters.close_paren");
+				pm.reparse();
+			}
+			return;
+		}
+		case METHOD_VALUE:
+			if (ClassBodyParser.parseMethodBody(pm, type, this.method))
+			{
 				this.mode = SEPARATOR;
 				return;
 			}
 
-			this.revertExpression(pm);
+			pm.reparse();
+			pm.report(token, "method.body.separator");
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
