@@ -266,7 +266,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (parseMethodBody(pm, type, (IMethod) this.member))
+			if (parseMethodBody(pm, type, (ICallableMember) this.member))
 			{
 				this.mode = METHOD_END;
 				return;
@@ -301,7 +301,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		}
 	}
 
-	public static boolean parseMethodBody(IParserManager pm, int type, IMethod member)
+	public static boolean parseMethodBody(IParserManager pm, int type, ICallableMember member)
 	{
 		if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 		{
