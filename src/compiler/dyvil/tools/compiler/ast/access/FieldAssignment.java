@@ -7,8 +7,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -217,11 +215,26 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			IValue value = this.resolveField(context);
+			IValue value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
 			}
+
+			// Duplicate in FieldAccess
+			if (this.receiver == null)
+			{
+				final IValue implicit = context.getImplicit();
+				if (implicit != null)
+				{
+					value = this.resolveField(implicit, context);
+					if (value != null)
+					{
+						return value;
+					}
+				}
+			}
+
 			value = this.resolveMethod(markers, context);
 			if (value != null)
 			{
@@ -235,7 +248,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			{
 				return value;
 			}
-			value = this.resolveField(context);
+			value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
@@ -245,12 +258,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		return null;
 	}
 	
-	private IValue resolveField(IContext context)
+	private IValue resolveField(IValue receiver, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field != null)
 		{
 			this.field = field;
+			this.receiver = receiver;
 			return this;
 		}
 		return null;
@@ -258,19 +272,10 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	
 	private IValue resolveMethod(MarkerList markers, IContext context)
 	{
-		Name name = Name.getQualified(this.name.qualified + "_$eq");
-		IArguments arg = new SingleArgument(this.value);
-		IMethod m = ICall.resolveMethod(context, this.receiver, name, arg);
-		if (m != null)
-		{
-			MethodCall mc = new MethodCall(this.position, this.receiver, name);
-			mc.arguments = arg;
-			mc.method = m;
-			mc.checkArguments(markers, context);
-			return mc;
-		}
-		
-		return null;
+		final Name name = Name.getQualified(this.name.qualified + "_$eq");
+		final MethodCall methodCall = new MethodCall(this.position, this.receiver, name,
+		                                             new SingleArgument(this.value));
+		return methodCall.resolveCall(markers, context);
 	}
 	
 	@Override

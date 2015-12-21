@@ -13,9 +13,9 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
-import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.VariableReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -53,7 +53,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		this.position = position;
 	}
-	
+
+	public FieldAccess(IDataMember field)
+	{
+		this.field = field;
+		this.name = field.getName();
+	}
+
 	public FieldAccess(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
@@ -310,11 +316,28 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			IValue value = this.resolveField(markers, context);
+			// Also true when receiver == null
+
+			IValue value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
 			}
+
+			// Duplicate in FieldAssignment
+			if (this.receiver == null)
+			{
+				final IValue implicit = context.getImplicit();
+				if (implicit != null)
+				{
+					value = this.resolveField(implicit, context);
+					if (value != null)
+					{
+						return value;
+					}
+				}
+			}
+
 			value = this.resolveMethod(markers, context);
 			if (value != null)
 			{
@@ -328,7 +351,8 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			{
 				return value;
 			}
-			value = this.resolveField(markers, context);
+
+			value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
@@ -337,6 +361,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 		// Qualified Type Name Resolution
 
+		return this.resolveType(context);
+	}
+
+	private IValue resolveType(IContext context)
+	{
 		final IContext typeContext;
 		final IContext packageContext;
 		if (this.receiver == null)
@@ -364,13 +393,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			return new ClassAccess(this.position, new PackageType(thePackage));
 		}
-		
+
 		return null;
 	}
 
-	private IValue resolveField(MarkerList markers, IContext context)
+	private IValue resolveField(IValue receiver, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field != null)
 		{
 			if (field.isEnumConstant())
@@ -379,6 +408,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			}
 			
 			this.field = field;
+			this.receiver = receiver;
 			return this;
 		}
 		return null;
@@ -386,14 +416,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	
 	private IValue resolveMethod(MarkerList markers, IContext context)
 	{
-		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
-		{
-			AbstractCall mc = this.toMethodCall(method);
-			mc.checkArguments(markers, context);
-			return mc;
-		}
-		return null;
+		return this.toMethodCall(null).resolveCall(markers, context);
 	}
 
 	@Override

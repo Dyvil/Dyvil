@@ -111,6 +111,97 @@ public final class MethodCall extends AbstractCall implements INamed
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		final int args = this.arguments.size();
+		final IValue op1 = this.resolvePriorityOperator(markers, context, args);
+		if (op1 != null)
+		{
+			return op1;
+		}
+
+		// Normal Method Resolution
+		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
+		if (method != null)
+		{
+			this.method = method;
+			this.checkArguments(markers, context);
+			return this;
+		}
+
+		if (this.receiver != null)
+		{
+			final IValue op = this.resolveOperator(markers, context, args);
+			if (op != null)
+			{
+				return op;
+			}
+		}
+		else
+		{
+			// Implicit Calls
+			final IValue implicit = context.getImplicit();
+			if (implicit != null)
+			{
+				method = ICall.resolveMethod(context, implicit, this.name, this.arguments);
+				if (method != null)
+				{
+					this.receiver = implicit;
+					this.method = method;
+					this.checkArguments(markers, context);
+					return this;
+				}
+			}
+
+			// Resolve Apply Method
+			return ApplyMethodCall
+					.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
+					              this.genericData);
+		}
+		
+		return null;
+	}
+
+	public IValue resolveOperator(MarkerList markers, IContext context, int args)
+	{
+		switch (args)
+		{
+		case 0:
+		{
+			// Postfix Operators
+			final IValue op = Operators.getPostfix(this.receiver, this.name);
+			if (op != null)
+			{
+				op.setPosition(this.position);
+				op.resolveOperator(markers, context);
+				return op;
+			}
+			break;
+		}
+		case 1:
+		{
+			// Infix Operators
+			final IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
+			if (op != null)
+			{
+				op.setPosition(this.position);
+				op.resolveOperator(markers, context);
+				return op;
+			}
+
+			// Compound Operators
+			final String qualified = this.name.qualified;
+			if (qualified.endsWith("$eq"))
+			{
+				Name name = Util.stripEq(this.name);
+
+				return CompoundCall.resolveCall(markers, context, this.position, this.receiver, name, this.arguments);
+			}
+			break;
+		}
+		}
+		return null;
+	}
+
+	public IValue resolvePriorityOperator(MarkerList markers, IContext context, int args)
+	{
 		if (args == 1)
 		{
 			final IValue op;
@@ -132,64 +223,6 @@ public final class MethodCall extends AbstractCall implements INamed
 				return op;
 			}
 		}
-
-		// Normal Method Resolution
-		final IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
-		if (method != null)
-		{
-			this.method = method;
-			this.checkArguments(markers, context);
-			return this;
-		}
-
-		if (this.receiver != null)
-		{
-			switch (args)
-			{
-			case 0:
-			{
-				// Postfix Operators
-				final IValue op = Operators.getPostfix(this.receiver, this.name);
-				if (op != null)
-				{
-					op.setPosition(this.position);
-					op.resolveOperator(markers, context);
-					return op;
-				}
-				break;
-			}
-			case 1:
-			{
-				// Infix Operators
-				final IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
-				if (op != null)
-				{
-					op.setPosition(this.position);
-					op.resolveOperator(markers, context);
-					return op;
-				}
-
-				// Compound Operators
-				final String qualified = this.name.qualified;
-				if (qualified.endsWith("$eq"))
-				{
-					Name name = Util.stripEq(this.name);
-
-					return CompoundCall
-							.resolveCall(markers, context, this.position, this.receiver, name, this.arguments);
-				}
-				break;
-			}
-			}
-		}
-		else
-		{
-			// Resolve Apply Method
-			return ApplyMethodCall
-					.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
-					              this.genericData);
-		}
-		
 		return null;
 	}
 	
