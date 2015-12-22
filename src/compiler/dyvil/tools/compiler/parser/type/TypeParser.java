@@ -47,7 +47,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case END:
@@ -190,7 +190,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				pm.pushParser(new TypeParser(mt::setValueType));
 				return;
 			}
-			//$FALL-THROUGH$
+			// Fallthrough
 		case ARRAY_END:
 			this.type.expandPosition(token);
 			this.mode = END;
