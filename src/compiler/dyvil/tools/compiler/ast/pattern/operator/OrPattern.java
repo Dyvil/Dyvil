@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.pattern.operator;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -82,10 +83,16 @@ public class OrPattern extends BinaryPattern
 		varIndex = this.checkVar(writer, varIndex);
 
 		final Label rightLabel = new Label();
+		final Label targetLabel = new Label();
+
+		// TODO Optimize this by using writeJump instead of writeInvJump for the first pattern.
 
 		this.left.writeInvJump(writer, varIndex, rightLabel);
+		writer.writeJumpInsn(Opcodes.GOTO, targetLabel);
 		writer.writeLabel(rightLabel);
 		this.right.writeInvJump(writer, varIndex, elseLabel);
+
+		writer.writeLabel(targetLabel);
 	}
 
 	@Override
