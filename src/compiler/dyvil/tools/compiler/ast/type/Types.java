@@ -52,7 +52,6 @@ public final class Types
 	public static final ClassType THROWABLE         = new ClassType();
 	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
-	public static final ClassType IMMUTABLE         = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
 	
 	public static IClass VOID_CLASS;
@@ -126,13 +125,13 @@ public final class Types
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
-		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
 		SERIALIZABLE.theClass = SERIALIZABLE_CLASS = Package.javaIO.resolveClass("Serializable");
-		
-		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
+
 		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");
-		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("mutating");
-		
+		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
+		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("Mutating");
+		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
+
 		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");
 		BOOLEAN_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
 		CHAR_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("CharConvertible");

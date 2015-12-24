@@ -164,6 +164,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	IType getElementType();
 	
 	IClass getArrayClass();
+
+	default boolean isImmutable()
+	{
+		return this.getAnnotation(Types.IMMUTABLE_CLASS) != null;
+	}
 	
 	// Super Type
 	
@@ -333,6 +338,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// IContext
+
+	default IAnnotation getAnnotation(IClass type)
+	{
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.getAnnotation(type);
+	}
 	
 	@Override
 	default IDyvilHeader getHeader()
@@ -391,8 +402,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	String getSignature();
 	
 	void appendSignature(StringBuilder buffer);
-	
-	// Compilation
 	
 	int getLoadOpcode();
 	
