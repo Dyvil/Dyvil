@@ -8,7 +8,7 @@ import dyvil.collection.immutable.SingletonSet;
 import dyvil.lang.Float;
 import dyvil.lang.Int;
 import dyvil.lang.Long;
-import dyvil.util.Immutable;
+import dyvil.annotation.Immutable;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -66,7 +66,7 @@ public class CollectionTests
 		Collection immutable = collection.immutable();
 		Collection immutableCopy = collection.immutableCopy();
 		
-		assertTrue("Immutable Collection must be instanceof dyvil.util.Immutable",
+		assertTrue("Immutable Collection must be instanceof dyvil.annotation.Immutable",
 		           isImmutable == collection instanceof Immutable);
 
 		assertEquals("Collection must be equal to it's copy: " + copy.getClass(), collection, copy);

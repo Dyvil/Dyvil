@@ -5,6 +5,7 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.iterator.ImmutableIterator;
+import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Immutable
 public class SetView<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = 816522991709785465L;

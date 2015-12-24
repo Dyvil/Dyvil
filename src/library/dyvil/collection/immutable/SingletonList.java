@@ -6,6 +6,7 @@ import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -19,6 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @TupleConvertible
+@Immutable
 public class SingletonList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = -3612390510825873413L;

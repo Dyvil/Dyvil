@@ -1,5 +1,6 @@
 package dyvil.util;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
@@ -12,6 +13,7 @@ import java.util.function.Supplier;
 
 @NilConvertible
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
+@Immutable
 public final class None implements Option
 {
 	private static final long serialVersionUID = 1853796001996785317L;

@@ -1,7 +1,12 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Mutating;
+import dyvil.annotation.Immutable;
+import dyvil.util.ImmutableException;
+
 import java.util.Iterator;
 
+@Immutable
 public class PrependIterator<E> implements Iterator<E>
 {
 	private final E                     head;
@@ -30,5 +35,12 @@ public class PrependIterator<E> implements Iterator<E>
 			return this.head;
 		}
 		return this.tail.next();
+	}
+
+	@Override
+	@Mutating
+	public void remove()
+	{
+		throw new ImmutableException();
 	}
 }

@@ -3,6 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tuple.Tuple2;
+import dyvil.annotation.Immutable;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -16,6 +17,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+@Immutable
 public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 {
 	private static final long serialVersionUID = 2791619158507681686L;

@@ -1,10 +1,13 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Mutating;
+import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+@Immutable
 public class ImmutableIterator<E> implements Iterator<E>
 {
 	private final Iterator<E> iterator;
@@ -33,6 +36,7 @@ public class ImmutableIterator<E> implements Iterator<E>
 	}
 	
 	@Override
+	@Mutating
 	public void remove()
 	{
 		throw new ImmutableException("remove() on Immutable Iterator");

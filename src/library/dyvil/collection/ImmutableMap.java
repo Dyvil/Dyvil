@@ -1,7 +1,7 @@
 package dyvil.collection;
 
+import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.Covariant;
-import dyvil.annotation.mutating;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
@@ -9,7 +9,6 @@ import dyvil.collection.immutable.TupleMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.util.Immutable;
 import dyvil.util.ImmutableException;
 import dyvil.util.Option;
 
@@ -22,7 +21,7 @@ import java.util.function.BiPredicate;
 @NilConvertible
 @ArrayConvertible
 @MapConvertible
-public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Immutable
+public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 {
 	interface Builder<K, V>
 	{
@@ -191,189 +190,189 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>, Imm
 	// Mutating Operations
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $plus$eq(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $plus$plus$eq(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("+= on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $minus$at$eq(Object key)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $minus$eq(Entry<?, ?> entry)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $minus$colon$eq(Object value)
 	{
 		throw new ImmutableException("-:= on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $minus$minus$eq(Map<?, ?> map)
 	{
 		throw new ImmutableException("-= on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void subscript_$eq(K key, V value)
 	{
 		throw new ImmutableException("() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default V put(K key, V value)
 	{
 		throw new ImmutableException("put() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default V put(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("put() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void putAll(Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("putAll() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean putIfAbsent(K key, V value)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean replace(K key, V oldValue, V newValue)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default V replace(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default V replace(K key, V newValue)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default V removeKey(Object key)
 	{
 		throw new ImmutableException("removeKey() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean removeValue(Object value)
 	{
 		throw new ImmutableException("removeValue() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean remove(Object key, Object value)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean remove(Entry<?, ?> entry)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean removeKeys(Collection<?> keys)
 	{
 		throw new ImmutableException("removeKeys() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean removeAll(Map<?, ?> map)
 	{
 		throw new ImmutableException("removeAll() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
 	{
 		throw new ImmutableException("mapKeys() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		throw new ImmutableException("mapValues() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
 	{
 		throw new ImmutableException("mapEntries() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable Map");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void filter(BiPredicate<? super K, ? super V> condition)
 	{
 		throw new ImmutableException("filter() on Immutable Map");

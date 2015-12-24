@@ -1,20 +1,25 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Mutating;
 import dyvil.array.ObjectArray;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.annotation.Immutable;
+import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
 
 @ArrayConvertible
+@Immutable
 public class ArrayIterator<E> implements Iterator<E>
 {
 	private       int index;
 	private final E[] array;
 	private final int size;
 	
+	@SafeVarargs
 	public static <E> ArrayIterator<E> apply(E... array)
 	{
-		return new ArrayIterator(array);
+		return new ArrayIterator<>(array);
 	}
 	
 	public ArrayIterator(E[] array)
@@ -49,9 +54,10 @@ public class ArrayIterator<E> implements Iterator<E>
 	}
 	
 	@Override
+	@Mutating
 	public void remove()
 	{
-		throw new UnsupportedOperationException();
+		throw new ImmutableException();
 	}
 	
 	@Override
