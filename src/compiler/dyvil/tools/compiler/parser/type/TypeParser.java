@@ -22,16 +22,16 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParser extends Parser implements ITypeConsumer
 {
-	public static final int NAME           = 1;
-	public static final int GENERICS       = 2;
-	public static final int GENERICS_END   = 4;
-	public static final int ARRAY_COLON    = 8;
-	public static final int ARRAY_END      = 16;
-	public static final int WILDCARD_TYPE  = 32;
-	public static final int TUPLE_END      = 64;
-	public static final int LAMBDA_TYPE    = 128;
-	public static final int LAMBDA_END     = 256;
-	public static final int ANNOTATION_END = 512;
+	public static final int NAME           = 0;
+	public static final int GENERICS       = 1;
+	public static final int GENERICS_END   = 2;
+	public static final int ARRAY_COLON    = 4;
+	public static final int ARRAY_END      = 8;
+	public static final int WILDCARD_TYPE  = 16;
+	public static final int TUPLE_END      = 32;
+	public static final int LAMBDA_TYPE    = 64;
+	public static final int LAMBDA_END     = 128;
+	public static final int ANNOTATION_END = 256;
 	
 	protected ITypeConsumer consumer;
 
@@ -51,6 +51,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case END:
+		{
 			if (type == Tokens.SYMBOL_IDENTIFIER)
 			{
 				final Name name = token.nameValue();
@@ -72,6 +73,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			pm.popParser(true);
 			return;
+		}
 		case NAME:
 			switch (type)
 			{
@@ -88,18 +90,21 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				this.mode = TUPLE_END;
 				return;
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
+			{
+				final ArrayType arrayType = new ArrayType();
 				this.mode = ARRAY_COLON;
-				ArrayType at = new ArrayType();
-				this.type = at;
-				pm.pushParser(pm.newTypeParser(at));
+				this.type = arrayType;
+				pm.pushParser(pm.newTypeParser(arrayType));
 				return;
+			}
 			case DyvilSymbols.ARROW_OPERATOR:
-				LambdaType lt = new LambdaType();
-				lt.setPosition(token.raw());
-				this.type = lt;
-				pm.pushParser(pm.newTypeParser(lt));
+			{
+				final LambdaType lambdaType = new LambdaType(token.raw());
+				pm.pushParser(pm.newTypeParser(lambdaType));
+				this.type = lambdaType;
 				this.mode = LAMBDA_END;
 				return;
+			}
 			case DyvilKeywords.NULL:
 				this.consumer.setType(Types.NULL);
 				pm.popParser();
@@ -153,6 +158,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			pm.report(MarkerMessages.createSyntaxError(token, "type.invalid", token.toString()));
 			return;
 		case TUPLE_END:
+		{
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
@@ -172,6 +178,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			this.type.expandPosition(token);
 			this.mode = END;
 			return;
+		}
 		case LAMBDA_TYPE:
 			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
 			this.mode = LAMBDA_END;
@@ -212,25 +219,27 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			pm.popParser(true);
 			return;
 		case WILDCARD_TYPE:
-			Name name = token.nameValue();
-			WildcardType wt = (WildcardType) this.type;
+		{
+			final Name name = token.nameValue();
+			final WildcardType wildcardType = (WildcardType) this.type;
 			if (name == Names.ltcolon) // <: - Upper Bound
 			{
-				wt.setVariance(Variance.COVARIANT);
-				pm.pushParser(pm.newTypeParser(wt));
+				wildcardType.setVariance(Variance.COVARIANT);
+				pm.pushParser(pm.newTypeParser(wildcardType));
 				this.mode = END;
 				return;
 			}
 			if (name == Names.gtcolon) // >: - Lower Bound
 			{
-				wt.setVariance(Variance.CONTRAVARIANT);
-				pm.pushParser(pm.newTypeParser(wt));
+				wildcardType.setVariance(Variance.CONTRAVARIANT);
+				pm.pushParser(pm.newTypeParser(wildcardType));
 				this.mode = END;
 				return;
 			}
 			this.consumer.setType(this.type);
 			pm.popParser(true);
 			return;
+		}
 		case GENERICS_END:
 			this.mode = END;
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
