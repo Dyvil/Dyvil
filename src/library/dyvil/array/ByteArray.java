@@ -1,6 +1,7 @@
 package dyvil.array;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
@@ -100,12 +101,14 @@ public interface ByteArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, BASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
 	static void subscript_$eq(byte[] array, int i, byte v)
 	{
 		array[i] = v;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
 	static void subscript_$eq(byte[] array, Range<Int> range, byte[] values)
 	{
 		int start = Int.unapply(range.first());

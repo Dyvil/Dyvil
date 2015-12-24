@@ -1,6 +1,7 @@
 package dyvil.array;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
@@ -99,12 +100,14 @@ public interface IntArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, IASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
 	static void subscript_$eq(int[] array, int i, int v)
 	{
 		array[i] = v;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
 	static void subscript_$eq(int[] array, Range<Int> range, int[] values)
 	{
 		int start = Int.unapply(range.first());
