@@ -92,6 +92,13 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
 			{
 				final ArrayType arrayType = new ArrayType();
+
+				if (token.next().type() == DyvilKeywords.FINAL)
+				{
+					arrayType.setImmutable(true);
+					pm.skip();
+				}
+
 				this.mode = ARRAY_COLON;
 				this.type = arrayType;
 				pm.pushParser(pm.newTypeParser(arrayType));

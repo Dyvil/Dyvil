@@ -28,8 +28,10 @@ import java.io.IOException;
 public class ArrayType implements IObjectType, ITyped
 {
 	public static final int OBJECT_DISTANCE = 2;
-	private IType type;
-	
+
+	private IType   type;
+	private boolean immutable;
+
 	public ArrayType()
 	{
 	}
@@ -105,7 +107,18 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		return 1 + this.type.getArrayDimensions();
 	}
-	
+
+	public void setImmutable(boolean immutable)
+	{
+		this.immutable = immutable;
+	}
+
+	@Override
+	public boolean isImmutable()
+	{
+		return this.immutable;
+	}
+
 	@Override
 	public IType getElementType()
 	{
@@ -367,42 +380,57 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
+		if (annotation.getType().getTheClass() == Types.IMMUTABLE_CLASS)
+		{
+			this.immutable = true;
+			return;
+		}
+
 		if (typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
 		{
 			return;
 		}
-		
+
 		this.type = IType.withAnnotation(this.type, annotation, typePath, step + 1, steps);
 	}
 	
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
+		final String newTypePath = typePath.concat("[");
+		this.type.writeAnnotations(visitor, typeRef, newTypePath);
+
+		visitor.visitTypeAnnotation(typeRef, TypePath.fromString(newTypePath), "Ldyvil/util/Immutable;", true);
 	}
 	
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
+		out.writeBoolean(this.immutable);
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
+		this.immutable = in.readBoolean();
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "[" + this.type.toString() + "]";
+		return (this.immutable ? "[final " : "[") + this.type.toString() + "]";
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('[');
+		if (this.immutable)
+		{
+			buffer.append("final ");
+		}
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
