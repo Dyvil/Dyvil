@@ -66,8 +66,8 @@ public class CollectionTests
 		Collection immutable = collection.immutable();
 		Collection immutableCopy = collection.immutableCopy();
 		
-		assertTrue("Immutable Collection must be instanceof dyvil.annotation.Immutable",
-		           isImmutable == collection instanceof Immutable);
+		assertTrue("Immutable Collection must have a dyvil.annotation.Immutable annotation",
+		           isImmutable == collection.getClass().isAnnotationPresent(Immutable.class));
 
 		assertEquals("Collection must be equal to it's copy: " + copy.getClass(), collection, copy);
 		assertEquals("Collection must be equal to it's mutable version: " + mutable.getClass(), collection, mutable);
