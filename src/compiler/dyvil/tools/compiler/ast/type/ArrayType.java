@@ -41,7 +41,13 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type = type;
 	}
-	
+
+	public ArrayType(IType type, boolean immutable)
+	{
+		this.immutable = immutable;
+		this.type = type;
+	}
+
 	public static IType getArrayType(IType type, int dims)
 	{
 		switch (dims)
@@ -298,7 +304,11 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			concrete = concrete.getObjectType();
 		}
-		return new ArrayType(concrete);
+		if (concrete != null && concrete != this.type)
+		{
+			return new ArrayType(concrete, this.immutable);
+		}
+		return this;
 	}
 	
 	@Override
@@ -402,7 +412,8 @@ public class ArrayType implements IObjectType, ITyped
 
 		if (this.immutable)
 		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtils.IMMUTABE_EXTENDED, true);
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtils.IMMUTABE_EXTENDED,
+			                            true);
 		}
 	}
 	
@@ -441,6 +452,6 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public IType clone()
 	{
-		return new ArrayType(this.type);
+		return new ArrayType(this.type, this.immutable);
 	}
 }
