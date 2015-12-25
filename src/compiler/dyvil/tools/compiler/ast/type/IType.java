@@ -410,6 +410,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	void appendExtendedName(StringBuilder buffer);
 	
 	String getSignature();
+
+	static String getSignature(IType type)
+	{
+		final StringBuilder builder = new StringBuilder();
+		type.appendSignature(builder);
+		return builder.toString();
+	}
 	
 	void appendSignature(StringBuilder buffer);
 	

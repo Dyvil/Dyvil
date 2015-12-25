@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.generic.type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MapExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -91,13 +90,13 @@ public class InternalGenericType extends GenericType
 			return new ReferenceType(Types.getObjectRefClass(), this.typeArguments[0]);
 		case "dyvil/collection/ImmutableMap":
 			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.MUTABLE,
-			                   MapExpr.MapTypes.MUTABLE_MAP_CLASS);
+			                   MapType.MapTypes.MUTABLE_MAP_CLASS);
 		case "dyvil/collection/MutableMap":
 			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.IMMUTABLE,
-			                   MapExpr.MapTypes.IMMUTABLE_MAP_CLASS);
+			                   MapType.MapTypes.IMMUTABLE_MAP_CLASS);
 		case "dyvil/collection/Map":
 			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.UNDEFINED,
-			                   MapExpr.MapTypes.MAP_CLASS);
+			                   MapType.MapTypes.MAP_CLASS);
 		}
 
 		final IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);

@@ -5,11 +5,8 @@ import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MapExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -18,6 +15,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -29,13 +27,25 @@ import java.io.IOException;
 
 public class MapType implements IObjectType
 {
+	public static final class MapTypes
+	{
+		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
+		public static final IClass MUTABLE_MAP_CLASS     = Package.dyvilCollection.resolveClass("MutableMap");
+		public static final IClass IMMUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("ImmutableMap");
+		public static final IClass MAP_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("MapConvertible");
+
+		public static final ITypeVariable KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeVariable(0);
+		public static final ITypeVariable VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeVariable(1);
+	}
+
 	protected IType keyType;
 	protected IType valueType;
+
 	protected Mutability mutability = Mutability.UNDEFINED;
 
 	// Metadata
 	private IClass theClass;
-	
+
 	public MapType(IType keyType, IType valueType)
 	{
 		this.keyType = keyType;
@@ -62,39 +72,39 @@ public class MapType implements IObjectType
 	{
 		return MAP;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
 		return true;
 	}
-	
+
 	public void setKeyType(IType keyType)
 	{
 		this.keyType = keyType;
 	}
-	
+
 	public IType getKeyType()
 	{
 		return this.keyType;
 	}
-	
+
 	public void setValueType(IType valueType)
 	{
 		this.valueType = valueType;
 	}
-	
+
 	public IType getValueType()
 	{
 		return this.valueType;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.theClass.getName();
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
@@ -106,7 +116,7 @@ public class MapType implements IObjectType
 	{
 		return this.mutability;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
@@ -123,13 +133,13 @@ public class MapType implements IObjectType
 		}
 		return this.theClass.resolveType(typeVar, this);
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
 		return this.keyType.hasTypeVariables() || this.valueType.hasTypeVariables();
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
@@ -141,7 +151,7 @@ public class MapType implements IObjectType
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
@@ -153,21 +163,21 @@ public class MapType implements IObjectType
 	{
 		if (mutability == Mutability.IMMUTABLE)
 		{
-			return MapExpr.MapTypes.IMMUTABLE_MAP_CLASS;
+			return MapTypes.IMMUTABLE_MAP_CLASS;
 		}
 		if (mutability == Mutability.MUTABLE)
 		{
-			return MapExpr.MapTypes.MUTABLE_MAP_CLASS;
+			return MapTypes.MUTABLE_MAP_CLASS;
 		}
-		return MapExpr.MapTypes.MAP_CLASS;
+		return MapTypes.MAP_CLASS;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.theClass != null;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
@@ -177,72 +187,70 @@ public class MapType implements IObjectType
 		this.valueType = this.valueType.resolveType(markers, context);
 		return this;
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 		this.keyType.checkType(markers, context, position);
 		this.valueType.checkType(markers, context, position);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.keyType.check(markers, context);
 		this.valueType.check(markers, context);
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 		this.keyType.foldConstants();
 		this.valueType.foldConstants();
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.keyType.cleanup(context, compilableList);
 		this.valueType.cleanup(context, compilableList);
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.theClass.getInternalName();
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
-		StringBuilder sb = new StringBuilder();
-		this.appendSignature(sb);
-		return sb.toString();
+		return IType.getSignature(this);
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
@@ -251,7 +259,7 @@ public class MapType implements IObjectType
 		this.valueType.appendSignature(buffer);
 		buffer.append('>').append(';');
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
@@ -260,54 +268,39 @@ public class MapType implements IObjectType
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/MapType", "apply",
 		                       "(Ldyvil/lang/Type;Ldyvil/lang/Type;)Ldyvil/reflect/types/MapType;", true);
 	}
-	
-	@Override
-	public void writeDefaultValue(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeInsn(Opcodes.ACONST_NULL);
-	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (step == steps)
+		if (step >= steps || typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
 		{
 			return;
 		}
 
-		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
+		if (typePath.getStepArgument(step) == 0)
 		{
-			return;
+			this.keyType = IType.withAnnotation(this.keyType, annotation, typePath, step + 1, steps);
 		}
-		
-		int index = typePath.getStepArgument(step);
-		if (index == 1)
+		else
 		{
 			this.valueType = IType.withAnnotation(this.valueType, annotation, typePath, step + 1, steps);
 		}
-		this.keyType = IType.withAnnotation(this.keyType, annotation, typePath, step + 1, steps);
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
 		this.keyType.writeAnnotations(visitor, typeRef, typePath + "0;");
 		this.valueType.writeAnnotations(visitor, typeRef, typePath + "1;");
 	}
-	
-	@Override
-	public IConstantValue getDefaultValue()
-	{
-		return NullValue.getNull();
-	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		IType.writeType(this.keyType, out);
 		IType.writeType(this.valueType, out);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
@@ -337,7 +330,7 @@ public class MapType implements IObjectType
 		this.valueType.toString(prefix, builder);
 		builder.append(']');
 	}
-	
+
 	@Override
 	public IType clone()
 	{

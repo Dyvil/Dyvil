@@ -204,10 +204,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case ARRAY_COLON:
 			if (type == BaseSymbols.COLON)
 			{
+				final MapType mapType = new MapType(this.type.getElementType(), null, this.type.getMutability());
+				this.type = mapType;
 				this.mode = ARRAY_END;
-				MapType mt = new MapType(this.type.getElementType(), null, this.type.getMutability());
-				this.type = mt;
-				pm.pushParser(new TypeParser(mt::setValueType));
+				pm.pushParser(new TypeParser(mapType::setValueType));
+				this.mode = ARRAY_END;
 				return;
 			}
 			// Fallthrough
