@@ -148,6 +148,17 @@ public class AnnotatedType implements IType, ITyped
 	{
 		return this.type.getArrayClass();
 	}
+
+	@Override
+	public byte getMutability()
+	{
+		final byte mutability = IType.super.getMutability();
+		if (mutability != MUTABILITY_UNDEFINED)
+		{
+			return mutability;
+		}
+		return this.type.getMutability();
+	}
 	
 	@Override
 	public IMethod getBoxMethod()
