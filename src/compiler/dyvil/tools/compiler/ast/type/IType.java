@@ -91,10 +91,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	// Compound Types
 	int TUPLE     = 32;
 	int LAMBDA    = 33;
+
 	int ARRAY     = 34;
-	int MAP       = 35;
-	int OPTIONAL  = 36;
-	int REFERENCE = 38;
+	int LIST      = 35;
+	int MAP       = 37;
+
+	int OPTIONAL  = 48;
+	int REFERENCE = 50;
 	
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
