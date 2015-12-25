@@ -8,6 +8,7 @@ import dyvil.lang.Ordered;
 import dyvil.lang.Rangeable;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.annotation.Immutable;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
 
 @NilConvertible
 @TupleConvertible
+@Immutable
 public interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
 	static <T extends Ordered<T>> Range<T> apply()

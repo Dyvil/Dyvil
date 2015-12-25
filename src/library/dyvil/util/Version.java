@@ -1,5 +1,6 @@
 package dyvil.util;
 
+import dyvil.annotation.Immutable;
 import dyvil.lang.Ordered;
 import dyvil.lang.literal.StringConvertible;
 import dyvil.lang.literal.TupleConvertible;
@@ -15,7 +16,8 @@ import java.util.regex.Pattern;
  */
 @StringConvertible
 @TupleConvertible
-public final class Version implements Ordered<Version>, Immutable, Serializable
+@Immutable
+public final class Version implements Ordered<Version>, Serializable
 {
 	public enum Element
 	{

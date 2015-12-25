@@ -162,6 +162,17 @@ public class AnnotatedType implements IType, ITyped
 	}
 
 	@Override
+	public byte getMutability()
+	{
+		final byte mutability = IType.super.getMutability();
+		if (mutability != MUTABILITY_UNDEFINED)
+		{
+			return mutability;
+		}
+		return this.type.getMutability();
+	}
+
+	@Override
 	public IMethod getBoxMethod()
 	{
 		return this.type.getBoxMethod();
@@ -294,7 +305,18 @@ public class AnnotatedType implements IType, ITyped
 		this.type.cleanup(context, compilableList);
 		this.annotation.cleanup(context, compilableList);
 	}
-	
+
+	@Override
+	public IAnnotation getAnnotation(IClass type)
+	{
+		if (this.annotation.getType().getTheClass() == type)
+		{
+			return this.annotation;
+		}
+
+		return this.type.getAnnotation(type);
+	}
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{

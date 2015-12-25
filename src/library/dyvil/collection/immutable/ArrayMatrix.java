@@ -6,12 +6,14 @@ import dyvil.collection.Matrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.lang.Int;
 import dyvil.tuple.Tuple2;
+import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Immutable
 public class ArrayMatrix<E> implements ImmutableMatrix<E>
 {
 	private static final long serialVersionUID = 7258516530768096953L;

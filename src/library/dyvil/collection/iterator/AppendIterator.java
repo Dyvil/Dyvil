@@ -1,8 +1,12 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Immutable;
+import dyvil.util.ImmutableException;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+@Immutable
 public class AppendIterator<E> implements Iterator<E>
 {
 	private final Iterator<? extends E> head;
@@ -35,5 +39,11 @@ public class AppendIterator<E> implements Iterator<E>
 			return this.tail;
 		}
 		throw new NoSuchElementException();
+	}
+
+	@Override
+	public void remove()
+	{
+		throw new ImmutableException();
 	}
 }

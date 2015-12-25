@@ -104,6 +104,11 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Other Types
 	int ANNOTATED = 192;
+
+	// Mutabilities
+	byte MUTABILITY_UNDEFINED = 0;
+	byte MUTABILITY_IMMUTABLE = 1;
+	byte MUTABILITY_MUTABLE   = 2;
 	
 	@Override
 	default ICodePosition getPosition()
@@ -165,12 +170,21 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	IClass getArrayClass();
 
+	default byte getMutability()
+	{
+		if (this.getAnnotation(Types.IMMUTABLE_CLASS) != null)
+		{
+			return MUTABILITY_IMMUTABLE;
+		}
+		return MUTABILITY_UNDEFINED;
+	}
+
 	// Lambda Types
 
 	boolean isExtension();
 
 	void setExtension(boolean extension);
-	
+
 	// Super Type
 	
 	default int getSuperTypeDistance(IType superType)
@@ -339,6 +353,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// IContext
+
+	default IAnnotation getAnnotation(IClass type)
+	{
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.getAnnotation(type);
+	}
 	
 	@Override
 	default IDyvilHeader getHeader()
@@ -397,8 +417,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	String getSignature();
 	
 	void appendSignature(StringBuilder buffer);
-	
-	// Compilation
 	
 	int getLoadOpcode();
 	

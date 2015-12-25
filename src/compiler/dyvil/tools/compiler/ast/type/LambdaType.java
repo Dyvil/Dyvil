@@ -73,6 +73,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.parameterTypes = new IType[typeCount];
 	}
 
+	public LambdaType(ICodePosition position)
+	{
+		this();
+		this.position = position;
+	}
+
 	public static IClass getLambdaClass(int typeCount)
 	{
 		IClass iclass = functionClasses[typeCount];

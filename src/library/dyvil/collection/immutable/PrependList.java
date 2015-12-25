@@ -4,6 +4,7 @@ import dyvil.collection.*;
 import dyvil.collection.iterator.AppendIterator;
 import dyvil.collection.iterator.PrependIterator;
 import dyvil.collection.mutable.LinkedList;
+import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Immutable
 public class PrependList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = -989114482136946209L;

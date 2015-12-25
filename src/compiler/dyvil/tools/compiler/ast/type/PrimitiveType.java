@@ -277,6 +277,12 @@ public final class PrimitiveType implements IType
 		}
 		return iclass;
 	}
+
+	@Override
+	public byte getMutability()
+	{
+		return MUTABILITY_IMMUTABLE;
+	}
 	
 	@Override
 	public Name getName()

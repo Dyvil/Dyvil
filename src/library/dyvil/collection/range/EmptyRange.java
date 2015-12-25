@@ -5,12 +5,14 @@ import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
+import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
 
 @NilConvertible
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
+@Immutable
 public final class EmptyRange<T> implements Range<T>
 {
 	private static final long serialVersionUID = 5914222536371440711L;

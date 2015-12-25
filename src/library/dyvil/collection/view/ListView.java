@@ -5,6 +5,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.ImmutableIterator;
+import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Immutable
 public class ListView<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = -4432411036304678600L;

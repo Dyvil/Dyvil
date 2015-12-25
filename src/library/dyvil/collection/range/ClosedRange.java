@@ -3,6 +3,7 @@ package dyvil.collection.range;
 import dyvil.collection.Range;
 import dyvil.lang.Rangeable;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -10,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 @TupleConvertible
+@Immutable
 public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 {
 	private static final long serialVersionUID = -2752505419258591804L;

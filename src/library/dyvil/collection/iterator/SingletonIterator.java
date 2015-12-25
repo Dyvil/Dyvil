@@ -1,6 +1,9 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Mutating;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.annotation.Immutable;
+import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -8,6 +11,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @TupleConvertible
+@Immutable
 public class SingletonIterator<E> implements Iterator<E>
 {
 	private       boolean returned;
@@ -41,9 +45,10 @@ public class SingletonIterator<E> implements Iterator<E>
 	}
 	
 	@Override
+	@Mutating
 	public void remove()
 	{
-		throw new UnsupportedOperationException();
+		throw new ImmutableException();
 	}
 	
 	@Override

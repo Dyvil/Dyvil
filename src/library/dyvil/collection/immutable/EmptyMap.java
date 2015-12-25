@@ -6,6 +6,7 @@ import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
+import dyvil.annotation.Immutable;
 import dyvil.util.None;
 import dyvil.util.Option;
 
@@ -18,6 +19,7 @@ import java.util.function.Consumer;
 
 @NilConvertible
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
+@Immutable
 public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 4719096668028950933L;

@@ -7,11 +7,13 @@ import dyvil.collection.MutableMatrix;
 import dyvil.collection.iterator.ImmutableIterator;
 import dyvil.lang.Int;
 import dyvil.tuple.Tuple2;
+import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Immutable
 public class MatrixView<E> implements ImmutableMatrix<E>
 {
 	private static final long serialVersionUID = -3291167467848562079L;

@@ -1,7 +1,5 @@
 package dyvil.annotation;
 
-import dyvil.util.Immutable;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,7 +16,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface mutating
+public @interface Mutating
 {
 	String VALUE_DEFAULT = "Invalid invocation of mutating method {method} on immutable type {type}";
 	

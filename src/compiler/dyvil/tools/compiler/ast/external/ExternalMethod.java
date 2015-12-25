@@ -296,6 +296,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
 		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
+		if (typePath == null)
+		{
+			typePath = TypePath.EMPTY;
+		}
+
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.METHOD_RETURN:

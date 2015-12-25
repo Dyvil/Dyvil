@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.annotation.mutating;
+import dyvil.annotation.Mutating;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -858,23 +858,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 	
-	private void checkMutating(MarkerList markers, IValue instance)
+	private void checkMutating(MarkerList markers, IValue receiver)
 	{
-		IType type = instance.getType();
-		if (!Types.IMMUTABLE.isSuperTypeOf(type))
+		final IType receiverType = receiver.getType();
+		if (receiverType.getMutability() != IType.MUTABILITY_IMMUTABLE)
 		{
 			return;
 		}
 		
-		IAnnotation a = this.getAnnotation(Types.MUTATING_CLASS);
-		if (a == null)
+		final IAnnotation mutatingAnnotation = this.getAnnotation(Types.MUTATING_CLASS);
+		if (mutatingAnnotation == null)
 		{
 			return;
 		}
 		
-		IValue v = a.getArguments().getValue(0, Annotation.VALUE);
-		String s = v != null ? v.stringValue() : mutating.VALUE_DEFAULT;
-		StringBuilder builder = new StringBuilder(s);
+		final IValue value = mutatingAnnotation.getArguments().getValue(0, Annotation.VALUE);
+		final String stringValue = value != null ? value.stringValue() : Mutating.VALUE_DEFAULT;
+		StringBuilder builder = new StringBuilder(stringValue);
 		
 		int index = builder.indexOf("{method}");
 		if (index >= 0)
@@ -885,10 +885,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		index = builder.indexOf("{type}");
 		if (index >= 0)
 		{
-			builder.replace(index, index + 6, type.toString());
+			builder.replace(index, index + 6, receiverType.toString());
 		}
 		
-		markers.add(new SemanticError(instance.getPosition(), builder.toString()));
+		markers.add(new SemanticError(receiver.getPosition(), builder.toString()));
 	}
 	
 	@Override

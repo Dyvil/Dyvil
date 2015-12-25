@@ -5,6 +5,7 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @ArrayConvertible
+@Immutable
 public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = 5534347282324757054L;

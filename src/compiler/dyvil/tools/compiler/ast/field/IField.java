@@ -39,6 +39,6 @@ public interface IField extends IClassMember, IDataMember
 			}
 		}
 		
-		type.writeAnnotations(fv, TypeReference.FIELD, "");
+		type.writeAnnotations(fv, TypeReference.newTypeReference(TypeReference.FIELD), "");
 	}
 }

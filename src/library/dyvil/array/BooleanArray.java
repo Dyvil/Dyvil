@@ -1,6 +1,7 @@
 package dyvil.array;
 
 import dyvil.annotation.Intrinsic;
+import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
@@ -78,12 +79,14 @@ public interface BooleanArray
 	
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, BASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
 	static void subscript_$eq(boolean[] array, int i, boolean v)
 	{
 		array[i] = v;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
 	static void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
 	{
 		int start = Int.unapply(range.first());

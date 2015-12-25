@@ -3,10 +3,12 @@ package dyvil.tuple;
 import dyvil.annotation._internal.ClassParameters;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.Entry;
+import dyvil.annotation.Immutable;
 
 import java.util.Objects;
 
 @ClassParameters(names = { "_1", "_2" })
+@Immutable
 public class Tuple2<@Covariant A, @Covariant B> implements Entry<A, B>
 {
 	private static final long serialVersionUID = -5140899078103651408L;

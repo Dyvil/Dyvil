@@ -1,5 +1,6 @@
 package dyvil.util;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
@@ -14,6 +15,7 @@ import java.util.function.Supplier;
 @NilConvertible
 @TupleConvertible
 @DyvilModifiers(Modifiers.SEALED)
+@Immutable
 public interface Option<T> extends Serializable
 {
 	static <T> Option<T> of(T t)

@@ -9,6 +9,7 @@ import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
+import dyvil.annotation.Immutable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -18,6 +19,7 @@ import java.util.function.Predicate;
 
 @NilConvertible
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
+@Immutable
 public final class EmptyList<E> implements ImmutableList<E>
 {
 	private static final long serialVersionUID = -6059901529322971155L;

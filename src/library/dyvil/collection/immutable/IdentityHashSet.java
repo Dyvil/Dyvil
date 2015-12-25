@@ -6,11 +6,13 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.annotation.Immutable;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 @ArrayConvertible
+@Immutable
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -1347044009183554635L;

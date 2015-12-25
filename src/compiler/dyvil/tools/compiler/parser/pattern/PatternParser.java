@@ -22,28 +22,41 @@ import dyvil.tools.parsing.token.IToken;
 
 public class PatternParser extends Parser
 {
-	private static final int END             = 0;
-	private static final int PATTERN         = 1;
-	private static final int NEGATIVE_NUMBER = 2;
-	private static final int TUPLE_END       = 4;
-	private static final int CASE_CLASS_END  = 8;
+	private static final int END             = -1;
+	private static final int PATTERN         = 0;
+	private static final int NEGATIVE_NUMBER = 1;
+	private static final int TUPLE_END       = 2;
+	private static final int CASE_CLASS_END  = 4;
+
+	private static final int OPERATOR_OR  = 1;
+	private static final int OPERATOR_AND = 2;
 	
 	protected IPatternConsumer consumer;
 	
 	private IPattern pattern;
+
+	private int operator;
 	
 	public PatternParser(IPatternConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = PATTERN;
 	}
-	
+
+	protected PatternParser(IPatternConsumer consumer, int operator)
+	{
+		this.consumer = consumer;
+		this.operator = operator;
+		this.mode = PATTERN;
+	}
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		if (this.mode == END)
+		switch (this.mode)
 		{
+		case END:
 			if (type == DyvilKeywords.AS)
 			{
 				final TypeCheckPattern typeCheck = new TypeCheckPattern(token.raw(), this.pattern);
@@ -54,36 +67,38 @@ public class PatternParser extends Parser
 
 			if (ParserUtil.isIdentifier(type))
 			{
-				// TODO Operator Precedence
-
 				final Name name = token.nameValue();
 				if (name == Names.bar)
 				{
+					if (this.checkPrecedence(OPERATOR_OR))
+					{
+						this.endPattern(pm);
+						return;
+					}
+
 					final OrPattern orPattern = new OrPattern(this.pattern, token.raw(), null);
 					this.pattern = orPattern;
-					pm.pushParser(new PatternParser(orPattern::setRight));
+					pm.pushParser(new PatternParser(orPattern::setRight, OPERATOR_OR));
 					return;
 				}
 
 				if (name == Names.amp)
 				{
+					if (this.checkPrecedence(OPERATOR_AND))
+					{
+						this.endPattern(pm);
+						return;
+					}
+
 					final AndPattern andPattern = new AndPattern(this.pattern, token.raw(), null);
 					this.pattern = andPattern;
-					pm.pushParser(new PatternParser(andPattern::setRight));
+					pm.pushParser(new PatternParser(andPattern::setRight, OPERATOR_AND));
 					return;
 				}
 			}
-			
-			pm.popParser(true);
-			if (this.pattern != null)
-			{
-				this.consumer.setPattern(this.pattern);
-			}
+
+			this.endPattern(pm);
 			return;
-		}
-		
-		switch (this.mode)
-		{
 		case PATTERN:
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -191,6 +206,20 @@ public class PatternParser extends Parser
 			}
 			return;
 		}
+	}
+
+	private void endPattern(IParserManager pm)
+	{
+		pm.popParser(true);
+		if (this.pattern != null)
+		{
+			this.consumer.setPattern(this.pattern);
+		}
+	}
+	
+	private boolean checkPrecedence(int operator)
+	{
+		return this.operator != 0 && this.operator > operator;
 	}
 	
 	public static IPattern parsePrimitive(IToken token, int type)
