@@ -861,7 +861,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	private void checkMutating(MarkerList markers, IValue receiver)
 	{
 		final IType receiverType = receiver.getType();
-		if (!receiverType.isImmutable())
+		if (receiverType.getMutability() != IType.MUTABILITY_IMMUTABLE)
 		{
 			return;
 		}
