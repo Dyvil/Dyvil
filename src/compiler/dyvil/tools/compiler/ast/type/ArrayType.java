@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -380,27 +381,29 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (annotation.getType().getTheClass() == Types.IMMUTABLE_CLASS)
+		if (step == steps && AnnotationUtils.IMMUTABLE.equals(annotation.getType().getInternalName()))
 		{
 			this.immutable = true;
 			return;
 		}
 
-		if (typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
+		if (step >= steps || typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
 		{
 			return;
 		}
 
 		this.type = IType.withAnnotation(this.type, annotation, typePath, step + 1, steps);
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		final String newTypePath = typePath.concat("[");
-		this.type.writeAnnotations(visitor, typeRef, newTypePath);
+		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
 
-		visitor.visitTypeAnnotation(typeRef, TypePath.fromString(newTypePath), "Ldyvil/util/Immutable;", true);
+		if (this.immutable)
+		{
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtils.IMMUTABE_EXTENDED, true);
+		}
 	}
 	
 	@Override
