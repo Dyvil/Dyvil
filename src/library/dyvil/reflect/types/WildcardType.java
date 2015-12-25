@@ -20,19 +20,19 @@ public class WildcardType<T> implements Type<T>
 	}
 	
 	@Override
-	public Class<T> getTheClass()
+	public Class<T> erasure()
 	{
 		return null;
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "_";
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return "_";
 	}

@@ -27,7 +27,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Type<K> type)
 	{
-		return new EnumMap<>(type.getTheClass());
+		return new EnumMap<>(type.erasure());
 	}
 	
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Class<K> type)
@@ -54,7 +54,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	
 	public EnumMap(Type<K> type)
 	{
-		super(type.getTheClass());
+		super(type.erasure());
 	}
 	
 	public EnumMap(Map<K, V> map)

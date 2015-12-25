@@ -121,7 +121,7 @@ public class PrimitiveType implements Type
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		switch (this.id)
 		{
@@ -148,13 +148,13 @@ public class PrimitiveType implements Type
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
-		return this.getName();
+		return this.name();
 	}
 	
 	@Override
-	public Class getTheClass()
+	public Class erasure()
 	{
 		return this.theClass;
 	}
@@ -162,7 +162,7 @@ public class PrimitiveType implements Type
 	@Override
 	public String toString()
 	{
-		return this.getName();
+		return this.name();
 	}
 	
 	@Override

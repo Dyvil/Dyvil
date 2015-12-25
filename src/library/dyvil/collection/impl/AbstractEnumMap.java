@@ -120,7 +120,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	public AbstractEnumMap(Type<K> type)
 	{
-		this(type.getTheClass());
+		this(type.erasure());
 	}
 	
 	public AbstractEnumMap(Class<K> type)

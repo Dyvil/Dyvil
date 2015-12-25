@@ -18,19 +18,19 @@ public class ListType<E> implements Type<List<E>>
 	}
 	
 	@Override
-	public Class<List<E>> getTheClass()
+	public Class<List<E>> erasure()
 	{
 		return (Class) List.class;
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "List";
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return "dyvil.collection.List";
 	}

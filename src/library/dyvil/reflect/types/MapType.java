@@ -20,19 +20,19 @@ public class MapType<K, V> implements Type<Map<K, V>>
 	}
 	
 	@Override
-	public Class<Map<K, V>> getTheClass()
+	public Class<Map<K, V>> erasure()
 	{
 		return (Class) Map.class;
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "Map";
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return "dyvil.collection.Map";
 	}

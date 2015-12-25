@@ -20,13 +20,13 @@ public class TupleType implements Type
 	}
 	
 	@Override
-	public Class getTheClass()
+	public Class erasure()
 	{
 		if (this.theClass == null)
 		{
 			try
 			{
-				return this.theClass = Class.forName(this.getQualifiedName());
+				return this.theClass = Class.forName(this.qualifiedName());
 			}
 			catch (ClassNotFoundException ex)
 			{
@@ -37,13 +37,13 @@ public class TupleType implements Type
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "Tuple" + this.types.length;
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return "dyvil/tuple/Tuple" + this.types.length;
 	}
@@ -76,13 +76,13 @@ public class TupleType implements Type
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append('L').append(this.getQualifiedName()).append(';');
+		builder.append('L').append(this.qualifiedName()).append(';');
 	}
 	
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		builder.append('L').append(this.getQualifiedName());
+		builder.append('L').append(this.qualifiedName());
 		builder.append('<');
 		int len = this.types.length;
 		if (len > 0)

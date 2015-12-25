@@ -17,19 +17,19 @@ public class UnknownType<T> implements Type<T>
 	}
 	
 	@Override
-	public Class getTheClass()
+	public Class erasure()
 	{
 		return null;
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "auto";
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return "auto";
 	}

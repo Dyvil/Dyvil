@@ -20,12 +20,12 @@ public interface Type<T>
 	
 	static <T> Type<T> apply(String className)
 	{
-		return new NamedType(className);
+		return new NamedType<>(className);
 	}
 	
 	static <T> Type<T> apply(String className, Type... generics)
 	{
-		return new GenericType(className, generics);
+		return new GenericType<>(className, generics);
 	}
 	
 	static <T> Type<T> apply(Class<T> c)
@@ -39,14 +39,14 @@ public interface Type<T>
 	
 	static <T> Type<T> apply(Class<T> c, Type... generics)
 	{
-		return new GenericType(c, generics);
+		return new GenericType<>(c, generics);
 	}
 	
-	Class<T> getTheClass();
+	Class<T> erasure();
 	
-	String getName();
+	String name();
 	
-	String getQualifiedName();
+	String qualifiedName();
 	
 	@Override
 	String toString();

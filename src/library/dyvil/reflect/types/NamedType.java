@@ -33,19 +33,19 @@ public class NamedType<T> implements Type<T>
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
-		return this.getTheClass().getSimpleName();
+		return this.erasure().getSimpleName();
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return this.name;
 	}
 	
 	@Override
-	public Class<T> getTheClass()
+	public Class<T> erasure()
 	{
 		if (this.theClass == null)
 		{

@@ -20,21 +20,21 @@ public class ArrayType<T> implements Type<T[]>
 	}
 	
 	@Override
-	public Class getTheClass()
+	public Class erasure()
 	{
-		return ObjectArray.getArrayType(this.componentType.getTheClass());
+		return ObjectArray.getArrayType(this.componentType.erasure());
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
-		return this.componentType.getName();
+		return this.componentType.name();
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
-		return this.componentType.getQualifiedName();
+		return this.componentType.qualifiedName();
 	}
 	
 	@Override

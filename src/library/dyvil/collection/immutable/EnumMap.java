@@ -30,7 +30,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
 	{
-		return new Builder<>(type.getTheClass());
+		return new Builder<>(type.erasure());
 	}
 	
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
@@ -52,7 +52,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	
 	public EnumMap(Type<K> type)
 	{
-		super(type.getTheClass());
+		super(type.erasure());
 	}
 	
 	public EnumMap(Map<K, V> map)

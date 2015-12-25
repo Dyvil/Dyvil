@@ -17,13 +17,13 @@ public class AnyType implements Type<Object>
 	}
 	
 	@Override
-	public Class<Object> getTheClass()
+	public Class<Object> erasure()
 	{
 		return null;
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return "any";
 	}
@@ -35,7 +35,7 @@ public class AnyType implements Type<Object>
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return "dyvil/lang/Any";
 	}

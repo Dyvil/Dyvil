@@ -19,19 +19,19 @@ public class TypeArgument implements Type
 	}
 	
 	@Override
-	public Class getTheClass()
+	public Class erasure()
 	{
 		return null;
 	}
 	
 	@Override
-	public String getName()
+	public String name()
 	{
 		return this.name;
 	}
 	
 	@Override
-	public String getQualifiedName()
+	public String qualifiedName()
 	{
 		return this.name;
 	}
