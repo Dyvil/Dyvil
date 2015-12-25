@@ -162,10 +162,10 @@ public class AnnotatedType implements IType, ITyped
 	}
 
 	@Override
-	public byte getMutability()
+	public Mutability getMutability()
 	{
-		final byte mutability = IType.super.getMutability();
-		if (mutability != MUTABILITY_UNDEFINED)
+		final Mutability mutability = IType.super.getMutability();
+		if (mutability != Mutability.UNDEFINED)
 		{
 			return mutability;
 		}

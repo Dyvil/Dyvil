@@ -104,11 +104,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Other Types
 	int ANNOTATED = 192;
-
-	// Mutabilities
-	byte MUTABILITY_UNDEFINED = 0;
-	byte MUTABILITY_IMMUTABLE = 1;
-	byte MUTABILITY_MUTABLE   = 2;
 	
 	@Override
 	default ICodePosition getPosition()
@@ -170,13 +165,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	IClass getArrayClass();
 
-	default byte getMutability()
+	default Mutability getMutability()
 	{
 		if (this.getAnnotation(Types.IMMUTABLE_CLASS) != null)
 		{
-			return MUTABILITY_IMMUTABLE;
+			return Mutability.IMMUTABLE;
 		}
-		return MUTABILITY_UNDEFINED;
+		return Mutability.UNDEFINED;
 	}
 
 	// Lambda Types

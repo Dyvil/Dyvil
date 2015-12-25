@@ -71,13 +71,14 @@ public final class Types
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
 	public static IClass RUNTIME_EXCEPTION_CLASS;
-	public static IClass IMMUTABLE_CLASS;
 	public static IClass SERIALIZABLE_CLASS;
-	
 	public static IClass INTRINSIC_CLASS;
+
 	public static IClass OVERRIDE_CLASS;
 	public static IClass MUTATING_CLASS;
-	
+	public static IClass MUTABLE_CLASS;
+	public static IClass IMMUTABLE_CLASS;
+
 	public static IClass BOOLEAN_CONVERTIBLE_CLASS;
 	public static IClass CHAR_CONVERTIBLE_CLASS;
 	public static IClass INT_CONVERTIBLE_CLASS;
@@ -130,6 +131,7 @@ public final class Types
 		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");
 		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
 		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("Mutating");
+		MUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Mutable");
 		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
 
 		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");

@@ -96,11 +96,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				switch (token.next().type())
 				{
 				case DyvilKeywords.FINAL:
-					arrayType.setMutability(IType.MUTABILITY_IMMUTABLE);
+					arrayType.setMutability(Mutability.IMMUTABLE);
 					pm.skip();
 					break;
 				case DyvilKeywords.VAR:
-					arrayType.setMutability(IType.MUTABILITY_MUTABLE);
+					arrayType.setMutability(Mutability.MUTABLE);
 					pm.skip();
 					break;
 				}

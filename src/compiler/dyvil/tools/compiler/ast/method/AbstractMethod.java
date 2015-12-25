@@ -31,6 +31,7 @@ import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -861,7 +862,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	private void checkMutating(MarkerList markers, IValue receiver)
 	{
 		final IType receiverType = receiver.getType();
-		if (receiverType.getMutability() != IType.MUTABILITY_IMMUTABLE)
+		if (receiverType.getMutability() != Mutability.IMMUTABLE)
 		{
 			return;
 		}

@@ -279,9 +279,9 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public byte getMutability()
+	public Mutability getMutability()
 	{
-		return MUTABILITY_IMMUTABLE;
+		return Mutability.IMMUTABLE;
 	}
 	
 	@Override

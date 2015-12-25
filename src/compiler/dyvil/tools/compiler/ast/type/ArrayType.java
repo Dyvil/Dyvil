@@ -17,7 +17,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -30,8 +29,8 @@ public class ArrayType implements IObjectType, ITyped
 {
 	public static final int OBJECT_DISTANCE = 2;
 
-	private IType type;
-	private byte  mutability;
+	private IType      type;
+	private Mutability mutability;
 
 	public ArrayType()
 	{
@@ -42,7 +41,7 @@ public class ArrayType implements IObjectType, ITyped
 		this.type = type;
 	}
 
-	public ArrayType(IType type, byte mutability)
+	public ArrayType(IType type, Mutability mutability)
 	{
 		this.mutability = mutability;
 		this.type = type;
@@ -116,12 +115,12 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public byte getMutability()
+	public Mutability getMutability()
 	{
 		return this.mutability;
 	}
 
-	public void setMutability(byte mutability)
+	public void setMutability(Mutability mutability)
 	{
 		this.mutability = mutability;
 	}
@@ -259,7 +258,7 @@ public class ArrayType implements IObjectType, ITyped
 
 	private static boolean checkImmutable(IType superType, IType subtype)
 	{
-		return superType.getMutability() == 0 || superType.getMutability() == subtype.getMutability();
+		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype.getMutability();
 	}
 
 	private boolean checkPrimitiveType(IType elementType)
@@ -422,13 +421,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		if (step == steps)
 		{
-			final String internalType = annotation.getType().getInternalName();
-			if (AnnotationUtils.IMMUTABLE.equals(internalType))
-			{
-				this.mutability = MUTABILITY_MUTABLE;
-				return;
-			}
-			return;
+			this.mutability = Mutability.readAnnotation(annotation);
 		}
 
 		if (step >= steps || typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
@@ -443,57 +436,36 @@ public class ArrayType implements IObjectType, ITyped
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
 		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
-
-		if (this.mutability == MUTABILITY_IMMUTABLE)
-		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtils.IMMUTABE_EXTENDED,
-			                            true);
-		}
 	}
 	
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
-		out.writeByte(this.mutability);
+		this.mutability.write(out);
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
-		this.mutability = in.readByte();
+		this.mutability = Mutability.read(in);
 	}
 	
 	@Override
 	public String toString()
 	{
-		final StringBuilder builder = new StringBuilder();
-		builder.append('[');
-		this.appendMutability(builder);
+		final StringBuilder builder = new StringBuilder().append('[');
+		this.mutability.appendKeyword(builder);
 		builder.append(this.type.toString());
 		return builder.append(']').toString();
-	}
-
-	private void appendMutability(StringBuilder builder)
-	{
-		switch (this.mutability) {
-		case MUTABILITY_UNDEFINED:
-			return;
-		case MUTABILITY_MUTABLE:
-			builder.append("var ");
-			return;
-		case MUTABILITY_IMMUTABLE:
-			builder.append("final ");
-			return;
-		}
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('[');
-		this.appendMutability(buffer);
+		this.mutability.appendKeyword(buffer);
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
