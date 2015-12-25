@@ -63,7 +63,7 @@ public class InstanceFieldReference implements IReference
 		writer.writeLDC(fieldName);
 
 		// Write a call to the access factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/ReferenceFactory", factoryMethodName,
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName,
 		                       factoryMethodType, false);
 	}
 }

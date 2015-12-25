@@ -395,8 +395,8 @@ public final class TupleType implements IObjectType, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply",
-		                       "([Ldyvil/lang/Type;)Ldyvil/reflect/types/TupleType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/TupleType", "apply",
+		                       "([Ldyvil/lang/Type;)Ldyvilx/lang/model/type/TupleType;", false);
 	}
 	
 	@Override

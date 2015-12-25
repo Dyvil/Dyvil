@@ -86,7 +86,7 @@ public class InternalGenericType extends GenericType
 
 		switch (this.internalName)
 		{
-		case "dyvil/lang/ref/ObjectRef":
+		case "dyvil/ref/ObjectRef":
 			return new ReferenceType(Types.getObjectRefClass(), this.typeArguments[0]);
 		case "dyvil/collection/ImmutableMap":
 			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.MUTABLE,

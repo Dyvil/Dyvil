@@ -112,8 +112,8 @@ public class AnyType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/AnyType", "instance",
-		                      "Ldyvil/reflect/types/AnyType;");
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/AnyType", "instance",
+		                      "Ldyvilx/lang/model/type/AnyType;");
 	}
 	
 	@Override

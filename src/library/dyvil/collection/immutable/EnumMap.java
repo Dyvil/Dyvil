@@ -3,7 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvil.lang.Type;
+import dyvilx.lang.model.type.Type;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.reflect.EnumReflection;
 import dyvil.reflect.Modifiers;

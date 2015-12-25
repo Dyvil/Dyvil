@@ -44,7 +44,7 @@ public class ArrayReference implements IReference
 		final String factoryMethodName = "new" + refKeyword + "ArrayRef";
 		final String factoryMethodType = getFactoryMethodType(elementType, refKeyword);
 
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/ReferenceFactory", factoryMethodName,
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName,
 		                       factoryMethodType, false);
 	}
 
@@ -60,7 +60,7 @@ public class ArrayReference implements IReference
 			factoryMethodType.append("[Ljava/lang/Object;");
 		}
 
-		factoryMethodType.append("I)Ldyvil/lang/ref/").append(refKeyword).append("Ref;");
+		factoryMethodType.append("I)Ldyvil/ref/").append(refKeyword).append("Ref;");
 		return factoryMethodType.toString();
 	}
 }

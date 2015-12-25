@@ -36,8 +36,8 @@ public class Package implements INamed, IDefaultContext
 	public static Package dyvilFunction;
 	public static Package dyvilLang;
 	public static Package dyvilLangLiteral;
-	public static Package dyvilLangRef;
-	public static Package dyvilLangRefSimple;
+	public static Package dyvilRef;
+	public static Package dyvilRefSimple;
 	public static Package dyvilTuple;
 	public static Package dyvilUtil;
 	public static Package java;
@@ -85,8 +85,8 @@ public class Package implements INamed, IDefaultContext
 		dyvilFunction = dyvil.resolvePackage("function");
 		dyvilLang = dyvil.resolvePackage("lang");
 		dyvilLangLiteral = dyvilLang.resolvePackage("literal");
-		dyvilLangRef = dyvilLang.resolvePackage("ref");
-		dyvilLangRefSimple = dyvilLangRef.resolvePackage("simple");
+		dyvilRef = dyvil.resolvePackage("ref");
+		dyvilRefSimple = dyvilRef.resolvePackage("simple");
 		dyvilTuple = dyvil.resolvePackage("tuple");
 		dyvilUtil = dyvil.resolvePackage("util");
 		

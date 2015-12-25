@@ -6,7 +6,7 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvil.lang.Type;
+import dyvilx.lang.model.type.Type;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.TypeConvertible;

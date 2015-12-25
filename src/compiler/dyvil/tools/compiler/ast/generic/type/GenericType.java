@@ -185,8 +185,8 @@ public abstract class GenericType implements IObjectType, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/GenericType", "apply",
-		                       "(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/types/GenericType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
+		                       "(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvilx/lang/model/type/GenericType;", false);
 	}
 	
 	@Override

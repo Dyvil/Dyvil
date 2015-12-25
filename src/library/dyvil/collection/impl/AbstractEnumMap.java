@@ -2,7 +2,7 @@ package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
-import dyvil.lang.Type;
+import dyvilx.lang.model.type.Type;
 import dyvil.reflect.EnumReflection;
 import dyvil.tuple.Tuple2;
 import dyvil.util.None;

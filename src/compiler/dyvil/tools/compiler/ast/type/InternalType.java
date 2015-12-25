@@ -57,23 +57,23 @@ public class InternalType implements IRawType
 	{
 		switch (this.internalName)
 		{
-		case "dyvil/lang/ref/BooleanRef":
+		case "dyvil/ref/BooleanRef":
 			return Types.BOOLEAN.getRefType();
-		case "dyvil/lang/ref/ByteRef":
+		case "dyvil/ref/ByteRef":
 			return Types.BYTE.getRefType();
-		case "dyvil/lang/ref/ShortRef":
+		case "dyvil/ref/ShortRef":
 			return Types.SHORT.getRefType();
-		case "dyvil/lang/ref/CharRef":
+		case "dyvil/ref/CharRef":
 			return Types.CHAR.getRefType();
-		case "dyvil/lang/ref/IntRef":
+		case "dyvil/ref/IntRef":
 			return Types.INT.getRefType();
-		case "dyvil/lang/ref/LongRef":
+		case "dyvil/ref/LongRef":
 			return Types.LONG.getRefType();
-		case "dyvil/lang/ref/FloatRef":
+		case "dyvil/ref/FloatRef":
 			return Types.FLOAT.getRefType();
-		case "dyvil/lang/ref/DoubleRef":
+		case "dyvil/ref/DoubleRef":
 			return Types.DOUBLE.getRefType();
-		case "dyvil/lang/ref/StringRef":
+		case "dyvil/ref/StringRef":
 			return Types.STRING.getRefType();
 
 		case "dyvil/lang/Null":

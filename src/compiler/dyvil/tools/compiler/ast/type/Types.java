@@ -205,7 +205,7 @@ public final class Types
 	{
 		if (OBJECT_REF_CLASS == null)
 		{
-			return OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
+			return OBJECT_REF_CLASS = Package.dyvilRef.resolveClass("ObjectRef");
 		}
 		return OBJECT_REF_CLASS;
 	}
@@ -219,7 +219,7 @@ public final class Types
 	{
 		if (OBJECT_SIMPLE_REF_CLASS == null)
 		{
-			return OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
+			return OBJECT_SIMPLE_REF_CLASS = Package.dyvilRefSimple.resolveClass("SimpleObjectRef");
 		}
 		return OBJECT_SIMPLE_REF_CLASS;
 	}
@@ -242,7 +242,7 @@ public final class Types
 
 	public static String getInternalRef(IType type, String prefix)
 	{
-		return "dyvil/lang/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
+		return "dyvil/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
 	}
 
 	public static String getReferenceFactoryName(IType type, String prefix)
