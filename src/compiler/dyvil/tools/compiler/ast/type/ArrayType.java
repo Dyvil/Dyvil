@@ -30,8 +30,8 @@ public class ArrayType implements IObjectType, ITyped
 {
 	public static final int OBJECT_DISTANCE = 2;
 
-	private IType   type;
-	private boolean immutable;
+	private IType type;
+	private byte  mutability;
 
 	public ArrayType()
 	{
@@ -42,9 +42,9 @@ public class ArrayType implements IObjectType, ITyped
 		this.type = type;
 	}
 
-	public ArrayType(IType type, boolean immutable)
+	public ArrayType(IType type, byte mutability)
 	{
-		this.immutable = immutable;
+		this.mutability = mutability;
 		this.type = type;
 	}
 
@@ -115,15 +115,15 @@ public class ArrayType implements IObjectType, ITyped
 		return 1 + this.type.getArrayDimensions();
 	}
 
-	public void setImmutable(boolean immutable)
+	@Override
+	public byte getMutability()
 	{
-		this.immutable = immutable;
+		return this.mutability;
 	}
 
-	@Override
-	public boolean isImmutable()
+	public void setMutability(byte mutability)
 	{
-		return this.immutable;
+		this.mutability = mutability;
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return type.isArrayType() && this.immutable == type.isImmutable() && this.type
+		return type.isArrayType() && this.mutability == type.getMutability() && this.type
 				.isSameType(type.getElementType());
 	}
 	
@@ -259,7 +259,7 @@ public class ArrayType implements IObjectType, ITyped
 
 	private static boolean checkImmutable(IType superType, IType subtype)
 	{
-		return !superType.isImmutable() || subtype.isImmutable();
+		return superType.getMutability() == 0 || superType.getMutability() == subtype.getMutability();
 	}
 
 	private boolean checkPrimitiveType(IType elementType)
@@ -335,7 +335,7 @@ public class ArrayType implements IObjectType, ITyped
 		}
 		if (concrete != null && concrete != this.type)
 		{
-			return new ArrayType(concrete, this.immutable);
+			return new ArrayType(concrete, this.mutability);
 		}
 		return this;
 	}
@@ -420,9 +420,14 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (step == steps && AnnotationUtils.IMMUTABLE.equals(annotation.getType().getInternalName()))
+		if (step == steps)
 		{
-			this.immutable = true;
+			final String internalType = annotation.getType().getInternalName();
+			if (AnnotationUtils.IMMUTABLE.equals(internalType))
+			{
+				this.mutability = MUTABILITY_MUTABLE;
+				return;
+			}
 			return;
 		}
 
@@ -439,7 +444,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
 
-		if (this.immutable)
+		if (this.mutability == MUTABILITY_IMMUTABLE)
 		{
 			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtils.IMMUTABE_EXTENDED,
 			                            true);
@@ -450,30 +455,45 @@ public class ArrayType implements IObjectType, ITyped
 	public void write(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
-		out.writeBoolean(this.immutable);
+		out.writeByte(this.mutability);
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
-		this.immutable = in.readBoolean();
+		this.mutability = in.readByte();
 	}
 	
 	@Override
 	public String toString()
 	{
-		return (this.immutable ? "[final " : "[") + this.type.toString() + "]";
+		final StringBuilder builder = new StringBuilder();
+		builder.append('[');
+		this.appendMutability(builder);
+		builder.append(this.type.toString());
+		return builder.append(']').toString();
+	}
+
+	private void appendMutability(StringBuilder builder)
+	{
+		switch (this.mutability) {
+		case MUTABILITY_UNDEFINED:
+			return;
+		case MUTABILITY_MUTABLE:
+			builder.append("var ");
+			return;
+		case MUTABILITY_IMMUTABLE:
+			builder.append("final ");
+			return;
+		}
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('[');
-		if (this.immutable)
-		{
-			buffer.append("final ");
-		}
+		this.appendMutability(buffer);
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
@@ -481,6 +501,6 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public IType clone()
 	{
-		return new ArrayType(this.type, this.immutable);
+		return new ArrayType(this.type, this.mutability);
 	}
 }

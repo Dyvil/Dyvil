@@ -93,10 +93,16 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			{
 				final ArrayType arrayType = new ArrayType();
 
-				if (token.next().type() == DyvilKeywords.FINAL)
+				switch (token.next().type())
 				{
-					arrayType.setImmutable(true);
+				case DyvilKeywords.FINAL:
+					arrayType.setMutability(IType.MUTABILITY_IMMUTABLE);
 					pm.skip();
+					break;
+				case DyvilKeywords.VAR:
+					arrayType.setMutability(IType.MUTABILITY_MUTABLE);
+					pm.skip();
+					break;
 				}
 
 				this.mode = ARRAY_COLON;
@@ -171,13 +177,13 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				pm.reparse();
 				pm.report(token, "type.tuple.close_paren");
 			}
-			IToken next = token.next();
-			int nextType = next.type();
-			if (nextType == DyvilSymbols.ARROW_OPERATOR)
+
+			final IToken nextToken = token.next();
+			if (nextToken.type() == DyvilSymbols.ARROW_OPERATOR)
 			{
 				TupleType tupleType = (TupleType) this.type;
 				this.type = new LambdaType(tupleType);
-				this.type.setPosition(next.raw());
+				this.type.setPosition(nextToken.raw());
 				this.mode = LAMBDA_TYPE;
 				return;
 			}
