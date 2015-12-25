@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -217,7 +218,9 @@ public class ListType implements IObjectType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		// TODO
+		this.elementType.writeTypeExpression(writer);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ListType", "apply",
+		                       "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ListType;", false);
 	}
 
 	@Override
