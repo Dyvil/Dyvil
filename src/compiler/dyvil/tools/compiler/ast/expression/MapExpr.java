@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.MapType;
+import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -104,7 +105,8 @@ public class MapExpr implements IValue
 	{
 		if (this.type == null)
 		{
-			return this.type = new MapType(this.getKeyType(), this.getValueType());
+			return this.type = new MapType(this.getKeyType(), this.getValueType(), Mutability.UNDEFINED,
+			                               MapTypes.MAP_CLASS);
 		}
 		return this.type;
 	}
