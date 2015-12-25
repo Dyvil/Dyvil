@@ -29,15 +29,34 @@ import java.io.IOException;
 
 public class MapType implements IObjectType
 {
-	private IType keyType;
-	private IType valueType;
+	protected IType keyType;
+	protected IType valueType;
+	protected Mutability mutability = Mutability.UNDEFINED;
+
+	// Metadata
+	private IClass theClass;
 	
 	public MapType(IType keyType, IType valueType)
 	{
 		this.keyType = keyType;
 		this.valueType = valueType;
 	}
-	
+
+	public MapType(IType keyType, IType valueType, Mutability mutability)
+	{
+		this.keyType = keyType;
+		this.mutability = mutability;
+		this.valueType = valueType;
+	}
+
+	public MapType(IType keyType, IType valueType, Mutability mutability, IClass theClass)
+	{
+		this.keyType = keyType;
+		this.valueType = valueType;
+		this.mutability = mutability;
+		this.theClass = theClass;
+	}
+
 	@Override
 	public int typeTag()
 	{
@@ -73,27 +92,36 @@ public class MapType implements IObjectType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified("Map");
+		return this.theClass.getName();
 	}
 	
 	@Override
 	public IClass getTheClass()
 	{
-		return MapExpr.Types.MAP_CLASS;
+		return this.theClass;
+	}
+
+	@Override
+	public Mutability getMutability()
+	{
+		return this.mutability;
 	}
 	
 	@Override
 	public IType resolveType(ITypeVariable typeVar)
 	{
-		if (typeVar == MapExpr.Types.KEY_VARIABLE)
+		if (typeVar.getGeneric() == this.theClass)
 		{
-			return this.keyType;
+			if (typeVar.getIndex() == 0)
+			{
+				return this.keyType;
+			}
+			else
+			{
+				return this.valueType;
+			}
 		}
-		if (typeVar == MapExpr.Types.VALUE_VARIABLE)
-		{
-			return this.valueType;
-		}
-		return MapExpr.Types.MAP_CLASS.resolveType(typeVar, this);
+		return this.theClass.resolveType(typeVar, this);
 	}
 	
 	@Override
@@ -105,11 +133,11 @@ public class MapType implements IObjectType
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		IType newKeyType = this.keyType.getConcreteType(context);
-		IType newValueType = this.valueType.getConcreteType(context);
+		final IType newKeyType = this.keyType.getConcreteType(context);
+		final IType newValueType = this.valueType.getConcreteType(context);
 		if (newKeyType != this.keyType || newValueType != this.valueType)
 		{
-			return new MapType(newKeyType, newValueType);
+			return new MapType(newKeyType, newValueType, this.mutability, this.theClass);
 		}
 		return this;
 	}
@@ -117,19 +145,34 @@ public class MapType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		this.keyType.inferTypes(concrete.resolveType(MapExpr.Types.KEY_VARIABLE), typeContext);
-		this.valueType.inferTypes(concrete.resolveType(MapExpr.Types.VALUE_VARIABLE), typeContext);
+		this.keyType.inferTypes(concrete.resolveType(this.theClass.getTypeVariable(0)), typeContext);
+		this.valueType.inferTypes(concrete.resolveType(this.theClass.getTypeVariable(1)), typeContext);
+	}
+
+	private static IClass getClass(Mutability mutability)
+	{
+		if (mutability == Mutability.IMMUTABLE)
+		{
+			return MapExpr.MapTypes.IMMUTABLE_MAP_CLASS;
+		}
+		if (mutability == Mutability.MUTABLE)
+		{
+			return MapExpr.MapTypes.MUTABLE_MAP_CLASS;
+		}
+		return MapExpr.MapTypes.MAP_CLASS;
 	}
 	
 	@Override
 	public boolean isResolved()
 	{
-		return true;
+		return this.theClass != null;
 	}
 	
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
+		this.theClass = getClass(this.mutability);
+
 		this.keyType = this.keyType.resolveType(markers, context);
 		this.valueType = this.valueType.resolveType(markers, context);
 		return this;
@@ -172,7 +215,7 @@ public class MapType implements IObjectType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		MapExpr.Types.MAP_CLASS.getMethodMatches(list, instance, name, arguments);
+		this.theClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -189,13 +232,7 @@ public class MapType implements IObjectType
 	@Override
 	public String getInternalName()
 	{
-		return MapExpr.Types.MAP_CLASS.getInternalName();
-	}
-	
-	@Override
-	public void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append("Ldyvil/collection/Map;");
+		return this.theClass.getInternalName();
 	}
 	
 	@Override
@@ -209,7 +246,7 @@ public class MapType implements IObjectType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		buffer.append("Ldyvil/collection/Map;");
+		buffer.append('L').append(this.theClass.getInternalName()).append('<');
 		this.keyType.appendSignature(buffer);
 		this.valueType.appendSignature(buffer);
 		buffer.append('>').append(';');
@@ -233,6 +270,11 @@ public class MapType implements IObjectType
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
+		if (step == steps)
+		{
+			return;
+		}
+
 		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
 		{
 			return;
@@ -272,20 +314,33 @@ public class MapType implements IObjectType
 		this.keyType = IType.readType(in);
 		this.valueType = IType.readType(in);
 	}
-	
+
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public String toString()
 	{
-		buffer.append('[');
-		this.keyType.toString(prefix, buffer);
-		buffer.append(':');
-		this.valueType.toString(prefix, buffer);
-		buffer.append(']');
+		final StringBuilder builder = new StringBuilder().append('[');
+		this.mutability.appendKeyword(builder);
+		builder.append(this.keyType);
+		builder.append(':');
+		builder.append(this.valueType);
+		builder.append(']');
+		return builder.toString();
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder builder)
+	{
+		builder.append('[');
+		this.mutability.appendKeyword(builder);
+		this.keyType.toString(prefix, builder);
+		builder.append(':');
+		this.valueType.toString(prefix, builder);
+		builder.append(']');
 	}
 	
 	@Override
 	public IType clone()
 	{
-		return new MapType(this.keyType, this.valueType);
+		return new MapType(this.keyType, this.valueType, this.mutability, this.theClass);
 	}
 }

@@ -30,7 +30,7 @@ public class ArrayType implements IObjectType, ITyped
 	public static final int OBJECT_DISTANCE = 2;
 
 	private IType      type;
-	private Mutability mutability;
+	private Mutability mutability = Mutability.UNDEFINED;
 
 	public ArrayType()
 	{
