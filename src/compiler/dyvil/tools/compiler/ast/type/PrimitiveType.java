@@ -254,7 +254,18 @@ public final class PrimitiveType implements IType
 	{
 		return null;
 	}
-	
+
+	@Override
+	public boolean isExtension()
+	{
+		return false;
+	}
+
+	@Override
+	public void setExtension(boolean extension)
+	{
+	}
+
 	@Override
 	public IClass getArrayClass()
 	{

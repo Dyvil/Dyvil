@@ -150,6 +150,18 @@ public class AnnotatedType implements IType, ITyped
 	}
 
 	@Override
+	public boolean isExtension()
+	{
+		return this.type.isExtension();
+	}
+
+	@Override
+	public void setExtension(boolean extension)
+	{
+		this.type.setExtension(extension);
+	}
+
+	@Override
 	public byte getMutability()
 	{
 		final byte mutability = IType.super.getMutability();
@@ -159,7 +171,7 @@ public class AnnotatedType implements IType, ITyped
 		}
 		return this.type.getMutability();
 	}
-	
+
 	@Override
 	public IMethod getBoxMethod()
 	{

@@ -498,7 +498,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public IAccessible getAccessibleImplicit()
+	public IValue getImplicit()
 	{
 		return null;
 	}

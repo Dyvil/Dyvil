@@ -51,7 +51,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			}
 			
 			Modifier modifier;
-			if ((modifier = BaseModifiers.parseMethodModifier(token, pm)) != null)
+			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{

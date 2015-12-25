@@ -178,7 +178,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		}
 		return MUTABILITY_UNDEFINED;
 	}
-	
+
+	// Lambda Types
+
+	boolean isExtension();
+
+	void setExtension(boolean extension);
+
 	// Super Type
 	
 	default int getSuperTypeDistance(IType superType)

@@ -217,12 +217,33 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			IValue value = this.resolveField(context);
+			IValue value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
 			}
-			value = this.resolveMethod(markers, context);
+
+			// Duplicate in FieldAccess
+			if (this.receiver == null)
+			{
+				final IValue implicit = context.getImplicit();
+				if (implicit != null)
+				{
+					value = this.resolveField(implicit, context);
+					if (value != null)
+					{
+						return value;
+					}
+
+					value = this.resolveMethod(implicit, markers, context);
+					if (value != null)
+					{
+						return value;
+					}
+				}
+			}
+
+			value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -230,12 +251,12 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		}
 		else
 		{
-			IValue value = this.resolveMethod(markers, context);
+			IValue value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
 			}
-			value = this.resolveField(context);
+			value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
@@ -245,31 +266,32 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		return null;
 	}
 	
-	private IValue resolveField(IContext context)
+	private IValue resolveField(IValue receiver, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, this.receiver, this.name);
+		IDataMember field = ICall.resolveField(context, receiver, this.name);
 		if (field != null)
 		{
 			this.field = field;
+			this.receiver = receiver;
 			return this;
 		}
 		return null;
 	}
 	
-	private IValue resolveMethod(MarkerList markers, IContext context)
+	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
-		Name name = Name.getQualified(this.name.qualified + "_$eq");
-		IArguments arg = new SingleArgument(this.value);
-		IMethod m = ICall.resolveMethod(context, this.receiver, name, arg);
+		final Name name = Name.getQualified(this.name.qualified + "_$eq");
+		final IArguments arg = new SingleArgument(this.value);
+		final IMethod m = ICall.resolveMethod(context, receiver, name, arg);
 		if (m != null)
 		{
-			MethodCall mc = new MethodCall(this.position, this.receiver, name);
+			MethodCall mc = new MethodCall(this.position, receiver, name);
 			mc.arguments = arg;
 			mc.method = m;
 			mc.checkArguments(markers, context);
 			return mc;
 		}
-		
+
 		return null;
 	}
 	

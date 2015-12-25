@@ -110,7 +110,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			Modifier modifier;
-			if ((modifier = BaseModifiers.parseMemberModifier(token, pm)) != null)
+			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
 				this.modifiers.addModifier(modifier);
 				return;
