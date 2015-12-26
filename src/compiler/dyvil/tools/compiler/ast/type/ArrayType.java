@@ -413,7 +413,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ArrayType", "apply",
-		                       "(Ldyvil/lang/Type;)Ldyvilx/lang/model/type/ArrayType;", false);
+		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ArrayType;", false);
 	}
 	
 	@Override

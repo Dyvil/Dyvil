@@ -505,7 +505,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.returnType.writeTypeExpression(writer);
 		
 		writer.writeLDC(this.parameterCount);
-		writer.writeNewArray("dyvil/lang/Type", 1);
+		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			writer.writeInsn(Opcodes.DUP);
@@ -515,7 +515,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
-		                       "(Ldyvil/lang/Type;[Ldyvil/lang/Type;)Ldyvilx/lang/model/type/FunctionType;", false);
+		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;", false);
 	}
 	
 	@Override

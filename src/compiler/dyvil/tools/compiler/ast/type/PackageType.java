@@ -101,8 +101,8 @@ public class PackageType implements IRawType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.thePackage.getInternalName());
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Type", "apply",
-		                       "(Ljava/lang/String;)Ldyvil/lang/Type;", true);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
+		                       "(Ljava/lang/String;)Ldyvilx/lang/model/type/Type;", true);
 	}
 
 	@Override

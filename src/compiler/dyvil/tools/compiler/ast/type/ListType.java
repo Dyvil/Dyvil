@@ -220,7 +220,7 @@ public class ListType implements IObjectType
 	{
 		this.elementType.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ListType", "apply",
-		                       "(Ldyvil/lang/Type;)Ldyvilx/lang/model/type/ListType;", false);
+		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ListType;", false);
 	}
 
 	@Override
