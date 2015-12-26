@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -22,7 +21,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class TryStatement extends AbstractValue implements IStatement, IDefaultContext
+public final class TryStatement extends AbstractValue implements IDefaultContext
 {
 	protected IValue action;
 	protected CatchBlock[] catchBlocks = new CatchBlock[1];
@@ -41,6 +40,23 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 	public int valueTag()
 	{
 		return TRY;
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		if (!this.action.isResolved())
+		{
+			return false;
+		}
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			if (!this.catchBlocks[i].action.isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	public void setAction(IValue action)
@@ -95,38 +111,28 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.finallyBlock != null)
-		{
-			IValue value1 = this.finallyBlock.withType(type, typeContext, markers, context);
-			if (value1 == null)
-			{
-				return null;
-			}
-			this.finallyBlock = value1;
-			this.commonType = type;
-			return this;
-		}
-		
 		if (this.action != null)
 		{
-			IValue value1 = this.action.withType(type, typeContext, markers, context);
-			if (value1 == null)
+			final IValue typedAction = this.action.withType(type, typeContext, markers, context);
+			if (typedAction == null)
 			{
 				return null;
 			}
-			this.action = value1;
+			this.action = typedAction;
 		}
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			IValue value1 = block.action.withType(type, typeContext, markers, context);
-			if (value1 == null)
+			final CatchBlock block = this.catchBlocks[i];
+			final IValue typedAction = block.action.withType(type, typeContext, markers, context);
+
+			if (typedAction == null)
 			{
 				return null;
 			}
-			block.action = value1;
+			block.action = typedAction;
 		}
-		
+
 		this.commonType = type;
 		return this;
 	}
@@ -137,10 +143,6 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 		if (type == Types.VOID)
 		{
 			return true;
-		}
-		if (this.finallyBlock != null)
-		{
-			return this.finallyBlock.isType(type);
 		}
 		if (this.action != null && !this.action.isType(type))
 		{
@@ -159,7 +161,22 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		return 0;
+		float total = this.action.getTypeMatch(type);
+		if (total <= 0F)
+		{
+			return 0F;
+		}
+		for (int i = 0; i < this.catchBlockCount; i++)
+		{
+			final float blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
+			if (blockMatch <= 0F)
+			{
+				return 0F;
+			}
+			total += blockMatch;
+		}
+
+		return total / (1 + this.catchBlockCount);
 	}
 	
 	public void addCatchBlock(CatchBlock block)
@@ -342,50 +359,80 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 		}
 		return false;
 	}
-	
+
 	@Override
-	public void writeStatement(MethodWriter writer) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
+		if (type == null)
+		{
+			type = this.getType();
+		}
+
+		final boolean expression;
+		final int storeInsn;
+		final int localIndex;
+
+		if (type != Types.VOID)
+		{
+			storeInsn = type.getStoreOpcode();
+			localIndex = writer.localCount();
+			expression = true;
+		}
+		else
+		{
+			storeInsn = 0;
+			localIndex = -1;
+			expression = false;
+		}
+
+		final dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
+		final dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
+		final dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
 		
 		writer.writeTargetLabel(tryStart);
 		if (this.action != null)
 		{
-			this.action.writeExpression(writer, Types.VOID);
+			this.action.writeExpression(writer, type);
+			if (expression)
+			{
+				writer.writeVarInsn(storeInsn, localIndex);
+				writer.resetLocals(localIndex);
+			}
+
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		writer.writeLabel(tryEnd);
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
-			String handlerType = block.type.getInternalName();
+			final CatchBlock block = this.catchBlocks[i];
+			final dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
+			final String handlerType = block.type.getInternalName();
 			
 			writer.writeTargetLabel(handlerLabel);
 			writer.startCatchBlock(handlerType);
-			// We need a NOP here so the MethodWriter creates a StackMapFrame
-			// that does *not* include the variable that is about to be
-			// registered.
-			writer.writeInsn(Opcodes.NOP);
 			
 			// Check if the block's variable is actually used
 			if (block.variable != null)
 			{
 				// If yes register a new local variable for the exception and
 				// store it.
-				int localCount = writer.localCount();
+				final int localCount = writer.localCount();
 				block.variable.writeInit(writer, null);
-				block.action.writeExpression(writer, Types.VOID);
+				block.action.writeExpression(writer, type);
 				writer.resetLocals(localCount);
 			}
 			// Otherwise pop the exception from the stack
 			else
 			{
 				writer.writeInsn(Opcodes.POP);
-				block.action.writeExpression(writer, Types.VOID);
+				block.action.writeExpression(writer, type);
+			}
+
+			if (expression)
+			{
+				writer.writeVarInsn(storeInsn, localIndex);
+				writer.resetLocals(localIndex);
 			}
 			
 			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
@@ -394,7 +441,7 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 		
 		if (this.finallyBlock != null)
 		{
-			dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
+			final dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
 			
 			writer.writeLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
@@ -406,6 +453,13 @@ public final class TryStatement extends AbstractValue implements IStatement, IDe
 		else
 		{
 			writer.writeLabel(endLabel);
+		}
+
+		if (expression)
+		{
+			writer.setLocalType(localIndex, type.getFrameType());
+			writer.writeVarInsn(type.getLoadOpcode(), localIndex);
+			writer.resetLocals(localIndex);
 		}
 	}
 	

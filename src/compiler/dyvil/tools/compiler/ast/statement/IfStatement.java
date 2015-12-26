@@ -151,9 +151,9 @@ public class IfStatement extends AbstractValue
 			return this.then.getTypeMatch(type);
 		}
 		
-		float f1 = this.then.getTypeMatch(type);
-		float f2 = this.elseThen.getTypeMatch(type);
-		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
+		final float thenMatch = this.then.getTypeMatch(type);
+		final float elseMatch = this.elseThen.getTypeMatch(type);
+		return thenMatch == 0 || elseMatch == 0 ? 0 : (thenMatch + elseMatch) / 2F;
 	}
 	
 	@Override
