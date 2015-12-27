@@ -252,18 +252,13 @@ public final class Types
 
 	public static IType combine(IType type1, IType type2)
 	{
-		if (type1.isSameType(type2))
-		{
-			return type1;
-		}
-		return type1;
-	}
-
-	public static IType findCommonSuperType(IType type1, IType type2)
-	{
 		if (type1 == Types.VOID || type2 == Types.VOID)
 		{
 			return Types.VOID;
+		}
+		if (type1.isSameType(type2))
+		{
+			return type1;
 		}
 		if (type1.typeTag() == IType.NULL)
 		{
@@ -274,10 +269,10 @@ public final class Types
 			return type1.getObjectType();
 		}
 		
-		Set<IType> types1 = superTypes(type1);
-		Set<IType> types2 = superTypes(type2);
+		final Set<IType> superTypes1 = superTypes(type1);
+		final Set<IType> superTypes2 = superTypes(type2);
 		
-		for (IType t1 : types1)
+		for (IType t1 : superTypes1)
 		{
 			IClass class1 = t1.getTheClass();
 			if (class1 == Types.OBJECT_CLASS)
@@ -285,7 +280,7 @@ public final class Types
 				continue;
 			}
 			
-			for (IType t2 : types2)
+			for (IType t2 : superTypes2)
 			{
 				if (class1 == t2.getTheClass())
 				{

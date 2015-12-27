@@ -61,7 +61,7 @@ public abstract class BinaryPattern implements IPattern
 	{
 		if (this.commonType == null)
 		{
-			return this.commonType = Types.findCommonSuperType(this.left.getType(), this.right.getType());
+			return this.commonType = Types.combine(this.left.getType(), this.right.getType());
 		}
 		return this.commonType;
 	}
