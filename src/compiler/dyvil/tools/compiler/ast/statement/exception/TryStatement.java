@@ -475,6 +475,10 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			{
 				buffer.append('\n').append(actionPrefix);
 			}
+			else if (Formatting.getBoolean("try.space_after"))
+			{
+				buffer.append(' ');
+			}
 
 			this.action.toString(actionPrefix, buffer);
 		}

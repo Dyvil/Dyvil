@@ -9,6 +9,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TryStatementParser extends Parser implements IValueConsumer
@@ -34,6 +35,9 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		final int type = token.type();
 		switch (this.mode)
 		{
+		case END:
+			pm.popParser(true);
+			return;
 		case ACTION:
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = CATCH;
@@ -53,14 +57,11 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			}
 			if (ParserUtil.isTerminator(type))
 			{
-				IToken next = token.next();
-				if (next == null)
-				{
+				int nextType = token.next().type();
+				if (nextType == Tokens.EOF) {
 					pm.popParser(true);
 					return;
 				}
-				
-				int nextType = token.next().type();
 				if (nextType == DyvilKeywords.CATCH || nextType == DyvilKeywords.FINALLY)
 				{
 					return;
@@ -92,6 +93,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			pm.pushParser(pm.newExpressionParser(this.catchBlock));
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
+				pm.reparse();
 				pm.report(token, "try.catch.close_paren");
 			}
 			return;
@@ -108,7 +110,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			return;
 		case END:
 			this.statement.setFinallyBlock(value);
-			break;
+			return;
 		}
 	}
 }

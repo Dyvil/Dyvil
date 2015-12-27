@@ -453,6 +453,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			switch (type)
 			{
 			case DyvilKeywords.ELSE:
+			case DyvilKeywords.CATCH:
+			case DyvilKeywords.FINALLY:
 				this.valueConsumer.setValue(this.value);
 				pm.popParser(true);
 				return;
@@ -980,7 +982,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case DyvilKeywords.ELSE:
 		{
-			if (!(this.parent instanceof IfStatementParser))
+			if (!(this.parent instanceof IfStatementParser) && !(this.parent instanceof ExpressionParser))
 			{
 				pm.report(token, "expression.else");
 				return true;
@@ -1066,7 +1068,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case DyvilKeywords.CATCH:
 		{
-			if (!(this.parent instanceof TryStatementParser))
+			if (!(this.parent instanceof TryStatementParser) && !(this.parent instanceof ExpressionParser))
 			{
 				pm.report(token, "expression.catch");
 				return true;
@@ -1077,7 +1079,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		case DyvilKeywords.FINALLY:
 		{
-			if (!(this.parent instanceof TryStatementParser))
+			if (!(this.parent instanceof TryStatementParser) && !(this.parent instanceof ExpressionParser))
 			{
 				pm.report(token, "expression.finally");
 				return true;
