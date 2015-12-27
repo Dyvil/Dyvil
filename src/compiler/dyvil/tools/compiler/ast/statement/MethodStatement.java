@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class MethodStatement implements IStatement
@@ -41,6 +42,8 @@ public class MethodStatement implements IStatement
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		markers.add(new SemanticError(this.method.getPosition(), "Nested Methods are currently disabled"));
+
 		this.method.setTheClass(context.getThisClass());
 
 		if (context.isStatic())
