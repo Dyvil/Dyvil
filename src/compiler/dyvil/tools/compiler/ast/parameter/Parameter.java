@@ -118,13 +118,13 @@ public abstract class Parameter extends Member implements IParameter
 	@Override
 	public String getDescription()
 	{
-		return this.getActualType().getExtendedName();
+		return this.getInternalType().getExtendedName();
 	}
 	
 	@Override
 	public String getSignature()
 	{
-		return this.getActualType().getSignature();
+		return this.getInternalType().getSignature();
 	}
 	
 	@Override

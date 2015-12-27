@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.IConstructor;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -164,7 +163,7 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public IType getActualType()
+	public IType getInternalType()
 	{
 		return this.refType == null ? this.type : this.refType;
 	}
@@ -312,48 +311,64 @@ public final class Variable extends Member implements IVariable
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		writer.setLocalType(this.localIndex, this.type.getFrameType());
 	}
-	
+
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
+	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
-			
+			return;
+		}
+		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
+	}
+
+	@Override
+	public void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (this.refType != null)
+		{
 			final IClass refClass = this.refType.getTheClass();
 			final IDataMember refField = refClass.getBody().getField(0);
-			refField.writeGet(writer, null, lineNumber);
-			
+			refField.writeGet_Get(writer, lineNumber);
+
 			if (refClass == Types.getObjectSimpleRefClass())
 			{
 				Types.OBJECT.writeCast(writer, this.type, lineNumber);
 			}
-			return;
 		}
-		
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
-	
+
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
+	public boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
-			ReferenceType.writeGetRef(writer, value, this.localIndex);
-			
-			IDataMember f = this.refType.getTheClass().getBody().getField(0);
-			f.writeSet(writer, null, null, lineNumber);
-			return;
+			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			return true;
 		}
-		
-		if (value != null)
-		{
-			value.writeExpression(writer, this.type);
-		}
-		
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		return false;
 	}
-	
+
+	@Override
+	public void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (this.refType != null)
+		{
+			final IDataMember refField = this.refType.getTheClass().getBody().getField(0);
+			refField.writeSet_Set(writer, lineNumber);
+		}
+	}
+
+	@Override
+	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (this.refType == null)
+		{
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		}
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

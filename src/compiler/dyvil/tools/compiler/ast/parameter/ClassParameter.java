@@ -123,18 +123,21 @@ public final class ClassParameter extends Parameter implements IField
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(MarkerMessages.createMarker(position, "classparameter.access.static", this.name.unqualified));
+					markers.add(MarkerMessages
+							            .createMarker(position, "classparameter.access.static", this.name.unqualified));
 					return null;
 				}
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(MarkerMessages.createMarker(position, "classparameter.access.instance", this.name.unqualified));
+				markers.add(
+						MarkerMessages.createMarker(position, "classparameter.access.instance", this.name.unqualified));
 			}
 		}
 		else if (!this.hasModifier(Modifiers.STATIC))
 		{
-			markers.add(MarkerMessages.createMarker(position, "classparameter.access.unqualified", this.name.unqualified));
+			markers.add(
+					MarkerMessages.createMarker(position, "classparameter.access.unqualified", this.name.unqualified));
 			return new ThisExpr(position, this.theClass.getType(), context, markers);
 		}
 		
@@ -146,7 +149,8 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(MarkerMessages.createError(position, "classparameter.assign.annotation", this.name.unqualified));
+			markers.add(
+					MarkerMessages.createError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
 		else if (this.hasModifier(Modifiers.FINAL))
 		{
@@ -199,7 +203,8 @@ public final class ClassParameter extends Parameter implements IField
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "classparameter.type.nodefault", this.name.unqualified));
+			markers.add(
+					MarkerMessages.createMarker(this.position, "classparameter.type.nodefault", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -237,15 +242,10 @@ public final class ClassParameter extends Parameter implements IField
 		writer.registerParameter(this.localIndex, this.name.qualified, this.type, 0);
 		this.writeAnnotations(writer);
 	}
-	
+
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
+	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer, this.theClass.getType());
-		}
-		
 		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			StringBuilder desc = new StringBuilder("()");
@@ -261,18 +261,8 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
+	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer, this.theClass.getType());
-		}
-		
-		if (value != null)
-		{
-			value.writeExpression(writer, this.type);
-		}
-		
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified,
 		                      this.getDescription());
 	}

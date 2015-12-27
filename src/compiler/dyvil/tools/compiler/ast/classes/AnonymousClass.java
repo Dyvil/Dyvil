@@ -7,13 +7,13 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class AnonymousClass extends CodeClass
 {
-	protected CaptureField[] capturedFields;
-	protected int            capturedFieldCount;
+	protected CaptureHelper captureHelper = new CaptureHelper(CaptureField.factory(this));
 	
 	protected FieldThis thisField;
 	
@@ -92,32 +92,7 @@ public class AnonymousClass extends CodeClass
 			return variable;
 		}
 		
-		if (this.capturedFields == null)
-		{
-			this.capturedFields = new CaptureField[2];
-			this.capturedFieldCount = 1;
-			return this.capturedFields[0] = new CaptureField(this, variable);
-		}
-		
-		// Check if the variable is already in the array
-		for (int i = 0; i < this.capturedFieldCount; i++)
-		{
-			if (this.capturedFields[i].field == variable)
-			{
-				// If yes, return the match and skip adding the variable
-				// again.
-				return this.capturedFields[i];
-			}
-		}
-		
-		int index = this.capturedFieldCount++;
-		if (this.capturedFieldCount > this.capturedFields.length)
-		{
-			CaptureField[] temp = new CaptureField[this.capturedFieldCount];
-			System.arraycopy(this.capturedFields, 0, temp, 0, index);
-			this.capturedFields = temp;
-		}
-		return this.capturedFields[index] = new CaptureField(this, variable);
+		return this.captureHelper.capture(variable);
 	}
 	
 	@Override

@@ -102,6 +102,7 @@ public class IncOperator extends AbstractValue
 	public void resolveOperator(MarkerList markers, IContext context)
 	{
 		this.field = this.field.capture(context);
+		this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 		this.field.checkAssign(markers, context, this.position, null, this);
 	}
 
@@ -165,16 +166,20 @@ public class IncOperator extends AbstractValue
 				return;
 			}
 
+			this.field.writeGet_PreReceiver(writer, lineNumber);
+
 			if (receiver)
 			{
 				this.receiver.writeExpression(writer, null);
 				writer.writeInsn(Opcodes.DUP);
 			}
 
-			this.field.writeGet(writer, null, lineNumber);
+			this.field.writeGet_Get(writer, lineNumber);
+			this.field.writeGet_Unwrap(writer, lineNumber);
 			this.writeAdd1(writer, typecode);
 
-			this.field.writeSet(writer, null, null, lineNumber);
+			this.field.writeSet_Wrap(writer, lineNumber);
+			this.field.writeSet_Set(writer, lineNumber);
 			return;
 		}
 
@@ -196,6 +201,8 @@ public class IncOperator extends AbstractValue
 		{
 			int localCount = 0;
 
+			this.field.writeSet_PreReceiver(writer, lineNumber);
+
 			if (receiver)
 			{
 				localCount = writer.localCount();
@@ -207,34 +214,42 @@ public class IncOperator extends AbstractValue
 				writer.writeVarInsn(Opcodes.ASTORE, localCount);
 			}
 
-			// Load the old value
-			this.field.writeGet(writer, null, lineNumber);
+			final boolean tempValue = this.field.writeSet_PreValue(writer, lineNumber);
+			final int dupOpcode = tempValue ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP;
+
+			// GETTER
+			{
+				this.field.writeGet_PreReceiver(writer, lineNumber);
+
+				if (receiver)
+				{
+					// Load the receiver again
+					writer.writeVarInsn(Opcodes.ALOAD, localCount);
+				}
+
+				// Load the old value
+				this.field.writeGet_Get(writer, lineNumber);
+				this.field.writeGet_Unwrap(writer, lineNumber);
+			}
 
 			if (this.prefix)
 			{
 				// Compute the new value
 				this.writeAdd1(writer, typecode);
 				// Copy the new value
-				writer.writeInsn(Opcodes.AUTO_DUP);
+				writer.writeInsn(dupOpcode);
 			}
 			else
 			{
 				// Copy the old value
-				writer.writeInsn(Opcodes.AUTO_DUP);
+				writer.writeInsn(dupOpcode);
 				// Compute the new value
 				this.writeAdd1(writer, typecode);
 			}
 
-			if (receiver)
-			{
-				// Load the receiver again
-				writer.writeVarInsn(Opcodes.ALOAD, localCount);
-				// Swap the receiver and the top value
-				writer.writeInsn(Opcodes.AUTO_SWAP);
-			}
-
 			// Store the field
-			this.field.writeSet(writer, null, null, lineNumber);
+			this.field.writeSet_Wrap(writer, lineNumber);
+			this.field.writeSet_Set(writer, lineNumber);
 			// The new value is left on the stack
 
 			if (receiver)

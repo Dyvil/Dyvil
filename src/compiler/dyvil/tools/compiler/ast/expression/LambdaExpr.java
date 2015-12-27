@@ -66,7 +66,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 */
 	protected IMethod method;
 
-	protected CaptureHelper captureHelper = new CaptureHelper();
+	protected CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
 	
 	private String owner;
 	private String name;
@@ -718,7 +718,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		                                       writer.visitMethod(modifiers, this.name, this.getLambdaDescriptor(),
 		                                                          null, null));
 		
-		int index = this.captureHelper.writeCaptureParameters(mw);
+		int index = this.captureHelper.writeCaptureParameters(mw, 0);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{

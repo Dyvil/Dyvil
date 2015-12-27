@@ -43,10 +43,59 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	{
 		this.writeGet(writer, null, 0);
 	}
+
+	default void writeGet_PreReceiver(MethodWriter writer, int lineNumber)
+	{
+	}
+
+	void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException;
+
+	default void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+
+	}
+
+	default void writeSet_PreReceiver(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+	}
+
+	default boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		return false;
+	}
+
+	default void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+	}
+
+	void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException;
 	
-	void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException;
+	default void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
+	{
+		this.writeGet_PreReceiver(writer, lineNumber);
+		if (receiver != null)
+		{
+			receiver.writeExpression(writer, this.getTheClass().getType());
+		}
+
+		this.writeGet_Get(writer, lineNumber);
+		this.writeGet_Unwrap(writer, lineNumber);
+	}
 	
-	void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException;
+	default void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
+	{
+		this.writeSet_PreReceiver(writer, lineNumber);
+		if (receiver != null)
+		{
+			receiver.writeExpression(writer, this.getTheClass().getType());
+		}
+
+		this.writeSet_PreValue(writer, lineNumber);
+		value.writeExpression(writer, this.getType());
+
+		this.writeSet_Wrap(writer, lineNumber);
+		this.writeSet_Set(writer, lineNumber);
+	}
 	
 	String getDescription();
 	

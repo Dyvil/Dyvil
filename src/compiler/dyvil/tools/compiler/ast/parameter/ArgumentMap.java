@@ -186,7 +186,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 				continue;
 			}
 			
-			IType type = param.getActualType().getParameterType();
+			IType type = param.getInternalType().getParameterType();
 			IValue value = this.values[i];
 			IValue typed = IType.convertValue(value, type, typeContext, markers, context);
 			if (typed == null)

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
@@ -90,7 +91,7 @@ public final class MethodParameter extends Parameter
 	}
 
 	@Override
-	public IType getActualType()
+	public IType getInternalType()
 	{
 		return this.refType != null ? this.refType : this.type;
 	}
@@ -205,37 +206,58 @@ public final class MethodParameter extends Parameter
 	public void write(MethodWriter writer)
 	{
 		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.getActualType(), 0);
+		writer.registerParameter(this.localIndex, this.name.qualified, this.getInternalType(), 0);
 
 		this.writeAnnotations(writer);
 	}
-	
+
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
+	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
-			this.refType.writeGet(writer, this.localIndex);
+			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
 			return;
 		}
-		
 		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
-	
+
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
+	public void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
-			this.refType.writeSet(writer, this.localIndex, value);
-			return;
+			this.refType.writeUnwrap(writer, this.localIndex);
 		}
-		
-		if (value != null)
+	}
+
+	@Override
+	public boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (this.refType != null)
 		{
-			value.writeExpression(writer, this.type);
+			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			return true;
 		}
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		return false;
+	}
+
+	@Override
+	public void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (this.refType != null)
+		{
+			this.refType.writeWrap(writer, this.localIndex);
+		}
+	}
+
+	@Override
+	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (this.refType == null)
+		{
+			writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		}
 	}
 
 	@Override

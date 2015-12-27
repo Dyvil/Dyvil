@@ -1,30 +1,16 @@
 package dyvil.tools.compiler.ast.field;
 
-import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
+import java.util.function.Function;
 
-public class CaptureVariable implements IVariable
+public class CaptureVariable extends CaptureDataMember implements IVariable
 {
-	protected int           index;
-	protected IVariable     variable;
-	protected IType         type;
-	protected ICodePosition accessPosition;
-	
+	public static Function<? super IVariable, CaptureVariable> FACTORY = CaptureVariable::new;
+
 	public CaptureVariable()
 	{
 	}
@@ -32,124 +18,12 @@ public class CaptureVariable implements IVariable
 	public CaptureVariable(IVariable variable)
 	{
 		this.variable = variable;
-		this.type = variable.getType();
 	}
 
-	public IVariable getVariable()
-	{
-		return this.variable;
-	}
-
-	@Override
-	public ICodePosition getPosition()
-	{
-		return this.accessPosition;
-	}
-	
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-	}
-	
-	@Override
-	public int getAccessLevel()
-	{
-		return this.variable.getAccessLevel();
-	}
-	
-	@Override
-	public void setName(Name name)
-	{
-		this.variable.setName(name);
-	}
-	
-	@Override
-	public Name getName()
-	{
-		return this.variable.getName();
-	}
-	
-	@Override
-	public void setType(IType type)
-	{
-		this.variable.setType(type);
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return this.variable.getType();
-	}
-	
-	@Override
-	public void setModifiers(ModifierSet modifiers)
-	{
-		this.variable.setModifiers(modifiers);
-	}
-	
-	@Override
-	public ModifierSet getModifiers()
-	{
-		return this.variable.getModifiers();
-	}
-	
-	@Override
-	public boolean hasModifier(int mod)
-	{
-		return this.variable.hasModifier(mod);
-	}
-	
-	@Override
-	public AnnotationList getAnnotations()
-	{
-		return this.variable.getAnnotations();
-	}
-	
-	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-	}
-	
-	@Override
-	public IAnnotation getAnnotation(IClass type)
-	{
-		return this.variable.getAnnotation(type);
-	}
-	
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		this.variable.addAnnotation(annotation);
-	}
-	
 	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.LOCAL_VARIABLE;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.variable.setValue(value);
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return this.variable.getValue();
-	}
-	
-	@Override
-	public void setLocalIndex(int index)
-	{
-		this.index = index;
-	}
-	
-	@Override
-	public int getLocalIndex()
-	{
-		return this.index;
 	}
 
 	@Override
@@ -171,9 +45,9 @@ public class CaptureVariable implements IVariable
 	}
 	
 	@Override
-	public IType getActualType()
+	public IType getInternalType()
 	{
-		return this.variable.getActualType();
+		return this.variable.getInternalType();
 	}
 	
 	@Override
@@ -181,118 +55,19 @@ public class CaptureVariable implements IVariable
 	{
 		return true;
 	}
-	
-	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
-	{
-		if (this.accessPosition == null)
-		{
-			this.accessPosition = position;
-		}
 
-		return this.variable.checkAccess(markers, position, instance, context);
-	}
-	
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
+	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (!this.variable.isReferenceCapturable())
+		writer.writeVarInsn(this.variable.getInternalType().getLoadOpcode(), this.localIndex);
+	}
+
+	@Override
+	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	{
+		if (!this.variable.isReferenceType())
 		{
-			markers.add(MarkerMessages.createMarker(position, "variable.assign.capture", this.variable.getName()));
+			writer.writeVarInsn(this.variable.getInternalType().getStoreOpcode(), this.localIndex);
 		}
-		else
-		{
-			this.variable.setReferenceType();
-			this.type = this.variable.getActualType();
-		}
-		
-		return this.variable.checkAssign(markers, context, position, instance, newValue);
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		// Check if the variable is neither final nor effectively final
-		if (this.variable.isAssigned() && !this.variable.hasModifier(Modifiers.FINAL))
-		{
-			if (!this.variable.isReferenceCapturable())
-			{
-				markers.add(MarkerMessages.createError(this.accessPosition, "variable.access.capture",
-				                                       this.variable.getName()));
-			}
-			else
-			{
-				// Reference Capture is required
-				this.variable.setReferenceType();
-				this.type = this.variable.getActualType();
-			}
-		}
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void foldConstants()
-	{
-	}
-	
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return this.type.getExtendedName();
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
-	}
-	
-	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
-	{
-		int index = this.variable.getLocalIndex();
-		this.variable.setLocalIndex(this.index);
-		this.variable.writeGet(writer, instance, lineNumber);
-		this.variable.setLocalIndex(index);
-	}
-	
-	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
-	{
-		int index = this.variable.getLocalIndex();
-		this.variable.setLocalIndex(this.index);
-		this.variable.writeSet(writer, instance, value, lineNumber);
-		this.variable.setLocalIndex(index);
-	}
-	
-	@Override
-	public String toString()
-	{
-		return "#" + this.variable.toString();
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		this.variable.toString(prefix, buffer);
 	}
 }

@@ -263,10 +263,8 @@ public class ReferenceType implements IObjectType
 		this.type = IType.readType(in);
 	}
 	
-	public void writeGet(MethodWriter writer, int index) throws BytecodeException
+	public void writeUnwrap(MethodWriter writer, int index) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, index);
-		
 		String internal = this.theClass.getInternalName();
 		if (this.theClass == Types.getObjectRefClass())
 		{
@@ -282,27 +280,10 @@ public class ReferenceType implements IObjectType
 		StringBuilder sb = new StringBuilder("()");
 		this.type.appendExtendedName(sb);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", sb.toString(), true);
-		return;
 	}
 	
-	public static void writeGetRef(MethodWriter writer, IValue value, int index) throws BytecodeException
+	public void writeWrap(MethodWriter writer, int index) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, index);
-		
-		if (value != null)
-		{
-			value.writeExpression(writer, null);
-		}
-		else
-		{
-			writer.writeInsn(Opcodes.AUTO_SWAP);
-		}
-	}
-	
-	public void writeSet(MethodWriter writer, int index, IValue value) throws BytecodeException
-	{
-		writeGetRef(writer, value, index);
-		
 		String internal = this.theClass.getInternalName();
 		if (this.theClass == Types.getObjectRefClass())
 		{

@@ -380,13 +380,8 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
+	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer, this.theClass.getType());
-		}
-		
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
@@ -402,17 +397,8 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
+	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer, this.theClass.getType());
-		}
-		if (value != null)
-		{
-			value.writeExpression(writer, this.type);
-		}
-		
 		String owner = this.theClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();

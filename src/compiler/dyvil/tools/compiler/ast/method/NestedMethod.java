@@ -4,6 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
@@ -22,7 +23,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class NestedMethod extends CodeMethod
 {
-	private CaptureHelper captureHelper = new CaptureHelper();
+	private CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
 	
 	public NestedMethod(ICodePosition position, Name name, IType type, ModifierSet modifierSet)
 	{
@@ -115,7 +116,7 @@ public class NestedMethod extends CodeMethod
 
 		this.writeAnnotations(mw, modifiers);
 
-		int index = this.captureHelper.writeCaptureParameters(mw);
+		int index = this.captureHelper.writeCaptureParameters(mw, 0);
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{

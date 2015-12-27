@@ -3,18 +3,26 @@ package dyvil.tools.compiler.transform;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.field.CaptureVariable;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.field.*;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.function.Function;
+
 public class CaptureHelper
 {
-	private CaptureVariable[] capturedFields;
-	private int               capturedFieldCount;
-	private IClass            thisClass;
+	private CaptureDataMember[] capturedFields;
+	private int                 capturedFieldCount;
+
+	private       IClass                                                   thisClass;
+	private final Function<? super IVariable, ? extends CaptureDataMember> captureSupplier;
+
+	public CaptureHelper(Function<? super IVariable, ? extends CaptureDataMember> captureSupplier)
+	{
+		this.captureSupplier = captureSupplier;
+	}
 
 	public void setThisClass(IClass thisClass)
 	{
@@ -30,15 +38,15 @@ public class CaptureHelper
 	{
 		if (this.capturedFields == null)
 		{
-			this.capturedFields = new CaptureVariable[2];
+			this.capturedFields = new CaptureDataMember[2];
 			this.capturedFieldCount = 1;
-			return this.capturedFields[0] = new CaptureVariable(variable);
+			return this.capturedFields[0] = this.captureSupplier.apply(variable);
 		}
 
 		// Check if the variable is already in the array
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			CaptureVariable var = this.capturedFields[i];
+			final CaptureDataMember var = this.capturedFields[i];
 			if (var.getVariable() == variable)
 			{
 				// If yes, return the match and skip adding the variable
@@ -50,11 +58,11 @@ public class CaptureHelper
 		int index = this.capturedFieldCount++;
 		if (this.capturedFieldCount > this.capturedFields.length)
 		{
-			CaptureVariable[] temp = new CaptureVariable[this.capturedFieldCount];
+			CaptureDataMember[] temp = new CaptureDataMember[this.capturedFieldCount];
 			System.arraycopy(this.capturedFields, 0, temp, 0, index);
 			this.capturedFields = temp;
 		}
-		return this.capturedFields[index] = new CaptureVariable(variable);
+		return this.capturedFields[index] = this.captureSupplier.apply(variable);
 	}
 
 	public void checkCaptures(MarkerList markers, IContext context)
@@ -86,10 +94,9 @@ public class CaptureHelper
 
 	public void appendCaptureTypes(StringBuilder buffer)
 	{
-
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			this.capturedFields[i].getActualType().appendExtendedName(buffer);
+			this.capturedFields[i].getVariable().getInternalType().appendExtendedName(buffer);
 		}
 	}
 
@@ -102,14 +109,13 @@ public class CaptureHelper
 
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			CaptureVariable var = this.capturedFields[i];
-			writer.writeVarInsn(var.getActualType().getLoadOpcode(), var.getVariable().getLocalIndex());
+			final CaptureDataMember capture = this.capturedFields[i];
+			capture.getVariable().writeGet_Get(writer, 0);
 		}
 	}
 
-	public int writeCaptureParameters(MethodWriter writer)
+	public int writeCaptureParameters(MethodWriter writer, int index)
 	{
-		int index = 0;
 		if (this.thisClass != null)
 		{
 			writer.setThisType(this.thisClass.getInternalName());
@@ -118,11 +124,33 @@ public class CaptureHelper
 
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			CaptureVariable capture = this.capturedFields[i];
+			final CaptureDataMember capture = this.capturedFields[i];
 			capture.setLocalIndex(index);
-			index = writer.registerParameter(index, capture.getName().qualified, capture.getActualType(), 0);
+			index = writer
+					.registerParameter(index, capture.getName().qualified, capture.getVariable().getInternalType(), 0);
 		}
 
 		return index;
+	}
+
+	public void writeCaptureFields(ClassWriter writer) throws BytecodeException
+	{
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			final CaptureField field = (CaptureField) this.capturedFields[i];
+			field.write(writer);
+		}
+	}
+
+	public void writeFieldAssignments(MethodWriter writer) throws BytecodeException
+	{
+		for (int i = 0; i < this.capturedFieldCount; i++)
+		{
+			final CaptureField field = (CaptureField) this.capturedFields[i];
+			writer.writeVarInsn(Opcodes.ALOAD, 0);
+			writer.writeVarInsn(field.getInternalType().getLoadOpcode(), field.getLocalIndex());
+			writer.writeFieldInsn(Opcodes.PUTFIELD, field.theClass.getInternalName(), field.name,
+			                      field.getInternalType().getExtendedName());
+		}
 	}
 }

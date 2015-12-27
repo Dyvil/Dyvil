@@ -227,7 +227,7 @@ public class REPLVariable extends Field
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
+	public void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
 	{
 		if (this.isConstant())
 		{
@@ -246,7 +246,7 @@ public class REPLVariable extends Field
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
+	public void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (value != null)
 		{
