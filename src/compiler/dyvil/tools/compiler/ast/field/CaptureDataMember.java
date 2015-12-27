@@ -224,23 +224,12 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public void writeGet_PreReceiver(MethodWriter writer, int lineNumber)
-	{
-
-	}
-
-	@Override
 	public abstract void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException;
 
 	@Override
 	public void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		this.variable.writeGet_Unwrap(writer, lineNumber);
-	}
-
-	@Override
-	public void writeSet_PreReceiver(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
 	}
 
 	@Override

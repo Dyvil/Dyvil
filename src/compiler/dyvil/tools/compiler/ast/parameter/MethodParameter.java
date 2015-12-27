@@ -234,7 +234,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			this.refType.writeUnwrap(writer, this.localIndex);
+			this.refType.writeUnwrap(writer);
 		}
 	}
 
@@ -254,7 +254,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			this.refType.writeWrap(writer, this.localIndex);
+			this.refType.writeWrap(writer);
 		}
 	}
 

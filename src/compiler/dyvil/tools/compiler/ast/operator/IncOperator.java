@@ -166,7 +166,7 @@ public class IncOperator extends AbstractValue
 				return;
 			}
 
-			this.field.writeGet_PreReceiver(writer, lineNumber);
+			this.field.writeSet_PreValue(writer, lineNumber);
 
 			if (receiver)
 			{
@@ -199,32 +199,28 @@ public class IncOperator extends AbstractValue
 		}
 		else
 		{
-			int localCount = 0;
-
-			this.field.writeSet_PreReceiver(writer, lineNumber);
+			int receiverIndex = 0;
 
 			if (receiver)
 			{
-				localCount = writer.localCount();
+				receiverIndex = writer.localCount();
 
 				this.receiver.writeExpression(writer, null);
 				// Copy the receiver
 				writer.writeInsn(Opcodes.DUP);
 				// Store the receiver in a local variable
-				writer.writeVarInsn(Opcodes.ASTORE, localCount);
+				writer.writeVarInsn(Opcodes.ASTORE, receiverIndex);
 			}
 
 			final boolean tempValue = this.field.writeSet_PreValue(writer, lineNumber);
-			final int dupOpcode = tempValue ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP;
+			final int dupOpcode = tempValue || receiver ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP;
 
 			// GETTER
 			{
-				this.field.writeGet_PreReceiver(writer, lineNumber);
-
 				if (receiver)
 				{
 					// Load the receiver again
-					writer.writeVarInsn(Opcodes.ALOAD, localCount);
+					writer.writeVarInsn(Opcodes.ALOAD, receiverIndex);
 				}
 
 				// Load the old value
@@ -254,7 +250,7 @@ public class IncOperator extends AbstractValue
 
 			if (receiver)
 			{
-				writer.resetLocals(localCount);
+				writer.resetLocals(receiverIndex);
 			}
 		}
 

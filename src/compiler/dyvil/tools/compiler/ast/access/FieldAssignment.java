@@ -69,7 +69,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
@@ -354,35 +354,48 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final IType fieldType = this.field.getType();
 		final int lineNumber = this.getLineNumber();
+		if (type == Types.VOID)
+		{
+			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
+			return;
+		}
+		if (type == null)
+		{
+			type = this.getType();
+		}
+
+		final IType fieldType = this.field.getType();
+
+		if (this.receiver != null)
+		{
+			this.receiver.writeExpression(writer, null);
+		}
+
+		this.field.writeSet_PreValue(writer, lineNumber);
 
 		if (this.receiver == null)
 		{
+			final boolean tempVar = this.field.writeSet_PreValue(writer, lineNumber);
+
 			this.value.writeExpression(writer, fieldType);
 
-			if (type != Types.VOID)
-			{
-				writer.writeInsn(Opcodes.AUTO_DUP);
-			}
+			writer.writeInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
 		}
 		else
 		{
-			this.receiver.writeExpression(writer, null);
+			this.field.writeSet_PreValue(writer, lineNumber);
+
 			this.value.writeExpression(writer, fieldType);
 
-			if (type != Types.VOID)
-			{
-				writer.writeInsn(Opcodes.AUTO_DUP_X1);
-			}
+			writer.writeInsn(Opcodes.AUTO_DUP_X1);
 		}
 
-		this.field.writeSet(writer, null, null, lineNumber);
+		this.field.writeSet_Wrap(writer, lineNumber);
+		this.field.writeSet_Set(writer, lineNumber);
 
-		if (type != null && type != Types.VOID)
-		{
-			fieldType.writeCast(writer, type, lineNumber);
-		}
+		// Return value left on stack
+		fieldType.writeCast(writer, type, lineNumber);
 	}
 	
 	@Override

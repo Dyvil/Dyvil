@@ -263,9 +263,9 @@ public class ReferenceType implements IObjectType
 		this.type = IType.readType(in);
 	}
 	
-	public void writeUnwrap(MethodWriter writer, int index) throws BytecodeException
+	public void writeUnwrap(MethodWriter writer) throws BytecodeException
 	{
-		String internal = this.theClass.getInternalName();
+		final String internal = this.theClass.getInternalName();
 		if (this.theClass == Types.getObjectRefClass())
 		{
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
@@ -277,24 +277,24 @@ public class ReferenceType implements IObjectType
 			return;
 		}
 		
-		StringBuilder sb = new StringBuilder("()");
-		this.type.appendExtendedName(sb);
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", sb.toString(), true);
+		final StringBuilder stringBuilder = new StringBuilder("()");
+		this.type.appendExtendedName(stringBuilder);
+		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", stringBuilder.toString(), true);
 	}
 	
-	public void writeWrap(MethodWriter writer, int index) throws BytecodeException
+	public void writeWrap(MethodWriter writer) throws BytecodeException
 	{
-		String internal = this.theClass.getInternalName();
+		final String internal = this.theClass.getInternalName();
 		if (this.theClass == Types.getObjectRefClass())
 		{
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
 			return;
 		}
 		
-		StringBuilder sb = new StringBuilder().append('(');
-		this.type.appendExtendedName(sb);
-		sb.append(")V");
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", sb.toString(), true);
+		final StringBuilder stringBuilder = new StringBuilder().append('(');
+		this.type.appendExtendedName(stringBuilder);
+		stringBuilder.append(")V");
+		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", stringBuilder.toString(), true);
 	}
 
 	@Override

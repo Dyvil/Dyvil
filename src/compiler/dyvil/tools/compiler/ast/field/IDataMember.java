@@ -44,19 +44,11 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		this.writeGet(writer, null, 0);
 	}
 
-	default void writeGet_PreReceiver(MethodWriter writer, int lineNumber)
-	{
-	}
-
 	void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException;
 
 	default void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 
-	}
-
-	default void writeSet_PreReceiver(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
 	}
 
 	default boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
@@ -72,7 +64,6 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	
 	default void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
 	{
-		this.writeGet_PreReceiver(writer, lineNumber);
 		if (receiver != null)
 		{
 			receiver.writeExpression(writer, this.getTheClass().getType());
@@ -84,7 +75,6 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	
 	default void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
 	{
-		this.writeSet_PreReceiver(writer, lineNumber);
 		if (receiver != null)
 		{
 			receiver.writeExpression(writer, this.getTheClass().getType());
