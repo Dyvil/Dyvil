@@ -1,0 +1,46 @@
+package dyvil.test
+
+public class BuilderTest
+{
+	public case class Buildable(private int _int
+                                private double _double
+                                private String _string)
+    {
+
+		public static Buildable apply(extension Buildable => void configure)
+		{
+			auto b = new Buildable(0, 0D, null)
+			configure(b)
+			b
+		}
+
+		public int myInt
+		{
+			get: return this._int
+			set: this._int = myInt
+		}
+
+		public double myDouble
+		{
+			get: return this._double
+			set: this._double = myDouble
+		}
+
+		public String myString
+		{
+			get: return this._string
+			set: this._string = myString
+		}
+    }
+
+	public static void main([String] args)
+	{
+		auto buildable = Buildable {
+			myInt = 10
+			myString = "Hello World"
+			myDouble = 1.1D
+		}
+
+		Main.test("Builder Test", buildable, Buildable(10, 1.1D, "Hello World"))
+	}
+}

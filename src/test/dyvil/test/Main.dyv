@@ -12,6 +12,7 @@ public class Main
 		AbstractProperties.main(args)
 		AnnotationTest.main(args)
 		BridgeTest.main(args)
+		BuilderTest.main(args)
 		CaptureTest.main(args)
 		ExtensionTest.main(args)
 		ForTest.main(args)
