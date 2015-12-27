@@ -693,13 +693,8 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeGet(MethodWriter writer, IValue instance, int lineNumber) throws BytecodeException
+	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer, this.theClass.getType());
-		}
-		
 		int opcode;
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
@@ -718,17 +713,8 @@ public class Property extends Member implements IProperty, IContext
 	}
 	
 	@Override
-	public void writeSet(MethodWriter writer, IValue instance, IValue value, int lineNumber) throws BytecodeException
+	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (instance != null)
-		{
-			instance.writeExpression(writer, this.theClass.getType());
-		}
-		if (value != null)
-		{
-			value.writeExpression(writer, this.type);
-		}
-		
 		int opcode;
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{

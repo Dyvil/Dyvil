@@ -95,7 +95,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 				continue;
 			}
 			
-			writer.writeInsn(opcode, lineNumber);
+			writer.writeInsnAtLine(opcode, lineNumber);
 		}
 	}
 	

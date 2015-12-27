@@ -228,7 +228,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType type = param.getActualType().getParameterType();
+		IType type = param.getInternalType().getParameterType();
 		IValue value = this.values[index];
 		IValue typed = IType.convertValue(value, type, typeContext, markers, context);
 		if (typed == null)
@@ -249,7 +249,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType varParamType = param.getActualType();
+		IType varParamType = param.getInternalType();
 		
 		IValue value = this.values[index];
 		if (value.isType(varParamType.getConcreteType(typeContext)))

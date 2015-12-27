@@ -37,7 +37,7 @@ public interface IVariable extends IDataMember
 	{
 	}
 	
-	default IType getActualType()
+	default IType getInternalType()
 	{
 		return this.getType();
 	}

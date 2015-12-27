@@ -156,7 +156,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getActualType().getParameterType();
+		IType type = param.getInternalType().getParameterType();
 		IValue typed = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (typed == null)
 		{
@@ -177,7 +177,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getActualType();
+		IType type = param.getInternalType();
 		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
 		if (value1 != null)
 		{

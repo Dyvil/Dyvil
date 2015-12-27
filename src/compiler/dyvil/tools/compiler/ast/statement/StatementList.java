@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.collection.Entry;
+import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -14,6 +16,9 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -42,6 +47,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	// Metadata
 	protected Map<Name, Variable> variables;
 	protected IType               returnType;
+	protected List<IMethod>       methods;
 	
 	public StatementList()
 	{
@@ -231,7 +237,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.variables != null)
 		{
-			IDataMember field = this.variables.get(name);
+			final IDataMember field = this.variables.get(name);
 			if (field != null)
 			{
 				return field;
@@ -240,7 +246,25 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		
 		return null;
 	}
-	
+
+	@Override
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	{
+		if (this.methods == null)
+		{
+			return;
+		}
+
+		for (IMethod method : this.methods)
+		{
+			final float match = method.getSignatureMatch(name, instance, arguments);
+			if (match > 0)
+			{
+				list.add(method, match);
+			}
+		}
+	}
+
 	@Override
 	public Label resolveLabel(Name name)
 	{
@@ -302,23 +326,30 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		int len = this.valueCount - 1;
 		for (int i = 0; i < len; i++)
 		{
-			IValue resolved = this.values[i] = this.values[i].resolve(markers, combinedContext);
-			
-			if (resolved.valueTag() == IValue.VARIABLE)
+			final IValue resolvedValue = this.values[i] = this.values[i].resolve(markers, combinedContext);
+			final int valueTag = resolvedValue.valueTag();
+
+			if (valueTag == IValue.VARIABLE)
 			{
-				this.addVariable(resolved);
+				this.addVariable((FieldInitializer) resolvedValue);
+				continue;
+			}
+			if (valueTag == IValue.NESTED_METHOD)
+			{
+				this.addMethod((MethodStatement) resolvedValue);
+				continue;
 			}
 			
-			IValue typed = resolved.withType(Types.VOID, Types.VOID, markers, combinedContext);
-			if (typed == null)
+			IValue typedValue = resolvedValue.withType(Types.VOID, Types.VOID, markers, combinedContext);
+			if (typedValue == null)
 			{
-				Marker marker = MarkerMessages.createMarker(resolved.getPosition(), "statementlist.statement");
-				marker.addInfo(MarkerMessages.getMarker("return.type", resolved.getType()));
+				Marker marker = MarkerMessages.createMarker(resolvedValue.getPosition(), "statementlist.statement");
+				marker.addInfo(MarkerMessages.getMarker("return.type", resolvedValue.getType()));
 				markers.add(marker);
 			}
 			else
 			{
-				this.values[i] = typed;
+				this.values[i] = typedValue;
 			}
 		}
 
@@ -328,15 +359,25 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		return this;
 	}
 	
-	protected void addVariable(IValue value)
+	protected void addVariable(FieldInitializer initializer)
 	{
 		if (this.variables == null)
 		{
 			this.variables = new IdentityHashMap<>();
 		}
 		
-		Variable var = ((FieldInitializer) value).variable;
-		this.variables.put(var.getName(), var);
+		final Variable variable = initializer.variable;
+		this.variables.put(variable.getName(), variable);
+	}
+
+	protected void addMethod(MethodStatement methodStatement)
+	{
+		if (this.methods == null)
+		{
+			this.methods = new ArrayList<>();
+		}
+
+		this.methods.add(methodStatement.method);
 	}
 	
 	@Override

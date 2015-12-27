@@ -73,7 +73,7 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 	
 	void writeInsn(int opcode) throws BytecodeException;
 	
-	void writeInsn(int opcode, int lineNumber) throws BytecodeException;
+	void writeInsnAtLine(int opcode, int lineNumber) throws BytecodeException;
 	
 	void writeIntInsn(int opcode, int operand) throws BytecodeException;
 	

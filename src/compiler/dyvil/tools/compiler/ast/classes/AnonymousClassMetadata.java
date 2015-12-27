@@ -4,7 +4,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.CaptureField;
 import dyvil.tools.compiler.ast.field.FieldThis;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -14,6 +13,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class AnonymousClassMetadata implements IClassMetadata
@@ -69,13 +69,8 @@ public class AnonymousClassMetadata implements IClassMetadata
 		{
 			buf.append(thisField.getDescription());
 		}
-		
-		CaptureField[] capturedFields = this.theClass.capturedFields;
-		len = this.theClass.capturedFieldCount;
-		for (int i = 0; i < len; i++)
-		{
-			capturedFields[i].getType().appendExtendedName(buf);
-		}
+
+		this.theClass.captureHelper.appendCaptureTypes(buf);
 		
 		return this.desc = buf.append(")V").toString();
 	}
@@ -95,12 +90,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 			thisField.getOuter().writeGet(writer);
 		}
 		
-		CaptureField[] capturedFields = this.theClass.capturedFields;
-		int len = this.theClass.capturedFieldCount;
-		for (int i = 0; i < len; i++)
-		{
-			capturedFields[i].field.writeGet(writer, null, 0);
-		}
+		this.theClass.captureHelper.writeCaptures(writer);
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, this.getDesc(), false);
 	}
@@ -108,24 +98,26 @@ public class AnonymousClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
 	{
-		CaptureField[] capturedFields = this.theClass.capturedFields;
-		int capturedFieldCount = this.theClass.capturedFieldCount;
-		
+		final CaptureHelper captureHelper = this.theClass.captureHelper;
+		captureHelper.writeCaptureFields(writer);
+
 		MethodWriter mw = new MethodWriterImpl(writer,
 		                                       writer.visitMethod(Modifiers.MANDATED, "<init>", this.getDesc(), null,
 		                                                          null));
 		int params = this.constructor.parameterCount();
-		
+
+		// Signature & Parameter Data
+
 		mw.setThisType(this.theClass.getInternalName());
-		
+
 		for (int i = 0; i < params; i++)
 		{
 			this.constructor.getParameter(i).write(mw);
 		}
-		
+
 		int index = mw.localCount();
 		int thisIndex = index;
-		
+
 		FieldThis thisField = this.theClass.thisField;
 		if (thisField != null)
 		{
@@ -133,27 +125,17 @@ public class AnonymousClassMetadata implements IClassMetadata
 			index = mw.registerParameter(index, thisField.getName(), thisField.getTheClass().getType(),
 			                             Modifiers.MANDATED);
 		}
-		
-		int[] indexes = null;
-		if (capturedFieldCount > 0)
-		{
-			indexes = new int[capturedFieldCount];
-			
-			for (int i = 0; i < capturedFieldCount; i++)
-			{
-				CaptureField field = capturedFields[i];
-				field.write(writer);
-				indexes[i] = index;
-				index = mw.registerParameter(index, field.name, field.getType(), Modifiers.MANDATED);
-			}
-		}
+
+		captureHelper.writeCaptureParameters(mw, index);
+
+		// Constructor Body
 		
 		mw.begin();
 		mw.writeVarInsn(Opcodes.ALOAD, 0);
 		for (int i = 0; i < params; i++)
 		{
 			IParameter param = this.constructor.getParameter(i);
-			mw.writeVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
+			param.writeGet(mw);
 		}
 		this.constructor.writeInvoke(mw, 0);
 		
@@ -165,17 +147,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 			                  thisField.getDescription());
 		}
 		
-		if (capturedFieldCount > 0)
-		{
-			for (int i = 0; i < capturedFieldCount; i++)
-			{
-				CaptureField field = capturedFields[i];
-				mw.writeVarInsn(Opcodes.ALOAD, 0);
-				mw.writeVarInsn(field.getType().getLoadOpcode(), indexes[i]);
-				mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), field.name,
-				                  field.getDescription());
-			}
-		}
+		captureHelper.writeFieldAssignments(mw);
 		
 		mw.end(Types.VOID);
 	}

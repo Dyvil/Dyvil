@@ -11,15 +11,13 @@ import static dyvil.reflect.Opcodes.*;
 
 public final class MethodWriterImpl implements MethodWriter
 {
-	private static final Long LONG_MINUS_ONE = Long.valueOf(-1);
+	private static final Long LONG_MINUS_ONE = -1L;
 	
 	public    ClassWriter   cw;
 	protected MethodVisitor mv;
 	
 	protected Frame frame = new Frame();
 	private boolean visitFrame;
-	private int     maxLocals;
-	private int     maxStack;
 	
 	private boolean hasReturn;
 	
@@ -183,7 +181,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitIntInsn(Opcodes.SIPUSH, value);
 			return;
 		}
-		this.mv.visitLdcInsn(Integer.valueOf(value));
+		this.mv.visitLdcInsn(value);
 	}
 	
 	@Override
@@ -203,7 +201,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitInsn(LCONST_1);
 			return;
 		}
-		this.mv.visitLdcInsn(Long.valueOf(value));
+		this.mv.visitLdcInsn(value);
 	}
 	
 	@Override
@@ -228,7 +226,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitInsn(FCONST_2);
 			return;
 		}
-		this.mv.visitLdcInsn(Float.valueOf(value));
+		this.mv.visitLdcInsn(value);
 	}
 	
 	@Override
@@ -248,7 +246,7 @@ public final class MethodWriterImpl implements MethodWriter
 			this.mv.visitInsn(DCONST_1);
 			return;
 		}
-		this.mv.visitLdcInsn(Double.valueOf(value));
+		this.mv.visitLdcInsn(value);
 	}
 	
 	@Override
@@ -317,7 +315,7 @@ public final class MethodWriterImpl implements MethodWriter
 	// Other Instructions
 	
 	@Override
-	public void writeInsn(int opcode, int lineNumber) throws BytecodeException
+	public void writeInsnAtLine(int opcode, int lineNumber) throws BytecodeException
 	{
 		switch (opcode)
 		{
@@ -859,6 +857,6 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public String toString()
 	{
-		return this.mv.toString();
+		return "MethodWriter(frame: " + this.frame + ")";
 	}
 }

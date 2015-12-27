@@ -39,7 +39,7 @@ public class SimpleIntrinsicData implements IntrinsicData
 			return;
 		}
 		
-		writer.writeInsn(insn, lineNumber);
+		writer.writeInsnAtLine(insn, lineNumber);
 	}
 	
 	@Override
