@@ -19,10 +19,13 @@ import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
+	private static final boolean DISALLOW_EXPRESSIONS = true;
+
 	protected IValue action;
 	protected CatchBlock[] catchBlocks = new CatchBlock[1];
 	protected int    catchBlockCount;
@@ -82,6 +85,11 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public IType getType()
 	{
+		if (DISALLOW_EXPRESSIONS)
+		{
+			return Types.VOID;
+		}
+
 		if (this.commonType != null)
 		{
 			return this.commonType;
@@ -275,7 +283,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			}
 		}
 
-		if (this.commonType != Types.VOID) {
+		if (DISALLOW_EXPRESSIONS && this.commonType != Types.VOID)
+		{
+			markers.add(new SemanticError(this.position, "Try Statements cannot currently be used as expressions"));
 		}
 		return this;
 	}
