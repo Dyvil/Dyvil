@@ -86,26 +86,23 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		{
 			return this.commonType;
 		}
-		
-		if (this.finallyBlock != null)
-		{
-			return this.commonType = this.finallyBlock.getType();
-		}
+
 		if (this.action == null)
 		{
 			return Types.UNKNOWN;
 		}
-		IType type = this.action.getType();
+
+		IType combinedType = this.action.getType();
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			IType t1 = this.catchBlocks[i].action.getType();
-			type = Types.combine(type, t1);
-			if (type == null)
+			final IType catchBlockType = this.catchBlocks[i].action.getType();
+			combinedType = Types.combine(combinedType, catchBlockType);
+			if (combinedType == null)
 			{
 				return this.commonType = Types.ANY;
 			}
 		}
-		return this.commonType = type;
+		return this.commonType = combinedType;
 	}
 	
 	@Override
@@ -116,21 +113,35 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			final IValue typedAction = this.action.withType(type, typeContext, markers, context);
 			if (typedAction == null)
 			{
-				return null;
+				final Marker marker = MarkerMessages
+						.createError(this.action.getPosition(), "try.action.type.incompatible");
+				marker.addInfo(MarkerMessages.getMarker("action.type", this.action.getType().toString()));
+				marker.addInfo(MarkerMessages.getMarker("type.expected", type));
+				markers.add(marker);
 			}
-			this.action = typedAction;
+			else
+			{
+				this.action = typedAction;
+			}
 		}
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
-			final IValue typedAction = block.action.withType(type, typeContext, markers, context);
+			final IValue action = block.action;
+			final IValue typedAction = action.withType(type, typeContext, markers, context);
 
 			if (typedAction == null)
 			{
-				return null;
+				final Marker marker = MarkerMessages.createError(action.getPosition(), "try.catch.type.incompatible");
+				marker.addInfo(MarkerMessages.getMarker("try.catchblock.type", action.getType().toString()));
+				marker.addInfo(MarkerMessages.getMarker("type.expected", type));
+				markers.add(marker);
 			}
-			block.action = typedAction;
+			else
+			{
+				block.action = typedAction;
+			}
 		}
 
 		this.commonType = type;
@@ -241,7 +252,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
+			final CatchBlock block = this.catchBlocks[i];
 			block.type.resolve(markers, context);
 			block.action = block.action.resolve(markers, new CombiningContext(block, context));
 		}
@@ -249,6 +260,22 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock = this.finallyBlock.resolve(markers, context);
+
+			final IValue typedFinally = this.finallyBlock.withType(Types.VOID, Types.VOID, markers, context);
+			if (typedFinally == null)
+			{
+				final Marker marker = MarkerMessages
+						.createError(this.finallyBlock.getPosition(), "try.finally.type.invalid");
+				marker.addInfo(MarkerMessages.getMarker("try.finally.type", this.finallyBlock.getType().toString()));
+				markers.add(marker);
+			}
+			else
+			{
+				this.finallyBlock = typedFinally;
+			}
+		}
+
+		if (this.commonType != Types.VOID) {
 		}
 		return this;
 	}
@@ -289,7 +316,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
-				Marker marker = MarkerMessages.createMarker(block.position, "try.catch.type");
+				Marker marker = MarkerMessages.createMarker(block.position, "try.catch.type.not_throwable");
 				marker.addInfo(MarkerMessages.getMarker("exception.type", block.type));
 				markers.add(marker);
 			}
@@ -446,6 +473,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			writer.writeLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
 			writer.writeInsn(Opcodes.POP);
+
 			writer.writeLabel(endLabel);
 			this.finallyBlock.writeExpression(writer, Types.VOID);
 			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
@@ -458,6 +486,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		if (expression)
 		{
 			writer.setLocalType(localIndex, type.getFrameType());
+
 			writer.writeVarInsn(type.getLoadOpcode(), localIndex);
 			writer.resetLocals(localIndex);
 		}
