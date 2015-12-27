@@ -1,13 +1,16 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Mutating;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 @NilConvertible
-public class EmptyIterator<E> implements Iterator<E>
+@Immutable
+public final class EmptyIterator<E> implements Iterator<E>
 {
 	public static final EmptyIterator instance = new EmptyIterator();
 	
@@ -33,6 +36,7 @@ public class EmptyIterator<E> implements Iterator<E>
 	}
 	
 	@Override
+	@Mutating
 	public void remove()
 	{
 		throw new NoSuchElementException("Empty Iterator");

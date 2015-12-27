@@ -148,13 +148,20 @@ public final class MethodParameter extends Parameter
 	{
 		super.resolveTypes(markers, context);
 		
-		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.VAR))
+		if (this.modifiers != null)
 		{
-			if (this.method instanceof ExternalMethod)
+			if (this.modifiers.hasIntModifier(Modifiers.VAR))
 			{
-				this.type = this.type.getElementType();
+				if (this.method instanceof ExternalMethod)
+				{
+					this.type = this.type.getElementType();
+				}
+				this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
 			}
-			this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
+			else if (this.modifiers.hasIntModifier(Modifiers.INFIX & ~Modifiers.STATIC))
+			{
+				this.type.setExtension(true);
+			}
 		}
 	}
 	

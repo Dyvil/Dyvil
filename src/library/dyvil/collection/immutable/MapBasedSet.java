@@ -3,11 +3,13 @@ package dyvil.collection.immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 import dyvil.collection.mutable.HashMap;
+import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@Immutable
 public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = 2820007412138106503L;

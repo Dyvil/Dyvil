@@ -157,7 +157,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		writer.writeLDC(fieldName);
 
 		// Invoke the factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/ReferenceFactory", factoryMethodName,
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName,
 		                       factoryMethodType, false);
 		
 		// Assign the reference field

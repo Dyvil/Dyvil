@@ -136,7 +136,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				}
 			}
 			Modifier modifier;
-			if ((modifier = BaseModifiers.parseMemberModifier(token, pm)) != null)
+			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{

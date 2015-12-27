@@ -4,6 +4,7 @@ import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
+import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @ArrayConvertible
+@Immutable
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = -5372836862143742212L;

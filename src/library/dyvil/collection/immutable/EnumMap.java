@@ -3,11 +3,12 @@ package dyvil.collection.immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvil.lang.Type;
+import dyvilx.lang.model.type.Type;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.reflect.EnumReflection;
 import dyvil.reflect.Modifiers;
 import dyvil.tuple.Tuple2;
+import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @ArrayConvertible
+@Immutable
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = -2305035920228304893L;
@@ -28,7 +30,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
 	{
-		return new Builder<>(type.getTheClass());
+		return new Builder<>(type.erasure());
 	}
 	
 	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
@@ -50,7 +52,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	
 	public EnumMap(Type<K> type)
 	{
-		super(type.getTheClass());
+		super(type.erasure());
 	}
 	
 	public EnumMap(Map<K, V> map)

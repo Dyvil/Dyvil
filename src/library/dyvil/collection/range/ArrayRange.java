@@ -4,12 +4,14 @@ import dyvil.collection.Range;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.lang.Rangeable;
 import dyvil.lang.literal.TupleConvertible;
+import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
 @TupleConvertible
+@Immutable
 public class ArrayRange<T extends Rangeable<T>> implements Range<T>
 {
 	private static final long serialVersionUID = 3645807463260154912L;

@@ -55,7 +55,7 @@ public enum BaseModifiers implements Modifier
 		this.keyword = keyword;
 	}
 
-	public static Modifier parseVisibilityModifier(IToken token, IParserManager parserManager)
+	public static Modifier parseModifier(IToken token, IParserManager parserManager)
 	{
 		switch (token.type())
 		{
@@ -83,14 +83,6 @@ public enum BaseModifiers implements Modifier
 			return PUBLIC;
 		case DyvilKeywords.INTERNAL:
 			return INTERNAL;
-		}
-		return null;
-	}
-
-	public static Modifier parseMethodModifier(IToken token, IParserManager parserManager)
-	{
-		switch (token.type())
-		{
 		case DyvilKeywords.PREFIX:
 			return PREFIX;
 		case DyvilKeywords.INFIX:
@@ -111,69 +103,16 @@ public enum BaseModifiers implements Modifier
 			return INLINE;
 		case DyvilKeywords.SYNCHRONIZED:
 			return SYNCHRONIZED;
-		}
-		return parseVisibilityModifier(token, parserManager);
-	}
-
-	public static Modifier parseClassModifier(IToken token, IParserManager parserManager)
-	{
-		switch (token.type())
-		{
-		case DyvilKeywords.STATIC:
-			return STATIC;
-		case DyvilKeywords.ABSTRACT:
-			return ABSTRACT;
-		case DyvilKeywords.FINAL:
-			return FINAL;
 		case DyvilKeywords.FUNCTIONAL:
 			return FUNCTIONAL;
-		}
-		return parseVisibilityModifier(token, parserManager);
-	}
-
-	private static Modifier parseFieldModifier(IToken token, IParserManager parserManager)
-	{
-		switch (token.type())
-		{
-		case DyvilKeywords.STATIC:
-			return STATIC;
-		case DyvilKeywords.FINAL:
-			return FINAL;
 		case DyvilKeywords.CONST:
 			return CONST;
 		case DyvilKeywords.LAZY:
 			return LAZY;
-		}
-		return parseVisibilityModifier(token, parserManager);
-	}
-
-	public static Modifier parseMemberModifier(IToken token, IParserManager parserManager)
-	{
-		Modifier modifier = parseMethodModifier(token, parserManager);
-		if (modifier != null)
-		{
-			return modifier;
-		}
-
-		modifier = parseClassModifier(token, parserManager);
-		if (modifier != null)
-		{
-			return modifier;
-		}
-
-		return parseFieldModifier(token, parserManager);
-	}
-
-	public static Modifier parseParameterModifier(IToken token, IParserManager parserManager)
-	{
-		switch (token.type())
-		{
-		case DyvilKeywords.FINAL:
-			return FINAL;
 		case DyvilKeywords.VAR:
 			return VAR;
 		}
-		return parseFieldModifier(token, parserManager);
+		return null;
 	}
 
 	@Override

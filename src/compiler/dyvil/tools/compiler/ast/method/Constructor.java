@@ -526,7 +526,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public IAccessible getAccessibleImplicit()
+	public IValue getImplicit()
 	{
 		return null;
 	}

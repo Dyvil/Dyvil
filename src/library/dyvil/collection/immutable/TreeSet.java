@@ -4,10 +4,12 @@ import dyvil.collection.ImmutableMap;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.Set;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.annotation.Immutable;
 
 import java.util.Comparator;
 
 @ArrayConvertible
+@Immutable
 public class TreeSet<E> extends MapBasedSet<E>
 {
 	private static final long serialVersionUID = -6636571715777235576L;

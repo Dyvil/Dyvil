@@ -2,15 +2,13 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.MapType;
+import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -21,14 +19,6 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class MapExpr implements IValue
 {
-	public static final class Types
-	{
-		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
-		public static final IClass MAP_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("MapConvertible");
-		
-		public static final ITypeVariable KEY_VARIABLE   = Types.MAP_CLASS.getTypeVariable(0);
-		public static final ITypeVariable VALUE_VARIABLE = Types.MAP_CLASS.getTypeVariable(1);
-	}
 	
 	protected ICodePosition position;
 	
@@ -102,7 +92,8 @@ public class MapExpr implements IValue
 	{
 		if (this.type == null)
 		{
-			return this.type = new MapType(this.getKeyType(), this.getValueType());
+			return this.type = new MapType(this.getKeyType(), this.getValueType(), Mutability.UNDEFINED,
+			                               MapType.MapTypes.MAP_CLASS);
 		}
 		return this.type;
 	}
@@ -116,9 +107,9 @@ public class MapExpr implements IValue
 	@Override
 	public IValue withType(IType mapType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!Types.MAP_CLASS.isSubTypeOf(mapType))
+		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(mapType))
 		{
-			IAnnotation annotation = mapType.getTheClass().getAnnotation(Types.MAP_CONVERTIBLE_CLASS);
+			IAnnotation annotation = mapType.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
 				ArgumentList arguments = new ArgumentList(
@@ -130,8 +121,8 @@ public class MapExpr implements IValue
 			return null;
 		}
 		
-		IType keyType = this.keyType = mapType.resolveTypeSafely(Types.KEY_VARIABLE);
-		IType valueType = this.valueType = mapType.resolveTypeSafely(Types.VALUE_VARIABLE);
+		IType keyType = this.keyType = mapType.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
+		IType valueType = this.valueType = mapType.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
 		
 		for (int i = 0; i < this.count; i++)
 		{
@@ -174,13 +165,13 @@ public class MapExpr implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (!Types.MAP_CLASS.isSubTypeOf(type))
+		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(type))
 		{
 			return this.isConvertibleFrom(type);
 		}
 		
-		IType keyType = type.resolveTypeSafely(Types.KEY_VARIABLE);
-		IType valueType = type.resolveTypeSafely(Types.VALUE_VARIABLE);
+		IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
+		IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
 		
 		for (int i = 0; i < this.count; i++)
 		{
@@ -199,13 +190,13 @@ public class MapExpr implements IValue
 	
 	private boolean isConvertibleFrom(IType type)
 	{
-		return type.getTheClass().getAnnotation(Types.MAP_CONVERTIBLE_CLASS) != null;
+		return type.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (!Types.MAP_CLASS.isSubTypeOf(type))
+		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(type))
 		{
 			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
 		}
@@ -215,8 +206,8 @@ public class MapExpr implements IValue
 			return 1;
 		}
 		
-		IType keyType = type.resolveTypeSafely(Types.KEY_VARIABLE);
-		IType valueType = type.resolveTypeSafely(Types.VALUE_VARIABLE);
+		IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
+		IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
 		
 		float total = 0;
 		for (int i = 0; i < this.count; i++)

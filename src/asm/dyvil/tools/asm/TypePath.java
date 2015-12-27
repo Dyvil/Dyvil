@@ -36,6 +36,8 @@ public class TypePath
 	public final static int INNER_TYPE     = 1;
 	public final static int WILDCARD_BOUND = 2;
 	public final static int TYPE_ARGUMENT  = 3;
+
+	public static final TypePath EMPTY = new TypePath(new byte[] { 0 }, 0);
 	
 	byte[] b;
 	int    offset;

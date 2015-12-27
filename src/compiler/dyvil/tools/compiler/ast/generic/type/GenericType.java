@@ -176,7 +176,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 		writer.writeLDC(iclass == null ? this.getName().qualified : iclass.getFullName());
 		
 		writer.writeLDC(this.typeArgumentCount);
-		writer.writeNewArray("dyvil/lang/Type", 1);
+		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			writer.writeInsn(Opcodes.DUP);
@@ -185,8 +185,8 @@ public abstract class GenericType implements IObjectType, ITypeList
 			writer.writeInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/GenericType", "apply",
-		                       "(Ljava/lang/String;[Ldyvil/lang/Type;)Ldyvil/reflect/types/GenericType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
+		                       "(Ljava/lang/String;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;", false);
 	}
 	
 	@Override

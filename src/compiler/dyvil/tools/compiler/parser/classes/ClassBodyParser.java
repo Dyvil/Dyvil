@@ -28,6 +28,7 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ClassBodyParser extends Parser implements ITypeConsumer
 {
+	protected static final int END            = 0;
 	protected static final int TYPE           = 1;
 	protected static final int NAME_OPERATOR  = 2;
 	protected static final int NAME           = 4;
@@ -73,14 +74,14 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		
 		switch (this.mode)
 		{
 		case TYPE:
 			switch (type)
 			{
-			case 0:
+			case END:
 				// no error
 				pm.popParser();
 				return;
@@ -108,7 +109,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			Modifier modifier;
-			if ((modifier = BaseModifiers.parseMemberModifier(token, pm)) != null)
+			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
 				this.modifiers.addModifier(modifier);
 				return;
@@ -160,66 +161,73 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				pm.report(token, "member.identifier");
 				return;
 			}
-			IToken next = token.next();
-			type = next.type();
-			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.CLOSE_CURLY_BRACKET)
+
+			final IToken nextToken = token.next();
+			final int nextType = nextToken.type();
+
+			switch (nextType)
 			{
-				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				f.setAnnotations(this.annotations);
-				this.consumer.addField(f);
-				
+			case BaseSymbols.SEMICOLON:
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+			{
+				final IField field = new Field(token.raw(), this.theClass, token.nameValue(), this.type,
+				                               this.modifiers);
+				field.setAnnotations(this.annotations);
+				this.consumer.addField(field);
+
 				if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 				{
 					pm.popParser(true);
 					return;
 				}
-				
+
 				pm.skip();
 				this.reset();
 				return;
 			}
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
+			case BaseSymbols.OPEN_PARENTHESIS:
 			{
+
+				final IMethod method = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type,
+				                                      this.modifiers);
+				method.setAnnotations(this.annotations);
 				this.mode = PARAMETERS;
-				
-				AbstractMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type,
-				                                  this.modifiers);
-				m.setAnnotations(this.annotations);
-				this.member = m;
+				this.member = method;
 				return;
 			}
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				Property p = new Property(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				p.setAnnotations(this.annotations);
-				this.member = p;
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+				final Property property = new Property(token.raw(), this.theClass, token.nameValue(), this.type,
+				                                       this.modifiers);
+				property.setAnnotations(this.annotations);
+				this.member = property;
 				this.mode = FIELD_END;
-				
+
 				pm.skip();
-				pm.pushParser(new PropertyParser(p));
+				pm.pushParser(new PropertyParser(property));
 				return;
-			}
-			if (type == BaseSymbols.EQUALS)
+			case BaseSymbols.EQUALS:
 			{
-				Field f = new Field(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
-				f.setAnnotations(this.annotations);
-				this.member = f;
+				final IField field = new Field(token.raw(), this.theClass, token.nameValue(), this.type,
+				                               this.modifiers);
+				field.setAnnotations(this.annotations);
+				this.member = field;
 				this.mode = FIELD_END;
-				
+
 				pm.skip();
-				pm.pushParser(pm.newExpressionParser(f));
+				pm.pushParser(pm.newExpressionParser(field));
 				return;
 			}
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
 			{
 				CodeMethod m = new CodeMethod(token.raw(), this.theClass, token.nameValue(), this.type, this.modifiers);
 				m.setAnnotations(this.annotations);
 				this.member = m;
-				
+
 				this.mode = GENERICS_END;
 				pm.skip();
 				pm.pushParser(new TypeVariableListParser(m));
 				return;
+			}
 			}
 			
 			this.mode = TYPE;

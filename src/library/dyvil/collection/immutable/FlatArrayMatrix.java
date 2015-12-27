@@ -4,9 +4,11 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
+import dyvil.annotation.Immutable;
 
 import java.util.function.Function;
 
+@Immutable
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements ImmutableMatrix<E>
 {
 	private static final long serialVersionUID = 7265281981107132533L;

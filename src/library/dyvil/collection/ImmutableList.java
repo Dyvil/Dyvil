@@ -1,13 +1,14 @@
 package dyvil.collection;
 
+import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.Covariant;
-import dyvil.annotation.mutating;
 import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.SingletonList;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Comparator;
@@ -20,6 +21,7 @@ import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
+@Immutable
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {
 	interface Builder<E> extends ImmutableCollection.Builder<E>
@@ -180,83 +182,83 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	// Mutating Operations
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $plus$eq(E element)
 	{
 		throw new ImmutableException("+= on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $plus$plus$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("++= on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $minus$eq(Object element)
 	{
 		throw new ImmutableException("-= on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $minus$minus$eq(Collection<?> collection)
 	{
 		throw new ImmutableException("--= on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void $amp$eq(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("&= on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void ensureCapacity(int minSize)
 	{
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void subscript_$eq(int index, E element)
 	{
 		throw new ImmutableException("update() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default E set(int index, E element)
 	{
 		throw new ImmutableException("set() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void insert(int index, E element)
 	{
 		throw new ImmutableException("insert() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean add(E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default E add(int index, E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
@@ -269,35 +271,35 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean removeFirst(Object element)
 	{
 		throw new ImmutableException("removeFirst() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean removeLast(Object element)
 	{
 		throw new ImmutableException("removeLast() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void removeAt(int index)
 	{
 		throw new ImmutableException("removeAt() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default boolean removeAll(Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable List");
@@ -310,56 +312,56 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void filter(Predicate<? super E> condition)
 	{
 		throw new ImmutableException("filter() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void map(Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void reverse()
 	{
 		throw new ImmutableException("reverse() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void sort()
 	{
 		throw new ImmutableException("sort() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void sort(Comparator<? super E> comparator)
 	{
 		throw new ImmutableException("sort() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void distinguish()
 	{
 		throw new ImmutableException("distinguish() on Immutable List");
 	}
 	
 	@Override
-	@mutating
+	@Mutating
 	default void distinguish(Comparator<? super E> comparator)
 	{
 		throw new ImmutableException("disinguish() on Immutable List");

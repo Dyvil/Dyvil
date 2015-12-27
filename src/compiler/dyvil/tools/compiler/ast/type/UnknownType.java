@@ -153,8 +153,8 @@ public class UnknownType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/UnknownType", "instance",
-		                      "Ldyvil/reflect/types/UnknownType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/UnknownType", "instance",
+		                      "Ldyvilx/lang/model/type/UnknownType;", false);
 	}
 	
 	@Override

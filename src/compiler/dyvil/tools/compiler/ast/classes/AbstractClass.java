@@ -930,7 +930,7 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public IAccessible getAccessibleImplicit()
+	public IValue getImplicit()
 	{
 		return null;
 	}

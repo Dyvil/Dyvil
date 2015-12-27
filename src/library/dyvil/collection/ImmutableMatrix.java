@@ -5,14 +5,13 @@ import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
-import dyvil.util.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 @ArrayConvertible
-public interface ImmutableMatrix<@Covariant E> extends Matrix<E>, Immutable
+public interface ImmutableMatrix<@Covariant E> extends Matrix<E>
 {
 	static <E> ImmutableMatrix<E> apply(E[]... elements)
 	{

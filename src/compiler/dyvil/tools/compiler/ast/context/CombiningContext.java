@@ -108,10 +108,10 @@ public class CombiningContext implements IContext
 	}
 	
 	@Override
-	public IAccessible getAccessibleImplicit()
+	public IValue getImplicit()
 	{
-		IAccessible i = this.inner.getAccessibleImplicit();
-		return i == null ? this.outer.getAccessibleImplicit() : i;
+		final IValue innerImplicit = this.inner.getImplicit();
+		return innerImplicit == null ? this.outer.getImplicit() : innerImplicit;
 	}
 	
 	@Override

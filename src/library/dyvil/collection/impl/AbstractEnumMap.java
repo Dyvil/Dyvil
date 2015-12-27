@@ -2,7 +2,7 @@ package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
-import dyvil.lang.Type;
+import dyvilx.lang.model.type.Type;
 import dyvil.reflect.EnumReflection;
 import dyvil.tuple.Tuple2;
 import dyvil.util.None;
@@ -120,7 +120,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	
 	public AbstractEnumMap(Type<K> type)
 	{
-		this(type.getTheClass());
+		this(type.erasure());
 	}
 	
 	public AbstractEnumMap(Class<K> type)

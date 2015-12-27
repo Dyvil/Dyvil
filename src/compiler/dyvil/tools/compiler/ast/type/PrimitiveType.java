@@ -208,7 +208,7 @@ public final class PrimitiveType implements IType
 		if (this.refClass == null)
 		{
 			final String className = this.theClass.getName().qualified + "Ref";
-			return this.refClass = Package.dyvilLangRef.resolveClass(className);
+			return this.refClass = Package.dyvilRef.resolveClass(className);
 		}
 		return this.refClass;
 	}
@@ -220,7 +220,7 @@ public final class PrimitiveType implements IType
 		if (refType == null)
 		{
 			String className = "Simple" + this.theClass.getName().qualified + "Ref";
-			return this.simpleRefType = new ClassType(Package.dyvilLangRefSimple.resolveClass(className));
+			return this.simpleRefType = new ClassType(Package.dyvilRefSimple.resolveClass(className));
 		}
 		return refType;
 	}
@@ -254,7 +254,18 @@ public final class PrimitiveType implements IType
 	{
 		return null;
 	}
-	
+
+	@Override
+	public boolean isExtension()
+	{
+		return false;
+	}
+
+	@Override
+	public void setExtension(boolean extension)
+	{
+	}
+
 	@Override
 	public IClass getArrayClass()
 	{
@@ -265,6 +276,12 @@ public final class PrimitiveType implements IType
 			return this.arrayClass = Package.dyvilArray.resolveClass(className);
 		}
 		return iclass;
+	}
+
+	@Override
+	public Mutability getMutability()
+	{
+		return Mutability.IMMUTABLE;
 	}
 	
 	@Override
@@ -489,8 +506,8 @@ public final class PrimitiveType implements IType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.writeLDC(this.typecode);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/PrimitiveType", "apply",
-		                       "(I)Ldyvil/reflect/types/PrimitiveType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
+		                       "(I)Ldyvilx/lang/model/type/PrimitiveType;", false);
 	}
 	
 	@Override

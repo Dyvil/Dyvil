@@ -6,6 +6,7 @@ import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonSet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
+@Immutable
 public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>
 {
 	interface Builder<E> extends ImmutableCollection.Builder<E>

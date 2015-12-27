@@ -1,5 +1,6 @@
 package dyvil.tuple
 
+@Immutable
 public case class Tuple6[+A, +B, +C, +D, +E, +F] (
 		public final A _1
 		public final B _2

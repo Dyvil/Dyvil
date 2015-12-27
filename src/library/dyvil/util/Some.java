@@ -1,5 +1,6 @@
 package dyvil.util;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.ClassParameters;
 import dyvil.lang.literal.TupleConvertible;
 
@@ -11,6 +12,7 @@ import java.util.function.Supplier;
 
 @TupleConvertible
 @ClassParameters(names = { "value" })
+@Immutable
 public final class Some<T> implements Option<T>
 {
 	private static final long serialVersionUID = 4760957059219326387L;

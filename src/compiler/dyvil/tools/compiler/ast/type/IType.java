@@ -91,10 +91,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	// Compound Types
 	int TUPLE     = 32;
 	int LAMBDA    = 33;
+
 	int ARRAY     = 34;
-	int MAP       = 35;
-	int OPTIONAL  = 36;
-	int REFERENCE = 38;
+	int LIST      = 35;
+	int MAP       = 37;
+
+	int OPTIONAL  = 48;
+	int REFERENCE = 50;
 	
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
@@ -164,7 +167,22 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	IType getElementType();
 	
 	IClass getArrayClass();
-	
+
+	default Mutability getMutability()
+	{
+		if (this.getAnnotation(Types.IMMUTABLE_CLASS) != null)
+		{
+			return Mutability.IMMUTABLE;
+		}
+		return Mutability.UNDEFINED;
+	}
+
+	// Lambda Types
+
+	boolean isExtension();
+
+	void setExtension(boolean extension);
+
 	// Super Type
 	
 	default int getSuperTypeDistance(IType superType)
@@ -333,6 +351,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	// IContext
+
+	default IAnnotation getAnnotation(IClass type)
+	{
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.getAnnotation(type);
+	}
 	
 	@Override
 	default IDyvilHeader getHeader()
@@ -389,10 +413,15 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	void appendExtendedName(StringBuilder buffer);
 	
 	String getSignature();
+
+	static String getSignature(IType type)
+	{
+		final StringBuilder builder = new StringBuilder();
+		type.appendSignature(builder);
+		return builder.toString();
+	}
 	
 	void appendSignature(StringBuilder buffer);
-	
-	// Compilation
 	
 	int getLoadOpcode();
 	

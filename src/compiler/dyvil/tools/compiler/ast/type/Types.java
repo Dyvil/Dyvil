@@ -52,7 +52,6 @@ public final class Types
 	public static final ClassType THROWABLE         = new ClassType();
 	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
-	public static final ClassType IMMUTABLE         = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
 	
 	public static IClass VOID_CLASS;
@@ -72,13 +71,14 @@ public final class Types
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
 	public static IClass RUNTIME_EXCEPTION_CLASS;
-	public static IClass IMMUTABLE_CLASS;
 	public static IClass SERIALIZABLE_CLASS;
-	
 	public static IClass INTRINSIC_CLASS;
+
 	public static IClass OVERRIDE_CLASS;
 	public static IClass MUTATING_CLASS;
-	
+	public static IClass MUTABLE_CLASS;
+	public static IClass IMMUTABLE_CLASS;
+
 	public static IClass BOOLEAN_CONVERTIBLE_CLASS;
 	public static IClass CHAR_CONVERTIBLE_CLASS;
 	public static IClass INT_CONVERTIBLE_CLASS;
@@ -126,13 +126,14 @@ public final class Types
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
-		IMMUTABLE.theClass = IMMUTABLE_CLASS = Package.dyvilUtil.resolveClass("Immutable");
 		SERIALIZABLE.theClass = SERIALIZABLE_CLASS = Package.javaIO.resolveClass("Serializable");
-		
-		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
+
 		OVERRIDE_CLASS = Package.javaLang.resolveClass("Override");
-		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("mutating");
-		
+		INTRINSIC_CLASS = Package.dyvilAnnotation.resolveClass("Intrinsic");
+		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("Mutating");
+		MUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Mutable");
+		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
+
 		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");
 		BOOLEAN_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
 		CHAR_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("CharConvertible");
@@ -204,7 +205,7 @@ public final class Types
 	{
 		if (OBJECT_REF_CLASS == null)
 		{
-			return OBJECT_REF_CLASS = Package.dyvilLangRef.resolveClass("ObjectRef");
+			return OBJECT_REF_CLASS = Package.dyvilRef.resolveClass("ObjectRef");
 		}
 		return OBJECT_REF_CLASS;
 	}
@@ -218,7 +219,7 @@ public final class Types
 	{
 		if (OBJECT_SIMPLE_REF_CLASS == null)
 		{
-			return OBJECT_SIMPLE_REF_CLASS = Package.dyvilLangRefSimple.resolveClass("SimpleObjectRef");
+			return OBJECT_SIMPLE_REF_CLASS = Package.dyvilRefSimple.resolveClass("SimpleObjectRef");
 		}
 		return OBJECT_SIMPLE_REF_CLASS;
 	}
@@ -241,7 +242,7 @@ public final class Types
 
 	public static String getInternalRef(IType type, String prefix)
 	{
-		return "dyvil/lang/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
+		return "dyvil/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
 	}
 
 	public static String getReferenceFactoryName(IType type, String prefix)

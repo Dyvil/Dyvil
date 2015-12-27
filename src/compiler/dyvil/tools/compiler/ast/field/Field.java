@@ -212,7 +212,7 @@ public class Field extends Member implements IField
 		{
 			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "field.assign.type", this.name.unqualified);
 			marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
-			marker.addInfo(MarkerMessages.getMarker("field.type", newValue.getType()));
+			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else

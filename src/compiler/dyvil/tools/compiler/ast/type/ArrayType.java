@@ -28,8 +28,10 @@ import java.io.IOException;
 public class ArrayType implements IObjectType, ITyped
 {
 	public static final int OBJECT_DISTANCE = 2;
-	private IType type;
-	
+
+	private IType      type;
+	private Mutability mutability = Mutability.UNDEFINED;
+
 	public ArrayType()
 	{
 	}
@@ -38,7 +40,13 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type = type;
 	}
-	
+
+	public ArrayType(IType type, Mutability mutability)
+	{
+		this.mutability = mutability;
+		this.type = type;
+	}
+
 	public static IType getArrayType(IType type, int dims)
 	{
 		switch (dims)
@@ -105,7 +113,18 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		return 1 + this.type.getArrayDimensions();
 	}
-	
+
+	@Override
+	public Mutability getMutability()
+	{
+		return this.mutability;
+	}
+
+	public void setMutability(Mutability mutability)
+	{
+		this.mutability = mutability;
+	}
+
 	@Override
 	public IType getElementType()
 	{
@@ -133,19 +152,8 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return type.isArrayType() && this.type.isSameType(type.getElementType());
-	}
-	
-	@Override
-	public boolean isSuperTypeOf(IType type)
-	{
-		if (!type.isArrayType())
-		{
-			return false;
-		}
-
-		IType elementType = type.getElementType();
-		return this.type.isSuperTypeOf(elementType) && this.type.isPrimitive() == elementType.isPrimitive();
+		return type.isArrayType() && this.mutability == type.getMutability() && this.type
+				.isSameType(type.getElementType());
 	}
 	
 	@Override
@@ -156,10 +164,26 @@ public class ArrayType implements IObjectType, ITyped
 			return false;
 		}
 
-		IType elementType = type.getElementType();
-		return this.type.classEquals(elementType) && this.type.isPrimitive() == elementType.isPrimitive();
+		final IType elementType = type.getElementType();
+		return this.checkPrimitiveType(elementType) && this.type.classEquals(elementType);
 	}
-	
+
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		if (!type.isArrayType())
+		{
+			return false;
+		}
+		if (!checkImmutable(this, type))
+		{
+			return false;
+		}
+
+		final IType elementType = type.getElementType();
+		return this.checkPrimitiveType(elementType) && this.type.isSuperTypeOf(elementType);
+	}
+
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
@@ -168,10 +192,10 @@ public class ArrayType implements IObjectType, ITyped
 			return false;
 		}
 
-		IType elementType = type.getElementType();
-		return this.type.isSuperClassOf(elementType) && this.type.isPrimitive() == elementType.isPrimitive();
+		final IType elementType = type.getElementType();
+		return this.checkPrimitiveType(elementType) && this.type.isSuperClassOf(elementType);
 	}
-	
+
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
@@ -179,15 +203,19 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			return superType.getTheClass() == Types.OBJECT_CLASS ? OBJECT_DISTANCE : 0;
 		}
+		if (!checkImmutable(superType, this))
+		{
+			return 0;
+		}
 
 		IType elementType = superType.getElementType();
-		if (this.type.isPrimitive() || elementType.isPrimitive())
+		if (!this.checkPrimitiveType(elementType))
 		{
-			return this.type.isSameType(elementType) ? 1 : 0;
+			return 0;
 		}
 		return this.type.getSuperTypeDistance(elementType);
 	}
-	
+
 	@Override
 	public float getSubTypeDistance(IType subtype)
 	{
@@ -195,14 +223,19 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			return 0F;
 		}
-		IType elementType = subtype.getElementType();
-		if (this.type.isPrimitive() || elementType.isPrimitive())
+		if (!checkImmutable(this, subtype))
 		{
-			return this.type.isSameType(elementType) ? 1 : 0;
+			return 0F;
+		}
+
+		final IType elementType = subtype.getElementType();
+		if (!this.checkPrimitiveType(elementType))
+		{
+			return 0F;
 		}
 		return this.type.getSubTypeDistance(elementType);
 	}
-	
+
 	@Override
 	public int getSubClassDistance(IType subtype)
 	{
@@ -210,12 +243,27 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			return 0;
 		}
-		IType elementType = subtype.getElementType();
-		if (this.type.isPrimitive() || elementType.isPrimitive())
+		if (checkImmutable(this, subtype))
 		{
-			return this.type.isSameType(elementType) ? 1 : 0;
+			return 0;
+		}
+
+		final IType elementType = subtype.getElementType();
+		if (!this.checkPrimitiveType(elementType))
+		{
+			return 0;
 		}
 		return this.type.getSubClassDistance(subtype.getElementType());
+	}
+
+	private static boolean checkImmutable(IType superType, IType subtype)
+	{
+		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype.getMutability();
+	}
+
+	private boolean checkPrimitiveType(IType elementType)
+	{
+		return this.type.isPrimitive() == elementType.isPrimitive();
 	}
 	
 	@Override
@@ -284,7 +332,11 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			concrete = concrete.getObjectType();
 		}
-		return new ArrayType(concrete);
+		if (concrete != null && concrete != this.type)
+		{
+			return new ArrayType(concrete, this.mutability);
+		}
+		return this;
 	}
 	
 	@Override
@@ -360,21 +412,26 @@ public class ArrayType implements IObjectType, ITyped
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ArrayType", "apply",
-		                       "(Ldyvil/lang/Type;)Ldyvil/reflect/types/ArrayType;", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ArrayType", "apply",
+		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ArrayType;", false);
 	}
 	
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
+		if (step == steps)
+		{
+			this.mutability = Mutability.readAnnotation(annotation);
+		}
+
+		if (step >= steps || typePath.getStep(step) != TypePath.ARRAY_ELEMENT)
 		{
 			return;
 		}
-		
+
 		this.type = IType.withAnnotation(this.type, annotation, typePath, step + 1, steps);
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
@@ -385,24 +442,30 @@ public class ArrayType implements IObjectType, ITyped
 	public void write(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
+		this.mutability.write(out);
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
+		this.mutability = Mutability.read(in);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "[" + this.type.toString() + "]";
+		final StringBuilder builder = new StringBuilder().append('[');
+		this.mutability.appendKeyword(builder);
+		builder.append(this.type.toString());
+		return builder.append(']').toString();
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('[');
+		this.mutability.appendKeyword(buffer);
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
@@ -410,6 +473,6 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public IType clone()
 	{
-		return new ArrayType(this.type);
+		return new ArrayType(this.type, this.mutability);
 	}
 }

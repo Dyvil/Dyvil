@@ -504,7 +504,7 @@ public class CodeMethod extends AbstractMethod
 			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 
-		this.type.writeAnnotations(mw, TypeReference.METHOD_RETURN, "");
+		this.type.writeAnnotations(mw, TypeReference.newTypeReference(TypeReference.METHOD_RETURN), "");
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i].writeAnnotations(mw, TypeReference.newExceptionReference(i), "");

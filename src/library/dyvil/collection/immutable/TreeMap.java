@@ -4,6 +4,7 @@ import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
+import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @ArrayConvertible
+@Immutable
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 2012245218476747334L;

@@ -2,6 +2,7 @@ package dyvil.collection.view;
 
 import dyvil.collection.*;
 import dyvil.collection.iterator.ImmutableIterator;
+import dyvil.annotation.Immutable;
 import dyvil.util.Option;
 
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+@Immutable
 public class MapView<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 1586369703282366862L;
