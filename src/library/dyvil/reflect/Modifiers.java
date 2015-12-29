@@ -1,16 +1,13 @@
 package dyvil.reflect;
 
-import dyvil.annotation._internal.*;
-
 /**
  * The <b>Modifiers</b> interface declares all (visible and invisible) modifiers
  * that can be used <i>Dyvil</i> source code and that can appear in class files.
  * Note that only modifiers less than {@code 0xFFFF} will actually appear in the
- * Bytecode, other modifiers such as the ones added by <i>Dyvil</i> will be
- * converted to annotations.
+ * Bytecode, other modifiers such Dyvil-specific ones will be stored in
+ * {@link dyvil.annotation._internal.DyvilModifiers DyvilModifiers} annotations.
  *
  * @author Clashsoft
- * @version 1.0
  */
 public interface Modifiers
 {
@@ -125,8 +122,7 @@ public interface Modifiers
 	
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this
-	 * modifier, it is a singleton object class. This modifier will be converted
-	 * to the {@link object} annotation.
+	 * modifier, it is a singleton object class.
 	 */
 	int OBJECT_CLASS = 0x00010000;
 	
@@ -142,14 +138,18 @@ public interface Modifiers
 	 * the {@link FunctionalInterface} annotation.
 	 */
 	int FUNCTIONAL = 0x00040000;
+
+	/**
+	 * <i>Dyvil</i> {@code trait} modifier.
+	 */
+	int TRAIT_CLASS = 0x00080000 | INTERFACE_CLASS;
 	
 	// Method Modifiers
 	
 	/**
 	 * <i>Dyvil</i> {@code inline} modifier. If a method is marked with this
 	 * modifier, it will be inlined by the compiler to reduce method call
-	 * overhead. This modifier will be converted to the {@link inline}
-	 * annotation.
+	 * overhead.
 	 */
 	int INLINE = 0x00010000;
 	
@@ -157,7 +157,7 @@ public interface Modifiers
 	 * <i>Dyvil</i> {@code infix} modifier. If a method is marked with this
 	 * modifier, it is a method that can be called on any Object and virtually
 	 * has the instance as the first parameter. An infix method is always
-	 * static. This modifier will be converted to the {@link infix} annotation.
+	 * static.
 	 */
 	int INFIX = 0x00020000 | STATIC;
 	
@@ -166,8 +166,7 @@ public interface Modifiers
 	/**
 	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this
 	 * modifier, it is a method that can be called on any Object and virtually
-	 * uses the first (and only) parameter as the instance. This modifier will
-	 * be converted to the {@link prefix} annotation.
+	 * uses the first (and only) parameter as the instance.
 	 */
 	int PREFIX = 0x00040000;
 	
@@ -182,8 +181,7 @@ public interface Modifiers
 	/**
 	 * <i>Dyvil</i> {@code lazy} modifier. The {@code lazy} modifier can be
 	 * applied on fields, variables and parameters and has a different behavior
-	 * on each different type. This modifier will be converted to the
-	 * {@link lazy} annotation.
+	 * on each different type.
 	 */
 	int LAZY = 0x00010000;
 	
@@ -194,8 +192,7 @@ public interface Modifiers
 	/**
 	 * <i>Dyvil</i> {@code var} modifier. This is used to mark that a parameter
 	 * is Call-By-Reference. If a parameter doesn't have this flag, it behaves
-	 * like a normal formal parameter. This modifier will be converted to the
-	 * {@link var} annotation.
+	 * like a normal formal parameter.
 	 */
 	int VAR = 0x00040000;
 	
@@ -204,8 +201,7 @@ public interface Modifiers
 	/**
 	 * <i>Dyvil</i> {@code internal} modifier. This is used to mark that a
 	 * class, method or field is only visible from inside the current library /
-	 * project. This modifier will be converted to the {@link internal}
-	 * annotation.
+	 * project.
 	 */
 	int INTERNAL = 0x01000000;
 	
@@ -218,8 +214,7 @@ public interface Modifiers
 	/**
 	 * <i>Dyvil</i> {@code sealed} modifier. This modifier is used to mark that
 	 * a class is {@code sealed}, i.e. it can only be extended from classes in
-	 * the same library. This modifier will be converted to the {@link sealed}
-	 * annotation.
+	 * the same library.
 	 */
 	int SEALED = 0x04000000;
 	
@@ -243,7 +238,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED;
+	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED | TRAIT_CLASS;
 	
 	/**
 	 * The modifiers that can be used on fields.

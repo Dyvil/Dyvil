@@ -57,13 +57,14 @@ public class DyvilKeywords
 	public static final int THIS         = Tokens.KEYWORD | 0x00330000;
 	public static final int THROW        = Tokens.KEYWORD | 0x00340000;
 	public static final int THROWS       = Tokens.KEYWORD | 0x00350000;
-	public static final int TRUE         = Tokens.KEYWORD | 0x00360000;
-	public static final int TRY          = Tokens.KEYWORD | 0x00370000;
-	public static final int TYPE         = Tokens.KEYWORD | 0x00380000;
-	public static final int USING        = Tokens.KEYWORD | 0x00390000;
-	public static final int VAR          = Tokens.KEYWORD | 0x003A0000;
-	public static final int WHERE        = Tokens.KEYWORD | 0x003B0000;
-	public static final int WHILE        = Tokens.KEYWORD | 0x003C0000;
+	public static final int TRAIT        = Tokens.KEYWORD | 0x00360000;
+	public static final int TRUE         = Tokens.KEYWORD | 0x00370000;
+	public static final int TRY          = Tokens.KEYWORD | 0x00380000;
+	public static final int TYPE         = Tokens.KEYWORD | 0x00390000;
+	public static final int USING        = Tokens.KEYWORD | 0x003A0000;
+	public static final int VAR          = Tokens.KEYWORD | 0x003B0000;
+	public static final int WHERE        = Tokens.KEYWORD | 0x003C0000;
+	public static final int WHILE        = Tokens.KEYWORD | 0x003D0000;
 	
 	public static int getKeywordType(String s)
 	{
@@ -175,6 +176,8 @@ public class DyvilKeywords
 			return THROW;
 		case "throws":
 			return THROWS;
+		case "trait":
+			return TRAIT;
 		case "true":
 			return TRUE;
 		case "try":
@@ -303,6 +306,8 @@ public class DyvilKeywords
 			return "throw";
 		case THROWS:
 			return "throws";
+		case TRAIT:
+			return "trait";
 		case TRUE:
 			return "true";
 		case TRY:

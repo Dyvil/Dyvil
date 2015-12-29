@@ -62,27 +62,35 @@ public final class ModifierUtil
 		if (mod == 0)
 		{
 			sb.append("class ");
+			return;
 		}
-		else if ((mod & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		if ((mod & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
 			sb.append("@interface ");
+			return;
 		}
-		else if ((mod & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS)
+		if ((mod & Modifiers.TRAIT_CLASS) == Modifiers.TRAIT_CLASS)
+		{
+			sb.append("trait ");
+			return;
+		}
+		if ((mod & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS)
 		{
 			sb.append("interface ");
+			return;
 		}
-		else if ((mod & Modifiers.ENUM) == Modifiers.ENUM)
+		if ((mod & Modifiers.ENUM) == Modifiers.ENUM)
 		{
 			sb.append("enum ");
+			return;
 		}
-		else if ((mod & Modifiers.OBJECT_CLASS) == Modifiers.OBJECT_CLASS)
+		if ((mod & Modifiers.OBJECT_CLASS) == Modifiers.OBJECT_CLASS)
 		{
 			sb.append("object ");
+			return;
 		}
-		else
-		{
-			sb.append("class ");
-		}
+
+		sb.append("class ");
 	}
 
 	public static String classModifiersToString(int mod)
@@ -269,6 +277,8 @@ public final class ModifierUtil
 			return 0;
 		case DyvilKeywords.INTERFACE:
 			return Modifiers.INTERFACE_CLASS;
+		case DyvilKeywords.TRAIT:
+			return Modifiers.TRAIT_CLASS;
 		case DyvilKeywords.ENUM:
 			return Modifiers.ENUM;
 		case DyvilKeywords.OBJECT:
@@ -286,15 +296,13 @@ public final class ModifierUtil
 		// If the method does not have an implementation and is static
 		if (isStatic && isAbstract)
 		{
-			markers.add(
-					MarkerMessages
-							.createError(member.getPosition(), "modifiers.static.abstract", Util.toString(member, type)));
+			markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.static.abstract",
+			                                       Util.toString(member, type)));
 		}
 		else if (isAbstract && isNative)
 		{
-			markers.add(
-					MarkerMessages
-							.createError(member.getPosition(), "modifiers.native.abstract", Util.toString(member, type)));
+			markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.native.abstract",
+			                                       Util.toString(member, type)));
 		}
 		else
 		{
@@ -331,8 +339,8 @@ public final class ModifierUtil
 		}
 		if (!hasValue && !isAbstract && !isNative)
 		{
-			markers.add(MarkerMessages
-					            .createError(member.getPosition(), "modifiers.unimplemented", Util.toString(member, type)));
+			markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.unimplemented",
+			                                       Util.toString(member, type)));
 		}
 	}
 }

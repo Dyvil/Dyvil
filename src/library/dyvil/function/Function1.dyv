@@ -1,6 +1,6 @@
 package dyvil.function
 
-public functional interface Function1[-P1, +R]
+public functional trait Function1[-P1, +R]
 {
 	public R apply(P1 par1)
 	
