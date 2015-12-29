@@ -45,8 +45,9 @@ public class Property extends Member implements IProperty, IContext
 	protected IValue      setter;
 	protected ModifierSet getterModifiers;
 	protected ModifierSet setterModifiers;
-	
+
 	protected MethodParameter setterParameter;
+	protected Name            setterParameterName;
 	protected IProperty       overrideProperty;
 	
 	public Property(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
@@ -122,6 +123,18 @@ public class Property extends Member implements IProperty, IContext
 	}
 
 	@Override
+	public Name getSetterParameterName()
+	{
+		return this.setterParameterName;
+	}
+
+	@Override
+	public void setSetterParameterName(Name setterParameterName)
+	{
+		this.setterParameterName = setterParameterName;
+	}
+
+	@Override
 	public boolean hasSetter()
 	{
 		return this.setter != null || this.setterModifiers != null;
@@ -164,8 +177,9 @@ public class Property extends Member implements IProperty, IContext
 				}
 				else if (instance.getType().getTheClass() != this.theClass)
 				{
-					markers.add(MarkerMessages.createMarker(position, "property.access.static.type", this.name.unqualified,
-					                                        this.theClass.getFullName()));
+					markers.add(MarkerMessages
+							            .createMarker(position, "property.access.static.type", this.name.unqualified,
+							                          this.theClass.getFullName()));
 				}
 				instance = null;
 			}
@@ -173,7 +187,8 @@ public class Property extends Member implements IProperty, IContext
 			{
 				if (!instance.getType().getTheClass().isObject())
 				{
-					markers.add(MarkerMessages.createMarker(position, "property.access.instance", this.name.unqualified));
+					markers.add(
+							MarkerMessages.createMarker(position, "property.access.instance", this.name.unqualified));
 				}
 			}
 			else
@@ -190,7 +205,8 @@ public class Property extends Member implements IProperty, IContext
 			}
 			else
 			{
-				markers.add(MarkerMessages.createMarker(position, "property.access.unqualified", this.name.unqualified));
+				markers.add(
+						MarkerMessages.createMarker(position, "property.access.unqualified", this.name.unqualified));
 				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
@@ -221,7 +237,8 @@ public class Property extends Member implements IProperty, IContext
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "property.assign.type", this.name.unqualified);
+			Marker marker = MarkerMessages
+					.createMarker(newValue.getPosition(), "property.assign.type", this.name.unqualified);
 			marker.addInfo(MarkerMessages.getMarker("property.type", this.type));
 			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
 			markers.add(marker);
@@ -264,7 +281,8 @@ public class Property extends Member implements IProperty, IContext
 
 		if (this.setter != null || this.setterModifiers != null)
 		{
-			this.setterParameter = new MethodParameter(this.name, this.type);
+			final Name parameterName = this.setterParameterName == null ? this.name : this.setterParameterName;
+			this.setterParameter = new MethodParameter(parameterName, this.type);
 			this.setterParameter.setIndex(0);
 			this.setterParameter.setModifiers(EmptyModifiers.INSTANCE);
 		}
@@ -294,7 +312,8 @@ public class Property extends Member implements IProperty, IContext
 				this.type = this.getter.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "property.type.infer", this.name.unqualified));
+					markers.add(
+							MarkerMessages.createMarker(this.position, "property.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -322,7 +341,8 @@ public class Property extends Member implements IProperty, IContext
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "property.type.infer.writeonly", this.name.unqualified));
+			markers.add(
+					MarkerMessages.createMarker(this.position, "property.type.infer.writeonly", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -389,7 +409,8 @@ public class Property extends Member implements IProperty, IContext
 			IType type = this.overrideProperty.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSameType(this.type))
 			{
-				Marker marker = MarkerMessages.createMarker(this.position, "property.override.type.incompatible", this.name);
+				Marker marker = MarkerMessages
+						.createMarker(this.position, "property.override.type.incompatible", this.name);
 				marker.addInfo(MarkerMessages.getMarker("property.type", this.type));
 				marker.addInfo(MarkerMessages.getMarker("property.override.type", type));
 				markers.add(marker);
@@ -521,7 +542,7 @@ public class Property extends Member implements IProperty, IContext
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (name == this.name)
+		if (name == this.setterParameter.getName())
 		{
 			return this.setterParameter;
 		}
