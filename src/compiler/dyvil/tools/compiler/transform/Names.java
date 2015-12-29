@@ -57,7 +57,6 @@ public final class Names
 	public static final Name bangeq       = new Name("!=", "$bang$eq");
 	public static final Name eqeqeq       = new Name("===", "$eq$eq$eq");
 	public static final Name bangeqeq     = new Name("!==", "$bang$eq$eq");
-	public static final Name coloneqcolon = new Name(":=:", "$colon$eq$colon");
 	
 	public static final Name lt      = new Name("<", "$lt");
 	public static final Name lteq    = new Name("<=", "$lt$eq");

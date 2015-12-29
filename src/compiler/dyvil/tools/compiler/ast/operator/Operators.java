@@ -133,15 +133,6 @@ public interface Operators
 			}
 			return rangeOperator;
 		}
-		// Swap Operator
-		if (name == Names.coloneqcolon)
-		{
-			if (arg1.valueTag() == IValue.FIELD_ACCESS && arg2.valueTag() == IValue.FIELD_ACCESS)
-			{
-				return new SwapOperator((FieldAccess) arg1, (FieldAccess) arg2);
-			}
-			return null;
-		}
 		if (name == Names.ampamp)
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))
