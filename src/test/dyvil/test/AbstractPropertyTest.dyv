@@ -1,6 +1,6 @@
 package dyvil.test
 
-public class AbstractProperties
+public class AbstractPropertyTest
 {
 	interface A {
 		public int myProp {
@@ -12,7 +12,7 @@ public class AbstractProperties
 	class C implements A
 	{
 	    public override int myProp {
-	    	set : {}
+	    	set(newValue) : {}
 	    	get : 1
 	    }
 	}
