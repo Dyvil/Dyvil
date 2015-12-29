@@ -27,8 +27,10 @@ public class PropertyParser extends Parser implements IValueConsumer
 	public static final Name set = Name.getQualified("set");
 	
 	protected Property    property;
+
 	private   ModifierSet modifiers;
-	
+	private boolean targetSetter;
+
 	public PropertyParser(Property property)
 	{
 		this.property = property;
@@ -69,7 +71,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			{
 				int nextType = token.next().type();
 				if (nextType == BaseSymbols.COLON || nextType == BaseSymbols.CLOSE_CURLY_BRACKET
-						|| nextType == BaseSymbols.SEMICOLON)
+						|| nextType == BaseSymbols.SEMICOLON || nextType == BaseSymbols.OPEN_PARENTHESIS)
 				{
 					Name name = token.nameValue();
 					if (name == get)
@@ -77,6 +79,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 						this.property.setGetterModifiers(this.modifiers);
 						this.modifiers = null;
 						this.mode = COLON;
+						this.targetSetter = false;
 						return;
 					}
 					if (name == set)
@@ -84,6 +87,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 						this.property.setSetterModifiers(this.modifiers);
 						this.modifiers = null;
 						this.mode = SET;
+						this.targetSetter = true;
 						return;
 					}
 				}
@@ -139,13 +143,13 @@ public class PropertyParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.mode == COLON)
-		{
-			this.property.setGetter(value);
-		}
-		else if (this.mode == SET)
+		if (this.targetSetter)
 		{
 			this.property.setSetter(value);
+		}
+		else
+		{
+			this.property.setGetter(value);
 		}
 	}
 }
