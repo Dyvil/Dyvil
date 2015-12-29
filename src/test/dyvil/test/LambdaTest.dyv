@@ -2,7 +2,7 @@ package dyvil.test
 
 public class LambdaTest
 {	
-	functional interface Function[P, R]
+	functional trait Function[P, R]
 	{
 		public R apply(P par1)
 		

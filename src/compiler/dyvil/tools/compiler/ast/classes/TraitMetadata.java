@@ -5,15 +5,17 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class InterfaceMetadata implements IClassMetadata
+public class TraitMetadata implements IClassMetadata
 {
 	private final IClass theClass;
 
-	public InterfaceMetadata(IClass theClass)
+	public TraitMetadata(IClass theClass)
 	{
 		this.theClass = theClass;
 	}
@@ -27,35 +29,38 @@ public class InterfaceMetadata implements IClassMetadata
 			return;
 		}
 
-		// Make fields public and static
 		for (int i = 0, count = classBody.fieldCount(); i < count; i++)
 		{
-			processField(classBody.getField(i));
+			final IField field = classBody.getField(i);
+			if (!field.isField())
+			{
+				// Skip properties
+				continue;
+			}
+
+			final ModifierSet modifierSet = field.getModifiers();
+			if (!modifierSet.hasIntModifier(Modifiers.PUBLIC))
+			{
+				modifierSet.addIntModifier(Modifiers.PUBLIC);
+			}
+			if (!modifierSet.hasIntModifier(Modifiers.STATIC) || !modifierSet.hasIntModifier(Modifiers.FINAL))
+			{
+				modifierSet.addIntModifier(Modifiers.STATIC);
+				modifierSet.addIntModifier(Modifiers.FINAL);
+				markers.add(MarkerMessages.createMarker(field.getPosition(), "field.trait.warning", field.getName()));
+			}
 		}
 
-		// Make non-static methods public and abstract
 		for (int i = 0, count = classBody.methodCount(); i < count; i++)
 		{
-			processMethod(classBody.getMethod(i));
+			final IMethod method = classBody.getMethod(i);
+			if (!method.hasModifier(Modifiers.PUBLIC))
+			{
+				method.getModifiers().addIntModifier(Modifiers.PUBLIC);
+			}
 		}
 	}
-
-	protected static void processMethod(IMethod method)
-	{
-		if (!method.hasModifier(Modifiers.STATIC))
-		{
-			method.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.ABSTRACT);
-		}
-	}
-
-	protected static void processField(IField field)
-	{
-		if (field.isField())
-		{
-			field.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.FINAL);
-		}
-	}
-
+	
 	@Override
 	public void resolveTypesBody(MarkerList markers, IContext context)
 	{
