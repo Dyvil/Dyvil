@@ -49,29 +49,6 @@ public class Property extends Member implements IProperty, IContext
 	protected MethodParameter setterParameter;
 	protected IProperty       overrideProperty;
 	
-	public Property(IClass iclass)
-	{
-		this.theClass = iclass;
-	}
-	
-	public Property(IClass iclass, Name name)
-	{
-		super(name);
-		this.theClass = iclass;
-	}
-	
-	public Property(IClass iclass, Name name, IType type)
-	{
-		super(name, type);
-		this.theClass = iclass;
-	}
-	
-	public Property(IClass iclass, Name name, IType type, ModifierSet modifiers)
-	{
-		super(name, type, modifiers);
-		this.theClass = iclass;
-	}
-	
 	public Property(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(name, type, modifiers);
@@ -113,25 +90,25 @@ public class Property extends Member implements IProperty, IContext
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean hasGetter()
 	{
 		return this.getter != null || this.getterModifiers != null;
 	}
-	
+
 	@Override
 	public void setGetterModifiers(ModifierSet modifiers)
 	{
 		this.getterModifiers = modifiers;
 	}
-	
+
 	@Override
 	public ModifierSet getGetterModifiers()
 	{
 		return this.getterModifiers;
 	}
-	
+
 	@Override
 	public void setGetter(IValue get)
 	{
@@ -143,25 +120,25 @@ public class Property extends Member implements IProperty, IContext
 	{
 		return this.getter;
 	}
-	
+
 	@Override
 	public boolean hasSetter()
 	{
 		return this.setter != null || this.setterModifiers != null;
 	}
-	
+
 	@Override
 	public void setSetterModifiers(ModifierSet modifiers)
 	{
 		this.setterModifiers = modifiers;
 	}
-	
+
 	@Override
 	public ModifierSet getSetterModifiers()
 	{
 		return this.setterModifiers;
 	}
-	
+
 	@Override
 	public void setSetter(IValue set)
 	{
@@ -284,7 +261,7 @@ public class Property extends Member implements IProperty, IContext
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
-		
+
 		if (this.setter != null || this.setterModifiers != null)
 		{
 			this.setterParameter = new MethodParameter(this.name, this.type);
@@ -295,7 +272,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.setter != null)
 		{
 			this.setter = this.setter.resolve(markers, this);
-			
+
 			IValue set1 = this.setter.withType(Types.VOID, Types.VOID, markers, context);
 			if (set1 == null)
 			{
@@ -309,7 +286,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.getter != null)
 		{
 			this.getter = this.getter.resolve(markers, this);
-			
+
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
@@ -321,7 +298,7 @@ public class Property extends Member implements IProperty, IContext
 					this.type = Types.ANY;
 				}
 			}
-			
+
 			IValue get1 = this.getter.withType(this.type, this.type, markers, context);
 			if (get1 == null)
 			{
@@ -340,7 +317,7 @@ public class Property extends Member implements IProperty, IContext
 					this.type = get1.getType();
 				}
 			}
-			
+
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
@@ -450,7 +427,7 @@ public class Property extends Member implements IProperty, IContext
 		if (this.setter != null)
 		{
 			this.setter.check(markers, context);
-			
+
 			if (this.type == Types.VOID)
 			{
 				markers.add(MarkerMessages.createMarker(this.position, "property.type.void"));
