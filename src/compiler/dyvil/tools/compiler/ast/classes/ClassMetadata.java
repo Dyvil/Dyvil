@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -179,7 +178,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 		
-		IConstructor match = IContext.resolveConstructor(superType, EmptyArguments.INSTANCE);
+		final IConstructor match = IContext.resolveConstructor(superType, this.theClass.getSuperConstructorArguments());
 		if (match != null)
 		{
 			this.superConstructor = match;
@@ -224,7 +223,7 @@ public class ClassMetadata implements IClassMetadata
 		}
 		if (this.superConstructor != null)
 		{
-			list.addValue(new InitializerCall(null, this.superConstructor, EmptyArguments.INSTANCE, true));
+			list.addValue(new InitializerCall(null, this.superConstructor, this.theClass.getSuperConstructorArguments(), true));
 		}
 		int count = this.theClass.parameterCount();
 		for (int i = 0; i < count; i++)

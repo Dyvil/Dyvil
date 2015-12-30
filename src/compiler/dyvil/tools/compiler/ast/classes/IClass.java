@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -73,6 +74,15 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	boolean isSubTypeOf(IType type);
 	
 	int getSuperTypeDistance(IType superType);
+
+	default IArguments getSuperConstructorArguments()
+	{
+		return null;
+	}
+
+	default void setSuperConstructorArguments(IArguments arguments)
+	{
+	}
 	
 	// Interfaces
 	

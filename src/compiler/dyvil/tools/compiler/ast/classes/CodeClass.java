@@ -19,6 +19,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -45,6 +47,8 @@ public class CodeClass extends AbstractClass
 {
 	protected IDyvilHeader  unit;
 	protected ICodePosition position;
+
+	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
 	
 	public CodeClass()
 	{
@@ -106,7 +110,19 @@ public class CodeClass extends AbstractClass
 			this.fullName = this.unit.getFullName(name);
 		}
 	}
-	
+
+	@Override
+	public IArguments getSuperConstructorArguments()
+	{
+		return this.superConstructorArguments;
+	}
+
+	@Override
+	public void setSuperConstructorArguments(IArguments superConstructorArguments)
+	{
+		this.superConstructorArguments = superConstructorArguments;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
