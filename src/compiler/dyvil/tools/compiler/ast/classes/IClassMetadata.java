@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -56,16 +57,36 @@ public interface IClassMetadata
 	 * Called before the class body goes through RESOLVE_TYPES. Super-types and
 	 * -interfaces and generics have already been resolved.
 	 */
-	void resolveTypes(MarkerList markers, IContext context);
+	default void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
 	
 	/**
 	 * Called after the class body went through RESOLVE_TYPES.
 	 */
-	void resolveTypesBody(MarkerList markers, IContext context);
+	default void resolveTypesBody(MarkerList markers, IContext context)
+	{
+	}
 	
-	void resolve(MarkerList markers, IContext context);
+	default void resolve(MarkerList markers, IContext context)
+	{
+	}
 	
-	void checkTypes(MarkerList markers, IContext context);
+	default void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+
+	default void check(MarkerList markers, IContext context)
+	{
+	}
+
+	default void foldConstants()
+	{
+	}
+
+	default void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+	}
 	
 	default IDataMember resolveField(Name name)
 	{

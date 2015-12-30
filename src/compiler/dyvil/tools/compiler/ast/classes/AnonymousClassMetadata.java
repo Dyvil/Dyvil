@@ -28,26 +28,6 @@ public class AnonymousClassMetadata implements IClassMetadata
 		this.constructor = constructor;
 	}
 	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-	
 	private String getDesc()
 	{
 		if (this.desc != null)

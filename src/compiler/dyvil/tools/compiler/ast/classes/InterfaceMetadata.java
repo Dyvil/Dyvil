@@ -55,21 +55,6 @@ public class InterfaceMetadata implements IClassMetadata
 			field.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.FINAL);
 		}
 	}
-
-	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
 	
 	@Override
 	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException

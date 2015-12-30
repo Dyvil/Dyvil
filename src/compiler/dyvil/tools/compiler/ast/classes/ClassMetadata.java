@@ -12,13 +12,14 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -38,7 +39,7 @@ public class ClassMetadata implements IClassMetadata
 	protected final IClass theClass;
 	
 	protected IConstructor constructor;
-	protected IConstructor superConstructor;
+	protected IValue superInitializer;
 	
 	protected byte methods;
 	
@@ -126,6 +127,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		this.theClass.getSuperConstructorArguments().resolveTypes(markers, context);
 	}
 	
 	@Override
@@ -134,10 +136,11 @@ public class ClassMetadata implements IClassMetadata
 		IClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
 		{
-			IConstructor c = body.getConstructor(this.theClass.getParameters(), this.theClass.parameterCount());
-			if (c != null)
+			final IConstructor constructor = body
+					.getConstructor(this.theClass.getParameters(), this.theClass.parameterCount());
+			if (constructor != null)
 			{
-				this.constructor = c;
+				this.constructor = constructor;
 				this.methods |= CONSTRUCTOR;
 				return;
 			}
@@ -151,8 +154,21 @@ public class ClassMetadata implements IClassMetadata
 		
 		Constructor constructor = new Constructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
 		int parameterCount = this.theClass.parameterCount();
+
+		/* TOGGLE
 		IParameter[] parameters = this.theClass.getParameters();
-		
+		/*/
+		IParameter[] parameters = new IParameter[parameterCount];
+
+		for (int i = 0; i < parameterCount; i++)
+		{
+			final IParameter classParameter = this.theClass.getParameter(i);
+			parameters[i] = new MethodParameter(classParameter.getPosition(), classParameter.getName(),
+			                                    classParameter.getType(), classParameter.getModifiers());
+			parameters[i].setIndex(i);
+		}
+		//*/
+
 		constructor.setParameters(parameters, parameterCount);
 		
 		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
@@ -172,27 +188,64 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 		
-		IType superType = this.theClass.getSuperType();
+		final IType superType = this.theClass.getSuperType();
 		if (superType == null)
 		{
 			return;
 		}
-		
-		final IConstructor match = IContext.resolveConstructor(superType, this.theClass.getSuperConstructorArguments());
-		if (match != null)
+
+		final StatementList constructorBody = new StatementList();
+		final InitializerCall initializerCall = new InitializerCall(this.theClass.getPosition(), null,
+		                                                            this.theClass.getSuperConstructorArguments(), true);
+
+		this.superInitializer = initializerCall.resolve(markers, this.constructor);
+		constructorBody.addValue(this.superInitializer);
+
+		for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
 		{
-			this.superConstructor = match;
-			return;
+			IParameter param = this.constructor.getParameter(i);
+			constructorBody.addValue(new ClassParameterSetter(this.theClass, param));
 		}
-		
-		markers.add(MarkerMessages.createMarker(this.theClass.getPosition(), "constructor.super", superType.toString()));
+
+		this.constructor.setValue(constructorBody);
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if ((this.methods & CONSTRUCTOR) == 0)
+		{
+			this.superInitializer.checkTypes(markers, this.constructor);
+		}
 	}
-	
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if ((this.methods & CONSTRUCTOR) == 0)
+		{
+			this.superInitializer.check(markers, this.constructor);
+		}
+	}
+
+	@Override
+	public void foldConstants()
+	{
+		if ((this.methods & CONSTRUCTOR) == 0)
+		{
+			this.superInitializer.foldConstants();
+		}
+	}
+
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		if ((this.methods & CONSTRUCTOR) == 0)
+		{
+			this.superInitializer.cleanup(this.constructor, compilableList);
+		}
+	}
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
@@ -215,24 +268,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			return;
 		}
-		
-		StatementList list = new StatementList();
-		if (instanceFields != null)
-		{
-			list.addValue(instanceFields);
-		}
-		if (this.superConstructor != null)
-		{
-			list.addValue(new InitializerCall(null, this.superConstructor, this.theClass.getSuperConstructorArguments(), true));
-		}
-		int count = this.theClass.parameterCount();
-		for (int i = 0; i < count; i++)
-		{
-			IParameter param = this.theClass.getParameter(i);
-			list.addValue(new ClassParameterSetter(this.theClass, param));
-		}
-		
-		this.constructor.setValue(list);
+
 		this.constructor.write(writer, instanceFields);
 	}
 }
