@@ -5,10 +5,12 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.*;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeVariableListParser;
@@ -19,15 +21,17 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
 {
-	private static final int NAME           = 1;
-	private static final int GENERICS       = 2;
-	private static final int GENERICS_END   = 4;
-	private static final int PARAMETERS     = 8;
-	private static final int PARAMETERS_END = 16;
-	private static final int EXTENDS        = 32;
-	private static final int IMPLEMENTS     = 64;
-	private static final int BODY           = 128;
-	private static final int BODY_END       = 256;
+	private static final int NAME                   = 1;
+	private static final int GENERICS               = 2;
+	private static final int GENERICS_END           = 4;
+	private static final int PARAMETERS             = 8;
+	private static final int PARAMETERS_END         = 16;
+	private static final int EXTENDS                = 32;
+	private static final int EXTENDS_PARAMETERS     = 64;
+	private static final int EXTENDS_PARAMETERS_END = 128;
+	private static final int IMPLEMENTS             = 256;
+	private static final int BODY                   = 512;
+	private static final int BODY_END               = 1024;
 	
 	protected IDyvilHeader header;
 	protected IClass       outerClass;
@@ -129,7 +133,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				}
 				
 				pm.pushParser(pm.newTypeParser(this));
-				this.mode = IMPLEMENTS;
+				this.mode = EXTENDS_PARAMETERS;
 				return;
 			}
 		case IMPLEMENTS:
@@ -196,6 +200,25 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				pm.report(token, "class.body.end");
 			}
 			return;
+		case EXTENDS_PARAMETERS_END:
+			this.mode = IMPLEMENTS;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "class.extends.close_paren");
+			}
+			return;
+		case EXTENDS_PARAMETERS:
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				final IArguments arguments = ExpressionParser.parseArguments(pm, token.next());
+				this.theClass.setSuperConstructorArguments(arguments);
+				this.mode = EXTENDS_PARAMETERS_END;
+				return;
+			}
+			this.mode = IMPLEMENTS;
+			pm.reparse();
+			return;
 		}
 	}
 	
@@ -204,8 +227,9 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	{
 		switch (this.mode)
 		{
+		case EXTENDS:
 		case IMPLEMENTS:
-		case EXTENDS: // extends
+		case EXTENDS_PARAMETERS: // extends
 			this.theClass.setSuperType(type);
 			return;
 		case BODY: // implements

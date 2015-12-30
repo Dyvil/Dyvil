@@ -307,7 +307,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				IArguments arguments = this.parseArguments(pm, token.next());
+				IArguments arguments = parseArguments(pm, token.next());
 				icall.setArguments(arguments);
 				this.mode = CONSTRUCTOR_END;
 				return;
@@ -579,7 +579,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	 *
 	 * @return the appropriate AST representation for the type of argument list.
 	 */
-	private IArguments parseArguments(IParserManager pm, IToken next)
+	public static IArguments parseArguments(IParserManager pm, IToken next)
 	{
 		int type = next.type();
 		if (type == BaseSymbols.CLOSE_PARENTHESIS)
