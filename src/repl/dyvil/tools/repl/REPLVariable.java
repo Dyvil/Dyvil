@@ -39,45 +39,6 @@ public class REPLVariable extends Field
 		return mod == Modifiers.STATIC || this.modifiers.hasIntModifier(mod);
 	}
 	
-	private static boolean isConstant(IValue value)
-	{
-		int tag = value.valueTag();
-		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
-	}
-	
-	protected void updateValue()
-	{
-		try
-		{
-			if (this.type == Types.VOID)
-			{
-				ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
-			}
-			else
-			{
-				java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
-				field.setAccessible(true);
-				Object result = field.get(null);
-				this.value = new REPLResult(result);
-			}
-		}
-		catch (IllegalAccessException illegalAccess)
-		{
-			illegalAccess.printStackTrace();
-		}
-		catch (ExceptionInInitializerError initializerError)
-		{
-			Throwable cause = initializerError.getCause();
-			filterStackTrace(cause);
-			cause.printStackTrace();
-		}
-		catch (Throwable throwable)
-		{
-			filterStackTrace(throwable);
-			throwable.printStackTrace();
-		}
-	}
-
 	private static void filterStackTrace(Throwable throwable)
 	{
 		StackTraceElement[] traceElements = throwable.getStackTrace();
@@ -109,42 +70,70 @@ public class REPLVariable extends Field
 			filterStackTrace(suppressed);
 		}
 	}
-	
-	protected void compute(List<IClassCompilable> compilableList)
+
+	protected void compute(DyvilREPL repl, List<IClassCompilable> compilableList)
 	{
 		if (this.isConstant() && !compilableList.isEmpty())
 		{
 			return;
 		}
-		
+
 		try
 		{
 			this.theClass = this.generateClass(this.className, compilableList);
-			this.updateValue();
-		}
-		catch (ExceptionInInitializerError t)
-		{
-			Throwable ex = t.getCause();
-			System.err.println(ex.getClass().getCanonicalName() + ": " + ex.getMessage());
-			StackTraceElement[] trace = ex.getStackTrace();
-			int len = trace.length - 10;
-			for (int i = 0; i < len; i++)
-			{
-				System.err.println("\tat " + trace[i]);
-			}
-			this.value = this.type.getDefaultValue();
+			this.updateValue(repl);
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace();
+			filterStackTrace(t);
+			t.printStackTrace(repl.getOutput());
 		}
 	}
-	
+
+	protected void updateValue(DyvilREPL repl)
+	{
+		try
+		{
+			if (this.type == Types.VOID)
+			{
+				ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
+			}
+			else
+			{
+				java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
+				field.setAccessible(true);
+				Object result = field.get(null);
+				this.value = new REPLResult(result);
+			}
+		}
+		catch (IllegalAccessException illegalAccess)
+		{
+			illegalAccess.printStackTrace(repl.getOutput());
+		}
+		catch (ExceptionInInitializerError initializerError)
+		{
+			final Throwable cause = initializerError.getCause();
+			filterStackTrace(cause);
+			cause.printStackTrace(repl.getOutput());
+		}
+		catch (Throwable throwable)
+		{
+			filterStackTrace(throwable);
+			throwable.printStackTrace(repl.getOutput());
+		}
+	}
+
 	private boolean isConstant()
 	{
 		return this.hasModifier(Modifiers.FINAL) && this.value != null && isConstant(this.value);
 	}
-	
+
+	private static boolean isConstant(IValue value)
+	{
+		int tag = value.valueTag();
+		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
+	}
+
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		String name = this.name.qualified;

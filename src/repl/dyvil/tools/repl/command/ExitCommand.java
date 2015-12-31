@@ -32,7 +32,7 @@ public class ExitCommand implements ICommand
 		}
 		catch (NumberFormatException ex)
 		{
-			System.out.println("Invalid Exit Code " + args[0]);
+			repl.getOutput().println("Invalid Exit Code " + args[0]);
 		}
 		System.exit(code);
 		return;

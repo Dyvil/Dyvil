@@ -24,7 +24,7 @@ public class VariablesCommand implements ICommand
 		REPLContext context = repl.getContext();
 		for (IField v : context.fields.values())
 		{
-			System.out.println(v);
+			repl.getOutput().println(v);
 		}
 	}
 }

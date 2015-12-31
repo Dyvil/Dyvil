@@ -110,7 +110,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			}
 			catch (Throwable t)
 			{
-				t.printStackTrace();
+				t.printStackTrace(this.repl.getOutput());
 			}
 		}
 	}
@@ -182,7 +182,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	private void compileVariable(REPLVariable field)
 	{
 		this.compileInnerClasses();
-		field.compute(this.compilableList);
+		field.compute(this.repl, this.compilableList);
 	}
 	
 	private REPLMemberClass getREPLClass(IClassMember member)
@@ -225,8 +225,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			IDataMember f = ((FieldAccess) value).getField();
 			if (f instanceof REPLVariable)
 			{
-				((REPLVariable) f).updateValue();
-				System.out.println(f);
+				((REPLVariable) f).updateValue(this.repl);
+				this.repl.getOutput().println(f);
 				return;
 			}
 		}
@@ -263,7 +263,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		if (type != Types.VOID)
 		{
 			this.fields.put(field.getName(), field);
-			System.out.println(field.toString());
+			this.repl.getOutput().println(field.toString());
 		}
 	}
 	
@@ -271,7 +271,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void addOperator(Operator op)
 	{
 		this.operators.put(op.name, op);
-		System.out.println("Defined " + op);
+		this.repl.getOutput().println("Defined " + op);
 	}
 	
 	@Override
@@ -291,7 +291,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addImport(declaration);
-		System.out.println(declaration);
+		this.repl.getOutput().println(declaration);
 	}
 	
 	@Override
@@ -305,7 +305,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		
 		super.addUsing(declaration);
-		System.out.println(declaration);
+		this.repl.getOutput().println(declaration);
 	}
 	
 	@Override
@@ -320,7 +320,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		super.addInclude(component);
 		this.operators.putAll(component.getHeader().getOperators());
-		System.out.println(component);
+		this.repl.getOutput().println(component);
 	}
 	
 	@Override
@@ -340,7 +340,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		typeAlias.cleanup(this, this);
 
 		super.addTypeAlias(typeAlias);
-		System.out.println(typeAlias);
+		this.repl.getOutput().println(typeAlias);
 	}
 	
 	@Override
@@ -357,7 +357,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		}
 		catch (ClassNotFoundException ex)
 		{
-
 		}
 		
 		// Run the usual phases
@@ -385,7 +384,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		StringBuilder buf = new StringBuilder("Defined ");
 		Util.classSignatureToString(iclass, buf);
-		System.out.println(buf.toString());
+		this.repl.getOutput().println(buf.toString());
 	}
 	
 	@Override
@@ -432,7 +431,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		if (this.computeVariable(var))
 		{
 			this.fields.put(var.getName(), var);
-			System.out.println(var.toString());
+			this.repl.getOutput().println(var.toString());
 		}
 	}
 	
@@ -463,7 +462,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		StringBuilder buf = new StringBuilder("Defined Property '");
 		Util.propertySignatureToString(property, buf);
-		System.out.println(buf.append('\'').toString());
+		this.repl.getOutput().println(buf.append('\'').toString());
 		
 		this.cleanup();
 	}
@@ -539,7 +538,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		
 		buf.append('\'');
 		Util.methodSignatureToString(method, buf);
-		System.out.println(buf.append('\'').toString());
+		this.repl.getOutput().println(buf.append('\'').toString());
 	}
 	
 	@Override

@@ -21,6 +21,6 @@ public class DebugCommand implements ICommand
 	public void execute(DyvilREPL repl, String... args)
 	{
 		DyvilCompiler.debug = !DyvilCompiler.debug;
-		System.out.println("Setting debug mode to " + (DyvilCompiler.debug ? "ON" : "OFF"));
+		repl.getOutput().println("Setting debug mode to " + (DyvilCompiler.debug ? "ON" : "OFF"));
 	}
 }

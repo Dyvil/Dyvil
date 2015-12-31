@@ -43,7 +43,7 @@ public class CompleteCommand implements ICommand
 		{
 			// REPL Variables
 			
-			this.printMembers(context, "");
+			this.printMembers(repl, context, "");
 			return;
 		}
 		
@@ -53,7 +53,7 @@ public class CompleteCommand implements ICommand
 		{
 			// REPL Variable Completions
 			
-			this.printMembers(context, BaseSymbols.qualify(argument));
+			this.printMembers(repl, context, BaseSymbols.qualify(argument));
 			return;
 		}
 		
@@ -66,9 +66,9 @@ public class CompleteCommand implements ICommand
 			// Field Completions
 			
 			IType type = variable.getType();
-			System.out.println("Available completions for '" + varName + "' of type '" + type + "':");
+			repl.getOutput().println("Available completions for '" + varName + "' of type '" + type + "':");
 			
-			this.printCompletions(memberStart, type);
+			this.printCompletions(repl, memberStart, type);
 			return;
 		}
 		
@@ -76,17 +76,17 @@ public class CompleteCommand implements ICommand
 		if (type != null)
 		{
 			// Type Completions
-			System.out.println("Available completions for type '" + type + "':");
-			this.printCompletions(memberStart, type);
+			repl.getOutput().println("Available completions for type '" + type + "':");
+			this.printCompletions(repl, memberStart, type);
 			return;
 		}
 		
 		// No Completions available
-		System.out.println("'" + varName + "' could not be resolved");
+		repl.getOutput().println("'" + varName + "' could not be resolved");
 		return;
 	}
 	
-	private void printCompletions(String memberStart, IType type)
+	private void printCompletions(DyvilREPL repl,  String memberStart, IType type)
 	{
 		Set<String> fields = new TreeSet();
 		Set<String> properties = new TreeSet();
@@ -96,34 +96,34 @@ public class CompleteCommand implements ICommand
 		
 		if (!fields.isEmpty())
 		{
-			System.out.println("Fields:");
+			repl.getOutput().println("Fields:");
 			for (String field : fields)
 			{
-				System.out.print('\t');
-				System.out.println(field);
+				repl.getOutput().print('\t');
+				repl.getOutput().println(field);
 			}
 		}
 		if (!properties.isEmpty())
 		{
-			System.out.println("Properties:");
+			repl.getOutput().println("Properties:");
 			for (String property : properties)
 			{
-				System.out.print('\t');
-				System.out.println(property);
+				repl.getOutput().print('\t');
+				repl.getOutput().println(property);
 			}
 		}
 		if (!methods.isEmpty())
 		{
-			System.out.println("Methods:");
+			repl.getOutput().println("Methods:");
 			for (String method : methods)
 			{
-				System.out.print('\t');
-				System.out.println(method);
+				repl.getOutput().print('\t');
+				repl.getOutput().println(method);
 			}
 		}
 	}
 	
-	private void printMembers(REPLContext context, String start)
+	private void printMembers(DyvilREPL repl, REPLContext context, String start)
 	{
 		Set<String> fields = new TreeSet();
 		Set<String> methods = new TreeSet();
@@ -145,20 +145,20 @@ public class CompleteCommand implements ICommand
 		
 		if (!fields.isEmpty())
 		{
-			System.out.println("Fields:");
+			repl.getOutput().println("Fields:");
 			for (String field : fields)
 			{
-				System.out.print('\t');
-				System.out.println(field);
+				repl.getOutput().print('\t');
+				repl.getOutput().println(field);
 			}
 		}
 		if (!methods.isEmpty())
 		{
-			System.out.println("Methods:");
+			repl.getOutput().println("Methods:");
 			for (String method : methods)
 			{
-				System.out.print('\t');
-				System.out.println(method);
+				repl.getOutput().print('\t');
+				repl.getOutput().println(method);
 			}
 		}
 	}
