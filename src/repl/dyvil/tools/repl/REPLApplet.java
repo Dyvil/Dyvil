@@ -66,7 +66,7 @@ public class REPLApplet extends Applet
 
 		final Font monaco = new Font("Monaco", Font.TRUETYPE_FONT, 12);
 
-		this.textArea = new JTextArea(30, 50);
+		this.textArea = new JTextArea(40, 80);
 
 		this.textArea.setAutoscrolls(true);
 		this.textArea.setFont(monaco);
@@ -74,12 +74,12 @@ public class REPLApplet extends Applet
 		this.textArea.setTabSize(4);
 
 		final JScrollPane jScrollPane = new JScrollPane(this.textArea);
-		this.add(BorderLayout.NORTH, jScrollPane);
+		this.add(BorderLayout.PAGE_START, jScrollPane);
 
-		this.textBox = new JTextField(50);
+		this.textBox = new JTextField(80);
 		this.textBox.setFont(monaco);
 		this.textBox.addActionListener(this.actionListener);
-		this.add(BorderLayout.SOUTH, this.textBox);
+		this.add(BorderLayout.PAGE_END, this.textBox);
 	}
 }
 
