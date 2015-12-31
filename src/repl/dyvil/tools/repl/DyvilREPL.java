@@ -27,6 +27,7 @@ public final class DyvilREPL
 	private static BufferedReader reader;
 
 	private PrintStream output;
+	private PrintStream errorOutput;
 	
 	protected REPLContext context = new REPLContext(this);
 	protected REPLParser  parser  = new REPLParser(this.context);
@@ -76,9 +77,16 @@ public final class DyvilREPL
 		}
 	}
 	
-	private DyvilREPL(PrintStream output)
+	public DyvilREPL(PrintStream output)
 	{
 		this.output = output;
+		this.errorOutput = output;
+	}
+
+	public DyvilREPL(PrintStream output, PrintStream errorOutput)
+	{
+		this.output = output;
+		this.errorOutput = errorOutput;
 	}
 
 	public REPLContext getContext()
@@ -104,6 +112,11 @@ public final class DyvilREPL
 	public PrintStream getOutput()
 	{
 		return this.output;
+	}
+
+	public PrintStream getErrorOutput()
+	{
+		return this.errorOutput;
 	}
 
 	protected void launch(String[] args)

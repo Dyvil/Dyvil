@@ -95,7 +95,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			m.log(this.currentCode, buf);
 		}
 
-		System.err.println(buf.toString());
+		this.repl.getErrorOutput().println(buf.toString());
 	}
 	
 	private void compileInnerClasses()
@@ -110,7 +110,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			}
 			catch (Throwable t)
 			{
-				t.printStackTrace(this.repl.getOutput());
+				t.printStackTrace(this.repl.getErrorOutput());
 			}
 		}
 	}
