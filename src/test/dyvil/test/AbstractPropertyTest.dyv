@@ -2,25 +2,29 @@ package dyvil.test
 
 public class AbstractPropertyTest
 {
-	interface A {
+	interface AbstractProperty {
 		public int myProp {
 			abstract get
 			abstract set
 		}
 	}
 	
-	class C implements A
+	class ConcreteProperty implements AbstractProperty
 	{
+		private int value
+
 	    public override int myProp {
-	    	set(newValue) : {}
-	    	get : 1
+	    	set(newValue) : this.value = newValue
+	    	get : this.value
 	    }
 	}
 	
 	public static void main([String] args)
 	{
-		auto c = new C
-		Main.test("Property Getter", 1, c.myProp)
+		auto c = new ConcreteProperty
+
+		c.myProp = 20
+		Main.test("Property Getter", 20, c.myProp)
 
 		auto result = c.myProp = 10
 		Main.test("Property Setter", 10, result)
