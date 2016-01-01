@@ -76,6 +76,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 					Name name = token.nameValue();
 					if (name == get)
 					{
+						this.property.setGetterPosition(token.raw());
 						this.property.setGetterModifiers(this.modifiers);
 						this.modifiers = null;
 						this.mode = COLON;
@@ -84,6 +85,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 					}
 					if (name == set)
 					{
+						this.property.setSetterPosition(token.raw());
 						this.property.setSetterModifiers(this.modifiers);
 						this.modifiers = null;
 						this.mode = SET;
@@ -145,11 +147,11 @@ public class PropertyParser extends Parser implements IValueConsumer
 	{
 		if (this.targetSetter)
 		{
-			this.property.setSetter(value);
+			this.property.setSetterValue(value);
 		}
 		else
 		{
-			this.property.setGetter(value);
+			this.property.setGetterValue(value);
 		}
 	}
 }

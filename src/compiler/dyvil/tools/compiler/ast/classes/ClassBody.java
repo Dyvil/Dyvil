@@ -467,6 +467,22 @@ public class ClassBody implements IClassBody
 				return true;
 			}
 		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			final IProperty property = this.properties[i];
+
+			final IMethod getter = property.getGetter();
+			if (getter != null && getter.checkOverride(markers, iclass, candidate, typeContext))
+			{
+				return true;
+			}
+
+			final IMethod setter = property.getSetter();
+			if (setter != null && setter.checkOverride(markers, iclass, candidate, typeContext))
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -475,17 +491,41 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod candidate = this.methods[i];
-			if (iclass.checkImplements(markers, iclass, candidate, typeContext))
+			final IMethod candidate = this.methods[i];
+			this.checkMethod(markers, iclass, typeContext, candidate);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			final IProperty property = this.properties[i];
+
+			final IMethod getter = property.getGetter();
+			if (getter != null)
 			{
-				continue;
+				this.checkMethod(markers, iclass, typeContext, getter);
 			}
-			
-			if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
+
+			final IMethod setter = property.getSetter();
+			if (setter != null)
 			{
-				markers.add(MarkerMessages.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(),
-				                                        candidate.getName(), this.theClass.getName()));
+				this.checkMethod(markers, iclass, typeContext, setter);
 			}
+		}
+	}
+
+	private void checkMethod(MarkerList markers, IClass iclass, ITypeContext typeContext, IMethod candidate)
+	{
+		// Check if the super class implements the method
+		if (iclass.checkImplements(markers, iclass, candidate, typeContext))
+		{
+			return;
+		}
+
+		// If it doesn't, check for abstract modifiers
+		if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
+		{
+			// Create an abstract method error
+			markers.add(MarkerMessages.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(),
+			                                        candidate.getName(), this.theClass.getName()));
 		}
 	}
 	
