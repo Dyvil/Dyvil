@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.library;
 
-import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
+import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.DyvilCompiler;
@@ -59,7 +59,7 @@ public abstract class Library
 		}
 	}
 	
-	protected static final Map<String, String> env = ImmutableMap.apply("create", "true");
+	protected static final Map<String, String> env = SingletonMap.apply("create", "true");
 	
 	protected static final String[]     emptyStrings     = {};
 	protected static final LinkOption[] emptyLinkOptions = {};

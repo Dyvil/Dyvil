@@ -7,7 +7,6 @@ import dyvil.collection.view.MapView;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 import dyvil.util.Option;
 
 import java.util.Iterator;
@@ -22,11 +21,6 @@ public interface MutableMap<K, V> extends Map<K, V>
 	static <K, V> MutableMap<K, V> apply()
 	{
 		return new HashMap<>();
-	}
-	
-	static <K, V> MutableMap<K, V> apply(K key, V value)
-	{
-		return apply(new Tuple2<>(key, value));
 	}
 	
 	static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)

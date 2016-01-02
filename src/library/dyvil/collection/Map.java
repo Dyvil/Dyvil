@@ -4,7 +4,6 @@ import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.ref.ObjectRef;
-import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -40,7 +39,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	@SafeVarargs
-	static <K, V> ImmutableMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
+	static <K, V> ImmutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		return ImmutableMap.apply(entries);
 	}

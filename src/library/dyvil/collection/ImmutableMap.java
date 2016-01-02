@@ -48,11 +48,6 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		return EmptyMap.apply();
 	}
 	
-	static <K, V> ImmutableMap<K, V> apply(K key, V value)
-	{
-		return new SingletonMap<>(key, value);
-	}
-	
 	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
 		return new SingletonMap<>(entry.getKey(), entry.getValue());
@@ -61,8 +56,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	@SafeVarargs
 	static <K, V> ImmutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
-		int len = entries.length;
-		switch (len)
+		switch (entries.length)
 		{
 		case 0:
 			return EmptyMap.apply();

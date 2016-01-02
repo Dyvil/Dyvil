@@ -108,7 +108,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		return ImmutableMap.apply(key, value);
+		return SingletonMap.apply(key, value);
 	}
 	
 	@Override

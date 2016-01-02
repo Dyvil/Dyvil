@@ -27,7 +27,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	
 	public static <K, V> SingletonMap<K, V> apply(K key, V value)
 	{
-		return new SingletonMap(key, value);
+		return new SingletonMap<>(key, value);
 	}
 	
 	public static <K, V> SingletonMap<K, V> apply(Entry<K, V> entry)
@@ -62,13 +62,13 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public Iterator<K> keyIterator()
 	{
-		return new SingletonIterator(this.key);
+		return new SingletonIterator<>(this.key);
 	}
 	
 	@Override
 	public Iterator<V> valueIterator()
 	{
-		return new SingletonIterator(this.value);
+		return new SingletonIterator<>(this.value);
 	}
 	
 	@Override
@@ -122,13 +122,13 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public Option<V> getOption(Object key)
 	{
-		return Objects.equals(key, this.key) ? new Some(this.value) : None.instance;
+		return Objects.equals(key, this.key) ? new Some<>(this.value) : None.instance;
 	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		return new ArrayMap(new Object[] { this.key, key }, new Object[] { this.value, value }, 2, true);
+		return new ArrayMap<>(new Object[] { this.key, key }, new Object[] { this.value, value }, 2, true);
 	}
 	
 	@Override
@@ -136,7 +136,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	{
 		int index = 1;
 		Tuple2<? extends K, ? extends V>[] tuples = new Tuple2[1 + map.size()];
-		tuples[0] = new Tuple2(this.key, this.value);
+		tuples[0] = new Tuple2<>(this.key, this.value);
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
 			tuples[index++] = new Tuple2<K, V>(entry.getKey(), entry.getValue());
@@ -177,7 +177,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		return new SingletonMap(mapper.apply(this.key, this.value), this.value);
+		return new SingletonMap<>(mapper.apply(this.key, this.value), this.value);
 	}
 	
 	@Override
@@ -190,13 +190,13 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
 		Entry<? extends NK, ? extends NV> entry = mapper.apply(this.key, this.value);
-		return entry == null ? EmptyMap.instance : new SingletonMap(entry.getKey(), entry.getValue());
+		return entry == null ? EmptyMap.instance : new SingletonMap<>(entry.getKey(), entry.getValue());
 	}
 	
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		ArrayMap.Builder<NK, NV> builder = new ArrayMap.Builder<NK, NV>();
+		ArrayMap.Builder<NK, NV> builder = new ArrayMap.Builder<>();
 		for (Entry<? extends NK, ? extends NV> entry : mapper.apply(this.key, this.value))
 		{
 			builder.put(entry.getKey(), entry.getValue());
@@ -255,13 +255,13 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new SingletonMap(this.key, this.value);
+		return new SingletonMap<>(this.key, this.value);
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return MutableMap.apply(this.key, this.value);
+		return MutableMap.apply(new Tuple2<>(this.key, this.value));
 	}
 	
 	@Override
@@ -283,11 +283,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 		{
 			return Map.mapEquals(this, (Map) obj);
 		}
-		if (obj instanceof Entry)
-		{
-			return Entry.entryEquals(this, (Entry) obj);
-		}
-		return false;
+		return obj instanceof Entry && Entry.entryEquals(this, (Entry) obj);
 	}
 	
 	@Override
