@@ -41,7 +41,7 @@ public class DumpCommand implements ICommand
 		catch (IOException ex)
 		{
 			String absolute = dumpDir.getAbsolutePath();
-			System.err.println("Invalid Dumping Path: " + absolute);
+			repl.getErrorOutput().println("Invalid Dumping Path: " + absolute);
 		}
 	}
 }

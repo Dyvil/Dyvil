@@ -23,11 +23,11 @@ public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
 	
-	private static DyvilREPL      instance;
-	private static BufferedReader reader;
+	private static DyvilREPL instance;
 
-	private PrintStream output;
-	private PrintStream errorOutput;
+	private PrintStream    output;
+	private PrintStream    errorOutput;
+	private BufferedReader input;
 	
 	protected REPLContext context = new REPLContext(this);
 	protected REPLParser  parser  = new REPLParser(this.context);
@@ -66,27 +66,28 @@ public final class DyvilREPL
 	{
 		running = true;
 
-		instance = new DyvilREPL(System.out);
+		instance = new DyvilREPL(System.in, System.out, System.err);
 		instance.launch(args);
-		
-		reader = new BufferedReader(new InputStreamReader(System.in));
 		
 		while (running)
 		{
-			instance.loop();
+			instance.readAndProcess();
 		}
 	}
 	
-	public DyvilREPL(PrintStream output)
+	public DyvilREPL(InputStream input, PrintStream output)
 	{
-		this.output = output;
-		this.errorOutput = output;
+		this(input, output, output);
 	}
 
-	public DyvilREPL(PrintStream output, PrintStream errorOutput)
+	public DyvilREPL(InputStream input, PrintStream output, PrintStream errorOutput)
 	{
 		this.output = output;
 		this.errorOutput = errorOutput;
+		if (input != null)
+		{
+			this.input = new BufferedReader(new InputStreamReader(input));
+		}
 	}
 
 	public REPLContext getContext()
@@ -152,7 +153,7 @@ public final class DyvilREPL
 		}
 	}
 	
-	private static String readLine() throws IOException
+	public String readInput() throws IOException
 	{
 		StringBuilder buffer = new StringBuilder();
 		int depth1 = 0;
@@ -162,7 +163,7 @@ public final class DyvilREPL
 		
 		while (true)
 		{
-			String s = reader.readLine();
+			String s = this.input.readLine();
 			
 			if (s == null)
 			{
@@ -257,12 +258,12 @@ public final class DyvilREPL
 		return buffer.toString();
 	}
 
-	private static void printIndent(int indent)
+	private void printIndent(int indent)
 	{
-		System.out.print("  ");
+		this.output.print("  ");
 		for (int j = 0; j < indent; j++)
 		{
-			System.out.print("    ");
+			this.output.print("    ");
 		}
 	}
 	
@@ -271,14 +272,14 @@ public final class DyvilREPL
 		running = false;
 	}
 
-	protected void loop()
+	public void readAndProcess()
 	{
 		this.output.print("> ");
 
 		String currentCode;
 		try
 		{
-			currentCode = readLine();
+			currentCode = this.readInput();
 			if (currentCode == null)
 			{
 				return;
@@ -355,12 +356,12 @@ public final class DyvilREPL
 		this.runCommand(line.substring(1, index), line.substring(index + 1).split(" "));
 	}
 	
-	private void runCommand(String name, String... arguments)
+	public void runCommand(String name, String... arguments)
 	{
 		ICommand command = commands.get(name);
 		if (command == null)
 		{
-			this.output.println("Unknown Command: " + name);
+			this.errorOutput.println("Unknown Command: " + name);
 			return;
 		}
 		

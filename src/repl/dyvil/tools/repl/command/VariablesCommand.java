@@ -22,7 +22,7 @@ public class VariablesCommand implements ICommand
 	public void execute(DyvilREPL repl, String... args)
 	{
 		REPLContext context = repl.getContext();
-		for (IField v : context.fields.values())
+		for (IField v : context.getFields().values())
 		{
 			repl.getOutput().println(v);
 		}

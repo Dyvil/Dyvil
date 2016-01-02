@@ -125,17 +125,17 @@ public class CompleteCommand implements ICommand
 	
 	private void printMembers(DyvilREPL repl, REPLContext context, String start)
 	{
-		Set<String> fields = new TreeSet();
-		Set<String> methods = new TreeSet();
+		Set<String> fields = new TreeSet<>();
+		Set<String> methods = new TreeSet<>();
 		
-		for (IField variable : context.fields.values())
+		for (IField variable : context.getFields().values())
 		{
 			if (variable.getName().startWith(start))
 			{
 				fields.add(getSignature(Types.UNKNOWN, variable));
 			}
 		}
-		for (IMethod method : context.methods)
+		for (IMethod method : context.getMethods())
 		{
 			if (method.getName().startWith(start))
 			{

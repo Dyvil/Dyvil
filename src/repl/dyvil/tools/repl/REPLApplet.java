@@ -32,7 +32,7 @@ public class REPLApplet extends Applet
 	{
 		this.initGUI();
 
-		this.repl = new DyvilREPL(new PrintStream(new ByteArrayOutputStream()
+		this.repl = new DyvilREPL(null, new PrintStream(new ByteArrayOutputStream()
 		{
 			@Override
 			public synchronized void write(byte[] b, int off, int len)

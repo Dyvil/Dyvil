@@ -23,7 +23,7 @@ public class MethodsCommand implements ICommand
 	public void execute(DyvilREPL repl, String... args)
 	{
 		REPLContext context = repl.getContext();
-		for (IMethod method : context.methods)
+		for (IMethod method : context.getMethods())
 		{
 			StringBuilder builder = new StringBuilder();
 			Util.methodSignatureToString(method, builder);

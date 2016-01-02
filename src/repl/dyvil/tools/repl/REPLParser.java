@@ -81,7 +81,7 @@ public class REPLParser extends ParserManager
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace();
+				ex.printStackTrace(this.context.repl.getErrorOutput());
 				return false;
 			}
 			

@@ -58,7 +58,7 @@ public class JavapCommand implements ICommand
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			e.printStackTrace(repl.getErrorOutput());
 		}
 	}
 

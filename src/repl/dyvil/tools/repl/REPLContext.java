@@ -46,28 +46,50 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	private static final String REPL$CLASSES     = "repl$classes/";
 	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
 	
-	protected DyvilREPL repl;
-	protected String    currentCode;
-	private   int       classIndex;
-	private   String    className;
-	protected MarkerList markers = new MarkerList();
-	
-	public Map<Name, IField> fields  = new IdentityHashMap<>();
-	public List<IMethod>     methods = new ArrayList<>();
-	public Map<Name, IClass> classes = new IdentityHashMap<>();
-	
-	protected List<IClassCompilable> compilableList = new ArrayList<>();
-	protected List<IClassCompilable> innerClassList = new ArrayList<>();
-	
-	private IClass memberClass;
-	
+	protected final DyvilREPL repl;
+
+	// Persistent members
+
+	private final Map<Name, IField> fields  = new IdentityHashMap<>();
+	private final List<IMethod>     methods = new ArrayList<>();
+	private final Map<Name, IClass> classes = new IdentityHashMap<>();
+
 	private Map<String, AtomicInteger> resultIndexes = new HashMap<>();
-	
+
+	// Cleared / Updated for every evaluation
+	protected String currentCode;
+	private   int    classIndex;
+	private   String className;
+	protected final MarkerList             markers        = new MarkerList();
+	protected final List<IClassCompilable> compilableList = new ArrayList<>();
+	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
+
+	private IClass memberClass;
+
 	public REPLContext(DyvilREPL repl)
 	{
 		super(Name.getQualified("REPL"));
 		this.repl = repl;
 	}
+
+	// Getters
+
+	public Map<Name, IField> getFields()
+	{
+		return this.fields;
+	}
+
+	public List<IMethod> getMethods()
+	{
+		return this.methods;
+	}
+
+	public Map<Name, IClass> getClasses()
+	{
+		return this.classes;
+	}
+
+	// Evaluation
 	
 	protected void startEvaluation(String code)
 	{
@@ -352,10 +374,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		try
 		{
 			Class.forName(iclass.getFullName(), false, REPLMemberClass.CLASS_LOADER);
-			System.err.println("The class '" + iclass.getName() + "' cannot be re-defined");
+			this.repl.getErrorOutput().println("The class '" + iclass.getName() + "' cannot be re-defined");
 			return;
 		}
-		catch (ClassNotFoundException ex)
+		catch (ClassNotFoundException ignored)
 		{
 		}
 		
