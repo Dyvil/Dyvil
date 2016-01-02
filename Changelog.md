@@ -1,3 +1,45 @@
+Dyvil v0.14.0
+=============
+
+- Added Traits. #160
+- Added Super Type Arguments. #165
+- Added support for custom-named Property Setter Parameters. #161
+- Interfaces now automatically declare fields as `public static final` and methods as `public abstract`.
+- Concrete methods in Interfaces are no longer permitted.
+- Removed the Swap Operator. #166
+
+## Dyvil Library v0.14.0
+
+- Added `subscriptRef` methods for all Array Types.
+- Added `subscriptRef` methods for Lists and Maps.
+- Updated the `Map.apply(Entry...)` method to take `Entry`s rather than tuples.
+- Improved immutable Tuple Map builders.
+- Fixed infinite recursion in Tuple Maps.
+- Cleaned up the SingletonMap class.
+- Removed the `MutableMap.` and `ImmutableMap.apply(Object, Object)` methods.
+
+## Dyvil Compiler v0.14.0
+
+- Properties now use two underlying methods.
+- Added compiler support for `trait`s.
+- Added compiler support for the `subscriptRef` method. #168
+- Added an error for when Type Parameters are referenced in Type Operators. #162
+- Improved Override Checking for Properties.
+- Fixed Super/Subtype relationship behaviour being implemented incorrectly for Reference Types.
+- Fixed Reference Types not converting Primitive Types in place of Type Parameters to Object Types.
+- Fixed Properties being added to the Field list of Class Bodies.
+- Removed the `ExternalProperty` class.
+- Removed unused `Property` constructors.
+- Cleaned up the `Property` class.
+
+## Dyvil REPL v0.8.0
+
+- Added an Applet version of the REPL.
+- Updated the REPL I/O system to use custom Inputs and Outputs.
+- Updated several REPL APIs.
+
+## Dyvil Property Format v0.3.2
+
 Dyvil v0.13.0
 =============
 

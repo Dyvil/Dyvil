@@ -1,3 +1,8 @@
+v0.14.0
+library:https://github.com/Dyvil/Dyvil/releases/download/v0.14.0/dyvil-library-0.14.0.jar
+compiler:https://github.com/Dyvil/Dyvil/releases/download/v0.14.0/dyvil-compiler-0.14.0.jar
+repl:https://github.com/Dyvil/Dyvil/releases/download/v0.14.0/dyvil-repl-0.8.0.jar
+
 v0.13.0
 library:https://github.com/Dyvil/Dyvil/releases/download/v0.13.0/dyvil-library-0.13.0.jar
 compiler:https://github.com/Dyvil/Dyvil/releases/download/v0.13.0/dyvil-compiler-0.13.0.jar
