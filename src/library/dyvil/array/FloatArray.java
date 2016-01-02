@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Float;
 import dyvil.lang.Int;
+import dyvil.ref.FloatRef;
+import dyvil.ref.array.FloatArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -125,6 +127,13 @@ public interface FloatArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static FloatRef subscriptRef(float[] array, int index)
+	{
+		return new FloatArrayRef(array, index);
 	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })

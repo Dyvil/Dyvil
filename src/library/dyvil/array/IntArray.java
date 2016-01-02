@@ -6,6 +6,8 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Int;
+import dyvil.ref.IntRef;
+import dyvil.ref.array.IntArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -113,6 +115,13 @@ public interface IntArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static IntRef subscriptRef(int[] array, int index)
+	{
+		return new IntArrayRef(array, index);
 	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })

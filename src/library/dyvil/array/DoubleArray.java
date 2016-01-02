@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Double;
 import dyvil.lang.Int;
+import dyvil.ref.DoubleRef;
+import dyvil.ref.array.DoubleArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -114,6 +116,13 @@ public interface DoubleArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static DoubleRef subscriptRef(double[] array, int index)
+	{
+		return new DoubleArrayRef(array, index);
 	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
