@@ -83,7 +83,7 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -95,12 +95,7 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null)
-		{
-			return true;
-		}
-		
-		return type.isSuperTypeOf(this.getType());
+		return type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -141,6 +136,11 @@ public final class TypeOperator extends AbstractValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
+
+		if (this.type.getTypeVariable() == null && this.type.hasTypeVariables())
+		{
+			markers.add(MarkerMessages.createError(this.position, "typeoperator.typevar"));
+		}
 	}
 	
 	@Override

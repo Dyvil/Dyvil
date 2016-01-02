@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -73,6 +74,15 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	boolean isSubTypeOf(IType type);
 	
 	int getSuperTypeDistance(IType superType);
+
+	default IArguments getSuperConstructorArguments()
+	{
+		return null;
+	}
+
+	default void setSuperConstructorArguments(IArguments arguments)
+	{
+	}
 	
 	// Interfaces
 	
@@ -144,7 +154,6 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 	
 	static IClassMetadata getClassMetadata(IClass iclass, int modifiers)
 	{
-		
 		if ((modifiers & Modifiers.OBJECT_CLASS) != 0)
 		{
 			return new ObjectClassMetadata(iclass);
@@ -157,9 +166,14 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 		{
 			return new AnnotationMetadata(iclass);
 		}
-		if ((modifiers & Modifiers.INTERFACE_CLASS) != 0)
+		final int interfaceModifiers = modifiers & Modifiers.TRAIT_CLASS;
+		if (interfaceModifiers == Modifiers.TRAIT_CLASS)
 		{
-			return new InterfaceMetadata();
+			return new TraitMetadata(iclass);
+		}
+		else if (interfaceModifiers != 0)
+		{
+			return new InterfaceMetadata(iclass);
 		}
 		return new ClassMetadata(iclass);
 	}

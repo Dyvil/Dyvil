@@ -19,13 +19,48 @@ public final class ClassParameterSetter implements IValue
 {
 	private IClass     theClass;
 	private IParameter parameter;
-	
+
 	public ClassParameterSetter(IClass theClass, IParameter param)
 	{
 		this.theClass = theClass;
 		this.parameter = param;
 	}
-	
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.parameter.getPosition();
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
+	@Override
+	public IType getType()
+	{
+		return Types.VOID;
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return type == Types.VOID ? this : null;
+	}
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return type == Types.VOID;
+	}
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -36,57 +71,22 @@ public final class ClassParameterSetter implements IValue
 		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
 		                      this.parameter.getDescription());
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		Name name = this.parameter.getName();
 		buffer.append("this.").append(name).append(" = ").append(name);
 	}
-	
+
 	// ----- Ignore -----
-	
+
 	@Override
 	public int valueTag()
 	{
 		return 0;
 	}
-	
-	@Override
-	public ICodePosition getPosition()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return true;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return null;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return false;
-	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

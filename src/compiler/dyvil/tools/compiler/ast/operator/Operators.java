@@ -82,7 +82,7 @@ public interface Operators
 		return null;
 	}
 	
-	static IValue get(IValue arg1, Name name, IValue arg2)
+	static IValue getInfix(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.plus)
 		{
@@ -132,15 +132,6 @@ public interface Operators
 				rangeOperator.setHalfOpen(openRange);
 			}
 			return rangeOperator;
-		}
-		// Swap Operator
-		if (name == Names.coloneqcolon)
-		{
-			if (arg1.valueTag() == IValue.FIELD_ACCESS && arg2.valueTag() == IValue.FIELD_ACCESS)
-			{
-				return new SwapOperator((FieldAccess) arg1, (FieldAccess) arg2);
-			}
-			return null;
 		}
 		if (name == Names.ampamp)
 		{

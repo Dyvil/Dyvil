@@ -25,7 +25,7 @@ public class DumpCommand implements ICommand
 	{
 		if (args.length == 0)
 		{
-			System.out.println("Result Class Dumping disabled.");
+			repl.getOutput().println("Result Class Dumping disabled.");
 			repl.setDumpDir(null);
 			return;
 		}
@@ -36,7 +36,7 @@ public class DumpCommand implements ICommand
 		try
 		{
 			String canonical = dumpDir.getCanonicalPath();
-			System.out.println("Dumping Result Classes to '" + canonical + "'");
+			repl.getOutput().println("Dumping Result Classes to '" + canonical + "'");
 		}
 		catch (IOException ex)
 		{

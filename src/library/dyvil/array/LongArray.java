@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Int;
 import dyvil.lang.Long;
+import dyvil.ref.LongRef;
+import dyvil.ref.array.LongArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -114,6 +116,13 @@ public interface LongArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static LongRef subscriptRef(long[] array, int index)
+	{
+		return new LongArrayRef(array, index);
 	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })

@@ -19,6 +19,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -45,6 +47,8 @@ public class CodeClass extends AbstractClass
 {
 	protected IDyvilHeader  unit;
 	protected ICodePosition position;
+
+	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
 	
 	public CodeClass()
 	{
@@ -106,7 +110,19 @@ public class CodeClass extends AbstractClass
 			this.fullName = this.unit.getFullName(name);
 		}
 	}
-	
+
+	@Override
+	public IArguments getSuperConstructorArguments()
+	{
+		return this.superConstructorArguments;
+	}
+
+	@Override
+	public void setSuperConstructorArguments(IArguments superConstructorArguments)
+	{
+		this.superConstructorArguments = superConstructorArguments;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -191,7 +207,7 @@ public class CodeClass extends AbstractClass
 			this.interfaces[i].resolve(markers, this);
 		}
 		
-		this.metadata.resolve(markers, context);
+		this.metadata.resolve(markers, this);
 		
 		if (this.body != null)
 		{
@@ -202,33 +218,33 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.metadata.checkTypes(markers, context);
-		
 		if (this.annotations != null)
 		{
 			this.annotations.checkTypes(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			this.generics[i].checkTypes(markers, this);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].checkTypes(markers, this);
 		}
-		
+
 		if (this.superType != null)
 		{
 			this.superType.checkType(markers, this, TypePosition.SUPER_TYPE);
 		}
-		
+
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			this.interfaces[i].checkType(markers, this, TypePosition.SUPER_TYPE);
 		}
-		
+
+		this.metadata.checkTypes(markers, context);
+
 		if (this.body != null)
 		{
 			this.body.checkTypes(markers);
@@ -247,46 +263,27 @@ public class CodeClass extends AbstractClass
 			                                       MarkerMessages.getMarker("class", this.name),
 			                                       ModifierUtil.classModifiersToString(illegalModifiers)));
 		}
-		
+
+
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
 		}
-		
+
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			this.generics[i].check(markers, this);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, this);
 		}
-		
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			IType type = this.interfaces[i];
-			type.check(markers, context);
-			
-			IClass iclass = type.getTheClass();
-			if (iclass == null)
-			{
-				continue;
-			}
-			
-			int modifiers = iclass.getModifiers().toFlags();
-			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
-			{
-				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
-				                                        ModifierUtil.classModifiersToString(modifiers),
-				                                        iclass.getName()));
-			}
-		}
-		
+
 		if (this.superType != null)
 		{
 			this.superType.check(markers, context);
-			
+
 			IClass superClass = this.superType.getTheClass();
 			if (superClass != null)
 			{
@@ -303,7 +300,29 @@ public class CodeClass extends AbstractClass
 				}
 			}
 		}
-		
+
+		for (int i = 0; i < this.interfaceCount; i++)
+		{
+			IType type = this.interfaces[i];
+			type.check(markers, context);
+
+			IClass iclass = type.getTheClass();
+			if (iclass == null)
+			{
+				continue;
+			}
+
+			int modifiers = iclass.getModifiers().toFlags();
+			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+			{
+				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
+				                                        ModifierUtil.classModifiersToString(modifiers),
+				                                        iclass.getName()));
+			}
+		}
+
+		this.metadata.check(markers, context);
+
 		if (this.body != null)
 		{
 			this.body.check(markers);
@@ -317,27 +336,29 @@ public class CodeClass extends AbstractClass
 		{
 			this.annotations.foldConstants();
 		}
-		
+
 		for (int i = 0; i < this.genericCount; i++)
 		{
 			this.generics[i].foldConstants();
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
 		}
-		
+
 		if (this.superType != null)
 		{
 			this.superType.foldConstants();
 		}
-		
+
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			this.interfaces[i].foldConstants();
 		}
-		
+
+		this.metadata.foldConstants();
+
 		if (this.body != null)
 		{
 			this.body.foldConstants();
@@ -371,6 +392,8 @@ public class CodeClass extends AbstractClass
 		{
 			this.interfaces[i].cleanup(this, this);
 		}
+
+		this.metadata.cleanup(this, this);
 		
 		if (this.body != null)
 		{

@@ -9,11 +9,12 @@ public class Main
 		
 	private static void runTests([String] args)
 	{
-		AbstractProperties.main(args)
+		AbstractPropertyTest.main(args)
 		AnnotationTest.main(args)
 		BridgeTest.main(args)
 		BuilderTest.main(args)
 		CaptureTest.main(args)
+		ConstructorTest.main(args)
 		ExtensionTest.main(args)
 		ForTest.main(args)
 		IncTest.main(args)

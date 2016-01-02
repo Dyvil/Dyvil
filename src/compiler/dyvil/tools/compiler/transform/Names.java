@@ -9,6 +9,7 @@ public final class Names
 	public static final Name unapply       = new Name("unapply");
 	public static final Name update        = new Name("update");
 	public static final Name subscript     = new Name("subscript");
+	public static final Name subscriptRef  = new Name("subscriptRef");
 	public static final Name subscript_$eq = new Name("subscript_=", "subscript_$eq");
 	public static final Name match         = new Name("match");
 	public static final Name equals        = new Name("equals");
@@ -53,11 +54,10 @@ public final class Names
 	public static final Name ampamp  = new Name("&&", "$amp$amp");
 	public static final Name barbar  = new Name("||", "$bar$bar");
 	
-	public static final Name eqeq         = new Name("==", "$eq$eq");
-	public static final Name bangeq       = new Name("!=", "$bang$eq");
-	public static final Name eqeqeq       = new Name("===", "$eq$eq$eq");
-	public static final Name bangeqeq     = new Name("!==", "$bang$eq$eq");
-	public static final Name coloneqcolon = new Name(":=:", "$colon$eq$colon");
+	public static final Name eqeq     = new Name("==", "$eq$eq");
+	public static final Name bangeq   = new Name("!=", "$bang$eq");
+	public static final Name eqeqeq   = new Name("===", "$eq$eq$eq");
+	public static final Name bangeqeq = new Name("!==", "$bang$eq$eq");
 	
 	public static final Name lt      = new Name("<", "$lt");
 	public static final Name lteq    = new Name("<=", "$lt$eq");

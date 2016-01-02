@@ -20,14 +20,14 @@ public class HelpCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{
-		System.out.println("Available Commands: ");
+		repl.getOutput().println("Available Commands: ");
 		
 		for (Entry<String, ICommand> entry : DyvilREPL.getCommands())
 		{
-			System.out.print(" ");
-			System.out.print(entry.getKey());
-			System.out.print(" - ");
-			System.out.println(entry.getValue().getDescription());
+			repl.getOutput().print(" ");
+			repl.getOutput().print(entry.getKey());
+			repl.getOutput().print(" - ");
+			repl.getOutput().println(entry.getValue().getDescription());
 		}
 	}
 }

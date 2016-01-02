@@ -200,7 +200,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				                                       this.modifiers);
 				property.setAnnotations(this.annotations);
 				this.member = property;
-				this.mode = FIELD_END;
+				this.mode = PROPERTY_END;
 
 				pm.skip();
 				pm.pushParser(new PropertyParser(property));

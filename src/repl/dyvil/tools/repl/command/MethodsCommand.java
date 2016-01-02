@@ -27,7 +27,7 @@ public class MethodsCommand implements ICommand
 		{
 			StringBuilder builder = new StringBuilder();
 			Util.methodSignatureToString(method, builder);
-			System.out.println(builder.toString());
+			repl.getOutput().println(builder.toString());
 		}
 	}
 }

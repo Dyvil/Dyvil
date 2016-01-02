@@ -1,31 +1,32 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IProperty extends IField
 {
 	// Getter
-	
-	boolean hasGetter();
-	
+
+	void setGetterValue(IValue value);
+
 	void setGetterModifiers(ModifierSet modifiers);
+
+	void setGetterPosition(ICodePosition position);
 	
-	ModifierSet getGetterModifiers();
-	
-	void setGetter(IValue get);
-	
-	IValue getGetter();
+	IMethod getGetter();
 	
 	// Setter
-	
-	boolean hasSetter();
-	
+
+	void setSetterValue(IValue value);
+
 	void setSetterModifiers(ModifierSet modifiers);
-	
-	ModifierSet getSetterModifiers();
-	
-	void setSetter(IValue set);
-	
-	IValue getSetter();
+
+	void setSetterPosition(ICodePosition position);
+
+	void setSetterParameterName(Name name);
+
+	IMethod getSetter();
 }

@@ -27,12 +27,12 @@ public class JavapCommand implements ICommand
 	{
 		if (args.length == 0)
 		{
-			System.out.println("No class name given");
+			repl.getOutput().println("No class name given");
 			return;
 		}
 
 		// Construct the Command
-		String[] command = getCommand(args);
+		String[] command = getCommand(repl, args);
 		if (command == null)
 		{
 			return;
@@ -52,7 +52,7 @@ public class JavapCommand implements ICommand
 				String line;
 				while ((line = reader.readLine()) != null)
 				{
-					System.out.println(line);
+					repl.getOutput().println(line);
 				}
 			}
 		}
@@ -62,7 +62,7 @@ public class JavapCommand implements ICommand
 		}
 	}
 
-	public static String[] getCommand(String[] args)
+	public static String[] getCommand(DyvilREPL repl, String[] args)
 	{
 		String className = args[0];
 		Class theClass;
@@ -75,7 +75,7 @@ public class JavapCommand implements ICommand
 		}
 		catch (ClassNotFoundException ex)
 		{
-			System.out.println("Could not find Class '" + className + "'");
+			repl.getOutput().println("Could not find Class '" + className + "'");
 			return null;
 		}
 

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.generic.type;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -227,9 +226,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(this.typeVar.getName().qualified);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/TypeArgument", "apply",
-		                       "(Ljava/lang/String;)Ldyvilx/lang/model/type/TypeArgument;", false);
+		throw new Error("Type Variable Types cannot be used in Type Operators");
 	}
 	
 	@Override

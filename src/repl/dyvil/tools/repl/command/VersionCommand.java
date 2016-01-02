@@ -20,13 +20,13 @@ public class VersionCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{
-		System.out.print("Dyvil version:\t\t");
-		System.out.println(DyvilCompiler.DYVIL_VERSION);
-		System.out.print(" Library version:\t");
-		System.out.println(DyvilCompiler.LIBRARY_VERSION);
-		System.out.print(" Compiler version:\t");
-		System.out.println(DyvilCompiler.VERSION);
-		System.out.print(" REPL version:\t\t");
-		System.out.println(DyvilREPL.VERSION);
+		repl.getOutput().print("Dyvil version:\t\t");
+		repl.getOutput().println(DyvilCompiler.DYVIL_VERSION);
+		repl.getOutput().print(" Library version:\t");
+		repl.getOutput().println(DyvilCompiler.LIBRARY_VERSION);
+		repl.getOutput().print(" Compiler version:\t");
+		repl.getOutput().println(DyvilCompiler.VERSION);
+		repl.getOutput().print(" REPL version:\t\t");
+		repl.getOutput().println(DyvilREPL.VERSION);
 	}
 }

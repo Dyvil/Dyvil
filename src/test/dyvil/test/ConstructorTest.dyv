@@ -1,0 +1,45 @@
+package dyvil.test
+
+public class ConstructorTest
+{
+	case class A(public int i,
+				 public int j)
+
+	case class B(public int i) extends A(i, 0)
+
+	case class C(public int j) extends A(0, j)
+
+	case object O extends A(1, 1)
+
+	public new()
+	{
+	}
+
+	public static void main([String] args)
+	{
+		A a = A(1, 2)
+		B b = B(1)
+		C c = C(2)
+		O o = O
+
+		A ba = b // B -> A
+		A ca = c // C -> A
+		A oa = o // O -> A
+
+		Main.test("A", a, A(1, 2))
+		Main.test("A.i", a.i, 1)
+		Main.test("A.j", a.j, 2)
+
+		Main.test("B", b, B(1))
+		Main.test("B.i", ba.i, 1)
+		Main.test("B.j", ba.j, 0)
+
+		Main.test("C", c, C(2))
+		Main.test("C.i", ca.i, 0)
+		Main.test("C.j", ca.j, 2)
+
+		Main.test("O", o, O)
+		Main.test("O.i", oa.i, 1)
+		Main.test("O.j", oa.j, 1)
+	}
+}

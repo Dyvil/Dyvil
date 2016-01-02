@@ -50,7 +50,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	}
 	
 	@Override
-	public void check(ICodePosition position, MarkerList markers)
+	public void check(ICodePosition position, MarkerList markers, IContext context)
 	{
 		map.clear();
 

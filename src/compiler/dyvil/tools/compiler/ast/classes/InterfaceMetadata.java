@@ -1,31 +1,59 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public final class InterfaceMetadata implements IClassMetadata
+public class InterfaceMetadata implements IClassMetadata
 {
+	private final IClass theClass;
+
+	public InterfaceMetadata(IClass theClass)
+	{
+		this.theClass = theClass;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		final IClassBody classBody = this.theClass.getBody();
+		if (classBody == null)
+		{
+			return;
+		}
+
+		// Make fields public and static
+		for (int i = 0, count = classBody.fieldCount(); i < count; i++)
+		{
+			processField(classBody.getField(i));
+		}
+
+		// Make non-static methods public and abstract
+		for (int i = 0, count = classBody.methodCount(); i < count; i++)
+		{
+			processMethod(classBody.getMethod(i));
+		}
 	}
-	
-	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
+
+	protected static void processMethod(IMethod method)
 	{
+		if (!method.hasModifier(Modifiers.STATIC))
+		{
+			method.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.ABSTRACT);
+		}
 	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
+
+	protected static void processField(IField field)
 	{
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
+		if (field.isField())
+		{
+			field.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.FINAL);
+		}
 	}
 	
 	@Override

@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Boolean;
 import dyvil.lang.Int;
+import dyvil.ref.BooleanRef;
+import dyvil.ref.array.BooleanArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -92,6 +94,13 @@ public interface BooleanArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static BooleanRef subscriptRef(boolean[] array, int index)
+	{
+		return new BooleanArrayRef(array, index);
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })

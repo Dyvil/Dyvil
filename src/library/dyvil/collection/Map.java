@@ -3,6 +3,7 @@ package dyvil.collection;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.ref.ObjectRef;
 import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -424,6 +425,24 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	default V subscript(Object key)
 	{
 		return this.get(key);
+	}
+
+	default ObjectRef<V> subscriptRef(K key)
+	{
+		return new ObjectRef<V>()
+		{
+			@Override
+			public V get()
+			{
+				return Map.this.get(key);
+			}
+
+			@Override
+			public void set(V value)
+			{
+				Map.this.put(key, value);
+			}
+		};
 	}
 	
 	/**

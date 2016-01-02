@@ -582,7 +582,7 @@ public class REPLMemberClass implements IClass
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace();
+			t.printStackTrace(repl.getOutput());
 			return null;
 		}
 	}
