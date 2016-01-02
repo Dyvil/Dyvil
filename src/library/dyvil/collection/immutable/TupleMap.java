@@ -78,67 +78,45 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
-		private Tuple2<K, V>[] entries;
-		private int            size;
+		private TupleMap<K, V> map;
 		
 		public Builder()
 		{
-			this.entries = new Tuple2[DEFAULT_CAPACITY];
+			this.map = new TupleMap<>(DEFAULT_CAPACITY);
 		}
 		
 		public Builder(int capacity)
 		{
-			this.entries = new Tuple2[capacity];
-		}
-		
-		private void put(K key, Tuple2<K, V> newEntry)
-		{
-			for (int i = 0; i < this.size; i++)
-			{
-				if (Objects.equals(this.entries[i]._1, key))
-				{
-					this.entries[i] = newEntry;
-					return;
-				}
-			}
-			
-			int index = this.size++;
-			if (index >= this.entries.length)
-			{
-				Tuple2<K, V>[] temp = new Tuple2[(int) (this.size * 1.1F)];
-				System.arraycopy(this.entries, 0, temp, 0, index);
-				this.entries = temp;
-			}
-			this.entries[index] = newEntry;
+			this.map = new TupleMap<>(capacity);
 		}
 		
 		@Override
 		public void put(K key, V value)
 		{
-			if (this.size < 0)
+			if (this.map == null)
 			{
 				throw new IllegalStateException("Already built");
 			}
 			
-			this.put(key, new Tuple2<K, V>(key, value));
+			this.map.putInternal(new Tuple2<K, V>(key, value));
 		}
 		
 		@Override
 		public void put(Entry<? extends K, ? extends V> entry)
 		{
-			if (this.size < 0)
+			if (this.map == null)
 			{
 				throw new IllegalStateException("Already built");
 			}
 			
-			this.put(entry.getKey(), (Tuple2) entry.toTuple());
+			this.map.putInternal((Tuple2<K, V>) entry.toTuple());
 		}
 		
 		@Override
 		public TupleMap<K, V> build()
 		{
-			TupleMap<K, V> map = new TupleMap(this.entries, this.size, true);
-			this.size = -1;
+			final TupleMap<K, V> map = this.map;
+			this.map = null;
 			return map;
 		}
 	}
@@ -184,7 +162,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 			
 			entries[index++] = entry;
 		}
-		return new TupleMap(entries, index, true);
+		return new TupleMap<>(entries, index, true);
 	}
 	
 	@Override
@@ -203,7 +181,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 			
 			entries[index++] = entry;
 		}
-		return new TupleMap(entries, index, true);
+		return new TupleMap<>(entries, index, true);
 	}
 	
 	@Override
@@ -222,7 +200,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 			
 			entries[index++] = entry;
 		}
-		return new TupleMap(entries, index, true);
+		return new TupleMap<>(entries, index, true);
 	}
 	
 	@Override
@@ -241,7 +219,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 			
 			entries[index++] = entry;
 		}
-		return new TupleMap(entries, index, true);
+		return new TupleMap<>(entries, index, true);
 	}
 	
 	@Override
@@ -260,7 +238,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 			
 			entries[index++] = entry;
 		}
-		return new TupleMap(entries, index, true);
+		return new TupleMap<>(entries, index, true);
 	}
 	
 	@Override
@@ -337,7 +315,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 				entries[index++] = entry;
 			}
 		}
-		return new TupleMap(entries, index, true);
+		return new TupleMap<>(entries, index, true);
 	}
 	
 	@Override
@@ -356,13 +334,13 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new TupleMap(this);
+		return new TupleMap<>(this);
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.TupleMap(this);
+		return new dyvil.collection.mutable.TupleMap<>(this);
 	}
 	
 	@Override
