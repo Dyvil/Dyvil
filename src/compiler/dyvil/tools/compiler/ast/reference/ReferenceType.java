@@ -69,6 +69,38 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		if (superType.getTheClass() == Types.OBJECT_CLASS)
+		{
+			return 2;
+		}
+		return this.isSameType(superType) ? 1 : 0;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType type)
+	{
+		return IObjectType.super.isSuperTypeOf(type) && this.isSameBaseType(type);
+	}
+
+	private boolean isSameBaseType(IType type)
+	{
+		if (this.theClass == Types.getObjectRefClass())
+		{
+			final IType otherType = type.resolveType(this.theClass.getTypeVariable(0));
+			return otherType == null || this.type.isSameType(otherType);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isSameType(IType type)
+	{
+		return this.theClass == type.getTheClass() && this.isSameBaseType(type);
+	}
+
+	@Override
 	public Name getName()
 	{
 		return this.theClass.getName();
@@ -99,7 +131,11 @@ public class ReferenceType implements IObjectType
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		final IType concreteType = this.type.getConcreteType(context);
+		IType concreteType = this.type.getConcreteType(context);
+		if (!this.type.isPrimitive() && concreteType.isPrimitive())
+		{
+			concreteType = concreteType.getObjectType();
+		}
 		if (concreteType != null && concreteType != this.type)
 		{
 			return concreteType.getRefType();
