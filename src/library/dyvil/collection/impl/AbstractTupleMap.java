@@ -324,7 +324,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 			Tuple2<K, V> entry = this.entries[i];
 			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
-				return new Some(entry._2);
+				return new Some<>(entry._2);
 			}
 		}
 		return None.instance;
