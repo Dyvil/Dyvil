@@ -74,8 +74,7 @@ public final class CompoundCall
 			if (op != null)
 			{
 				op.setPosition(position);
-				op.resolveOperator(markers, context);
-				return op;
+				return op.resolveOperator(markers, context);
 			}
 
 			// x op= z

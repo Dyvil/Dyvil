@@ -146,6 +146,11 @@ public interface IValue extends IASTNode, ITyped
 	{
 		return null;
 	}
+
+	default IValue toReferenceValue(MarkerList markers, IContext context)
+	{
+		return null;
+	}
 	
 	boolean isResolved();
 	
@@ -189,8 +194,9 @@ public interface IValue extends IASTNode, ITyped
 	
 	IValue resolve(MarkerList markers, IContext context);
 
-	default void resolveOperator(MarkerList markers, IContext context)
+	default IValue resolveOperator(MarkerList markers, IContext context)
 	{
+		return this;
 	}
 	
 	void checkTypes(MarkerList markers, IContext context);

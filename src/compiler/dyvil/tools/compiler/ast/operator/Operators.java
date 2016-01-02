@@ -82,7 +82,7 @@ public interface Operators
 		return null;
 	}
 	
-	static IValue get(IValue arg1, Name name, IValue arg2)
+	static IValue getInfix(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.plus)
 		{

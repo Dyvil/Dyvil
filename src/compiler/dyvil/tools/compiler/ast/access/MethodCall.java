@@ -170,20 +170,18 @@ public final class MethodCall extends AbstractCall implements INamed
 			if (op != null)
 			{
 				op.setPosition(this.position);
-				op.resolveOperator(markers, context);
-				return op;
+				return op.resolveOperator(markers, context);
 			}
 			break;
 		}
 		case 1:
 		{
 			// Infix Operators
-			final IValue op = Operators.get(this.receiver, this.name, this.arguments.getFirstValue());
+			final IValue op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
 			if (op != null)
 			{
 				op.setPosition(this.position);
-				op.resolveOperator(markers, context);
-				return op;
+				return op.resolveOperator(markers, context);
 			}
 
 			// Compound Operators
@@ -219,8 +217,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			if (op != null)
 			{
 				op.setPosition(this.position);
-				op.resolveOperator(markers, context);
-				return op;
+				return op.resolveOperator(markers, context);
 			}
 		}
 		return null;

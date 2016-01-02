@@ -6,9 +6,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.reference.ArrayReference;
-import dyvil.tools.compiler.ast.reference.IReference;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -108,17 +105,12 @@ public class SubscriptGetter extends AbstractCall
 	}
 
 	@Override
-	public IReference toReference()
+	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
-		if (this.receiver.getType().isArrayType() && this.arguments.size() == 1)
-		{
-			IValue argument = this.arguments.getFirstValue();
-			if (argument.isType(Types.INT))
-			{
-				return new ArrayReference(this.receiver, argument);
-			}
-		}
-		return null;
+		MethodCall methodCall = new MethodCall(this.position, this.receiver, Names.subscriptRef, this.arguments);
+		methodCall.setGenericData(this.genericData);
+		methodCall.setType(this.type);
+		return methodCall.resolveCall(markers, context);
 	}
 
 	@Override

@@ -102,7 +102,7 @@ public class ReferenceValue implements IValue
 	{
 		this.value.resolveTypes(markers, context);
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -112,25 +112,44 @@ public class ReferenceValue implements IValue
 	}
 
 	@Override
-	public void resolveOperator(MarkerList markers, IContext context)
+	public IValue resolveOperator(MarkerList markers, IContext context)
 	{
-		if (this.reference == null)
+		if (this.reference != null)
 		{
-			final IReference reference = this.value.toReference();
+			return this;
+		}
 
-			if (reference == null && this.value.isResolved())
+		final IValue referenceValue = this.value.toReferenceValue(markers, context);
+		if (referenceValue != null)
+		{
+			return referenceValue.resolveOperator(markers, context);
+		}
+
+		final IReference reference = this.value.toReference();
+
+		if (reference == null)
+		{
+			if (this.value.isResolved())
 			{
 				markers.add(MarkerMessages.createError(this.value.getPosition(), "reference.expression.invalid"));
 			}
-
-			this.reference = reference;
+			return this;
 		}
+
+		reference.resolve(this.value.getPosition(), markers, context);
+		this.reference = reference;
+		return this;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.value.checkTypes(markers, context);
+
+		if (this.reference != null)
+		{
+			this.reference.checkTypes(this.value.getPosition(), markers, context);
+		}
 	}
 	
 	@Override
@@ -140,7 +159,7 @@ public class ReferenceValue implements IValue
 
 		if (this.reference != null)
 		{
-			this.reference.check(this.value.getPosition(), markers);
+			this.reference.check(this.value.getPosition(), markers, context);
 		}
 	}
 	
@@ -168,7 +187,13 @@ public class ReferenceValue implements IValue
 	{
 		this.reference.writeReference(writer);
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return "*" + this.value.toString();
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
