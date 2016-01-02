@@ -5,6 +5,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.ref.ObjectRef;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -148,6 +149,24 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		int start = Int.unapply(range.first());
 		int length = range.count();
 		return this.subList(start, length);
+	}
+
+	default ObjectRef<E> subscriptRef(int index)
+	{
+		return new ObjectRef<E>()
+		{
+			@Override
+			public E get()
+			{
+				return List.this.get(index);
+			}
+
+			@Override
+			public void set(E value)
+			{
+				List.this.set(index, value);
+			}
+		};
 	}
 
 	/**
