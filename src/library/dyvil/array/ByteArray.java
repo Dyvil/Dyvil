@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Byte;
 import dyvil.lang.Int;
+import dyvil.ref.ByteRef;
+import dyvil.ref.array.ByteArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -115,8 +117,13 @@ public interface ByteArray
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
-	
-	// Operators
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static ByteRef subscriptRef(byte[] array, int index)
+	{
+		return new ByteArrayRef(array, index);
+	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)

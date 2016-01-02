@@ -26,7 +26,7 @@ public class VariableReference implements IReference
 	}
 
 	@Override
-	public void check(ICodePosition position, MarkerList markers)
+	public void check(ICodePosition position, MarkerList markers, IContext context)
 	{
 		IVariable variable = this.getVariable();
 		if (!variable.isReferenceCapturable())

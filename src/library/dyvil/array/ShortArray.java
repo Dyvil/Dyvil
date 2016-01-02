@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Int;
 import dyvil.lang.Short;
+import dyvil.ref.ShortRef;
+import dyvil.ref.array.ShortArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -125,6 +127,13 @@ public interface ShortArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static ShortRef subscriptRef(short[] array, int index)
+	{
+		return new ShortArrayRef(array, index);
 	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })

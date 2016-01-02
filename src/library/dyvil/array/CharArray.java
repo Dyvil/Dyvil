@@ -7,6 +7,8 @@ import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.lang.Char;
 import dyvil.lang.Int;
+import dyvil.ref.CharRef;
+import dyvil.ref.array.CharArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -115,6 +117,13 @@ public interface CharArray
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static CharRef subscriptRef(char[] array, int index)
+	{
+		return new CharArrayRef(array, index);
+	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
@@ -131,6 +140,8 @@ public interface CharArray
 			action.accept(v);
 		}
 	}
+
+	// Operators
 	
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	static boolean $qmark(char[] array, char v)
@@ -149,9 +160,7 @@ public interface CharArray
 	{
 		return !Arrays.equals(array1, array2);
 	}
-	
-	// Operators
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	static char[] $plus(char[] array, char v)
 	{

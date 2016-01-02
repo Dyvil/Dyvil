@@ -13,6 +13,8 @@ import dyvil.lang.Double;
 import dyvil.lang.Float;
 import dyvil.lang.Long;
 import dyvil.lang.Short;
+import dyvil.ref.ObjectRef;
+import dyvil.ref.array.ObjectArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.lang.reflect.Array;
@@ -121,6 +123,13 @@ public interface ObjectArray
 		int start = Int.unapply(range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	static <T> ObjectRef<T> subscriptRef(T[] array, int index)
+	{
+		return new ObjectArrayRef<>(array, index);
 	}
 	
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })

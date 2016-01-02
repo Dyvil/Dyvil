@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -36,14 +35,9 @@ public class InstanceFieldReference implements IReference
 	}
 
 	@Override
-	public void check(ICodePosition position, MarkerList markers)
+	public void check(ICodePosition position, MarkerList markers, IContext context)
 	{
 		checkFinalAccess(this.field, position, markers);
-	}
-
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
 	}
 
 	@Override

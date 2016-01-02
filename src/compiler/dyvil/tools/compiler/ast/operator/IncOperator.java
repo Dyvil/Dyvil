@@ -99,11 +99,12 @@ public class IncOperator extends AbstractValue
 	}
 
 	@Override
-	public void resolveOperator(MarkerList markers, IContext context)
+	public IValue resolveOperator(MarkerList markers, IContext context)
 	{
 		this.field = this.field.capture(context);
 		this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 		this.field.checkAssign(markers, context, this.position, null, this);
+		return this;
 	}
 
 	@Override
