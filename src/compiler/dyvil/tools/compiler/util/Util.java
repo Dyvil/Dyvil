@@ -31,10 +31,16 @@ public class Util
 	{
 		fieldSignatureToString(property, buf);
 	}
+
+	public static String methodSignatureToString(IMethod method)
+	{
+		final StringBuilder stringBuilder = new StringBuilder();
+		methodSignatureToString(method, stringBuilder);
+		return stringBuilder.toString();
+	}
 	
 	public static void methodSignatureToString(IMethod method, StringBuilder buf)
 	{
-		method.getModifiers().toString(buf);
 		method.getType().toString("", buf);
 		buf.append(' ').append(method.getName());
 		
