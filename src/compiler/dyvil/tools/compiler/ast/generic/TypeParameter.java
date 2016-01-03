@@ -28,41 +28,42 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public final class TypeVariable implements ITypeVariable
+public final class TypeParameter implements ITypeParameter
 {
 	protected ICodePosition position;
 	
-	protected Variance variance = Variance.INVARIANT;
+	protected Variance    variance    = Variance.INVARIANT;
+
 	protected Name name;
 	protected IType[] upperBounds = new IType[1];
 	protected int   upperBoundCount;
 	protected IType lowerBound;
 	
-	private int      index;
-	private IGeneric generic;
+	private int                index;
+	private ITypeParameterized generic;
 	
 	private AnnotationList annotations;
 
 	private IType parameterType = new ParameterTypeVarType(this);
 	
-	public TypeVariable(IGeneric generic)
+	public TypeParameter(ITypeParameterized generic)
 	{
 		this.generic = generic;
 	}
 	
-	public TypeVariable(IGeneric generic, Name name)
+	public TypeParameter(ITypeParameterized generic, Name name)
 	{
 		this.name = name;
 		this.generic = generic;
 	}
 	
-	public TypeVariable(ICodePosition position, IGeneric generic)
+	public TypeParameter(ICodePosition position, ITypeParameterized generic)
 	{
 		this.position = position;
 		this.generic = generic;
 	}
 	
-	public TypeVariable(ICodePosition position, IGeneric generic, Name name, Variance variance)
+	public TypeParameter(ICodePosition position, ITypeParameterized generic, Name name, Variance variance)
 	{
 		this.position = position;
 		this.name = name;
@@ -71,7 +72,7 @@ public final class TypeVariable implements ITypeVariable
 	}
 	
 	@Override
-	public IGeneric getGeneric()
+	public ITypeParameterized getGeneric()
 	{
 		return this.generic;
 	}
@@ -99,7 +100,7 @@ public final class TypeVariable implements ITypeVariable
 	{
 		return this.variance;
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{

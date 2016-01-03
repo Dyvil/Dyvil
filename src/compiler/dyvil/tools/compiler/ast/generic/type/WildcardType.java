@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -218,11 +218,11 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
 		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			return this.bound.resolveType(typeVar);
+			return this.bound.resolveType(typeParameter);
 		}
 		return null;
 	}

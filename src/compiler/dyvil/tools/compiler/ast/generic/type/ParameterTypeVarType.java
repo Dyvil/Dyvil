@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.generic.type;
 
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 
 public class ParameterTypeVarType extends TypeVarType
 {
-	public ParameterTypeVarType(ITypeVariable typeVariable)
+	public ParameterTypeVarType(ITypeParameter typeVariable)
 	{
 		super(typeVariable);
 	}
@@ -20,14 +20,14 @@ public class ParameterTypeVarType extends TypeVarType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeVar.isAssignableFrom(type);
+		return this.typeParameter.isAssignableFrom(type);
 	}
 
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
 		IType type = super.getConcreteType(context);
-		if (type.getTypeVariable() == this.typeVar)
+		if (type.getTypeVariable() == this.typeParameter)
 		{
 			return this;
 		}

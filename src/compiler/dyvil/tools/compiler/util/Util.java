@@ -38,15 +38,15 @@ public class Util
 		method.getType().toString("", buf);
 		buf.append(' ').append(method.getName());
 		
-		int typeVariables = method.genericCount();
+		int typeVariables = method.typeParameterCount();
 		if (typeVariables > 0)
 		{
 			buf.append('[');
-			method.getTypeVariable(0).toString("", buf);
+			method.getTypeParameter(0).toString("", buf);
 			for (int i = 1; i < typeVariables; i++)
 			{
 				buf.append(", ");
-				method.getTypeVariable(i).toString("", buf);
+				method.getTypeParameter(i).toString("", buf);
 			}
 			buf.append(']');
 		}
@@ -72,16 +72,16 @@ public class Util
 		iclass.getModifiers().toString(buf);
 		buf.append(iclass.getName());
 		
-		int typeVariables = iclass.genericCount();
+		int typeVariables = iclass.typeParameterCount();
 		if (typeVariables > 0)
 		{
 			buf.append('[');
 			
-			iclass.getTypeVariable(0).toString("", buf);
+			iclass.getTypeParameter(0).toString("", buf);
 			for (int i = 1; i < typeVariables; i++)
 			{
 				buf.append(", ");
-				iclass.getTypeVariable(i).toString("", buf);
+				iclass.getTypeParameter(i).toString("", buf);
 			}
 			
 			buf.append(']');

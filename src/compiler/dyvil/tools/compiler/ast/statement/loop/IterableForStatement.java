@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IterableForStatement extends ForEachStatement
 {
-	public static final ITypeVariable ITERABLE_TYPE  = Types.ITERABLE.getTheClass().getTypeVariable(0);
-	public static final IClass        ITERATOR_CLASS = Package.javaUtil.resolveClass("Iterator");
+	public static final ITypeParameter ITERABLE_TYPE  = Types.ITERABLE.getTheClass().getTypeParameter(0);
+	public static final IClass         ITERATOR_CLASS = Package.javaUtil.resolveClass("Iterator");
 	
 	public static final Name $iterator = Name.getQualified("$iterator");
 	

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -43,11 +43,11 @@ public class NestedMethod extends CodeMethod
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeVariable var = this.generics[i];
+			ITypeParameter var = this.typeParameters[i];
 			if (var.getName() == name)
 			{
 				return var;

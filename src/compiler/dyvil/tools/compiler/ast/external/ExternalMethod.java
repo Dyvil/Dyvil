@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -77,9 +77,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	private void resolveGenerics()
 	{
 		this.genericsResolved = true;
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].resolveTypes(null, Package.rootPackage);
+			this.typeParameters[i].resolveTypes(null, Package.rootPackage);
 		}
 	}
 	
@@ -308,7 +308,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			if (typeVar.addRawAnnotation(desc, annotation))
 			{
 				return null;
@@ -319,7 +319,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		}
 		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
 		{
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
 			break;
 		}

@@ -177,7 +177,7 @@ public final class TupleExpr implements IValue, IValueList
 		{
 			IType elementType = iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS ?
 					dyvil.tools.compiler.ast.type.Types.ANY :
-					type.resolveTypeSafely(iclass.getTypeVariable(i));
+					type.resolveTypeSafely(iclass.getTypeParameter(i));
 			
 			IValue value = this.values[i];
 			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);

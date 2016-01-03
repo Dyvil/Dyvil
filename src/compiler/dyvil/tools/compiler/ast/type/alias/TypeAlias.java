@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.type.alias;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
-import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -24,8 +24,8 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	protected Name  name;
 	protected IType type;
 
-	protected ITypeVariable[] typeVariables;
-	protected int             typeVariableCount;
+	protected ITypeParameter[] typeVariables;
+	protected int              typeVariableCount;
 	
 	public TypeAlias()
 	{
@@ -78,11 +78,11 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void addTypeVariable(ITypeVariable var)
+	public void addTypeParameter(ITypeParameter var)
 	{
 		if (this.typeVariables == null)
 		{
-			this.setGeneric();
+			this.setTypeParameterized();
 			var.setIndex(0);
 			this.typeVariables[0] = var;
 			this.typeVariableCount = 1;
@@ -92,7 +92,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		int index = this.typeVariableCount++;
 		if (index >= this.typeVariables.length)
 		{
-			ITypeVariable[] temp = new ITypeVariable[index + 1];
+			ITypeParameter[] temp = new ITypeParameter[index + 1];
 			System.arraycopy(this.typeVariables, 0, temp, 0, index);
 			this.typeVariables = temp;
 		}
@@ -102,44 +102,44 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public int genericCount()
+	public int typeParameterCount()
 	{
 		return this.typeVariableCount;
 	}
 
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
 		return this.typeVariables[index];
 	}
 
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
 		return this.typeVariables;
 	}
 
 	@Override
-	public boolean isGeneric()
+	public boolean isTypeParameterized()
 	{
 		return this.typeVariables != null;
 	}
 
 	@Override
-	public void setGeneric()
+	public void setTypeParameterized()
 	{
-		this.typeVariables = new ITypeVariable[2];
+		this.typeVariables = new ITypeParameter[2];
 	}
 
 	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
+	public void setTypeParameter(int index, ITypeParameter var)
 	{
 		var.setIndex(index);
 		this.typeVariables[index] = var;
 	}
 
 	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeVars, int count)
 	{
 		this.typeVariables = typeVars;
 		this.typeVariableCount = count;
@@ -150,7 +150,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	{
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			ITypeVariable typeVariable = this.typeVariables[i];
+			ITypeParameter typeVariable = this.typeVariables[i];
 			if (typeVariable.getName() == name)
 			{
 				return new TypeVarType(typeVariable);
@@ -257,11 +257,11 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		this.type = IType.readType(in);
 
 		this.typeVariableCount = in.readShort();
-		this.typeVariables = new ITypeVariable[this.typeVariableCount];
+		this.typeVariables = new ITypeParameter[this.typeVariableCount];
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			ITypeVariable typeVariable = new TypeVariable(this);
+			ITypeParameter typeVariable = new TypeParameter(this);
 			typeVariable.read(in);
 			this.typeVariables[i] = typeVariable;
 		}

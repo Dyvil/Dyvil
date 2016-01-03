@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
@@ -59,8 +59,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	static final int VARARGS_MATCH = 100;
 	
-	protected ITypeVariable[] generics;
-	protected int             genericCount;
+	protected ITypeParameter[] typeParameters;
+	protected int              typeParameterCount;
 	
 	protected IParameter[] parameters = new MethodParameter[3];
 	protected int parameterCount;
@@ -121,69 +121,69 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void setGeneric()
+	public void setTypeParameterized()
 	{
-		this.generics = new ITypeVariable[2];
+		this.typeParameters = new ITypeParameter[2];
 	}
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isTypeParameterized()
 	{
-		return this.genericCount > 0;
+		return this.typeParameterCount > 0;
 	}
 	
 	@Override
-	public int genericCount()
+	public int typeParameterCount()
 	{
-		return this.genericCount;
+		return this.typeParameterCount;
 	}
 	
 	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeVars, int count)
 	{
-		this.generics = typeVars;
-		this.genericCount = count;
+		this.typeParameters = typeVars;
+		this.typeParameterCount = count;
 	}
 	
 	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
+	public void setTypeParameter(int index, ITypeParameter var)
 	{
-		this.generics[index] = var;
+		this.typeParameters[index] = var;
 	}
 	
 	@Override
-	public void addTypeVariable(ITypeVariable var)
+	public void addTypeParameter(ITypeParameter var)
 	{
-		if (this.generics == null)
+		if (this.typeParameters == null)
 		{
-			this.generics = new ITypeVariable[3];
-			this.generics[0] = var;
-			this.genericCount = 1;
+			this.typeParameters = new ITypeParameter[3];
+			this.typeParameters[0] = var;
+			this.typeParameterCount = 1;
 			return;
 		}
 		
-		int index = this.genericCount++;
-		if (this.genericCount > this.generics.length)
+		int index = this.typeParameterCount++;
+		if (this.typeParameterCount > this.typeParameters.length)
 		{
-			ITypeVariable[] temp = new ITypeVariable[this.genericCount];
-			System.arraycopy(this.generics, 0, temp, 0, index);
-			this.generics = temp;
+			ITypeParameter[] temp = new ITypeParameter[this.typeParameterCount];
+			System.arraycopy(this.typeParameters, 0, temp, 0, index);
+			this.typeParameters = temp;
 		}
-		this.generics[index] = var;
+		this.typeParameters[index] = var;
 		
 		var.setIndex(index);
 	}
 	
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
-		return this.generics;
+		return this.typeParameters;
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
-		return this.generics[index];
+		return this.typeParameters[index];
 	}
 	
 	@Override
@@ -407,9 +407,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IType resolveType(Name name)
 	{
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeVariable var = this.generics[i];
+			ITypeParameter var = this.typeParameters[i];
 			if (var.getName() == name)
 			{
 				return new TypeVarType(var);
@@ -420,11 +420,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeVariable var = this.generics[i];
+			ITypeParameter var = this.typeParameters[i];
 			if (var.getName() == name)
 			{
 				return var;
@@ -634,7 +634,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		if (genericData == null)
 		{
-			genericData = new GenericData(this, this.genericCount);
+			genericData = new GenericData(this, this.typeParameterCount);
 			
 			this.inferTypes(genericData, instance, arguments);
 			
@@ -643,7 +643,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		genericData.method = this;
 		
-		genericData.setTypeCount(this.genericCount);
+		genericData.setTypeCount(this.typeParameterCount);
 		this.inferTypes(genericData, instance, arguments);
 		
 		return genericData;
@@ -817,9 +817,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	
 	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, ITypeContext typeContext)
 	{
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeVariable typeVar = this.generics[i];
+			ITypeParameter typeVar = this.typeParameters[i];
 			IType type = typeContext.resolveType(typeVar);
 			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
 			{
@@ -929,7 +929,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return this.genericCount > 0 || this.theClass.isGeneric();
+		return this.typeParameterCount > 0 || this.theClass.isTypeParameterized();
 	}
 	
 	@Override
@@ -959,7 +959,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	
 	private boolean needsSignature()
 	{
-		if (this.genericCount != 0 || this.theClass.isGeneric() || this.type.isGenericType())
+		if (this.typeParameterCount != 0 || this.type.isGenericType())
 		{
 			return true;
 		}
@@ -982,12 +982,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		
 		StringBuilder buffer = new StringBuilder();
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			buffer.append('<');
-			for (int i = 0; i < this.genericCount; i++)
+			for (int i = 0; i < this.typeParameterCount; i++)
 			{
-				this.generics[i].appendSignature(buffer);
+				this.typeParameters[i].appendSignature(buffer);
 			}
 			buffer.append('>');
 		}
@@ -1203,10 +1203,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		buffer.append(this.name);
 		
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
-			Util.astToString(prefix, this.generics, this.genericCount,
+			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
 			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}

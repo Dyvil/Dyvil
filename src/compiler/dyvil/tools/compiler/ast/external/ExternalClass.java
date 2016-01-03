@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
@@ -88,13 +88,13 @@ public final class ExternalClass extends AbstractClass
 	private void resolveGenerics()
 	{
 		this.genericsResolved = true;
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			ClassGenericType type = new ClassGenericType(this);
 			
-			for (int i = 0; i < this.genericCount; i++)
+			for (int i = 0; i < this.typeParameterCount; i++)
 			{
-				ITypeVariable var = this.generics[i];
+				ITypeParameter var = this.typeParameters[i];
 				var.resolveTypes(null, Package.rootPackage);
 				type.addType(new TypeVarType(var));
 			}
@@ -239,13 +239,13 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
 		}
-		return super.getTypeVariable(index);
+		return super.getTypeParameter(index);
 	}
 	
 	@Override
@@ -269,7 +269,7 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	public IType resolveType(ITypeParameter typeVar, IType concrete)
 	{
 		if (!this.genericsResolved)
 		{
@@ -520,7 +520,7 @@ public final class ExternalClass extends AbstractClass
 		
 		if (signature != null)
 		{
-			this.generics = new ITypeVariable[2];
+			this.typeParameters = new ITypeParameter[2];
 			ClassFormat.readClassSignature(signature, this);
 		}
 		else
@@ -593,7 +593,7 @@ public final class ExternalClass extends AbstractClass
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER:
 		{
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			if (typeVar.addRawAnnotation(desc, annotation))
 			{
 				return null;
@@ -604,7 +604,7 @@ public final class ExternalClass extends AbstractClass
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
 		{
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
 			break;
 		}
@@ -691,7 +691,7 @@ public final class ExternalClass extends AbstractClass
 		
 		if (signature != null)
 		{
-			method.setGeneric();
+			method.setTypeParameterized();
 			ClassFormat.readMethodType(signature, method);
 		}
 		else

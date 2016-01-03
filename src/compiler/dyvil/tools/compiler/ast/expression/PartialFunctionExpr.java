@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
@@ -31,10 +31,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class PartialFunctionExpr implements IValue, ICase, IClassCompilable, IDefaultContext
 {
-	public static final IClass        PARTIALFUNCTION_CLASS = Package.dyvilFunction.resolveClass("PartialFunction");
-	public static final ClassType     PARTIALFUNCTION       = new ClassType(PARTIALFUNCTION_CLASS);
-	public static final ITypeVariable PAR_TYPE              = PARTIALFUNCTION_CLASS.getTypeVariable(0);
-	public static final ITypeVariable RETURN_TYPE           = PARTIALFUNCTION_CLASS.getTypeVariable(1);
+	public static final IClass         PARTIALFUNCTION_CLASS = Package.dyvilFunction.resolveClass("PartialFunction");
+	public static final ClassType      PARTIALFUNCTION       = new ClassType(PARTIALFUNCTION_CLASS);
+	public static final ITypeParameter PAR_TYPE              = PARTIALFUNCTION_CLASS.getTypeParameter(0);
+	public static final ITypeParameter RETURN_TYPE           = PARTIALFUNCTION_CLASS.getTypeParameter(1);
 	
 	protected ICodePosition position;
 	

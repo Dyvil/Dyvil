@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -158,45 +158,45 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void setGeneric()
+	public void setTypeParameterized()
 	{
 	}
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isTypeParameterized()
 	{
 		return false;
 	}
 	
 	@Override
-	public int genericCount()
+	public int typeParameterCount()
 	{
 		return 0;
 	}
 	
 	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeVars, int count)
 	{
 	}
 	
 	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
+	public void setTypeParameter(int index, ITypeParameter var)
 	{
 	}
 	
 	@Override
-	public void addTypeVariable(ITypeVariable var)
+	public void addTypeParameter(ITypeParameter var)
 	{
 	}
 	
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
 		return null;
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
 		return null;
 	}
@@ -425,7 +425,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
 		return this.context.resolveTypeVariable(name);
 	}
@@ -505,7 +505,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	public IType resolveType(ITypeParameter typeVar, IType concrete)
 	{
 		return null;
 	}

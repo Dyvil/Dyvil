@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -25,7 +25,7 @@ public interface IObjectType extends IType
 	}
 	
 	@Override
-	default ITypeVariable getTypeVariable()
+	default ITypeParameter getTypeVariable()
 	{
 		return null;
 	}

@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeParameterized;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -73,7 +73,7 @@ public interface IParserManager
 		return new AnnotationParser(annotation);
 	}
 	
-	default Parser newTypeVariableParser(IGeneric generic)
+	default Parser newTypeVariableParser(ITypeParameterized generic)
 	{
 		return new TypeVariableParser(generic);
 	}

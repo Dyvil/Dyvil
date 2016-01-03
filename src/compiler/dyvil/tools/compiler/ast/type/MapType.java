@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -34,8 +34,8 @@ public class MapType implements IObjectType
 		public static final IClass IMMUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("ImmutableMap");
 		public static final IClass MAP_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("MapConvertible");
 
-		public static final ITypeVariable KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeVariable(0);
-		public static final ITypeVariable VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeVariable(1);
+		public static final ITypeParameter KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeParameter(0);
+		public static final ITypeParameter VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeParameter(1);
 	}
 
 	protected IType keyType;
@@ -118,11 +118,11 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (typeVar.getGeneric() == this.theClass)
+		if (typeParameter.getGeneric() == this.theClass)
 		{
-			if (typeVar.getIndex() == 0)
+			if (typeParameter.getIndex() == 0)
 			{
 				return this.keyType;
 			}
@@ -131,7 +131,7 @@ public class MapType implements IObjectType
 				return this.valueType;
 			}
 		}
-		return this.theClass.resolveType(typeVar, this);
+		return this.theClass.resolveType(typeParameter, this);
 	}
 
 	@Override
@@ -155,8 +155,8 @@ public class MapType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		this.keyType.inferTypes(concrete.resolveType(this.theClass.getTypeVariable(0)), typeContext);
-		this.valueType.inferTypes(concrete.resolveType(this.theClass.getTypeVariable(1)), typeContext);
+		this.keyType.inferTypes(concrete.resolveType(this.theClass.getTypeParameter(0)), typeContext);
+		this.valueType.inferTypes(concrete.resolveType(this.theClass.getTypeParameter(1)), typeContext);
 	}
 
 	private static IClass getClass(Mutability mutability)

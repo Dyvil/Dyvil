@@ -18,9 +18,9 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface ITypeVariable extends IASTNode, INamed, IAnnotated, IObjectCompilable
+public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCompilable
 {
-	IGeneric getGeneric();
+	ITypeParameterized getGeneric();
 	
 	void setIndex(int index);
 	

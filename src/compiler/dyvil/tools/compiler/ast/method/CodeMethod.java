@@ -68,9 +68,9 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.resolveTypes(markers, this);
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].resolveTypes(markers, this);
+			this.typeParameters[i].resolveTypes(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -102,9 +102,9 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.resolve(markers, this);
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].resolve(markers, this);
+			this.typeParameters[i].resolve(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -164,9 +164,9 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.checkTypes(markers, this);
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].checkTypes(markers, this);
+			this.typeParameters[i].checkTypes(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -191,9 +191,9 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.check(markers, this);
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].check(markers, this);
+			this.typeParameters[i].check(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -318,9 +318,9 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.foldConstants();
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].foldConstants();
+			this.typeParameters[i].foldConstants();
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -353,9 +353,9 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].cleanup(this, compilableList);
+			this.typeParameters[i].cleanup(this, compilableList);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

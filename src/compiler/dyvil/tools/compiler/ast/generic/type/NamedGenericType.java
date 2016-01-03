@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -65,7 +65,7 @@ public class NamedGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
 		return null;
 	}
@@ -126,30 +126,30 @@ public class NamedGenericType extends GenericType
 		this.resolveTypeArguments(markers, context);
 
 		IClass iClass = resolved.getTheClass();
-		ITypeVariable[] typeVariables;
+		ITypeParameter[] typeVariables;
 		IType concrete;
 
 		// Convert the non-generic class type to a generic one
 		if (!resolved.isGenericType())
 		{
 			resolved = iClass.getType();
-			typeVariables = iClass.getTypeVariables();
+			typeVariables = iClass.getTypeParameters();
 
 			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
 		}
 		else
 		{
-			typeVariables = new ITypeVariable[this.typeArgumentCount];
+			typeVariables = new ITypeParameter[this.typeArgumentCount];
 
 			// Create a concrete type and save Type Variables in the above array
-			concrete = resolved.getConcreteType(typeVar -> {
-				int index = typeVar.getIndex();
+			concrete = resolved.getConcreteType(typeParameter -> {
+				int index = typeParameter.getIndex();
 
 				if (index >= this.typeArgumentCount)
 				{
 					return null;
 				}
-				typeVariables[index] = typeVar;
+				typeVariables[index] = typeParameter;
 				return this.typeArguments[index];
 			});
 		}
@@ -157,7 +157,7 @@ public class NamedGenericType extends GenericType
 		// Check if the Type Variable Bounds accept the supplied Type Arguments
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			ITypeVariable typeVariable = typeVariables[i];
+			ITypeParameter typeVariable = typeVariables[i];
 			IType type = this.typeArguments[i];
 			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
 			{
