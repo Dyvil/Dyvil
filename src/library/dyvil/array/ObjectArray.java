@@ -37,12 +37,12 @@ public interface ObjectArray
 		return (T[]) EMPTY;
 	}
 	
-	static <@Reified T> T[] apply(int count, Class<T> type)
+	static <@Reified(erasure = true) T> T[] apply(int count, Class<T> type)
 	{
 		return (T[]) Array.newInstance(type, count);
 	}
 	
-	static <@Reified T> T[] repeat(int count, T repeatedValue, Class<T> type)
+	static <@Reified(erasure = true) T> T[] repeat(int count, T repeatedValue, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -52,7 +52,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	static <@Reified T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
+	static <@Reified(erasure = true) T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -62,7 +62,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	static <@Reified T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
+	static <@Reified(erasure = true) T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end) + 1);
@@ -73,7 +73,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	static <@Reified T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
+	static <@Reified(erasure = true) T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end));
@@ -252,7 +252,7 @@ public interface ObjectArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T, @Reified U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
+	static <T, @Reified(erasure = true) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
 	{
 		int len = array.length;
 		U[] res = (U[]) Array.newInstance(type, len);
@@ -264,7 +264,7 @@ public interface ObjectArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T, @Reified U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
+	static <T, @Reified(erasure = true) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
 	{
 		int size = 0;
 		U[] res = (U[]) EMPTY;
