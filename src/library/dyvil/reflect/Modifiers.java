@@ -223,7 +223,7 @@ public interface Modifiers
 	 * {@code class}, {@code interface}, {@code enum}, {@code object} or
 	 * {@code annotation} / {@code @interface})
 	 */
-	int CLASS_TYPE_MODIFIERS = INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS;
+	int CLASS_TYPE_MODIFIERS = (INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | TRAIT_CLASS) & ~ABSTRACT;
 	
 	/**
 	 * The access modifiers.
