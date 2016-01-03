@@ -1,13 +1,18 @@
 package dyvil.tools.compiler.parser.type;
 
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.ITypeParameterized;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
@@ -15,8 +20,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParameterParser extends Parser implements ITyped
 {
-	public static final int NAME          = 1;
-	public static final int TYPE_VARIABLE = 16;
+	public static final int ANNOTATIONS = 0;
+	public static final int NAME        = 1;
+	public static final int TYPE_BOUNDS = 2;
 	
 	public static final int UPPER = 1;
 	public static final int LOWER = 2;
@@ -24,45 +30,66 @@ public final class TypeParameterParser extends Parser implements ITyped
 	protected ITypeParameterized typeParameterized;
 	
 	private byte           boundMode;
+	private Variance       variance;
 	private ITypeParameter typeParameter;
+	private AnnotationList annotationList;
 	
 	public TypeParameterParser(ITypeParameterized typeParameterized)
 	{
 		this.typeParameterized = typeParameterized;
-		this.mode = NAME;
+		// this.mode = ANNOTATIONS; // pointless assignment to 0
 	}
 	
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (this.mode == NAME)
+		final int type = token.type();
+		switch (this.mode)
 		{
+		case ANNOTATIONS:
+			if (type == DyvilSymbols.AT)
+			{
+				final IAnnotation annotation = new Annotation();
+				this.addAnnotation(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
+				return;
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				Name name = token.nameValue();
-				if (name == Names.plus || name == Names.minus)
+				final Name name = token.nameValue();
+				if (ParserUtil.isIdentifier(token.next().type()))
 				{
-					IToken next = token.next();
-					if (ParserUtil.isIdentifier(next.type()))
+					if (name == Names.plus)
 					{
-						Variance v = name == Names.minus ? Variance.CONTRAVARIANT : Variance.COVARIANT;
-						this.typeParameter = new TypeParameter(next, this.typeParameterized, next.nameValue(), v);
-						this.mode = TYPE_VARIABLE;
-						pm.skip();
+						this.mode = NAME;
+						this.variance = Variance.COVARIANT;
+						return;
+					}
+					if (name == Names.minus)
+					{
+						this.mode = NAME;
+						this.variance = Variance.CONTRAVARIANT;
 						return;
 					}
 				}
-				
-				this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(), Variance.INVARIANT);
-				this.mode = TYPE_VARIABLE;
+
+				this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(),
+				                                       Variance.INVARIANT);
+				this.mode = TYPE_BOUNDS;
 				return;
 			}
 			pm.report(token, "typeparameter.identifier");
 			return;
-		}
-		if (this.mode == TYPE_VARIABLE)
-		{
+		case NAME:
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(), this.variance);
+				this.mode = TYPE_BOUNDS;
+				return;
+			}
+			pm.report(token, "typeparameter.identifier");
+			return;
+		case TYPE_BOUNDS:
 			if (ParserUtil.isTerminator(type))
 			{
 				if (this.typeParameter != null)
@@ -109,6 +136,15 @@ public final class TypeParameterParser extends Parser implements ITyped
 			pm.report(token, "typeparameter.bound.invalid");
 			return;
 		}
+	}
+
+	private void addAnnotation(IAnnotation annotion)
+	{
+		if (this.annotationList == null)
+		{
+			this.annotationList = new AnnotationList();
+		}
+		this.annotationList.addAnnotation(annotion);
 	}
 	
 	@Override
