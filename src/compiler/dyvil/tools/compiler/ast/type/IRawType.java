@@ -35,7 +35,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default IType resolveType(ITypeVariable typeVar)
+	default IType resolveType(ITypeVariable typeParameter)
 	{
 		return this.getTheClass().resolveType(typeParameter, this);
 	}
