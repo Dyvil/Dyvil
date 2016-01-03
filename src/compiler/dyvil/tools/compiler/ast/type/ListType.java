@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -88,13 +88,13 @@ public class ListType implements IObjectType
 	}
 
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (typeVar.getGeneric() == this.theClass)
+		if (typeParameter.getGeneric() == this.theClass)
 		{
 			return this.elementType;
 		}
-		return this.theClass.resolveType(typeVar, this);
+		return this.theClass.resolveType(typeParameter, this);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class ListType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		this.elementType.inferTypes(concrete.resolveType(this.theClass.getTypeVariable(0)), typeContext);
+		this.elementType.inferTypes(concrete.resolveType(this.theClass.getTypeParameter(0)), typeContext);
 	}
 
 	@Override

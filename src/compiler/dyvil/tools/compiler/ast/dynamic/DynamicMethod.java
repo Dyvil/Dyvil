@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -104,45 +104,45 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void setGeneric()
+	public void setTypeParameterized()
 	{
 	}
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isTypeParameterized()
 	{
 		return false;
 	}
 	
 	@Override
-	public int genericCount()
+	public int typeParameterCount()
 	{
 		return 0;
 	}
 	
 	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeVars, int count)
 	{
 	}
 	
 	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
+	public void setTypeParameter(int index, ITypeParameter var)
 	{
 	}
 	
 	@Override
-	public void addTypeVariable(ITypeVariable var)
+	public void addTypeParameter(ITypeParameter var)
 	{
 	}
 	
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
 		return null;
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
 		return null;
 	}
@@ -398,7 +398,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException
 	{
 		StringBuilder desc = new StringBuilder();
@@ -422,19 +422,19 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 	}

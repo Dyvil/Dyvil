@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement.loop;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
@@ -123,7 +124,7 @@ public class ArrayForStatement extends ForEachStatement
 		// Auto(un)boxing
 		if (this.boxMethod != null)
 		{
-			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, null, lineNumber);
+			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, null, lineNumber);
 		}
 		// Store variable
 		var.writeInit(writer, null);

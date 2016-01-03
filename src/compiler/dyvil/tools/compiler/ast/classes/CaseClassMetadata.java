@@ -55,7 +55,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			int parameterCount = this.theClass.parameterCount();
 			
 			m.setParameters(parameters, parameterCount);
-			m.setTypeVariables(this.theClass.getTypeVariables(), this.theClass.genericCount());
+			m.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 			
 			if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
 			{

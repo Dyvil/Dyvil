@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -67,9 +67,9 @@ public class CombiningContext implements IContext
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
-		ITypeVariable typeVar = this.inner.resolveTypeVariable(name);
+		ITypeParameter typeVar = this.inner.resolveTypeVariable(name);
 		return typeVar == null ? this.outer.resolveTypeVariable(name) : typeVar;
 	}
 	

@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -32,7 +32,7 @@ public class ClassGenericType extends GenericType
 	
 	public ClassGenericType(IClass iclass)
 	{
-		super(iclass.genericCount());
+		super(iclass.typeParameterCount());
 		this.theClass = iclass;
 	}
 	
@@ -53,7 +53,7 @@ public class ClassGenericType extends GenericType
 	@Override
 	public boolean isGenericType()
 	{
-		return this.theClass.isGeneric();
+		return this.theClass.isTypeParameterized();
 	}
 	
 	@Override
@@ -104,10 +104,10 @@ public class ClassGenericType extends GenericType
 	
 	protected boolean argumentsMatch(IType type)
 	{
-		int count = Math.min(this.typeArgumentCount, this.theClass.genericCount());
+		int count = Math.min(this.typeArgumentCount, this.theClass.typeParameterCount());
 		for (int i = 0; i < count; i++)
 		{
-			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
+			ITypeParameter typeVar = this.theClass.getTypeParameter(i);
 			
 			IType otherType = type.resolveTypeSafely(typeVar);
 			if (!typeVar.getVariance().checkCompatible(this.typeArguments[i], otherType))
@@ -131,13 +131,13 @@ public class ClassGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		int index = typeVar.getIndex();
+		int index = typeParameter.getIndex();
 		
-		if (this.theClass.getTypeVariable(index) != typeVar)
+		if (this.theClass.getTypeParameter(index) != typeParameter)
 		{
-			return this.theClass.resolveType(typeVar, this);
+			return this.theClass.resolveType(typeParameter, this);
 		}
 		if (index > this.typeArgumentCount)
 		{
@@ -151,7 +151,7 @@ public class ClassGenericType extends GenericType
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			ITypeVariable typeVar = this.theClass.getTypeVariable(i);
+			ITypeParameter typeVar = this.theClass.getTypeParameter(i);
 			IType concreteType = concrete.resolveType(typeVar);
 			if (concreteType != null)
 			{

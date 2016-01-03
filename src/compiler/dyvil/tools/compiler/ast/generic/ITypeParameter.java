@@ -14,13 +14,22 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.IObjectCompilable;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface ITypeVariable extends IASTNode, INamed, IAnnotated, IObjectCompilable
+public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCompilable
 {
-	IGeneric getGeneric();
+	enum ReifiedKind
+	{
+		NOT_REIFIED,
+		REIFIED_ERASURE,
+		REIFIED_TYPE
+	}
+
+	ITypeParameterized getGeneric();
 	
 	void setIndex(int index);
 	
@@ -31,10 +40,12 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated, IObjectComp
 	void setVariance(Variance variance);
 	
 	Variance getVariance();
+
+	ReifiedKind getReifiedKind();
 	
 	IType getDefaultType();
 	
-	IType getParameterType();
+	IType getCovariantType();
 
 	// Upper Bounds
 
@@ -89,6 +100,12 @@ public interface ITypeVariable extends IASTNode, INamed, IAnnotated, IObjectComp
 	// Compilation
 
 	void appendSignature(StringBuilder buffer);
+
+	void appendParameterDescriptor(StringBuilder buffer);
+
+	void appendParameterSignature(StringBuilder buffer);
+
+	void writeParameter(MethodWriter writer, IType type) throws BytecodeException;
 
 	void write(TypeAnnotatableVisitor visitor);
 }

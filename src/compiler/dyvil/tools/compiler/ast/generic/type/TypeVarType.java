@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -24,15 +24,15 @@ import java.io.IOException;
 
 public class TypeVarType implements IRawType
 {
-	protected ITypeVariable typeVar;
+	protected ITypeParameter typeParameter;
 	
 	public TypeVarType()
 	{
 	}
 	
-	public TypeVarType(ITypeVariable typeVar)
+	public TypeVarType(ITypeParameter typeParameter)
 	{
-		this.typeVar = typeVar;
+		this.typeParameter = typeParameter;
 	}
 	
 	@Override
@@ -48,9 +48,9 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable()
+	public ITypeParameter getTypeVariable()
 	{
-		return this.typeVar;
+		return this.typeParameter;
 	}
 	
 	@Override
@@ -62,13 +62,19 @@ public class TypeVarType implements IRawType
 	@Override
 	public IClass getTheClass()
 	{
-		return this.typeVar.getTheClass();
+		return this.typeParameter.getTheClass();
 	}
 
 	@Override
 	public IType getParameterType()
 	{
-		return this.typeVar.getParameterType();
+		return this.typeParameter.getCovariantType();
+	}
+
+	@Override
+	public IType getReturnType()
+	{
+		return this.typeParameter.getCovariantType();
 	}
 
 	@Override
@@ -80,31 +86,31 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeVar == type.getTypeVariable();
+		return this.typeParameter == type.getTypeVariable();
 	}
 	
 	@Override
 	public boolean isSuperClassOf(IType type)
 	{
-		return this.typeVar.isSuperClassOf(type);
+		return this.typeParameter.isSuperClassOf(type);
 	}
 	
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
-		return this.typeVar.getSuperTypeDistance(superType);
+		return this.typeParameter.getSuperTypeDistance(superType);
 	}
 	
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.typeVar == type.getTypeVariable();
+		return this.typeParameter == type.getTypeVariable();
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return this.typeVar == type.getTypeVariable();
+		return this.typeParameter == type.getTypeVariable();
 	}
 	
 	@Override
@@ -121,24 +127,24 @@ public class TypeVarType implements IRawType
 			return this;
 		}
 		
-		IType t = context.resolveType(this.typeVar);
+		IType t = context.resolveType(this.typeParameter);
 		if (t != null)
 		{
 			return t;
 		}
-		return this.typeVar.getDefaultType();
+		return this.typeParameter.getDefaultType();
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.typeVar == typeVar ? this : null;
+		return this.typeParameter == typeParameter ? this : null;
 	}
 	
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		typeContext.addMapping(this.typeVar, concrete);
+		typeContext.addMapping(this.typeParameter, concrete);
 	}
 	
 	@Override
@@ -173,13 +179,13 @@ public class TypeVarType implements IRawType
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.typeVar.resolveField(name);
+		return this.typeParameter.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		this.typeVar.getMethodMatches(list, instance, name, arguments);
+		this.typeParameter.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -196,9 +202,9 @@ public class TypeVarType implements IRawType
 	@Override
 	public String getInternalName()
 	{
-		if (this.typeVar.upperBoundCount() > 0)
+		if (this.typeParameter.upperBoundCount() > 0)
 		{
-			return this.typeVar.getUpperBound(0).getInternalName();
+			return this.typeParameter.getUpperBound(0).getInternalName();
 		}
 		return "java/lang/Object";
 	}
@@ -220,7 +226,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		buffer.append('T').append(this.typeVar.getName().qualified).append(';');
+		buffer.append('T').append(this.typeParameter.getName().qualified).append(';');
 	}
 	
 	@Override
@@ -232,7 +238,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		out.writeUTF(this.typeVar.getName().qualified);
+		out.writeUTF(this.typeParameter.getName().qualified);
 	}
 	
 	@Override
@@ -243,18 +249,18 @@ public class TypeVarType implements IRawType
 	@Override
 	public IType clone()
 	{
-		return new TypeVarType(this.typeVar);
+		return new TypeVarType(this.typeParameter);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return this.typeVar.getName().toString();
+		return this.typeParameter.getName().toString();
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.typeVar.getName());
+		buffer.append(this.typeParameter.getName());
 	}
 }

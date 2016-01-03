@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.VariableThis;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
@@ -131,13 +131,13 @@ public class CodeClass extends AbstractClass
 			this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		}
 		
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			ClassGenericType type = new ClassGenericType(this);
 			
-			for (int i = 0; i < this.genericCount; i++)
+			for (int i = 0; i < this.typeParameterCount; i++)
 			{
-				ITypeVariable var = this.generics[i];
+				ITypeParameter var = this.typeParameters[i];
 				var.resolveTypes(markers, context);
 				type.addType(new TypeVarType(var));
 			}
@@ -187,9 +187,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolve(markers, context);
 		}
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].resolve(markers, this);
+			this.typeParameters[i].resolve(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -223,9 +223,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.checkTypes(markers, context);
 		}
 
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].checkTypes(markers, this);
+			this.typeParameters[i].checkTypes(markers, this);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -270,9 +270,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.check(markers, context, this.getElementType());
 		}
 
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].check(markers, this);
+			this.typeParameters[i].check(markers, this);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -337,9 +337,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.foldConstants();
 		}
 
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].foldConstants();
+			this.typeParameters[i].foldConstants();
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -373,9 +373,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.cleanup(context, this);
 		}
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].cleanup(this, this);
+			this.typeParameters[i].cleanup(this, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -593,9 +593,9 @@ public class CodeClass extends AbstractClass
 		}
 		
 		// Type Variable Annotations
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].write(writer);
+			this.typeParameters[i].write(writer);
 		}
 		
 		// Super Type Variable Annotations

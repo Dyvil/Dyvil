@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -177,7 +177,7 @@ public class ConstructorCall implements ICall
 		
 		if (this.type.isArrayType())
 		{
-			ITypeVariable typeVar = this.type.getElementType().getTypeVariable();
+			ITypeParameter typeVar = this.type.getElementType().getTypeVariable();
 			if (typeVar != null)
 			{
 				Marker marker = MarkerMessages.createError(this.position, "constructor.access.array.typevar", typeVar.getName());
@@ -229,7 +229,7 @@ public class ConstructorCall implements ICall
 			return null;
 		}
 		
-		if (this.constructor.getTheClass().isGeneric() && !this.type.isGenericType())
+		if (this.constructor.getTheClass().isTypeParameterized() && !this.type.isGenericType())
 		{
 			this.type = this.constructor.checkGenericType(markers, this.position, context, this.type, this.arguments);
 		}

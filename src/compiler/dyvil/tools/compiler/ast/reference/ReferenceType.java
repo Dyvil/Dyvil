@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -88,7 +88,7 @@ public class ReferenceType implements IObjectType
 	{
 		if (this.theClass == Types.getObjectRefClass())
 		{
-			final IType otherType = type.resolveType(this.theClass.getTypeVariable(0));
+			final IType otherType = type.resolveType(this.theClass.getTypeParameter(0));
 			return otherType == null || this.type.isSameType(otherType);
 		}
 		return true;
@@ -113,9 +113,9 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (typeVar.getGeneric() == this.theClass)
+		if (typeParameter.getGeneric() == this.theClass)
 		{
 			return this.type;
 		}
@@ -146,12 +146,12 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (!this.theClass.isGeneric())
+		if (!this.theClass.isTypeParameterized())
 		{
 			return;
 		}
 
-		final ITypeVariable typeVariable = this.theClass.getTypeVariable(0);
+		final ITypeParameter typeVariable = this.theClass.getTypeParameter(0);
 		if (typeVariable != null)
 		{
 			final IType concreteRefType = concrete.resolveType(typeVariable);

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -340,9 +340,9 @@ public class ArrayType implements IObjectType, ITyped
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.type.resolveType(typeVar);
+		return this.type.resolveType(typeParameter);
 	}
 	
 	@Override

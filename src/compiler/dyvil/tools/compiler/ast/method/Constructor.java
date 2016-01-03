@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -474,7 +474,7 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
 		return this.theClass.resolveTypeVariable(name);
 	}
@@ -610,11 +610,11 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		int typeVarCount = this.theClass.genericCount();
+		int typeVarCount = this.theClass.typeParameterCount();
 		ClassGenericType gt = new ClassGenericType(this.theClass, new IType[typeVarCount], typeVarCount)
 		{
 			@Override
-			public void addMapping(ITypeVariable typeVar, IType type)
+			public void addMapping(ITypeParameter typeVar, IType type)
 			{
 				int index = typeVar.getIndex();
 				this.typeArguments[index] = type;
@@ -645,7 +645,7 @@ public class Constructor extends Member implements IConstructor
 				gt.setType(i, Types.ANY);
 				
 				markers.add(MarkerMessages.createMarker(position, "constructor.typevar.infer",
-				                                        this.theClass.getTypeVariable(i).getName(), this.theClass.getName()));
+				                                        this.theClass.getTypeParameter(i).getName(), this.theClass.getName()));
 			}
 		}
 		
@@ -714,7 +714,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public String getSignature()
 	{
-		if (!this.theClass.isGeneric())
+		if (!this.theClass.isTypeParameterized())
 		{
 			return null;
 		}

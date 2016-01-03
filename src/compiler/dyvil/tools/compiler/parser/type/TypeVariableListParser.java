@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.type;
 
-import dyvil.tools.compiler.ast.generic.IGeneric;
+import dyvil.tools.compiler.ast.generic.ITypeParameterized;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -12,9 +12,9 @@ public class TypeVariableListParser extends Parser
 	private static final int TYPE_VARIABLE = 0;
 	private static final int COMMA = 1;
 
-	protected IGeneric generic;
+	protected ITypeParameterized generic;
 	
-	public TypeVariableListParser(IGeneric generic)
+	public TypeVariableListParser(ITypeParameterized generic)
 	{
 		this.generic = generic;
 		this.mode = TYPE_VARIABLE;

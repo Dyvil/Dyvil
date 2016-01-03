@@ -73,7 +73,7 @@ public interface IValue extends IASTNode, ITyped
 	int INITIALIZER_CALL = 113;
 	
 	// Assignments
-	int FIELD_ASSIGN  = 120;
+	int FIELD_ASSIGN = 120;
 	
 	// Special Operators and Intrinsics
 	int SWAP_OPERATOR  = 128;
@@ -232,6 +232,10 @@ public interface IValue extends IASTNode, ITyped
 		if (c == Character.class)
 		{
 			return new CharValue(null, o.toString(), true);
+		}
+		else if (c == Boolean.class)
+		{
+			return new BooleanValue((Boolean) o);
 		}
 		else if (c == Integer.class)
 		{

@@ -4,11 +4,12 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface ITypeContext
 {
-	ITypeContext DEFAULT = ITypeVariable::getDefaultType;
+	ITypeContext NULL    = typeParameter -> null;
+	ITypeContext DEFAULT = ITypeParameter::getDefaultType;
 
-	IType resolveType(ITypeVariable typeVar);
+	IType resolveType(ITypeParameter typeParameter);
 	
-	default void addMapping(ITypeVariable typeVar, IType type)
+	default void addMapping(ITypeParameter typeVar, IType type)
 	{
 	}
 }

@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -37,7 +37,7 @@ public interface IContext
 	
 	IType resolveType(Name name);
 	
-	ITypeVariable resolveTypeVariable(Name name);
+	ITypeParameter resolveTypeVariable(Name name);
 	
 	IDataMember resolveField(Name name);
 	
