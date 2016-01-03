@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
@@ -573,7 +572,7 @@ public final class TypeParameter implements ITypeParameter
 	{
 		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
 		{
-			writer.writeLDC(Type.getObjectType(type.getInternalName()));
+			type.writeClassExpression(writer);
 		}
 		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
 		{

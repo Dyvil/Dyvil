@@ -578,7 +578,48 @@ public final class PrimitiveType implements IType
 			               .writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
-	
+
+	@Override
+	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		String owner;
+
+		// Cannot use PrimitiveType.getInternalName as it returns the Dyvil
+		// class instead of the Java one.
+		switch (this.typecode)
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+			owner = "java/lang/Boolean";
+			break;
+		case PrimitiveType.BYTE_CODE:
+			owner = "java/lang/Byte";
+			break;
+		case PrimitiveType.SHORT_CODE:
+			owner = "java/lang/Short";
+			break;
+		case PrimitiveType.CHAR_CODE:
+			owner = "java/lang/Character";
+			break;
+		case PrimitiveType.INT_CODE:
+			owner = "java/lang/Integer";
+			break;
+		case PrimitiveType.LONG_CODE:
+			owner = "java/lang/Long";
+			break;
+		case PrimitiveType.FLOAT_CODE:
+			owner = "java/lang/Float";
+			break;
+		case PrimitiveType.DOUBLE_CODE:
+			owner = "java/lang/Double";
+			break;
+		default:
+			owner = "java/lang/Void";
+			break;
+		}
+
+		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
+	}
+
 	private static void writeIntCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
