@@ -1156,7 +1156,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			final ITypeParameter typeParameter = this.typeParameters[i];
-			typeParameter.writeParameter(writer, typeContext.resolveType(typeParameter));
+			typeParameter.writeArgument(writer, typeContext.resolveType(typeParameter));
 		}
 
 		writer.writeLineNumber(lineNumber);

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
@@ -170,7 +171,13 @@ public interface IObjectType extends IType
 			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
-	
+
+	@Override
+	default void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		writer.writeLDC(Type.getObjectType(this.getInternalName()));
+	}
+
 	@Override
 	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{

@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.MarkerMessages;
@@ -97,12 +96,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
-		{
-			return true;
-		}
-		
-		return type.isSuperTypeOf(this.getType());
+		return type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
@@ -218,49 +212,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (this.type.isPrimitive())
-		{
-			String owner;
-			
-			// Cannot use PrimitiveType.getInternalName as it returns the Dyvil
-			// class instead of the Java one.
-			switch (this.type.getTypecode())
-			{
-			case PrimitiveType.BOOLEAN_CODE:
-				owner = "java/lang/Boolean";
-				break;
-			case PrimitiveType.BYTE_CODE:
-				owner = "java/lang/Byte";
-				break;
-			case PrimitiveType.SHORT_CODE:
-				owner = "java/lang/Short";
-				break;
-			case PrimitiveType.CHAR_CODE:
-				owner = "java/lang/Character";
-				break;
-			case PrimitiveType.INT_CODE:
-				owner = "java/lang/Integer";
-				break;
-			case PrimitiveType.LONG_CODE:
-				owner = "java/lang/Long";
-				break;
-			case PrimitiveType.FLOAT_CODE:
-				owner = "java/lang/Float";
-				break;
-			case PrimitiveType.DOUBLE_CODE:
-				owner = "java/lang/Double";
-				break;
-			default:
-				owner = "java/lang/Void";
-				break;
-			}
-			
-			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
-			return;
-		}
-		
-		dyvil.tools.asm.Type t = dyvil.tools.asm.Type.getType(this.type.getExtendedName());
-		writer.writeLDC(t);
+		this.type.writeClassExpression(writer);
 
 		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
 		{

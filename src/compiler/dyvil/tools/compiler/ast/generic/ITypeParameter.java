@@ -43,8 +43,10 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	ReifiedKind getReifiedKind();
 	
+	int getParameterIndex();
+
 	IType getDefaultType();
-	
+
 	IType getCovariantType();
 
 	// Upper Bounds
@@ -105,7 +107,9 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	void appendParameterSignature(StringBuilder buffer);
 
-	void writeParameter(MethodWriter writer, IType type) throws BytecodeException;
+	void writeParameter(MethodWriter writer) throws BytecodeException;
+
+	void writeArgument(MethodWriter writer, IType type) throws BytecodeException;
 
 	void write(TypeAnnotatableVisitor visitor);
 }

@@ -406,7 +406,13 @@ public class AnnotatedType implements IType, ITyped
 	{
 		this.type.writeCast(writer, target, lineNumber);
 	}
-	
+
+	@Override
+	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		this.type.writeClassExpression(writer);
+	}
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
