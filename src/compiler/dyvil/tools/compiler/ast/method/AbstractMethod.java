@@ -953,6 +953,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			this.parameters[i].getInternalType().appendExtendedName(buffer);
 		}
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].appendParameterDescriptor(buffer);
+		}
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
 		return this.descriptor = buffer.toString();
@@ -997,6 +1001,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].getInternalType().appendSignature(buffer);
+		}
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].appendParameterSignature(buffer);
 		}
 		buffer.append(')');
 		this.type.appendSignature(buffer);

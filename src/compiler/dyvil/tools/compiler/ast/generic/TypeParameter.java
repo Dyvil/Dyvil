@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
@@ -10,7 +11,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.type.ParameterTypeVarType;
+import dyvil.tools.compiler.ast.generic.type.CovariantTypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -18,6 +19,8 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -33,15 +36,17 @@ public final class TypeParameter implements ITypeParameter
 	protected ICodePosition position;
 	
 	protected Variance    variance    = Variance.INVARIANT;
+	private   ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
 
 	protected Name name;
 	protected IType[] upperBounds = new IType[1];
-	protected int   upperBoundCount;
+	protected int upperBoundCount;
+
 	protected IType lowerBound;
-	
-	private int                index;
+	private   int   index;
+
 	private ITypeParameterized generic;
-	
+
 	private AnnotationList annotations;
 	private IType covariantType = new CovariantTypeVarType(this);
 
@@ -98,6 +103,12 @@ public final class TypeParameter implements ITypeParameter
 	public Variance getVariance()
 	{
 		return this.variance;
+	}
+
+	@Override
+	public ReifiedKind getReifiedKind()
+	{
+		return this.reifiedKind;
 	}
 
 	@Override
@@ -403,6 +414,20 @@ public final class TypeParameter implements ITypeParameter
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);
+
+			IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
+			if (reifiedAnnotation != null)
+			{
+				final IValue erasure = reifiedAnnotation.getArguments().getFirstValue();
+				if (erasure != null && erasure.booleanValue())
+				{
+					this.reifiedKind = ReifiedKind.REIFIED_ERASURE;
+				}
+				else
+				{
+					this.reifiedKind = ReifiedKind.REIFIED_TYPE;
+				}
+			}
 		}
 	}
 	
@@ -523,7 +548,39 @@ public final class TypeParameter implements ITypeParameter
 			buffer.append("Ljava/lang/Object;");
 		}
 	}
-	
+
+	@Override
+	public void appendParameterDescriptor(StringBuilder buffer)
+	{
+		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		{
+			buffer.append("Ljava/lang/Class;");
+		}
+		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		{
+			buffer.append("Ldyvilx/lang/model/type/Type;");
+		}
+	}
+
+	@Override
+	public void appendParameterSignature(StringBuilder buffer)
+	{
+		this.appendParameterDescriptor(buffer);
+	}
+
+	@Override
+	public void writeParameter(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		{
+			writer.writeLDC(Type.getObjectType(type.getInternalName()));
+		}
+		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		{
+			type.writeTypeExpression(writer);
+		}
+	}
+
 	@Override
 	public void write(TypeAnnotatableVisitor visitor)
 	{

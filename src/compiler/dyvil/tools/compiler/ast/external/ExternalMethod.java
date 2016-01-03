@@ -90,6 +90,17 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			this.resolveGenerics();
 		}
 		this.parametersResolved = true;
+
+		int parametersToRemove = 0;
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			if (this.typeParameters[i].getReifiedKind() != ITypeParameter.ReifiedKind.NOT_REIFIED)
+			{
+				parametersToRemove++;
+			}
+		}
+
+		this.parameterCount -= parametersToRemove;
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
