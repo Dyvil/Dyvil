@@ -25,6 +25,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -284,7 +285,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "method.override", this.name));
+				markers.add(MarkerMessages.createMarker(this.position, "method.override.notfound", this.name));
 			}
 			return;
 		}
@@ -301,13 +302,16 @@ public class CodeMethod extends AbstractMethod
 				markers.add(MarkerMessages.createMarker(this.position, "method.override.final", this.name));
 			}
 			
-			IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
+			final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
 				Marker marker = MarkerMessages
 						.createMarker(this.position, "method.override.type.incompatible", this.name);
 				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
 				marker.addInfo(MarkerMessages.getMarker("method.override.type", type));
+
+				marker.addInfo(MarkerMessages.getMarker("method.override", Util.methodSignatureToString(overrideMethod),
+				                                        overrideMethod.getTheClass().getFullName()));
 				markers.add(marker);
 			}
 		}
