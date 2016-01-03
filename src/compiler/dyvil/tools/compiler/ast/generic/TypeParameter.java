@@ -399,11 +399,21 @@ public final class TypeParameter implements ITypeParameter
 				}
 			}
 		}
+
+		if (this.annotations != null)
+		{
+			this.annotations.resolveTypes(markers, context, this);
+		}
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.resolve(markers, context);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.resolve(markers, context);
@@ -418,6 +428,11 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.checkTypes(markers, context);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -432,6 +447,11 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, ElementType.TYPE_PARAMETER);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.check(markers, context);
@@ -446,6 +466,11 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void foldConstants()
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.foldConstants();
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.foldConstants();
@@ -460,6 +485,11 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.cleanup(context, compilableList);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.cleanup(context, compilableList);
