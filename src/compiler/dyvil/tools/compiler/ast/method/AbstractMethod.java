@@ -964,13 +964,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	
 	private boolean needsSignature()
 	{
-		if (this.typeParameterCount != 0 || this.type.isGenericType())
+		if (this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables())
 		{
 			return true;
 		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			if (this.parameters[i].getInternalType().isGenericType())
+			final IType parameterType = this.parameters[i].getInternalType();
+			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
 			{
 				return true;
 			}
