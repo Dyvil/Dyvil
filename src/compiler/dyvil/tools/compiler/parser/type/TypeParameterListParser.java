@@ -7,16 +7,16 @@ import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-public class TypeVariableListParser extends Parser
+public class TypeParameterListParser extends Parser
 {
 	private static final int TYPE_VARIABLE = 0;
-	private static final int COMMA = 1;
+	private static final int COMMA         = 1;
 
-	protected ITypeParameterized generic;
+	protected ITypeParameterized typeParameterized;
 	
-	public TypeVariableListParser(ITypeParameterized generic)
+	public TypeParameterListParser(ITypeParameterized typeParameterized)
 	{
-		this.generic = generic;
+		this.typeParameterized = typeParameterized;
 		this.mode = TYPE_VARIABLE;
 	}
 	
@@ -28,7 +28,7 @@ public class TypeVariableListParser extends Parser
 		{
 		case TYPE_VARIABLE:
 			this.mode = COMMA;
-			pm.pushParser(pm.newTypeVariableParser(this.generic), true);
+			pm.pushParser(pm.newTypeParameterParser(this.typeParameterized), true);
 			return;
 		case COMMA:
 			if (ParserUtil.isCloseBracket(type))

@@ -19,7 +19,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
-import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
@@ -225,7 +225,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 
 				this.mode = GENERICS_END;
 				pm.skip();
-				pm.pushParser(new TypeVariableListParser(m));
+				pm.pushParser(new TypeParameterListParser(m));
 				return;
 			}
 			}

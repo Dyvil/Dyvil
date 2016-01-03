@@ -13,7 +13,7 @@ import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.token.IToken;
 
-public final class TypeVariableParser extends Parser implements ITyped
+public final class TypeParameterParser extends Parser implements ITyped
 {
 	public static final int NAME          = 1;
 	public static final int TYPE_VARIABLE = 16;
@@ -21,14 +21,14 @@ public final class TypeVariableParser extends Parser implements ITyped
 	public static final int UPPER = 1;
 	public static final int LOWER = 2;
 	
-	protected ITypeParameterized generic;
+	protected ITypeParameterized typeParameterized;
 	
 	private byte           boundMode;
-	private ITypeParameter variable;
+	private ITypeParameter typeParameter;
 	
-	public TypeVariableParser(ITypeParameterized typed)
+	public TypeParameterParser(ITypeParameterized typeParameterized)
 	{
-		this.generic = typed;
+		this.typeParameterized = typeParameterized;
 		this.mode = NAME;
 	}
 	
@@ -47,14 +47,14 @@ public final class TypeVariableParser extends Parser implements ITyped
 					if (ParserUtil.isIdentifier(next.type()))
 					{
 						Variance v = name == Names.minus ? Variance.CONTRAVARIANT : Variance.COVARIANT;
-						this.variable = new TypeParameter(next, this.generic, next.nameValue(), v);
+						this.typeParameter = new TypeParameter(next, this.typeParameterized, next.nameValue(), v);
 						this.mode = TYPE_VARIABLE;
 						pm.skip();
 						return;
 					}
 				}
 				
-				this.variable = new TypeParameter(token, this.generic, token.nameValue(), Variance.INVARIANT);
+				this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(), Variance.INVARIANT);
 				this.mode = TYPE_VARIABLE;
 				return;
 			}
@@ -65,9 +65,9 @@ public final class TypeVariableParser extends Parser implements ITyped
 		{
 			if (ParserUtil.isTerminator(type))
 			{
-				if (this.variable != null)
+				if (this.typeParameter != null)
 				{
-					this.generic.addTypeParameter(this.variable);
+					this.typeParameterized.addTypeParameter(this.typeParameter);
 				}
 				pm.popParser(true);
 				return;
@@ -101,9 +101,9 @@ public final class TypeVariableParser extends Parser implements ITyped
 				}
 			}
 
-			if (this.variable != null)
+			if (this.typeParameter != null)
 			{
-				this.generic.addTypeParameter(this.variable);
+				this.typeParameterized.addTypeParameter(this.typeParameter);
 			}
 			pm.popParser(true);
 			pm.report(token, "typeparameter.bound.invalid");
@@ -116,11 +116,11 @@ public final class TypeVariableParser extends Parser implements ITyped
 	{
 		if (this.boundMode == UPPER)
 		{
-			this.variable.addUpperBound(type);
+			this.typeParameter.addUpperBound(type);
 		}
 		else if (this.boundMode == LOWER)
 		{
-			this.variable.setLowerBound(type);
+			this.typeParameter.setLowerBound(type);
 		}
 	}
 	
