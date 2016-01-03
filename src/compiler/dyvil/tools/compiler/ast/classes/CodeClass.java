@@ -313,10 +313,10 @@ public class CodeClass extends AbstractClass
 			}
 
 			int modifiers = iclass.getModifiers().toFlags();
-			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 			{
 				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
-				                                        ModifierUtil.classModifiersToString(modifiers),
+				                                        ModifierUtil.classTypeToString(modifiers),
 				                                        iclass.getName()));
 			}
 		}
