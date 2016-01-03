@@ -13,6 +13,8 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.type.CovariantTypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.operator.ClassOperator;
+import dyvil.tools.compiler.ast.operator.TypeOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -33,39 +35,43 @@ import java.lang.annotation.ElementType;
 public final class TypeParameter implements ITypeParameter
 {
 	protected ICodePosition position;
-	
-	protected Variance    variance    = Variance.INVARIANT;
-	private   ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
-
-	protected Name name;
-	protected IType[] upperBounds = new IType[1];
-	protected int upperBoundCount;
-
-	protected IType lowerBound;
-	private   int   index;
-
-	private ITypeParameterized generic;
 
 	private AnnotationList annotations;
-	private IType covariantType = new CovariantTypeVarType(this);
 
+	protected Variance variance = Variance.INVARIANT;
+
+	protected Name name;
+
+	protected IType[] upperBounds = new IType[1];
+	protected int   upperBoundCount;
+	protected IType lowerBound;
+
+	// Metadata
+	private int                index;
+
+	private int                parameterIndex;
+
+	private ITypeParameterized generic;
+	private ReifiedKind reifiedKind   = ReifiedKind.NOT_REIFIED;
+
+	private IType       covariantType = new CovariantTypeVarType(this);
 	public TypeParameter(ITypeParameterized generic)
 	{
 		this.generic = generic;
 	}
-	
+
 	public TypeParameter(ITypeParameterized generic, Name name)
 	{
 		this.name = name;
 		this.generic = generic;
 	}
-	
+
 	public TypeParameter(ICodePosition position, ITypeParameterized generic)
 	{
 		this.position = position;
 		this.generic = generic;
 	}
-	
+
 	public TypeParameter(ICodePosition position, ITypeParameterized generic, Name name, Variance variance)
 	{
 		this.position = position;
@@ -73,31 +79,31 @@ public final class TypeParameter implements ITypeParameter
 		this.generic = generic;
 		this.variance = variance;
 	}
-	
+
 	@Override
 	public ITypeParameterized getGeneric()
 	{
 		return this.generic;
 	}
-	
+
 	@Override
 	public void setIndex(int index)
 	{
 		this.index = index;
 	}
-	
+
 	@Override
 	public int getIndex()
 	{
 		return this.index;
 	}
-	
+
 	@Override
 	public void setVariance(Variance variance)
 	{
 		this.variance = variance;
 	}
-	
+
 	@Override
 	public Variance getVariance()
 	{
@@ -111,11 +117,17 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
+	public int getParameterIndex()
+	{
+		return this.parameterIndex;
+	}
+
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
@@ -568,7 +580,28 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void writeParameter(MethodWriter writer, IType type) throws BytecodeException
+	public void writeParameter(MethodWriter writer) throws BytecodeException
+	{
+		final IType type;
+		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		{
+			type = ClassOperator.Types.CLASS;
+		}
+		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		{
+			type = TypeOperator.Types.TYPE;
+		}
+		else
+		{
+			return;
+		}
+
+		this.parameterIndex = writer.localCount();
+		writer.registerParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
+	}
+
+	@Override
+	public void writeArgument(MethodWriter writer, IType type) throws BytecodeException
 	{
 		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
 		{

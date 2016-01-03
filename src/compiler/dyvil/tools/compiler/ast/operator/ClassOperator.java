@@ -96,12 +96,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
-		{
-			return true;
-		}
-		
-		return type.isSuperTypeOf(this.getType());
+		return type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
