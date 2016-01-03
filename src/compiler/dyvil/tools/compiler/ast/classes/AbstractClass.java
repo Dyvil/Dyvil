@@ -503,22 +503,22 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
 	{
 		if (candidate.getTheClass() == this)
 		{
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
 		
-		if (this.body != null && this.body.checkImplements(markers, iclass, candidate, typeContext))
+		if (this.body != null && this.body.checkImplements(markers, checkedClass, candidate, typeContext))
 		{
 			return true;
 		}
 		
 		if (this.superType != null)
 		{
-			if (this.superType.getTheClass()
-			                  .checkImplements(markers, iclass, candidate, this.superType.getConcreteType(typeContext)))
+			if (this.superType.getTheClass().checkImplements(markers, checkedClass, candidate,
+			                                                 this.superType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -526,8 +526,9 @@ public abstract class AbstractClass implements IClass
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType type = this.interfaces[i];
-			if (type.getTheClass().checkImplements(markers, iclass, candidate, type.getConcreteType(typeContext)))
+			final IType interfaceType = this.interfaces[i];
+			if (interfaceType.getTheClass().checkImplements(markers, checkedClass, candidate,
+			                                                interfaceType.getConcreteType(typeContext)))
 			{
 				return true;
 			}

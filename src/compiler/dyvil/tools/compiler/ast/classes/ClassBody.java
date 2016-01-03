@@ -458,11 +458,11 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (this.methods[i].checkOverride(markers, iclass, candidate, typeContext))
+			if (this.methods[i].checkOverride(markers, checkedClass, candidate, typeContext))
 			{
 				return true;
 			}
@@ -472,13 +472,13 @@ public class ClassBody implements IClassBody
 			final IProperty property = this.properties[i];
 
 			final IMethod getter = property.getGetter();
-			if (getter != null && getter.checkOverride(markers, iclass, candidate, typeContext))
+			if (getter != null && getter.checkOverride(markers, checkedClass, candidate, typeContext))
 			{
 				return true;
 			}
 
 			final IMethod setter = property.getSetter();
-			if (setter != null && setter.checkOverride(markers, iclass, candidate, typeContext))
+			if (setter != null && setter.checkOverride(markers, checkedClass, candidate, typeContext))
 			{
 				return true;
 			}
@@ -487,12 +487,12 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			final IMethod candidate = this.methods[i];
-			this.checkMethod(markers, iclass, typeContext, candidate);
+			this.checkMethod(markers, checkedClass, typeContext, candidate);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
@@ -501,31 +501,38 @@ public class ClassBody implements IClassBody
 			final IMethod getter = property.getGetter();
 			if (getter != null)
 			{
-				this.checkMethod(markers, iclass, typeContext, getter);
+				this.checkMethod(markers, checkedClass, typeContext, getter);
 			}
 
 			final IMethod setter = property.getSetter();
 			if (setter != null)
 			{
-				this.checkMethod(markers, iclass, typeContext, setter);
+				this.checkMethod(markers, checkedClass, typeContext, setter);
 			}
 		}
 	}
 
-	private void checkMethod(MarkerList markers, IClass iclass, ITypeContext typeContext, IMethod candidate)
+	private void checkMethod(MarkerList markers, IClass checkedClass, ITypeContext typeContext, IMethod candidate)
 	{
+		if (candidate.hasModifier(Modifiers.STATIC))
+		{
+			// Don't check static methods
+			return;
+		}
+
 		// Check if the super class implements the method
-		if (iclass.checkImplements(markers, iclass, candidate, typeContext))
+		if (checkedClass.checkImplements(markers, checkedClass, candidate, typeContext))
 		{
 			return;
 		}
 
 		// If it doesn't, check for abstract modifiers
-		if (candidate.hasModifier(Modifiers.ABSTRACT) && !iclass.hasModifier(Modifiers.ABSTRACT))
+		if (candidate.hasModifier(Modifiers.ABSTRACT) && !checkedClass.hasModifier(Modifiers.ABSTRACT))
 		{
 			// Create an abstract method error
-			markers.add(MarkerMessages.createMarker(iclass.getPosition(), "class.method.abstract", iclass.getName(),
-			                                        candidate.getName(), this.theClass.getName()));
+			markers.add(MarkerMessages.createMarker(checkedClass.getPosition(), "class.method.abstract",
+			                                        checkedClass.getName(), candidate.getName(),
+			                                        this.theClass.getName()));
 		}
 	}
 	

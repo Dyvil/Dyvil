@@ -164,18 +164,29 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		{
 			return 0;
 		}
-		
-		if (!this.genericsResolved)
-		{
-			this.resolveGenerics();
-		}
+
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();
 		}
 		return super.getSignatureMatch(name, receiver, arguments);
 	}
-	
+
+	@Override
+	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	{
+		if (this.name != candidate.getName())
+		{
+			return false;
+		}
+
+		if (!this.parametersResolved)
+		{
+			this.resolveParameters();
+		}
+		return super.checkOverride(markers, iclass, candidate, typeContext);
+	}
+
 	@Override
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
