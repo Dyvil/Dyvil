@@ -18,8 +18,9 @@ import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.classes.ClassBodyParser;
+import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
@@ -227,9 +228,22 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		}
 		case METHOD_VALUE:
-			if (ClassBodyParser.parseMethodBody(pm, type, this.method))
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
+				pm.pushParser(new StatementListParser(this.method), true);
 				this.mode = SEPARATOR;
+				return;
+			}
+			if (type == BaseSymbols.EQUALS)
+			{
+				pm.pushParser(pm.newExpressionParser(this.method));
+				this.mode = SEPARATOR;
+				return;
+			}
+			if (type == DyvilKeywords.THROWS)
+			{
+				pm.pushParser(new ExceptionListParser(this.method));
+				// mode stays METHOD_VALUE
 				return;
 			}
 
