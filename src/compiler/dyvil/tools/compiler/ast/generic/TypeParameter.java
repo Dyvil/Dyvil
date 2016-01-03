@@ -43,9 +43,8 @@ public final class TypeParameter implements ITypeParameter
 	private ITypeParameterized generic;
 	
 	private AnnotationList annotations;
+	private IType covariantType = new CovariantTypeVarType(this);
 
-	private IType parameterType = new ParameterTypeVarType(this);
-	
 	public TypeParameter(ITypeParameterized generic)
 	{
 		this.generic = generic;
@@ -201,9 +200,9 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType getCovariantType()
 	{
-		return this.parameterType;
+		return this.covariantType;
 	}
 
 	@Override

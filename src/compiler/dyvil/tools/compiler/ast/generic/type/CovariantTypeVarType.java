@@ -4,9 +4,9 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 
-public class ParameterTypeVarType extends TypeVarType
+public class CovariantTypeVarType extends TypeVarType
 {
-	public ParameterTypeVarType(ITypeParameter typeVariable)
+	public CovariantTypeVarType(ITypeParameter typeVariable)
 	{
 		super(typeVariable);
 	}

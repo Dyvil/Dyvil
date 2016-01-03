@@ -68,7 +68,13 @@ public class TypeVarType implements IRawType
 	@Override
 	public IType getParameterType()
 	{
-		return this.typeParameter.getParameterType();
+		return this.typeParameter.getCovariantType();
+	}
+
+	@Override
+	public IType getReturnType()
+	{
+		return this.typeParameter.getCovariantType();
 	}
 
 	@Override

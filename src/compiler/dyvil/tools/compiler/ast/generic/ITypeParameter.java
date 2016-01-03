@@ -34,7 +34,7 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 	
 	IType getDefaultType();
 	
-	IType getParameterType();
+	IType getCovariantType();
 
 	// Upper Bounds
 
