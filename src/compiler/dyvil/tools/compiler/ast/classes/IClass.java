@@ -171,7 +171,7 @@ public interface IClass extends IClassMember, IGeneric, IContext, IParameterized
 		{
 			return new TraitMetadata(iclass);
 		}
-		else if (interfaceModifiers != 0)
+		else if (interfaceModifiers == Modifiers.INTERFACE_CLASS)
 		{
 			return new InterfaceMetadata(iclass);
 		}
