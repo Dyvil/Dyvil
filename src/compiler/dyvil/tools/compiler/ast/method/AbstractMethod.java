@@ -823,7 +823,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			IType type = typeContext.resolveType(typeVar);
 			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
 			{
-				markers.add(MarkerMessages.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
+				markers.add(
+						MarkerMessages.createMarker(position, "method.typevar.infer", this.name, typeVar.getName()));
 				typeContext.addMapping(typeVar, Types.ANY);
 			}
 		}
@@ -1019,7 +1020,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException
 	{
 		if (this.intrinsicData != null)
@@ -1028,10 +1029,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
+			this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
 		}
 		
-		if (type == Types.VOID)
+		if (targetType == Types.VOID)
 		{
 			if (this.type != Types.VOID)
 			{
@@ -1040,14 +1041,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 		
-		if (type != null)
+		if (targetType != null)
 		{
-			this.type.writeCast(writer, type, lineNumber);
+			this.type.writeCast(writer, targetType, lineNumber);
 		}
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		if (this.intrinsicData != null)
@@ -1056,12 +1057,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 		
-		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
 		writer.writeJumpInsn(IFNE, dest);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		if (this.intrinsicData != null)
@@ -1070,7 +1071,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 		
-		this.writeArgumentsAndInvoke(writer, instance, arguments, lineNumber);
+		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
@@ -1131,18 +1132,24 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 	
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		this.writeReceiver(writer, instance);
 		this.writeArguments(writer, instance, arguments);
-		this.writeInvoke(writer, instance, arguments, lineNumber);
+		this.writeInvoke(writer, instance, arguments, typeContext, lineNumber);
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			final ITypeParameter typeParameter = this.typeParameters[i];
+			typeParameter.writeParameter(writer, typeContext.resolveType(typeParameter));
+		}
+
 		writer.writeLineNumber(lineNumber);
 		
 		int opcode;

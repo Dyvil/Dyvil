@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -115,7 +116,7 @@ public class IterableForStatement extends ForEachStatement
 		if (this.boxMethod != null)
 		{
 			writer.writeTypeInsn(Opcodes.CHECKCAST, this.boxMethod.getTheClass().getInternalName());
-			this.boxMethod.writeInvoke(writer, null, null, lineNumber);
+			this.boxMethod.writeInvoke(writer, null, null, ITypeContext.DEFAULT, lineNumber);
 		}
 		else
 		{

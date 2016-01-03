@@ -298,19 +298,19 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 			type = this.getType();
 		}
 
-		this.method.writeCall(writer, this.receiver, this.arguments, type, this.getLineNumber());
+		this.method.writeCall(writer, this.receiver, this.arguments, this.genericData, type, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeJump(writer, dest, this.receiver, this.arguments, this.getLineNumber());
+		this.method.writeJump(writer, dest, this.receiver, this.arguments, this.genericData, this.getLineNumber());
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeInvJump(writer, dest, this.receiver, this.arguments, this.getLineNumber());
+		this.method.writeInvJump(writer, dest, this.receiver, this.arguments, this.genericData, this.getLineNumber());
 	}
 	
 	@Override

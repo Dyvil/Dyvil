@@ -398,7 +398,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException
 	{
 		StringBuilder desc = new StringBuilder();
@@ -422,19 +422,19 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 	}

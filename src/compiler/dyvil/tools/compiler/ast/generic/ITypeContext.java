@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface ITypeContext
 {
+	ITypeContext NULL    = typeParameter -> null;
 	ITypeContext DEFAULT = ITypeParameter::getDefaultType;
 
 	IType resolveType(ITypeParameter typeParameter);

@@ -546,7 +546,7 @@ public final class PrimitiveType implements IType
 			// Target is not a primitive type
 			if (primitiveTarget == target)
 			{
-				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 				return;
 			}
 		}
@@ -574,7 +574,8 @@ public final class PrimitiveType implements IType
 		// If the target is not primitive
 		if (primitiveTarget != target)
 		{
-			primitiveTarget.getBoxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+			primitiveTarget.getBoxMethod()
+			               .writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
 	

@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -166,7 +167,7 @@ public interface IObjectType extends IType
 		}
 		if (target.isPrimitive())
 		{
-			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
 	

@@ -6,6 +6,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -230,7 +231,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			if (method != null)
 			{
 				// Invoke the getter method
-				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 				method.getType().writeCast(writer, patternType, lineNumber);
 			}
 			else

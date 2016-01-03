@@ -194,7 +194,7 @@ public final class LiteralConversion implements IValue
 			type = this.type;
 		}
 
-		this.method.writeCall(writer, null, this.arguments, type, this.literal.getLineNumber());
+		this.method.writeCall(writer, null, this.arguments, this.type, type, this.literal.getLineNumber());
 	}
 	
 	@Override

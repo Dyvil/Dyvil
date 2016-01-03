@@ -260,36 +260,36 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeCall(writer, instance, arguments, type, lineNumber);
+		super.writeCall(writer, instance, arguments, typeContext, targetType, lineNumber);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeJump(writer, dest, instance, arguments, lineNumber);
+		super.writeJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
+		super.writeInvJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
 	
 	@Override
@@ -309,7 +309,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
 			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
-			if (typeVar.addRawAnnotation(desc, annotation))
+			if (!typeVar.addRawAnnotation(desc, annotation))
 			{
 				return null;
 			}
