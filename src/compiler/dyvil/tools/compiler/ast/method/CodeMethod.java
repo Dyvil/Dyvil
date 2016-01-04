@@ -467,6 +467,7 @@ public class CodeMethod extends AbstractMethod
 			
 			mw.begin();
 			mw.setThisType(internalThisClassName);
+
 			mw.writeVarInsn(Opcodes.ALOAD, 0);
 			
 			final int lineNumber = this.getLineNumber();
@@ -478,7 +479,7 @@ public class CodeMethod extends AbstractMethod
 				final IType overrideParameterType = overrideParameter.getInternalType();
 				
 				overrideParameter.write(mw);
-				mw.writeVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getIndex());
+				mw.writeVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
 				overrideParameterType.writeCast(mw, parameterType, lineNumber);
 			}
 			
