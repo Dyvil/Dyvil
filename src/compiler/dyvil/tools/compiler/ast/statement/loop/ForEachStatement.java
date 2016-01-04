@@ -200,11 +200,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 					                                        this.variable.getName()));
 				}
 			}
-			else if (rangeType == Types.UNKNOWN)
-			{
-				rangeType = varType;
-			}
-			else if (!varType.isSuperTypeOf(rangeType))
+			else if (rangeType != Types.UNKNOWN && !varType.isSuperTypeOf(rangeType))
 			{
 				Marker marker = MarkerMessages.createMarker(value1.getPosition(), "for.range.type");
 				marker.addInfo(MarkerMessages.getMarker("range.type", rangeType));
@@ -262,7 +258,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				markers.add(m);
 			}
 			
-			IterableForStatement ifs = new IterableForStatement(this.position, this.variable, valueType, iterableType);
+			IterableForStatement ifs = new IterableForStatement(this.position, this.variable, iterableType);
 			ifs.resolveAction(this.action, markers, context);
 			return ifs;
 		}

@@ -25,9 +25,6 @@ public class RangeForStatement extends ForEachStatement
 	protected IValue  value2;
 	protected boolean halfOpen;
 	
-	private Variable startVar;
-	private Variable endVar;
-	
 	public RangeForStatement(ICodePosition position, Variable var, IValue value1, IValue value2, boolean halfOpen)
 	{
 		super(position, var);
@@ -35,12 +32,6 @@ public class RangeForStatement extends ForEachStatement
 		this.value1 = value1;
 		this.value2 = value2;
 		this.halfOpen = halfOpen;
-		
-		IType varType = var.getType();
-		
-		this.startVar = new Variable(ForStatement.$forStart, varType);
-		
-		this.endVar = new Variable(ForStatement.$forEnd, varType);
 	}
 	
 	@Override
@@ -109,53 +100,51 @@ public class RangeForStatement extends ForEachStatement
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
+
+		final int startVarIndex = writer.localCount();
 		
 		Variable var = this.variable;
-		Variable endVar = this.endVar;
-		Variable startVar = this.startVar;
-		
-		int locals = writer.localCount();
-		
+
 		// Write the start value and store it in the variable.
 		this.value1.writeExpression(writer, var.getType());
 		writer.writeInsn(Opcodes.AUTO_DUP);
-		startVar.writeInit(writer, null);
 		var.writeInit(writer, null);
-		
+
+		final int endVarIndex = writer.localCount();
+
 		this.value2.writeExpression(writer, var.getType());
-		endVar.writeInit(writer, null);
+		writer.writeVarInsn(var.getType().getStoreOpcode(), endVarIndex);
 		
 		writer.writeTargetLabel(startLabel);
 		
 		int varIndex = var.getLocalIndex();
-		int endIndex = endVar.getLocalIndex();
 		
 		// Check the condition
 		switch (type)
 		{
 		case INT:
 			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
-			writer.writeVarInsn(Opcodes.ILOAD, endIndex);
+			writer.writeVarInsn(Opcodes.ILOAD, endVarIndex);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_ICMPGE : Opcodes.IF_ICMPGT, endLabel);
 			break;
 		case LONG:
 			writer.writeVarInsn(Opcodes.LLOAD, varIndex);
-			writer.writeVarInsn(Opcodes.LLOAD, endIndex);
+			writer.writeVarInsn(Opcodes.LLOAD, endVarIndex);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_LCMPGE : Opcodes.IF_LCMPGT, endLabel);
 			break;
 		case FLOAT:
 			writer.writeVarInsn(Opcodes.FLOAD, varIndex);
-			writer.writeVarInsn(Opcodes.FLOAD, endIndex);
+			writer.writeVarInsn(Opcodes.FLOAD, endVarIndex);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_FCMPGE : Opcodes.IF_FCMPGT, endLabel);
 			break;
 		case DOUBLE:
 			writer.writeVarInsn(Opcodes.DLOAD, varIndex);
-			writer.writeVarInsn(Opcodes.DLOAD, endIndex);
+			writer.writeVarInsn(Opcodes.DLOAD, endVarIndex);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
 			break;
 		case ORDERED:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeVarInsn(Opcodes.ALOAD, endIndex);
+			writer.writeVarInsn(Opcodes.ALOAD, endVarIndex);
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "compareTo",
 			                       "(Ldyvil/lang/Rangeable;)I", true);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
@@ -210,11 +199,9 @@ public class RangeForStatement extends ForEachStatement
 		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
 		
 		// Local Variables
-		writer.resetLocals(locals);
+		writer.resetLocals(startVarIndex);
 		writer.writeLabel(endLabel);
 		
 		var.writeLocal(writer, scopeLabel, endLabel);
-		startVar.writeLocal(writer, scopeLabel, endLabel);
-		endVar.writeLocal(writer, scopeLabel, endLabel);
 	}
 }

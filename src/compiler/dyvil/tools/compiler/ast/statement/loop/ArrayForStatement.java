@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -10,19 +9,11 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
-	public static final Name $index  = Name.getQualified("$index");
-	public static final Name $length = Name.getQualified("$length");
-	public static final Name $array  = Name.getQualified("$array");
-	
-	protected Variable indexVar;
-	protected Variable lengthVar;
-	protected Variable arrayVar;
-	
+	protected IType arrayType;
 	protected IMethod boxMethod;
 	
 	public ArrayForStatement(ICodePosition position, Variable var)
@@ -33,11 +24,9 @@ public class ArrayForStatement extends ForEachStatement
 	public ArrayForStatement(ICodePosition position, Variable var, IType arrayType)
 	{
 		super(position, var);
-		
-		this.indexVar = new Variable($index, Types.INT);
-		this.lengthVar = new Variable($length, Types.INT);
-		this.arrayVar = new Variable($array, arrayType);
-		
+
+		this.arrayType = arrayType;
+
 		IType elementType = arrayType.getElementType();
 		IType varType = var.getType();
 		boolean primitive = varType.isPrimitive();
@@ -55,30 +44,6 @@ public class ArrayForStatement extends ForEachStatement
 	}
 	
 	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (name == this.variable.getName())
-		{
-			return this.variable;
-		}
-		
-		if (name == $index)
-		{
-			return this.indexVar;
-		}
-		if (name == $length)
-		{
-			return this.lengthVar;
-		}
-		if (name == $array)
-		{
-			return this.arrayVar;
-		}
-		
-		return null;
-	}
-	
-	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
@@ -86,41 +51,45 @@ public class ArrayForStatement extends ForEachStatement
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		Variable var = this.variable;
-		Variable arrayVar = this.arrayVar;
-		Variable indexVar = this.indexVar;
-		Variable lengthVar = this.lengthVar;
+
 		int lineNumber = this.getLineNumber();
 		
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
+
+		final int localCount = writer.localCount();
 		
 		// Load the array
 		var.getValue().writeExpression(writer, null);
 		
 		// Local Variables
-		int locals = writer.localCount();
+		final int arrayVarIndex = writer.localCount();
+		final int lengthVarIndex = arrayVarIndex + 1;
+		final int indexVarIndex = arrayVarIndex + 2;
+
 		writer.writeInsn(Opcodes.DUP);
-		arrayVar.writeInit(writer, null);
+
+		writer.writeVarInsn(Opcodes.ASTORE, arrayVarIndex);
 		// Load the length
 		writer.writeLineNumber(lineNumber);
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
 		writer.writeInsn(Opcodes.DUP);
-		lengthVar.writeInit(writer, null);
+		writer.writeVarInsn(Opcodes.ISTORE, lengthVarIndex);
 		
-		// Initial Boundary Check - if the length is 0, skip the loop
-		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
+		// Initial Boundary Check - if the length is less than or equal to 0, skip the loop
+		writer.writeJumpInsn(Opcodes.IFLE, endLabel);
 		
 		// Set index to 0
 		writer.writeLDC(0);
-		indexVar.writeInit(writer, null);
+		writer.writeVarInsn(Opcodes.ISTORE, indexVarIndex);
 		
 		writer.writeTargetLabel(startLabel);
 		
 		// Load the element
-		arrayVar.writeGet(writer, null, lineNumber);
-		indexVar.writeGet(writer, null, lineNumber);
+		writer.writeVarInsn(Opcodes.ALOAD, arrayVarIndex);
+		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
 		writer.writeLineNumber(lineNumber);
-		writer.writeInsn(arrayVar.getType().getElementType().getArrayLoadOpcode());
+		writer.writeInsn(this.arrayType.getElementType().getArrayLoadOpcode());
 		// Auto(un)boxing
 		if (this.boxMethod != null)
 		{
@@ -137,19 +106,16 @@ public class ArrayForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increment index
-		writer.writeIINC(indexVar.getLocalIndex(), 1);
+		writer.writeIINC(indexVarIndex, 1);
 		// Boundary Check
-		indexVar.writeGet(writer, null, lineNumber);
-		lengthVar.writeGet(writer, null, lineNumber);
+		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
+		writer.writeVarInsn(Opcodes.ILOAD, lengthVarIndex);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables
-		writer.resetLocals(locals);
+		writer.resetLocals(localCount);
 		writer.writeLabel(endLabel);
 		
 		var.writeLocal(writer, scopeLabel, endLabel);
-		indexVar.writeLocal(writer, scopeLabel, endLabel);
-		lengthVar.writeLocal(writer, scopeLabel, endLabel);
-		arrayVar.writeLocal(writer, scopeLabel, endLabel);
 	}
 }
