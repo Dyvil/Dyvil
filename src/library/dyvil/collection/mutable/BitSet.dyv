@@ -1,0 +1,83 @@
+package dyvil.collection.mutable
+
+import dyvil.collection.impl.AbstractBitSet
+
+public class BitSet extends AbstractBitSet implements MutableSet[int]
+{
+	public new()
+	{
+		super.new()
+	}
+
+	public new(int capacity)
+	{
+		super.new(capacity)
+	}
+
+	public new(int... elements)
+	{
+		super.new(elements)
+	}
+
+	public new(Collection[int] elements)
+	{
+		super.new(elements)
+	}
+
+	public override void clear()
+	{
+		this.size = 0
+		for (int i : 0 ..< this.words.length)
+		{
+			this.words[i] = 0L
+		}
+	}
+
+	public override boolean add(int element)
+	{
+		if (this.bitSet(element)) return false
+
+		this.setBit(element)
+		return true
+	}
+
+	public override boolean remove(Object element)
+	{
+		if (!(element is Int)) return false
+
+		final int bit = element as int
+		if (!this.bitSet(bit)) return false
+
+		this.clearBit(bit)
+		return true
+	}
+
+	public override void removeAt(int bit) = this.clearBit(bit)
+
+	public override void map(java.util.function.Function[_ >: int, _ <: int] mapper)
+	{
+		final [int] ints = this.toIntArray
+
+		this.clear()
+		for (int i : ints)
+		{
+			this.add(mapper.apply(i))
+		}
+	}
+
+	public override void flatMap(java.util.function.Function[_ >: int, _ <: Iterable[_ <: int]] mapper)
+	{
+		final [int] ints = this.toIntArray
+
+		this.clear()
+		for (int i : ints)
+		{
+			for (int newValue : mapper.apply(i))
+			{
+				this.add(newValue)
+			}
+		}
+	}
+
+	public override MutableSet[R] emptyCopy[R]() = null
+}
