@@ -24,6 +24,11 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 		super.new(elements)
 	}
 
+	public new(AbstractBitSet elements)
+	{
+		super.new(elements)
+	}
+
 	public override void clear()
 	{
 		this.size = 0
@@ -79,5 +84,9 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 		}
 	}
 
-	public override MutableSet[R] emptyCopy[R]() = null
+	public override MutableSet[int] copy() = new BitSet(this)
+
+	public override ImmutableSet[int] immutable() = null  // TODO ImmutableBitSet
+
+	public override MutableSet[R] emptyCopy[R]() = MutableSet.[R]
 }
