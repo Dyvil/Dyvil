@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.FieldThis;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -14,7 +13,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaptureHelper;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class AnonymousClassMetadata implements IClassMetadata
 {
@@ -128,6 +126,8 @@ public class AnonymousClassMetadata implements IClassMetadata
 		}
 		
 		captureHelper.writeFieldAssignments(mw);
+
+		instanceFields.writeExpression(mw, Types.VOID);
 		
 		mw.end(Types.VOID);
 	}
