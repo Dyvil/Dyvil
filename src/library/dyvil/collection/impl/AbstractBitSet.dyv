@@ -65,8 +65,9 @@ public abstract class AbstractBitSet implements Set[int]
 
 	protected void ensureWordCapacity(int wordCount)
 	{
-		[long] newArray = new [long](wordCount)
-		System.arraycopy(this.words, 0, newArray, 0, this.words.length)
+		[long] newWords = new [long](wordCount)
+		System.arraycopy(this.words, 0, newWords, 0, this.words.length)
+		this.words = newWords
 	}
 
 	protected boolean bitSet(int bit)
@@ -137,7 +138,8 @@ public abstract class AbstractBitSet implements Set[int]
 
 	public override boolean isSorted() = true
 
-	public override Iterator[int] iterator() = new Iterator[int]() {
+	public override Iterator[int] iterator() = new Iterator[int]()
+	{
 		private int currentBit = this[AbstractBitSet].nextSetBit(-1)
 
 		public override int next()
