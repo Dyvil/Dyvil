@@ -2,9 +2,6 @@ package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -14,7 +11,6 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class ArrayForStatement extends ForEachStatement
 {
 	protected IType arrayType;
-	protected IMethod boxMethod;
 	
 	public ArrayForStatement(ICodePosition position, Variable var)
 	{
@@ -26,21 +22,6 @@ public class ArrayForStatement extends ForEachStatement
 		super(position, var);
 
 		this.arrayType = arrayType;
-
-		IType elementType = arrayType.getElementType();
-		IType varType = var.getType();
-		boolean primitive = varType.isPrimitive();
-		if (primitive != elementType.isPrimitive())
-		{
-			if (primitive)
-			{
-				this.boxMethod = varType.getUnboxMethod();
-			}
-			else
-			{
-				this.boxMethod = elementType.getBoxMethod();
-			}
-		}
 	}
 	
 	@Override
@@ -49,19 +30,20 @@ public class ArrayForStatement extends ForEachStatement
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
-		
-		Variable var = this.variable;
 
-		int lineNumber = this.getLineNumber();
-		
+		final Variable var = this.variable;
+		final IType elementType = this.arrayType.getElementType();
+		final int lineNumber = this.getLineNumber();
+
+		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
 
 		final int localCount = writer.localCount();
-		
+
 		// Load the array
 		var.getValue().writeExpression(writer, null);
-		
+
 		// Local Variables
 		final int arrayVarIndex = writer.localCount();
 		final int lengthVarIndex = arrayVarIndex + 1;
@@ -75,26 +57,23 @@ public class ArrayForStatement extends ForEachStatement
 		writer.writeInsn(Opcodes.ARRAYLENGTH);
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeVarInsn(Opcodes.ISTORE, lengthVarIndex);
-		
+
 		// Initial Boundary Check - if the length is less than or equal to 0, skip the loop
 		writer.writeJumpInsn(Opcodes.IFLE, endLabel);
-		
+
 		// Set index to 0
 		writer.writeLDC(0);
 		writer.writeVarInsn(Opcodes.ISTORE, indexVarIndex);
-		
+
 		writer.writeTargetLabel(startLabel);
-		
+
 		// Load the element
 		writer.writeVarInsn(Opcodes.ALOAD, arrayVarIndex);
 		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
 		writer.writeLineNumber(lineNumber);
-		writer.writeInsn(this.arrayType.getElementType().getArrayLoadOpcode());
-		// Auto(un)boxing
-		if (this.boxMethod != null)
-		{
-			this.boxMethod.writeCall(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, null, lineNumber);
-		}
+		writer.writeInsn(elementType.getArrayLoadOpcode());
+		// Autocasting
+		elementType.writeCast(writer, var.getType(), lineNumber);
 		// Store variable
 		var.writeInit(writer, null);
 		

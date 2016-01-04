@@ -21,13 +21,14 @@ public class StringForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
-		Variable var = this.variable;
-		int lineNumber = this.getLineNumber();
-		
+		final Variable var = this.variable;
+		final int lineNumber = this.getLineNumber();
+
+		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
 
-		int localCount = writer.localCount();
+		final int localCount = writer.localCount();
 		
 		// Load the String
 		var.getValue().writeExpression(writer, null);
@@ -59,6 +60,8 @@ public class StringForStatement extends ForEachStatement
 		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
 		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
+		// Autocasting
+		Types.CHAR.writeCast(writer, var.getType(), lineNumber);
 		var.writeInit(writer, null);
 		
 		// Action

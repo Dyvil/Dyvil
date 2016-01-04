@@ -258,7 +258,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				markers.add(m);
 			}
 			
-			IterableForStatement ifs = new IterableForStatement(this.position, this.variable, iterableType);
+			IterableForStatement ifs = new IterableForStatement(this.position, this.variable);
 			ifs.resolveAction(this.action, markers, context);
 			return ifs;
 		}

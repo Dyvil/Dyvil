@@ -2,9 +2,7 @@ package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -12,7 +10,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class IterableForStatement extends ForEachStatement
@@ -24,37 +21,7 @@ public class IterableForStatement extends ForEachStatement
 	
 	public IterableForStatement(ICodePosition position, Variable variable)
 	{
-		this(position, variable, variable.getValue().getType());
-	}
-	
-	public IterableForStatement(ICodePosition position, Variable variable, IType elementType)
-	{
 		super(position, variable);
-
-		IType varType = variable.getType();
-		boolean primitive = varType.isPrimitive();
-		if (primitive != elementType.isPrimitive())
-		{
-			if (primitive)
-			{
-				this.boxMethod = varType.getUnboxMethod();
-			}
-			else
-			{
-				this.boxMethod = elementType.getBoxMethod();
-			}
-		}
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (name == this.variable.getName())
-		{
-			return this.variable;
-		}
-		
-		return null;
 	}
 	
 	@Override
@@ -64,12 +31,14 @@ public class IterableForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
-		Variable var = this.variable;
-		IType varType = var.getType();
-		int lineNumber = this.getLineNumber();
-		
+		final Variable var = this.variable;
+		final IType varType = var.getType();
+		final int lineNumber = this.getLineNumber();
+
+		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
+		int localCount = writer.localCount();
 		
 		// Get the iterator
 		var.getValue().writeExpression(writer, null);
@@ -92,17 +61,8 @@ public class IterableForStatement extends ForEachStatement
 		writer.writeVarInsn(Opcodes.ALOAD, iteratorVarIndex);
 		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
-		// Cast to the variable type
-		// Auto(un)boxing
-		if (this.boxMethod != null)
-		{
-			writer.writeTypeInsn(Opcodes.CHECKCAST, this.boxMethod.getTheClass().getInternalName());
-			this.boxMethod.writeInvoke(writer, null, null, ITypeContext.DEFAULT, lineNumber);
-		}
-		else
-		{
-			Types.OBJECT.writeCast(writer, varType, lineNumber);
-		}
+		// Auocasting
+		Types.OBJECT.writeCast(writer, varType, lineNumber);
 		
 		// Store the next element
 		writer.writeVarInsn(varType.getStoreOpcode(), iteratorVarIndex + 1);
@@ -123,7 +83,7 @@ public class IterableForStatement extends ForEachStatement
 		writer.writeJumpInsn(Opcodes.IFNE, startLabel);
 		
 		// Local Variables
-		writer.resetLocals(iteratorVarIndex);
+		writer.resetLocals(localCount);
 		writer.writeLabel(endLabel);
 		
 		var.writeLocal(writer, scopeLabel, endLabel);
