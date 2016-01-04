@@ -238,13 +238,13 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
 		}
-		return super.getTypeVariables();
+		return super.getTypeParameters();
 	}
 
 	@Override
