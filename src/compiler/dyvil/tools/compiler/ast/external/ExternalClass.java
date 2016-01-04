@@ -82,7 +82,6 @@ public final class ExternalClass extends AbstractClass
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		this.metadata.resolveTypes(null, this);
-		this.metadata.resolveTypesBody(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -237,7 +236,17 @@ public final class ExternalClass extends AbstractClass
 		}
 		return super.getSuperTypeDistance(superType);
 	}
-	
+
+	@Override
+	public ITypeParameter[] getTypeParameters()
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		return super.getTypeParameters();
+	}
+
 	@Override
 	public ITypeParameter getTypeParameter(int index)
 	{

@@ -99,23 +99,26 @@ public class NamedGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		if (this.name == Names.Tuple)
+		if (this.parent == null)
 		{
-			this.resolveTypeArguments(markers, context);
-			return new TupleType(this.typeArguments, this.typeArgumentCount);
-		}
-		if (this.name == Names.Function)
-		{
-			if (this.typeArgumentCount > 0)
+			if (this.name == Names.Tuple)
 			{
 				this.resolveTypeArguments(markers, context);
-				return new LambdaType(this.typeArguments, this.typeArgumentCount - 1,
-				                      this.typeArguments[this.typeArgumentCount - 1]);
+				return new TupleType(this.typeArguments, this.typeArgumentCount);
+			}
+			if (this.name == Names.Function)
+			{
+				if (this.typeArgumentCount > 0)
+				{
+					this.resolveTypeArguments(markers, context);
+					return new LambdaType(this.typeArguments, this.typeArgumentCount - 1,
+					                      this.typeArguments[this.typeArgumentCount - 1]);
+				}
 			}
 		}
 
 		// resolveType0 is used to avoid Type Variable -> Default Value replacement done be replaceType
-		IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
+		final IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
 
 		if (!resolved.isResolved())
 		{
@@ -125,14 +128,13 @@ public class NamedGenericType extends GenericType
 
 		this.resolveTypeArguments(markers, context);
 
-		IClass iClass = resolved.getTheClass();
-		ITypeParameter[] typeVariables;
-		IType concrete;
+		final IClass iClass = resolved.getTheClass();
+		final ITypeParameter[] typeVariables;
+		final IType concrete;
 
 		// Convert the non-generic class type to a generic one
 		if (!resolved.isGenericType())
 		{
-			resolved = iClass.getType();
 			typeVariables = iClass.getTypeParameters();
 
 			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
@@ -157,11 +159,11 @@ public class NamedGenericType extends GenericType
 		// Check if the Type Variable Bounds accept the supplied Type Arguments
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			ITypeParameter typeVariable = typeVariables[i];
-			IType type = this.typeArguments[i];
+			final ITypeParameter typeVariable = typeVariables[i];
+			final IType type = this.typeArguments[i];
 			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
 			{
-				Marker marker = MarkerMessages.createMarker(type.getPosition(), "generic.type.incompatible",
+				final Marker marker = MarkerMessages.createMarker(type.getPosition(), "generic.type.incompatible",
 				                                            typeVariable.getName().qualified);
 				marker.addInfo(MarkerMessages.getMarker("generic.type", type));
 				marker.addInfo(MarkerMessages.getMarker("typevariable", typeVariable));

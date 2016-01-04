@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -21,6 +22,11 @@ public class InterfaceMetadata implements IClassMetadata
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.theClass instanceof ExternalClass)
+		{
+			return;
+		}
+
 		final IClassBody classBody = this.theClass.getBody();
 		if (classBody == null)
 		{
