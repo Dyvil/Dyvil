@@ -23,7 +23,13 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitParameter(String name, int modifiers)
 	{
-		final IParameter parameter = this.method.getParameter_(this.parameterIndex++);
+		final IParameter parameter = this.method.getParameter_(this.parameterIndex);
+		if (parameter == null)
+		{
+			return;
+		}
+
+		this.parameterIndex++;
 		parameter.setName(Name.getQualified(name));
 
 		if (modifiers != 0)
