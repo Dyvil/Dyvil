@@ -155,9 +155,6 @@ public class ClassMetadata implements IClassMetadata
 		Constructor constructor = new Constructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
 		int parameterCount = this.theClass.parameterCount();
 
-		/* TOGGLE
-		IParameter[] parameters = this.theClass.getParameters();
-		/*/
 		IParameter[] parameters = new IParameter[parameterCount];
 
 		for (int i = 0; i < parameterCount; i++)

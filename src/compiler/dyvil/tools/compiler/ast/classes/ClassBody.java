@@ -462,7 +462,7 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (this.methods[i].checkOverride(markers, checkedClass, candidate, typeContext))
+			if (checkOverride(this.methods[i], markers, checkedClass, candidate, typeContext))
 			{
 				return true;
 			}
@@ -472,18 +472,24 @@ public class ClassBody implements IClassBody
 			final IProperty property = this.properties[i];
 
 			final IMethod getter = property.getGetter();
-			if (getter != null && getter.checkOverride(markers, checkedClass, candidate, typeContext))
+			if (getter != null && checkOverride(getter, markers, checkedClass, candidate, typeContext))
 			{
 				return true;
 			}
 
 			final IMethod setter = property.getSetter();
-			if (setter != null && setter.checkOverride(markers, checkedClass, candidate, typeContext))
+			if (setter != null && checkOverride(setter, markers, checkedClass, candidate, typeContext))
 			{
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private static boolean checkOverride(IMethod method, MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	{
+		return method.checkOverride(markers, checkedClass, candidate, typeContext) && !method
+				.hasModifier(Modifiers.ABSTRACT);
 	}
 	
 	@Override
