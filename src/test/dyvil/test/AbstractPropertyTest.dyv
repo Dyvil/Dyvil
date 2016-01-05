@@ -13,10 +13,16 @@ public class AbstractPropertyTest
 	{
 		private int value
 
-	    public override int myProp {
-	    	set(newValue) : this.value = newValue
-	    	get : this.value
-	    }
+		public override int myProp
+		{
+			set(newValue) {
+				this.value = newValue
+			}
+
+			get {
+				return this.value
+			}
+		}
 	}
 	
 	public static void main([String] args)
