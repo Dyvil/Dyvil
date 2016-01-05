@@ -170,7 +170,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, method::addType);
+			i = readTyped(desc, i, method::addParameterType);
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -253,7 +253,6 @@ public final class ClassFormat
 			while (desc.charAt(index) != '>')
 			{
 				index = readTyped(desc, index, type);
-
 			}
 			return type;
 		}
