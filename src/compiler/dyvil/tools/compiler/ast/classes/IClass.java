@@ -110,8 +110,6 @@ public interface IClass extends IClassMember, ITypeParameterized, IContext, IPar
 	
 	IMethod getFunctionalMethod();
 	
-	IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
-	
 	IDataMember getSuperField(Name name);
 	
 	boolean isMember(IClassMember member);

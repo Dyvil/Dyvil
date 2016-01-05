@@ -49,13 +49,12 @@ public class PropertyParser extends Parser implements IValueConsumer
 				pm.popParser();
 				return;
 			}
-
-			if (type == BaseSymbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON && token.isInferred())
 			{
 				return;
 			}
 			
-			Modifier modifier;
+			final Modifier modifier;
 			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
@@ -69,7 +68,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{
-				Name name = token.nameValue();
+				final Name name = token.nameValue();
 				if (name == Names.get)
 				{
 					this.property.setGetterPosition(token.raw());
@@ -101,32 +100,32 @@ public class PropertyParser extends Parser implements IValueConsumer
 			}
 			// Fallthrough
 		case SEPARATOR:
-			if (type == BaseSymbols.COLON)
+			switch (type)
 			{
+			case BaseSymbols.COLON:
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
-			}
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
+			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.pushParser(new StatementListParser(this), true);
 				return;
-			}
-			if (type == BaseSymbols.SEMICOLON)
-			{
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				pm.popParser();
+				return;
+			case BaseSymbols.SEMICOLON:
 				this.mode = TAG;
 				return;
 			}
-			pm.report(token, "property.colon");
+			pm.report(token, "property.separator");
 			return;
 		case SETTER_PARAMETER_NAME:
 			this.mode = SETTER_PARAMETER_END;
-			if (!ParserUtil.isIdentifier(type))
+			if (ParserUtil.isIdentifier(type))
 			{
-				pm.report(token, "property.setter.identifier");
+				this.property.setSetterParameterName(token.nameValue());
 			}
 			else
 			{
-				this.property.setSetterParameterName(token.nameValue());
+				pm.report(token, "property.setter.identifier");
 			}
 			return;
 		case SETTER_PARAMETER_END:
