@@ -8,14 +8,12 @@ import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -102,6 +100,20 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.varargs = true;
 				return;
 			}
+			if (type == DyvilKeywords.THIS)
+			{
+				this.mode = SEPERATOR;
+				this.annotations = null;
+				this.modifiers = null;
+				this.varargs = false;
+				if (this.paramList instanceof IParameterized && ((IParameterized) this.paramList)
+						.setSelfType(this.type))
+				{
+					pm.report(token, "parameter.self.invalid");
+					return;
+				}
+				return;
+			}
 			this.mode = SEPERATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -121,6 +133,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.paramList.addParameter(this.parameter);
 
 				this.annotations = null;
+				this.modifiers = null;
 				this.varargs = false;
 				
 				return;
