@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.expression.MatchExpr;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.pattern.PatternParser;
+import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -76,14 +77,20 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
+			// Fallthrough
 		case ACTION:
 			this.mode = SEPARATOR;
-			pm.pushParser(pm.newExpressionParser(this));
-			if (type == BaseSymbols.COLON || type == DyvilSymbols.ARROW_OPERATOR)
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
+				pm.pushParser(new StatementListParser(this), true);
 				return;
 			}
-			pm.report(token, "match.case.action");
+			pm.pushParser(pm.newExpressionParser(this));
+			if (type != BaseSymbols.COLON && type != DyvilSymbols.ARROW_OPERATOR)
+			{
+				pm.reparse();
+				pm.report(token, "match.case.action");
+			}
 			return;
 		case SEPARATOR:
 			this.matchExpression.addCase(this.currentCase);
