@@ -127,11 +127,14 @@ public final class Variable extends Member implements IVariable
 		final IValue typedValue = this.type.convertValue(newValue, this.type, markers, context);
 		if (typedValue == null)
 		{
-			Marker marker = MarkerMessages
-					.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
-			marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
-			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
-			markers.add(marker);
+			if (newValue.isResolved())
+			{
+				Marker marker = MarkerMessages
+						.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+				marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
+				marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
+				markers.add(marker);
+			}
 		}
 		else
 		{
@@ -191,7 +194,7 @@ public final class Variable extends Member implements IVariable
 		{
 			inferType = true;
 			this.type = this.value.getType();
-			if (this.type == Types.UNKNOWN)
+			if (this.type == Types.UNKNOWN && this.value.isResolved())
 			{
 				markers.add(MarkerMessages.createMarker(this.position, "variable.type.infer", this.name.unqualified));
 				this.type = Types.ANY;
@@ -201,11 +204,14 @@ public final class Variable extends Member implements IVariable
 		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages
-					.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
-			marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
-			marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
-			markers.add(marker);
+			if (this.value.isResolved())
+			{
+				Marker marker = MarkerMessages
+						.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
+				marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
+				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+				markers.add(marker);
+			}
 		}
 		else
 		{
