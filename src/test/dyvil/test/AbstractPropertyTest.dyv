@@ -2,26 +2,28 @@ package dyvil.test
 
 public class AbstractPropertyTest
 {
-	interface AbstractProperty {
-		public int myProp {
-			abstract get
-			abstract set
-		}
+	interface AbstractProperty
+	{
+		public abstract int subscript { get; set }
 	}
 	
 	class ConcreteProperty implements AbstractProperty
 	{
 		private int value
+		private boolean _setterCalled
 
-		public override int myProp
+		public override int subscript
 		{
-			set(newValue) {
+			set (newValue) {
+				this._setterCalled = true
 				this.value = newValue
 			}
+			get: this.value
+		}
 
-			get {
-				return this.value
-			}
+		public boolean setterCalled
+		{
+			get: this._setterCalled
 		}
 	}
 	
@@ -29,10 +31,10 @@ public class AbstractPropertyTest
 	{
 		auto c = new ConcreteProperty
 
-		c.myProp = 20
-		Main.test("Property Getter", 20, c.myProp)
+		c[] = 20
+		Main.test("Property Getter", 20, c[])
 
-		auto result = c.myProp = 10
-		Main.test("Property Setter", 10, result)
+		c.subscript = 10
+		Main.test("Property Setter", true, c.setterCalled)
 	}
 }

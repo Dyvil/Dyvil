@@ -307,47 +307,36 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
-	{
-		outer:
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IMethod m = this.methods[i];
-			if (m.getName() != name)
-			{
-				continue;
-			}
-			
-			if (parameterCount != m.parameterCount())
-			{
-				continue;
-			}
-			
-			for (int p = 0; p < parameterCount; p++)
-			{
-				IType t1 = parameters[p].getType();
-				IType t2 = m.getParameter(p).getType().getConcreteType(concrete);
-				if (!t1.isSameType(t2))
-				{
-					continue outer;
-				}
-			}
-			return m;
-		}
-		return null;
-	}
-	
-	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod method = this.methods[i];
-			float match = method.getSignatureMatch(name, instance, arguments);
-			if (match > 0)
+			getMethodMatch(list, instance, name, arguments, this.methods[i]);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			final IProperty property = this.properties[i];
+
+			final IMethod getter = property.getGetter();
+			if (getter != null)
 			{
-				list.add(method, match);
+				getMethodMatch(list, instance, name, arguments, getter);
 			}
+
+			final IMethod setter = property.getSetter();
+			if (setter != null)
+			{
+				getMethodMatch(list, instance, name, arguments, setter);
+			}
+		}
+	}
+
+	private static void getMethodMatch(MethodMatchList list, IValue instance, Name name, IArguments arguments, IMethod method)
+	{
+		float match = method.getSignatureMatch(name, instance, arguments);
+		if (match > 0)
+		{
+			list.add(method, match);
 		}
 	}
 	

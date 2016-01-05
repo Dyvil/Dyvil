@@ -855,20 +855,6 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
-	{
-		if (this.body != null)
-		{
-			IMethod m = this.body.getMethod(name, parameters, parameterCount, concrete);
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		return null;
-	}
-	
-	@Override
 	public IDataMember getSuperField(Name name)
 	{
 		if (this.superType != null)
