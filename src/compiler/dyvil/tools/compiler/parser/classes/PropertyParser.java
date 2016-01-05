@@ -9,6 +9,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.statement.StatementListParser;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -17,39 +19,37 @@ import dyvil.tools.parsing.token.IToken;
 
 public class PropertyParser extends Parser implements IValueConsumer
 {
-	private static final int GET_OR_SET                = 1;
-	private static final int COLON                     = 2;
-	private static final int SET                       = 4;
-	private static final int SETTER_PARAMETER_NAME     = 8;
-	private static final int SETTER_PARAMETER_NAME_END = 16;
+	private static final int TAG                   = 0;
+	private static final int SEPARATOR             = 1;
+	private static final int SETTER_PARAMETER      = 2;
+	private static final int SETTER_PARAMETER_NAME = 4;
+	private static final int SETTER_PARAMETER_END  = 8;
 	
-	public static final Name get = Name.getQualified("get");
-	public static final Name set = Name.getQualified("set");
-	
-	protected Property    property;
+	protected Property property;
 
-	private   ModifierSet modifiers;
-	private boolean targetSetter;
+	private ModifierSet modifiers;
+	private boolean     targetSetter;
 
 	public PropertyParser(Property property)
 	{
 		this.property = property;
-		this.mode = GET_OR_SET;
+		// this.mode = TAG; // pointless assignment to 0
 	}
 	
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
-		{
-			pm.popParser();
-			return;
-		}
-		
+		final int type = token.type();
+
 		switch (this.mode)
 		{
-		case GET_OR_SET:
+		case TAG:
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.popParser();
+				return;
+			}
+
 			if (type == BaseSymbols.SEMICOLON)
 			{
 				return;
@@ -69,60 +69,57 @@ public class PropertyParser extends Parser implements IValueConsumer
 			
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{
-				int nextType = token.next().type();
-				if (nextType == BaseSymbols.COLON || nextType == BaseSymbols.CLOSE_CURLY_BRACKET
-						|| nextType == BaseSymbols.SEMICOLON || nextType == BaseSymbols.OPEN_PARENTHESIS)
+				Name name = token.nameValue();
+				if (name == Names.get)
 				{
-					Name name = token.nameValue();
-					if (name == get)
-					{
-						this.property.setGetterPosition(token.raw());
-						this.property.setGetterModifiers(this.modifiers);
-						this.modifiers = null;
-						this.mode = COLON;
-						this.targetSetter = false;
-						return;
-					}
-					if (name == set)
-					{
-						this.property.setSetterPosition(token.raw());
-						this.property.setSetterModifiers(this.modifiers);
-						this.modifiers = null;
-						this.mode = SET;
-						this.targetSetter = true;
-						return;
-					}
+					this.property.setGetterPosition(token.raw());
+					this.property.setGetterModifiers(this.modifiers);
+					this.modifiers = null;
+					this.mode = SEPARATOR;
+					this.targetSetter = false;
+					return;
 				}
+				if (name == Names.set)
+				{
+					this.property.setSetterPosition(token.raw());
+					this.property.setSetterModifiers(this.modifiers);
+					this.modifiers = null;
+					this.mode = SETTER_PARAMETER;
+					this.targetSetter = true;
+					return;
+				}
+				pm.report(token, "property.tag.unknown");
+				return;
 			}
-			
-			// No 'get:' or 'set:' tag -> Read-Only Property
-			this.property.setGetterModifiers(this.modifiers);
-			this.modifiers = null;
-			this.mode = COLON;
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.report(token, "property.tag");
 			return;
-		case SET:
+		case SETTER_PARAMETER:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = SETTER_PARAMETER_NAME;
 				return;
 			}
 			// Fallthrough
-		case COLON:
+		case SEPARATOR:
 			if (type == BaseSymbols.COLON)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				pm.pushParser(new StatementListParser(this), true);
+				return;
+			}
 			if (type == BaseSymbols.SEMICOLON)
 			{
-				this.mode = GET_OR_SET;
+				this.mode = TAG;
 				return;
 			}
 			pm.report(token, "property.colon");
 			return;
 		case SETTER_PARAMETER_NAME:
-			this.mode = SETTER_PARAMETER_NAME_END;
+			this.mode = SETTER_PARAMETER_END;
 			if (!ParserUtil.isIdentifier(type))
 			{
 				pm.report(token, "property.setter.identifier");
@@ -132,8 +129,8 @@ public class PropertyParser extends Parser implements IValueConsumer
 				this.property.setSetterParameterName(token.nameValue());
 			}
 			return;
-		case SETTER_PARAMETER_NAME_END:
-			this.mode = COLON;
+		case SETTER_PARAMETER_END:
+			this.mode = SEPARATOR;
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "property.setter.close_paren");
