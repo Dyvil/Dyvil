@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.TupleType;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -150,17 +150,12 @@ public final class TuplePattern extends Pattern implements IPatternList
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
-		ITypeList typeList = (ITypeList) this.tupleType;
-		String internal = this.tupleType.getInternalName();
-		
-		if (varIndex < 0)
-		{
-			varIndex = writer.localCount();
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-		}
-		
+		final int lineNumber = this.getLineNumber();
+
+		final String internalTupleClassName = this.tupleType.getInternalName();
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			if (this.patterns[i].getPatternType() == WILDCARD)
@@ -168,12 +163,11 @@ public final class TuplePattern extends Pattern implements IPatternList
 				// Skip wildcard patterns
 				continue;
 			}
-			
-			// Copy above
+
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeFieldInsn(Opcodes.GETFIELD, internal, "_" + (i + 1), "Ljava/lang/Object;");
-			writer.writeTypeInsn(Opcodes.CHECKCAST, typeList.getType(i).getInternalName());
-			this.patterns[i].writeInvJump(writer, -1, elseLabel);
+			matchedType.writeCast(writer, this.tupleType, lineNumber);
+			writer.writeFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
+			this.patterns[i].writeInvJump(writer, -1, Types.OBJECT, elseLabel);
 		}
 	}
 	
