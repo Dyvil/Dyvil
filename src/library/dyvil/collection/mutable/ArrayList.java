@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableList;
-import dyvil.collection.MutableList;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayList;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -22,17 +19,18 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	
 	public static <E> ArrayList<E> apply()
 	{
-		return new ArrayList();
+		return new ArrayList<>();
 	}
 	
+	@SafeVarargs
 	public static <E> ArrayList<E> apply(E... elements)
 	{
-		return new ArrayList(elements, true);
+		return new ArrayList<>(elements, true);
 	}
 	
-	public static <E> ArrayList<E> fromArray(E... elements)
+	public static <E> ArrayList<E> fromArray(E[] elements)
 	{
-		return new ArrayList(elements);
+		return new ArrayList<>(elements);
 	}
 	
 	public ArrayList()
@@ -45,6 +43,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		super((E[]) new Object[size], 0, true);
 	}
 	
+	@SafeVarargs
 	public ArrayList(E... elements)
 	{
 		super(elements);
@@ -73,15 +72,12 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public MutableList<E> subList(int startIndex, int length)
 	{
-		this.rangeCheck(startIndex);
-		if (startIndex + length >= this.size)
-		{
-			throw new IndexOutOfBoundsException("Array Length out of Bounds: " + length);
-		}
+		List.rangeCheck(startIndex, this.size);
+		List.rangeCheck(startIndex + length - 1, this.size);
 		
 		Object[] array = new Object[length];
 		System.arraycopy(this.elements, startIndex, array, 0, length);
-		return new ArrayList(array, length, true);
+		return new ArrayList<>((E[]) array, length, true);
 	}
 	
 	@Override
@@ -89,7 +85,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	{
 		Object[] newArray = new Object[Math.max(this.size, newCapacity)];
 		System.arraycopy(this.elements, 0, newArray, 0, this.size);
-		return new ArrayList(newArray, this.size, true);
+		return new ArrayList<>((E[]) newArray, this.size, true);
 	}
 	
 	@Override
@@ -101,7 +97,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		{
 			newArray[--index] = o;
 		}
-		return new ArrayList(newArray, this.size, true);
+		return new ArrayList<>((E[]) newArray, this.size, true);
 	}
 	
 	@Override
@@ -157,15 +153,25 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public void subscript_$eq(int index, E element)
 	{
-		this.rangeCheck(index);
+		List.rangeCheck(index, this.size);
 		this.elements[index] = element;
 	}
-	
+
 	@Override
 	public E set(int index, E element)
 	{
+		List.rangeCheck(index, this.size);
+		final E oldValue = (E) this.elements[index];
+		this.elements[index] = element;
+		return oldValue;
+	}
+
+	@Override
+	public E setResizing(int index, E element)
+	{
 		if (index < 0)
 		{
+			List.rangeCheck(index, this.size);
 			return null;
 		}
 		if (index >= this.size)
@@ -186,33 +192,12 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			this.$plus$eq(element);
 			return;
 		}
-		this.rangeCheck(index);
+		List.rangeCheck(index, this.size);
 		
 		this.ensureCapacity(this.size + 1);
 		System.arraycopy(this.elements, index, this.elements, index + 1, this.size - index);
 		this.elements[index] = element;
 		this.size++;
-	}
-	
-	@Override
-	public E add(int index, E element)
-	{
-		if (index > this.size)
-		{
-			return this.set(index, element);
-		}
-		if (index == this.size)
-		{
-			this.$plus$eq(element);
-			return null;
-		}
-		
-		E e = (E) this.elements[index];
-		
-		this.resize(index + 1);
-		System.arraycopy(this.elements, index, this.elements, index + 1, this.size - index);
-		this.elements[index] = element;
-		return e;
 	}
 	
 	@Override
@@ -253,7 +238,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public void removeAt(int index)
 	{
-		this.rangeCheck(index);
+		List.rangeCheck(index, this.size);
 		int numMoved = --this.size - index;
 		if (numMoved > 0)
 		{
@@ -395,24 +380,24 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public MutableList<E> copy()
 	{
-		return new ArrayList(this.elements, this.size);
+		return new ArrayList<>((E[]) this.elements, this.size);
 	}
 	
 	@Override
-	public MutableList<E> emptyCopy()
+	public <R> MutableList<R> emptyCopy()
 	{
-		return new ArrayList(this.size);
+		return new ArrayList<>(this.size);
 	}
 	
 	@Override
-	public MutableList<E> emptyCopy(int newCapacity)
+	public <R> MutableList<R> emptyCopy(int newCapacity)
 	{
-		return new ArrayList(newCapacity);
+		return new ArrayList<>(newCapacity);
 	}
 	
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayList(this.elements, this.size);
+		return new dyvil.collection.immutable.ArrayList<>((E[]) this.elements, this.size);
 	}
 }
