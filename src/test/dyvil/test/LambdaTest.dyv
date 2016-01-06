@@ -75,7 +75,7 @@ public class LambdaTest
 	}
 
 	private static void partialFunctionTest() {
-		(int, int) => int compareInts = _ compareTo _;
+		(int, int) => int compareInts = _ compareTo _
 		any => void printFun1 = Main.test("Partial Function Test 1", -1, _)
 
 		printFun1(compareInts(1, 2))
