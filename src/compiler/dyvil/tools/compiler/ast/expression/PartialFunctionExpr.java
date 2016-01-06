@@ -336,7 +336,7 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		mw.setThisType(this.internalClassName);
 		mw.setLocalType(1, parFrameType);
 		
-		this.pattern.writeInvJump(mw, 1, elseLabel);
+		this.pattern.writeInvJump(mw, 1, parType, elseLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeInvJump(mw, elseLabel);
@@ -365,7 +365,7 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		mw.setThisType(this.internalClassName);
 		mw.setLocalType(1, parFrameType);
 		
-		this.pattern.writeInvJump(mw, 1, elseLabel);
+		this.pattern.writeInvJump(mw, 1, parType, elseLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeInvJump(mw, elseLabel);

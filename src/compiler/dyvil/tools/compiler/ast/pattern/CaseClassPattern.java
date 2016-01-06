@@ -202,14 +202,9 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
-		if (varIndex < 0)
-		{
-			varIndex = writer.localCount();
-			writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-		}
-		
 		final IClass caseClass = this.type.getTheClass();
 		final int lineNumber = this.getLineNumber();
 
@@ -223,30 +218,31 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 			// Load the instance
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			matchedType.writeCast(writer, this.type, lineNumber);
 
-			final IType patternType = this.patterns[i].getType();
 			final IMethod method = this.getterMethods[i];
+			final IType targetType;
 
 			if (method != null)
 			{
 				// Invoke the getter method
+				targetType = method.getType();
 				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
-				method.getType().writeCast(writer, patternType, lineNumber);
 			}
 			else
 			{
 				final IDataMember field = caseClass.getParameter(i);
 
 				// Get the field value
+				targetType = field.getType();
 				field.writeGet(writer, null, lineNumber);
-				field.getType().writeCast(writer, patternType, lineNumber);
 			}
 
 			// Check the pattern
-			this.patterns[i].writeInvJump(writer, -1, elseLabel);
+			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
