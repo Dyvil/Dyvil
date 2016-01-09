@@ -76,6 +76,17 @@ public class CodeMethod extends AbstractMethod
 		else
 		{
 			this.selfType = this.selfType.resolveType(markers, context);
+
+			// Check the self type for compatibility
+			final IClass selfTypeClass = this.selfType.getTheClass();
+			if (selfTypeClass != null && selfTypeClass != this.theClass)
+			{
+				final Marker marker = MarkerMessages
+						.createError(this.selfType.getPosition(), "method.receivertype.incompatible", this.getName());
+				marker.addInfo(MarkerMessages.getMarker("method.receivertype", this.selfType));
+				marker.addInfo(MarkerMessages.getMarker("method.classtype", this.theClass.getFullName()));
+				markers.add(marker);
+			}
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
