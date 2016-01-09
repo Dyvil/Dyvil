@@ -167,7 +167,13 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	{
 		if (this.value == null)
 		{
-			writer.writeInsn(Opcodes.RETURN);
+			if (type == Types.VOID || type == null)
+			{
+				writer.writeInsn(Opcodes.RETURN);
+				return;
+			}
+
+			type.writeDefaultValue(writer);
 			return;
 		}
 
