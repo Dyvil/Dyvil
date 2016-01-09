@@ -454,7 +454,13 @@ public class Constructor extends Member implements IConstructor
 	{
 		return this.theClass.getThisClass();
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return this.theClass.getThisType();
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{

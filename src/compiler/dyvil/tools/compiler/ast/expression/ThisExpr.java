@@ -120,10 +120,10 @@ public final class ThisExpr implements IValue
 			return;
 		}
 		
-		IType t = context.getThisClass().getType();
-		if (t != null)
+		final IType thisType = context.getThisType();
+		if (thisType != null)
 		{
-			this.type = t;
+			this.type = thisType;
 		}
 	}
 	

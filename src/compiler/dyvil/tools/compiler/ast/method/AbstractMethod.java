@@ -61,7 +61,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
-	
+
+	protected IType selfType;
+
 	protected IParameter[] parameters = new MethodParameter[3];
 	protected int parameterCount;
 	
@@ -197,7 +199,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
-	
+
+	@Override
+	public boolean setSelfType(IType selfType)
+	{
+		this.selfType = selfType;
+		return true;
+	}
+
 	@Override
 	public void setParameters(IParameter[] parameters, int parameterCount)
 	{
@@ -391,7 +400,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return this.theClass;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return this.selfType;
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{

@@ -68,7 +68,16 @@ public class CodeMethod extends AbstractMethod
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, this);
-		
+
+		if (this.selfType == null)
+		{
+			this.selfType = this.theClass.getType();
+		}
+		else
+		{
+			this.selfType.resolveType(markers, context);
+		}
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolveTypes(markers, this);
@@ -106,6 +115,11 @@ public class CodeMethod extends AbstractMethod
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolve(markers, this);
+		}
+
+		if (this.selfType != null)
+		{
+			this.selfType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -164,6 +178,11 @@ public class CodeMethod extends AbstractMethod
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		super.checkTypes(markers, this);
+
+		if (this.selfType != null)
+		{
+			this.selfType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -191,12 +210,17 @@ public class CodeMethod extends AbstractMethod
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, this);
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].check(markers, this);
 		}
-		
+
+		if (this.selfType != null)
+		{
+			this.selfType.check(markers, context);
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, this);
@@ -321,12 +345,17 @@ public class CodeMethod extends AbstractMethod
 	public void foldConstants()
 	{
 		super.foldConstants();
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].foldConstants();
 		}
-		
+
+		if (this.selfType != null)
+		{
+			this.selfType.foldConstants();
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
@@ -355,6 +384,11 @@ public class CodeMethod extends AbstractMethod
 			{
 				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
 			}
+		}
+
+		if (this.selfType != null)
+		{
+			this.selfType.cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)

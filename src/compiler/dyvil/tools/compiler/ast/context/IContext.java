@@ -30,6 +30,8 @@ public interface IContext
 	IDyvilHeader getHeader();
 	
 	IClass getThisClass();
+
+	IType getThisType();
 	
 	Package resolvePackage(Name name);
 	

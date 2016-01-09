@@ -38,12 +38,6 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractClass implements IClass
 {
-	// Metadata
-	
-	protected IClass         outerClass;
-	protected IClassMetadata metadata;
-	protected IType          type;
-	
 	// Modifiers and Annotations
 	
 	protected AnnotationList annotations;
@@ -70,6 +64,13 @@ public abstract class AbstractClass implements IClass
 	protected IClassBody         body;
 	protected IClassCompilable[] compilables;
 	protected int                compilableCount;
+
+	// Metadata
+
+	protected IClass         outerClass;
+	protected IClassMetadata metadata;
+	protected IType          thisType;
+	protected IType classType = new ClassType(this);
 	
 	@Override
 	public void setOuterClass(IClass iclass)
@@ -91,13 +92,13 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return this.thisType;
 	}
 	
 	@Override
 	public IType getClassType()
 	{
-		return new ClassType(this);
+		return this.classType;
 	}
 	
 	@Override
@@ -678,7 +679,13 @@ public abstract class AbstractClass implements IClass
 	{
 		return this;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return this.thisType;
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -711,7 +718,7 @@ public abstract class AbstractClass implements IClass
 	{
 		if (name == this.name)
 		{
-			return this.type;
+			return this.thisType;
 		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
