@@ -75,7 +75,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		else
 		{
-			this.selfType.resolveType(markers, context);
+			this.selfType = this.selfType.resolveType(markers, context);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)

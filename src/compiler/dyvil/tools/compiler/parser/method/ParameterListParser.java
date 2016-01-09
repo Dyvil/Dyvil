@@ -106,7 +106,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.annotations = null;
 				this.modifiers = null;
 				this.varargs = false;
-				if (this.paramList instanceof IParameterized && ((IParameterized) this.paramList)
+				if (this.paramList instanceof IParameterized && !((IParameterized) this.paramList)
 						.setSelfType(this.type))
 				{
 					pm.report(token, "parameter.self.invalid");

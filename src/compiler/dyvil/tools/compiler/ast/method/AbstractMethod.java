@@ -738,12 +738,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			else
 			{
-				IType type = this.theClass.getClassType();
-				IValue instance1 = IType.convertValue(instance, type, typeContext, markers, context);
+				IValue instance1 = IType.convertValue(instance, this.selfType, typeContext, markers, context);
 				
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, type, typeContext, "method.access.receiver_type",
+					Util.createTypeError(markers, instance, this.selfType, typeContext, "method.access.receiver_type",
 					                     this.name);
 				}
 				else

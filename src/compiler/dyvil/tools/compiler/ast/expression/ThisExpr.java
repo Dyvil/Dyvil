@@ -144,8 +144,8 @@ public final class ThisExpr implements IValue
 		}
 		
 		this.type.checkType(markers, context, TypePosition.CLASS);
+
 		IClass iclass = this.type.getTheClass();
-		
 		this.getter = context.getAccessibleThis(iclass);
 		if (this.getter == null)
 		{
