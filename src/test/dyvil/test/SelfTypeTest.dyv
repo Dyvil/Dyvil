@@ -1,0 +1,28 @@
+package dyvil.test
+
+public class SelfTypeTest
+{
+	case class MyList[T](T... elements)
+	{
+		public double sum(MyList[double] this)
+		{
+			double result = 0D
+			for (Object d : this.elements)
+			{
+				result += d as double
+			}
+			return result
+		}
+	}
+
+	public static void main([String] args)
+	{
+		auto list = MyList(1D, 2D, 3D)
+		auto result = list.sum
+
+		// auto error1 = MyList(1, 2, 3).sum
+		// auto error2 = MyList("a", "b", "c").sum
+
+		Main.test("Self Type Test", result, 6D, result == 6D)
+	}
+}
