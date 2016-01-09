@@ -76,12 +76,10 @@ public final class BooleanPattern extends Pattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
 	{
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
-		}
+		IPattern.loadVar(writer, varIndex, matchedType);
+		matchedType.writeCast(writer, Types.BOOLEAN, this.getLineNumber());
 		writer.writeJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
 	}
 	

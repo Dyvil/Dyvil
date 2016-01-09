@@ -109,13 +109,9 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
 	{
-		if (varIndex < 0)
-		{
-			varIndex = writer.localCount();
-			writer.writeVarInsn(this.fromType.getStoreOpcode(), varIndex);
-		}
+		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
 		if (!this.fromType.isPrimitive())
 		{
@@ -128,7 +124,7 @@ public class TypeCheckPattern implements IPattern
 		{
 			writer.writeVarInsn(this.fromType.getLoadOpcode(), varIndex);
 			this.fromType.writeCast(writer, this.type, this.getLineNumber());
-			this.pattern.writeInvJump(writer, -1, elseLabel);
+			this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
 		}
 	}
 	

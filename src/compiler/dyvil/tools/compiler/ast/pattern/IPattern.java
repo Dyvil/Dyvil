@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.pattern;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
@@ -113,6 +114,33 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		return -1;
 	}
+
+	static void loadVar(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
+	{
+		if (varIndex >= 0)
+		{
+			writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
+		}
+	}
+
+	static int ensureVar(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
+	{
+		if (varIndex < 0)
+		{
+			varIndex = writer.localCount();
+			writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
+		}
+		return varIndex;
+	}
+
+	default void writeJump(MethodWriter writer, int varIndex, IType matchedType, Label targetLabel)
+			throws BytecodeException
+	{
+		final Label rightLabel = new Label();
+		this.writeInvJump(writer, varIndex, matchedType, rightLabel);
+		writer.writeJumpInsn(Opcodes.GOTO, targetLabel);
+		writer.writeLabel(rightLabel);
+	}
 	
-	void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException;
+	void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException;
 }

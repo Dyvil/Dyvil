@@ -25,23 +25,23 @@ public final class MatchExpr implements IValue
 {
 	protected ICodePosition position;
 	
-	protected IValue value;
+	protected IValue matchedValue;
 	protected MatchCase[] cases = new MatchCase[3];
 	protected int caseCount;
 	
 	// Metadata
 	private boolean exhaustive;
-	private IType   type;
+	private IType   returnType;
 	
-	public MatchExpr(ICodePosition position, IValue value)
+	public MatchExpr(ICodePosition position, IValue matchedValue)
 	{
 		this.position = position;
-		this.value = value;
+		this.matchedValue = matchedValue;
 	}
 	
-	public MatchExpr(IValue value, MatchCase[] cases)
+	public MatchExpr(IValue matchedValue, MatchCase[] cases)
 	{
-		this.value = value;
+		this.matchedValue = matchedValue;
 		this.cases = cases;
 		this.caseCount = cases.length;
 	}
@@ -93,22 +93,22 @@ public final class MatchExpr implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.type != null && this.type.isResolved();
+		return this.returnType != null && this.returnType.isResolved();
 	}
 	
 	@Override
 	public IType getType()
 	{
-		if (this.type != null)
+		if (this.returnType != null)
 		{
-			return this.type;
+			return this.returnType;
 		}
 		
 		int len = this.caseCount;
 		if (len == 0)
 		{
-			this.type = Types.VOID;
-			return this.type;
+			this.returnType = Types.VOID;
+			return this.returnType;
 		}
 		
 		IType t = null;
@@ -131,9 +131,9 @@ public final class MatchExpr implements IValue
 		
 		if (t == null)
 		{
-			return this.type = Types.VOID;
+			return this.returnType = Types.VOID;
 		}
-		return this.type = t;
+		return this.returnType = t;
 	}
 	
 	@Override
@@ -215,9 +215,9 @@ public final class MatchExpr implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
+		if (this.matchedValue != null)
 		{
-			this.value.resolveTypes(markers, context);
+			this.matchedValue.resolveTypes(markers, context);
 		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
@@ -238,12 +238,12 @@ public final class MatchExpr implements IValue
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		IType type;
-		if (this.value != null)
+		if (this.matchedValue != null)
 		{
-			this.value = this.value.resolve(markers, context);
-			type = this.value.getType();
+			this.matchedValue = this.matchedValue.resolve(markers, context);
+			type = this.matchedValue.getType();
 			
-			this.value = this.value.withType(type, type, markers, context);
+			this.matchedValue = this.matchedValue.withType(type, type, markers, context);
 		}
 		else
 		{
@@ -272,9 +272,9 @@ public final class MatchExpr implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
+		if (this.matchedValue != null)
 		{
-			this.value.checkTypes(markers, context);
+			this.matchedValue.checkTypes(markers, context);
 		}
 
 		for (int i = 0; i < this.caseCount; i++)
@@ -286,9 +286,9 @@ public final class MatchExpr implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.value != null)
+		if (this.matchedValue != null)
 		{
-			this.value.check(markers, context);
+			this.matchedValue.check(markers, context);
 		}
 
 		for (int i = 0; i < this.caseCount; i++)
@@ -300,9 +300,9 @@ public final class MatchExpr implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.value != null)
+		if (this.matchedValue != null)
 		{
-			this.value = this.value.foldConstants();
+			this.matchedValue = this.matchedValue.foldConstants();
 		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
@@ -314,9 +314,9 @@ public final class MatchExpr implements IValue
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.value != null)
+		if (this.matchedValue != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.matchedValue = this.matchedValue.cleanup(context, compilableList);
 		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
@@ -330,7 +330,7 @@ public final class MatchExpr implements IValue
 	{
 		if (type == null)
 		{
-			type = this.type;
+			type = this.returnType;
 		}
 
 		// type.getFrameType() returns null for void. This is specially handled in the implementations, so we don't need
@@ -338,11 +338,11 @@ public final class MatchExpr implements IValue
 
 		if (this.canGenerateSwitch())
 		{
-			this.generateSwitch(writer, true, type.getFrameType());
+			this.generateSwitch(writer, type.getFrameType());
 		}
 		else
 		{
-			this.generateBranched(writer, true, type.getFrameType());
+			this.generateBranched(writer, type.getFrameType());
 		}
 	}
 	
@@ -360,13 +360,16 @@ public final class MatchExpr implements IValue
 		return true;
 	}
 	
-	private void generateBranched(MethodWriter writer, boolean expr, Object frameType) throws BytecodeException
+	private void generateBranched(MethodWriter writer, Object frameType) throws BytecodeException
 	{
-		int varIndex = writer.localCount();
-		IType type = this.value.getType();
-		this.value.writeExpression(writer, null);
-		writer.writeVarInsn(type.getStoreOpcode(), varIndex);
-		int localCount = writer.localCount();
+		final boolean expr = frameType != null;
+		final int varIndex = writer.localCount();
+		final IType matchedType = this.matchedValue.getType();
+
+		this.matchedValue.writeExpression(writer, null);
+		writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
+
+		final int localCount = writer.localCount();
 		
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
@@ -375,7 +378,7 @@ public final class MatchExpr implements IValue
 			MatchCase c = this.cases[i];
 			IValue condition = c.condition;
 			
-			c.pattern.writeInvJump(writer, varIndex, elseLabel);
+			c.pattern.writeInvJump(writer, varIndex, matchedType, elseLabel);
 			if (condition != null)
 			{
 				condition.writeInvJump(writer, elseLabel);
@@ -400,19 +403,20 @@ public final class MatchExpr implements IValue
 		writer.writeLabel(elseLabel);
 		if (!this.exhaustive)
 		{
-			this.writeMatchError(writer, varIndex, type);
+			this.writeMatchError(writer, varIndex, matchedType);
 		}
+
 		writer.writeLabel(endLabel);
 		writer.resetLocals(varIndex);
 	}
 	
-	private void writeMatchError(MethodWriter writer, int varIndex, IType type) throws BytecodeException
+	private void writeMatchError(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
 	{
-		String desc = type.isPrimitive() ? "(" + type.getExtendedName() + ")V" : "(Ljava/lang/Object;)V";
+		String desc = matchedType.isPrimitive() ? "(" + matchedType.getExtendedName() + ")V" : "(Ljava/lang/Object;)V";
 		
 		writer.writeTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
 		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(type.getLoadOpcode(), varIndex);
+		writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
 		writer.writeLineNumber(this.getLineNumber());
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", desc, false);
 		writer.writeInsn(Opcodes.ATHROW);
@@ -425,7 +429,7 @@ public final class MatchExpr implements IValue
 		{
 			if (expr)
 			{
-				value.writeExpression(writer, this.type);
+				value.writeExpression(writer, this.returnType);
 				writer.getFrame().set(frameType);
 			}
 			else
@@ -435,19 +439,17 @@ public final class MatchExpr implements IValue
 		}
 		else if (expr)
 		{
-			this.type.writeDefaultValue(writer);
+			this.returnType.writeDefaultValue(writer);
 		}
 	}
 	
-	private void generateSwitch(MethodWriter writer, boolean expr, Object frameType) throws BytecodeException
+	private void generateSwitch(MethodWriter writer, Object frameType) throws BytecodeException
 	{
 		Label defaultLabel = null;
 		int cases = 0;
 		int low = Integer.MAX_VALUE; // the minimum int
 		int high = Integer.MIN_VALUE; // the maximum int
-		boolean switchVar = false; // Do we need to store the value in a
-		// variable (for string equality checks
-		// later)
+		boolean switchVar = false; // Do we need to store the value in a variable (for string equality checks later)
 		
 		// Second run: count the number of total cases, the minimum and maximum
 		// int value, find the default case, and find out if a variable needs to
@@ -486,7 +488,7 @@ public final class MatchExpr implements IValue
 		
 		// Check if a match error should be generated - Non-exhaustive pattern
 		// and no default label
-		Label endLabel = new Label();
+		final Label endLabel = new Label();
 		boolean matchError = false;
 		if (defaultLabel == null)
 		{
@@ -503,27 +505,29 @@ public final class MatchExpr implements IValue
 				defaultLabel = endLabel;
 			}
 		}
+
+		final boolean expr = frameType != null;
 		
 		// Write the value
-		IType type = this.value.getType();
-		this.value.writeExpression(writer, null);
+		final IType matchedType = this.matchedValue.getType();
+		this.matchedValue.writeExpression(writer, null);
 		
 		int varIndex = -1;
 		if (switchVar)
 		{
 			varIndex = writer.localCount();
 			// Need a variable - store and load the value
-			writer.writeVarInsn(type.getStoreOpcode(), varIndex);
-			writer.writeVarInsn(type.getLoadOpcode(), varIndex);
+			writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
+			writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
 		}
 		
 		// Not a primitive type (String) - we need the hashCode
-		if (!type.isPrimitive())
+		if (!matchedType.isPrimitive())
 		{
 			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
 		}
 		
-		int localCount = writer.localCount();
+		final int localCount = writer.localCount();
 		
 		// Choose and generate the appropriate instruction
 		// Third run
@@ -549,7 +553,7 @@ public final class MatchExpr implements IValue
 			
 			if (matchCase.pattern.switchCheck())
 			{
-				matchCase.pattern.writeInvJump(writer, varIndex, defaultLabel);
+				matchCase.pattern.writeInvJump(writer, varIndex, matchedType, defaultLabel);
 			}
 			
 			this.writeAction(writer, expr, frameType, matchCase.action);
@@ -562,7 +566,7 @@ public final class MatchExpr implements IValue
 		if (matchError)
 		{
 			writer.writeLabel(defaultLabel);
-			this.writeMatchError(writer, varIndex, type);
+			this.writeMatchError(writer, varIndex, matchedType);
 		}
 		
 		writer.writeLabel(endLabel);
@@ -686,7 +690,7 @@ public final class MatchExpr implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.value.toString(prefix, buffer);
+		this.matchedValue.toString(prefix, buffer);
 		if (this.caseCount == 1 && Formatting.getBoolean("match.convert_single"))
 		{
 			buffer.append(" match ");

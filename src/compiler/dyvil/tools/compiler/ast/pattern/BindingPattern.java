@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -120,16 +121,18 @@ public final class BindingPattern extends Pattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
 		if (this.variable != null)
 		{
 			this.variable.setType(this.type);
-			if (varIndex >= 0)
-			{
-				writer.writeVarInsn(this.type.getLoadOpcode(), varIndex);
-			}
+			IPattern.loadVar(writer, varIndex, matchedType);
 			this.variable.writeInit(writer, null);
+		}
+		else if (varIndex < 0)
+		{
+			writer.writeInsn(Opcodes.AUTO_POP);
 		}
 	}
 	
