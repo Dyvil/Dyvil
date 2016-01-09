@@ -405,7 +405,13 @@ public class REPLMemberClass implements IClass
 	{
 		return this;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return new ClassType(this);
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{

@@ -61,7 +61,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
-	
+
+	protected IType receiverType;
+
 	protected IParameter[] parameters = new MethodParameter[3];
 	protected int parameterCount;
 	
@@ -197,7 +199,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
-	
+
+	@Override
+	public boolean setReceiverType(IType receiverType)
+	{
+		this.receiverType = receiverType;
+		return true;
+	}
+
 	@Override
 	public void setParameters(IParameter[] parameters, int parameterCount)
 	{
@@ -391,7 +400,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return this.theClass;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return this.receiverType;
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -723,12 +738,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			else
 			{
-				IType type = this.theClass.getClassType();
-				IValue instance1 = IType.convertValue(instance, type, typeContext, markers, context);
+				IValue instance1 = IType.convertValue(instance, this.receiverType, typeContext, markers, context);
 				
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, type, typeContext, "method.access.receiver_type",
+					Util.createTypeError(markers, instance, this.receiverType, typeContext, "method.access.receiver_type",
 					                     this.name);
 				}
 				else

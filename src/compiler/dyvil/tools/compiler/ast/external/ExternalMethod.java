@@ -91,6 +91,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		}
 		this.parametersResolved = true;
 
+		if (this.receiverType == null)
+		{
+			this.receiverType = this.theClass.getType();
+		}
+
 		int parametersToRemove = 0;
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{

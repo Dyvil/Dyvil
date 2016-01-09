@@ -68,7 +68,27 @@ public class CodeMethod extends AbstractMethod
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, this);
-		
+
+		if (this.receiverType == null)
+		{
+			this.receiverType = this.theClass.getType();
+		}
+		else
+		{
+			this.receiverType = this.receiverType.resolveType(markers, context);
+
+			// Check the self type for compatibility
+			final IClass selfTypeClass = this.receiverType.getTheClass();
+			if (selfTypeClass != null && selfTypeClass != this.theClass)
+			{
+				final Marker marker = MarkerMessages
+						.createError(this.receiverType.getPosition(), "method.receivertype.incompatible", this.getName());
+				marker.addInfo(MarkerMessages.getMarker("method.receivertype", this.receiverType));
+				marker.addInfo(MarkerMessages.getMarker("method.classtype", this.theClass.getFullName()));
+				markers.add(marker);
+			}
+		}
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolveTypes(markers, this);
@@ -106,6 +126,11 @@ public class CodeMethod extends AbstractMethod
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolve(markers, this);
+		}
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -164,6 +189,11 @@ public class CodeMethod extends AbstractMethod
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		super.checkTypes(markers, this);
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -191,12 +221,17 @@ public class CodeMethod extends AbstractMethod
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, this);
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].check(markers, this);
 		}
-		
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.check(markers, context);
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, this);
@@ -321,12 +356,17 @@ public class CodeMethod extends AbstractMethod
 	public void foldConstants()
 	{
 		super.foldConstants();
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].foldConstants();
 		}
-		
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.foldConstants();
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
@@ -355,6 +395,11 @@ public class CodeMethod extends AbstractMethod
 			{
 				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
 			}
+		}
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)

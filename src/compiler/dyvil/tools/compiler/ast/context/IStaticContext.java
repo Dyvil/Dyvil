@@ -30,7 +30,13 @@ public interface IStaticContext extends IContext
 	{
 		return null;
 	}
-	
+
+	@Override
+	default IType getThisType()
+	{
+		return null;
+	}
+
 	@Override
 	Package resolvePackage(Name name);
 	

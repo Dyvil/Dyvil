@@ -142,11 +142,11 @@ public class CodeClass extends AbstractClass
 				type.addType(new TypeVarType(var));
 			}
 			
-			this.type = type;
+			this.thisType = type;
 		}
 		else
 		{
-			this.type = new ClassType(this);
+			this.thisType = new ClassType(this);
 		}
 		
 		if (this.annotations != null)
@@ -492,7 +492,7 @@ public class CodeClass extends AbstractClass
 			}
 		}
 		
-		ThisExpr thisValue = new ThisExpr(this.type, VariableThis.DEFAULT);
+		ThisExpr thisValue = new ThisExpr(this.thisType, VariableThis.DEFAULT);
 		StatementList instanceFields = new StatementList();
 		
 		IField[] staticFields = new IField[fields + 1];

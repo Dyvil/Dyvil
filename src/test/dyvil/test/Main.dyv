@@ -24,6 +24,7 @@ public class Main
 		MatchTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)
+		SelfTypeTest.main(args)
 	}
 
 	public static void test(String testName, any expected, any actual)

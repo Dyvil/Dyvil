@@ -98,7 +98,7 @@ public final class ExternalClass extends AbstractClass
 				type.addType(new TypeVarType(var));
 			}
 			
-			this.type = type;
+			this.thisType = type;
 		}
 	}
 	
@@ -184,7 +184,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveGenerics();
 		}
-		return this.type;
+		return this.thisType;
 	}
 	
 	@Override
@@ -554,7 +554,7 @@ public final class ExternalClass extends AbstractClass
 			}
 		}
 		
-		this.type = new ClassType(this);
+		this.thisType = new ClassType(this);
 	}
 	
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
