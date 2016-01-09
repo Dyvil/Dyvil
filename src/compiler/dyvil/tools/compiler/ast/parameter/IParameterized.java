@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public interface IParameterized extends INamed, IModified, IParameterList
 {
-	default boolean setSelfType(IType type)
+	default boolean setReceiverType(IType type)
 	{
 		return false;
 	}

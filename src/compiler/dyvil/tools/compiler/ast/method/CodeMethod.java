@@ -69,21 +69,21 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.resolveTypes(markers, this);
 
-		if (this.selfType == null)
+		if (this.receiverType == null)
 		{
-			this.selfType = this.theClass.getType();
+			this.receiverType = this.theClass.getType();
 		}
 		else
 		{
-			this.selfType = this.selfType.resolveType(markers, context);
+			this.receiverType = this.receiverType.resolveType(markers, context);
 
 			// Check the self type for compatibility
-			final IClass selfTypeClass = this.selfType.getTheClass();
+			final IClass selfTypeClass = this.receiverType.getTheClass();
 			if (selfTypeClass != null && selfTypeClass != this.theClass)
 			{
 				final Marker marker = MarkerMessages
-						.createError(this.selfType.getPosition(), "method.receivertype.incompatible", this.getName());
-				marker.addInfo(MarkerMessages.getMarker("method.receivertype", this.selfType));
+						.createError(this.receiverType.getPosition(), "method.receivertype.incompatible", this.getName());
+				marker.addInfo(MarkerMessages.getMarker("method.receivertype", this.receiverType));
 				marker.addInfo(MarkerMessages.getMarker("method.classtype", this.theClass.getFullName()));
 				markers.add(marker);
 			}
@@ -128,9 +128,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].resolve(markers, this);
 		}
 
-		if (this.selfType != null)
+		if (this.receiverType != null)
 		{
-			this.selfType.resolve(markers, context);
+			this.receiverType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -190,9 +190,9 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.checkTypes(markers, this);
 
-		if (this.selfType != null)
+		if (this.receiverType != null)
 		{
-			this.selfType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+			this.receiverType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
 		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -227,9 +227,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].check(markers, this);
 		}
 
-		if (this.selfType != null)
+		if (this.receiverType != null)
 		{
-			this.selfType.check(markers, context);
+			this.receiverType.check(markers, context);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -362,9 +362,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].foldConstants();
 		}
 
-		if (this.selfType != null)
+		if (this.receiverType != null)
 		{
-			this.selfType.foldConstants();
+			this.receiverType.foldConstants();
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -397,9 +397,9 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
-		if (this.selfType != null)
+		if (this.receiverType != null)
 		{
-			this.selfType.cleanup(context, compilableList);
+			this.receiverType.cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
