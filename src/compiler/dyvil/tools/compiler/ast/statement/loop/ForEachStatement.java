@@ -204,7 +204,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			{
 				Marker marker = MarkerMessages.createMarker(value1.getPosition(), "for.range.type");
 				marker.addInfo(MarkerMessages.getMarker("range.type", rangeType));
-				marker.addInfo(MarkerMessages.getMarker("Variable Type: ", varType));
+				marker.addInfo(MarkerMessages.getMarker("variable.type", varType));
 				markers.add(marker);
 			}
 			
@@ -226,11 +226,11 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 					                                        this.variable.getName()));
 				}
 			}
-			else if (!varType.classEquals(valueType.getElementType()))
+			else if (!varType.isSuperTypeOf(valueType.getElementType()))
 			{
 				Marker marker = MarkerMessages.createMarker(value.getPosition(), "for.array.type");
 				marker.addInfo(MarkerMessages.getMarker("array.type", valueType));
-				marker.addInfo(MarkerMessages.getMarker("var.type", varType));
+				marker.addInfo(MarkerMessages.getMarker("variable.type", varType));
 				markers.add(marker);
 			}
 			
@@ -266,7 +266,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.setType(varType = Types.CHAR);
+				this.variable.setType(Types.CHAR);
 			}
 			else if (!varType.classEquals(Types.CHAR))
 			{
