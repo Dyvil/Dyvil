@@ -29,8 +29,8 @@ public class ArrayType implements IObjectType, ITyped
 {
 	public static final int OBJECT_DISTANCE = 2;
 
-	private IType      type;
-	private Mutability mutability = Mutability.UNDEFINED;
+	protected IType type;
+	protected Mutability mutability = Mutability.UNDEFINED;
 
 	public ArrayType()
 	{
@@ -258,7 +258,8 @@ public class ArrayType implements IObjectType, ITyped
 
 	private static boolean checkImmutable(IType superType, IType subtype)
 	{
-		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype.getMutability();
+		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype
+				.getMutability();
 	}
 
 	private boolean checkPrimitiveType(IType elementType)
@@ -328,14 +329,33 @@ public class ArrayType implements IObjectType, ITyped
 	public IType getConcreteType(ITypeContext context)
 	{
 		IType concrete = this.type.getConcreteType(context);
-		if (!this.type.isPrimitive() && concrete.isPrimitive())
+
+		final ITypeParameter typeParameter = this.type.getTypeVariable();
+		if (typeParameter != null)
 		{
-			concrete = concrete.getObjectType();
+			if (!this.type.isPrimitive() && concrete.isPrimitive())
+			{
+				concrete = concrete.getObjectType();
+			}
+			if (concrete != null && concrete != this.type)
+			{
+				return new ArrayType(concrete, this.mutability)
+				{
+					@Override
+					public IType getReturnType()
+					{
+						return new ArrayType(typeParameter.getDefaultType(), this.mutability);
+					}
+				};
+			}
+			return this;
 		}
+
 		if (concrete != null && concrete != this.type)
 		{
-			return new ArrayType(concrete, this.mutability);
+			return concrete;
 		}
+
 		return this;
 	}
 	
