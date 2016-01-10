@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -93,9 +93,9 @@ public class MatchCase implements ICase, IDefaultContext
 			final IPattern typedPattern = this.pattern.withType(type, markers);
 			if (typedPattern == null)
 			{
-				Marker marker = MarkerMessages.createError(this.pattern.getPosition(), "pattern.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("pattern.type", this.pattern.getType()));
-				marker.addInfo(MarkerMessages.getMarker("value.type", type));
+				Marker marker = Markers.semanticError(this.pattern.getPosition(), "pattern.type.incompatible");
+				marker.addInfo(Markers.getSemantic("pattern.type", this.pattern.getType()));
+				marker.addInfo(Markers.getSemantic("value.type", type));
 				markers.add(marker);
 			}
 			else
@@ -112,8 +112,8 @@ public class MatchCase implements ICase, IDefaultContext
 			final IValue typedCondition = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, combinedContext);
 			if (typedCondition == null)
 			{
-				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "match.condition.type");
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
+				Marker marker = Markers.semantic(this.condition.getPosition(), "match.condition.type");
+				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else

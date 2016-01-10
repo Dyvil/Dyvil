@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -214,7 +214,7 @@ public final class StringInterpolationExpr implements IValue
 			
 			if (v.getType() == dyvil.tools.compiler.ast.type.Types.VOID)
 			{
-				markers.add(MarkerMessages.createMarker(v.getPosition(), "string.interpolation.void"));
+				markers.add(Markers.semantic(v.getPosition(), "string.interpolation.void"));
 			}
 		}
 	}

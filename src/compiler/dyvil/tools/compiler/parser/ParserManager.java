@@ -4,7 +4,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
@@ -38,7 +38,7 @@ public class ParserManager implements IParserManager
 	@Override
 	public void report(IToken token, String message)
 	{
-		this.report(MarkerMessages.createSyntaxError(token, message));
+		this.report(Markers.syntaxError(token, message));
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class ParserManager implements IParserManager
 			{
 				if (token != null && !token.isInferred())
 				{
-					this.report(MarkerMessages.createSyntaxError(token, "parser.unexpected", token));
+					this.report(Markers.syntaxError(token, "parser.unexpected", token));
 				}
 				continue;
 			}
@@ -113,7 +113,7 @@ public class ParserManager implements IParserManager
 			catch (Exception ex)
 			{
 				DyvilCompiler.error("ParserManager", "parseToken", ex);
-				this.markers.add(MarkerMessages.createSyntaxError(token, "parser.error", token, ex.getMessage()));
+				this.markers.add(Markers.syntaxError(token, "parser.error", token, ex.getMessage()));
 			}
 		}
 		

@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -183,8 +183,8 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 			if (condition1 == null)
 			{
-				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "for.condition.type");
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
+				Marker marker = Markers.semantic(this.condition.getPosition(), "for.condition.type");
+				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
 				markers.add(marker);
 			}
 			else

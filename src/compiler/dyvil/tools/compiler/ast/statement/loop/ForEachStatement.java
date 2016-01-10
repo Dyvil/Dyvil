@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -196,15 +196,15 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				this.variable.setType(varType = rangeType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(MarkerMessages.createMarker(this.variable.getPosition(), "for.variable.infer",
-					                                        this.variable.getName()));
+					markers.add(Markers.semantic(this.variable.getPosition(), "for.variable.infer",
+					                             this.variable.getName()));
 				}
 			}
 			else if (rangeType != Types.UNKNOWN && !varType.isSuperTypeOf(rangeType))
 			{
-				Marker marker = MarkerMessages.createMarker(value1.getPosition(), "for.range.type");
-				marker.addInfo(MarkerMessages.getMarker("range.type", rangeType));
-				marker.addInfo(MarkerMessages.getMarker("variable.type", varType));
+				Marker marker = Markers.semantic(value1.getPosition(), "for.range.type");
+				marker.addInfo(Markers.getSemantic("range.type", rangeType));
+				marker.addInfo(Markers.getSemantic("variable.type", varType));
 				markers.add(marker);
 			}
 			
@@ -222,15 +222,15 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				this.variable.setType(varType = valueType.getElementType());
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(MarkerMessages.createMarker(this.variable.getPosition(), "for.variable.infer",
-					                                        this.variable.getName()));
+					markers.add(Markers.semantic(this.variable.getPosition(), "for.variable.infer",
+					                             this.variable.getName()));
 				}
 			}
 			else if (!varType.isSuperTypeOf(valueType.getElementType()))
 			{
-				Marker marker = MarkerMessages.createMarker(value.getPosition(), "for.array.type");
-				marker.addInfo(MarkerMessages.getMarker("array.type", valueType));
-				marker.addInfo(MarkerMessages.getMarker("variable.type", varType));
+				Marker marker = Markers.semantic(value.getPosition(), "for.array.type");
+				marker.addInfo(Markers.getSemantic("array.type", valueType));
+				marker.addInfo(Markers.getSemantic("variable.type", varType));
 				markers.add(marker);
 			}
 			
@@ -246,15 +246,15 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 				this.variable.setType(varType = iterableType);
 				if (varType == Types.UNKNOWN)
 				{
-					markers.add(MarkerMessages.createMarker(this.variable.getPosition(), "for.variable.infer",
-					                                        this.variable.getName()));
+					markers.add(Markers.semantic(this.variable.getPosition(), "for.variable.infer",
+					                             this.variable.getName()));
 				}
 			}
 			else if (!varType.isSuperTypeOf(iterableType))
 			{
-				Marker m = MarkerMessages.createMarker(value.getPosition(), "for.iterable.type");
-				m.addInfo(MarkerMessages.getMarker("iterable.type", iterableType));
-				m.addInfo(MarkerMessages.getMarker("variable.type", varType));
+				Marker m = Markers.semantic(value.getPosition(), "for.iterable.type");
+				m.addInfo(Markers.getSemantic("iterable.type", iterableType));
+				m.addInfo(Markers.getSemantic("variable.type", varType));
 				markers.add(m);
 			}
 			
@@ -270,8 +270,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			}
 			else if (!varType.classEquals(Types.CHAR))
 			{
-				Marker marker = MarkerMessages.createMarker(value.getPosition(), "for.string.type");
-				marker.addInfo(MarkerMessages.getMarker("variable.type", varType));
+				Marker marker = Markers.semantic(value.getPosition(), "for.string.type");
+				marker.addInfo(Markers.getSemantic("variable.type", varType));
 				markers.add(marker);
 			}
 			
@@ -280,9 +280,9 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 			return sfs;
 		}
 		
-		Marker marker = MarkerMessages.createMarker(this.variable.getPosition(), "for.each.invalid");
-		marker.addInfo(MarkerMessages.getMarker("variable.type", varType));
-		marker.addInfo(MarkerMessages.getMarker("value.type", valueType));
+		Marker marker = Markers.semantic(this.variable.getPosition(), "for.each.invalid");
+		marker.addInfo(Markers.getSemantic("variable.type", varType));
+		marker.addInfo(Markers.getSemantic("value.type", valueType));
 		markers.add(marker);
 		
 		this.resolveAction(this.action, markers, context);
@@ -303,8 +303,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context1);
 		if (typedAction == null)
 		{
-			Marker marker = MarkerMessages.createMarker(this.action.getPosition(), "for.action.type");
-			marker.addInfo(MarkerMessages.getMarker("action.type", this.action.getType()));
+			Marker marker = Markers.semantic(this.action.getPosition(), "for.action.type");
+			marker.addInfo(Markers.getSemantic("action.type", this.action.getType()));
 			markers.add(marker);
 		}
 		else

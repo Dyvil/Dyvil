@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -115,7 +115,7 @@ public final class TypeOperator extends AbstractValue
 		if (this.type == null)
 		{
 			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
-			markers.add(MarkerMessages.createMarker(this.position, "typeoperator.invalid"));
+			markers.add(Markers.semantic(this.position, "typeoperator.invalid"));
 			return;
 		}
 		

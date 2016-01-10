@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -180,7 +180,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		if (this.type == null)
 		{
 			this.type = Types.UNKNOWN;
-			markers.add(MarkerMessages.createError(this.position, "typealias.invalid"));
+			markers.add(Markers.semanticError(this.position, "typealias.invalid"));
 		}
 
 		this.type = this.type.resolveType(markers, combinedContext);

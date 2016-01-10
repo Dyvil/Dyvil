@@ -37,7 +37,7 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -535,11 +535,11 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				return;
 			}
 			
-			pm.report(MarkerMessages.createSyntaxError(token, "expression.dot.invalid", token.toString()));
+			pm.report(Markers.syntaxError(token, "expression.dot.invalid", token.toString()));
 			return;
 		}
 		
-		pm.report(MarkerMessages.createSyntaxError(token, "expression.invalid", token.toString()));
+		pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
 		return;
 	}
 	
@@ -759,7 +759,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 					pm.popParser(true);
 					return;
 				case Operator.INFIX_NONE:
-					pm.report(MarkerMessages.createError(token, "expression.operator.invalid", name.toString()));
+					pm.report(Markers.semanticError(token, "expression.operator.invalid", name.toString()));
 					return;
 				case Operator.INFIX_RIGHT:
 				}
@@ -859,7 +859,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			}
 		}
 
-		pm.report(MarkerMessages.createSyntaxError(token, "assignment.invalid", token));
+		pm.report(Markers.syntaxError(token, "assignment.invalid", token));
 		this.mode = VALUE;
 		this.value = null;
 		return;

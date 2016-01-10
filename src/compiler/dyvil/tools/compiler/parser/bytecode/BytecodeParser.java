@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -71,7 +71,7 @@ public final class BytecodeParser extends Parser
 				int opcode = Opcodes.parseOpcode(name.qualified);
 				if (opcode == -1)
 				{
-					pm.report(MarkerMessages.createSyntaxError(token, "bytecode.instruction.unknown", name));
+					pm.report(Markers.syntaxError(token, "bytecode.instruction.unknown", name));
 					return;
 				}
 

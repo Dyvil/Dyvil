@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -36,7 +36,7 @@ public final class JumpInstruction implements IInstruction
 			this.target = bytecode.resolveLabel(this.target.name);
 			if (this.target == null)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "resolve.label", this.target));
+				markers.add(Markers.semantic(this.position, "resolve.label", this.target));
 				return;
 			}
 		}

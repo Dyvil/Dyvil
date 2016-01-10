@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -163,10 +163,10 @@ public class NamedGenericType extends GenericType
 			final IType type = this.typeArguments[i];
 			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
 			{
-				final Marker marker = MarkerMessages.createMarker(type.getPosition(), "generic.type.incompatible",
-				                                            typeVariable.getName().qualified);
-				marker.addInfo(MarkerMessages.getMarker("generic.type", type));
-				marker.addInfo(MarkerMessages.getMarker("typevariable", typeVariable));
+				final Marker marker = Markers.semantic(type.getPosition(), "generic.type.incompatible",
+				                                       typeVariable.getName().qualified);
+				marker.addInfo(Markers.getSemantic("generic.type", type));
+				marker.addInfo(Markers.getSemantic("typevariable", typeVariable));
 				markers.add(marker);
 			}
 		}
@@ -180,7 +180,7 @@ public class NamedGenericType extends GenericType
 		/*
 		 * TODO Position handling
 		 * if (position == TypePosition.CLASS) {
-		 * markers.add(MarkerMessages.createMarker(this.position, "type.class.generic"));
+		 * markers.add(Markers.createMarker(this.position, "type.class.generic"));
 		 * } // If the position is a SUPER_TYPE position if (position ==
 		 * TypePosition.SUPER_TYPE || position ==
 		 * TypePosition.SUPER_TYPE_ARGUMENT) { position =

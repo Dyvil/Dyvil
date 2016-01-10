@@ -34,7 +34,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -259,9 +259,9 @@ public class CodeClass extends AbstractClass
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.CLASS_MODIFIERS & ~Modifiers.CLASS_TYPE_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(MarkerMessages.createError(this.position, "modifiers.illegal",
-			                                       MarkerMessages.getMarker("class", this.name),
-			                                       ModifierUtil.classModifiersToString(illegalModifiers)));
+			markers.add(Markers.semanticError(this.position, "modifiers.illegal",
+			                                  Markers.getSemantic("class", this.name),
+			                                  ModifierUtil.classModifiersToString(illegalModifiers)));
 		}
 
 
@@ -290,13 +290,13 @@ public class CodeClass extends AbstractClass
 				int modifiers = superClass.getModifiers().toFlags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "class.extend.type",
-					                                        ModifierUtil.classTypeToString(modifiers),
-					                                        superClass.getName()));
+					markers.add(Markers.semantic(this.position, "class.extend.type",
+					                             ModifierUtil.classTypeToString(modifiers),
+					                             superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "class.extend.final", superClass.getName()));
+					markers.add(Markers.semantic(this.position, "class.extend.final", superClass.getName()));
 				}
 			}
 		}
@@ -315,9 +315,9 @@ public class CodeClass extends AbstractClass
 			int modifiers = iclass.getModifiers().toFlags();
 			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
-				                                        ModifierUtil.classTypeToString(modifiers),
-				                                        iclass.getName()));
+				markers.add(Markers.semantic(this.position, "class.implement.type",
+				                             ModifierUtil.classTypeToString(modifiers),
+				                             iclass.getName()));
 			}
 		}
 

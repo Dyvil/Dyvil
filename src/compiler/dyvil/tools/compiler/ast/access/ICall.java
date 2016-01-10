@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -149,20 +149,20 @@ public interface ICall extends IValue
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
-			Marker marker = MarkerMessages.createMarker(position, "resolve.method_field", name);
+			Marker marker = Markers.semantic(position, "resolve.method_field", name);
 			if (instance != null)
 			{
-				marker.addInfo(MarkerMessages.getMarker("receiver.type", instance.getType()));
+				marker.addInfo(Markers.getSemantic("receiver.type", instance.getType()));
 			}
 			
 			markers.add(marker);
 			return;
 		}
 		
-		Marker marker = MarkerMessages.createMarker(position, "resolve.method", name);
+		Marker marker = Markers.semantic(position, "resolve.method", name);
 		if (instance != null)
 		{
-			marker.addInfo(MarkerMessages.getMarker("receiver.type", instance.getType()));
+			marker.addInfo(Markers.getSemantic("receiver.type", instance.getType()));
 		}
 		if (!arguments.isEmpty())
 		{

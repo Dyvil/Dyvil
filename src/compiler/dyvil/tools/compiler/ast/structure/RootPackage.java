@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.library.Library;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -26,7 +26,7 @@ public final class RootPackage extends Package
 	{
 		if (packageDecl != null)
 		{
-			markers.add(MarkerMessages.createMarker(packageDecl.getPosition(), "package.default"));
+			markers.add(Markers.semantic(packageDecl.getPosition(), "package.default"));
 		}
 	}
 	

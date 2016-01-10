@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -57,7 +57,7 @@ public class BreakStatement extends AbstractValue implements IStatement
 			ILoop loop = context.getEnclosingLoop();
 			if (loop == null)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "break.invalid"));
+				markers.add(Markers.semantic(this.position, "break.invalid"));
 				return;
 			}
 			
@@ -69,7 +69,7 @@ public class BreakStatement extends AbstractValue implements IStatement
 		
 		if (!(this.label.value instanceof ILoop))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "break.invalid.type", this.name));
+			markers.add(Markers.semantic(this.position, "break.invalid.type", this.name));
 			return;
 		}
 		
@@ -83,11 +83,11 @@ public class BreakStatement extends AbstractValue implements IStatement
 		{
 			if (this.name == null)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "break.invalid"));
+				markers.add(Markers.semantic(this.position, "break.invalid"));
 			}
 			else
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "resolve.label", this.name));
+				markers.add(Markers.semantic(this.position, "resolve.label", this.name));
 			}
 		}
 	}

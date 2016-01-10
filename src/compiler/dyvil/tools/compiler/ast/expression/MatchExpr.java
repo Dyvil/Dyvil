@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -152,9 +152,9 @@ public final class MatchExpr implements IValue
 			IValue value = IType.convertValue(action, type, typeContext, markers, context);
 			if (value == null)
 			{
-				Marker marker = MarkerMessages.createMarker(action.getPosition(), "match.value.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("type.expected", type.getConcreteType(typeContext)));
-				marker.addInfo(MarkerMessages.getMarker("value.type", action.getType()));
+				Marker marker = Markers.semantic(action.getPosition(), "match.value.type.incompatible");
+				marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
+				marker.addInfo(Markers.getSemantic("value.type", action.getType()));
 				markers.add(marker);
 			}
 			else
@@ -248,7 +248,7 @@ public final class MatchExpr implements IValue
 		else
 		{
 			type = Types.ANY;
-			markers.add(MarkerMessages.createMarker(this.position, "match.invalid"));
+			markers.add(Markers.semantic(this.position, "match.invalid"));
 		}
 
 		for (int i = 0; i < this.caseCount; i++)
@@ -256,7 +256,7 @@ public final class MatchExpr implements IValue
 			MatchCase c = this.cases[i];
 			if (this.exhaustive)
 			{
-				markers.add(MarkerMessages.createMarker(c.getPattern().getPosition(), "pattern.dead"));
+				markers.add(Markers.semantic(c.getPattern().getPosition(), "pattern.dead"));
 			}
 			
 			c.resolve(markers, type, context);

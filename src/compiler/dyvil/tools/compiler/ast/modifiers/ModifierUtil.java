@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
@@ -296,13 +296,13 @@ public final class ModifierUtil
 		// If the method does not have an implementation and is static
 		if (isStatic && isAbstract)
 		{
-			markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.static.abstract",
-			                                       Util.toString(member, type)));
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.static.abstract",
+			                                  Util.toString(member, type)));
 		}
 		else if (isAbstract && isNative)
 		{
-			markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.native.abstract",
-			                                       Util.toString(member, type)));
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.abstract",
+			                                  Util.toString(member, type)));
 		}
 		else
 		{
@@ -310,16 +310,16 @@ public final class ModifierUtil
 			{
 				if (!hasValue)
 				{
-					markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.static.unimplemented",
-					                                       Util.toString(member, type)));
+					markers.add(Markers.semanticError(member.getPosition(), "modifiers.static.unimplemented",
+					                                  Util.toString(member, type)));
 				}
 			}
 			if (isNative)
 			{
 				if (!hasValue)
 				{
-					markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.native.implemented",
-					                                       Util.toString(member, type)));
+					markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
+					                                  Util.toString(member, type)));
 				}
 			}
 			if (isAbstract)
@@ -327,20 +327,20 @@ public final class ModifierUtil
 				IClass theClass = member.getTheClass();
 				if (!theClass.isAbstract())
 				{
-					markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.abstract.concrete_class",
-					                                       Util.toString(member, type), theClass.getName()));
+					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",
+					                                  Util.toString(member, type), theClass.getName()));
 				}
 				if (hasValue)
 				{
-					markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.abstract.implemented",
-					                                       Util.toString(member, type)));
+					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.implemented",
+					                                  Util.toString(member, type)));
 				}
 			}
 		}
 		if (!hasValue && !isAbstract && !isNative)
 		{
-			markers.add(MarkerMessages.createError(member.getPosition(), "modifiers.unimplemented",
-			                                       Util.toString(member, type)));
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented",
+			                                  Util.toString(member, type)));
 		}
 	}
 }

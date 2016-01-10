@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -95,23 +95,23 @@ public class Deprecation
 		String description = getStringValue(arguments, DEP_DESCRIPTION_PARAM);
 		String since = getStringValue(arguments, DEP_SINCE_PARAM);
 
-		value = value.replace("{membertype}", MarkerMessages.getMarker("member." + memberType))
+		value = value.replace("{membertype}", Markers.getSemantic("member." + memberType))
 		             .replace("{membername}", member.getName().toString()) //
 		             .replace("{since}", since);
 
-		Marker marker = MarkerMessages.createTextMarker(position, markerLevel, value);
+		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
 
 		// Description
 		if (!description.isEmpty())
 		{
-			marker.addInfo(MarkerMessages.getMarker("deprecated.description", description));
+			marker.addInfo(Markers.getSemantic("deprecated.description", description));
 		}
 
 		// Since
 		if (!since.isEmpty())
 		{
-			marker.addInfo(MarkerMessages.getMarker("deprecated.since", since));
+			marker.addInfo(Markers.getSemantic("deprecated.since", since));
 		}
 
 		// Reasons
@@ -130,12 +130,12 @@ public class Deprecation
 				{
 					builder.append(", ").append(reasons[i].name().toLowerCase());
 				}
-				marker.addInfo(MarkerMessages.getMarker("deprecated.reasons", builder.toString()));
+				marker.addInfo(Markers.getSemantic("deprecated.reasons", builder.toString()));
 			}
 			// one reason that is not UNSPECIFIED
 			else if (reasons[0] != Reason.UNSPECIFIED)
 			{
-				marker.addInfo(MarkerMessages.getMarker("deprecated.reason", reasons[0].name().toLowerCase()));
+				marker.addInfo(Markers.getSemantic("deprecated.reason", reasons[0].name().toLowerCase()));
 			}
 		}
 
@@ -169,20 +169,20 @@ public class Deprecation
 		Stage stage = getEnumValue(arguments, EXP_STAGE_PARAM, Stage.class);
 		assert stage != null;
 
-		value = value.replace("{membertype}", MarkerMessages.getMarker("member." + memberType))
+		value = value.replace("{membertype}", Markers.getSemantic("member." + memberType))
 		             .replace("{membername}", member.getName().toString()).replace("{stage}", stage.toString());
 
-		Marker marker = MarkerMessages.createTextMarker(position, markerLevel, value);
+		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
 
 		// Description
 		if (!description.isEmpty())
 		{
-			marker.addInfo(MarkerMessages.getMarker("experimental.description", description));
+			marker.addInfo(Markers.getSemantic("experimental.description", description));
 		}
 
 		// Stage
-		marker.addInfo(MarkerMessages.getMarker("experimental.stage", stage.name().toLowerCase()));
+		marker.addInfo(Markers.getSemantic("experimental.stage", stage.name().toLowerCase()));
 
 		markers.add(marker);
 	}
@@ -200,16 +200,16 @@ public class Deprecation
 		String value = getStringValue(arguments, INF_VALUE_PARAM);
 		String description = getStringValue(arguments, INF_DESCRIPTION_PARAM);
 
-		value = value.replace("{membertype}", MarkerMessages.getMarker("member." + memberType))
+		value = value.replace("{membertype}", Markers.getSemantic("member." + memberType))
 		             .replace("{membername}", member.getName().toString());
 
-		Marker marker = MarkerMessages.createTextMarker(position, markerLevel, value);
+		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
 
 		// Description
 		if (!description.isEmpty())
 		{
-			marker.addInfo(MarkerMessages.getMarker("experimental.description", description));
+			marker.addInfo(Markers.getSemantic("experimental.description", description));
 		}
 
 		markers.add(marker);

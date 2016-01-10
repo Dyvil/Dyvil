@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -117,7 +117,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
-			markers.add(MarkerMessages.createMarker(position, "variable.assign.final", this.name.unqualified));
+			markers.add(Markers.semantic(position, "variable.assign.final", this.name.unqualified));
 		}
 		else
 		{
@@ -129,10 +129,10 @@ public final class Variable extends Member implements IVariable
 		{
 			if (newValue.isResolved())
 			{
-				Marker marker = MarkerMessages
-						.createMarker(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
-				marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
+				Marker marker = Markers
+						.semantic(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+				marker.addInfo(Markers.getSemantic("variable.type", this.type));
+				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 				markers.add(marker);
 			}
 		}
@@ -196,7 +196,7 @@ public final class Variable extends Member implements IVariable
 			this.type = this.value.getType();
 			if (this.type == Types.UNKNOWN && this.value.isResolved())
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "variable.type.infer", this.name.unqualified));
+				markers.add(Markers.semantic(this.position, "variable.type.infer", this.name.unqualified));
 				this.type = Types.ANY;
 			}
 		}
@@ -206,10 +206,10 @@ public final class Variable extends Member implements IVariable
 		{
 			if (this.value.isResolved())
 			{
-				Marker marker = MarkerMessages
-						.createMarker(this.position, "variable.type.incompatible", this.name.unqualified);
-				marker.addInfo(MarkerMessages.getMarker("variable.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+				Marker marker = Markers
+						.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
+				marker.addInfo(Markers.getSemantic("variable.type", this.type));
+				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 		}
@@ -240,7 +240,7 @@ public final class Variable extends Member implements IVariable
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "variable.type.void"));
+			markers.add(Markers.semantic(this.position, "variable.type.void"));
 		}
 	}
 	

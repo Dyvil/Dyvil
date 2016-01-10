@@ -177,7 +177,7 @@ public class Util
 		if (value1 == null)
 		{
 			markers.add(
-					MarkerMessages.createMarker(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
+					Markers.semantic(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
 			return value.getType().getDefaultValue();
 		}
 		
@@ -220,9 +220,9 @@ public class Util
 	
 	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
 	{
-		Marker marker = MarkerMessages.createMarker(value.getPosition(), key, args);
-		marker.addInfo(MarkerMessages.getMarker("type.expected", type.getConcreteType(typeContext)));
-		marker.addInfo(MarkerMessages.getMarker("value.type", value.getType()));
+		Marker marker = Markers.semantic(value.getPosition(), key, args);
+		marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
+		marker.addInfo(Markers.getSemantic("value.type", value.getType()));
 		markers.add(marker);
 	}
 
@@ -269,7 +269,7 @@ public class Util
 
 	public static String toString(IClassMember member, String type)
 	{
-		return MarkerMessages.getMarker("member.named", MarkerMessages.getMarker("member." + type), member.getName());
+		return Markers.getSemantic("member.named", Markers.getSemantic("member." + type), member.getName());
 	}
 
 	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)

@@ -24,7 +24,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.AnnotationUtils;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -81,10 +81,10 @@ public class CodeMethod extends AbstractMethod
 			final IClass selfTypeClass = this.receiverType.getTheClass();
 			if (selfTypeClass != null && selfTypeClass != this.theClass)
 			{
-				final Marker marker = MarkerMessages
-						.createError(this.receiverType.getPosition(), "method.receivertype.incompatible", this.getName());
-				marker.addInfo(MarkerMessages.getMarker("method.receivertype", this.receiverType));
-				marker.addInfo(MarkerMessages.getMarker("method.classtype", this.theClass.getFullName()));
+				final Marker marker = Markers
+						.semanticError(this.receiverType.getPosition(), "method.receivertype.incompatible", this.getName());
+				marker.addInfo(Markers.getSemantic("method.receivertype", this.receiverType));
+				marker.addInfo(Markers.getSemantic("method.classtype", this.theClass.getFullName()));
 				markers.add(marker);
 			}
 		}
@@ -154,7 +154,7 @@ public class CodeMethod extends AbstractMethod
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN)
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "method.type.infer", this.name.unqualified));
+					markers.add(Markers.semantic(this.position, "method.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -162,10 +162,10 @@ public class CodeMethod extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages
-						.createMarker(this.position, "method.type.incompatible", this.name.unqualified);
-				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+				Marker marker = Markers
+						.semantic(this.position, "method.type.incompatible", this.name.unqualified);
+				marker.addInfo(Markers.getSemantic("method.type", this.type));
+				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -180,7 +180,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "method.type.abstract", this.name.unqualified));
+			markers.add(Markers.semantic(this.position, "method.type.abstract", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -244,8 +244,8 @@ public class CodeMethod extends AbstractMethod
 			
 			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
 			{
-				Marker marker = MarkerMessages.createMarker(exceptionType.getPosition(), "method.exception.type");
-				marker.addInfo(MarkerMessages.getMarker("exception.type", exceptionType));
+				Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
+				marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
 				markers.add(marker);
 			}
 		}
@@ -259,8 +259,8 @@ public class CodeMethod extends AbstractMethod
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.METHOD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(MarkerMessages.createError(this.position, "method.illegal_modifiers", this.name,
-			                                       ModifierUtil.fieldModifiersToString(illegalModifiers)));
+			markers.add(Markers.semanticError(this.position, "method.illegal_modifiers", this.name,
+			                                  ModifierUtil.fieldModifiersToString(illegalModifiers)));
 		}
 		
 		// Check illegal modifier combinations
@@ -294,7 +294,7 @@ public class CodeMethod extends AbstractMethod
 			
 			if (m.getDescriptor().equals(desc))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "method.duplicate", this.name, desc));
+				markers.add(Markers.semantic(this.position, "method.duplicate", this.name, desc));
 			}
 		}
 	}
@@ -320,33 +320,33 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "method.override.notfound", this.name));
+				markers.add(Markers.semantic(this.position, "method.override.notfound", this.name));
 			}
 			return;
 		}
 		
 		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "method.overrides", this.name));
+			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
 		}
 		
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
 			if (overrideMethod.hasModifier(Modifiers.FINAL))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "method.override.final", this.name));
+				markers.add(Markers.semantic(this.position, "method.override.final", this.name));
 			}
 			
 			final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = MarkerMessages
-						.createMarker(this.position, "method.override.type.incompatible", this.name);
-				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("method.override.type", type));
+				Marker marker = Markers
+						.semantic(this.position, "method.override.type.incompatible", this.name);
+				marker.addInfo(Markers.getSemantic("method.type", this.type));
+				marker.addInfo(Markers.getSemantic("method.override.type", type));
 
-				marker.addInfo(MarkerMessages.getMarker("method.override", Util.methodSignatureToString(overrideMethod),
-				                                        overrideMethod.getTheClass().getFullName()));
+				marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
+				                                   overrideMethod.getTheClass().getFullName()));
 				markers.add(marker);
 			}
 		}

@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -411,7 +411,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		if (this.returnType == null)
 		{
 			this.returnType = Types.UNKNOWN;
-			markers.add(MarkerMessages.createError(this.position, "type.lambda.return"));
+			markers.add(Markers.semanticError(this.position, "type.lambda.return"));
 		}
 		else
 		{
@@ -436,7 +436,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "type.class.lambda"));
+			markers.add(Markers.semantic(this.position, "type.class.lambda"));
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

@@ -26,7 +26,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -254,7 +254,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			if (depth-- < 0)
 			{
 				markers.add(
-						MarkerMessages.createMarker(this.getPosition(), "annotation.field.not_constant", this.name));
+						Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name));
 				return this;
 			}
 			

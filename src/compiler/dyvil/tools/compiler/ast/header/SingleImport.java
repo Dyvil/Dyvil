@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -79,7 +79,7 @@ public final class SingleImport extends Import
 		{
 			if (!(context instanceof IClass))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "using.class.invalid"));
+				markers.add(Markers.semantic(this.position, "using.class.invalid"));
 				return;
 			}
 			
@@ -107,7 +107,7 @@ public final class SingleImport extends Import
 				return;
 			}
 			
-			markers.add(MarkerMessages.createMarker(this.position, "resolve.method_field", this.name.qualified));
+			markers.add(Markers.semantic(this.position, "resolve.method_field", this.name.qualified));
 			return;
 		}
 		
@@ -125,7 +125,7 @@ public final class SingleImport extends Import
 			return;
 		}
 		
-		markers.add(MarkerMessages.createMarker(this.position, "resolve.package", this.name.qualified));
+		markers.add(Markers.semantic(this.position, "resolve.package", this.name.qualified));
 	}
 	
 	@Override

@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -157,7 +157,7 @@ public abstract class CaptureDataMember implements IDataMember
 	{
 		if (!this.variable.isReferenceCapturable())
 		{
-			markers.add(MarkerMessages.createMarker(position, "variable.assign.capture", this.variable.getName()));
+			markers.add(Markers.semantic(position, "variable.assign.capture", this.variable.getName()));
 		}
 		else
 		{
@@ -185,8 +185,8 @@ public abstract class CaptureDataMember implements IDataMember
 		{
 			if (!this.variable.isReferenceCapturable())
 			{
-				markers.add(MarkerMessages.createError(this.accessPosition, "variable.access.capture",
-				                                       this.variable.getName()));
+				markers.add(Markers.semanticError(this.accessPosition, "variable.access.capture",
+				                                  this.variable.getName()));
 			}
 			else
 			{

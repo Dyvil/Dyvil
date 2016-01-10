@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -123,21 +123,21 @@ public final class ClassParameter extends Parameter implements IField
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(MarkerMessages
-							            .createMarker(position, "classparameter.access.static", this.name.unqualified));
+					markers.add(Markers
+							            .semantic(position, "classparameter.access.static", this.name.unqualified));
 					return null;
 				}
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
 				markers.add(
-						MarkerMessages.createMarker(position, "classparameter.access.instance", this.name.unqualified));
+						Markers.semantic(position, "classparameter.access.instance", this.name.unqualified));
 			}
 		}
 		else if (!this.hasModifier(Modifiers.STATIC))
 		{
 			markers.add(
-					MarkerMessages.createMarker(position, "classparameter.access.unqualified", this.name.unqualified));
+					Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
 			return new ThisExpr(position, this.theClass.getType(), context, markers);
 		}
 		
@@ -150,20 +150,20 @@ public final class ClassParameter extends Parameter implements IField
 		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			markers.add(
-					MarkerMessages.createError(position, "classparameter.assign.annotation", this.name.unqualified));
+					Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
 		else if (this.hasModifier(Modifiers.FINAL))
 		{
-			markers.add(MarkerMessages.createMarker(position, "classparameter.assign.final", this.name.unqualified));
+			markers.add(Markers.semantic(position, "classparameter.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages
-					.createMarker(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
-			marker.addInfo(MarkerMessages.getMarker("classparameter.type", this.type));
-			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
+			Marker marker = Markers
+					.semantic(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
+			marker.addInfo(Markers.getSemantic("classparameter.type", this.type));
+			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 			markers.add(marker);
 		}
 		else
@@ -186,11 +186,11 @@ public final class ClassParameter extends Parameter implements IField
 			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages
-						.createMarker(this.defaultValue.getPosition(), "classparameter.type.incompatible",
-						              this.name.unqualified);
-				marker.addInfo(MarkerMessages.getMarker("classparameter.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.defaultValue.getType()));
+				Marker marker = Markers
+						.semantic(this.defaultValue.getPosition(), "classparameter.type.incompatible",
+						          this.name.unqualified);
+				marker.addInfo(Markers.getSemantic("classparameter.type", this.type));
+				marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
 				markers.add(marker);
 			}
 			else
@@ -204,7 +204,7 @@ public final class ClassParameter extends Parameter implements IField
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(
-					MarkerMessages.createMarker(this.position, "classparameter.type.nodefault", this.name.unqualified));
+					Markers.semantic(this.position, "classparameter.type.nodefault", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -221,7 +221,7 @@ public final class ClassParameter extends Parameter implements IField
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "classparameter.type.void"));
+			markers.add(Markers.semantic(this.position, "classparameter.type.void"));
 		}
 	}
 	

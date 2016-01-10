@@ -13,7 +13,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -168,7 +168,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				pm.popParser(true);
 				return;
 			}
-			pm.report(MarkerMessages.createSyntaxError(token, "type.invalid", token.toString()));
+			pm.report(Markers.syntaxError(token, "type.invalid", token.toString()));
 			return;
 		case TUPLE_END:
 		{

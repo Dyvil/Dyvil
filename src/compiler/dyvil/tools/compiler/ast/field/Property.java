@@ -21,7 +21,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -243,14 +243,14 @@ public class Property extends Member implements IProperty
 
 			if (this.type == Types.VOID)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "property.type.void"));
+				markers.add(Markers.semantic(this.position, "property.type.void"));
 			}
 		}
 		
 		// No setter and no getter
 		if (this.getter == null && this.setter == null)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "property.empty", this.name));
+			markers.add(Markers.semantic(this.position, "property.empty", this.name));
 		}
 	}
 	

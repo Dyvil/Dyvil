@@ -19,7 +19,7 @@ import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -203,7 +203,7 @@ public class DyvilHeaderParser extends Parser
 
 	protected static void reportInvalidElement(IParserManager pm, IToken token)
 	{
-		pm.report(MarkerMessages.createSyntaxError(token, "header.element.invalid", token.toString()));
+		pm.report(Markers.syntaxError(token, "header.element.invalid", token.toString()));
 	}
 	
 	private void parseAnnotation(IParserManager pm, IToken token)

@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
@@ -70,7 +70,7 @@ public class REPLParser extends ParserManager
 			{
 				if (token != null && !token.isInferred())
 				{
-					this.report(MarkerMessages.createSyntaxError(token, "parser.unexpected", token));
+					this.report(Markers.syntaxError(token, "parser.unexpected", token));
 				}
 				continue;
 			}

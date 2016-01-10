@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -176,7 +176,7 @@ public class ClassGenericType extends GenericType
 
 			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
 			{
-				markers.add(MarkerMessages.createMarker(this.getPosition(), "type.access.internal", iclass.getName()));
+				markers.add(Markers.semantic(this.getPosition(), "type.access.internal", iclass.getName()));
 			}
 		}
 		

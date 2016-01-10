@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class TraitMetadata implements IClassMetadata
@@ -53,7 +53,7 @@ public class TraitMetadata implements IClassMetadata
 			{
 				modifierSet.addIntModifier(Modifiers.STATIC);
 				modifierSet.addIntModifier(Modifiers.FINAL);
-				markers.add(MarkerMessages.createMarker(field.getPosition(), "field.trait.warning", field.getName()));
+				markers.add(Markers.semantic(field.getPosition(), "field.trait.warning", field.getName()));
 			}
 		}
 
