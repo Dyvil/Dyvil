@@ -60,7 +60,7 @@ public class TypeAliasParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.typeAlias = new TypeAlias(name);
+				this.typeAlias = new TypeAlias(name, token.raw());
 				this.mode = TYPE_PARAMETERS;
 				return;
 			}

@@ -9,7 +9,9 @@ import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -26,7 +28,10 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 	protected ITypeParameter[] typeVariables;
 	protected int              typeVariableCount;
-	
+
+	// Metadata
+	protected ICodePosition position;
+
 	public TypeAlias()
 	{
 	}
@@ -34,6 +39,12 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	public TypeAlias(Name name)
 	{
 		this.name = name;
+	}
+
+	public TypeAlias(Name name, ICodePosition position)
+	{
+		this.name = name;
+		this.position = position;
 	}
 
 	public TypeAlias(Name name, IType type)
@@ -45,12 +56,13 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public ICodePosition getPosition()
 	{
-		return null;
+		return this.position;
 	}
 	
 	@Override
 	public void setPosition(ICodePosition position)
 	{
+		this.position = position;
 	}
 	
 	@Override
@@ -164,6 +176,12 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		IContext combinedContext = new CombiningContext(this, context);
+
+		if (this.type == null)
+		{
+			this.type = Types.UNKNOWN;
+			markers.add(MarkerMessages.createError(this.position, "typealias.invalid"));
+		}
 
 		this.type = this.type.resolveType(markers, combinedContext);
 
