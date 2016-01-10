@@ -11,18 +11,19 @@ import	dyvil.function.PartialFunction
 import	dyvil.util.{ Option, None, Some }
 import	dyvil.util.Version
 
-// Import Function1, Tuple2 and Tuple3 with more user-friendly names
+// Import Tuple2 and Tuple3 with more user-friendly names
 import	dyvil.tuple.{ Tuple2 => Pair, Tuple3 => Triple }
 
 // Import useful annotation classes
 import	dyvil.annotation.Intrinsic
 import	dyvil.annotation.{ Deprecated, Experimental, UsageInfo }
 import	dyvil.annotation.{
-							Native => native,
-							Transient => transient,
-							Volatile => volatile,
-							Immutable => immutable,
-							Mutating => mutating
+							Native		=> native,
+							Transient	=> transient,
+							Volatile	=> volatile,
+							Immutable	=> immutable,
+							Mutating	=> mutating,
+							Reified		=> reified
 						 }
 
 import	java.lang._
@@ -90,6 +91,3 @@ infix	operator .. 	{ none, 3000 }
 infix	operator ..<	{ none, 3000 }
 // infix operator >.. { none, 3000 }
 // infix operator >.< { none, 3000 }
-
-// Misc. Operators
-infix operator :=: { none, 10000 }

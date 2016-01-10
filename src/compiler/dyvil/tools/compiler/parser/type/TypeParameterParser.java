@@ -30,7 +30,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 	protected ITypeParameterized typeParameterized;
 	
 	private byte           boundMode;
-	private Variance       variance;
+	private Variance       variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
 	private AnnotationList annotationList;
 	
@@ -73,9 +73,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 					}
 				}
 
-				this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(),
-				                                       Variance.INVARIANT);
-				this.mode = TYPE_BOUNDS;
+				this.createTypeParameter(token, this.variance);
 				return;
 			}
 			pm.report(token, "typeparameter.identifier");
@@ -83,8 +81,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(), this.variance);
-				this.mode = TYPE_BOUNDS;
+				this.createTypeParameter(token, this.variance);
 				return;
 			}
 			pm.report(token, "typeparameter.identifier");
@@ -136,6 +133,13 @@ public final class TypeParameterParser extends Parser implements ITyped
 			pm.report(token, "typeparameter.bound.invalid");
 			return;
 		}
+	}
+
+	private void createTypeParameter(IToken token, Variance variance)
+	{
+		this.typeParameter = new TypeParameter(token, this.typeParameterized, token.nameValue(), variance);
+		this.typeParameter.setAnnotations(this.annotationList);
+		this.mode = TYPE_BOUNDS;
 	}
 
 	private void addAnnotation(IAnnotation annotion)
