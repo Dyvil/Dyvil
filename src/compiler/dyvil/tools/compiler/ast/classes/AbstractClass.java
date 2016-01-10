@@ -688,6 +688,26 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
+		IClass iclass = this.resolveInnerClass(name);
+		if (iclass != null)
+			return iclass;
+		
+		if (this.outerClass != null)
+		{
+			return this.outerClass.resolveClass(name);
+		}
+		
+		final IDyvilHeader header = this.getHeader();
+		if (header != null)
+		{
+			return header.resolveClass(name);
+		}
+
+		return null;
+	}
+
+	private IClass resolveInnerClass(Name name)
+	{
 		if (this.body != null)
 		{
 			IClass iclass = this.body.getClass(name);
@@ -696,14 +716,7 @@ public abstract class AbstractClass implements IClass
 				return iclass;
 			}
 		}
-		
-		if (this.outerClass != null)
-		{
-			return this.outerClass.resolveClass(name);
-		}
-		
-		IDyvilHeader header = this.getHeader();
-		return header == null ? null : header.resolveClass(name);
+		return null;
 	}
 	
 	@Override
@@ -722,9 +735,25 @@ public abstract class AbstractClass implements IClass
 				return new TypeVarType(var);
 			}
 		}
-		
-		IClass iclass = this.resolveClass(name);
-		return iclass != null ? new ClassType(iclass) : null;
+
+		IClass iClass = this.resolveInnerClass(name);
+		if (iClass != null)
+		{
+			return iClass.getClassType();
+		}
+
+		if (this.outerClass != null)
+		{
+			return this.outerClass.resolveType(name);
+		}
+
+		final IDyvilHeader header = this.getHeader();
+		if (header != null)
+		{
+			return header.resolveType(name);
+		}
+
+		return null;
 	}
 	
 	@Override
