@@ -33,20 +33,25 @@ import java.lang.annotation.ElementType;
 
 public class Property extends Member implements IProperty
 {
-	protected IClass theClass;
-	
 	protected IMethod getter;
-	protected IMethod setter;
 
-	private MethodParameter setterParameter;
-	
+	protected IMethod setter;
+	protected IValue  initializer;
+
+	// Metadata
+
+	protected IClass theClass;
+
+	protected MethodParameter setterParameter;
+	protected ICodePosition   initializerPosition;
+
 	public Property(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(name, type, modifiers);
 		this.position = position;
 		this.theClass = iclass;
 	}
-	
+
 	@Override
 	public void setTheClass(IClass iclass)
 	{
@@ -117,6 +122,30 @@ public class Property extends Member implements IProperty
 		this.setter.addParameter(this.setterParameter);
 
 		return this.setter;
+	}
+
+	@Override
+	public IValue getInitializer()
+	{
+		return this.initializer;
+	}
+
+	@Override
+	public void setInitializer(IValue value)
+	{
+		this.initializer = value;
+	}
+
+	@Override
+	public ICodePosition getInitializerPosition()
+	{
+		return this.initializerPosition;
+	}
+
+	@Override
+	public void setInitializerPosition(ICodePosition position)
+	{
+		this.initializerPosition = position;
 	}
 
 	@Override

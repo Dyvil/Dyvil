@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IProperty extends IClassMember
 {
@@ -24,4 +25,14 @@ public interface IProperty extends IClassMember
 	IMethod getSetter();
 
 	IMethod initSetter();
+
+	// Initializer
+
+	IValue getInitializer();
+
+	void setInitializer(IValue value);
+
+	ICodePosition getInitializerPosition();
+
+	void setInitializerPosition(ICodePosition position);
 }

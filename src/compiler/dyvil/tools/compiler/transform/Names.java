@@ -7,6 +7,7 @@ public final class Names
 	public static final Name instance      = Name.getQualified("instance");
 	public static final Name get           = Name.getQualified("get");
 	public static final Name set           = Name.getQualified("set");
+	public static final Name init          = Name.getQualified("init");
 	public static final Name apply         = Name.getQualified("apply");
 	public static final Name unapply       = Name.getQualified("unapply");
 	public static final Name update        = Name.getQualified("update");
@@ -17,15 +18,13 @@ public final class Names
 	public static final Name equals        = Name.getQualified("equals");
 	public static final Name hashCode      = Name.getQualified("hashCode");
 	public static final Name toString      = Name.getQualified("toString");
-	public static final Name $it           = Name.getQualified("$it");
 	
 	public static final Name writeReplace = Name.getQualified("writeReplace");
 	public static final Name readResolve  = Name.getQualified("readResolve");
 	
 	public static final Name Function = Name.getQualified("Function");
 	public static final Name Tuple    = Name.getQualified("Tuple");
-	
-	public static final Name _this    = Name.getQualified("this");
+
 	public static final Name _null    = Name.getQualified("null");
 	public static final Name _void    = Name.getQualified("void");
 	public static final Name _boolean = Name.getQualified("boolean");

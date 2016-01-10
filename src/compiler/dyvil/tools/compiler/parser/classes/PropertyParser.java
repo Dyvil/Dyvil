@@ -28,8 +28,9 @@ public class PropertyParser extends Parser implements IValueConsumer
 	private static final int SETTER_PARAMETER_END  = 8;
 
 	// Targets
-	private static final byte GETTER = 0;
-	private static final byte SETTER = 1;
+	private static final byte GETTER      = 0;
+	private static final byte SETTER      = 1;
+	private static final byte INITIALIZER = 2;
 
 	// --------------------------------------------------
 
@@ -90,6 +91,13 @@ public class PropertyParser extends Parser implements IValueConsumer
 					this.configureMethod(this.property.getSetter(), token);
 					this.mode = SETTER_PARAMETER;
 					this.target = SETTER;
+					return;
+				}
+				if (name == Names.init)
+				{
+					this.property.setInitializerPosition(token.raw());
+					this.mode = SEPARATOR;
+					this.target = INITIALIZER;
 					return;
 				}
 				pm.report(token, "property.tag.unknown");
@@ -160,6 +168,9 @@ public class PropertyParser extends Parser implements IValueConsumer
 			return;
 		case SETTER:
 			this.property.initSetter().setValue(value);
+			return;
+		case INITIALIZER:
+			this.property.setInitializer(value);
 			return;
 		}
 	}
