@@ -24,7 +24,7 @@ public interface IContext
 	byte VISIBLE   = 0;
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
-	
+
 	boolean isStatic();
 	
 	IDyvilHeader getHeader();
@@ -105,7 +105,16 @@ public interface IContext
 		context.getMethodMatches(matches, instance, name, arguments);
 		return matches.getBestMethod();
 	}
-	
+
+	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
+	{
+		float match = method.getSignatureMatch(name, receiver, arguments);
+		if (match > 0)
+		{
+			list.add(method, match);
+		}
+	}
+
 	static byte getVisibility(IContext context, IClassMember member)
 	{
 		IClass thisClass = context.getThisClass();

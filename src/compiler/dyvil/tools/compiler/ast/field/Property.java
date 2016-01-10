@@ -1,16 +1,16 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -23,7 +23,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -52,6 +51,15 @@ public class Property extends Member implements IProperty
 	public void setTheClass(IClass iclass)
 	{
 		this.theClass = iclass;
+
+		if (this.getter != null)
+		{
+			this.getter.setTheClass(iclass);
+		}
+		if (this.setter != null)
+		{
+			this.setter.setTheClass(iclass);
+		}
 	}
 	
 	@Override
@@ -61,26 +69,9 @@ public class Property extends Member implements IProperty
 	}
 	
 	@Override
-	public boolean isField()
-	{
-		return false;
-	}
-	
-	@Override
 	public ElementType getElementType()
 	{
-		return ElementType.FIELD;
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-	}
-	
-	@Override
-	public IValue getValue()
-	{
-		return null;
+		return ElementType.METHOD;
 	}
 
 	private void initGetter()
@@ -148,7 +139,8 @@ public class Property extends Member implements IProperty
 	@Override
 	public void setSetterModifiers(ModifierSet modifiers)
 	{
-		if (modifiers == null) {
+		if (modifiers == null)
+		{
 			return;
 		}
 		this.initSetter();
@@ -175,92 +167,19 @@ public class Property extends Member implements IProperty
 	{
 		return this.setter;
 	}
-	
+
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		if (instance != null)
+		if (this.getter != null)
 		{
-			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
-			{
-				if (instance.valueTag() != IValue.CLASS_ACCESS)
-				{
-					markers.add(MarkerMessages.createMarker(position, "property.access.static", this.name.unqualified));
-				}
-				else if (instance.getType().getTheClass() != this.theClass)
-				{
-					markers.add(MarkerMessages
-							            .createMarker(position, "property.access.static.type", this.name.unqualified,
-							                          this.theClass.getFullName()));
-				}
-				instance = null;
-			}
-			else if (instance.valueTag() == IValue.CLASS_ACCESS)
-			{
-				if (!instance.getType().getTheClass().isObject())
-				{
-					markers.add(
-							MarkerMessages.createMarker(position, "property.access.instance", this.name.unqualified));
-				}
-			}
-			else
-			{
-				IType type = this.theClass.getType();
-				instance = type.convertValue(instance, type, markers, context);
-			}
-		}
-		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
-		{
-			if (context.isStatic())
-			{
-				markers.add(MarkerMessages.createMarker(position, "property.access.instance", this.name.unqualified));
-			}
-			else
-			{
-				markers.add(
-						MarkerMessages.createMarker(position, "property.access.unqualified", this.name.unqualified));
-				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
-			}
+			IContext.getMethodMatch(list, receiver, name, arguments, this.getter);
 		}
 
-		Deprecation.checkAnnotations(markers, position, this, "property");
-
-		switch (IContext.getVisibility(context, this))
+		if (this.setter != null)
 		{
-		case IContext.INTERNAL:
-			markers.add(MarkerMessages.createMarker(position, "property.access.sealed", this.name));
-			break;
-		case IContext.INVISIBLE:
-			markers.add(MarkerMessages.createMarker(position, "property.access.invisible", this.name));
-			break;
+			IContext.getMethodMatch(list, receiver, name, arguments, this.setter);
 		}
-
-		return instance;
-	}
-	
-	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
-	{
-		if (this.setter == null)
-		{
-			markers.add(MarkerMessages.createMarker(position, "property.assign.readonly", this.name.unqualified));
-		}
-		
-		IValue value1 = newValue.withType(this.type, null, markers, context);
-		if (value1 == null)
-		{
-			Marker marker = MarkerMessages
-					.createMarker(newValue.getPosition(), "property.assign.type", this.name.unqualified);
-			marker.addInfo(MarkerMessages.getMarker("property.type", this.type));
-			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
-			markers.add(marker);
-		}
-		else
-		{
-			newValue = value1;
-		}
-		
-		return newValue;
 	}
 	
 	@Override
@@ -367,18 +286,6 @@ public class Property extends Member implements IProperty
 	
 	// Compilation
 	
-	@Override
-	public String getDescription()
-	{
-		return null;
-	}
-	
-	@Override
-	public String getSignature()
-	{
-		return null;
-	}
-	
 	protected void writeAnnotations(MethodWriter mw, int modifiers)
 	{
 		if (this.annotations != null)
@@ -463,46 +370,6 @@ public class Property extends Member implements IProperty
 				mw.end(Types.VOID);
 			}
 		}
-	}
-	
-	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		int opcode;
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else
-		{
-			writer.writeLineNumber(lineNumber);
-			opcode = Opcodes.INVOKEVIRTUAL;
-		}
-		
-		String owner = this.theClass.getInternalName();
-		String name = this.name.qualified;
-		String desc = "()" + this.type.getExtendedName();
-		writer.writeInvokeInsn(opcode, owner, name, desc, false);
-	}
-	
-	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		int opcode;
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
-		{
-			opcode = Opcodes.INVOKESTATIC;
-		}
-		else
-		{
-			writer.writeLineNumber(lineNumber);
-			opcode = Opcodes.INVOKEVIRTUAL;
-		}
-		
-		String owner = this.theClass.getInternalName();
-		String name = this.name.qualified + "_$eq";
-		String desc = "(" + this.type.getExtendedName() + ")V";
-		writer.writeInvokeInsn(opcode, owner, name, desc, false);
 	}
 	
 	@Override

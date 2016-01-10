@@ -6,10 +6,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.IAccessible;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.VariableThis;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
@@ -783,22 +780,16 @@ public abstract class AbstractClass implements IClass
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
+			final IParameter param = this.parameters[i];
 			if (param.getName() == name)
 			{
 				return param;
 			}
 		}
-		
+
+		IDataMember field;
 		if (this.body != null)
 		{
-			// Own properties
-			IDataMember field = this.body.getProperty(name);
-			if (field != null)
-			{
-				return field;
-			}
-			
 			// Own fields
 			field = this.body.getField(name);
 			if (field != null)
@@ -807,30 +798,30 @@ public abstract class AbstractClass implements IClass
 			}
 		}
 		
-		IDataMember match = this.metadata.resolveField(name);
-		if (match != null)
+		field = this.metadata.resolveField(name);
+		if (field != null)
 		{
-			return match;
+			return field;
 		}
 		
 		// Inherited Fields
 		if (this.superType != null)
 		{
-			match = this.superType.resolveField(name);
-			if (match != null)
+			field = this.superType.resolveField(name);
+			if (field != null)
 			{
-				return match;
+				return field;
 			}
 		}
 		
 		// Static Imports
-		IDyvilHeader header = this.getHeader();
+		final IDyvilHeader header = this.getHeader();
 		if (header != null && header.hasMemberImports())
 		{
-			match = header.resolveField(name);
-			if (match != null)
+			field = header.resolveField(name);
+			if (field != null)
 			{
-				return match;
+				return field;
 			}
 		}
 		

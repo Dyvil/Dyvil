@@ -644,17 +644,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 		}
 		
 		// Name is not a compound operator (does not end with '=')
-		if (name.qualified.endsWith("$eq"))
+		if (Util.hasEq(name))
 		{
 			// e.g. this += that
 			
-			Name newName = Util.stripEq(name);
+			final Name newName = Util.removeEq(name);
 			op = pm.getOperator(newName);
 			if (op == null)
 			{
 				op = new Operator(newName, 1, Operator.INFIX_RIGHT);
 			}
-			if (op.type == Operator.INFIX_LEFT)
+			else if (op.type == Operator.INFIX_LEFT)
 			{
 				// Compound Operators are always right-associative, so create a
 				// copy

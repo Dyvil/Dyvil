@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -203,7 +204,6 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		}
 		
 		Marker marker = MarkerMessages.createMarker(this.position, "resolve.field", this.name.unqualified);
-		marker.addInfo(MarkerMessages.getMarker("name.qualified", this.name.qualified));
 		if (this.receiver != null)
 		{
 			marker.addInfo(MarkerMessages.getMarker("receiver.type", this.receiver.getType()));
@@ -280,7 +280,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
-		final Name name = Name.getQualified(this.name.qualified + "_$eq");
+		final Name name = Util.addEq(this.name);
 		final IArguments arg = new SingleArgument(this.value);
 		final IMethod m = ICall.resolveMethod(context, receiver, name, arg);
 		if (m != null)

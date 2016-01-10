@@ -398,15 +398,12 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (!this.genericsResolved)
-		{
-			this.resolveGenerics();
-		}
-		
 		if (!this.parametersResolved)
 		{
+			// Includes resolveGenerics
 			this.resolveParameters();
 		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
@@ -416,15 +413,8 @@ public final class ExternalClass extends AbstractClass
 			}
 		}
 		
-		// Own properties
-		IDataMember field = this.body.getProperty(name);
-		if (field != null)
-		{
-			return field;
-		}
-		
 		// Own fields
-		field = this.body.getField(name);
+		IDataMember field = this.body.getField(name);
 		if (field != null)
 		{
 			return field;
@@ -438,10 +428,10 @@ public final class ExternalClass extends AbstractClass
 		// Inherited Fields
 		if (this.superType != null)
 		{
-			IDataMember match = this.superType.resolveField(name);
-			if (match != null)
+			field = this.superType.resolveField(name);
+			if (field != null)
 			{
-				return match;
+				return field;
 			}
 		}
 		return null;

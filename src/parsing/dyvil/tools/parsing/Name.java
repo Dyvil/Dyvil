@@ -6,7 +6,7 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 
 public final class Name
 {
-	private static final Map<String, Name> map = new HashMap();
+	private static final Map<String, Name> map = new HashMap<>();
 	
 	public final String qualified;
 	public final String unqualified;
@@ -51,7 +51,7 @@ public final class Name
 			return name;
 		}
 		
-		return new Name(BaseSymbols.unqualify(value), BaseSymbols.qualify(value));
+		return get(BaseSymbols.unqualify(value), BaseSymbols.qualify(value));
 	}
 	
 	public static Name getSpecial(String value)
@@ -62,7 +62,7 @@ public final class Name
 			return name;
 		}
 		
-		return new Name(value, BaseSymbols.qualify(value));
+		return get(value, BaseSymbols.qualify(value));
 	}
 	
 	public static Name getQualified(String value)

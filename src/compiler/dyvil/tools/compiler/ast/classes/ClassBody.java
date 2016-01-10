@@ -307,39 +307,18 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			getMethodMatch(list, instance, name, arguments, this.methods[i]);
+			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			final IProperty property = this.properties[i];
-
-			final IMethod getter = property.getGetter();
-			if (getter != null)
-			{
-				getMethodMatch(list, instance, name, arguments, getter);
-			}
-
-			final IMethod setter = property.getSetter();
-			if (setter != null)
-			{
-				getMethodMatch(list, instance, name, arguments, setter);
-			}
+			this.properties[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
-	private static void getMethodMatch(MethodMatchList list, IValue instance, Name name, IArguments arguments, IMethod method)
-	{
-		float match = method.getSignatureMatch(name, instance, arguments);
-		if (match > 0)
-		{
-			list.add(method, match);
-		}
-	}
-	
 	@Override
 	public IMethod getFunctionalMethod()
 	{

@@ -88,11 +88,11 @@ public class CompleteCommand implements ICommand
 	
 	private void printCompletions(DyvilREPL repl,  String memberStart, IType type)
 	{
-		Set<String> fields = new TreeSet();
-		Set<String> properties = new TreeSet();
-		Set<String> methods = new TreeSet();
+		Set<String> fields = new TreeSet<>();
+		Set<String> properties = new TreeSet<>();
+		Set<String> methods = new TreeSet<>();
 		
-		this.findCompletions(type, fields, properties, methods, memberStart, true, new IdentityHashSet());
+		this.findCompletions(type, fields, properties, methods, memberStart, true, new IdentityHashSet<>());
 		
 		if (!fields.isEmpty())
 		{
@@ -224,7 +224,7 @@ public class CompleteCommand implements ICommand
 		}
 	}
 	
-	private boolean matches(String start, IMember member, boolean statics)
+	private static boolean matches(String start, IMember member, boolean statics)
 	{
 		if (!member.getName().startWith(start))
 		{
@@ -232,19 +232,15 @@ public class CompleteCommand implements ICommand
 		}
 		
 		int modifiers = member.getModifiers().toFlags();
-		if ((modifiers & Modifiers.PUBLIC) == 0)
-		{
-			return false;
-		}
-		return !(!statics && (modifiers & Modifiers.STATIC) != 0);
+		return (modifiers & Modifiers.PUBLIC) != 0 && !(!statics && (modifiers & Modifiers.STATIC) != 0);
 	}
 	
-	private static String getSignature(IType type, IField field)
+	private static String getSignature(IType type, IMember member)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(field.getName());
+		sb.append(member.getName());
 		sb.append(" : ");
-		field.getType().getConcreteType(type).toString("", sb);
+		member.getType().getConcreteType(type).toString("", sb);
 		return sb.toString();
 	}
 	

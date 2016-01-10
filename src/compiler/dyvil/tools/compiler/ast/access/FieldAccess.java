@@ -29,7 +29,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.MarkerMessages;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -301,14 +300,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			return this;
 		}
 
-		Marker marker = MarkerMessages.createMarker(this.position, "resolve.method_field", this.name.unqualified);
-		marker.addInfo(MarkerMessages.getMarker("name.qualified", this.name.qualified));
-		if (this.receiver != null)
-		{
-			marker.addInfo(MarkerMessages.getMarker("receiver.type", this.receiver.getType()));
-		}
-		
-		markers.add(marker);
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, EmptyArguments.INSTANCE);
 		return this;
 	}
 
