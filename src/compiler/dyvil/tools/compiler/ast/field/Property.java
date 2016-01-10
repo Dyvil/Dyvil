@@ -74,55 +74,6 @@ public class Property extends Member implements IProperty
 		return ElementType.METHOD;
 	}
 
-	private void initGetter()
-	{
-		if (this.getter != null)
-		{
-			return;
-		}
-		this.getter = new CodeMethod(this.theClass, this.name, this.type, this.modifiers);
-	}
-
-	private void initSetter()
-	{
-		if (this.setter != null)
-		{
-			return;
-		}
-
-		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
-		this.setter = new CodeMethod(this.theClass, name, Types.VOID, this.modifiers);
-		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE);
-		this.setter.addParameter(this.setterParameter);
-	}
-
-	@Override
-	public void setGetterValue(IValue value)
-	{
-		this.initGetter();
-		this.getter.setValue(value);
-	}
-
-	@Override
-	public void setGetterModifiers(ModifierSet modifiers)
-	{
-		if (modifiers == null)
-		{
-			return;
-		}
-
-		this.initGetter();
-		modifiers.addIntModifier(this.modifiers.toFlags());
-		this.getter.setModifiers(modifiers);
-	}
-
-	@Override
-	public void setGetterPosition(ICodePosition position)
-	{
-		this.initGetter();
-		this.getter.setPosition(position);
-	}
-
 	@Override
 	public IMethod getGetter()
 	{
@@ -130,29 +81,19 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void setSetterValue(IValue value)
+	public IMethod initGetter()
 	{
-		this.initSetter();
-		this.setter.setValue(value);
-	}
-
-	@Override
-	public void setSetterModifiers(ModifierSet modifiers)
-	{
-		if (modifiers == null)
+		if (this.getter != null)
 		{
-			return;
+			return this.getter;
 		}
-		this.initSetter();
-		modifiers.addIntModifier(this.modifiers.toFlags());
-		this.setter.setModifiers(modifiers);
+		return this.getter = new CodeMethod(this.theClass, this.name, this.type, this.modifiers);
 	}
 
 	@Override
-	public void setSetterPosition(ICodePosition position)
+	public IMethod getSetter()
 	{
-		this.initSetter();
-		this.setter.setPosition(position);
+		return this.setter;
 	}
 
 	@Override
@@ -163,8 +104,18 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public IMethod getSetter()
+	public IMethod initSetter()
 	{
+		if (this.setter != null)
+		{
+			return this.setter;
+		}
+
+		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
+		this.setter = new CodeMethod(this.theClass, name, Types.VOID, this.modifiers);
+		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE);
+		this.setter.addParameter(this.setterParameter);
+
 		return this.setter;
 	}
 
