@@ -81,14 +81,14 @@ public class PropertyParser extends Parser implements IValueConsumer
 				final Name name = token.nameValue();
 				if (name == Names.get)
 				{
-					this.configureMethod(this.property.getGetter(), token);
+					this.configureMethod(this.property.initGetter(), token);
 					this.mode = SEPARATOR;
 					this.target = GETTER;
 					return;
 				}
 				if (name == Names.set)
 				{
-					this.configureMethod(this.property.getSetter(), token);
+					this.configureMethod(this.property.initSetter(), token);
 					this.mode = SETTER_PARAMETER;
 					this.target = SETTER;
 					return;
@@ -154,8 +154,11 @@ public class PropertyParser extends Parser implements IValueConsumer
 	private void configureMethod(IMethod method, IToken token)
 	{
 		method.setPosition(token.raw());
-		method.setModifiers(this.modifiers);
-		this.modifiers = null;
+		if (this.modifiers != null)
+		{
+			method.setModifiers(this.modifiers);
+			this.modifiers = null;
+		}
 	}
 	
 	@Override

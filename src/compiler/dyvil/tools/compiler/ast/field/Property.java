@@ -169,10 +169,12 @@ public class Property extends Member implements IProperty
 		
 		if (this.getter != null)
 		{
+			this.getter.getModifiers().addIntModifier(this.modifiers.toFlags());
 			this.getter.resolveTypes(markers, context);
 		}
 		if (this.setter != null)
 		{
+			this.setter.getModifiers().addIntModifier(this.modifiers.toFlags());
 			this.setter.resolveTypes(markers, context);
 		}
 	}
