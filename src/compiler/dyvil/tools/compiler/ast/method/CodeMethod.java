@@ -453,6 +453,11 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.parameters[i].write(mw);
 		}
+
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].writeParameter(mw);
+		}
 		
 		final Label start = new Label();
 		final Label end = new Label();
