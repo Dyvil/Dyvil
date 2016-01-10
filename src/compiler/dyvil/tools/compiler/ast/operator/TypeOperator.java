@@ -25,7 +25,7 @@ public final class TypeOperator extends AbstractValue
 	public static final class Types
 	{
 		public static final IClass    TYPE_CLASS = Package.dyvilxLangModelType.resolveClass("Type");
-		public static final ClassType TYPE       = new ClassType();
+		public static final ClassType TYPE       = new ClassType(TYPE_CLASS);
 		
 		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
 		
@@ -136,11 +136,6 @@ public final class TypeOperator extends AbstractValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
-
-		if (this.type.getTypeVariable() == null && this.type.hasTypeVariables())
-		{
-			markers.add(MarkerMessages.createError(this.position, "typeoperator.typevar"));
-		}
 	}
 	
 	@Override
