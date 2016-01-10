@@ -1,51 +1,17 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringForStatement extends ForEachStatement
 {
-	public static final Name $string = Name.getQualified("$string");
-	
-	protected Variable indexVar;
-	protected Variable lengthVar;
-	protected Variable stringVar;
-	
 	public StringForStatement(ICodePosition position, Variable var)
 	{
 		super(position, var);
-		
-		this.indexVar = new Variable(ArrayForStatement.$index, Types.INT);
-		this.lengthVar = new Variable(ArrayForStatement.$length, Types.INT);
-		this.stringVar = new Variable($string, Types.STRING);
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (this.variable.getName() == name)
-		{
-			return this.variable;
-		}
-		if (name == ArrayForStatement.$index)
-		{
-			return this.indexVar;
-		}
-		if (name == ArrayForStatement.$length)
-		{
-			return this.lengthVar;
-		}
-		if (name == $string)
-		{
-			return this.stringVar;
-		}
-		return null;
 	}
 	
 	@Override
@@ -55,42 +21,47 @@ public class StringForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
-		Variable var = this.variable;
-		Variable stringVar = this.stringVar;
-		Variable indexVar = this.indexVar;
-		Variable lengthVar = this.lengthVar;
-		int lineNumber = this.getLineNumber();
-		
+		final Variable var = this.variable;
+		final int lineNumber = this.getLineNumber();
+
+		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.writeLabel(scopeLabel);
+
+		final int localCount = writer.localCount();
 		
 		// Load the String
 		var.getValue().writeExpression(writer, null);
 		
 		// Local Variables
-		int locals = writer.localCount();
+		final int stringVarIndex = writer.localCount();
+		final int lengthVarIndex = stringVarIndex + 1;
+		final int indexVarIndex = stringVarIndex + 2;
+
 		writer.writeInsn(Opcodes.DUP);
-		stringVar.writeInit(writer, null);
+		writer.writeVarInsn(Opcodes.ASTORE, stringVarIndex);
 		// Get the length
 		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
 		writer.writeInsn(Opcodes.DUP);
-		lengthVar.writeInit(writer, null);
+		writer.writeVarInsn(Opcodes.ISTORE, lengthVarIndex);
 		
 		// Initial Boundary Check - if the length is 0, skip the loop.
 		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
 		
 		// Set index to 0
 		writer.writeLDC(0);
-		indexVar.writeInit(writer, null);
+		writer.writeVarInsn(Opcodes.ISTORE, indexVarIndex);
 		
 		writer.writeTargetLabel(startLabel);
 		
 		// Get the char at the index
-		stringVar.writeGet(writer, null, lineNumber);
-		indexVar.writeGet(writer, null, lineNumber);
+		writer.writeVarInsn(Opcodes.ALOAD, stringVarIndex);
+		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
 		writer.writeLineNumber(lineNumber);
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
+		// Autocasting
+		Types.CHAR.writeCast(writer, var.getType(), lineNumber);
 		var.writeInit(writer, null);
 		
 		// Action
@@ -101,19 +72,16 @@ public class StringForStatement extends ForEachStatement
 		
 		writer.writeLabel(updateLabel);
 		// Increment index
-		writer.writeIINC(indexVar.getLocalIndex(), 1);
+		writer.writeIINC(indexVarIndex, 1);
 		// Boundary Check
-		indexVar.writeGet(writer, null, lineNumber);
-		lengthVar.writeGet(writer, null, lineNumber);
+		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
+		writer.writeVarInsn(Opcodes.ILOAD, lengthVarIndex);
 		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables
-		writer.resetLocals(locals);
+		writer.resetLocals(localCount);
 		writer.writeLabel(endLabel);
 		
 		var.writeLocal(writer, scopeLabel, endLabel);
-		indexVar.writeLocal(writer, scopeLabel, endLabel);
-		lengthVar.writeLocal(writer, scopeLabel, endLabel);
-		stringVar.writeLocal(writer, scopeLabel, endLabel);
 	}
 }

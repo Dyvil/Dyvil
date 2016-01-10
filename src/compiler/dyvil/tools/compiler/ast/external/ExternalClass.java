@@ -82,7 +82,6 @@ public final class ExternalClass extends AbstractClass
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		this.metadata.resolveTypes(null, this);
-		this.metadata.resolveTypesBody(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -99,7 +98,7 @@ public final class ExternalClass extends AbstractClass
 				type.addType(new TypeVarType(var));
 			}
 			
-			this.type = type;
+			this.thisType = type;
 		}
 	}
 	
@@ -185,7 +184,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveGenerics();
 		}
-		return this.type;
+		return this.thisType;
 	}
 	
 	@Override
@@ -237,7 +236,17 @@ public final class ExternalClass extends AbstractClass
 		}
 		return super.getSuperTypeDistance(superType);
 	}
-	
+
+	@Override
+	public ITypeParameter[] getTypeParameters()
+	{
+		if (!this.genericsResolved)
+		{
+			this.resolveGenerics();
+		}
+		return super.getTypeParameters();
+	}
+
 	@Override
 	public ITypeParameter getTypeParameter(int index)
 	{
@@ -333,7 +342,7 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
 	{
 		if (!this.genericsResolved)
 		{
@@ -343,7 +352,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
-		return super.checkImplements(markers, iclass, candidate, typeContext);
+		return super.checkImplements(markers, checkedClass, candidate, typeContext);
 	}
 	
 	@Override
@@ -545,7 +554,7 @@ public final class ExternalClass extends AbstractClass
 			}
 		}
 		
-		this.type = new ClassType(this);
+		this.thisType = new ClassType(this);
 	}
 	
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)

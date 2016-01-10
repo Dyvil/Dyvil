@@ -16,26 +16,19 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
 /**
- * A <b>List</b> is a data type that represents an ordered (sequential)
- * {@linkplain Collection collection}. A list supports access using integer
- * indexes in a way similar to arrays. However, they also support various
- * operations for easily modifying the structure of their elements, examples for
- * which are the {@linkplain #add(Object) add} or {@linkplain #remove(Object)
- * remove} operations. Since a list is also a {@linkplain Collection}, it also
- * supports various querying operations including {@linkplain #map(Function)
- * map}, {@linkplain #filter(Predicate) filter} or
- * {@linkplain #flatMap(Function) flatMap} and new sequential operations such as
- * {@linkplain #sort() sort}.
+ * A <b>List</b> is a data type that represents an ordered (sequential) {@linkplain Collection collection}. A list
+ * supports access using integer indexes in a way similar to arrays. However, they also support various operations for
+ * easily modifying the structure of their elements, examples for which are the {@linkplain #add(Object) add} or
+ * {@linkplain #remove(Object) remove} operations. Since a list is also a {@linkplain Collection}, it also supports
+ * various querying operations including {@linkplain #map(Function) map}, {@linkplain #filter(Predicate) filter} or
+ * {@linkplain #flatMap(Function) flatMap} and new sequential operations such as {@linkplain #sort() sort}.
  * <p>
- * As with {@linkplain Collection collections}, lists also make a clear
- * distinction between {@linkplain MutableList mutable} and
- * {@linkplain ImmutableList immutable} data. For the latter, the <i>Dyvil
- * Collection Framework</i> provides various memory-efficient implementations
- * specialized for lists with zero, one or multiple elements.
+ * As with {@linkplain Collection collections}, lists also make a clear distinction between {@linkplain MutableList
+ * mutable} and {@linkplain ImmutableList immutable} data. For the latter, the <i>Dyvil Collection Framework</i>
+ * provides various memory-efficient implementations specialized for lists with zero, one or multiple elements.
  * <p>
- * Since this interface is both {@link NilConvertible} and
- * {@link ArrayConvertible}, it is possible to initialize both mutable and
- * immutable lists with simple expressions, as shown in the below example.
+ * Since this interface is both {@link NilConvertible} and {@link ArrayConvertible}, it is possible to initialize both
+ * mutable and immutable lists with simple expressions, as shown in the below example.
  * <p>
  * <pre>
  * List[int] mutable = nil // Creates an empty, mutable list
@@ -52,9 +45,8 @@ import java.util.function.Predicate;
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {
 	/**
-	 * Returns an empty, immutable list. This method is primarily for use with
-	 * the {@code nil} literal in <i>Dyvil</i> and returns an instance of
-	 * {@link EmptyList}.
+	 * Returns an empty, immutable list. This method is primarily for use with the {@code nil} literal in <i>Dyvil</i>
+	 * and returns an instance of {@link EmptyList}.
 	 *
 	 * @return an empty, immutable list
 	 */
@@ -64,8 +56,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	}
 	
 	/**
-	 * Returns an empty, mutable list. The exact type of the returned object is
-	 * given by {@link MutableList#apply()}.
+	 * Returns an empty, mutable list. The exact type of the returned object is given by {@link MutableList#apply()}.
 	 *
 	 * @return an empty, mutable list
 	 */
@@ -80,11 +71,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	}
 	
 	/**
-	 * Returns an immutable list containing all of the given {@code elements}.
-	 * This method is primarily for use with <i>Array Expressions</i> in
-	 * <i>Dyvil</i> and internally creates an
-	 * {@link dyvil.collection.immutable.ArrayList ArrayList} from the given
-	 * {@code elements}.
+	 * Returns an immutable list containing all of the given {@code elements}. This method is primarily for use with
+	 * <i>Array Expressions</i> in <i>Dyvil</i> and internally creates an {@link dyvil.collection.immutable.ArrayList
+	 * ArrayList} from the given {@code elements}.
 	 *
 	 * @param elements
 	 * 		the elements of the returned collection
@@ -130,9 +119,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	}
 	
 	/**
-	 * Returns the element at the given {@code index}. This method throws an
-	 * {@link IndexOutOfBoundsException} if the given {@code index} is less than
-	 * {@code 0} or greater than or equal to the size of this list.
+	 * Returns the element at the given {@code index}. By default, this method delegates to the {@link #get(int)}
+	 * method.
 	 *
 	 * @param index
 	 * 		the index
@@ -142,7 +130,10 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 * 		if the index is out of the bounds of this list
 	 */
-	E subscript(int index);
+	default E subscript(int index)
+	{
+		return this.get(index);
+	}
 
 	default List<E> subscript(Range<Int> range)
 	{
@@ -151,6 +142,15 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return this.subList(start, length);
 	}
 
+	/**
+	 * Returns a reference that points to the value at the given {@code index}. The reference delegates to the {@link
+	 * #get(int)} and {@link #setResizing(int, Object)} methods, meaning that it behaves just like these methods.
+	 *
+	 * @param index
+	 * 		the index the reference points at
+	 *
+	 * @return a reference that points to the value at the given index
+	 */
 	default ObjectRef<E> subscriptRef(int index)
 	{
 		return new ObjectRef<E>()
@@ -164,47 +164,43 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 			@Override
 			public void set(E value)
 			{
-				List.this.set(index, value);
+				List.this.setResizing(index, value);
 			}
 		};
 	}
 
 	/**
-	 * Returns the element at the given {@code index}. Unlike
-	 * {@link #subscript(int)}, this method will not throw any exceptions if the
-	 * given {@code index} is out of bounds. Instead, it silently ignores the
-	 * error and returns {@code null}.
+	 * Returns the element at the given {@code index}. This method throws an {@link IndexOutOfBoundsException} if the
+	 * given {@code index} is less than {@code 0} or greater than or equal to the size of this list.
 	 *
 	 * @param index
 	 * 		the index
 	 *
 	 * @return the element at the given index
+	 *
+	 * @throws IndexOutOfBoundsException
+	 * 		if the index is out of the bounds of this list
 	 */
 	E get(int index);
 	
 	// Non-mutating Operations
 	
 	/**
-	 * Creates and returns a {@linkplain List} containing {@code length} of the
-	 * elements of this list starting from the {@code startIndex}. If the
-	 * {@code startIndex} or the end index ({@code startIndex + length}) exceeds
-	 * the size of this list, an exception will be thrown.
+	 * Creates and returns a {@linkplain List} containing {@code length} of the elements of this list starting from the
+	 * {@code startIndex}. If the {@code startIndex} or the end index ({@code startIndex + length}) exceeds the size of
+	 * this list, an exception will be thrown.
 	 * <p>
-	 * Note that for {@linkplain MutableList mutable lists}, it is not
-	 * guaranteed that changes to the sub-list will be reflected in the list is
-	 * was created from. Although it is not an absolute requirement,
-	 * implementations should return a list that, when mutated, does <b>not</b>
-	 * reflect the changes in this list. This behavior is implemented in all
-	 * {@linkplain MutableList mutable list} implementations of the <i>Dyvil
-	 * Collection Framework</i>.
+	 * Note that for {@linkplain MutableList mutable lists}, it is not guaranteed that changes to the sub-list will be
+	 * reflected in the list it was created from. Although it is not an absolute requirement, implementations should
+	 * return a list that, when mutated, does <b>not</b> reflect the changes in this list. This behavior is implemented
+	 * in all {@linkplain MutableList mutable list} implementations of the <i>Dyvil Collection Framework</i>.
 	 *
 	 * @param startIndex
 	 * 		the start index of the sub list
 	 * @param length
 	 * 		the length of the sub list
 	 *
-	 * @return a sub-list with {@code length} elements starting from the
-	 * {@code startIndex}
+	 * @return a sub-list with {@code length} elements starting from the {@code startIndex}
 	 */
 	List<E> subList(int startIndex, int length);
 	
@@ -215,10 +211,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	List<? extends E> $plus$plus(Collection<? extends E> collection);
 	
 	/**
-	 * {@inheritDoc} Since {@link List Lists} can contain that same element
-	 * multiple times, implementations should behave so that <i>all</i>
-	 * occurrences of the element are removed, not only the first one. This
-	 * behavior can be achieved using this code snippet:
+	 * {@inheritDoc} Since {@link List Lists} can contain that same element multiple times, implementations should
+	 * behave so that <i>all</i> occurrences of the element are removed, not only the first one. This behavior can be
+	 * achieved using this code snippet:
 	 * <p>
 	 * <pre>
 	 * List copy = list.copy()
@@ -246,21 +241,18 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	List<E> reversed();
 	
 	/**
-	 * Returns a list that contains the same elements as this list, but in a
-	 * sorted order. The sorting order is given by the <i>natural order</i> of
-	 * the elements of this list, i.e. the order specified by their
-	 * {@link Comparable#compareTo(Object) compareTo} method. Thus, this method
-	 * will fail if the elements of this list do not implement
-	 * {@link Comparable} interface.
+	 * Returns a list that contains the same elements as this list, but in a sorted order. The sorting order is given by
+	 * the <i>natural order</i> of the elements of this list, i.e. the order specified by their {@link
+	 * Comparable#compareTo(Object) compareTo} method. Thus, this method will fail if the elements of this list do not
+	 * implement {@link Comparable} interface.
 	 *
 	 * @return a sorted list of this list's elements
 	 */
 	List<E> sorted();
 	
 	/**
-	 * Returns a list that contains the same elements as this list, but in a
-	 * sorted order. The sorting order is specified by the given
-	 * {@code comparator}.
+	 * Returns a list that contains the same elements as this list, but in a sorted order. The sorting order is
+	 * specified by the given {@code comparator}.
 	 *
 	 * @param comparator
 	 * 		the comparator that defines the order of the elements
@@ -282,9 +274,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	void clear();
 	
 	/**
-	 * Ensures the capacity of this list to be at least {@code minSize}. This
-	 * can be used to avoid having to recreate arrays in {@link ArrayList}s when
-	 * the amount of elements to be added is already known.
+	 * Ensures the capacity of this list to be at least {@code minSize}. This can be used to avoid having to recreate
+	 * arrays in {@link ArrayList}s when the amount of elements to be added is already known.
 	 *
 	 * @param minSize
 	 * 		the minimum size
@@ -294,9 +285,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	}
 	
 	/**
-	 * Updates the element at the given {@code index} of this list. This method
-	 * throws an {@link IndexOutOfBoundsException} if the given {@code index} is
-	 * less than {@code 0} or greater than or equal to the size of this list.
+	 * Updates the element at the given {@code index} of this list. The default implementation of this method delegates
+	 * to {@link #set(int, Object)}.
 	 *
 	 * @param index
 	 * 		the index of the element to be updated
@@ -306,7 +296,10 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 * 		if the index is out of the bounds of this list
 	 */
-	void subscript_$eq(int index, E element);
+	default void subscript_$eq(int index, E element)
+	{
+		this.set(index, element);
+	}
 
 	default void subscript_$eq(Range<Int> range, E[] elements)
 	{
@@ -327,12 +320,28 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 			this.subscript_$eq(start, elements.subscript(i));
 		}
 	}
+
+	/**
+	 * Updates the element at the given {@code index} of this list. This method throws an {@link
+	 * IndexOutOfBoundsException} if the given {@code index} is less than {@code 0} or greater than or equal to the size
+	 * of this list.
+	 *
+	 * @param index
+	 * 		the index of the element to be updated
+	 * @param element
+	 * 		the new element
+	 *
+	 * @return the old element at the given index
+	 *
+	 * @throws IndexOutOfBoundsException
+	 * 		if the index is out of the bounds of this list
+	 */
+	E set(int index, E element);
 	
 	/**
-	 * Updates the element at the given {@code index} of this list. Unlike
-	 * {@link #subscript_$eq(int, Object)}, this method will not throw any
-	 * exceptions if the given {@code index} is out of bounds. Instead, it
-	 * silently ignores the error and returns {@code null}.
+	 * Updates the element at the given {@code index} of this list. Unlike {@link #set(int, Object)}, this method will
+	 * not throw any exceptions if the given {@code index} is out of bounds. Instead, it resizes the list to the
+	 * required size and returns {@code null}.
 	 *
 	 * @param index
 	 * 		the index of the element to be updated
@@ -341,12 +350,12 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *
 	 * @return the old element, if present, {@code null} otherwise
 	 */
-	E set(int index, E element);
+	E setResizing(int index, E element);
 	
 	/**
-	 * Inserts the element at the given {@code index} of this list. This method
-	 * throws an {@link IndexOutOfBoundsException} if the given {@code index} is
-	 * less than {@code 0} or greater than the size of this list.
+	 * Inserts the element at the given {@code index} of this list. This method throws an {@link
+	 * IndexOutOfBoundsException} if the given {@code index} is less than {@code 0} or greater than the size of this
+	 * list. If the index is equal to the size of the list, the element gets appended to the end.
 	 *
 	 * @param index
 	 * 		the index at which to insert the element
@@ -356,46 +365,46 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 * 		if the index is out of the bounds of this list
 	 */
-	default void insert(int index, E element)
-	{
-		this.add(index, element);
-	}
+	void insert(int index, E element);
 	
+	/**
+	 * Inserts the element at the given {@code index} of this list. Unlike {@link #insert(int, Object)}, this method
+	 * will not throw any exception if the given {@code index} is out of bounds. Instead, it simply resizes this list to
+	 * it's needs and returns {@code null}.
+	 *
+	 * @param index
+	 * 		the index at which to insert the element
+	 * @param element
+	 * 		the element to be inserted
+	 */
+	default void insertResizing(int index, E element)
+	{
+		if (index > this.size())
+		{
+			this.setResizing(index, element);
+			return;
+		}
+		this.insert(index, element);
+	}
+
 	@Override
 	default boolean add(E element)
 	{
 		this.$plus$eq(element);
 		return true;
 	}
-	
+
 	/**
-	 * Inserts the element at the given {@code index} of this list. Unlike
-	 * {@link #insert(int, Object)}, this method will not throw any exception if
-	 * the given {@code index} is out of bounds. Instead, it simply resizes this
-	 * list to it's needs and returns {@code null}.
-	 *
-	 * @param index
-	 * 		the index at which to insert the element
-	 * @param element
-	 * 		the element to be inserted
-	 *
-	 * @return the old element, if present, {@code null} otherwise
-	 */
-	E add(int index, E element);
-	
-	/**
-	 * {@inheritDoc} Since {@link List Lists} can contain that same element
-	 * multiple times, implementations should behave so that <i>all</i>
-	 * occurrences of the element are removed, not only the first one. This
-	 * behavior can be achieved using the {@link #removeFirst(Object)
-	 * removeFirst} method.
+	 * {@inheritDoc} Since {@link List Lists} can contain that same element multiple times, implementations should
+	 * behave so that <i>all</i> occurrences of the element are removed, not only the first one. This behavior can be
+	 * achieved using the {@link #removeFirst(Object) removeFirst} method.
 	 */
 	@Override
 	boolean remove(Object element);
 	
 	default boolean removeFirst(Object element)
 	{
-		int index = this.indexOf(element);
+		final int index = this.indexOf(element);
 		if (index < 0)
 		{
 			return false;
@@ -407,7 +416,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	
 	default boolean removeLast(Object element)
 	{
-		int index = this.lastIndexOf(element);
+		final int index = this.lastIndexOf(element);
 		if (index < 0)
 		{
 			return false;
@@ -418,9 +427,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	}
 	
 	/**
-	 * Removes the element at the given {@code index} from this list. This
-	 * method throws an {@link IndexOutOfBoundsException} if the given
-	 * {@code index} is less than {@code 0} or greater than or equal to the size
+	 * Removes the element at the given {@code index} from this list. This method throws an {@link
+	 * IndexOutOfBoundsException} if the given {@code index} is less than {@code 0} or greater than or equal to the size
 	 * of this list.
 	 *
 	 * @param index
@@ -437,17 +445,14 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	void reverse();
 	
 	/**
-	 * Sorts the elements of this list. The sorting order is given by the
-	 * <i>natural order</i> of the elements of this collection, i.e. the order
-	 * specified by their {@link Comparable#compareTo(Object) compareTo} method.
-	 * Thus, this method will fail if the elements in this collection do not
-	 * implement {@link Comparable} interface.
+	 * Sorts the elements of this list. The sorting order is given by the <i>natural order</i> of the elements of this
+	 * collection, i.e. the order specified by their {@link Comparable#compareTo(Object) compareTo} method. Thus, this
+	 * method will fail if the elements in this collection do not implement {@link Comparable} interface.
 	 */
 	void sort();
 	
 	/**
-	 * Sorts the elements of this list. The sorting order is specified by the
-	 * given {@code comparator}.
+	 * Sorts the elements of this list. The sorting order is specified by the given {@code comparator}.
 	 *
 	 * @param comparator
 	 * 		the comparator that defines the order of the elements
@@ -461,8 +466,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	// Search Operations
 	
 	/**
-	 * Returns the first index of the given {@code element} in this list, and
-	 * {@code -1} if the element is not present in this list.
+	 * Returns the first index of the given {@code element} in this list, and {@code -1} if the element is not present
+	 * in this list.
 	 *
 	 * @param element
 	 * 		the element to search
@@ -472,8 +477,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	int indexOf(Object element);
 	
 	/**
-	 * Returns the last index of the given {@code element} in this list, and
-	 * {@code -1} if the element is not present in this list.
+	 * Returns the last index of the given {@code element} in this list, and {@code -1} if the element is not present in
+	 * this list.
 	 *
 	 * @param element
 	 * 		the element to search
@@ -506,6 +511,11 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	java.util.List<E> toJava();
 	
 	// Utility Methods
+
+	static void rangeCheck(int index, int size)
+	{
+
+	}
 	
 	static <E> boolean listEquals(List<E> list, Object o)
 	{

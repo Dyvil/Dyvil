@@ -36,7 +36,7 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
-	default void addType(IType type)
+	default void addParameterType(IType type)
 	{
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));

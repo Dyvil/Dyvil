@@ -74,11 +74,7 @@ public final class CharPattern extends Pattern
 				return true;
 			}
 		}
-		if (this.type == CHAR)
-		{
-			return false;
-		}
-		return type == Types.STRING || type.isSuperTypeOf(Types.STRING);
+		return this.type != CHAR && (type == Types.STRING || type.isSuperTypeOf(Types.STRING));
 	}
 	
 	@Override
@@ -116,17 +112,16 @@ public final class CharPattern extends Pattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
 	{
 		if (this.type == STRING)
 		{
-			StringPattern.writeStringInvJump(writer, varIndex, elseLabel, this.value);
+			StringPattern.writeStringInvJump(writer, varIndex, matchedType, elseLabel, this.value);
 			return;
 		}
-		if (varIndex >= 0)
-		{
-			writer.writeVarInsn(Opcodes.ILOAD, varIndex);
-		}
+
+		IPattern.loadVar(writer, varIndex, matchedType);
+		matchedType.writeCast(writer, Types.CHAR, this.getLineNumber());
 		writer.writeLDC(this.value.charAt(0));
 		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}

@@ -75,8 +75,6 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	
 	IMethod getMethod(Name name);
 	
-	IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete);
-	
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
 	default IMethod getFunctionalMethod()
@@ -84,9 +82,9 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 		return null;
 	}
 	
-	boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext);
 	
-	void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext);
+	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);
 	
 	// Phases
 	

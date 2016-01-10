@@ -210,10 +210,14 @@ public class Field extends Member implements IField
 		IValue value1 = IType.convertValue(newValue, this.type, this.type, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages.createMarker(newValue.getPosition(), "field.assign.type", this.name.unqualified);
-			marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
-			marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
-			markers.add(marker);
+			if (newValue.isResolved())
+			{
+				Marker marker = MarkerMessages
+						.createMarker(newValue.getPosition(), "field.assign.type", this.name.unqualified);
+				marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
+				marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
+				markers.add(marker);
+			}
 		}
 		else
 		{
@@ -248,7 +252,7 @@ public class Field extends Member implements IField
 			{
 				inferType = true;
 				this.type = this.value.getType();
-				if (this.type == Types.UNKNOWN)
+				if (this.type == Types.UNKNOWN && this.value.isResolved())
 				{
 					markers.add(MarkerMessages.createMarker(this.position, "field.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
@@ -258,11 +262,14 @@ public class Field extends Member implements IField
 			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages
-						.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
-				marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
-				markers.add(marker);
+				if (this.value.isResolved())
+				{
+					Marker marker = MarkerMessages
+							.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
+					marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
+					marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+					markers.add(marker);
+				}
 			}
 			else
 			{
@@ -311,9 +318,9 @@ public class Field extends Member implements IField
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.FIELD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(MarkerMessages
-					            .createError(this.position, "modifiers.illegal", MarkerMessages.getMarker("field", this.name),
-					                         ModifierUtil.methodModifiersToString(illegalModifiers)));
+			markers.add(MarkerMessages.createError(this.position, "modifiers.illegal",
+			                                       MarkerMessages.getMarker("field", this.name),
+			                                       ModifierUtil.methodModifiersToString(illegalModifiers)));
 		}
 	}
 	

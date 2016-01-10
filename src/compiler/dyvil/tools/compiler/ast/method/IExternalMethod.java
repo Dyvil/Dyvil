@@ -6,10 +6,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 
 public interface IExternalMethod extends ICallableMember
 {
-	default IParameter getParameter_(int index)
-	{
-		return this.getParameter(index);
-	}
+	IParameter getParameter_(int index);
 	
 	AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 }

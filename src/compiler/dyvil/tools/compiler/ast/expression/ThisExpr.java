@@ -120,10 +120,10 @@ public final class ThisExpr implements IValue
 			return;
 		}
 		
-		IType t = context.getThisClass().getType();
-		if (t != null)
+		final IType thisType = context.getThisType();
+		if (thisType != null)
 		{
-			this.type = t;
+			this.type = thisType;
 		}
 	}
 	
@@ -144,8 +144,8 @@ public final class ThisExpr implements IValue
 		}
 		
 		this.type.checkType(markers, context, TypePosition.CLASS);
+
 		IClass iclass = this.type.getTheClass();
-		
 		this.getter = context.getAccessibleThis(iclass);
 		if (this.getter == null)
 		{

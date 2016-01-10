@@ -1,0 +1,253 @@
+package dyvil.collection.impl
+
+import java.util.{ Iterator, NoSuchElementException }
+import java.io.IOException
+
+public abstract class AbstractBitSet implements Set[int]
+{
+	protected static final int DEFAULT_CAPACITY = 10
+
+	protected @Transient int size
+	protected @Transient [long] words
+
+	public new()
+	{
+		this.new(DEFAULT_CAPACITY)
+	}
+
+	public new(int capacity)
+	{
+		this.words = new [long](dyvil.math.MathUtils.ceil(capacity / 64))
+	}
+
+	public new(int... elements)
+	{
+		this.new(elements.length)
+		this.size = elements.length
+
+		for (int i : elements)
+		{
+			final int wordIndex = wordIndex(i)
+			this.words[wordIndex] |= mask(bitIndex(i))
+		}
+	}
+
+	public new(Collection[int] elements)
+	{
+		// Copy from above
+		this.new(elements.size)
+		this.size = elements.size
+
+		for (int i : elements)
+		{
+			final int wordIndex = wordIndex(i)
+            this.words[wordIndex] |= mask(bitIndex(i))
+		}
+	}
+
+	public new(AbstractBitSet elements)
+	{
+		this.size = elements.size
+		this.words = elements.words.copy()
+	}
+
+	// Utility Methods
+
+	protected static int wordIndex(int bit) = bit \ 64
+
+	protected static int bitIndex(int bit) = bit % 64
+
+	protected static boolean bitSet(long word, int bit) = (word & 1L << bit) != 0L
+
+	protected static long mask(int bit) = 1L << bit
+
+	// Internal Access Methods
+
+	protected void ensureWordCapacity(int wordCount)
+	{
+		[long] newWords = new [long](wordCount)
+		System.arraycopy(this.words, 0, newWords, 0, this.words.length)
+		this.words = newWords
+	}
+
+	protected boolean bitSet(int bit)
+	{
+		final int wordIndex = wordIndex(bit)
+		if (wordIndex >= this.words.length) return false
+
+		final int bitIndex = bitIndex(bit)
+		final long word = this.words[wordIndex]
+		return bitSet(word, bitIndex)
+	}
+
+	protected int nextSetBit(int start)
+	{
+		for (int i : (start + 1) ..< (this.words.length * 64))
+		{
+			if (this.bitSet(i))
+			{
+				return i
+			}
+		}
+		return -1
+	}
+
+	protected void setBit(int bit)
+	{
+		final int wordIndex = wordIndex(bit)
+		final long value = mask(bitIndex(bit))
+
+		if (wordIndex >= this.words.length)
+		{
+			this.ensureWordCapacity(wordIndex + 1)
+			this.words[wordIndex] = value // no need to OR here, the word is definitely all-0
+			this.size++
+			return
+		}
+
+		final long word = this.words[wordIndex]
+		final long newWord = word | value
+
+		if (newWord != word)
+		{
+			this.words[wordIndex] = newWord
+			this.size++
+		}
+	}
+
+	protected void clearBit(int bit)
+	{
+		final int wordIndex = wordIndex(bit)
+		if (wordIndex >= this.words.length) return // bit is already 0
+
+		final long word = this.words[wordIndex]
+		final long newWord = word & ~mask(bitIndex(bit))
+
+		if (newWord != word)
+		{
+			this.words[wordIndex] = newWord
+			this.size--
+		}
+	}
+
+	// Override Methods
+
+	public override int size() = this.size
+
+	public override boolean isEmpty() = this.size == 0
+
+	public override boolean isSorted() = true
+
+	public override Iterator[int] iterator() = new Iterator[int]()
+	{
+		private int currentBit = this[AbstractBitSet].nextSetBit(-1)
+
+		public override int next()
+		{
+			final int current = this.currentBit
+			if (current < 0) throw new NoSuchElementException
+
+			this.currentBit = this[AbstractBitSet].nextSetBit(current)
+			return current
+		}
+
+		public override boolean hasNext() = this.currentBit >= 0
+
+		public override void remove()
+		{
+			if (this.currentBit < 0) throw new NoSuchElementException
+
+			this[AbstractBitSet].removeAt(this.currentBit)
+			this.currentBit = this[AbstractBitSet].nextSetBit(this.currentBit)
+		}
+	}
+
+	public abstract void removeAt(int bit)
+
+	public override boolean contains(Object o) = o match {
+		case int i : this.bitSet(i)
+		case _ : false
+	}
+
+	public override void toArray(int index, [Object] store)
+	{
+		for (int wordIndex : 0 ..< this.words.length)
+		{
+			final long word = this.words[wordIndex]
+			for (int bit : 0 ..< 64)
+			{
+				if (bitSet(word, bit))
+				{
+					store[index++] = wordIndex * 64 + bit
+				}
+			}
+		}
+	}
+
+	public [int] toIntArray()
+	{
+		final [int] store = new [int](this.size)
+		this.toIntArray(0, store)
+		return store
+	}
+
+	public void toIntArray([int] store) = this.toIntArray(0, store)
+
+	public void toIntArray(int index, [int] store)
+	{
+		for (int wordIndex : 0 ..< this.words.length)
+		{
+			final long word = this.words[wordIndex]
+			for (int bit : 0 ..< 64)
+			{
+				if (bitSet(word, bit))
+				{
+					store[index++] = wordIndex * 64 + bit
+				}
+			}
+		}
+	}
+
+	public override java.util.Set[int] toJava()
+	{
+		final java.util.Set[int] hashSet = new java.util.HashSet[int]
+		for (Int element : this)
+		{
+			hashSet.add(element)
+		}
+		return hashSet
+	}
+
+	public override boolean equals(Object other) = Set.setEquals(this, other)
+
+	public override int hashCode() = Set.setHashCode(this)
+
+	public override String toString() = Collection.collectionToString(this)
+
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	{
+		out.defaultWriteObject()
+
+		out.writeInt(this.size)
+
+		out.writeInt(this.words.length)
+		for (long word : this.words)
+		{
+			out.writeLong(word)
+		}
+	}
+
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		in.defaultReadObject()
+
+		this.size = in.readInt()
+
+		final int wordCount = in.readInt()
+		this.words = new [long](wordCount)
+		for (int i : 0 ..< wordCount)
+		{
+			this.words[i] = in.readLong()
+		}
+	}
+}

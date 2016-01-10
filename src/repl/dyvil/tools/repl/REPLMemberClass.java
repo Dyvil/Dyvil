@@ -405,7 +405,13 @@ public class REPLMemberClass implements IClass
 	{
 		return this;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return new ClassType(this);
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -512,12 +518,6 @@ public class REPLMemberClass implements IClass
 	
 	@Override
 	public IMethod getFunctionalMethod()
-	{
-		return null;
-	}
-	
-	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
 	{
 		return null;
 	}

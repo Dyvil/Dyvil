@@ -55,7 +55,7 @@ public final class WildcardPattern extends Pattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
 	{
 		if (varIndex < 0)
 		{

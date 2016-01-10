@@ -170,7 +170,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, method::addType);
+			i = readTyped(desc, i, method::addParameterType);
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -326,19 +326,17 @@ public final class ClassFormat
 			return start + 1;
 		case '+':
 		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
 			WildcardType var = new WildcardType(Variance.COVARIANT);
-			var.setType(readType(desc, start + 1, end1));
+			int end1 = readTyped(desc, start + 1, var);
 			consumer.setType(var);
-			return end1 + 1;
+			return end1;
 		}
 		case '-':
 		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
 			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			var.setType(readType(desc, start + 1, end1));
+			int end1 = readTyped(desc, start + 1, var);
 			consumer.setType(var);
-			return end1 + 1;
+			return end1;
 		}
 		}
 		return start;

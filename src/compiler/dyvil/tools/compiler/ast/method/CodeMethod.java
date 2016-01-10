@@ -25,6 +25,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -67,7 +68,27 @@ public class CodeMethod extends AbstractMethod
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, this);
-		
+
+		if (this.receiverType == null)
+		{
+			this.receiverType = this.theClass.getType();
+		}
+		else
+		{
+			this.receiverType = this.receiverType.resolveType(markers, context);
+
+			// Check the self type for compatibility
+			final IClass selfTypeClass = this.receiverType.getTheClass();
+			if (selfTypeClass != null && selfTypeClass != this.theClass)
+			{
+				final Marker marker = MarkerMessages
+						.createError(this.receiverType.getPosition(), "method.receivertype.incompatible", this.getName());
+				marker.addInfo(MarkerMessages.getMarker("method.receivertype", this.receiverType));
+				marker.addInfo(MarkerMessages.getMarker("method.classtype", this.theClass.getFullName()));
+				markers.add(marker);
+			}
+		}
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolveTypes(markers, this);
@@ -105,6 +126,11 @@ public class CodeMethod extends AbstractMethod
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolve(markers, this);
+		}
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -163,6 +189,11 @@ public class CodeMethod extends AbstractMethod
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		super.checkTypes(markers, this);
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -190,12 +221,17 @@ public class CodeMethod extends AbstractMethod
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, this);
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].check(markers, this);
 		}
-		
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.check(markers, context);
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, this);
@@ -284,7 +320,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "method.override", this.name));
+				markers.add(MarkerMessages.createMarker(this.position, "method.override.notfound", this.name));
 			}
 			return;
 		}
@@ -301,13 +337,16 @@ public class CodeMethod extends AbstractMethod
 				markers.add(MarkerMessages.createMarker(this.position, "method.override.final", this.name));
 			}
 			
-			IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
+			final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
 				Marker marker = MarkerMessages
 						.createMarker(this.position, "method.override.type.incompatible", this.name);
 				marker.addInfo(MarkerMessages.getMarker("method.type", this.type));
 				marker.addInfo(MarkerMessages.getMarker("method.override.type", type));
+
+				marker.addInfo(MarkerMessages.getMarker("method.override", Util.methodSignatureToString(overrideMethod),
+				                                        overrideMethod.getTheClass().getFullName()));
 				markers.add(marker);
 			}
 		}
@@ -317,12 +356,17 @@ public class CodeMethod extends AbstractMethod
 	public void foldConstants()
 	{
 		super.foldConstants();
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].foldConstants();
 		}
-		
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.foldConstants();
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].foldConstants();
@@ -351,6 +395,11 @@ public class CodeMethod extends AbstractMethod
 			{
 				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);
 			}
+		}
+
+		if (this.receiverType != null)
+		{
+			this.receiverType.cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -386,15 +435,16 @@ public class CodeMethod extends AbstractMethod
 		{
 			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
 		}
-		
-		String[] exceptionTypes = this.getInternalExceptions();
+
+		final String internalThisClassName = this.theClass.getInternalName();
+		final String[] exceptionTypes = this.getInternalExceptions();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & 0xFFFF, this.name.qualified,
 		                                                                  this.getDescriptor(), this.getSignature(),
 		                                                                  exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.setThisType(this.theClass.getInternalName());
+			mw.setThisType(internalThisClassName);
 		}
 		
 		this.writeAnnotations(mw, modifiers);
@@ -404,8 +454,8 @@ public class CodeMethod extends AbstractMethod
 			this.parameters[i].write(mw);
 		}
 		
-		Label start = new Label();
-		Label end = new Label();
+		final Label start = new Label();
+		final Label end = new Label();
 		
 		if (this.value != null)
 		{
@@ -418,9 +468,9 @@ public class CodeMethod extends AbstractMethod
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
-			              param.getSignature(), start, end);
+			final IParameter parameter = this.parameters[i];
+			mw.writeLocal(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getDescription(),
+			              parameter.getSignature(), start, end);
 		}
 		
 		if ((modifiers & Modifiers.STATIC) != 0)
@@ -428,7 +478,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 		
-		mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
+		mw.writeLocal(0, "this", 'L' + internalThisClassName + ';', null, start, end);
 		
 		if (this.overrideMethods == null)
 		{
@@ -437,49 +487,54 @@ public class CodeMethod extends AbstractMethod
 		
 		String[] descriptors = new String[1 + this.overrideMethods.length];
 		descriptors[0] = this.descriptor;
+
 		methodLoop:
-		for (IMethod m : this.overrideMethods)
+		for (int i = 0; i < this.overrideMethods.length; i++)
 		{
+			final IMethod overrideMethod = this.overrideMethods[i];
+			final String desc = overrideMethod.getDescriptor();
+
 			// Check if a bridge method for the descriptor has not yet been
 			// generated
-			String desc = m.getDescriptor();
-			for (String preDesc : descriptors)
+			for (int j = 0; j <= i; j++)
 			{
-				if (desc.equals(preDesc))
+				if (desc.equals(descriptors[j]))
 				{
 					continue methodLoop;
 				}
 			}
-			
+			descriptors[i + 1] = desc;
+
 			// Generate a bridge method
 			mw = new MethodWriterImpl(writer,
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
 			                                             this.name.qualified, desc, null, exceptionTypes));
 			
 			mw.begin();
-			mw.setThisType(this.theClass.getInternalName());
+			mw.setThisType(internalThisClassName);
+
 			mw.writeVarInsn(Opcodes.ALOAD, 0);
 			
-			int lineNumber = this.getLineNumber();
+			final int lineNumber = this.getLineNumber();
 			
-			for (int i = 0; i < this.parameterCount; i++)
+			for (int p = 0; p < this.parameterCount; p++)
 			{
-				IParameter param = m.getParameter(i);
-				IType type1 = this.parameters[i].getType();
-				IType type2 = param.getType();
+				final IParameter overrideParameter = overrideMethod.getParameter(p);
+				final IType parameterType = this.parameters[p].getInternalType();
+				final IType overrideParameterType = overrideParameter.getInternalType();
 				
-				param.write(mw);
-				mw.writeVarInsn(type2.getLoadOpcode(), param.getIndex());
-				type2.writeCast(mw, type1, lineNumber);
+				overrideParameter.write(mw);
+				mw.writeVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
+				overrideParameterType.writeCast(mw, parameterType, lineNumber);
 			}
 			
-			IType overrideReturnType = m.getType();
+			IType overrideReturnType = overrideMethod.getType();
 			
 			mw.writeLineNumber(lineNumber);
 			boolean itf = this.theClass.isInterface();
 			mw.writeInvokeInsn(
 					(modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL,
-					this.theClass.getInternalName(), this.name.qualified, this.getDescriptor(), itf);
+					internalThisClassName, this.name.qualified, this.getDescriptor(), itf);
 			this.type.writeCast(mw, overrideReturnType, lineNumber);
 			mw.writeInsn(overrideReturnType.getReturnOpcode());
 			mw.end();

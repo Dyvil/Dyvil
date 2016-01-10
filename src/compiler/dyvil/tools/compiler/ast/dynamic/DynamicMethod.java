@@ -82,27 +82,11 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public int typeCount()
+	public void addParameterType(IType type)
 	{
-		return 0;
+
 	}
-	
-	@Override
-	public void setType(int index, IType type)
-	{
-	}
-	
-	@Override
-	public void addType(IType type)
-	{
-	}
-	
-	@Override
-	public IType getType(int index)
-	{
-		return null;
-	}
-	
+
 	@Override
 	public void setTypeParameterized()
 	{

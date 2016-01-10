@@ -222,12 +222,6 @@ public interface ICall extends IValue
 			}
 		}
 		
-		context.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return matches.getBestMethod();
-		}
-		
 		// Prefix Methods
 		if (arguments.size() == 1)
 		{
@@ -242,6 +236,12 @@ public interface ICall extends IValue
 					return matches.getBestMethod();
 				}
 			}
+		}
+
+		context.getMethodMatches(matches, instance, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return matches.getBestMethod();
 		}
 		
 		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);

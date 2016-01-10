@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -273,10 +274,22 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-
-			if (parseMethodBody(pm, type, (ICallableMember) this.member))
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
+				pm.pushParser(new StatementListParser((IValueConsumer) this.member), true);
 				this.mode = METHOD_END;
+				return;
+			}
+			if (type == BaseSymbols.EQUALS)
+			{
+				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
+				this.mode = METHOD_END;
+				return;
+			}
+			if (type == DyvilKeywords.THROWS)
+			{
+				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
+				// mode stays METHOD_VALUE
 				return;
 			}
 
@@ -307,26 +320,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			this.reset();
 			return;
 		}
-	}
-
-	public static boolean parseMethodBody(IParserManager pm, int type, ICallableMember member)
-	{
-		if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-		{
-			pm.pushParser(new StatementListParser(member), true);
-			return true;
-		}
-		if (type == BaseSymbols.EQUALS)
-		{
-			pm.pushParser(pm.newExpressionParser(member));
-			return true;
-		}
-		if (type == DyvilKeywords.THROWS)
-		{
-			pm.pushParser(new ExceptionListParser(member));
-			return true;
-		}
-		return false;
 	}
 	
 	@Override

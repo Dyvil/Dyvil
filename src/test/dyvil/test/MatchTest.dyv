@@ -8,9 +8,12 @@ public class MatchTest
 		tableHoles()
 		lookup()
 		stringTable()
-		stringLookup
+		stringLookup()
 		// stringCollision()
 		expression()
+		tuples()
+		orPatterns()
+		andPatterns()
 	}
 	
 	private static void table()
@@ -103,5 +106,51 @@ public class MatchTest
 		}
 
 		Main.test("Match Expression", "10", result)
+	}
+
+	private static void tuples()
+	{
+		String value = _
+		auto tuple = (1, 2)
+
+		tuple match {
+			case (0, _) => value = "(0, _)"
+			case (_, 0) => value = "(_, 0)"
+			case _		=> value = tuple.toString
+		}
+
+		Main.test("Match Tuples", value, tuple.toString)
+	}
+
+	private static void orPatterns()
+	{
+		[int] array = []
+
+		for (int i : 0 .. 10)
+		{
+			i match {
+				case 1 | 2 | 3	: array += 0
+				case 4 | 5 | 6	: array += 1
+				case 7 | 8 | 9	: array += 2
+				case 0 | 10		: array += 3
+			}
+		}
+
+		final [int] expected = [ 3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3 ]
+		Main.test("Match OR Patterns", array, expected, array == expected)
+	}
+
+	private static void andPatterns()
+	{
+		auto tuple = (1, 2)
+		boolean success = false
+
+		tuple match {
+			case (_, 2) & (1, _) => success = true
+			case (1, _) & (_, 2) => success = true
+			case _				 => success = false
+		}
+
+		Main.test("Match AND Patterns", success, true)
 	}
 }	

@@ -19,7 +19,18 @@ public abstract class AbstractArrayList<E> implements List<E>
 	
 	protected transient Object[] elements;
 	protected transient int      size;
+
+	public AbstractArrayList()
+	{
+		this(DEFAULT_CAPACITY);
+	}
+
+	public AbstractArrayList(int capacity)
+	{
+		this.elements = new Object[capacity];
+	}
 	
+	@SafeVarargs
 	public AbstractArrayList(E... elements)
 	{
 		this.elements = elements.clone();
@@ -48,18 +59,6 @@ public abstract class AbstractArrayList<E> implements List<E>
 		for (E element : collection)
 		{
 			this.elements[index++] = element;
-		}
-	}
-	
-	protected void rangeCheck(int index)
-	{
-		if (index < 0)
-		{
-			throw new IndexOutOfBoundsException("List Index out of Bounds: " + index + " < 0");
-		}
-		if (index >= this.size)
-		{
-			throw new IndexOutOfBoundsException("List Index out of Bounds: " + index + " >= " + this.size);
 		}
 	}
 	
@@ -254,19 +253,9 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 	
 	@Override
-	public E subscript(int index)
-	{
-		this.rangeCheck(index);
-		return (E) this.elements[index];
-	}
-	
-	@Override
 	public E get(int index)
 	{
-		if (index < 0 || index >= this.size)
-		{
-			return null;
-		}
+		List.rangeCheck(index, this.size);
 		return (E) this.elements[index];
 	}
 	

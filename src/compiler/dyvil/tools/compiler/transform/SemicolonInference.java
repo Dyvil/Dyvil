@@ -21,7 +21,7 @@ public final class SemicolonInference
 		
 		IToken prev = first;
 		IToken next = first.next();
-		while (next.type() != 0)
+		while (next.type() != Tokens.EOF)
 		{
 			inferSemicolon(prev, next);
 			prev = next;
@@ -30,7 +30,7 @@ public final class SemicolonInference
 		
 		prev = first;
 		next = first.next();
-		while (next.type() != 0)
+		while (next.type() != Tokens.EOF)
 		{
 			next.setPrev(prev);
 			prev = next;
@@ -40,8 +40,8 @@ public final class SemicolonInference
 	
 	private static void inferSemicolon(IToken prev, IToken next)
 	{
-		int prevLine = prev.endLine();
-		int nextLine = next.startLine();
+		final int prevLine = prev.endLine();
+		final int nextLine = next.startLine();
 		if (nextLine == prevLine)
 		{
 			// Don't infer a semicolon
@@ -53,7 +53,7 @@ public final class SemicolonInference
 		if (nextLine == prevLine + 1)
 		{
 			// Check last token on line in question
-			int prevType = prev.type();
+			final int prevType = prev.type();
 
 			// Check if the previous token is a symbol
 			if ((prevType & Tokens.SYMBOL) != 0)
@@ -66,11 +66,9 @@ public final class SemicolonInference
 				default:
 					return; // don't infer a semicolon
 				}
-				return;
 			}
-
 			// Check if the previous token is a keyword, but not a value keyword
-			if ((prevType & Tokens.KEYWORD) != 0)
+			else if ((prevType & Tokens.KEYWORD) != 0)
 			{
 				switch (prevType)
 				{
@@ -85,22 +83,23 @@ public final class SemicolonInference
 					return; // don't infer a semicolon
 				}
 			}
-
-			// Check for other token types
-			switch (prevType)
+			else
 			{
-			case Tokens.STRING_START:
-			case Tokens.STRING_PART:
-			case BaseSymbols.OPEN_PARENTHESIS:
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				return;
+				// Check for other token types
+				switch (prevType)
+				{
+				case Tokens.STRING_START:
+				case Tokens.STRING_PART:
+				case BaseSymbols.OPEN_PARENTHESIS:
+				case BaseSymbols.OPEN_SQUARE_BRACKET:
+				case BaseSymbols.OPEN_CURLY_BRACKET:
+					return;
+				}
 			}
 
 			// Check first token on the next line
 
-			int nextType = next.type();
-
+			final int nextType = next.type();
 			// Check if the first token on the next line is a symbol
 			if ((nextType & Tokens.SYMBOL) != 0)
 			{
@@ -120,7 +119,7 @@ public final class SemicolonInference
 			}
 		}
 		
-		IToken semicolon = new InferredSemicolon(prevLine, prev.endIndex());
+		final IToken semicolon = new InferredSemicolon(prevLine, prev.endIndex());
 		semicolon.setNext(next);
 		prev.setNext(semicolon);
 	}

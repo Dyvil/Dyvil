@@ -142,11 +142,11 @@ public class CodeClass extends AbstractClass
 				type.addType(new TypeVarType(var));
 			}
 			
-			this.type = type;
+			this.thisType = type;
 		}
 		else
 		{
-			this.type = new ClassType(this);
+			this.thisType = new ClassType(this);
 		}
 		
 		if (this.annotations != null)
@@ -313,10 +313,10 @@ public class CodeClass extends AbstractClass
 			}
 
 			int modifiers = iclass.getModifiers().toFlags();
-			if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != Modifiers.INTERFACE_CLASS)
+			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 			{
 				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
-				                                        ModifierUtil.classModifiersToString(modifiers),
+				                                        ModifierUtil.classTypeToString(modifiers),
 				                                        iclass.getName()));
 			}
 		}
@@ -492,7 +492,7 @@ public class CodeClass extends AbstractClass
 			}
 		}
 		
-		ThisExpr thisValue = new ThisExpr(this.type, VariableThis.DEFAULT);
+		ThisExpr thisValue = new ThisExpr(this.thisType, VariableThis.DEFAULT);
 		StatementList instanceFields = new StatementList();
 		
 		IField[] staticFields = new IField[fields + 1];

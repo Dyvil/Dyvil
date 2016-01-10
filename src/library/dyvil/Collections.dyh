@@ -34,6 +34,7 @@ import	dyvil.collection.mutable.ArraySet			=> MutableArraySet
 import	dyvil.collection.mutable.MapBasedSet		=> MutableMapBasedSet
 import	dyvil.collection.mutable.HashSet			=> MutableHashSet
 import	dyvil.collection.mutable.IdentityHashSet	=> MutableIdentityHashSet
+import	dyvil.collection.mutable.BitSet				=> MutableBitSet
 
 // Maps
 import	dyvil.collection.immutable.ArrayMap			=> ImmutableArrayMap

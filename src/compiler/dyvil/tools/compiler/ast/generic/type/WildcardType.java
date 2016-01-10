@@ -239,7 +239,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return this.bound == null ? false : this.bound.hasTypeVariables();
+		return this.bound != null && this.bound.hasTypeVariables();
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
@@ -164,6 +165,18 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (this.value == null)
+		{
+			if (type == Types.VOID || type == null)
+			{
+				writer.writeInsn(Opcodes.RETURN);
+				return;
+			}
+
+			type.writeDefaultValue(writer);
+			return;
+		}
+
 		if (type == Types.VOID)
 		{
 			this.value.writeExpression(writer, null);

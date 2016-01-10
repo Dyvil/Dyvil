@@ -44,7 +44,14 @@ public class CombiningContext implements IContext
 		IClass iclass = this.inner.getThisClass();
 		return iclass == null ? this.outer.getThisClass() : iclass;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		IType type = this.inner.getThisType();
+		return type == null ? this.outer.getThisType() : type;
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
