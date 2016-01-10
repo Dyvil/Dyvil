@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.generic.type;
 
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -165,14 +166,22 @@ public class TypeVarType implements IRawType
 		switch (position)
 		{
 		case CLASS:
+			if (this.typeParameter.getReifiedKind() != ITypeParameter.ReifiedKind.NOT_REIFIED)
+			{
+				return;
+			}
 		case TYPE:
+			if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
+			{
+				return;
+			}
 			markers.add(MarkerMessages.createMarker(this.getPosition(), "type.class.typevar"));
-			break;
+			return;
 		case SUPER_TYPE:
 			markers.add(MarkerMessages.createMarker(this.getPosition(), "type.super.typevar"));
-			break;
+			return;
 		default:
-			break;
+			return;
 		}
 	}
 	
@@ -228,10 +237,39 @@ public class TypeVarType implements IRawType
 	{
 		buffer.append('T').append(this.typeParameter.getName().qualified).append(';');
 	}
-	
+
+	@Override
+	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		final ITypeParameter.ReifiedKind reifiedKind = this.typeParameter.getReifiedKind();
+		if (reifiedKind != ITypeParameter.ReifiedKind.NOT_REIFIED)
+		{
+			// Get the parameter
+			final int parameterIndex = this.typeParameter.getParameterIndex();
+			writer.writeVarInsn(Opcodes.ALOAD, parameterIndex);
+
+			// The generic Type is reified -> extract erasure class
+			if (reifiedKind == ITypeParameter.ReifiedKind.REIFIED_TYPE)
+			{
+				writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
+				                       "()Ljava/lang/Class;", true);
+			}
+			return;
+		}
+
+		throw new Error("Type Variable Types cannot be used in Class Operators");
+	}
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
+		if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
+		{
+			final int parameterIndex = this.typeParameter.getParameterIndex();
+			writer.writeVarInsn(Opcodes.ALOAD, parameterIndex);
+			return;
+		}
+
 		throw new Error("Type Variable Types cannot be used in Type Operators");
 	}
 	

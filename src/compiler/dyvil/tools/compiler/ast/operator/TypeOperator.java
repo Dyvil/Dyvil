@@ -136,11 +136,6 @@ public final class TypeOperator extends AbstractValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
-
-		if (this.type.getTypeVariable() == null && this.type.hasTypeVariables())
-		{
-			markers.add(MarkerMessages.createError(this.position, "typeoperator.typevar"));
-		}
 	}
 	
 	@Override
