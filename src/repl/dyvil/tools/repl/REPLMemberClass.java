@@ -34,6 +34,7 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -638,6 +639,18 @@ public class REPLMemberClass implements IClass
 		{
 			c.write(writer);
 		}
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+
 	}
 	
 	@Override
