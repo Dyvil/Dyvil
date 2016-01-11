@@ -48,6 +48,8 @@ public interface IContext
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	boolean handleException(IType type);
+
+	boolean canReturn(IType type);
 	
 	boolean isMember(IVariable variable);
 	

@@ -106,7 +106,13 @@ public class CombiningContext implements IContext
 	{
 		return this.inner.handleException(type) || this.outer.handleException(type);
 	}
-	
+
+	@Override
+	public boolean canReturn(IType type)
+	{
+		return this.inner.canReturn(type) || this.outer.canReturn(type);
+	}
+
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{

@@ -11,6 +11,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -133,9 +135,21 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
+			final IType type = this.value.getType();
+			if (!context.canReturn(type))
+			{
+				final Marker marker = Markers.semanticError(this.position, "return.type.incompatible");
+				marker.addInfo(Markers.getSemantic("return.type", type));
+				markers.add(marker);
+			}
+		}
+		else if (!context.canReturn(Types.VOID))
+		{
+			markers.add(Markers.semanticError(this.position, "return.void.invalid"));
 		}
 	}
 	

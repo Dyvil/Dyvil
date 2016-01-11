@@ -524,7 +524,13 @@ public class Constructor extends Member implements IConstructor
 		}
 		return false;
 	}
-	
+
+	@Override
+	public boolean canReturn(IType type)
+	{
+		return type == Types.VOID;
+	}
+
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{

@@ -484,9 +484,15 @@ public class REPLMemberClass implements IClass
 	@Override
 	public boolean handleException(IType type)
 	{
+		return false;
+	}
+
+	@Override
+	public boolean canReturn(IType type)
+	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isMember(IVariable variable)
 	{

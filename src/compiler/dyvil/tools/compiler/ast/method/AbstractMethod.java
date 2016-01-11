@@ -506,7 +506,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		return false;
 	}
-	
+
+	@Override
+	public boolean canReturn(IType type)
+	{
+		return this.type.isSuperTypeOf(type);
+	}
+
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{

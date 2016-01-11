@@ -69,7 +69,13 @@ public interface IStaticContext extends IContext
 	{
 		return false;
 	}
-	
+
+	@Override
+	default boolean canReturn(IType type)
+	{
+		return false;
+	}
+
 	@Override
 	default boolean isMember(IVariable variable)
 	{
