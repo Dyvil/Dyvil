@@ -36,6 +36,12 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	{
 		return THROW;
 	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
 	
 	@Override
 	public void setValue(IValue value)

@@ -42,6 +42,12 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	}
 
 	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean isResolved()
 	{
 		return this.value.isResolved();
