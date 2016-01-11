@@ -12,6 +12,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IStatement extends IValue
 {
 	@Override
+	default boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
+	@Override
 	default boolean isResolved()
 	{
 		return true;

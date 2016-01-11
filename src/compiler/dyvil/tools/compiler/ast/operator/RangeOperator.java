@@ -266,17 +266,6 @@ public class RangeOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type == Types.VOID)
-		{
-			this.writeExpression(writer, this.type);
-			writer.writeInsn(Opcodes.ARETURN);
-			return;
-		}
-		if (type == null)
-		{
-			type = this.type;
-		}
-
 		// -- Range --
 		if (!this.type.isArrayType())
 		{

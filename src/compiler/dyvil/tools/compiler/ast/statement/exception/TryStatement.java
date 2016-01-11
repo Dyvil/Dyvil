@@ -46,6 +46,12 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 
 	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean isResolved()
 	{
 		if (!this.action.isResolved())
@@ -121,8 +127,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			final IValue typedAction = this.action.withType(type, typeContext, markers, context);
 			if (typedAction == null)
 			{
-				final Marker marker = Markers
-						.semanticError(this.action.getPosition(), "try.action.type.incompatible");
+				final Marker marker = Markers.semanticError(this.action.getPosition(), "try.action.type.incompatible");
 				marker.addInfo(Markers.getSemantic("action.type", this.action.getType().toString()));
 				marker.addInfo(Markers.getSemantic("type.expected", type));
 				markers.add(marker);
@@ -270,7 +275,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			this.finallyBlock = this.finallyBlock.resolve(markers, context);
 
 			final IValue typedFinally = this.finallyBlock.withType(Types.VOID, Types.VOID, markers, context);
-			if (typedFinally == null)
+			if (typedFinally == null || !typedFinally.isUsableAsStatement())
 			{
 				final Marker marker = Markers
 						.semanticError(this.finallyBlock.getPosition(), "try.finally.type.invalid");

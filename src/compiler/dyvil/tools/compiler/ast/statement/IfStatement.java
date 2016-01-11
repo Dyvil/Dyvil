@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,14 +18,15 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class IfStatement extends AbstractValue
+public class IfStatement implements IValue
 {
 	protected IValue condition;
 	protected IValue then;
 	protected IValue elseThen;
 	
 	// Metadata
-	private IType commonType;
+	private ICodePosition position;
+	private IType         commonType;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -37,6 +37,24 @@ public class IfStatement extends AbstractValue
 	public int valueTag()
 	{
 		return IF;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return this.then.isUsableAsStatement() && (this.elseThen == null || this.elseThen.isUsableAsStatement());
 	}
 	
 	public void setCondition(IValue condition)
@@ -395,7 +413,7 @@ public class IfStatement extends AbstractValue
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

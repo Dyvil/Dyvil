@@ -152,11 +152,7 @@ public final class InstanceOfOperator extends AbstractValue
 		this.value.writeExpression(writer, Types.OBJECT);
 		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.IRETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
 		}

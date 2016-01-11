@@ -422,11 +422,7 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, this.internalClassName, "<init>", "()V", false);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

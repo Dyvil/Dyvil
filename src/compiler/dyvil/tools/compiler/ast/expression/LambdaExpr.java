@@ -608,11 +608,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		writer.writeLineNumber(this.getLineNumber());
 		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, type1, handle, type2);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

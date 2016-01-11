@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -117,11 +116,7 @@ public class EnumValue implements IConstantValue, INamed
 		String desc = this.type.getExtendedName();
 		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

@@ -137,11 +137,7 @@ public final class BooleanValue implements IConstantValue
 			writer.writeLDC(0);
 		}
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.IRETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
 		}

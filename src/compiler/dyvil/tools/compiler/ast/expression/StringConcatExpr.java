@@ -194,11 +194,7 @@ public class StringConcatExpr implements IValue
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
 		                       false);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.STRING.writeCast(writer, type, this.getLineNumber());
 		}

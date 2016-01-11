@@ -82,6 +82,12 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		return this.field != null && this.field.getType().isPrimitive();
 	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
 	
 	@Override
 	public boolean isResolved()

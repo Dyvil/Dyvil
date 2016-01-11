@@ -273,11 +273,7 @@ public final class StringInterpolationExpr implements IValue
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
 		                       false);
 
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			dyvil.tools.compiler.ast.type.Types.STRING.writeCast(writer, type, this.getLineNumber());
 		}

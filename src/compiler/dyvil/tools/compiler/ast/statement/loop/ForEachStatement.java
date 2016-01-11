@@ -301,7 +301,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		this.action = action.resolve(markers, context1);
 		
 		IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context1);
-		if (typedAction == null)
+		if (typedAction == null || !typedAction.isUsableAsStatement())
 		{
 			Marker marker = Markers.semantic(this.action.getPosition(), "for.action.type");
 			marker.addInfo(Markers.getSemantic("action.type", this.action.getType()));

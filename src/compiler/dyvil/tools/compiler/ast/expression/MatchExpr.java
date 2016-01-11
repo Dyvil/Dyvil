@@ -89,6 +89,20 @@ public final class MatchExpr implements IValue
 		}
 		return true;
 	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			if (!this.cases[i].action.isUsableAsStatement())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 	
 	@Override
 	public boolean isResolved()
@@ -578,9 +592,8 @@ public final class MatchExpr implements IValue
 	}
 	
 	/**
-	 * Determines whether to generate a {@code tableswitch} or a
-	 * {@code lookupswitch} instruction, and returns {@code true} when a
-	 * {@code tableswitch} should be generated.
+	 * Determines whether to generate a {@code tableswitch} or a {@code lookupswitch} instruction, and returns {@code
+	 * true} when a {@code tableswitch} should be generated.
 	 *
 	 * @param low
 	 * 		the lowest value

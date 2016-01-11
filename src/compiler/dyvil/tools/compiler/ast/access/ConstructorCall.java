@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -344,11 +343,6 @@ public class ConstructorCall implements ICall
 		}
 		
 		this.constructor.writeCall(writer, this.arguments, type, this.getLineNumber());
-
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
 	}
 	
 	@Override

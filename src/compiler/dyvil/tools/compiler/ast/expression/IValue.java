@@ -141,6 +141,11 @@ public interface IValue extends IASTNode, ITyped
 	{
 		return this.getType().isPrimitive();
 	}
+
+	default boolean isUsableAsStatement()
+	{
+		return false;
+	}
 	
 	default IReference toReference()
 	{
@@ -171,9 +176,8 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	/**
-	 * Returns how much the type of this value 'matches' the given type.
-	 * {@code 1} indicates a perfect match, while {@code 0} marks incompatible
-	 * types. A higher value means that the value is less suitable for the type.
+	 * Returns how much the type of this value 'matches' the given type. {@code 1} indicates a perfect match, while
+	 * {@code 0} marks incompatible types. A higher value means that the value is less suitable for the type.
 	 *
 	 * @param type
 	 * 		the type to match
@@ -358,13 +362,10 @@ public interface IValue extends IASTNode, ITyped
 	}
 	
 	/**
-	 * Writes this {@link IValue} to the given {@link MethodWriter}
-	 * {@code writer} as a jump expression to the given {@link Label}
-	 * {@code dest}. By default, this calls
-	 * {@link #writeExpression(MethodWriter, IType)} and then writes an
-	 * {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That
-	 * means the JVM would jump to {@code dest} if the current value on the
-	 * stack equals {@code 0}.
+	 * Writes this {@link IValue} to the given {@link MethodWriter} {@code writer} as a jump expression to the given
+	 * {@link Label} {@code dest}. By default, this calls {@link #writeExpression(MethodWriter, IType)} and then writes
+	 * an {@link Opcodes#IFEQ IFEQ} instruction pointing to {@code dest}. That means the JVM would jump to {@code dest}
+	 * if the current value on the stack equals {@code 0}.
 	 *
 	 * @param writer
 	 * @param dest

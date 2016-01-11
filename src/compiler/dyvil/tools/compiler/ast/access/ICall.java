@@ -98,6 +98,12 @@ public interface ICall extends IValue
 	}
 	
 	@Override
+	default boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
+	@Override
 	default IValue resolve(MarkerList markers, IContext context)
 	{
 		// Wildcard Conversion

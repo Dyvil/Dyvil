@@ -62,6 +62,12 @@ public class IncOperator extends AbstractValue
 	}
 
 	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean isResolved()
 	{
 		return true;

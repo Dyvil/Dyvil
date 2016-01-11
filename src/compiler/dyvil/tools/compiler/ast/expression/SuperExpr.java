@@ -158,11 +158,7 @@ public final class SuperExpr implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

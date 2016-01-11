@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -214,11 +213,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	{
 		this.type.writeClassExpression(writer);
 
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.genericType.writeCast(writer, type, this.getLineNumber());
 		}

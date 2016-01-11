@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.annotation;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
@@ -11,7 +10,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -91,11 +89,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.isType(type))
-		{
-			return this;
-		}
-		return null;
+		return this.isType(type) ? this : null;
 	}
 	
 	@Override
@@ -175,11 +169,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 		
 		writer.writeInvokeDynamic("_", descBuilder.toString(), ANNOTATION_METAFACTORY, (Object[]) parameterNames);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.annotation.getType().writeCast(writer, type, this.getLineNumber());
 		}

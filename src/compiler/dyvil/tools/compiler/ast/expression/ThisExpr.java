@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -175,11 +174,7 @@ public final class ThisExpr implements IValue
 	{
 		this.getter.writeGet(writer);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

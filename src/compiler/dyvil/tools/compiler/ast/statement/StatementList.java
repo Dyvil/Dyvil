@@ -89,6 +89,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		return this.returnType != null && this.returnType.isPrimitive();
 	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
 	
 	@Override
 	public boolean isResolved()
@@ -341,7 +347,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			}
 			
 			IValue typedValue = resolvedValue.withType(Types.VOID, Types.VOID, markers, combinedContext);
-			if (typedValue == null)
+			if (typedValue == null || !typedValue.isUsableAsStatement())
 			{
 				Marker marker = Markers.semantic(resolvedValue.getPosition(), "statementlist.statement");
 				marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));

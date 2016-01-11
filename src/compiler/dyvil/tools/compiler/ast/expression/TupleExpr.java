@@ -307,11 +307,7 @@ public final class TupleExpr implements IValue, IValueList
 		String desc = TupleType.getConstructorDescriptor(this.valueCount);
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
 
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.tupleType.writeCast(writer, type, this.getLineNumber());
 		}

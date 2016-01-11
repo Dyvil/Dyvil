@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.AnonymousClass;
 import dyvil.tools.compiler.ast.classes.AnonymousClassMetadata;
 import dyvil.tools.compiler.ast.classes.IClassBody;
@@ -131,11 +130,6 @@ public class ClassConstructor extends ConstructorCall
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.metadata.writeConstructorCall(writer, this.arguments);
-
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
 	}
 	
 	@Override

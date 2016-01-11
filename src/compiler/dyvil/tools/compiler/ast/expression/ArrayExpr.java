@@ -469,11 +469,6 @@ public final class ArrayExpr implements IValue, IValueList
 			this.values[i].writeExpression(writer, elementType);
 			writer.writeInsn(opcode);
 		}
-
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
 	}
 	
 	@Override

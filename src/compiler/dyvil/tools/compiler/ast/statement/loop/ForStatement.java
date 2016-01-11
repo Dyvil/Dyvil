@@ -173,6 +173,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		{
 			this.variable.checkTypes(markers, context);
 		}
+
 		IContext context1 = new CombiningContext(this, context);
 		if (this.update != null)
 		{

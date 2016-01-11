@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.constant;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -154,11 +153,7 @@ public class LongValue implements IConstantValue
 	{
 		writer.writeLDC(this.value);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.LRETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.LONG.writeCast(writer, type, this.getLineNumber());
 		}
