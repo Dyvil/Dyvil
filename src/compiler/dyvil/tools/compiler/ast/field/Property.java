@@ -426,20 +426,93 @@ public class Property extends Member implements IProperty
 		}
 		buffer.append('{');
 
-		// Getters
+		// Initializer
+
+		if (this.initializer != null)
+		{
+			this.formatInitializer(prefix, buffer);
+
+			if (this.getter != null || this.setter != null)
+			{
+				buffer.append('\n').append(prefix);
+			}
+		}
+
+		// Getter
 		if (this.getter != null)
 		{
-			String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
+			this.formatGetter(prefix, buffer);
 
-			final IValue getterValue = this.getter.getValue();
-			final ModifierSet getterModifiers = this.getter.getModifiers();
-
-			buffer.append('\n').append(prefix);
-			if (getterModifiers != null)
+			if (this.setter != null)
 			{
-				getterModifiers.toString(buffer);
+				buffer.append('\n').append(prefix);
 			}
-			buffer.append("get");
+		}
+
+		// Setter
+		if (this.setter != null)
+		{
+			this.formatSetter(prefix, buffer);
+		}
+
+		// Block End
+		buffer.append('\n').append(prefix).append('}');
+	}
+
+	private void formatInitializer(String prefix, StringBuilder buffer)
+	{
+		final String initializerPrefix = Formatting.getIndent("property.initializer.indent", prefix);
+
+		buffer.append('\n').append(initializerPrefix).append("init");
+
+		if (Util.formatStatementList(initializerPrefix, buffer, this.initializer))
+		{
+			return;
+		}
+
+		// Separator
+		if (Formatting.getBoolean("property.initializer.separator.space_before"))
+		{
+			buffer.append(' ');
+		}
+		buffer.append(':');
+		if (Formatting.getBoolean("property.initializer.separator.newline_after"))
+		{
+			buffer.append('\n').append(initializerPrefix);
+		}
+		else if (Formatting.getBoolean("property.initializer.separator.space_after"))
+		{
+			buffer.append(' ');
+		}
+
+		this.initializer.toString(prefix, buffer);
+
+		if (Formatting.getBoolean("property.initializer.semicolon"))
+		{
+			buffer.append(';');
+		}
+	}
+
+	private void formatGetter(String prefix, StringBuilder buffer)
+	{
+		final String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
+
+		final IValue getterValue = this.getter.getValue();
+		final ModifierSet getterModifiers = this.getter.getModifiers();
+
+		buffer.append('\n').append(getterPrefix);
+		if (getterModifiers != null && getterModifiers != this.modifiers)
+		{
+			getterModifiers.toString(buffer);
+		}
+		buffer.append("get");
+
+		if (getterValue != null)
+		{
+			if (Util.formatStatementList(getterPrefix, buffer, getterValue))
+			{
+				return;
+			}
 
 			// Separator
 			if (Formatting.getBoolean("property.getter.separator.space_before"))
@@ -447,7 +520,7 @@ public class Property extends Member implements IProperty
 				buffer.append(' ');
 			}
 			buffer.append(':');
-			if (Formatting.getBoolean("property.getter.newline"))
+			if (Formatting.getBoolean("property.getter.separator.newline_after"))
 			{
 				buffer.append('\n').append(getterPrefix);
 			}
@@ -456,30 +529,41 @@ public class Property extends Member implements IProperty
 				buffer.append(' ');
 			}
 
-			if (getterValue != null)
-			{
-				getterValue.toString(getterPrefix, buffer);
-			}
-
-			if (Formatting.getBoolean("property.getter.semicolon"))
-			{
-				buffer.append(';');
-			}
+			getterValue.toString(getterPrefix, buffer);
 		}
 
-		// Setters
-		if (this.setter != null)
+		if (Formatting.getBoolean("property.getter.semicolon"))
 		{
-			String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
-			final IValue setterValue = this.setter.getValue();
-			final ModifierSet setterModifiers = this.setter.getModifiers();
+			buffer.append(';');
+		}
+	}
 
-			buffer.append('\n').append(prefix);
-			if (setterModifiers != null)
+	private void formatSetter(String prefix, StringBuilder buffer)
+	{
+		final String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
+		final IValue setterValue = this.setter.getValue();
+		final ModifierSet setterModifiers = this.setter.getModifiers();
+		final Name setterParameterName = this.setterParameter.getName();
+
+		buffer.append('\n').append(setterPrefix);
+		if (setterModifiers != null && setterModifiers != this.modifiers)
+		{
+			setterModifiers.toString(buffer);
+		}
+		buffer.append("set");
+
+		if (setterParameterName != this.name)
+		{
+			// TODO Formatting
+			buffer.append('(').append(setterParameterName).append(')');
+		}
+
+		if (setterValue != null)
+		{
+			if (Util.formatStatementList(setterPrefix, buffer, setterValue))
 			{
-				setterModifiers.toString(buffer);
+				return;
 			}
-			buffer.append("set");
 
 			// Separator
 			if (Formatting.getBoolean("property.setter.separator.space_before"))
@@ -487,7 +571,7 @@ public class Property extends Member implements IProperty
 				buffer.append(' ');
 			}
 			buffer.append(':');
-			if (Formatting.getBoolean("property.setter.newline"))
+			if (Formatting.getBoolean("property.setter.separator.newline_after"))
 			{
 				buffer.append('\n').append(setterPrefix);
 			}
@@ -496,18 +580,12 @@ public class Property extends Member implements IProperty
 				buffer.append(' ');
 			}
 
-			if (setterValue != null)
-			{
-				setterValue.toString(setterPrefix, buffer);
-			}
-
-			if (Formatting.getBoolean("property.setter.semicolon"))
-			{
-				buffer.append(';');
-			}
+			setterValue.toString(setterPrefix, buffer);
 		}
 
-		// Block End
-		buffer.append('\n').append(prefix).append('}');
+		if (Formatting.getBoolean("property.setter.semicolon"))
+		{
+			buffer.append(';');
+		}
 	}
 }
