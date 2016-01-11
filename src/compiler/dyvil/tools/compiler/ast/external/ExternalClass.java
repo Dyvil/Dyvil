@@ -32,7 +32,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
@@ -729,6 +729,18 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+
 	}
 	
 	@Override

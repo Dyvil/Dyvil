@@ -8,9 +8,7 @@ import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -18,7 +16,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-public interface IClassMetadata
+public interface IClassMetadata extends IClassCompilable
 {
 	default void setInstanceField(IDataMember field)
 	{
@@ -100,12 +98,4 @@ public interface IClassMetadata
 	default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
-	// Compilation
-	
-	default void writeStaticInit(MethodWriter writer) throws BytecodeException
-	{
-	}
-	
-	void write(ClassWriter writer, IValue instanceFields) throws BytecodeException;
 }

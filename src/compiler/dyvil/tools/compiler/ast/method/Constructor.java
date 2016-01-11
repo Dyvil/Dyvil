@@ -754,17 +754,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		this.write(writer, null);
-	}
-	
-	@Override
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
-	{
 		int modifiers = this.modifiers.toFlags() & 0xFFFF;
-		if (this.value == null)
-		{
-			modifiers |= Modifiers.ABSTRACT;
-		}
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(),
 		                                                                  this.getSignature(), this.getExceptions()));
 
@@ -791,22 +781,19 @@ public class Constructor extends Member implements IConstructor
 		
 		Label start = new Label();
 		Label end = new Label();
-		
+
+		mw.begin();
+		mw.writeLabel(start);
+
 		if (this.value != null)
 		{
-			mw.begin();
-			mw.writeLabel(start);
-			
-			if (instanceFields != null)
-			{
-				instanceFields.writeExpression(mw, Types.VOID);
-			}
-			
 			this.value.writeExpression(mw, Types.VOID);
-			mw.writeLabel(end);
-			mw.end(Types.VOID);
 		}
-		
+		this.theClass.writeInit(mw);
+
+		mw.writeLabel(end);
+		mw.end(Types.VOID);
+
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
 			mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);

@@ -1,6 +1,6 @@
 package dyvil.test
 
-public class AbstractPropertyTest
+public class PropertyTest
 {
 	interface AbstractProperty
 	{
@@ -14,15 +14,23 @@ public class AbstractPropertyTest
 
 		public override int subscript
 		{
-			set (newValue) {
+			init
+			{
+				this.value = 1
+			}
+
+			get: this.value
+
+			set (newValue)
+			{
 				this._setterCalled = true
 				this.value = newValue
 			}
-			get: this.value
 		}
 
 		public boolean setterCalled
 		{
+			init: this._setterCalled = false
 			get: this._setterCalled
 		}
 	}
@@ -30,6 +38,8 @@ public class AbstractPropertyTest
 	public static void main([String] args)
 	{
 		auto c = new ConcreteProperty
+
+		Main.test("Property Initializer", 1, c[])
 
 		c[] = 20
 		Main.test("Property Getter", 20, c[])

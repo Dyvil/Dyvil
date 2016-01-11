@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
@@ -19,16 +20,25 @@ import dyvil.tools.parsing.token.IToken;
 
 public class PropertyParser extends Parser implements IValueConsumer
 {
+	// Modes
 	private static final int TAG                   = 0;
 	private static final int SEPARATOR             = 1;
 	private static final int SETTER_PARAMETER      = 2;
 	private static final int SETTER_PARAMETER_NAME = 4;
 	private static final int SETTER_PARAMETER_END  = 8;
-	
+
+	// Targets
+	private static final byte GETTER      = 0;
+	private static final byte SETTER      = 1;
+	private static final byte INITIALIZER = 2;
+
+	// --------------------------------------------------
+
 	protected Property property;
 
+	// Metadata
 	private ModifierSet modifiers;
-	private boolean     targetSetter;
+	private byte        target;
 
 	public PropertyParser(Property property)
 	{
@@ -71,20 +81,23 @@ public class PropertyParser extends Parser implements IValueConsumer
 				final Name name = token.nameValue();
 				if (name == Names.get)
 				{
-					this.property.setGetterPosition(token.raw());
-					this.property.setGetterModifiers(this.modifiers);
-					this.modifiers = null;
+					this.configureMethod(this.property.initGetter(), token);
 					this.mode = SEPARATOR;
-					this.targetSetter = false;
+					this.target = GETTER;
 					return;
 				}
 				if (name == Names.set)
 				{
-					this.property.setSetterPosition(token.raw());
-					this.property.setSetterModifiers(this.modifiers);
-					this.modifiers = null;
+					this.configureMethod(this.property.initSetter(), token);
 					this.mode = SETTER_PARAMETER;
-					this.targetSetter = true;
+					this.target = SETTER;
+					return;
+				}
+				if (name == Names.init)
+				{
+					this.property.setInitializerPosition(token.raw());
+					this.mode = SEPARATOR;
+					this.target = INITIALIZER;
 					return;
 				}
 				pm.report(token, "property.tag.unknown");
@@ -137,17 +150,31 @@ public class PropertyParser extends Parser implements IValueConsumer
 			return;
 		}
 	}
+
+	private void configureMethod(IMethod method, IToken token)
+	{
+		method.setPosition(token.raw());
+		if (this.modifiers != null)
+		{
+			method.setModifiers(this.modifiers);
+			this.modifiers = null;
+		}
+	}
 	
 	@Override
 	public void setValue(IValue value)
 	{
-		if (this.targetSetter)
+		switch (this.target)
 		{
-			this.property.setSetterValue(value);
-		}
-		else
-		{
-			this.property.setGetterValue(value);
+		case GETTER:
+			this.property.initGetter().setValue(value);
+			return;
+		case SETTER:
+			this.property.initSetter().setValue(value);
+			return;
+		case INITIALIZER:
+			this.property.setInitializer(value);
+			return;
 		}
 	}
 }

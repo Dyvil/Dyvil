@@ -259,13 +259,13 @@ public class ClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if ((this.methods & CONSTRUCTOR) != 0)
 		{
 			return;
 		}
 
-		this.constructor.write(writer, instanceFields);
+		this.constructor.write(writer);
 	}
 }

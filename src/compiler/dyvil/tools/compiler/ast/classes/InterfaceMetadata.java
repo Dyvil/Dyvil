@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -63,7 +62,7 @@ public class InterfaceMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 	}
 }

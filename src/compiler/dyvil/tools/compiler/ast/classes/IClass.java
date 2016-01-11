@@ -5,19 +5,19 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParameterized;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -147,9 +147,15 @@ public interface IClass extends IClassMember, ITypeParameterized, IContext, IPar
 	
 	@Override
 	void write(ClassWriter writer) throws BytecodeException;
-	
+
+	@Override
+	void writeInit(MethodWriter writer) throws BytecodeException;
+
+	@Override
+	void writeStaticInit(MethodWriter writer) throws BytecodeException;
+
 	void writeInnerClassInfo(ClassWriter writer);
-	
+
 	static IClassMetadata getClassMetadata(IClass iclass, int modifiers)
 	{
 		if ((modifiers & Modifiers.OBJECT_CLASS) != 0)

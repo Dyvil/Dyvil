@@ -212,8 +212,7 @@ public class Field extends Member implements IField
 		{
 			if (newValue.isResolved())
 			{
-				Marker marker = Markers
-						.semantic(newValue.getPosition(), "field.assign.type", this.name.unqualified);
+				Marker marker = Markers.semantic(newValue.getPosition(), "field.assign.type", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("field.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 				markers.add(marker);
@@ -318,9 +317,9 @@ public class Field extends Member implements IField
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.FIELD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(Markers.semanticError(this.position, "modifiers.illegal",
-			                                  Markers.getSemantic("field", this.name),
-			                                  ModifierUtil.methodModifiersToString(illegalModifiers)));
+			markers.add(
+					Markers.semanticError(this.position, "modifiers.illegal", Markers.getSemantic("field", this.name),
+					                      ModifierUtil.methodModifiersToString(illegalModifiers)));
 		}
 	}
 	
@@ -374,7 +373,19 @@ public class Field extends Member implements IField
 		
 		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}
-	
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC))
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, 0);
+			this.value.writeExpression(writer, this.type);
+			writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified,
+			                      this.getDescription());
+		}
+	}
+
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{

@@ -5,7 +5,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -100,14 +99,14 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if (this.instanceField != null)
 		{
 			this.instanceField.write(writer);
 		}
 		
-		super.write(writer, instanceFields);
+		super.write(writer);
 		
 		String internalName = this.theClass.getInternalName();
 		if ((this.methods & TOSTRING) == 0)
