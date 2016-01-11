@@ -57,12 +57,10 @@ public final class PrimitiveType implements IType
 		{
 			promoBits |= bitMask(i, LONG_CODE);
 			promoBits |= bitMask(i, FLOAT_CODE);
-		}
-		// Everything can be promoted to double
-		for (int i = BYTE_CODE; i <= FLOAT_CODE; i++)
-		{
 			promoBits |= bitMask(i, DOUBLE_CODE);
 		}
+		promoBits |= bitMask(LONG_CODE, DOUBLE_CODE);
+		promoBits |= bitMask(FLOAT_CODE, DOUBLE_CODE);
 		PROMOTION_BITS = promoBits;
 		*/
 		// @formatter:on
@@ -347,7 +345,7 @@ public final class PrimitiveType implements IType
 	
 	private static boolean isPromotable(int from, int to)
 	{
-		return (PROMOTION_BITS & bitMask(from, to)) != 0;
+		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0;
 	}
 	
 	@Override
