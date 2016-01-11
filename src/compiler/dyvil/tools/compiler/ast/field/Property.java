@@ -22,6 +22,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -177,6 +178,10 @@ public class Property extends Member implements IProperty
 			this.setter.getModifiers().addIntModifier(this.modifiers.toFlags());
 			this.setter.resolveTypes(markers, context);
 		}
+		if (this.initializer != null)
+		{
+			this.initializer.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
@@ -192,6 +197,20 @@ public class Property extends Member implements IProperty
 		{
 			this.getter.resolve(markers, context);
 		}
+		if (this.initializer != null)
+		{
+			this.initializer = this.initializer.resolve(markers, context);
+
+			final IValue typed = IType.convertValue(this.initializer, Types.VOID, Types.VOID, markers, context);
+			if (typed == null)
+			{
+				Util.createTypeError(markers, this.initializer, Types.VOID, Types.VOID, "property.initializer.type");
+			}
+			else
+			{
+				this.initializer = typed;
+			}
+		}
 	}
 	
 	@Override
@@ -206,6 +225,10 @@ public class Property extends Member implements IProperty
 		if (this.setter != null)
 		{
 			this.setter.checkTypes(markers, context);
+		}
+		if (this.initializer != null)
+		{
+			this.initializer.checkTypes(markers, context);
 		}
 	}
 	
@@ -234,6 +257,16 @@ public class Property extends Member implements IProperty
 		{
 			markers.add(Markers.semantic(this.position, "property.empty", this.name));
 		}
+
+		if (this.initializer != null)
+		{
+			this.initializer.check(markers, context);
+
+			if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+			{
+				markers.add(Markers.semantic(this.initializerPosition, "property.initializer.interface"));
+			}
+		}
 	}
 	
 	@Override
@@ -249,6 +282,10 @@ public class Property extends Member implements IProperty
 		{
 			this.setter.foldConstants();
 		}
+		if (this.initializer != null)
+		{
+			this.initializer = this.initializer.foldConstants();
+		}
 	}
 	
 	@Override
@@ -263,6 +300,10 @@ public class Property extends Member implements IProperty
 		if (this.setter != null)
 		{
 			this.setter.cleanup(context, compilableList);
+		}
+		if (this.initializer != null)
+		{
+			this.initializer = this.initializer.cleanup(context, compilableList);
 		}
 	}
 	
