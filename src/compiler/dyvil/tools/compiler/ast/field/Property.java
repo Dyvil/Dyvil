@@ -394,7 +394,25 @@ public class Property extends Member implements IProperty
 			}
 		}
 	}
-	
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		if (this.initializer != null && !this.hasModifier(Modifiers.STATIC))
+		{
+			this.initializer.writeExpression(writer, Types.VOID);
+		}
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+		if (this.initializer != null && this.hasModifier(Modifiers.STATIC))
+		{
+			this.initializer.writeExpression(writer, Types.VOID);
+		}
+	}
+
 	@Override
 	public void writeSignature(DataOutput out) throws IOException
 	{
