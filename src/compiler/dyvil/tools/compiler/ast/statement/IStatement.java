@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IStatement extends IValue
@@ -58,4 +60,34 @@ public interface IStatement extends IValue
 	}
 
 	void writeStatement(MethodWriter writer) throws BytecodeException;
+
+	static IValue checkStatement(MarkerList markers, IContext context, IValue resolvedValue, String key)
+	{
+		final IValue typedValue = resolvedValue.withType(Types.VOID, Types.VOID, markers, context);
+
+		if (typedValue == null || !typedValue.isUsableAsStatement())
+		{
+			final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
+			marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));
+			markers.add(marker);
+			return resolvedValue;
+		}
+
+		return typedValue;
+	}
+
+	static IValue checkCondition(MarkerList markers, IContext context, IValue resolvedValue, String key)
+	{
+		final IValue typedValue = resolvedValue.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
+
+		if (typedValue == null)
+		{
+			final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
+			marker.addInfo(Markers.getSemantic("value.type", resolvedValue.getType()));
+			markers.add(marker);
+			return resolvedValue;
+		}
+
+		return typedValue;
+	}
 }

@@ -7,9 +7,9 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
+import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -108,18 +108,7 @@ public class MatchCase implements ICase, IDefaultContext
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, combinedContext);
-			
-			final IValue typedCondition = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, combinedContext);
-			if (typedCondition == null)
-			{
-				Marker marker = Markers.semantic(this.condition.getPosition(), "match.condition.type");
-				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.condition = typedCondition;
-			}
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "match.condition.type");
 		}
 		
 		if (this.action != null)

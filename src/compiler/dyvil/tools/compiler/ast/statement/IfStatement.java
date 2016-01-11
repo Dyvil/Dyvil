@@ -14,7 +14,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -213,6 +212,7 @@ public class IfStatement implements IValue
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "if.condition.type");
 		}
 		if (this.then != null)
 		{
@@ -230,18 +230,6 @@ public class IfStatement implements IValue
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
-			if (condition1 == null)
-			{
-				Marker marker = Markers.semantic(this.condition.getPosition(), "if.condition.type");
-				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.condition = condition1;
-			}
-			
 			this.condition.checkTypes(markers, context);
 		}
 		if (this.then != null)

@@ -27,10 +27,8 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -346,17 +344,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				continue;
 			}
 			
-			IValue typedValue = resolvedValue.withType(Types.VOID, Types.VOID, markers, combinedContext);
-			if (typedValue == null || !typedValue.isUsableAsStatement())
-			{
-				Marker marker = Markers.semantic(resolvedValue.getPosition(), "statementlist.statement");
-				marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.values[i] = typedValue;
-			}
+			this.values[i] = IStatement
+					.checkStatement(markers, combinedContext, resolvedValue, "statementlist.statement");
 		}
 
 		// Resolved the last value

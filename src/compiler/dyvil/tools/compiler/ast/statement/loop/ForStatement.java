@@ -12,10 +12,8 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -67,7 +65,19 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	{
 		return FOR;
 	}
-	
+
+	@Override
+	public IValue getAction()
+	{
+		return this.action;
+	}
+
+	@Override
+	public void setAction(IValue action)
+	{
+		this.action = action;
+	}
+
 	@Override
 	public Label getContinueLabel()
 	{
@@ -144,23 +154,28 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		IContext context1 = new CombiningContext(this, context);
+		final IContext combinedContext = new CombiningContext(this, context);
+
 		if (this.variable != null)
 		{
 			this.variable.resolve(markers, context);
 		}
+
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, context1);
+			this.condition = this.condition.resolve(markers, combinedContext);
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "for.condition.type");
 		}
 		if (this.update != null)
 		{
-			this.update = this.update.resolve(markers, context1);
+			this.update = this.update.resolve(markers, combinedContext);
+			this.update = IStatement.checkStatement(markers, context, this.update, "for.update.type");
 		}
 		
 		if (this.action != null)
 		{
-			this.action = this.action.resolve(markers, context1);
+			this.action = this.action.resolve(markers, combinedContext);
+			this.action = IStatement.checkStatement(markers, context, this.action, "for.action.type");
 		}
 		
 		return this;
@@ -174,30 +189,18 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			this.variable.checkTypes(markers, context);
 		}
 
-		IContext context1 = new CombiningContext(this, context);
+		final IContext combinedContext = new CombiningContext(this, context);
 		if (this.update != null)
 		{
-			this.update.checkTypes(markers, context1);
+			this.update.checkTypes(markers, combinedContext);
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
-			if (condition1 == null)
-			{
-				Marker marker = Markers.semantic(this.condition.getPosition(), "for.condition.type");
-				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.condition = condition1;
-			}
-			
-			this.condition.checkTypes(markers, context1);
+			this.condition.checkTypes(markers, combinedContext);
 		}
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, context1);
+			this.action.checkTypes(markers, combinedContext);
 		}
 	}
 	

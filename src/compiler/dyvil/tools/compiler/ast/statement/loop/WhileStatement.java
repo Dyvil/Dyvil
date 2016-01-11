@@ -17,7 +17,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -51,11 +50,13 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		return this.condition;
 	}
 	
+	@Override
 	public void setAction(IValue action)
 	{
 		this.action = action;
 	}
 	
+	@Override
 	public IValue getAction()
 	{
 		return this.action;
@@ -107,10 +108,12 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "while.condition.type");
 		}
 		if (this.action != null)
 		{
 			this.action = this.action.resolve(markers, context);
+			this.action = IStatement.checkStatement(markers, context, this.action, "while.action.type");
 		}
 		return this;
 	}
@@ -120,17 +123,6 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
-			if (condition1 == null)
-			{
-				Marker marker = Markers.semantic(this.condition.getPosition(), "while.condition.type");
-				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.condition = condition1;
-			}
 			this.condition.checkTypes(markers, context);
 		}
 		if (this.action != null)

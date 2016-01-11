@@ -12,10 +12,8 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -114,10 +112,12 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		if (this.action != null)
 		{
 			this.action = this.action.resolve(markers, context);
+			this.action = IStatement.checkStatement(markers, context, this.action, "do.action.type");
 		}
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "do.condition.type");
 		}
 		return this;
 	}
@@ -131,18 +131,6 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		}
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
-			if (condition1 == null)
-			{
-				Marker marker = Markers.semantic(this.condition.getPosition(), "do.condition.type");
-				marker.addInfo(Markers.getSemantic("value.type", this.condition.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.condition = condition1;
-			}
-			
 			this.condition.checkTypes(markers, context);
 		}
 	}
