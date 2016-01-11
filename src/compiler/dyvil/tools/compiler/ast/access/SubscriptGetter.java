@@ -130,11 +130,14 @@ public class SubscriptGetter extends AbstractCall
 		Formatting.appendSeparator(buffer, "method.subscript.open_bracket", '[');
 
 		int count = this.arguments.size();
-		this.arguments.getValue(0, null).toString(prefix, buffer);
-		for (int i = 1; i < count; i++)
+		if (count > 0)
 		{
-			Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
-			this.arguments.getValue(i, null).toString(prefix, buffer);
+			this.arguments.getValue(0, null).toString(prefix, buffer);
+			for (int i = 1; i < count; i++)
+			{
+				Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
+				this.arguments.getValue(i, null).toString(prefix, buffer);
+			}
 		}
 
 		if (Formatting.getBoolean("method.subscript.close_bracket.space_before"))
