@@ -590,6 +590,28 @@ public class ClassBody implements IClassBody
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
+		if (Formatting.getBoolean("class.body.open_bracket.newline"))
+		{
+			buffer.append('\n').append(prefix);
+		}
+		else
+		{
+			buffer.append(' ');
+		}
+
+		buffer.append('{').append('\n');
+		this.bodyToString(bodyPrefix, buffer);
+		buffer.append(prefix).append('}');
+
+		if (Formatting.getBoolean("class.body.close_bracket.newline_after"))
+		{
+			buffer.append('\n');
+		}
+	}
+
+	private void bodyToString(String prefix, StringBuilder buffer)
+	{
 		if (this.classCount > 0)
 		{
 			for (int i = 0; i < this.classCount; i++)
@@ -603,7 +625,7 @@ public class ClassBody implements IClassBody
 			}
 			buffer.append('\n');
 		}
-		
+
 		if (this.fieldCount > 0)
 		{
 			for (int i = 0; i < this.fieldCount; i++)
@@ -619,7 +641,7 @@ public class ClassBody implements IClassBody
 			}
 			buffer.append('\n');
 		}
-		
+
 		if (this.constructorCount > 0)
 		{
 			for (int i = 0; i < this.constructorCount; i++)
@@ -633,7 +655,7 @@ public class ClassBody implements IClassBody
 			}
 			buffer.append('\n');
 		}
-		
+
 		if (this.propertyCount > 0)
 		{
 			for (int i = 0; i < this.propertyCount; i++)
@@ -647,7 +669,7 @@ public class ClassBody implements IClassBody
 			}
 			buffer.append('\n');
 		}
-		
+
 		if (this.methodCount > 0)
 		{
 			for (int i = 0; i < this.methodCount; i++)

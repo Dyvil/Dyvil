@@ -1107,25 +1107,7 @@ public abstract class AbstractClass implements IClass
 		
 		if (this.body != null)
 		{
-			String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
-			if (Formatting.getBoolean("class.body.open_bracket.newline"))
-			{
-				buffer.append('\n').append(prefix);
-			}
-			else
-			{
-				buffer.append(' ');
-			}
-
-			buffer.append('{').append('\n');
-
-			this.body.toString(bodyPrefix, buffer);
-			buffer.append(prefix).append('}');
-
-			if (Formatting.getBoolean("class.body.close_bracket.newline_after"))
-			{
-				buffer.append('\n');
-			}
+			this.body.toString(prefix, buffer);
 		}
 		else if (Formatting.getBoolean("class.semicolon"))
 		{

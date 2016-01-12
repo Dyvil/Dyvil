@@ -140,7 +140,6 @@ public class ClassConstructor extends ConstructorCall
 		IClassBody body = this.nestedClass.getBody();
 		if (body != null)
 		{
-			buffer.append(' ');
 			body.toString(prefix, buffer);
 		}
 		else
