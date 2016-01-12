@@ -19,7 +19,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 public final class CastOperator extends AbstractValue
 {
 	protected IValue value;
-	protected IType type = Types.UNKNOWN;
+	protected IType  type;
 	
 	// Metadata
 	private boolean typeHint;
@@ -75,15 +75,36 @@ public final class CastOperator extends AbstractValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolveType(markers, context);
-		this.value.resolveTypes(markers, context);
+		if (this.type != null)
+		{
+			this.type = this.type.resolveType(markers, context);
+		}
+		else
+		{
+			this.type = Types.UNKNOWN;
+			markers.add(MarkerMessages.createError(this.position, "cast.type.invalid"));
+		}
+
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
+		else
+		{
+			markers.add(MarkerMessages.createError(this.position, "cast.value.invalid"));
+		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
-		
+
+		if (this.value == null)
+		{
+			return this;
+		}
+
 		this.value = this.value.resolve(markers, context);
 		if (this.type == Types.VOID)
 		{
@@ -96,35 +117,35 @@ public final class CastOperator extends AbstractValue
 			return this;
 		}
 		
-		IType prevType = this.value.getType();
+		IType valueType = this.value.getType();
 		
-		IValue value1 = this.value.withType(this.type, this.type, markers, context);
-		if (value1 != null)
+		final IValue typedValue = this.value.withType(this.type, this.type, markers, context);
+		if (typedValue != null)
 		{
-			this.value = value1;
+			this.value = typedValue;
 			
-			IType valueType = value1.getType();
-			if (!prevType.isSameType(valueType) && this.type.isSuperClassOf(valueType)
-					&& valueType.isPrimitive() == this.type.isPrimitive())
+			final IType newType = typedValue.getType();
+			if (!valueType.isSameType(newType) && this.type.isSuperClassOf(newType)
+					&& newType.isPrimitive() == this.type.isPrimitive())
 			{
 				this.typeHint = true;
-				this.type = valueType;
+				this.type = newType;
 				return this;
 			}
 			
-			prevType = valueType;
+			valueType = newType;
 		}
 		
-		boolean primitiveType = this.type.isPrimitive();
-		boolean primitiveValue = this.value.isPrimitive();
+		final boolean primitiveType = this.type.isPrimitive();
+		final boolean primitiveValue = this.value.isPrimitive();
 		
-		if (value1 == null && !(primitiveType && primitiveValue) && !prevType.isSuperClassOf(this.type))
+		if (typedValue == null && !(primitiveType && primitiveValue) && !valueType.isSuperClassOf(this.type))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "cast.incompatible", prevType, this.type));
+			markers.add(MarkerMessages.createMarker(this.position, "cast.incompatible", valueType, this.type));
 			return this;
 		}
 		
-		if (!this.typeHint && this.type.isSameType(prevType) && primitiveType == primitiveValue)
+		if (!this.typeHint && this.type.isSameType(valueType) && primitiveType == primitiveValue)
 		{
 			markers.add(MarkerMessages.createMarker(this.position, "cast.unnecessary"));
 			this.typeHint = true;
@@ -137,14 +158,20 @@ public final class CastOperator extends AbstractValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
-		this.value.checkTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.type.check(markers, context);
-		this.value.check(markers, context);
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
 	}
 	
 	@Override

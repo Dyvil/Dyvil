@@ -72,43 +72,87 @@ public final class InstanceOfOperator extends AbstractValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolveType(markers, context);
-		this.value.resolveTypes(markers, context);
+		if (this.type != null)
+		{
+			this.type = this.type.resolveType(markers, context);
+		}
+		else
+		{
+			markers.add(MarkerMessages.createError(this.position, "instanceof.type.invalid"));
+		}
+
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, context);
+		}
+		else
+		{
+			markers.add(MarkerMessages.createError(this.position, "instanceof.value.invalid"));
+		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.type.resolve(markers, context);
-		this.value = this.value.resolve(markers, context);
+		if (this.type != null)
+		{
+			this.type.resolve(markers, context);
+		}
+		if (this.value != null)
+		{
+			this.value = this.value.resolve(markers, context);
+		}
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
-		this.value.checkTypes(markers, context);
+		if (this.type != null)
+		{
+			this.type.checkType(markers, context, TypePosition.CLASS);
+		}
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.type.check(markers, context);
-		this.value.check(markers, context);
-		
-		if (this.type.isPrimitive())
+		if (this.type != null)
+		{
+			this.type.check(markers, context);
+
+			if (this.type.isPrimitive())
+			{
+				markers.add(MarkerMessages.createError(this.position, "instanceof.type.primitive"));
+				return;
+			}
+		}
+		else
 		{
 			markers.add(MarkerMessages.createError(this.position, "instanceof.type.primitive"));
 			return;
 		}
+
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
+		else
+		{
+			return;
+		}
+
 		if (this.value.isPrimitive())
 		{
 			markers.add(MarkerMessages.createError(this.position, "instanceof.value.primitive"));
 			return;
 		}
 		
-		IType valueType = this.value.getType();
+		final IType valueType = this.value.getType();
 		if (valueType.classEquals(this.type))
 		{
 			markers.add(MarkerMessages.createMarker(this.position, "instanceof.type.equal", valueType));
