@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -25,11 +25,11 @@ public class RangeOperator implements IValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass        RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
-		public static final ClassType     RANGE           = new ClassType(RANGE_CLASS);
-		public static final IClass        RANGEABLE_CLASS = Package.dyvilLang.resolveClass("Ordered");
-		public static final ClassType     RANGEABLE       = new ClassType(RANGEABLE_CLASS);
-		public static final ITypeVariable RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeVariable(0);
+		public static final IClass         RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
+		public static final ClassType      RANGE           = new ClassType(RANGE_CLASS);
+		public static final IClass         RANGEABLE_CLASS = Package.dyvilLang.resolveClass("Ordered");
+		public static final ClassType      RANGEABLE       = new ClassType(RANGEABLE_CLASS);
+		public static final ITypeParameter RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeParameter(0);
 	}
 	
 	protected ICodePosition position;
@@ -266,17 +266,6 @@ public class RangeOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type == Types.VOID)
-		{
-			this.writeExpression(writer, this.type);
-			writer.writeInsn(Opcodes.ARETURN);
-			return;
-		}
-		if (type == null)
-		{
-			type = this.type;
-		}
-
 		// -- Range --
 		if (!this.type.isArrayType())
 		{

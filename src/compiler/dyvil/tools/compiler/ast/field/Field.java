@@ -20,7 +20,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -140,12 +140,12 @@ public class Field extends Member implements IField
 			{
 				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(MarkerMessages.createMarker(position, "field.access.static", this.name));
+					markers.add(Markers.semantic(position, "field.access.static", this.name));
 				}
 				else if (receiver.getType().getTheClass() != this.theClass)
 				{
-					markers.add(MarkerMessages.createMarker(position, "field.access.static.type", this.name,
-					                                        this.theClass.getFullName()));
+					markers.add(Markers.semantic(position, "field.access.static.type", this.name,
+					                             this.theClass.getFullName()));
 				}
 				receiver = null;
 			}
@@ -153,7 +153,7 @@ public class Field extends Member implements IField
 			{
 				if (!receiver.getType().getTheClass().isObject())
 				{
-					markers.add(MarkerMessages.createMarker(position, "field.access.instance", this.name));
+					markers.add(Markers.semantic(position, "field.access.instance", this.name));
 				}
 			}
 			else
@@ -175,11 +175,11 @@ public class Field extends Member implements IField
 		{
 			if (context.isStatic())
 			{
-				markers.add(MarkerMessages.createMarker(position, "field.access.instance", this.name));
+				markers.add(Markers.semantic(position, "field.access.instance", this.name));
 			}
 			else
 			{
-				markers.add(MarkerMessages.createMarker(position, "field.access.unqualified", this.name.unqualified));
+				markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
 				receiver = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
@@ -189,10 +189,10 @@ public class Field extends Member implements IField
 		switch (IContext.getVisibility(context, this))
 		{
 		case IContext.INTERNAL:
-			markers.add(MarkerMessages.createMarker(position, "field.access.internal", this.name));
+			markers.add(Markers.semantic(position, "field.access.internal", this.name));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(MarkerMessages.createMarker(position, "field.access.invisible", this.name));
+			markers.add(Markers.semantic(position, "field.access.invisible", this.name));
 			break;
 		}
 		
@@ -204,7 +204,7 @@ public class Field extends Member implements IField
 	{
 		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
-			markers.add(MarkerMessages.createMarker(position, "field.assign.final", this.name.unqualified));
+			markers.add(Markers.semantic(position, "field.assign.final", this.name.unqualified));
 		}
 		
 		IValue value1 = IType.convertValue(newValue, this.type, this.type, markers, context);
@@ -212,10 +212,9 @@ public class Field extends Member implements IField
 		{
 			if (newValue.isResolved())
 			{
-				Marker marker = MarkerMessages
-						.createMarker(newValue.getPosition(), "field.assign.type", this.name.unqualified);
-				marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
-				marker.addInfo(MarkerMessages.getMarker("value.type", newValue.getType()));
+				Marker marker = Markers.semantic(newValue.getPosition(), "field.assign.type", this.name.unqualified);
+				marker.addInfo(Markers.getSemantic("field.type", this.type));
+				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 				markers.add(marker);
 			}
 		}
@@ -254,7 +253,7 @@ public class Field extends Member implements IField
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN && this.value.isResolved())
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "field.type.infer", this.name.unqualified));
+					markers.add(Markers.semantic(this.position, "field.type.infer", this.name.unqualified));
 					this.type = Types.ANY;
 				}
 			}
@@ -264,10 +263,10 @@ public class Field extends Member implements IField
 			{
 				if (this.value.isResolved())
 				{
-					Marker marker = MarkerMessages
-							.createMarker(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
-					marker.addInfo(MarkerMessages.getMarker("field.type", this.type));
-					marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+					Marker marker = Markers
+							.semantic(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
+					marker.addInfo(Markers.getSemantic("field.type", this.type));
+					marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 					markers.add(marker);
 				}
 			}
@@ -284,7 +283,7 @@ public class Field extends Member implements IField
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "field.type.novalue", this.name.unqualified));
+			markers.add(Markers.semantic(this.position, "field.type.novalue", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}
@@ -312,15 +311,15 @@ public class Field extends Member implements IField
 		
 		if (this.type == Types.VOID)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "field.type.void"));
+			markers.add(Markers.semantic(this.position, "field.type.void"));
 		}
 		
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.FIELD_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(MarkerMessages.createError(this.position, "modifiers.illegal",
-			                                       MarkerMessages.getMarker("field", this.name),
-			                                       ModifierUtil.methodModifiersToString(illegalModifiers)));
+			markers.add(
+					Markers.semanticError(this.position, "modifiers.illegal", Markers.getSemantic("field", this.name),
+					                      ModifierUtil.methodModifiersToString(illegalModifiers)));
 		}
 	}
 	
@@ -374,7 +373,19 @@ public class Field extends Member implements IField
 		
 		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}
-	
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC))
+		{
+			writer.writeVarInsn(Opcodes.ALOAD, 0);
+			this.value.writeExpression(writer, this.type);
+			writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified,
+			                      this.getDescription());
+		}
+	}
+
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{

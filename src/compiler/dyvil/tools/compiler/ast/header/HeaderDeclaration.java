@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.modifiers.IModified;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.backend.IObjectCompilable;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -128,9 +128,9 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		Name headerName = this.header.getName();
 		if (headerName != this.name)
 		{
-			Marker m = MarkerMessages.createMarker(this.position, "header.name.mismatch");
-			m.addInfo(MarkerMessages.getMarker("header.name", headerName));
-			m.addInfo(MarkerMessages.getMarker("header.declaration.name", this.name));
+			Marker m = Markers.semantic(this.position, "header.name.mismatch");
+			m.addInfo(Markers.getSemantic("header.name", headerName));
+			m.addInfo(Markers.getSemantic("header.declaration.name", this.name));
 			markers.add(m);
 		}
 	}

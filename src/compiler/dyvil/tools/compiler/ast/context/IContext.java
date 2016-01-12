@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IConstructor;
@@ -24,12 +24,14 @@ public interface IContext
 	byte VISIBLE   = 0;
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
-	
+
 	boolean isStatic();
 	
 	IDyvilHeader getHeader();
 	
 	IClass getThisClass();
+
+	IType getThisType();
 	
 	Package resolvePackage(Name name);
 	
@@ -37,7 +39,7 @@ public interface IContext
 	
 	IType resolveType(Name name);
 	
-	ITypeVariable resolveTypeVariable(Name name);
+	ITypeParameter resolveTypeVariable(Name name);
 	
 	IDataMember resolveField(Name name);
 	
@@ -46,6 +48,8 @@ public interface IContext
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	boolean handleException(IType type);
+
+	boolean canReturn(IType type);
 	
 	boolean isMember(IVariable variable);
 	
@@ -103,7 +107,16 @@ public interface IContext
 		context.getMethodMatches(matches, instance, name, arguments);
 		return matches.getBestMethod();
 	}
-	
+
+	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
+	{
+		float match = method.getSignatureMatch(name, receiver, arguments);
+		if (match > 0)
+		{
+			list.add(method, match);
+		}
+	}
+
 	static byte getVisibility(IContext context, IClassMember member)
 	{
 		IClass thisClass = context.getThisClass();

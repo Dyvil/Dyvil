@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -16,7 +15,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -115,7 +114,7 @@ public final class TypeOperator extends AbstractValue
 		if (this.type == null)
 		{
 			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
-			markers.add(MarkerMessages.createMarker(this.position, "typeoperator.invalid"));
+			markers.add(Markers.semantic(this.position, "typeoperator.invalid"));
 			return;
 		}
 		
@@ -136,11 +135,6 @@ public final class TypeOperator extends AbstractValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
-
-		if (this.type.getTypeVariable() == null && this.type.hasTypeVariables())
-		{
-			markers.add(MarkerMessages.createError(this.position, "typeoperator.typevar"));
-		}
 	}
 	
 	@Override
@@ -168,11 +162,7 @@ public final class TypeOperator extends AbstractValue
 	{
 		this.type.writeTypeExpression(writer);
 
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.genericType.writeCast(writer, type, this.getLineNumber());
 		}

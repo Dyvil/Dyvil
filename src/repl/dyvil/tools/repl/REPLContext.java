@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -50,9 +51,10 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 
 	// Persistent members
 
-	private final Map<Name, IField> fields  = new IdentityHashMap<>();
-	private final List<IMethod>     methods = new ArrayList<>();
-	private final Map<Name, IClass> classes = new IdentityHashMap<>();
+	private final Map<Name, IField>    fields     = new IdentityHashMap<>();
+	private final Map<Name, IProperty> properties = new IdentityHashMap<>();
+	private final List<IMethod>        methods    = new ArrayList<>();
+	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
 	private Map<String, AtomicInteger> resultIndexes = new HashMap<>();
 
@@ -461,7 +463,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	public void addProperty(IProperty property)
 	{
 		REPLMemberClass iclass = this.getREPLClass(property);
-		
+
+		property.setTheClass(iclass);
 		property.resolveTypes(this.markers, this);
 		property.resolve(this.markers, this);
 		property.checkTypes(this.markers, this);
@@ -479,11 +482,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		property.cleanup(this, this);
 		
 		this.compileClass(iclass);
-		
-		this.fields.put(property.getName(), property);
+
+		this.properties.put(property.getName(), property);
 		
 		StringBuilder buf = new StringBuilder("Defined Property '");
-		Util.propertySignatureToString(property, buf);
+		Util.memberSignatureToString(property, buf);
 		this.repl.getOutput().println(buf.append('\'').toString());
 		
 		this.cleanup();
@@ -593,15 +596,17 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (IMethod method : this.methods)
 		{
-			float match = method.getSignatureMatch(name, instance, arguments);
-			if (match > 0)
-			{
-				list.add(method, match);
-			}
+			IContext.getMethodMatch(list, receiver, name, arguments, method);
+		}
+
+		final IProperty property = this.properties.get(Util.removeEq(name));
+		if (property != null)
+		{
+			property.getMethodMatches(list, receiver, name, arguments);
 		}
 		
 		if (!list.isEmpty())
@@ -609,7 +614,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return;
 		}
 		
-		super.getMethodMatches(list, instance, name, arguments);
+		super.getMethodMatches(list, receiver, name, arguments);
 	}
 	
 	@Override

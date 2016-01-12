@@ -234,11 +234,7 @@ public final class CharValue implements IConstantValue
 		{
 			writer.writeLDC(this.value.charAt(0));
 
-			if (type == Types.VOID)
-			{
-				writer.writeInsn(Opcodes.IRETURN);
-			}
-			else if (type != null)
+			if (type != null)
 			{
 				Types.CHAR.writeCast(writer, type, this.getLineNumber());
 			}

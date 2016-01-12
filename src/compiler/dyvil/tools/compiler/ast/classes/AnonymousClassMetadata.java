@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.FieldThis;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -74,7 +73,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final CaptureHelper captureHelper = this.theClass.captureHelper;
 		captureHelper.writeCaptureFields(writer);
@@ -127,7 +126,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 		
 		captureHelper.writeFieldAssignments(mw);
 
-		instanceFields.writeExpression(mw, Types.VOID);
+		this.theClass.writeInit(mw);
 		
 		mw.end(Types.VOID);
 	}

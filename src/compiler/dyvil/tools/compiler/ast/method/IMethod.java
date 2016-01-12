@@ -36,7 +36,7 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	void setParameters(IParameter[] parameters, int parameterCount);
 	
 	@Override
-	default void addType(IType type)
+	default void addParameterType(IType type)
 	{
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
@@ -62,15 +62,15 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	
 	String[] getInternalExceptions();
 	
-	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 }

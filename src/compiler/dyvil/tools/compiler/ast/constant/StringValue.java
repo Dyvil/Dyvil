@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.constant;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -119,11 +118,7 @@ public final class StringValue implements IConstantValue
 	{
 		writer.writeLDC(this.value);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.STRING.writeCast(writer, type, this.getLineNumber());
 		}

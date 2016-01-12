@@ -78,6 +78,7 @@ public final class Types
 	public static IClass MUTATING_CLASS;
 	public static IClass MUTABLE_CLASS;
 	public static IClass IMMUTABLE_CLASS;
+	public static IClass REIFIED_CLASS;
 
 	public static IClass BOOLEAN_CONVERTIBLE_CLASS;
 	public static IClass CHAR_CONVERTIBLE_CLASS;
@@ -133,6 +134,7 @@ public final class Types
 		MUTATING_CLASS = Package.dyvilAnnotation.resolveClass("Mutating");
 		MUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Mutable");
 		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
+		REIFIED_CLASS = Package.dyvilAnnotation.resolveClass("Reified");
 
 		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");
 		BOOLEAN_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("BooleanConvertible");

@@ -110,11 +110,6 @@ public final class NullValue implements IConstantValue
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		writer.writeInsn(Opcodes.ACONST_NULL);
-
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
 	}
 	
 	@Override

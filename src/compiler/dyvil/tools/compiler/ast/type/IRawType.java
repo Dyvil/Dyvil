@@ -5,7 +5,7 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -35,7 +35,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default IType resolveType(ITypeVariable typeParameter)
+	default IType resolveType(ITypeParameter typeParameter)
 	{
 		return this.getTheClass().resolveType(typeParameter, this);
 	}

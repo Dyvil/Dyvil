@@ -5,14 +5,14 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -65,7 +65,7 @@ public class NamedGenericType extends GenericType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
 		return null;
 	}
@@ -129,29 +129,29 @@ public class NamedGenericType extends GenericType
 		this.resolveTypeArguments(markers, context);
 
 		final IClass iClass = resolved.getTheClass();
-		final ITypeVariable[] typeVariables;
+		final ITypeParameter[] typeVariables;
 		final IType concrete;
 
 		// Convert the non-generic class type to a generic one
 		if (!resolved.isGenericType())
 		{
-			typeVariables = iClass.getTypeVariables();
+			typeVariables = iClass.getTypeParameters();
 
 			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
 		}
 		else
 		{
-			typeVariables = new ITypeVariable[this.typeArgumentCount];
+			typeVariables = new ITypeParameter[this.typeArgumentCount];
 
 			// Create a concrete type and save Type Variables in the above array
-			concrete = resolved.getConcreteType(typeVar -> {
-				int index = typeVar.getIndex();
+			concrete = resolved.getConcreteType(typeParameter -> {
+				int index = typeParameter.getIndex();
 
 				if (index >= this.typeArgumentCount)
 				{
 					return null;
 				}
-				typeVariables[index] = typeVar;
+				typeVariables[index] = typeParameter;
 				return this.typeArguments[index];
 			});
 		}
@@ -159,14 +159,14 @@ public class NamedGenericType extends GenericType
 		// Check if the Type Variable Bounds accept the supplied Type Arguments
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			final ITypeVariable typeVariable = typeVariables[i];
+			final ITypeParameter typeVariable = typeVariables[i];
 			final IType type = this.typeArguments[i];
 			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
 			{
-				final Marker marker = MarkerMessages.createMarker(type.getPosition(), "generic.type.incompatible",
-				                                            typeVariable.getName().qualified);
-				marker.addInfo(MarkerMessages.getMarker("generic.type", type));
-				marker.addInfo(MarkerMessages.getMarker("typevariable", typeVariable));
+				final Marker marker = Markers.semantic(type.getPosition(), "generic.type.incompatible",
+				                                       typeVariable.getName().qualified);
+				marker.addInfo(Markers.getSemantic("generic.type", type));
+				marker.addInfo(Markers.getSemantic("typevariable", typeVariable));
 				markers.add(marker);
 			}
 		}
@@ -180,7 +180,7 @@ public class NamedGenericType extends GenericType
 		/*
 		 * TODO Position handling
 		 * if (position == TypePosition.CLASS) {
-		 * markers.add(MarkerMessages.createMarker(this.position, "type.class.generic"));
+		 * markers.add(Markers.createMarker(this.position, "type.class.generic"));
 		 * } // If the position is a SUPER_TYPE position if (position ==
 		 * TypePosition.SUPER_TYPE || position ==
 		 * TypePosition.SUPER_TYPE_ARGUMENT) { position =

@@ -1,0 +1,50 @@
+package dyvil.test
+
+public class PropertyTest
+{
+	interface AbstractProperty
+	{
+		public abstract int subscript { get; set }
+	}
+	
+	class ConcreteProperty implements AbstractProperty
+	{
+		private int value
+		private boolean _setterCalled
+
+		public override int subscript
+		{
+			init
+			{
+				this.value = 1
+			}
+
+			get: this.value
+
+			set (newValue)
+			{
+				this._setterCalled = true
+				this.value = newValue
+			}
+		}
+
+		public boolean setterCalled
+		{
+			init: this._setterCalled = false
+			get: this._setterCalled
+		}
+	}
+	
+	public static void main([String] args)
+	{
+		auto c = new ConcreteProperty
+
+		Main.test("Property Initializer", 1, c[])
+
+		c[] = 20
+		Main.test("Property Getter", 20, c[])
+
+		c.subscript = 10
+		Main.test("Property Setter", true, c.setterCalled)
+	}
+}

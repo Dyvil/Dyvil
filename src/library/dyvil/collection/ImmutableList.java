@@ -6,9 +6,11 @@ import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.SingletonList;
+import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.annotation.Immutable;
+import dyvil.ref.ObjectRef;
 import dyvil.util.ImmutableException;
 
 import java.util.Comparator;
@@ -37,7 +39,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	static <E> ImmutableList<E> apply(E element)
 	{
-		return new SingletonList<E>(element);
+		return new SingletonList<>(element);
 	}
 	
 	static <E> ImmutableList<E> apply(E e1, E e2)
@@ -128,9 +130,6 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED | Spliterator.IMMUTABLE);
 	}
-	
-	@Override
-	E subscript(int index);
 	
 	@Override
 	E get(int index);
@@ -233,14 +232,49 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	@Mutating
 	default void subscript_$eq(int index, E element)
 	{
-		throw new ImmutableException("update() on Immutable List");
+		throw new ImmutableException("subscript() on Immutable List");
 	}
-	
+
+	@Override
+	@Mutating
+	default List<E> subscript(Range<Int> range)
+	{
+		throw new ImmutableException("subscript() on Immutable List");
+	}
+
+	@Override
+	@Mutating
+	default void subscript_$eq(Range<Int> range, E[] elements)
+	{
+		throw new ImmutableException("subscript_=() on Immutable List");
+	}
+
+	@Override
+	@Mutating
+	default void subscript_$eq(Range<Int> range, List<? extends E> elements)
+	{
+		throw new ImmutableException("subscript_=() on Immutable List");
+	}
+
+	@Override
+	@Mutating
+	default ObjectRef<E> subscriptRef(int index)
+	{
+		throw new ImmutableException("subscriptRef() on Immutable List");
+	}
+
 	@Override
 	@Mutating
 	default E set(int index, E element)
 	{
 		throw new ImmutableException("set() on Immutable List");
+	}
+
+	@Override
+	@Mutating
+	default E setResizing(int index, E element)
+	{
+		throw new ImmutableException("setResizing() on Immutable List");
 	}
 	
 	@Override
@@ -249,22 +283,23 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	{
 		throw new ImmutableException("insert() on Immutable List");
 	}
-	
+
+	@Override
+	@Mutating
+	default void insertResizing(int index, E element)
+	{
+		throw new ImmutableException("insertResizing() on Immutable List");
+	}
+
 	@Override
 	@Mutating
 	default boolean add(E element)
 	{
 		throw new ImmutableException("add() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default E add(int index, E element)
-	{
-		throw new ImmutableException("add() on Immutable List");
-	}
-	
-	@Override
 	default boolean addAll(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("addAll() on Immutable List");
@@ -306,6 +341,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	}
 	
 	@Override
+	@Mutating
 	default boolean intersect(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("intersect() on Immutable List");

@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -82,7 +82,7 @@ public final class CastOperator extends AbstractValue
 		else
 		{
 			this.type = Types.UNKNOWN;
-			markers.add(MarkerMessages.createError(this.position, "cast.type.invalid"));
+			markers.add(Markers.semanticError(this.position, "cast.type.invalid"));
 		}
 
 		if (this.value != null)
@@ -91,7 +91,7 @@ public final class CastOperator extends AbstractValue
 		}
 		else
 		{
-			markers.add(MarkerMessages.createError(this.position, "cast.value.invalid"));
+			markers.add(Markers.semanticError(this.position, "cast.value.invalid"));
 		}
 	}
 	
@@ -108,7 +108,7 @@ public final class CastOperator extends AbstractValue
 		this.value = this.value.resolve(markers, context);
 		if (this.type == Types.VOID)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "cast.void"));
+			markers.add(Markers.semantic(this.position, "cast.void"));
 			return this;
 		}
 		
@@ -141,13 +141,13 @@ public final class CastOperator extends AbstractValue
 		
 		if (typedValue == null && !(primitiveType && primitiveValue) && !valueType.isSuperClassOf(this.type))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "cast.incompatible", valueType, this.type));
+			markers.add(Markers.semantic(this.position, "cast.incompatible", valueType, this.type));
 			return this;
 		}
 		
 		if (!this.typeHint && this.type.isSameType(valueType) && primitiveType == primitiveValue)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "cast.unnecessary"));
+			markers.add(Markers.semantic(this.position, "cast.unnecessary"));
 			this.typeHint = true;
 		}
 		

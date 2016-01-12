@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
@@ -127,7 +127,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	boolean isGenericType();
 	
-	ITypeVariable getTypeVariable();
+	ITypeParameter getTypeVariable();
 	
 	Name getName();
 	
@@ -308,14 +308,15 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * <p>
 	 * <pre>
 	 * GenericType gt = type[List[String]]
-	 * ITypeVariable tv = type[List].getTypeVariable("E")
+	 * ITypeParameter tv = type[List].getTypeVariable("E")
 	 * gt.resolveType(tv) // => String
 	 * </pre>
+	 * @param typeParameter
 	 */
 	@Override
-	IType resolveType(ITypeVariable typeVar);
+	IType resolveType(ITypeParameter typeParameter);
 	
-	default IType resolveTypeSafely(ITypeVariable typeVar)
+	default IType resolveTypeSafely(ITypeParameter typeVar)
 	{
 		IType t = this.resolveType(typeVar);
 		return t == null ? Types.ANY : t;
@@ -436,7 +437,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	Object getFrameType();
 	
 	void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
-	
+
+	void writeClassExpression(MethodWriter writer) throws BytecodeException;
+
 	void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 	
 	void writeDefaultValue(MethodWriter writer) throws BytecodeException;

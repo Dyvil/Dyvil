@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -131,9 +131,9 @@ public class MapExpr implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages.createMarker(value.getPosition(), "map.key.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("type.expected", keyType.getConcreteType(typeContext)));
-				marker.addInfo(MarkerMessages.getMarker("map.key.type", value.getType()));
+				Marker marker = Markers.semantic(value.getPosition(), "map.key.type.incompatible");
+				marker.addInfo(Markers.getSemantic("type.expected", keyType.getConcreteType(typeContext)));
+				marker.addInfo(Markers.getSemantic("map.key.type", value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -147,9 +147,9 @@ public class MapExpr implements IValue
 			
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages.createMarker(value.getPosition(), "map.value.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("type.expected", valueType.getConcreteType(typeContext)));
-				marker.addInfo(MarkerMessages.getMarker("map.value.type", value.getType()));
+				Marker marker = Markers.semantic(value.getPosition(), "map.value.type.incompatible");
+				marker.addInfo(Markers.getSemantic("type.expected", valueType.getConcreteType(typeContext)));
+				marker.addInfo(Markers.getSemantic("map.value.type", value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -331,11 +331,7 @@ public class MapExpr implements IValue
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

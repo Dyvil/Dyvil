@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constant.NullValue;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -25,7 +27,7 @@ public interface IObjectType extends IType
 	}
 	
 	@Override
-	default ITypeVariable getTypeVariable()
+	default ITypeParameter getTypeVariable()
 	{
 		return null;
 	}
@@ -166,10 +168,16 @@ public interface IObjectType extends IType
 		}
 		if (target.isPrimitive())
 		{
-			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+			target.getUnboxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
-	
+
+	@Override
+	default void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		writer.writeLDC(Type.getObjectType(this.getInternalName()));
+	}
+
 	@Override
 	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{

@@ -10,14 +10,18 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.type.ParameterTypeVarType;
+import dyvil.tools.compiler.ast.generic.type.CovariantTypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.operator.ClassOperator;
+import dyvil.tools.compiler.ast.operator.TypeOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -28,84 +32,102 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public final class TypeVariable implements ITypeVariable
+public final class TypeParameter implements ITypeParameter
 {
 	protected ICodePosition position;
-	
+
+	private AnnotationList annotations;
+
 	protected Variance variance = Variance.INVARIANT;
+
 	protected Name name;
+
 	protected IType[] upperBounds = new IType[1];
 	protected int   upperBoundCount;
 	protected IType lowerBound;
-	
-	private int      index;
-	private IGeneric generic;
-	
-	private AnnotationList annotations;
 
-	private IType parameterType = new ParameterTypeVarType(this);
-	
-	public TypeVariable(IGeneric generic)
+	// Metadata
+	private int                index;
+
+	private int                parameterIndex;
+
+	private ITypeParameterized generic;
+	private ReifiedKind reifiedKind   = ReifiedKind.NOT_REIFIED;
+
+	private IType       covariantType = new CovariantTypeVarType(this);
+	public TypeParameter(ITypeParameterized generic)
 	{
 		this.generic = generic;
 	}
-	
-	public TypeVariable(IGeneric generic, Name name)
+
+	public TypeParameter(ITypeParameterized generic, Name name)
 	{
 		this.name = name;
 		this.generic = generic;
 	}
-	
-	public TypeVariable(ICodePosition position, IGeneric generic)
+
+	public TypeParameter(ICodePosition position, ITypeParameterized generic)
 	{
 		this.position = position;
 		this.generic = generic;
 	}
-	
-	public TypeVariable(ICodePosition position, IGeneric generic, Name name, Variance variance)
+
+	public TypeParameter(ICodePosition position, ITypeParameterized generic, Name name, Variance variance)
 	{
 		this.position = position;
 		this.name = name;
 		this.generic = generic;
 		this.variance = variance;
 	}
-	
+
 	@Override
-	public IGeneric getGeneric()
+	public ITypeParameterized getGeneric()
 	{
 		return this.generic;
 	}
-	
+
 	@Override
 	public void setIndex(int index)
 	{
 		this.index = index;
 	}
-	
+
 	@Override
 	public int getIndex()
 	{
 		return this.index;
 	}
-	
+
 	@Override
 	public void setVariance(Variance variance)
 	{
 		this.variance = variance;
 	}
-	
+
 	@Override
 	public Variance getVariance()
 	{
 		return this.variance;
 	}
-	
+
+	@Override
+	public ReifiedKind getReifiedKind()
+	{
+		return this.reifiedKind;
+	}
+
+	@Override
+	public int getParameterIndex()
+	{
+		return this.parameterIndex;
+	}
+
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
@@ -200,9 +222,9 @@ public final class TypeVariable implements ITypeVariable
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType getCovariantType()
 	{
-		return this.parameterType;
+		return this.covariantType;
 	}
 
 	@Override
@@ -399,11 +421,35 @@ public final class TypeVariable implements ITypeVariable
 				}
 			}
 		}
+
+		if (this.annotations != null)
+		{
+			this.annotations.resolveTypes(markers, context, this);
+
+			IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
+			if (reifiedAnnotation != null)
+			{
+				final IValue erasure = reifiedAnnotation.getArguments().getFirstValue();
+				if (erasure != null && erasure.booleanValue())
+				{
+					this.reifiedKind = ReifiedKind.REIFIED_ERASURE;
+				}
+				else
+				{
+					this.reifiedKind = ReifiedKind.REIFIED_TYPE;
+				}
+			}
+		}
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.resolve(markers, context);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.resolve(markers, context);
@@ -418,6 +464,11 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.checkTypes(markers, context);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -432,6 +483,11 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, ElementType.TYPE_PARAMETER);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.check(markers, context);
@@ -446,6 +502,11 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public void foldConstants()
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.foldConstants();
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.foldConstants();
@@ -460,6 +521,11 @@ public final class TypeVariable implements ITypeVariable
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.cleanup(context, compilableList);
+		}
+
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.cleanup(context, compilableList);
@@ -493,7 +559,60 @@ public final class TypeVariable implements ITypeVariable
 			buffer.append("Ljava/lang/Object;");
 		}
 	}
-	
+
+	@Override
+	public void appendParameterDescriptor(StringBuilder buffer)
+	{
+		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		{
+			buffer.append("Ljava/lang/Class;");
+		}
+		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		{
+			buffer.append("Ldyvilx/lang/model/type/Type;");
+		}
+	}
+
+	@Override
+	public void appendParameterSignature(StringBuilder buffer)
+	{
+		this.appendParameterDescriptor(buffer);
+	}
+
+	@Override
+	public void writeParameter(MethodWriter writer) throws BytecodeException
+	{
+		final IType type;
+		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		{
+			type = ClassOperator.Types.CLASS;
+		}
+		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		{
+			type = TypeOperator.Types.TYPE;
+		}
+		else
+		{
+			return;
+		}
+
+		this.parameterIndex = writer.localCount();
+		writer.registerParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
+	}
+
+	@Override
+	public void writeArgument(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		{
+			type.writeClassExpression(writer);
+		}
+		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		{
+			type.writeTypeExpression(writer);
+		}
+	}
+
 	@Override
 	public void write(TypeAnnotatableVisitor visitor)
 	{

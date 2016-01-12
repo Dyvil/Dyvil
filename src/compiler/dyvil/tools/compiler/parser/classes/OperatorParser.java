@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -177,7 +177,7 @@ public final class OperatorParser extends Parser
 				this.map.addOperator(this.operator);
 				return;
 			}
-			pm.report(MarkerMessages.createSyntaxError(token, "operator.property.invalid", token));
+			pm.report(Markers.syntaxError(token, "operator.property.invalid", token));
 			return;
 		case COMMA:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)

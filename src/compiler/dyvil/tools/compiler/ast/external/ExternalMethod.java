@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -77,9 +77,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	private void resolveGenerics()
 	{
 		this.genericsResolved = true;
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].resolveTypes(null, Package.rootPackage);
+			this.typeParameters[i].resolveTypes(null, Package.rootPackage);
 		}
 	}
 	
@@ -90,6 +90,22 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			this.resolveGenerics();
 		}
 		this.parametersResolved = true;
+
+		if (this.receiverType == null)
+		{
+			this.receiverType = this.theClass.getType();
+		}
+
+		int parametersToRemove = 0;
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			if (this.typeParameters[i].getReifiedKind() != ITypeParameter.ReifiedKind.NOT_REIFIED)
+			{
+				parametersToRemove++;
+			}
+		}
+
+		this.parameterCount -= parametersToRemove;
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -271,36 +287,36 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 	
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, IType type, int lineNumber)
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeCall(writer, instance, arguments, type, lineNumber);
+		super.writeCall(writer, instance, arguments, typeContext, targetType, lineNumber);
 	}
 	
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeJump(writer, dest, instance, arguments, lineNumber);
+		super.writeJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
-		super.writeInvJump(writer, dest, instance, arguments, lineNumber);
+		super.writeInvJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
 	
 	@Override
@@ -319,8 +335,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
-			if (typeVar.addRawAnnotation(desc, annotation))
+			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
+			if (!typeVar.addRawAnnotation(desc, annotation))
 			{
 				return null;
 			}
@@ -330,7 +346,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		}
 		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
 		{
-			ITypeVariable typeVar = this.generics[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
 			break;
 		}

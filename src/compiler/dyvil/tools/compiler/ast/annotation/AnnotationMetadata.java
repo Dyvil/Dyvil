@@ -129,7 +129,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void write(ClassWriter writer, IValue instanceFields) throws BytecodeException
+	public void write(ClassWriter writer) throws BytecodeException
 	{
 		int params = this.theClass.parameterCount();
 		for (int i = 0; i < params; i++)

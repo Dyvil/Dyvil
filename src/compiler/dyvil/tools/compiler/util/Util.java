@@ -5,31 +5,25 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class Util
 {
-	public static void fieldSignatureToString(IField field, StringBuilder buf)
+	public static void memberSignatureToString(IMember member, StringBuilder buf)
 	{
-		field.getModifiers().toString(buf);
-		field.getType().toString("", buf);
-		buf.append(' ').append(field.getName());
-	}
-	
-	public static void propertySignatureToString(IProperty property, StringBuilder buf)
-	{
-		fieldSignatureToString(property, buf);
+		member.getType().toString("", buf);
+		buf.append(' ').append(member.getName());
 	}
 
 	public static String methodSignatureToString(IMethod method)
@@ -41,18 +35,17 @@ public class Util
 	
 	public static void methodSignatureToString(IMethod method, StringBuilder buf)
 	{
-		method.getType().toString("", buf);
-		buf.append(' ').append(method.getName());
+		memberSignatureToString(method, buf);
 		
-		int typeVariables = method.genericCount();
+		int typeVariables = method.typeParameterCount();
 		if (typeVariables > 0)
 		{
 			buf.append('[');
-			method.getTypeVariable(0).toString("", buf);
+			method.getTypeParameter(0).toString("", buf);
 			for (int i = 1; i < typeVariables; i++)
 			{
 				buf.append(", ");
-				method.getTypeVariable(i).toString("", buf);
+				method.getTypeParameter(i).toString("", buf);
 			}
 			buf.append(']');
 		}
@@ -78,16 +71,16 @@ public class Util
 		iclass.getModifiers().toString(buf);
 		buf.append(iclass.getName());
 		
-		int typeVariables = iclass.genericCount();
+		int typeVariables = iclass.typeParameterCount();
 		if (typeVariables > 0)
 		{
 			buf.append('[');
 			
-			iclass.getTypeVariable(0).toString("", buf);
+			iclass.getTypeParameter(0).toString("", buf);
 			for (int i = 1; i < typeVariables; i++)
 			{
 				buf.append(", ");
-				iclass.getTypeVariable(i).toString("", buf);
+				iclass.getTypeParameter(i).toString("", buf);
 			}
 			
 			buf.append(']');
@@ -183,7 +176,8 @@ public class Util
 		IValue value1 = value.toConstant(markers);
 		if (value1 == null)
 		{
-			markers.add(MarkerMessages.createMarker(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
+			markers.add(
+					Markers.semantic(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
 			return value.getType().getDefaultValue();
 		}
 		
@@ -226,22 +220,56 @@ public class Util
 	
 	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
 	{
-		Marker marker = MarkerMessages.createMarker(value.getPosition(), key, args);
-		marker.addInfo(MarkerMessages.getMarker("type.expected", type.getConcreteType(typeContext)));
-		marker.addInfo(MarkerMessages.getMarker("value.type", value.getType()));
+		Marker marker = Markers.semantic(value.getPosition(), key, args);
+		marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
+		marker.addInfo(Markers.getSemantic("value.type", value.getType()));
 		markers.add(marker);
 	}
-	
-	public static final Name stripEq(Name name)
+
+	public static boolean hasEq(Name name)
 	{
-		String qualified = name.qualified.substring(0, name.qualified.length() - 3);
-		String unqualified = name.unqualified.substring(0, name.unqualified.length() - 1);
-		return Name.get(qualified, unqualified);
+		return name.unqualified.endsWith("=");
+	}
+
+	public static Name addEq(Name name)
+	{
+		final int unqualifiedLength = name.unqualified.length();
+		final char lastChar = name.unqualified.charAt(unqualifiedLength - 1);
+
+		if (LexerUtil.isIdentifierSymbol(lastChar))
+		{
+			// Last character is a symbol -> add = without _
+			return Name.get(name.unqualified.concat("="), name.qualified.concat("$eq"));
+		}
+		// Last character is NOT a symbol -> add _=
+		return Name.get(name.unqualified.concat("_="), name.qualified.concat("_$eq"));
+
+		// We use 'concat' above to avoid implicit StringBuilders to be created
+	}
+
+	public static Name removeEq(Name name)
+	{
+		final String unqualified = name.unqualified;
+		final String qualified = name.qualified;
+
+		if (unqualified.endsWith("_="))
+		{
+			final String newQualified = qualified.substring(0, qualified.length() - 4); // 4 = "_$eq".length
+			final String newUnqualified = unqualified.substring(0, unqualified.length() - 2); // 2 = "_=".length
+			return Name.get(newQualified, newUnqualified);
+		}
+		if (unqualified.endsWith("="))
+		{
+			final String newQualified = qualified.substring(0, qualified.length() - 3); // 3 = "$eq".length
+			final String newUnqualified = unqualified.substring(0, unqualified.length() - 1); // 1 = "=".length
+			return Name.get(newQualified, newUnqualified);
+		}
+		return name;
 	}
 
 	public static String toString(IClassMember member, String type)
 	{
-		return MarkerMessages.getMarker("member.named", MarkerMessages.getMarker("member." + type), member.getName());
+		return Markers.getSemantic("member.named", Markers.getSemantic("member." + type), member.getName());
 	}
 
 	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)

@@ -3,8 +3,8 @@ package dyvil.tools.compiler.backend;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.generic.IGeneric;
-import dyvil.tools.compiler.ast.generic.TypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
 import dyvil.tools.compiler.ast.generic.type.InternalGenericType;
@@ -170,7 +170,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, method::addType);
+			i = readTyped(desc, i, method::addParameterType);
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -253,7 +253,6 @@ public final class ClassFormat
 			while (desc.charAt(index) != '>')
 			{
 				index = readTyped(desc, index, type);
-
 			}
 			return type;
 		}
@@ -343,11 +342,11 @@ public final class ClassFormat
 		return start;
 	}
 	
-	private static int readGeneric(String desc, int start, IGeneric generic)
+	private static int readGeneric(String desc, int start, ITypeParameterized generic)
 	{
 		int index = desc.indexOf(':', start);
 		Name name = Name.getQualified(desc.substring(start, index));
-		TypeVariable typeVar = new TypeVariable(generic, name);
+		TypeParameter typeVar = new TypeParameter(generic, name);
 		if (desc.charAt(index + 1) == ':')
 		{
 			index++;
@@ -357,7 +356,7 @@ public final class ClassFormat
 		{
 			index = readTyped(desc, index + 1, typeVar::addUpperBound);
 		}
-		generic.addTypeVariable(typeVar);
+		generic.addTypeParameter(typeVar);
 		return index;
 	}
 	

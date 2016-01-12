@@ -57,9 +57,6 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	Iterator<E> reverseIterator();
 	
 	@Override
-	E subscript(int index);
-	
-	@Override
 	E get(int index);
 	
 	// Non-mutating Operations
@@ -222,22 +219,23 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	@Override
 	void $plus$eq(E element);
-	
-	@Override
-	void subscript_$eq(int index, E element);
-	
+
 	@Override
 	E set(int index, E element);
-	
+
+	@Override
+	E setResizing(int index, E element);
+
+	@Override
+	void insert(int index, E element);
+
 	@Override
 	default boolean add(E element)
 	{
+		// Duplicate override because of conflicting default methods
 		this.$plus$eq(element);
 		return true;
 	}
-	
-	@Override
-	E add(int index, E element);
 	
 	@Override
 	void removeAt(int index);

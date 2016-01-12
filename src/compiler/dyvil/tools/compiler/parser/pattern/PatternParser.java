@@ -12,7 +12,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -164,7 +164,7 @@ public class PatternParser extends Parser
 				this.mode = END;
 				return;
 			}
-			pm.report(MarkerMessages.createSyntaxError(token, "pattern.invalid", token.toString()));
+			pm.report(Markers.syntaxError(token, "pattern.invalid", token.toString()));
 			return;
 		case NEGATIVE_NUMBER:
 			switch (type)

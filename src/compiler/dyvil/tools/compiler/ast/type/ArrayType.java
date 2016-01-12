@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -29,8 +29,8 @@ public class ArrayType implements IObjectType, ITyped
 {
 	public static final int OBJECT_DISTANCE = 2;
 
-	private IType      type;
-	private Mutability mutability = Mutability.UNDEFINED;
+	protected IType type;
+	protected Mutability mutability = Mutability.UNDEFINED;
 
 	public ArrayType()
 	{
@@ -258,7 +258,8 @@ public class ArrayType implements IObjectType, ITyped
 
 	private static boolean checkImmutable(IType superType, IType subtype)
 	{
-		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype.getMutability();
+		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype
+				.getMutability();
 	}
 
 	private boolean checkPrimitiveType(IType elementType)
@@ -294,7 +295,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(MarkerMessages.createMarker(this.type.getPosition(), "type.super.array"));
+			markers.add(Markers.semantic(this.type.getPosition(), "type.super.array"));
 		}
 		
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -328,21 +329,40 @@ public class ArrayType implements IObjectType, ITyped
 	public IType getConcreteType(ITypeContext context)
 	{
 		IType concrete = this.type.getConcreteType(context);
-		if (!this.type.isPrimitive() && concrete.isPrimitive())
+
+		final ITypeParameter typeParameter = this.type.getTypeVariable();
+		if (typeParameter != null)
 		{
-			concrete = concrete.getObjectType();
+			if (!this.type.isPrimitive() && concrete.isPrimitive())
+			{
+				concrete = concrete.getObjectType();
+			}
+			if (concrete != null && concrete != this.type)
+			{
+				return new ArrayType(concrete, this.mutability)
+				{
+					@Override
+					public IType getReturnType()
+					{
+						return new ArrayType(typeParameter.getDefaultType(), this.mutability);
+					}
+				};
+			}
+			return this;
 		}
+
 		if (concrete != null && concrete != this.type)
 		{
-			return new ArrayType(concrete, this.mutability);
+			return concrete;
 		}
+
 		return this;
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.type.resolveType(typeVar);
+		return this.type.resolveType(typeParameter);
 	}
 	
 	@Override

@@ -3,18 +3,18 @@ package dyvil.tools.compiler.ast.context;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 
 public final class MapTypeContext implements ITypeContext
 {
-	private Map<ITypeVariable, IType> map = new IdentityHashMap();
+	private Map<ITypeParameter, IType> map = new IdentityHashMap();
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		IType type = this.map.get(typeVar);
+		IType type = this.map.get(typeParameter);
 		if (type == null)
 		{
 			return Types.ANY;
@@ -23,7 +23,7 @@ public final class MapTypeContext implements ITypeContext
 	}
 	
 	@Override
-	public void addMapping(ITypeVariable typeVar, IType type)
+	public void addMapping(ITypeParameter typeVar, IType type)
 	{
 		this.map.subscript_$eq(typeVar, type);
 	}

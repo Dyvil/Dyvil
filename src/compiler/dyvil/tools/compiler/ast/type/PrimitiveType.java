@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -57,12 +57,10 @@ public final class PrimitiveType implements IType
 		{
 			promoBits |= bitMask(i, LONG_CODE);
 			promoBits |= bitMask(i, FLOAT_CODE);
-		}
-		// Everything can be promoted to double
-		for (int i = BYTE_CODE; i <= FLOAT_CODE; i++)
-		{
 			promoBits |= bitMask(i, DOUBLE_CODE);
 		}
+		promoBits |= bitMask(LONG_CODE, DOUBLE_CODE);
+		promoBits |= bitMask(FLOAT_CODE, DOUBLE_CODE);
 		PROMOTION_BITS = promoBits;
 		*/
 		// @formatter:on
@@ -191,7 +189,7 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable()
+	public ITypeParameter getTypeVariable()
 	{
 		return null;
 	}
@@ -347,7 +345,7 @@ public final class PrimitiveType implements IType
 	
 	private static boolean isPromotable(int from, int to)
 	{
-		return (PROMOTION_BITS & bitMask(from, to)) != 0;
+		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0;
 	}
 	
 	@Override
@@ -357,7 +355,7 @@ public final class PrimitiveType implements IType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
 		return null;
 	}
@@ -546,7 +544,7 @@ public final class PrimitiveType implements IType
 			// Target is not a primitive type
 			if (primitiveTarget == target)
 			{
-				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 				return;
 			}
 		}
@@ -574,10 +572,52 @@ public final class PrimitiveType implements IType
 		// If the target is not primitive
 		if (primitiveTarget != target)
 		{
-			primitiveTarget.getBoxMethod().writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+			primitiveTarget.getBoxMethod()
+			               .writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
-	
+
+	@Override
+	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		String owner;
+
+		// Cannot use PrimitiveType.getInternalName as it returns the Dyvil
+		// class instead of the Java one.
+		switch (this.typecode)
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+			owner = "java/lang/Boolean";
+			break;
+		case PrimitiveType.BYTE_CODE:
+			owner = "java/lang/Byte";
+			break;
+		case PrimitiveType.SHORT_CODE:
+			owner = "java/lang/Short";
+			break;
+		case PrimitiveType.CHAR_CODE:
+			owner = "java/lang/Character";
+			break;
+		case PrimitiveType.INT_CODE:
+			owner = "java/lang/Integer";
+			break;
+		case PrimitiveType.LONG_CODE:
+			owner = "java/lang/Long";
+			break;
+		case PrimitiveType.FLOAT_CODE:
+			owner = "java/lang/Float";
+			break;
+		case PrimitiveType.DOUBLE_CODE:
+			owner = "java/lang/Double";
+			break;
+		default:
+			owner = "java/lang/Void";
+			break;
+		}
+
+		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
+	}
+
 	private static void writeIntCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())

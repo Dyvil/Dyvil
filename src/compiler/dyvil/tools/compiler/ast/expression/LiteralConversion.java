@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -114,9 +114,9 @@ public final class LiteralConversion implements IValue
 				StringBuilder builder = new StringBuilder();
 				this.arguments.typesToString(builder);
 				markers.add(
-						MarkerMessages
-								.createMarker(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
-								              builder));
+						Markers
+								.semantic(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
+								          builder));
 				this.type = type;
 				return null;
 			}
@@ -131,11 +131,11 @@ public final class LiteralConversion implements IValue
 		IType concrete = type.getConcreteType(typeContext);
 		if (!concrete.isSuperTypeOf(this.type))
 		{
-			Marker m = MarkerMessages.createMarker(this.literal.getPosition(), "literal.type.incompatible");
-			m.addInfo(MarkerMessages.getMarker("type.expected", concrete));
-			m.addInfo(MarkerMessages.getMarker("literal.type.conversion", this.type));
+			Marker m = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");
+			m.addInfo(Markers.getSemantic("type.expected", concrete));
+			m.addInfo(Markers.getSemantic("literal.type.conversion", this.type));
 			
-			m.addInfo(MarkerMessages.getMarker("literal.type.method"));
+			m.addInfo(Markers.getSemantic("literal.type.method"));
 			
 			StringBuilder sb = new StringBuilder("\t\t");
 			Util.methodSignatureToString(method, sb);
@@ -194,7 +194,7 @@ public final class LiteralConversion implements IValue
 			type = this.type;
 		}
 
-		this.method.writeCall(writer, null, this.arguments, type, this.literal.getLineNumber());
+		this.method.writeCall(writer, null, this.arguments, this.type, type, this.literal.getLineNumber());
 	}
 	
 	@Override

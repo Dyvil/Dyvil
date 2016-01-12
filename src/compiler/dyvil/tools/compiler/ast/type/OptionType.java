@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -30,8 +30,8 @@ public class OptionType implements IObjectType
 {
 	public static final class Types
 	{
-		public static final IClass        OPTION_CLASS = Package.dyvilUtil.resolveClass("Option");
-		public static final ITypeVariable OPTION_TYPE  = OPTION_CLASS.getTypeVariable(0);
+		public static final IClass         OPTION_CLASS = Package.dyvilUtil.resolveClass("Option");
+		public static final ITypeParameter OPTION_TYPE  = OPTION_CLASS.getTypeParameter(0);
 		
 		private Types()
 		{
@@ -71,9 +71,9 @@ public class OptionType implements IObjectType
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return typeVar == Types.OPTION_TYPE ? this.type : null;
+		return typeParameter == Types.OPTION_TYPE ? this.type : null;
 	}
 	
 	@Override

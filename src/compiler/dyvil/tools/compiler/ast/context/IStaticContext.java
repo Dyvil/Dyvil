@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -30,7 +30,13 @@ public interface IStaticContext extends IContext
 	{
 		return null;
 	}
-	
+
+	@Override
+	default IType getThisType()
+	{
+		return null;
+	}
+
 	@Override
 	Package resolvePackage(Name name);
 	
@@ -41,7 +47,7 @@ public interface IStaticContext extends IContext
 	IType resolveType(Name name);
 	
 	@Override
-	default ITypeVariable resolveTypeVariable(Name name)
+	default ITypeParameter resolveTypeVariable(Name name)
 	{
 		return null;
 	}
@@ -63,7 +69,13 @@ public interface IStaticContext extends IContext
 	{
 		return false;
 	}
-	
+
+	@Override
+	default boolean canReturn(IType type)
+	{
+		return false;
+	}
+
 	@Override
 	default boolean isMember(IVariable variable)
 	{

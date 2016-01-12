@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -86,7 +86,7 @@ public final class NullCheckOperator implements IValue
 		
 		if (this.value.isPrimitive())
 		{
-			markers.add(MarkerMessages.createMarker(this.value.getPosition(), "nullcheck.primitive"));
+			markers.add(Markers.semantic(this.value.getPosition(), "nullcheck.primitive"));
 		}
 	}
 	
@@ -124,11 +124,7 @@ public final class NullCheckOperator implements IValue
 		writer.writeLDC(1);
 		writer.writeLabel(label2);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.IRETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
 		}

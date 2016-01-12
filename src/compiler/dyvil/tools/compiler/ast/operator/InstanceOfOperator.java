@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -78,7 +78,7 @@ public final class InstanceOfOperator extends AbstractValue
 		}
 		else
 		{
-			markers.add(MarkerMessages.createError(this.position, "instanceof.type.invalid"));
+			markers.add(Markers.semanticError(this.position, "instanceof.type.invalid"));
 		}
 
 		if (this.value != null)
@@ -87,7 +87,7 @@ public final class InstanceOfOperator extends AbstractValue
 		}
 		else
 		{
-			markers.add(MarkerMessages.createError(this.position, "instanceof.value.invalid"));
+			markers.add(Markers.semanticError(this.position, "instanceof.value.invalid"));
 		}
 	}
 	
@@ -127,13 +127,13 @@ public final class InstanceOfOperator extends AbstractValue
 
 			if (this.type.isPrimitive())
 			{
-				markers.add(MarkerMessages.createError(this.position, "instanceof.type.primitive"));
+				markers.add(Markers.semanticError(this.position, "instanceof.type.primitive"));
 				return;
 			}
 		}
 		else
 		{
-			markers.add(MarkerMessages.createError(this.position, "instanceof.type.primitive"));
+			markers.add(Markers.semanticError(this.position, "instanceof.type.primitive"));
 			return;
 		}
 
@@ -148,24 +148,24 @@ public final class InstanceOfOperator extends AbstractValue
 
 		if (this.value.isPrimitive())
 		{
-			markers.add(MarkerMessages.createError(this.position, "instanceof.value.primitive"));
+			markers.add(Markers.semanticError(this.position, "instanceof.value.primitive"));
 			return;
 		}
 		
 		final IType valueType = this.value.getType();
 		if (valueType.classEquals(this.type))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "instanceof.type.equal", valueType));
+			markers.add(Markers.semantic(this.position, "instanceof.type.equal", valueType));
 			return;
 		}
 		if (this.type.isSuperClassOf(valueType))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "instanceof.type.subtype", valueType, this.type));
+			markers.add(Markers.semantic(this.position, "instanceof.type.subtype", valueType, this.type));
 			return;
 		}
 		if (!valueType.isSuperClassOf(this.type))
 		{
-			markers.add(MarkerMessages.createError(this.position, "instanceof.type.incompatible", valueType, this.type));
+			markers.add(Markers.semanticError(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}
 	}
 	
@@ -196,11 +196,7 @@ public final class InstanceOfOperator extends AbstractValue
 		this.value.writeExpression(writer, Types.OBJECT);
 		writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.IRETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
 		}

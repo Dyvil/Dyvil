@@ -6,13 +6,9 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ThisExpr;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.VariableThis;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
@@ -22,7 +18,6 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.ClassType;
@@ -34,7 +29,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -131,22 +126,22 @@ public class CodeClass extends AbstractClass
 			this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		}
 		
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			ClassGenericType type = new ClassGenericType(this);
 			
-			for (int i = 0; i < this.genericCount; i++)
+			for (int i = 0; i < this.typeParameterCount; i++)
 			{
-				ITypeVariable var = this.generics[i];
+				ITypeParameter var = this.typeParameters[i];
 				var.resolveTypes(markers, context);
 				type.addType(new TypeVarType(var));
 			}
 			
-			this.type = type;
+			this.thisType = type;
 		}
 		else
 		{
-			this.type = new ClassType(this);
+			this.thisType = new ClassType(this);
 		}
 		
 		if (this.annotations != null)
@@ -187,9 +182,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolve(markers, context);
 		}
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].resolve(markers, this);
+			this.typeParameters[i].resolve(markers, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -223,9 +218,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.checkTypes(markers, context);
 		}
 
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].checkTypes(markers, this);
+			this.typeParameters[i].checkTypes(markers, this);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -259,20 +254,19 @@ public class CodeClass extends AbstractClass
 		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.CLASS_MODIFIERS & ~Modifiers.CLASS_TYPE_MODIFIERS;
 		if (illegalModifiers != 0)
 		{
-			markers.add(MarkerMessages.createError(this.position, "modifiers.illegal",
-			                                       MarkerMessages.getMarker("class", this.name),
-			                                       ModifierUtil.classModifiersToString(illegalModifiers)));
+			markers.add(
+					Markers.semanticError(this.position, "modifiers.illegal", Markers.getSemantic("class", this.name),
+					                      ModifierUtil.classModifiersToString(illegalModifiers)));
 		}
-
 
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
 		}
 
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].check(markers, this);
+			this.typeParameters[i].check(markers, this);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -290,13 +284,12 @@ public class CodeClass extends AbstractClass
 				int modifiers = superClass.getModifiers().toFlags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "class.extend.type",
-					                                        ModifierUtil.classTypeToString(modifiers),
-					                                        superClass.getName()));
+					markers.add(Markers.semantic(this.position, "class.extend.type",
+					                             ModifierUtil.classTypeToString(modifiers), superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(MarkerMessages.createMarker(this.position, "class.extend.final", superClass.getName()));
+					markers.add(Markers.semantic(this.position, "class.extend.final", superClass.getName()));
 				}
 			}
 		}
@@ -315,9 +308,8 @@ public class CodeClass extends AbstractClass
 			int modifiers = iclass.getModifiers().toFlags();
 			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "class.implement.type",
-				                                        ModifierUtil.classTypeToString(modifiers),
-				                                        iclass.getName()));
+				markers.add(Markers.semantic(this.position, "class.implement.type",
+				                             ModifierUtil.classTypeToString(modifiers), iclass.getName()));
 			}
 		}
 
@@ -337,9 +329,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.foldConstants();
 		}
 
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].foldConstants();
+			this.typeParameters[i].foldConstants();
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -373,9 +365,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.cleanup(context, this);
 		}
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].cleanup(this, this);
+			this.typeParameters[i].cleanup(this, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -449,7 +441,7 @@ public class CodeClass extends AbstractClass
 		
 		if ((modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
-			this.metadata.write(writer, null);
+			this.metadata.write(writer);
 			return;
 		}
 		
@@ -471,18 +463,23 @@ public class CodeClass extends AbstractClass
 				iclass.writeInnerClassInfo(writer);
 			}
 		}
-		
-		// Fields, Methods and Properties
+
+		// Class Body
+
+		this.metadata.write(writer);
+
+		if (this.parameterCount > 0)
+		{
+			this.writeClassParameters(writer);
+		}
 		
 		int fields = 0;
-		int constructors = 0;
-		int methods = 0;
 		int properties = 0;
 		if (this.body != null)
 		{
+			final int methods = this.body.methodCount();
+			final int constructors = this.body.constructorCount();
 			fields = this.body.fieldCount();
-			methods = this.body.methodCount();
-			constructors = this.body.constructorCount();
 			properties = this.body.propertyCount();
 			
 			int classes = this.body.classCount();
@@ -490,88 +487,103 @@ public class CodeClass extends AbstractClass
 			{
 				this.body.getClass(i).writeInnerClassInfo(writer);
 			}
-		}
-		
-		ThisExpr thisValue = new ThisExpr(this.type, VariableThis.DEFAULT);
-		StatementList instanceFields = new StatementList();
-		
-		IField[] staticFields = new IField[fields + 1];
-		int staticFieldCount = 0;
-		
-		for (int i = 0; i < fields; i++)
-		{
-			IField f = this.body.getField(i);
-			f.write(writer);
-			
-			if (f.hasModifier(Modifiers.LAZY))
+
+			for (int i = 0; i < fields; i++)
 			{
-				continue;
+				this.body.getField(i).write(writer);
 			}
-			
-			if (f.hasModifier(Modifiers.STATIC))
+
+			for (int i = 0; i < constructors; i++)
 			{
-				staticFields[staticFieldCount++] = f;
+				this.body.getConstructor(i).write(writer);
 			}
-			else if (f.getValue() != null)
+
+			for (int i = 0; i < properties; i++)
 			{
-				FieldAssignment assign = new FieldAssignment(null, thisValue, f, f.getValue());
-				instanceFields.addValue(assign);
+				this.body.getProperty(i).write(writer);
+			}
+
+			for (int i = 0; i < methods; i++)
+			{
+				this.body.getMethod(i).write(writer);
 			}
 		}
-		
-		if (this.parameterCount > 0)
-		{
-			AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/_internal/ClassParameters;", false);
-			AnnotationVisitor array = av.visitArray("names");
-			
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				IParameter param = this.parameters[i];
-				param.write(writer);
-				array.visit("", param.getName().qualified);
-			}
-			
-			array.visitEnd();
-		}
-		
-		for (int i = 0; i < constructors; i++)
-		{
-			this.body.getConstructor(i).write(writer, instanceFields);
-		}
-		
-		for (int i = 0; i < properties; i++)
-		{
-			this.body.getProperty(i).write(writer);
-		}
-		
-		for (int i = 0; i < methods; i++)
-		{
-			this.body.getMethod(i).write(writer);
-		}
-		
+
 		for (int i = 0; i < this.compilableCount; i++)
 		{
 			this.compilables[i].write(writer);
 		}
 		
-		this.metadata.write(writer, instanceFields);
-		
 		// Create the static <clinit> method
+
 		MethodWriter mw = new MethodWriterImpl(writer,
 		                                       writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
 		mw.begin();
-		this.metadata.writeStaticInit(mw);
-		for (int i = 0; i < staticFieldCount; i++)
-		{
-			staticFields[i].writeStaticInit(mw);
-		}
-		for (int i = 0; i < this.compilableCount; i++)
-		{
-			this.compilables[i].writeStaticInit(mw);
-		}
+		this.writeStaticInit(mw);
 		mw.end(Types.VOID);
 	}
-	
+
+	private void writeClassParameters(ClassWriter writer) throws BytecodeException
+	{
+		AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/_internal/ClassParameters;", false);
+		AnnotationVisitor array = av.visitArray("names");
+
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			IParameter param = this.parameters[i];
+			param.write(writer);
+			array.visit("", param.getName().qualified);
+		}
+
+		array.visitEnd();
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		this.metadata.writeInit(writer);
+
+		if (this.body != null)
+		{
+			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
+			{
+				this.body.getField(i).writeInit(writer);
+			}
+			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
+			{
+				this.body.getProperty(i).writeInit(writer);
+			}
+		}
+
+		for (int i = 0; i < this.compilableCount; i++)
+		{
+			this.compilables[i].writeInit(writer);
+		}
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+		this.metadata.writeStaticInit(writer);
+
+		if (this.body != null)
+		{
+			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
+			{
+				this.body.getField(i).writeStaticInit(writer);
+			}
+			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
+			{
+				this.body.getProperty(i).writeStaticInit(writer);
+			}
+		}
+
+		for (int i = 0; i < this.compilableCount; i++)
+		{
+			this.compilables[i].writeStaticInit(writer);
+		}
+	}
+
 	private void writeAnnotations(ClassWriter writer, int modifiers)
 	{
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
@@ -593,9 +605,9 @@ public class CodeClass extends AbstractClass
 		}
 		
 		// Type Variable Annotations
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.generics[i].write(writer);
+			this.typeParameters[i].write(writer);
 		}
 		
 		// Super Type Variable Annotations

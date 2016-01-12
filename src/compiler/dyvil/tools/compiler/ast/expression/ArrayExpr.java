@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -206,9 +206,9 @@ public final class ArrayExpr implements IValue, IValueList
 			
 			if (typedValue == null)
 			{
-				Marker marker = MarkerMessages.createMarker(value.getPosition(), "array.element.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("array.type", arrayType.getConcreteType(typeContext)));
-				marker.addInfo(MarkerMessages.getMarker("array.element.type", value.getType()));
+				Marker marker = Markers.semantic(value.getPosition(), "array.element.type.incompatible");
+				marker.addInfo(Markers.getSemantic("array.type", arrayType.getConcreteType(typeContext)));
+				marker.addInfo(Markers.getSemantic("array.element.type", value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -369,7 +369,7 @@ public final class ArrayExpr implements IValue, IValueList
 			IValue v1 = v.toConstant(markers);
 			if (v1 == null)
 			{
-				markers.add(MarkerMessages.createMarker(v.getPosition(), "annotation.array.not_constant"));
+				markers.add(Markers.semantic(v.getPosition(), "annotation.array.not_constant"));
 			}
 			else
 			{
@@ -406,7 +406,7 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			if (this.valueCount == 0)
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "array.empty"));
+				markers.add(Markers.semantic(this.position, "array.empty"));
 				return;
 			}
 			
@@ -468,11 +468,6 @@ public final class ArrayExpr implements IValue, IValueList
 			writer.writeLDC(i);
 			this.values[i].writeExpression(writer, elementType);
 			writer.writeInsn(opcode);
-		}
-
-		if (type == dyvil.tools.compiler.ast.type.Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
 		}
 	}
 	

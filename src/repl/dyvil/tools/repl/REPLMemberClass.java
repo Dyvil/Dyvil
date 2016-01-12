@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -34,6 +34,7 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -158,45 +159,45 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void setGeneric()
+	public void setTypeParameterized()
 	{
 	}
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isTypeParameterized()
 	{
 		return false;
 	}
 	
 	@Override
-	public int genericCount()
+	public int typeParameterCount()
 	{
 		return 0;
 	}
 	
 	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeVars, int count)
 	{
 	}
 	
 	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
+	public void setTypeParameter(int index, ITypeParameter var)
 	{
 	}
 	
 	@Override
-	public void addTypeVariable(ITypeVariable var)
+	public void addTypeParameter(ITypeParameter var)
 	{
 	}
 	
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
 		return null;
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
 		return null;
 	}
@@ -405,7 +406,13 @@ public class REPLMemberClass implements IClass
 	{
 		return this;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return new ClassType(this);
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -425,7 +432,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
 		return this.context.resolveTypeVariable(name);
 	}
@@ -477,9 +484,15 @@ public class REPLMemberClass implements IClass
 	@Override
 	public boolean handleException(IType type)
 	{
+		return false;
+	}
+
+	@Override
+	public boolean canReturn(IType type)
+	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isMember(IVariable variable)
 	{
@@ -505,19 +518,13 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	public IType resolveType(ITypeParameter typeVar, IType concrete)
 	{
 		return null;
 	}
 	
 	@Override
 	public IMethod getFunctionalMethod()
-	{
-		return null;
-	}
-	
-	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
 	{
 		return null;
 	}
@@ -638,6 +645,18 @@ public class REPLMemberClass implements IClass
 		{
 			c.write(writer);
 		}
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+
 	}
 	
 	@Override

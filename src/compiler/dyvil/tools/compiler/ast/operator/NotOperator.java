@@ -114,11 +114,7 @@ public final class NotOperator extends AbstractValue
 		writer.writeLDC(1);
 		writer.writeLabel(label2);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.IRETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
 		}

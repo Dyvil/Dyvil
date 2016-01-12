@@ -13,7 +13,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
-import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -110,8 +110,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case GENERICS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
-				pm.pushParser(new TypeVariableListParser(this.theClass));
-				this.theClass.setGeneric();
+				pm.pushParser(new TypeParameterListParser(this.theClass));
+				this.theClass.setTypeParameterized();
 				this.mode = GENERICS_END;
 				return;
 			}

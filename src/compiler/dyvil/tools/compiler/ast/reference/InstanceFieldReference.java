@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -30,7 +30,7 @@ public class InstanceFieldReference implements IReference
 	{
 		if (field.hasModifier(Modifiers.FINAL))
 		{
-			markers.add(MarkerMessages.createError(position, "reference.field.final", field.getName()));
+			markers.add(Markers.semanticError(position, "reference.field.final", field.getName()));
 		}
 	}
 

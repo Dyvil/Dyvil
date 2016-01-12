@@ -6,6 +6,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -75,10 +76,10 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		final int paramCount = caseClass.parameterCount();
 		if (this.patternCount != paramCount)
 		{
-			final Marker marker = MarkerMessages
-					.createMarker(this.position, "pattern.class.count", this.type.toString());
-			marker.addInfo(MarkerMessages.getMarker("pattern.class.count.pattern", this.patternCount));
-			marker.addInfo(MarkerMessages.getMarker("pattern.class.count.class", paramCount));
+			final Marker marker = Markers
+					.semantic(this.position, "pattern.class.count", this.type.toString());
+			marker.addInfo(Markers.getSemantic("pattern.class.count.pattern", this.patternCount));
+			marker.addInfo(Markers.getSemantic("pattern.class.count.class", paramCount));
 			markers.add(marker);
 			return this;
 		}
@@ -98,9 +99,9 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			
 			if (typedPattern == null)
 			{
-				final Marker marker = MarkerMessages.createMarker(this.position, "pattern.class.type", param.getName());
-				marker.addInfo(MarkerMessages.getMarker("pattern.type", pattern.getType()));
-				marker.addInfo(MarkerMessages.getMarker("classparameter.type", paramType));
+				final Marker marker = Markers.semantic(this.position, "pattern.class.type", param.getName());
+				marker.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
+				marker.addInfo(Markers.getSemantic("classparameter.type", paramType));
 				markers.add(marker);
 			}
 			else
@@ -131,8 +132,8 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		}
 		else
 		{
-			Marker marker = MarkerMessages.createError(pattern.getPosition(), "pattern.class.access", param.getName());
-			marker.addInfo(MarkerMessages.getMarker("pattern.class.access.type", caseClass.getFullName()));
+			Marker marker = Markers.semanticError(pattern.getPosition(), "pattern.class.access", param.getName());
+			marker.addInfo(Markers.getSemantic("pattern.class.access.type", caseClass.getFullName()));
 			markers.add(marker);
 		}
 	}
@@ -225,9 +226,8 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 			if (method != null)
 			{
-				// Invoke the getter method
 				targetType = method.getType();
-				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, lineNumber);
+				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 			}
 			else
 			{

@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.statement;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -12,21 +11,21 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class IfStatement extends AbstractValue
+public class IfStatement implements IValue
 {
 	protected IValue condition;
 	protected IValue then;
 	protected IValue elseThen;
 	
 	// Metadata
-	private IType commonType;
+	private ICodePosition position;
+	private IType         commonType;
 	
 	public IfStatement(ICodePosition position)
 	{
@@ -37,6 +36,24 @@ public class IfStatement extends AbstractValue
 	public int valueTag()
 	{
 		return IF;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return this.then.isUsableAsStatement() && (this.elseThen == null || this.elseThen.isUsableAsStatement());
 	}
 	
 	public void setCondition(IValue condition)
@@ -195,6 +212,7 @@ public class IfStatement extends AbstractValue
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "if.condition.type");
 		}
 		if (this.then != null)
 		{
@@ -212,18 +230,6 @@ public class IfStatement extends AbstractValue
 	{
 		if (this.condition != null)
 		{
-			IValue condition1 = this.condition.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
-			if (condition1 == null)
-			{
-				Marker marker = MarkerMessages.createMarker(this.condition.getPosition(), "if.condition.type");
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.condition.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.condition = condition1;
-			}
-			
 			this.condition.checkTypes(markers, context);
 		}
 		if (this.then != null)
@@ -241,7 +247,7 @@ public class IfStatement extends AbstractValue
 		}
 		else
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "if.condition.invalid"));
+			markers.add(Markers.semantic(this.position, "if.condition.invalid"));
 		}
 		if (this.then != null)
 		{
@@ -395,7 +401,7 @@ public class IfStatement extends AbstractValue
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

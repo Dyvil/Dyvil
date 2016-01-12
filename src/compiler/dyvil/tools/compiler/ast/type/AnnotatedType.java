@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -74,7 +74,7 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable()
+	public ITypeParameter getTypeVariable()
 	{
 		return this.type.getTypeVariable();
 	}
@@ -233,9 +233,9 @@ public class AnnotatedType implements IType, ITyped
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.type.resolveType(typeVar);
+		return this.type.resolveType(typeParameter);
 	}
 	
 	@Override
@@ -406,7 +406,13 @@ public class AnnotatedType implements IType, ITyped
 	{
 		this.type.writeCast(writer, target, lineNumber);
 	}
-	
+
+	@Override
+	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	{
+		this.type.writeClassExpression(writer);
+	}
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{

@@ -4,80 +4,81 @@ import dyvil.tools.parsing.Name;
 
 public final class Names
 {
-	public static final Name instance      = new Name("instance");
-	public static final Name apply         = new Name("apply");
-	public static final Name unapply       = new Name("unapply");
-	public static final Name update        = new Name("update");
-	public static final Name subscript     = new Name("subscript");
-	public static final Name subscriptRef  = new Name("subscriptRef");
-	public static final Name subscript_$eq = new Name("subscript_=", "subscript_$eq");
-	public static final Name match         = new Name("match");
-	public static final Name equals        = new Name("equals");
-	public static final Name hashCode      = new Name("hashCode");
-	public static final Name toString      = new Name("toString");
-	public static final Name $it           = new Name("$it");
+	public static final Name instance      = Name.getQualified("instance");
+	public static final Name get           = Name.getQualified("get");
+	public static final Name set           = Name.getQualified("set");
+	public static final Name init          = Name.getQualified("init");
+	public static final Name apply         = Name.getQualified("apply");
+	public static final Name unapply       = Name.getQualified("unapply");
+	public static final Name update        = Name.getQualified("update");
+	public static final Name subscript     = Name.getQualified("subscript");
+	public static final Name subscriptRef  = Name.getQualified("subscriptRef");
+	public static final Name subscript_$eq = Name.get("subscript_=", "subscript_$eq");
+	public static final Name match         = Name.getQualified("match");
+	public static final Name equals        = Name.getQualified("equals");
+	public static final Name hashCode      = Name.getQualified("hashCode");
+	public static final Name toString      = Name.getQualified("toString");
 	
-	public static final Name writeReplace = new Name("writeReplace");
-	public static final Name readResolve  = new Name("readResolve");
+	public static final Name writeReplace = Name.getQualified("writeReplace");
+	public static final Name readResolve  = Name.getQualified("readResolve");
 	
-	public static final Name Function = new Name("Function");
-	public static final Name Tuple    = new Name("Tuple");
-	
-	public static final Name _this    = new Name("this");
-	public static final Name _null    = new Name("null");
-	public static final Name _void    = new Name("void");
-	public static final Name _boolean = new Name("boolean");
-	public static final Name _byte    = new Name("byte");
-	public static final Name _short   = new Name("short");
-	public static final Name _char    = new Name("char");
-	public static final Name _int     = new Name("int");
-	public static final Name _long    = new Name("long");
-	public static final Name _float   = new Name("float");
-	public static final Name _double  = new Name("double");
-	
-	public static final Name dynamic = new Name("dynamic");
-	public static final Name any     = new Name("any");
-	public static final Name auto    = new Name("auto");
-	
-	public static final Name plus    = new Name("+", "$plus");
-	public static final Name minus   = new Name("-", "$minus");
-	public static final Name times   = new Name("*", "$times");
-	public static final Name div     = new Name("/", "$div");
-	public static final Name bslash  = new Name("\\", "$bslash");
-	public static final Name percent = new Name("%", "$percent");
-	public static final Name amp     = new Name("&", "$amp");
-	public static final Name bar     = new Name("|", "$bar");
-	public static final Name up      = new Name("^", "$up");
-	public static final Name ltlt    = new Name("<<", "$lt$lt");
-	public static final Name gtgt    = new Name(">>", "$gt$gt");
-	public static final Name gtgtgt  = new Name(">>>", "$gt$gt$gt");
-	public static final Name ampamp  = new Name("&&", "$amp$amp");
-	public static final Name barbar  = new Name("||", "$bar$bar");
-	
-	public static final Name eqeq     = new Name("==", "$eq$eq");
-	public static final Name bangeq   = new Name("!=", "$bang$eq");
-	public static final Name eqeqeq   = new Name("===", "$eq$eq$eq");
-	public static final Name bangeqeq = new Name("!==", "$bang$eq$eq");
-	
-	public static final Name lt      = new Name("<", "$lt");
-	public static final Name lteq    = new Name("<=", "$lt$eq");
-	public static final Name ltcolon = new Name("<:", "$lt$colon");
-	public static final Name gt      = new Name(">", "$gt");
-	public static final Name gteq    = new Name(">=", "$gt$eq");
-	public static final Name gtcolon = new Name(">:", "$gt$colon");
-	public static final Name qmark   = new Name("?", "$qmark");
-	public static final Name bang    = new Name("!", "$bang");
-	public static final Name tilde   = new Name("~", "$tilde");
-	public static final Name minusgt = new Name("->", "$minus$gt");
-	public static final Name ltminus = new Name("<-", "$lt$minus");
-	
-	public static final Name dotdot   = new Name("..", "$dot$dot");
-	public static final Name dotdotlt = new Name("..<", "$dot$dot$lt");
-	
-	public static final Name pluseq = new Name("+=", "$plus$eq");
+	public static final Name Function = Name.getQualified("Function");
+	public static final Name Tuple    = Name.getQualified("Tuple");
 
-	public static final Name plusplus   = new Name("++", "$plus$plus");
-	public static final Name minusminus = new Name("--", "$minus$minus");
+	public static final Name _null    = Name.getQualified("null");
+	public static final Name _void    = Name.getQualified("void");
+	public static final Name _boolean = Name.getQualified("boolean");
+	public static final Name _byte    = Name.getQualified("byte");
+	public static final Name _short   = Name.getQualified("short");
+	public static final Name _char    = Name.getQualified("char");
+	public static final Name _int     = Name.getQualified("int");
+	public static final Name _long    = Name.getQualified("long");
+	public static final Name _float   = Name.getQualified("float");
+	public static final Name _double  = Name.getQualified("double");
+	
+	public static final Name dynamic = Name.getQualified("dynamic");
+	public static final Name any     = Name.getQualified("any");
+	public static final Name auto    = Name.getQualified("auto");
+	
+	public static final Name plus    = Name.get("+", "$plus");
+	public static final Name minus   = Name.get("-", "$minus");
+	public static final Name times   = Name.get("*", "$times");
+	public static final Name div     = Name.get("/", "$div");
+	public static final Name bslash  = Name.get("\\", "$bslash");
+	public static final Name percent = Name.get("%", "$percent");
+	public static final Name amp     = Name.get("&", "$amp");
+	public static final Name bar     = Name.get("|", "$bar");
+	public static final Name up      = Name.get("^", "$up");
+	public static final Name ltlt    = Name.get("<<", "$lt$lt");
+	public static final Name gtgt    = Name.get(">>", "$gt$gt");
+	public static final Name gtgtgt  = Name.get(">>>", "$gt$gt$gt");
+	public static final Name ampamp  = Name.get("&&", "$amp$amp");
+	public static final Name barbar  = Name.get("||", "$bar$bar");
+	
+	public static final Name eqeq     = Name.get("==", "$eq$eq");
+	public static final Name bangeq   = Name.get("!=", "$bang$eq");
+	public static final Name eqeqeq   = Name.get("===", "$eq$eq$eq");
+	public static final Name bangeqeq = Name.get("!==", "$bang$eq$eq");
+	
+	public static final Name lt      = Name.get("<", "$lt");
+	public static final Name lteq    = Name.get("<=", "$lt$eq");
+	public static final Name ltcolon = Name.get("<:", "$lt$colon");
+	public static final Name gt      = Name.get(">", "$gt");
+	public static final Name gteq    = Name.get(">=", "$gt$eq");
+	public static final Name gtcolon = Name.get(">:", "$gt$colon");
+	public static final Name qmark   = Name.get("?", "$qmark");
+	public static final Name bang    = Name.get("!", "$bang");
+	public static final Name tilde   = Name.get("~", "$tilde");
+	public static final Name minusgt = Name.get("->", "$minus$gt");
+	public static final Name ltminus = Name.get("<-", "$lt$minus");
+	
+	public static final Name dotdot   = Name.get("..", "$dot$dot");
+	public static final Name dotdotlt = Name.get("..<", "$dot$dot$lt");
+	
+	public static final Name pluseq = Name.get("+=", "$plus$eq");
+
+	public static final Name plusplus   = Name.get("++", "$plus$plus");
+	public static final Name minusminus = Name.get("--", "$minus$minus");
 
 	private Names()
 	{

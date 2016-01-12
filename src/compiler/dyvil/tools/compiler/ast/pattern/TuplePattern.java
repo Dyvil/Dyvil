@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -63,14 +63,14 @@ public final class TuplePattern extends Pattern implements IPatternList
 		this.tupleType = type;
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IType elementType = type.resolveTypeSafely(tupleClass.getTypeVariable(i));
+			IType elementType = type.resolveTypeSafely(tupleClass.getTypeParameter(i));
 			IPattern pattern = this.patterns[i];
 			IPattern typedPattern = pattern.withType(elementType, markers);
 			if (typedPattern == null)
 			{
-				Marker m = MarkerMessages.createMarker(pattern.getPosition(), "pattern.tuple.element.type");
-				m.addInfo(MarkerMessages.getMarker("pattern.type", pattern.getType()));
-				m.addInfo(MarkerMessages.getMarker("tuple.element.type", elementType));
+				Marker m = Markers.semantic(pattern.getPosition(), "pattern.tuple.element.type");
+				m.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
+				m.addInfo(Markers.getSemantic("tuple.element.type", elementType));
 				markers.add(m);
 			}
 			else

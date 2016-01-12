@@ -1,12 +1,11 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -17,7 +16,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -146,7 +145,7 @@ public class ConstructorCall implements ICall
 		}
 		else
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "constructor.invalid"));
+			markers.add(Markers.semantic(this.position, "constructor.invalid"));
 			this.type = Types.UNKNOWN;
 		}
 		
@@ -177,11 +176,11 @@ public class ConstructorCall implements ICall
 		
 		if (this.type.isArrayType())
 		{
-			ITypeVariable typeVar = this.type.getElementType().getTypeVariable();
+			ITypeParameter typeVar = this.type.getElementType().getTypeVariable();
 			if (typeVar != null)
 			{
-				Marker marker = MarkerMessages.createError(this.position, "constructor.access.array.typevar", typeVar.getName());
-				marker.addInfo(MarkerMessages.getMarker("typevariable", typeVar));
+				Marker marker = Markers.semanticError(this.position, "constructor.access.array.typevar", typeVar.getName());
+				marker.addInfo(Markers.getSemantic("typevariable", typeVar));
 				markers.add(marker);
 			}
 			
@@ -189,16 +188,16 @@ public class ConstructorCall implements ICall
 			int dims = this.type.getArrayDimensions();
 			if (dims != len)
 			{
-				Marker marker = MarkerMessages.createMarker(this.position, "constructor.access.array.length");
-				marker.addInfo(MarkerMessages.getMarker("type.dimensions", dims));
-				marker.addInfo(MarkerMessages.getMarker("constructor.access.array.length.count", len));
+				Marker marker = Markers.semantic(this.position, "constructor.access.array.length");
+				marker.addInfo(Markers.getSemantic("type.dimensions", dims));
+				marker.addInfo(Markers.getSemantic("constructor.access.array.length.count", len));
 				markers.add(marker);
 				return this;
 			}
 			
 			if (!(this.arguments instanceof ArgumentList))
 			{
-				markers.add(MarkerMessages.createMarker(this.position, "constructor.access.array"));
+				markers.add(Markers.semantic(this.position, "constructor.access.array"));
 				return this;
 			}
 			
@@ -210,8 +209,8 @@ public class ConstructorCall implements ICall
 				IValue v1 = v.withType(Types.INT, Types.INT, markers, context);
 				if (v1 == null)
 				{
-					Marker marker = MarkerMessages.createMarker(v.getPosition(), "constructor.access.array.type");
-					marker.addInfo(MarkerMessages.getMarker("value.type", v.getType()));
+					Marker marker = Markers.semantic(v.getPosition(), "constructor.access.array.type");
+					marker.addInfo(Markers.getSemantic("value.type", v.getType()));
 					markers.add(marker);
 				}
 				else
@@ -229,7 +228,7 @@ public class ConstructorCall implements ICall
 			return null;
 		}
 		
-		if (this.constructor.getTheClass().isGeneric() && !this.type.isGenericType())
+		if (this.constructor.getTheClass().isTypeParameterized() && !this.type.isGenericType())
 		{
 			this.type = this.constructor.checkGenericType(markers, this.position, context, this.type, this.arguments);
 		}
@@ -252,7 +251,7 @@ public class ConstructorCall implements ICall
 			return;
 		}
 		
-		Marker marker = MarkerMessages.createMarker(this.position, "resolve.constructor", this.type.toString());
+		Marker marker = Markers.semantic(this.position, "resolve.constructor", this.type.toString());
 		if (!this.arguments.isEmpty())
 		{
 			StringBuilder builder = new StringBuilder("Argument Types: ");
@@ -288,12 +287,12 @@ public class ConstructorCall implements ICall
 		}
 		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "constructor.interface", this.type));
+			markers.add(Markers.semantic(this.position, "constructor.interface", this.type));
 			return;
 		}
 		if (iclass.hasModifier(Modifiers.ABSTRACT))
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "constructor.abstract", this.type));
+			markers.add(Markers.semantic(this.position, "constructor.abstract", this.type));
 		}
 		
 		if (this.constructor != null)
@@ -344,11 +343,6 @@ public class ConstructorCall implements ICall
 		}
 		
 		this.constructor.writeCall(writer, this.arguments, type, this.getLineNumber());
-
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
 	}
 	
 	@Override

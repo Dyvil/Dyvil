@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.type.TypeVariableListParser;
+import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
@@ -60,7 +60,7 @@ public class TypeAliasParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				Name name = token.nameValue();
-				this.typeAlias = new TypeAlias(name);
+				this.typeAlias = new TypeAlias(name, token.raw());
 				this.mode = TYPE_PARAMETERS;
 				return;
 			}
@@ -71,9 +71,9 @@ public class TypeAliasParser extends Parser
 		case TYPE_PARAMETERS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
-				this.typeAlias.setGeneric();
+				this.typeAlias.setTypeParameterized();
 				this.mode = TYPE_PARAMETERS_END;
-				pm.pushParser(new TypeVariableListParser(this.typeAlias));
+				pm.pushParser(new TypeParameterListParser(this.typeAlias));
 				return;
 			}
 			// Fallthrough

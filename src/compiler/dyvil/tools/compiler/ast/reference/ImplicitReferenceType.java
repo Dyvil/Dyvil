@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ImplicitReferenceType extends ReferenceType
@@ -46,7 +46,7 @@ public class ImplicitReferenceType extends ReferenceType
 			return new ReferenceValue(value, ref);
 		}
 
-		markers.add(MarkerMessages.createMarker(value.getPosition(), "reference.expression.invalid"));
+		markers.add(Markers.semantic(value.getPosition(), "reference.expression.invalid"));
 		return typedValue;
 	}
 }

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -96,7 +96,7 @@ public final class TupleType implements IObjectType, ITypeList
 		
 		for (int i = 0; i < count; i++)
 		{
-			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			ITypeParameter typeVar = iclass.getTypeParameter(i);
 			IType type1 = type.resolveTypeSafely(typeVar);
 			if (!typedArray[i].isType(type1))
 			{
@@ -174,7 +174,7 @@ public final class TupleType implements IObjectType, ITypeList
 		
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			ITypeParameter typeVar = iclass.getTypeParameter(i);
 			IType type1 = type.resolveTypeSafely(typeVar);
 			
 			// Covariance
@@ -193,14 +193,14 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		int index = typeVar.getIndex();
+		int index = typeParameter.getIndex();
 		
 		IClass iclass = this.getTheClass();
-		if (iclass.getTypeVariable(index) != typeVar)
+		if (iclass.getTypeParameter(index) != typeParameter)
 		{
-			return iclass.resolveType(typeVar, this);
+			return iclass.resolveType(typeParameter, this);
 		}
 		
 		if (index >= this.typeCount)
@@ -241,7 +241,7 @@ public final class TupleType implements IObjectType, ITypeList
 		IClass iclass = getTupleClass(this.typeCount);
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			ITypeVariable typeVar = iclass.getTypeVariable(i);
+			ITypeParameter typeVar = iclass.getTypeParameter(i);
 			IType concreteType = concrete.resolveTypeSafely(typeVar);
 			if (concreteType != null)
 			{
@@ -290,7 +290,7 @@ public final class TupleType implements IObjectType, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(MarkerMessages.createMarker(this.types[0].getPosition(), "type.class.tuple"));
+			markers.add(Markers.semantic(this.types[0].getPosition(), "type.class.tuple"));
 		}
 		
 		for (int i = 0; i < this.typeCount; i++)

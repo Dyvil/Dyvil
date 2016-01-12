@@ -27,7 +27,7 @@ import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.CaptureHelper;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -218,9 +218,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
 			if (value1 == null)
 			{
-				Marker marker = MarkerMessages.createMarker(this.value.getPosition(), "lambda.type");
-				marker.addInfo(MarkerMessages.getMarker("method.type", this.returnType));
-				marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+				Marker marker = Markers.semantic(this.value.getPosition(), "lambda.type");
+				marker.addInfo(Markers.getSemantic("method.type", this.returnType));
+				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
 			}
 			else
@@ -288,7 +288,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
 			{
-				markers.add(MarkerMessages.createMarker(param.getPosition(), "lambda.parameter.type", param.getName()));
+				markers.add(Markers.semantic(param.getPosition(), "lambda.parameter.type", param.getName()));
 			}
 			param.setType(concreteType);
 		}
@@ -608,11 +608,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		writer.writeLineNumber(this.getLineNumber());
 		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, type1, handle, type2);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

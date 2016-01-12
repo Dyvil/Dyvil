@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class IncOperator extends AbstractValue
@@ -59,6 +59,12 @@ public class IncOperator extends AbstractValue
 	public int valueTag()
 	{
 		return INC;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
 	}
 
 	@Override
@@ -126,7 +132,7 @@ public class IncOperator extends AbstractValue
 
 		if (this.field.hasModifier(Modifiers.FINAL))
 		{
-			markers.add(MarkerMessages.createError(this.position, "field.assign.final", this.field.getName()));
+			markers.add(Markers.semanticError(this.position, "field.assign.final", this.field.getName()));
 		}
 	}
 

@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -83,7 +83,7 @@ public final class SuperExpr implements IValue
 	{
 		if (context.isStatic())
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "super.access.static"));
+			markers.add(Markers.semantic(this.position, "super.access.static"));
 			return;
 		}
 		
@@ -93,8 +93,8 @@ public final class SuperExpr implements IValue
 			this.type = thisType.getSuperType();
 			if (this.type == null)
 			{
-				Marker marker = MarkerMessages.createMarker(this.position, "super.access.type");
-				marker.addInfo(MarkerMessages.getMarker("type.enclosing", thisType));
+				Marker marker = Markers.semantic(this.position, "super.access.type");
+				marker.addInfo(Markers.getSemantic("type.enclosing", thisType));
 				markers.add(marker);
 			}
 			return;
@@ -112,10 +112,10 @@ public final class SuperExpr implements IValue
 			return;
 		}
 		
-		Marker marker = MarkerMessages
-				.createMarker(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
-		marker.addInfo(MarkerMessages.getMarker("type.enclosing", thisType));
-		marker.addInfo(MarkerMessages.getMarker("super.type.requested", this.type));
+		Marker marker = Markers
+				.semantic(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
+		marker.addInfo(Markers.getSemantic("type.enclosing", thisType));
+		marker.addInfo(Markers.getSemantic("super.type.requested", this.type));
 		markers.add(marker);
 	}
 	
@@ -158,11 +158,7 @@ public final class SuperExpr implements IValue
 	{
 		writer.writeVarInsn(Opcodes.ALOAD, 0);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}

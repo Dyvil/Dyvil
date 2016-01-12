@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -51,17 +51,17 @@ public class GoToStatement extends AbstractValue implements IStatement
 		this.label = context.resolveLabel(this.name);
 		if (this.label == null)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "resolve.label", this.name));
+			markers.add(Markers.semantic(this.position, "resolve.label", this.name));
 		}
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		markers.add(MarkerMessages.createMarker(this.position, "goto.warning"));
+		markers.add(Markers.semantic(this.position, "goto.warning"));
 		if (this.label == null)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "goto.invalid"));
+			markers.add(Markers.semantic(this.position, "goto.invalid"));
 			return this;
 		}
 		

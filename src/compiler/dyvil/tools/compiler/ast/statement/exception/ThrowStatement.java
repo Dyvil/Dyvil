@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -35,6 +35,12 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	public int valueTag()
 	{
 		return THROW;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
 	}
 	
 	@Override
@@ -97,8 +103,8 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 		IValue value1 = this.value.withType(Types.THROWABLE, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = MarkerMessages.createMarker(this.value.getPosition(), "throw.type");
-			marker.addInfo(MarkerMessages.getMarker("value.type", this.value.getType()));
+			Marker marker = Markers.semantic(this.value.getPosition(), "throw.type");
+			marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 			markers.add(marker);
 		}
 		else
@@ -117,7 +123,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 		IType exceptionType = this.value.getType();
 		if (IContext.isUnhandled(context, exceptionType))
 		{
-			markers.add(MarkerMessages.createMarker(this.value.getPosition(), "exception.unhandled", exceptionType.toString()));
+			markers.add(Markers.semantic(this.value.getPosition(), "exception.unhandled", exceptionType.toString()));
 		}
 	}
 	

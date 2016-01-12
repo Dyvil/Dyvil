@@ -185,12 +185,11 @@ public final class MethodCall extends AbstractCall implements INamed
 			}
 
 			// Compound Operators
-			final String qualified = this.name.qualified;
-			if (qualified.endsWith("$eq"))
+			if (Util.hasEq(this.name))
 			{
-				Name name = Util.stripEq(this.name);
-
-				return CompoundCall.resolveCall(markers, context, this.position, this.receiver, name, this.arguments);
+				return CompoundCall
+						.resolveCall(markers, context, this.position, this.receiver, Util.removeEq(this.name),
+						             this.arguments);
 			}
 			break;
 		}

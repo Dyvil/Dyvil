@@ -82,33 +82,33 @@ public final class GenericData implements ITypeList, ITypeContext
 		return this.generics[index];
 	}
 	
-	private boolean isMethodTypeVariable(ITypeVariable typeVar)
+	private boolean isMethodTypeVariable(ITypeParameter typeVar)
 	{
 		int index = typeVar.getIndex();
-		if (index >= this.method.genericCount())
+		if (index >= this.method.typeParameterCount())
 		{
 			return false;
 		}
-		return this.method.getTypeVariable(index) == typeVar;
+		return this.method.getTypeParameter(index) == typeVar;
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (this.isMethodTypeVariable(typeVar))
+		if (this.isMethodTypeVariable(typeParameter))
 		{
-			int index = typeVar.getIndex();
+			int index = typeParameter.getIndex();
 			if (index >= this.genericCount)
 			{
-				return new TypeVarType(typeVar);
+				return new TypeVarType(typeParameter);
 			}
 			return this.generics[index];
 		}
-		return this.instance.getType().resolveType(typeVar);
+		return this.instance.getType().resolveType(typeParameter);
 	}
 	
 	@Override
-	public void addMapping(ITypeVariable typeVar, IType type)
+	public void addMapping(ITypeParameter typeVar, IType type)
 	{
 		if (type == Types.UNKNOWN)
 		{

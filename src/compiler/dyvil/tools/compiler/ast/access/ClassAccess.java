@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -12,10 +11,9 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -131,8 +129,8 @@ public final class ClassAccess implements IValue
 		if (!this.type.isResolved())
 		{
 			markers.add(
-					MarkerMessages.createMarker(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
-					                            this.type.toString()));
+					Markers.semantic(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
+					                 this.type.toString()));
 		}
 		
 		return this;
@@ -160,7 +158,7 @@ public final class ClassAccess implements IValue
 			return;
 		}
 		
-		markers.add(MarkerMessages.createMarker(this.position, "type.access.invalid", this.type.toString()));
+		markers.add(Markers.semantic(this.position, "type.access.invalid", this.type.toString()));
 	}
 	
 	@Override
@@ -186,11 +184,6 @@ public final class ClassAccess implements IValue
 			{
 				field.writeGet(writer, null, this.getLineNumber());
 			}
-		}
-
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
 		}
 	}
 

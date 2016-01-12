@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -131,7 +131,7 @@ public class ReferenceValue implements IValue
 		{
 			if (this.value.isResolved())
 			{
-				markers.add(MarkerMessages.createError(this.value.getPosition(), "reference.expression.invalid"));
+				markers.add(Markers.semanticError(this.value.getPosition(), "reference.expression.invalid"));
 			}
 			return this;
 		}

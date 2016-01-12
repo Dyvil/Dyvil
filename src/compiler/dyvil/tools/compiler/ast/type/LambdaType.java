@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -251,7 +251,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 
 		final IClass functionClass = this.getTheClass();
 
-		ITypeVariable typeVar = functionClass.getTypeVariable(this.parameterCount);
+		ITypeParameter typeVar = functionClass.getTypeParameter(this.parameterCount);
 		IType resolvedType = type.resolveTypeSafely(typeVar);
 
 		// Return type is Covariant
@@ -262,7 +262,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			typeVar = functionClass.getTypeVariable(i);
+			typeVar = functionClass.getTypeParameter(i);
 			resolvedType = type.resolveType(typeVar);
 
 			// Contravariance
@@ -311,14 +311,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public IType resolveType(ITypeVariable typeVar)
+	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (typeVar.getGeneric() != this.getTheClass())
+		if (typeParameter.getGeneric() != this.getTheClass())
 		{
 			return null;
 		}
 
-		final int index = typeVar.getIndex();
+		final int index = typeParameter.getIndex();
 		if (index == this.parameterCount)
 		{
 			return this.returnType;
@@ -367,12 +367,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		boolean found = false;
 		
-		ITypeVariable typeVar;
+		ITypeParameter typeVar;
 		IType concreteType;
 		IClass iclass = this.getTheClass();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			typeVar = iclass.getTypeVariable(i);
+			typeVar = iclass.getTypeParameter(i);
 			concreteType = concrete.resolveType(typeVar);
 			if (concreteType != null)
 			{
@@ -381,7 +381,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			}
 		}
 		
-		typeVar = iclass.getTypeVariable(this.parameterCount);
+		typeVar = iclass.getTypeParameter(this.parameterCount);
 		concreteType = concrete.resolveType(typeVar);
 		if (concreteType != null)
 		{
@@ -411,7 +411,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		if (this.returnType == null)
 		{
 			this.returnType = Types.UNKNOWN;
-			markers.add(MarkerMessages.createError(this.position, "type.lambda.return"));
+			markers.add(Markers.semanticError(this.position, "type.lambda.return"));
 		}
 		else
 		{
@@ -436,7 +436,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "type.class.lambda"));
+			markers.add(Markers.semantic(this.position, "type.class.lambda"));
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)

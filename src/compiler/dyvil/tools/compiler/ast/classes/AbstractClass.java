@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeVariable;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ConstructorMatchList;
@@ -38,12 +38,6 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractClass implements IClass
 {
-	// Metadata
-	
-	protected IClass         outerClass;
-	protected IClassMetadata metadata;
-	protected IType          type;
-	
 	// Modifiers and Annotations
 	
 	protected AnnotationList annotations;
@@ -55,8 +49,8 @@ public abstract class AbstractClass implements IClass
 	protected String fullName;
 	protected String internalName;
 	
-	protected ITypeVariable[] generics;
-	protected int             genericCount;
+	protected ITypeParameter[] typeParameters;
+	protected int              typeParameterCount;
 	
 	protected IParameter[] parameters;
 	protected int          parameterCount;
@@ -70,6 +64,13 @@ public abstract class AbstractClass implements IClass
 	protected IClassBody         body;
 	protected IClassCompilable[] compilables;
 	protected int                compilableCount;
+
+	// Metadata
+
+	protected IClass         outerClass;
+	protected IClassMetadata metadata;
+	protected IType          thisType;
+	protected IType classType = new ClassType(this);
 	
 	@Override
 	public void setOuterClass(IClass iclass)
@@ -91,13 +92,13 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return this.thisType;
 	}
 	
 	@Override
 	public IType getClassType()
 	{
-		return new ClassType(this);
+		return this.classType;
 	}
 	
 	@Override
@@ -228,69 +229,69 @@ public abstract class AbstractClass implements IClass
 	// Generics
 	
 	@Override
-	public void setGeneric()
+	public void setTypeParameterized()
 	{
-		this.generics = new ITypeVariable[2];
+		this.typeParameters = new ITypeParameter[2];
 	}
 	
 	@Override
-	public boolean isGeneric()
+	public boolean isTypeParameterized()
 	{
-		return this.generics != null;
+		return this.typeParameters != null;
 	}
 	
 	@Override
-	public int genericCount()
+	public int typeParameterCount()
 	{
-		return this.genericCount;
+		return this.typeParameterCount;
 	}
 	
 	@Override
-	public void setTypeVariables(ITypeVariable[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeVars, int count)
 	{
-		this.generics = typeVars;
-		this.genericCount = count;
+		this.typeParameters = typeVars;
+		this.typeParameterCount = count;
 	}
 	
 	@Override
-	public void setTypeVariable(int index, ITypeVariable var)
+	public void setTypeParameter(int index, ITypeParameter var)
 	{
-		this.generics[index] = var;
+		this.typeParameters[index] = var;
 	}
 	
 	@Override
-	public void addTypeVariable(ITypeVariable var)
+	public void addTypeParameter(ITypeParameter var)
 	{
-		if (this.generics == null)
+		if (this.typeParameters == null)
 		{
-			this.generics = new ITypeVariable[3];
-			this.generics[0] = var;
-			this.genericCount = 1;
+			this.typeParameters = new ITypeParameter[3];
+			this.typeParameters[0] = var;
+			this.typeParameterCount = 1;
 			return;
 		}
 		
-		int index = this.genericCount++;
-		if (index >= this.generics.length)
+		int index = this.typeParameterCount++;
+		if (index >= this.typeParameters.length)
 		{
-			ITypeVariable[] temp = new ITypeVariable[this.genericCount];
-			System.arraycopy(this.generics, 0, temp, 0, index);
-			this.generics = temp;
+			ITypeParameter[] temp = new ITypeParameter[this.typeParameterCount];
+			System.arraycopy(this.typeParameters, 0, temp, 0, index);
+			this.typeParameters = temp;
 		}
-		this.generics[index] = var;
+		this.typeParameters[index] = var;
 		
 		var.setIndex(index);
 	}
 	
 	@Override
-	public ITypeVariable[] getTypeVariables()
+	public ITypeParameter[] getTypeParameters()
 	{
-		return this.generics;
+		return this.typeParameters;
 	}
 	
 	@Override
-	public ITypeVariable getTypeVariable(int index)
+	public ITypeParameter getTypeParameter(int index)
 	{
-		return this.generics[index];
+		return this.typeParameters[index];
 	}
 	
 	// Class Parameters
@@ -608,12 +609,12 @@ public abstract class AbstractClass implements IClass
 	{
 		StringBuilder buffer = new StringBuilder();
 		
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			buffer.append('<');
-			for (int i = 0; i < this.genericCount; i++)
+			for (int i = 0; i < this.typeParameterCount; i++)
 			{
-				this.generics[i].appendSignature(buffer);
+				this.typeParameters[i].appendSignature(buffer);
 			}
 			buffer.append('>');
 		}
@@ -646,7 +647,7 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public IType resolveType(ITypeVariable typeVar, IType concrete)
+	public IType resolveType(ITypeParameter typeVar, IType concrete)
 	{
 		if (this.superType != null)
 		{
@@ -678,7 +679,13 @@ public abstract class AbstractClass implements IClass
 	{
 		return this;
 	}
-	
+
+	@Override
+	public IType getThisType()
+	{
+		return this.thisType;
+	}
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -724,12 +731,12 @@ public abstract class AbstractClass implements IClass
 	{
 		if (name == this.name)
 		{
-			return this.type;
+			return this.thisType;
 		}
 		
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeVariable var = this.generics[i];
+			ITypeParameter var = this.typeParameters[i];
 			if (var.getName() == name)
 			{
 				return new TypeVarType(var);
@@ -757,11 +764,11 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public ITypeVariable resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeVariable(Name name)
 	{
-		for (int i = 0; i < this.genericCount; i++)
+		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeVariable var = this.generics[i];
+			ITypeParameter var = this.typeParameters[i];
 			if (var.getName() == name)
 			{
 				return var;
@@ -776,22 +783,16 @@ public abstract class AbstractClass implements IClass
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
+			final IParameter param = this.parameters[i];
 			if (param.getName() == name)
 			{
 				return param;
 			}
 		}
-		
+
+		IDataMember field;
 		if (this.body != null)
 		{
-			// Own properties
-			IDataMember field = this.body.getProperty(name);
-			if (field != null)
-			{
-				return field;
-			}
-			
 			// Own fields
 			field = this.body.getField(name);
 			if (field != null)
@@ -800,30 +801,30 @@ public abstract class AbstractClass implements IClass
 			}
 		}
 		
-		IDataMember match = this.metadata.resolveField(name);
-		if (match != null)
+		field = this.metadata.resolveField(name);
+		if (field != null)
 		{
-			return match;
+			return field;
 		}
 		
 		// Inherited Fields
 		if (this.superType != null)
 		{
-			match = this.superType.resolveField(name);
-			if (match != null)
+			field = this.superType.resolveField(name);
+			if (field != null)
 			{
-				return match;
+				return field;
 			}
 		}
 		
 		// Static Imports
-		IDyvilHeader header = this.getHeader();
+		final IDyvilHeader header = this.getHeader();
 		if (header != null && header.hasMemberImports())
 		{
-			match = header.resolveField(name);
-			if (match != null)
+			field = header.resolveField(name);
+			if (field != null)
 			{
-				return match;
+				return field;
 			}
 		}
 		
@@ -882,19 +883,17 @@ public abstract class AbstractClass implements IClass
 		
 		this.metadata.getConstructorMatches(list, arguments);
 	}
-	
+
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
+	public boolean handleException(IType type)
 	{
-		if (this.body != null)
-		{
-			IMethod m = this.body.getMethod(name, parameters, parameterCount, concrete);
-			if (m != null)
-			{
-				return m;
-			}
-		}
-		return null;
+		return false;
+	}
+
+	@Override
+	public boolean canReturn(IType type)
+	{
+		return false;
 	}
 	
 	@Override
@@ -929,12 +928,6 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-	
-	@Override
 	public boolean isMember(IVariable variable)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
@@ -956,7 +949,11 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		return type == this ? VariableThis.DEFAULT : null;
+		if (type == this || type.getClassType().isSuperTypeOf(this.classType))
+		{
+			return VariableThis.DEFAULT;
+		}
+		return null;
 	}
 	
 	@Override
@@ -1055,10 +1052,10 @@ public abstract class AbstractClass implements IClass
 		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
 		buffer.append(this.name);
 		
-		if (this.genericCount > 0)
+		if (this.typeParameterCount > 0)
 		{
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
-			Util.astToString(prefix, this.generics, this.genericCount,
+			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
 			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}

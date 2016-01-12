@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -307,50 +307,18 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public IMethod getMethod(Name name, IParameter[] parameters, int parameterCount, IType concrete)
-	{
-		outer:
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IMethod m = this.methods[i];
-			if (m.getName() != name)
-			{
-				continue;
-			}
-			
-			if (parameterCount != m.parameterCount())
-			{
-				continue;
-			}
-			
-			for (int p = 0; p < parameterCount; p++)
-			{
-				IType t1 = parameters[p].getType();
-				IType t2 = m.getParameter(p).getType().getConcreteType(concrete);
-				if (!t1.isSameType(t2))
-				{
-					continue outer;
-				}
-			}
-			return m;
-		}
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod method = this.methods[i];
-			float match = method.getSignatureMatch(name, instance, arguments);
-			if (match > 0)
-			{
-				list.add(method, match);
-			}
+			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
@@ -536,9 +504,9 @@ public class ClassBody implements IClassBody
 		if (candidate.hasModifier(Modifiers.ABSTRACT) && !checkedClass.hasModifier(Modifiers.ABSTRACT))
 		{
 			// Create an abstract method error
-			markers.add(MarkerMessages.createMarker(checkedClass.getPosition(), "class.method.abstract",
-			                                        checkedClass.getName(), candidate.getName(),
-			                                        this.theClass.getName()));
+			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract",
+			                             checkedClass.getName(), candidate.getName(),
+			                             this.theClass.getName()));
 		}
 	}
 	

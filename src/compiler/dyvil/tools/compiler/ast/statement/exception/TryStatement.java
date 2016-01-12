@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -43,6 +43,12 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	public int valueTag()
 	{
 		return TRY;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
 	}
 
 	@Override
@@ -121,10 +127,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			final IValue typedAction = this.action.withType(type, typeContext, markers, context);
 			if (typedAction == null)
 			{
-				final Marker marker = MarkerMessages
-						.createError(this.action.getPosition(), "try.action.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("action.type", this.action.getType().toString()));
-				marker.addInfo(MarkerMessages.getMarker("type.expected", type));
+				final Marker marker = Markers.semanticError(this.action.getPosition(), "try.action.type.incompatible");
+				marker.addInfo(Markers.getSemantic("action.type", this.action.getType().toString()));
+				marker.addInfo(Markers.getSemantic("type.expected", type));
 				markers.add(marker);
 			}
 			else
@@ -141,9 +146,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 			if (typedAction == null)
 			{
-				final Marker marker = MarkerMessages.createError(action.getPosition(), "try.catch.type.incompatible");
-				marker.addInfo(MarkerMessages.getMarker("try.catchblock.type", action.getType().toString()));
-				marker.addInfo(MarkerMessages.getMarker("type.expected", type));
+				final Marker marker = Markers.semanticError(action.getPosition(), "try.catch.type.incompatible");
+				marker.addInfo(Markers.getSemantic("try.catchblock.type", action.getType().toString()));
+				marker.addInfo(Markers.getSemantic("type.expected", type));
 				markers.add(marker);
 			}
 			else
@@ -270,11 +275,11 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			this.finallyBlock = this.finallyBlock.resolve(markers, context);
 
 			final IValue typedFinally = this.finallyBlock.withType(Types.VOID, Types.VOID, markers, context);
-			if (typedFinally == null)
+			if (typedFinally == null || !typedFinally.isUsableAsStatement())
 			{
-				final Marker marker = MarkerMessages
-						.createError(this.finallyBlock.getPosition(), "try.finally.type.invalid");
-				marker.addInfo(MarkerMessages.getMarker("try.finally.type", this.finallyBlock.getType().toString()));
+				final Marker marker = Markers
+						.semanticError(this.finallyBlock.getPosition(), "try.finally.type.invalid");
+				marker.addInfo(Markers.getSemantic("try.finally.type", this.finallyBlock.getType().toString()));
 				markers.add(marker);
 			}
 			else
@@ -326,8 +331,8 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			
 			if (!Types.THROWABLE.isSuperTypeOf(block.type))
 			{
-				Marker marker = MarkerMessages.createMarker(block.position, "try.catch.type.not_throwable");
-				marker.addInfo(MarkerMessages.getMarker("exception.type", block.type));
+				Marker marker = Markers.semantic(block.position, "try.catch.type.not_throwable");
+				marker.addInfo(Markers.getSemantic("exception.type", block.type));
 				markers.add(marker);
 			}
 			

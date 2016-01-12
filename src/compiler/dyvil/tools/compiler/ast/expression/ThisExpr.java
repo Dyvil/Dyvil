@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -11,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.MarkerMessages;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -107,7 +106,7 @@ public final class ThisExpr implements IValue
 	{
 		if (context.isStatic())
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "this.access.static"));
+			markers.add(Markers.semantic(this.position, "this.access.static"));
 			if (this.type == Types.UNKNOWN)
 			{
 				return;
@@ -120,10 +119,10 @@ public final class ThisExpr implements IValue
 			return;
 		}
 		
-		IType t = context.getThisClass().getType();
-		if (t != null)
+		final IType thisType = context.getThisType();
+		if (thisType != null)
 		{
-			this.type = t;
+			this.type = thisType;
 		}
 	}
 	
@@ -144,12 +143,12 @@ public final class ThisExpr implements IValue
 		}
 		
 		this.type.checkType(markers, context, TypePosition.CLASS);
+
 		IClass iclass = this.type.getTheClass();
-		
 		this.getter = context.getAccessibleThis(iclass);
 		if (this.getter == null)
 		{
-			markers.add(MarkerMessages.createMarker(this.position, "this.instance", this.type));
+			markers.add(Markers.semantic(this.position, "this.instance", this.type));
 		}
 	}
 	
@@ -175,11 +174,7 @@ public final class ThisExpr implements IValue
 	{
 		this.getter.writeGet(writer);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}
