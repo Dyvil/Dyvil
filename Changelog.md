@@ -1,3 +1,59 @@
+Dyvil v0.15.0
+=============
+
+- Added Property Initializers. #178
+- Added Reified Method Type Parameters. #131
+- Added Type Parameter annotations. #171
+- Improved the Property syntax to be more flexible with statement lists. #175
+- Improved the Match Cast syntax to be more flexible with statement lists. #176
+- Disallowed properties without `get` or `set` tags. #175
+- Removed implicit variables in ForEach statements. #173
+
+## Dyvil Library v0.15.0
+
+- Added the `AbstractBitSet`, a `Set[int]` base implementation written fully in Dyvil.
+- Updated the Lang Header to `import` the `@Reified` annotation.
+- Updated the various `List.set`, `.add`, `.insert` and `.subscript` methods to be more clearly defined and implemented.
+
+## Dyvil Compiler v0.15.0
+
+- Properties can now be used like methods at the use-site.
+- Properties no longer implement the `IDataMember` interface.
+- Added compiler support for the `@Reified` Type Parameter annotation.
+- Added a check for Return Statements to see if the returned value is compatible with the return type.
+- Added a new Property Test class that replaces the AbstractPropertyTest class.
+- Added an additional check for expressions to be usable as statements.
+- Updated Loop Resolution and Type-Checking for Conditions and Actions.
+- Updated the `Util.*Eq` methods.
+- Updated the `dyvil.tools.compiler.transform.Names` class.
+- Improved the Formatter for Properties.
+- Improved the way Field Initializers are compiled.
+- Fixed Cast and Instance Check operators causing compiler errors.
+- Fixed every type being a sub-type of the primitive type `void`.
+- Fixed Anonymous Class Bodies being formatted incorrectly.
+- Fixed Subscript Getters without arguments causing compiler errors when formatted.
+- Fixed Type Aliases without a type causing compiler errors.
+- Fixed Type Aliases not being resolvable in Class contexts.
+- Fixed `TypeOperator.Types.TYPE` being initialized incorrectly.
+- Fixed incompatible casts at runtime due to `ArrayType.getConcreteType` behaviour.
+- Fixed ForEach Statements being type-checked incorrectly for arrays.
+- Fixed Autocasting working incorrectly in ForEach Statements.
+- Removed implicit Return for all expressions that cannot be usable as statements.
+- Removed bloat methods in the `IProperty` interface.
+- Removed property marker messages.
+- Removed the `ITypeList` interface from the `IMethodSignature` super interfaces.
+- Dropped compiler support for the implicit variables in ForEach statements.
+- Renamed the `MarkerMessages` class to `Markers`.
+- Renamed many methods of the `Markers` class to more useful names.
+- Renamed the files that store Marker localizations.
+
+## Dyvil REPL v0.8.1
+
+- Updated Property resolution in the REPL.
+- Updated the :complete REPL command for Compiler API changes.
+
+## Dyvil Property Format v0.3.2
+
 Dyvil v0.14.1
 =============
 
