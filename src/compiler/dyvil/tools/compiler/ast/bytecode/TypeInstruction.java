@@ -1,11 +1,10 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.marker.MarkerList;
 
-public class TypeInstruction implements IInstruction, IInternalTyped
+public class TypeInstruction implements IInstruction
 {
 	private int    opcode;
 	private String type;
@@ -22,26 +21,9 @@ public class TypeInstruction implements IInstruction, IInternalTyped
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, InstructionList instructionList)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-	}
-	
-	@Override
-	public void setInternalType(String desc)
-	{
-		this.type = desc;
-	}
-	
-	@Override
-	public String getInternalType()
-	{
-		return this.type;
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeTypeInsn(this.opcode, this.type);
+		writer.visitTypeInsn(this.opcode, this.type);
 	}
 	
 	@Override

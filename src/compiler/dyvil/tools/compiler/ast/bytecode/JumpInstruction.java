@@ -1,19 +1,14 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class JumpInstruction implements IInstruction
 {
-	private ICodePosition position;
-	private int           opcode;
-	private Label         target;
+	private int   opcode;
+	private Label target;
 	
 	public JumpInstruction(int opcode, Label target)
 	{
@@ -21,31 +16,10 @@ public final class JumpInstruction implements IInstruction
 		this.target = target;
 	}
 	
-	public JumpInstruction(ICodePosition position, int opcode, Name target)
-	{
-		this.position = position;
-		this.opcode = opcode;
-		this.target = new Label(target);
-	}
-	
 	@Override
-	public void resolve(MarkerList markers, InstructionList instructionList)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-		if (this.target != null)
-		{
-			this.target = instructionList.resolveLabel(this.target.name);
-			if (this.target == null)
-			{
-				markers.add(Markers.semantic(this.position, "resolve.label", this.target));
-				return;
-			}
-		}
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeJumpInsn(this.opcode, this.target.target);
+		writer.visitJumpInsn(this.opcode, this.target);
 	}
 	
 	@Override

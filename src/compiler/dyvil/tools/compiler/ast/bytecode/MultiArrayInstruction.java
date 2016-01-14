@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class MultiArrayInstruction implements IInstruction
 {
@@ -15,15 +14,11 @@ public class MultiArrayInstruction implements IInstruction
 		this.dims = dims;
 	}
 	
+
 	@Override
-	public void resolve(MarkerList markers, InstructionList instructionList)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeNewArray(this.type, this.dims);
+		writer.visitMultiANewArrayInsn(this.type, this.dims);
 	}
 	
 	@Override

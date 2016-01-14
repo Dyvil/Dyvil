@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class Instruction implements IInstruction
 {
@@ -15,14 +14,9 @@ public class Instruction implements IInstruction
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, InstructionList instructionList)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeInsn(this.opcode);
+		writer.visitInsn(this.opcode);
 	}
 	
 	@Override
