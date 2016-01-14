@@ -19,7 +19,7 @@ public interface IInstruction extends IASTNode
 	{
 	}
 	
-	void resolve(MarkerList markers, Bytecode bytecode);
+	void resolve(MarkerList markers, InstructionList instructionList);
 	
 	// Compilation
 	

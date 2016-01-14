@@ -29,11 +29,11 @@ public final class JumpInstruction implements IInstruction
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, Bytecode bytecode)
+	public void resolve(MarkerList markers, InstructionList instructionList)
 	{
 		if (this.target != null)
 		{
-			this.target = bytecode.resolveLabel(this.target.name);
+			this.target = instructionList.resolveLabel(this.target.name);
 			if (this.target == null)
 			{
 				markers.add(Markers.semantic(this.position, "resolve.label", this.target));

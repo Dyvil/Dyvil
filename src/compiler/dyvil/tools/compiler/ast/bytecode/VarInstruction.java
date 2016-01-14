@@ -17,7 +17,7 @@ public final class VarInstruction implements IInstruction
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, Bytecode bytecode)
+	public void resolve(MarkerList markers, InstructionList instructionList)
 	{
 	}
 	

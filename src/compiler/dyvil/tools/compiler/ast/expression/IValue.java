@@ -41,7 +41,6 @@ public interface IValue extends IASTNode, ITyped
 	
 	// Compound Constructs
 	int STATEMENT_LIST = 32;
-	int BYTECODE       = 33;
 	int TUPLE          = 34;
 	int ARRAY          = 35;
 	int MAP            = 36;

@@ -1,72 +1,22 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
-public final class Bytecode implements IValue
+public final class InstructionList
 {
-	protected ICodePosition position;
-	
 	private IInstruction[] instructions = new IInstruction[3];
 	private int     instructionCount;
 	private Label[] labels;
 	
-	public Bytecode(ICodePosition position)
+	public InstructionList()
 	{
-		this.position = position;
-	}
-	
-	@Override
-	public ICodePosition getPosition()
-	{
-		return this.position;
-	}
-	
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-		this.position = position;
-	}
-	
-	@Override
-	public int valueTag()
-	{
-		return BYTECODE;
-	}
-	
-	@Override
-	public boolean isResolved()
-	{
-		return true;
-	}
-	
-	@Override
-	public IType getType()
-	{
-		return Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return this;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return true;
+
 	}
 	
 	public void addInstruction(IInstruction insn)
@@ -147,46 +97,16 @@ public final class Bytecode implements IValue
 		
 		return null;
 	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+
+	public void resolve(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.instructionCount; i++)
 		{
 			this.instructions[i].resolve(markers, this);
 		}
-		return this;
 	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public IValue foldConstants()
-	{
-		return this;
-	}
-	
-	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		return this;
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+
+	public void write(MethodWriter writer) throws BytecodeException
 	{
 		if (this.labels == null)
 		{
@@ -219,8 +139,7 @@ public final class Bytecode implements IValue
 			this.instructions[i].write(writer);
 		}
 	}
-	
-	@Override
+
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append('@');
