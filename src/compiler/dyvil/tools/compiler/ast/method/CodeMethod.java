@@ -70,11 +70,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.resolveTypes(markers, this);
 
-		if (this.receiverType == null)
-		{
-			this.receiverType = this.theClass.getType();
-		}
-		else
+		if (this.receiverType != null)
 		{
 			this.receiverType = this.receiverType.resolveType(markers, context);
 
@@ -89,6 +85,10 @@ public class CodeMethod extends AbstractMethod
 				marker.addInfo(Markers.getSemantic("method.classtype", this.theClass.getFullName()));
 				markers.add(marker);
 			}
+		}
+		else if (!this.isStatic())
+		{
+			this.receiverType = this.theClass.getType();
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -557,12 +557,15 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
-		// TODO Proper check
-		if (this.receiverType != this.theClass.getType())
+		if (this.receiverType != null && this.receiverType != this.theClass.getType())
 		{
-			AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtils.RECEIVER_TYPE, false);
-			annotationVisitor.visit("value", this.receiverType.getSignature());
-			annotationVisitor.visitEnd();
+			final String signature = this.receiverType.getSignature();
+			if (signature != null)
+			{
+				AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtils.RECEIVER_TYPE, false);
+				annotationVisitor.visit("value", signature);
+				annotationVisitor.visitEnd();
+			}
 		}
 
 		AnnotationUtils.writeModifiers(mw, this.modifiers);
