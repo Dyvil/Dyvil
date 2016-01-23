@@ -47,6 +47,8 @@ public class Parser
 		}
 		
 		this.parseNodeElements(visitor);
+
+		visitor.visitEnd();
 	}
 	
 	private void parseNodeElements(NodeVisitor visitor)

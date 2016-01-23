@@ -1,23 +1,14 @@
 package dyvil.tools.dpf.ast;
 
 import dyvil.collection.Map;
-import dyvil.tools.dpf.Parser;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class RootNode extends Node
 {
 	public RootNode()
 	{
 		super(Name.getQualified("root"));
-	}
-
-	public static RootNode parse(String content)
-	{
-		RootNode rootNode = new RootNode();
-		new Parser(new MarkerList(), content).accept(rootNode);
-		return rootNode;
 	}
 	
 	@Override
@@ -35,6 +26,7 @@ public class RootNode extends Node
 		{
 			nodeAccess.accept(visitor);
 		}
+		visitor.visitEnd();
 	}
 
 	@Override
