@@ -22,7 +22,7 @@ public class Parser
 	{
 		this.markers = markers;
 
-		DyvilLexer lexer = new DyvilLexer(markers, BaseSymbols.INSTANCE);
+		final DyvilLexer lexer = new DyvilLexer(markers, BaseSymbols.INSTANCE);
 		this.tokens = lexer.tokenize(code);
 	}
 	
@@ -39,7 +39,7 @@ public class Parser
 		return file;
 	}
 	
-	private void parseNodeBody(NodeVisitor visitor)
+	public void parseNodeBody(NodeVisitor visitor)
 	{
 		while (true)
 		{
@@ -332,7 +332,7 @@ public class Parser
 			case BaseSymbols.COMMA:
 			case BaseSymbols.SEMICOLON:
 				token = token.next();
-				continue;
+				// continue;
 			}
 		}
 	}

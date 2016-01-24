@@ -24,7 +24,7 @@ public class FlatMapConverter implements NodeVisitor
 	{
 		Parser parser = new Parser(new MarkerList(), content);
 		FlatMapConverter converter = new FlatMapConverter(map);
-		parser.parseFileNode(converter);
+		parser.parseNodeBody(converter);
 	}
 
 	public FlatMapConverter(Map<String, Object> map)
