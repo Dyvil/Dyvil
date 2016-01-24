@@ -185,6 +185,11 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (DISALLOW_EXPRESSIONS)
+		{
+			return 0F;
+		}
+
 		float total = this.action.getTypeMatch(type);
 		if (total <= 0F)
 		{
@@ -288,7 +293,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			}
 		}
 
-		if (DISALLOW_EXPRESSIONS && this.commonType != Types.VOID)
+		if (DISALLOW_EXPRESSIONS && this.commonType != null && this.commonType != Types.VOID)
 		{
 			markers.add(new SemanticError(this.position, "Try Statements cannot currently be used as expressions"));
 		}

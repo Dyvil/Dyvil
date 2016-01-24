@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -69,11 +70,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.resolveTypes(markers, this);
 
-		if (this.receiverType == null)
-		{
-			this.receiverType = this.theClass.getType();
-		}
-		else
+		if (this.receiverType != null)
 		{
 			this.receiverType = this.receiverType.resolveType(markers, context);
 
@@ -82,11 +79,16 @@ public class CodeMethod extends AbstractMethod
 			if (selfTypeClass != null && selfTypeClass != this.theClass)
 			{
 				final Marker marker = Markers
-						.semanticError(this.receiverType.getPosition(), "method.receivertype.incompatible", this.getName());
+						.semanticError(this.receiverType.getPosition(), "method.receivertype.incompatible",
+						               this.getName());
 				marker.addInfo(Markers.getSemantic("method.receivertype", this.receiverType));
 				marker.addInfo(Markers.getSemantic("method.classtype", this.theClass.getFullName()));
 				markers.add(marker);
 			}
+		}
+		else if (!this.isStatic())
+		{
+			this.receiverType = this.theClass.getType();
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -162,8 +164,7 @@ public class CodeMethod extends AbstractMethod
 			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
 			if (value1 == null)
 			{
-				Marker marker = Markers
-						.semantic(this.position, "method.type.incompatible", this.name.unqualified);
+				Marker marker = Markers.semantic(this.position, "method.type.incompatible", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("method.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
@@ -340,8 +341,7 @@ public class CodeMethod extends AbstractMethod
 			final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
 			if (type != this.type && !type.isSuperTypeOf(this.type))
 			{
-				Marker marker = Markers
-						.semantic(this.position, "method.override.type.incompatible", this.name);
+				Marker marker = Markers.semantic(this.position, "method.override.type.incompatible", this.name);
 				marker.addInfo(Markers.getSemantic("method.type", this.type));
 				marker.addInfo(Markers.getSemantic("method.override.type", type));
 
@@ -557,6 +557,17 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
+		if (this.receiverType != null && this.receiverType != this.theClass.getType())
+		{
+			final String signature = this.receiverType.getSignature();
+			if (signature != null)
+			{
+				AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtils.RECEIVER_TYPE, false);
+				annotationVisitor.visit("value", signature);
+				annotationVisitor.visitEnd();
+			}
+		}
+
 		AnnotationUtils.writeModifiers(mw, this.modifiers);
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
@@ -607,6 +618,7 @@ public class CodeMethod extends AbstractMethod
 		int parameterCount = in.readByte();
 		if (this.parameterCount != 0)
 		{
+
 			for (int i = 0; i < parameterCount; i++)
 			{
 				this.parameters[i].setType(IType.readType(in));

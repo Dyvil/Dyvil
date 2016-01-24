@@ -111,6 +111,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 		{
 			this.parameters[i].resolveTypes(null, this);
 		}
+
+		if (this.receiverType != null)
+		{
+			this.receiverType = this.receiverType.resolveType(null, this);
+		}
+		else if (!this.isStatic())
+		{
+			this.receiverType = this.theClass.getType();
+		}
 	}
 	
 	private void resolveExceptions()

@@ -205,8 +205,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			this.inferTypes(markers);
 			
-			IContext context1 = new CombiningContext(this, context);
-			this.value = this.value.resolve(markers, context1);
+			final IContext combinedContext = new CombiningContext(this, context);
+			this.value = this.value.resolve(markers, combinedContext);
 			
 			IType valueType = this.value.getType();
 			
@@ -215,8 +215,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				this.returnType = valueType;
 			}
 			
-			IValue value1 = this.value.withType(this.returnType, this.returnType, markers, context1);
-			if (value1 == null)
+			final IValue typedReturnValue = this.value.withType(this.returnType, this.returnType, markers, combinedContext);
+			if (typedReturnValue == null)
 			{
 				Marker marker = Markers.semantic(this.value.getPosition(), "lambda.type");
 				marker.addInfo(Markers.getSemantic("method.type", this.returnType));
@@ -225,7 +225,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 			else
 			{
-				this.value = value1;
+				this.value = typedReturnValue;
 				valueType = this.value.getType();
 			}
 			
@@ -293,7 +293,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			param.setType(concreteType);
 		}
 		
-		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType();
+		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType().getParameterType();
 	}
 	
 	@Override
