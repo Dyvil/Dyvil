@@ -163,7 +163,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 	@Override
 	public BuilderVisitor visitBuilder(Name name)
 	{
-		return null;
+		return IgnoreVisitor.instance;
 	}
 	
 	@Override
