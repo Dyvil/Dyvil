@@ -68,7 +68,11 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 	@Override
 	public void accept(NodeVisitor visitor)
 	{
-		NodeVisitor nodeVisitor = visitor.visitNode(this.name);
+		this.acceptBody(visitor.visitNode(this.name));
+	}
+
+	public void acceptBody(NodeVisitor nodeVisitor)
+	{
 		for (Property element : this.properties)
 		{
 			element.accept(nodeVisitor);

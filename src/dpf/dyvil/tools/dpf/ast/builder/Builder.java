@@ -59,15 +59,16 @@ public class Builder implements Value, BuilderVisitor, Expandable
 	@Override
 	public void accept(ValueVisitor visitor)
 	{
-		BuilderVisitor v = visitor.visitBuilder(this.name);
-		for (Parameter p : this.parameters)
+		final BuilderVisitor builderVisitor = visitor.visitBuilder(this.name);
+		for (Parameter parameter : this.parameters)
 		{
-			p.getValue().accept(v.visitParameter(p.getName()));
+			parameter.getValue().accept(builderVisitor.visitParameter(parameter.getName()));
 		}
 		if (this.node != null)
 		{
-			this.node.accept(v.visitNode());
+			this.node.acceptBody(builderVisitor.visitNode());
 		}
+		builderVisitor.visitEnd();
 	}
 
 	@Override

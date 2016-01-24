@@ -14,19 +14,7 @@ public class RootNode extends Node
 	@Override
 	public void accept(NodeVisitor visitor)
 	{
-		for (Property property : this.properties)
-		{
-			property.accept(visitor);
-		}
-		for (Node node : this.nodes)
-		{
-			node.accept(visitor);
-		}
-		for (NodeAccess nodeAccess : this.nodeAccesses)
-		{
-			nodeAccess.accept(visitor);
-		}
-		visitor.visitEnd();
+		this.acceptBody(visitor);
 	}
 
 	@Override

@@ -77,15 +77,12 @@ public class BinaryReader
 		{
 			stringInterpolationVisitor.visitStringPart(this.dataInput.readUTF());
 			final int tag = this.dataInput.readByte();
-			if (tag != 0)
-			{
-				this.readValue(tag, stringInterpolationVisitor.visitValue());
-			}
-			else
+			if (tag == END)
 			{
 				stringInterpolationVisitor.visitEnd();
 				return;
 			}
+			this.readValue(tag, stringInterpolationVisitor.visitValue());
 		}
 	}
 
@@ -94,7 +91,7 @@ public class BinaryReader
 		while (true)
 		{
 			final int tag = this.dataInput.readByte();
-			if (tag == 0)
+			if (tag == END)
 			{
 				listVisitor.visitEnd();
 				return;
@@ -108,7 +105,7 @@ public class BinaryReader
 		while (true)
 		{
 			final int tag = this.dataInput.readByte();
-			if (tag == 0)
+			if (tag == END)
 			{
 				mapVisitor.visitEnd();
 				return;
@@ -127,10 +124,11 @@ public class BinaryReader
 			final Name paramName = param.isEmpty() ? null : Name.getSpecial(param);
 
 			final int tag = this.dataInput.readByte();
-			if (tag == 0)
+			if (tag == END)
 			{
-				this.readNode(NODE, builderVisitor.visitNode());
+				this.readNodes(builderVisitor.visitNode());
 				builderVisitor.visitEnd();
+				this.dataInput.readByte(); // consume the builder end 0
 				return;
 			}
 
@@ -143,7 +141,7 @@ public class BinaryReader
 		while (true)
 		{
 			final int tag = this.dataInput.readByte();
-			if (tag == 0)
+			if (tag == END)
 			{
 				nodeVisitor.visitEnd();
 				return;

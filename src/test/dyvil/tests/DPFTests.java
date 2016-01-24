@@ -21,8 +21,10 @@ public class DPFTests
 			"\n" + "node1\n" + "{\n" + "\tintProperty = 10\n" + "\tstringProperty = \"abc\"\n"
 					+ "\tstringProperty2 = \"String Interpolation: \\(node1.stringProperty) where intProperty = \\(node1.intProperty)\"\n"
 					+ "\tlistProperty = [ 1, \"a\", true ]\n" + "\tmapProperty = {\n" + "\t\t1 : \"a\",\n"
-					+ "\t\t2 : \"b\"\n" + "\t}\n" + "}\n" + "\n" + "node2.subNode\n" + "{\n" + "\tsubProperty1 = 42\n"
-					+ "\t\n" + "\tsubNode2\n" + "\t{\n" + "\t\tsubProperty2 = 13\n" + "\t}\n" + "}\n";
+					+ "\t\t2 : \"b\"\n" + "\t}\n" + "\tbuilderProperty = Button(\"Click Me\", x: 10, y: 20) {\n"
+					+ "\t\tvisible = true\n" + "\t}\n" + "}\n" + "\n" + "node2.subNode\n" + "{\n"
+					+ "\tsubProperty1 = 42\n" + "\t\n" + "\tsubNode2\n" + "\t{\n" + "\t\tsubProperty2 = 13\n" + "\t}\n"
+					+ "}\n";
 
 	private RootNode rootNode;
 

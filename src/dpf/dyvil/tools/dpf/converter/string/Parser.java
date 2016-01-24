@@ -272,7 +272,7 @@ public class Parser
 	{
 		// button = Button(text: 'Hello') { visible = false }
 		
-		IToken token = this.tokens.next();
+		final IToken token = this.tokens.next();
 		switch (token.type())
 		{
 		case BaseSymbols.OPEN_PARENTHESIS:
@@ -282,9 +282,11 @@ public class Parser
 				this.tokens.next();
 				this.parseBuilderNode(visitor);
 			}
+			visitor.visitEnd();
 			return;
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 			this.parseBuilderNode(visitor);
+			visitor.visitEnd();
 			return;
 		}
 	}
@@ -293,7 +295,7 @@ public class Parser
 	{
 		this.parseNodeBody(visitor.visitNode());
 		
-		IToken token = this.tokens.next();
+		final IToken token = this.tokens.lastReturned();
 		if (token.type() != BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			this.markers.add(new SyntaxError(token, "Invalid Builder - '}' expected"));
@@ -306,7 +308,6 @@ public class Parser
 		if (token.type() == BaseSymbols.CLOSE_PARENTHESIS)
 		{
 			this.tokens.next();
-			visitor.visitEnd();
 			return;
 		}
 		
@@ -327,7 +328,6 @@ public class Parser
 			switch (token.type())
 			{
 			case BaseSymbols.CLOSE_PARENTHESIS:
-				visitor.visitEnd();
 				return;
 			case BaseSymbols.COMMA:
 			case BaseSymbols.SEMICOLON:

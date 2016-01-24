@@ -208,7 +208,7 @@ public class BinaryWriter
 	public BuilderVisitor visitBuilder(Name name)
 	{
 		this.writeTagAndName(BUILDER, name);
-		return null;
+		return this;
 	}
 
 	// ListVisitor
