@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.sources;
 
-import dyvil.collection.Map;
-import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
@@ -10,7 +8,7 @@ import dyvil.tools.parsing.CodeFile;
 
 import java.io.File;
 
-public class FileType implements IFileType
+public class DyvilFileType implements IFileType
 {
 	@FunctionalInterface
 	interface HeaderSupplier
@@ -21,23 +19,21 @@ public class FileType implements IFileType
 	public static final String CLASS_EXTENSION  = ".class";
 	public static final String OBJECT_EXTENSION = ".dyo";
 	
-	public static final Map<String, IFileType> fileTypes = new HashMap();
-	
-	public static final IFileType DYVIL_UNIT   = new FileType("dyv", DyvilUnit::new);
-	public static final IFileType DYVIL_HEADER = new FileType("dyh", DyvilHeader::new);
-	
-	static
+	public static final IFileType DYVIL_UNIT   = new DyvilFileType("dyv", DyvilUnit::new);
+	public static final IFileType DYVIL_HEADER = new DyvilFileType("dyh", DyvilHeader::new);
+
+	public static void setupFileFinder(FileFinder fileFinder)
 	{
-		fileTypes.put("dyv", DYVIL_UNIT);
-		fileTypes.put("dyvil", DYVIL_UNIT);
-		fileTypes.put("dyh", DYVIL_HEADER);
-		fileTypes.put("dyvilh", DYVIL_HEADER);
+		fileFinder.registerFileType("dyv", DYVIL_UNIT);
+		fileFinder.registerFileType("dyvil", DYVIL_UNIT);
+		fileFinder.registerFileType("dyh", DYVIL_HEADER);
+		fileFinder.registerFileType("dyvilh", DYVIL_HEADER);
 	}
 	
 	protected String         extension;
 	protected HeaderSupplier headerSupplier;
 	
-	public FileType(String extension, HeaderSupplier headerSupplier)
+	public DyvilFileType(String extension, HeaderSupplier headerSupplier)
 	{
 		this.extension = extension;
 		this.headerSupplier = headerSupplier;

@@ -8,6 +8,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.TestThread;
@@ -151,6 +152,7 @@ public final class DyvilCompiler
 		log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
 		
 		// Scan for Packages and Compilation Units
+		DyvilFileType.setupFileFinder(fileFinder);
 		config.findUnits(fileFinder);
 		
 		int fileCount = fileFinder.files.size();
