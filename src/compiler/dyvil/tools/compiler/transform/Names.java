@@ -15,6 +15,7 @@ public final class Names
 	public static final Name subscriptRef  = Name.getQualified("subscriptRef");
 	public static final Name subscript_$eq = Name.get("subscript_=", "subscript_$eq");
 	public static final Name match         = Name.getQualified("match");
+	public static final Name length        = Name.getQualified("length");
 	public static final Name equals        = Name.getQualified("equals");
 	public static final Name hashCode      = Name.getQualified("hashCode");
 	public static final Name toString      = Name.getQualified("toString");

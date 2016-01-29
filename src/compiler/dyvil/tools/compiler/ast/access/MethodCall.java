@@ -233,14 +233,15 @@ public final class MethodCall extends AbstractCall implements INamed
 	{
 		if (!this.arguments.isEmpty())
 		{
+			IValue argument;
 			if (this.receiver != null)
 			{
 				if (this.receiver.isConstant())
 				{
-					IValue argument;
 					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
 					{
-						IValue folded = ConstantFolder.apply(this.receiver, this.name, argument);
+						// Binary Infix Operators
+						final IValue folded = ConstantFolder.applyInfix(this.receiver, this.name, argument);
 						if (folded != null)
 						{
 							return folded;
@@ -252,16 +253,26 @@ public final class MethodCall extends AbstractCall implements INamed
 					this.receiver = this.receiver.foldConstants();
 				}
 			}
+			else if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+			{
+				// Unary Prefix Operators
+				final IValue folded = ConstantFolder.applyUnary(this.name, argument);
+				if (folded != null)
+				{
+					return folded;
+				}
+			}
+
 			this.arguments.foldConstants();
 			return this;
 		}
 		
 		if (this.receiver != null)
 		{
-			// Prefix methods are transformed to postfix notation
 			if (this.receiver.isConstant())
 			{
-				IValue folded = ConstantFolder.apply(this.name, this.receiver);
+				// Unary Postfix Operators (and some Prefix Operators)
+				final IValue folded = ConstantFolder.applyUnary(this.name, this.receiver);
 				if (folded != null)
 				{
 					return folded;
