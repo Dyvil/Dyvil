@@ -198,7 +198,7 @@ public final class Annotation implements IAnnotation
 		{
 			Marker error = Markers.semantic(this.position, "annotation.target", this.type.getName());
 			error.addInfo(Markers.getSemantic("annotation.target.element", target));
-			error.addInfo(Markers.getSemantic("annotation.target.allows", metadata.getTargets()));
+			error.addInfo(Markers.getSemantic("annotation.target.allowed", metadata.getTargets()));
 			markers.add(error);
 		}
 	}
