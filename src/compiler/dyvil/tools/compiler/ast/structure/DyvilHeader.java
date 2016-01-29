@@ -27,7 +27,7 @@ import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
-import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.parsing.CodeFile;
@@ -98,7 +98,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		start = name.lastIndexOf(File.separatorChar);
 		end = name.lastIndexOf('.');
 		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + FileType.OBJECT_EXTENSION);
+		this.outputFile = new File(name.substring(0, end) + DyvilFileType.OBJECT_EXTENSION);
 	}
 	
 	@Override

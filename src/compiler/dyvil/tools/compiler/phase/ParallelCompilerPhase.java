@@ -5,13 +5,13 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 import java.util.function.Consumer;
 
-public class CompilerPhase implements ICompilerPhase
+public class ParallelCompilerPhase implements ICompilerPhase
 {
-	private final int                                    id;
-	private final String                                 name;
-	private final Consumer<Collection<ICompilationUnit>> apply;
-	
-	public CompilerPhase(int id, String name, Consumer<Collection<ICompilationUnit>> apply)
+	private final int                        id;
+	private final String                     name;
+	private final Consumer<ICompilationUnit> apply;
+
+	public ParallelCompilerPhase(int id, String name, Consumer<ICompilationUnit> apply)
 	{
 		this.id = id;
 		this.name = name;
@@ -33,7 +33,7 @@ public class CompilerPhase implements ICompilerPhase
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
-		this.apply.accept(units);
+		units.parallelStream().forEach(this.apply);
 	}
 	
 	@Override

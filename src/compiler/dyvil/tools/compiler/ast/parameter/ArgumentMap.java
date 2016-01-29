@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -268,7 +269,19 @@ public final class ArgumentMap implements IArguments, IValueMap
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			this.values[i].resolveTypes(markers, context);
+			final Name key = this.keys[i];
+			final IValue value = this.values[i];
+
+			value.resolveTypes(markers, context);
+
+			for (int j = 0; j < i; j++)
+			{
+				if (this.keys[j] == key)
+				{
+					markers.add(Markers.semanticError(value.getPosition(), "arguments.duplicate.key", key));
+					break;
+				}
+			}
 		}
 	}
 	

@@ -36,7 +36,7 @@ import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
-import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.util.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -149,7 +149,7 @@ public final class ExternalClass extends AbstractClass
 			String internal = entry.getValue();
 			
 			// Resolve the class name
-			String fileName = internal + FileType.CLASS_EXTENSION;
+			String fileName = internal + DyvilFileType.CLASS_EXTENSION;
 			IClass c = Package.loadClass(fileName, name);
 			if (c != null)
 			{

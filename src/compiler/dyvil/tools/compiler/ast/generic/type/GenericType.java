@@ -245,7 +245,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i] = IType.readType(dis);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

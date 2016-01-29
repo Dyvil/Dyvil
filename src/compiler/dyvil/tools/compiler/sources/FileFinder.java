@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.sources;
 
 import dyvil.collection.List;
+import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -11,9 +13,16 @@ import java.io.File;
 
 public class FileFinder
 {
-	public final List<File>             files = new ArrayList();
-	public final List<ICompilationUnit> units = new ArrayList();
-	
+	private final Map<String, IFileType> fileTypes = new HashMap<>();
+
+	public final List<File>             files = new ArrayList<>();
+	public final List<ICompilationUnit> units = new ArrayList<>();
+
+	public void registerFileType(String extension, IFileType fileType)
+	{
+		this.fileTypes.put(extension, fileType);
+	}
+
 	public void process(File source, File output, Package pack)
 	{
 		if (source.isDirectory())
@@ -54,7 +63,7 @@ public class FileFinder
 		this.files.add(output);
 		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		
-		IFileType fileType = FileType.fileTypes.get(extension);
+		IFileType fileType = this.fileTypes.get(extension);
 		if (fileType == null)
 		{
 			return; // Skip: Unknown File Type

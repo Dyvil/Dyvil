@@ -7,9 +7,9 @@ import java.util.function.Consumer;
 
 public class SequentialCompilerPhase implements ICompilerPhase
 {
-	private int                        id;
-	private String                     name;
-	private Consumer<ICompilationUnit> apply;
+	private final int                        id;
+	private final String                     name;
+	private final Consumer<ICompilationUnit> apply;
 	
 	public SequentialCompilerPhase(int id, String name, Consumer<ICompilationUnit> apply)
 	{

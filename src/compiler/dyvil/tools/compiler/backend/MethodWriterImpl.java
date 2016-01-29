@@ -88,6 +88,7 @@ public final class MethodWriterImpl implements MethodWriter
 	
 	public void insnCallback()
 	{
+		this.hasReturn = false;
 		if (this.visitFrame)
 		{
 			this.frame.visitFrame(this.mv);

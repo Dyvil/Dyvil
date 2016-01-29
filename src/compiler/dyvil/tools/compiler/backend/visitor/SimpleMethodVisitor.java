@@ -3,6 +3,7 @@ package dyvil.tools.compiler.backend.visitor;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -57,6 +58,10 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(this.method.getModifiers());
+		}
+		if (AnnotationUtils.RECEIVER_TYPE.equals(type))
+		{
+			return new ReceiverTypeVisitor((IMethod) this.method);
 		}
 
 		String internal = ClassFormat.extendedToInternal(type);

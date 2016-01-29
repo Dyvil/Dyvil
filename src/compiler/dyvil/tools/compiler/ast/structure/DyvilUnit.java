@@ -8,7 +8,7 @@ import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
-import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.parsing.CodeFile;
 import dyvil.tools.parsing.Name;
 
@@ -208,11 +208,11 @@ public class DyvilUnit extends DyvilHeader
 			String name1;
 			if (name != this.name)
 			{
-				name1 = this.name.qualified + "$" + name.qualified + FileType.CLASS_EXTENSION;
+				name1 = this.name.qualified + "$" + name.qualified + DyvilFileType.CLASS_EXTENSION;
 			}
 			else
 			{
-				name1 = name.qualified + FileType.CLASS_EXTENSION;
+				name1 = name.qualified + DyvilFileType.CLASS_EXTENSION;
 			}
 			
 			File file = new File(this.outputDirectory, name1);
@@ -225,7 +225,7 @@ public class DyvilUnit extends DyvilHeader
 				for (int j = 0; j < len; j++)
 				{
 					IClass iclass1 = body.getClass(j);
-					name1 = this.name.qualified + "$" + iclass1.getName().qualified + FileType.CLASS_EXTENSION;
+					name1 = this.name.qualified + "$" + iclass1.getName().qualified + DyvilFileType.CLASS_EXTENSION;
 					file = new File(this.outputDirectory, name1);
 					ClassWriter.compile(file, iclass1);
 				}
@@ -235,7 +235,7 @@ public class DyvilUnit extends DyvilHeader
 		for (int i = 0; i < this.innerClassCount; i++)
 		{
 			IClassCompilable iclass = this.innerClasses[i];
-			String name = iclass.getFileName() + FileType.CLASS_EXTENSION;
+			String name = iclass.getFileName() + DyvilFileType.CLASS_EXTENSION;
 			File file = new File(this.outputDirectory, name);
 			ClassWriter.compile(file, iclass);
 		}
