@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 public class FoldConstantPhase implements ICompilerPhase
 {
-	private int id;
+	private final int id;
 	
 	public FoldConstantPhase(int id)
 	{
@@ -34,6 +34,7 @@ public class FoldConstantPhase implements ICompilerPhase
 	@Override
 	public void apply(Collection<ICompilationUnit> units)
 	{
+		// Apply foldConstants a given amount of time
 		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
 		{
 			for (ICompilationUnit cu : units)
