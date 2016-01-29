@@ -67,7 +67,18 @@ public abstract class Marker implements Comparable<Marker>
 		{
 			buf.append(": ").append(message);
 		}
-		
+
+		// Append Info (if any)
+		if (this.info != null)
+		{
+			for (String s : this.info)
+			{
+				buf.append("\n\t").append(s);
+			}
+			buf.append('\n');
+		}
+
+		// Compute newline locations
 		int startIndex = this.position.startIndex();
 		int endIndex = this.position.endIndex();
 		final int codeLength = code.length();
@@ -104,16 +115,7 @@ public abstract class Marker implements Comparable<Marker>
 		{
 			buf.append('¯');
 		}
-		
-		// Append Info (if any)
-		if (this.info != null)
-		{
-			for (String s : this.info)
-			{
-				buf.append("\n\t").append(s);
-			}
-			buf.append('\n');
-		}
+
 		buf.append('\n');
 	}
 	
