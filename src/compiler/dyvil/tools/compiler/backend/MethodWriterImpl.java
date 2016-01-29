@@ -31,12 +31,6 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public ClassWriter getClassWriter()
-	{
-		return this.cw;
-	}
-	
-	@Override
 	public Frame getFrame()
 	{
 		return this.frame;
