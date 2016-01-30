@@ -1,9 +1,10 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.math.MathUtils;
-import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -194,12 +195,13 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		this.table = map.table.clone();
 	}
 	
-	public AbstractIdentityHashMap(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public AbstractIdentityHashMap(Entry<K, V>... entries)
 	{
 		this(entries.length);
-		for (Tuple2<K, V> entry : entries)
+		for (Entry<K, V> entry : entries)
 		{
-			this.putInternal(entry._1, entry._2);
+			this.putInternal(entry.getKey(), entry.getValue());
 		}
 	}
 	
@@ -524,23 +526,60 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	@Override
 	public Option<V> getOption(Object key)
 	{
-		Object k = maskNull(key);
-		Object[] tab = this.table;
-		int len = tab.length;
-		int i = index(k, len);
+		final Object maskedKey = maskNull(key);
+		final Object[] table = this.table;
+		final int len = table.length;
+
+		int i = index(maskedKey, len);
 		while (true)
 		{
-			Object item = tab[i];
-			if (item == k)
+			Object item = table[i];
+			if (item == maskedKey)
 			{
-				return new Some(tab[i + 1]);
+				return new Some<>((V) table[i + 1]);
 			}
 			if (item == null)
 			{
-				return None.instance;
+				return (Option<V>) None.instance;
 			}
 			i = nextKeyIndex(i, len);
 		}
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.IdentityHashMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.IdentityHashMap<>(capacity);
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.IdentityHashMap<>(this);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.IdentityHashMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.IdentityHashMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.IdentityHashMap.builder(capacity);
 	}
 	
 	@Override

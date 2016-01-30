@@ -316,36 +316,12 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new IdentityHashMap<>(this);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new IdentityHashMap<>();
-	}
-
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
-	{
-		return new IdentityHashMap<>(this.size);
-	}
-
-	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
-	{
-		return dyvil.collection.immutable.IdentityHashMap.builder();
-	}
-
-	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
-	{
-		return dyvil.collection.immutable.IdentityHashMap.builder(capacity);
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.IdentityHashMap<>(this);
+		return this.immutableCopy();
 	}
 }
