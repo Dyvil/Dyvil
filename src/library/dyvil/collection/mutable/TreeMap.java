@@ -1,12 +1,12 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -25,14 +25,9 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 	
 	@SafeVarargs
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
 	{
-		TreeMap<K, V> map = new TreeMap<>();
-		for (Tuple2<K, V> entry : entries)
-		{
-			map.put(entry._1, entry._2);
-		}
-		return map;
+		return new TreeMap<>(entries);
 	}
 	
 	public TreeMap()
@@ -53,6 +48,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	public TreeMap(Map<? extends K, ? extends V> m, Comparator<? super K> comparator)
 	{
 		super(m, comparator);
+	}
+
+	@SafeVarargs
+	public TreeMap(Entry<? extends K, ? extends V>... entries)
+	{
+		super(entries);
 	}
 	
 	@Override
@@ -183,21 +184,9 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 
 	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
-	{
-		return new TreeMap<>();
-	}
-
-	@Override
 	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
 	{
 		return dyvil.collection.immutable.TreeMap.builder();
-	}
-
-	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
-	{
-		return this.immutableBuilder();
 	}
 	
 	@Override
