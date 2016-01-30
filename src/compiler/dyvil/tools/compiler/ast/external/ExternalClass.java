@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.external;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
-import dyvil.collection.mutable.ArrayMap;
+import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
@@ -32,8 +32,9 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.*;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.sources.FileType;
@@ -394,6 +395,17 @@ public final class ExternalClass extends AbstractClass
 		
 		return this.body.getClass(name);
 	}
+
+	@Override
+	public IType resolveType(Name name)
+	{
+		if (!this.innerTypesResolved)
+		{
+			this.resolveInnerTypes();
+		}
+
+		return super.resolveType(name);
+	}
 	
 	@Override
 	public IDataMember resolveField(Name name)
@@ -714,11 +726,16 @@ public final class ExternalClass extends AbstractClass
 	
 	public void visitInnerClass(String name, String outerName, String innerName, int access)
 	{
+		if (!this.internalName.equals(outerName))
+		{
+			return;
+		}
+
 		if (this.innerTypes == null)
 		{
-			this.innerTypes = new ArrayMap<>(3);
+			this.innerTypes = new HashMap<>();
 		}
-		
+
 		this.innerTypes.put(innerName, name);
 	}
 	

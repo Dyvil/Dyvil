@@ -380,13 +380,15 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	@Override
 	default IClass resolveClass(Name name)
 	{
-		return null;
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.resolveClass(name);
 	}
 	
 	@Override
 	default IType resolveType(Name name)
 	{
-		return null;
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.resolveType(name);
 	}
 	
 	@Override

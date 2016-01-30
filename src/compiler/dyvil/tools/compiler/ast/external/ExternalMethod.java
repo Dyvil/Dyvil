@@ -194,6 +194,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 			return false;
 		}
 
+		if (!this.returnTypeResolved)
+		{
+			this.resolveReturnType();
+		}
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();

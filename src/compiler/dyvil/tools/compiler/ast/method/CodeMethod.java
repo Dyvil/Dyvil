@@ -330,24 +330,28 @@ public class CodeMethod extends AbstractMethod
 		{
 			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
 		}
-		
+
+		final boolean thisTypeResolved = this.type.isResolved();
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
 			if (overrideMethod.hasModifier(Modifiers.FINAL))
 			{
 				markers.add(Markers.semantic(this.position, "method.override.final", this.name));
 			}
-			
-			final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
-			if (type != this.type && !type.isSuperTypeOf(this.type))
-			{
-				Marker marker = Markers.semantic(this.position, "method.override.type.incompatible", this.name);
-				marker.addInfo(Markers.getSemantic("method.type", this.type));
-				marker.addInfo(Markers.getSemantic("method.override.type", type));
 
-				marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
-				                                   overrideMethod.getTheClass().getFullName()));
-				markers.add(marker);
+			if (thisTypeResolved)
+			{
+				final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
+				if (type != this.type && type.isResolved() && !type.isSuperTypeOf(this.type))
+				{
+					Marker marker = Markers.semantic(this.position, "method.override.type.incompatible", this.name);
+					marker.addInfo(Markers.getSemantic("method.type", this.type));
+					marker.addInfo(Markers.getSemantic("method.override.type", type));
+
+					marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
+					                                   overrideMethod.getTheClass().getFullName()));
+					markers.add(marker);
+				}
 			}
 		}
 	}
