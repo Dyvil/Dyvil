@@ -1,7 +1,6 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.math.MathUtils;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 			this.hash = hash;
 		}
 		
-		public HashElement(E element, int hash, HashElement next)
+		public HashElement(E element, int hash, HashElement<E> next)
 		{
 			this.element = element;
 			this.hash = hash;
@@ -37,7 +36,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	private static final long serialVersionUID = -2574454530914084132L;
 	
 	protected transient int           size;
-	protected transient HashElement[] elements;
+	protected transient HashElement<E>[] elements;
 	
 	public AbstractHashSet()
 	{
@@ -49,13 +48,13 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		{
 			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
-		this.elements = new HashElement[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity))];
+		this.elements = (HashElement<E>[]) new HashElement[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity))];
 	}
 	
 	public AbstractHashSet(Collection<E> collection)
 	{
 		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(collection.size()));
-		HashElement[] elements = this.elements = new HashElement[length];
+		@SuppressWarnings("unchecked") HashElement<E>[] elements = this.elements = new HashElement[length];
 		int size = 0;
 		
 		outer:
@@ -63,7 +62,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		{
 			int hash = hash(element);
 			int index = index(hash, length);
-			for (HashElement e = elements[index]; e != null; e = e.next)
+			for (HashElement<E> e = elements[index]; e != null; e = e.next)
 			{
 				Object k;
 				if (e.hash == hash && ((k = e.element) == element || element != null && element.equals(k)))
@@ -73,7 +72,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 				}
 			}
 			
-			elements[index] = new HashElement(element, hash, elements[index]);
+			elements[index] = new HashElement<>(element, hash, elements[index]);
 			size++;
 		}
 		
@@ -84,14 +83,14 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	{
 		int size = this.size = set.size();
 		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
-		HashElement[] elements = this.elements = new HashElement[length];
+		@SuppressWarnings("unchecked") HashElement<E>[] elements = this.elements = new HashElement[length];
 		
 		// Assume unique elements
 		for (E element : set)
 		{
 			int hash = hash(element);
 			int index = index(hash, length);
-			elements[index] = new HashElement(element, hash, elements[index]);
+			elements[index] = new HashElement<>(element, hash, elements[index]);
 		}
 	}
 	
@@ -99,7 +98,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	{
 		int size = this.size = set.size();
 		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
-		HashElement[] elements = this.elements = new HashElement[length];
+		@SuppressWarnings("unchecked") HashElement<E>[] elements = this.elements = new HashElement[length];
 		
 		for (HashElement hashElement : set.elements)
 		{
@@ -107,15 +106,16 @@ public abstract class AbstractHashSet<E> implements Set<E>
 			{
 				int hash = hashElement.hash;
 				int index = index(hash, length);
-				elements[index] = new HashElement(hashElement.element, hash, elements[index]);
+				elements[index] = new HashElement<>((E) hashElement.element, hash, elements[index]);
 			}
 		}
 	}
 	
+	@SafeVarargs
 	public AbstractHashSet(E... elements)
 	{
 		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(elements.length));
-		HashElement[] hashElements = this.elements = new HashElement[length];
+		@SuppressWarnings("unchecked") HashElement<E>[] hashElements = this.elements = new HashElement[length];
 		int size = 0;
 		
 		outer:
@@ -133,7 +133,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 				}
 			}
 			
-			hashElements[index] = new HashElement(element, hash, hashElements[index]);
+			hashElements[index] = new HashElement<>(element, hash, hashElements[index]);
 			size++;
 		}
 		
@@ -155,7 +155,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	
 	protected void ensureCapacityInternal(int newCapacity)
 	{
-		HashElement[] oldMap = this.elements;
+		HashElement<E>[] oldMap = this.elements;
 		int oldCapacity = oldMap.length;
 		
 		// overflow-conscious code
@@ -169,14 +169,14 @@ public abstract class AbstractHashSet<E> implements Set<E>
 			newCapacity = MAX_ARRAY_SIZE;
 		}
 		
-		HashElement[] newMap = this.elements = new HashElement[newCapacity];
+		@SuppressWarnings("unchecked") HashElement<E>[] newMap = this.elements = new HashElement[newCapacity];
 		
 		for (int i = oldCapacity; i-- > 0; )
 		{
-			for (HashElement e = oldMap[i]; e != null;)
+			for (HashElement<E> e = oldMap[i]; e != null;)
 			{
 				int index = index(e.hash, newCapacity);
-				HashElement next = e.next;
+				HashElement<E> next = e.next;
 
 				e.next = newMap[index];
 				newMap[index] = e;
@@ -229,13 +229,11 @@ public abstract class AbstractHashSet<E> implements Set<E>
 				HashElement<E>[] t = AbstractHashSet.this.elements;
 				this.current = this.next = null;
 				this.index = 0;
+
 				// advance to first entry
 				if (t != null && AbstractHashSet.this.size > 0)
 				{
-					do
-					{
-					}
-					while (this.index < t.length && (this.next = t[this.index++]) == null);
+					this.advance(t);
 				}
 			}
 			
@@ -256,12 +254,20 @@ public abstract class AbstractHashSet<E> implements Set<E>
 				}
 				if ((this.next = (this.current = e).next) == null && (t = AbstractHashSet.this.elements) != null)
 				{
-					do
-					{
-					}
-					while (this.index < t.length && (this.next = t[this.index++]) == null);
+					this.advance(t);
 				}
 				return e.element;
+			}
+
+			private void advance(HashElement<E>[] t)
+			{
+				while (true)
+				{
+					if (!(this.index < t.length && (this.next = t[this.index++]) == null))
+					{
+						break;
+					}
+				}
 			}
 			
 			@Override
@@ -341,11 +347,47 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		}
 		return false;
 	}
+
+	@Override
+	public MutableSet<E> mutableCopy()
+	{
+		return new dyvil.collection.mutable.HashSet<>(this);
+	}
+
+	@Override
+	public <R> MutableSet<R> emptyCopy()
+	{
+		return new dyvil.collection.mutable.HashSet<>();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.HashSet<>(capacity);
+	}
+
+	@Override
+	public ImmutableSet<E> immutableCopy()
+	{
+		return new dyvil.collection.immutable.HashSet<>(this);
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.immutable.HashSet.builder();
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.HashSet.builder(capacity);
+	}
 	
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		java.util.HashSet<E> set = new java.util.HashSet<E>(this.size);
+		java.util.HashSet<E> set = new java.util.HashSet<>(this.size);
 		for (E element : this)
 		{
 			set.add(element);
@@ -397,7 +439,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		this.size = in.readInt();
 		int len = in.readInt();
 		
-		this.elements = new HashElement[len];
+		this.elements = (HashElement<E>[]) new HashElement[len];
 		for (int i = 0; i < len; i++)
 		{
 			this.addInternal((E) in.readObject());

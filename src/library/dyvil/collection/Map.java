@@ -740,14 +740,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	
 	MutableMap<K, V> mutableCopy();
 
+	ImmutableMap<K, V> immutable();
+
+	ImmutableMap<K, V> immutableCopy();
+
 	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder();
 
 	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity);
-	
-	ImmutableMap<K, V> immutable();
-	
-	ImmutableMap<K, V> immutableCopy();
-	
+
 	ImmutableMap<K, V> view();
 	
 	/**

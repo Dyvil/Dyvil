@@ -15,45 +15,21 @@ import java.util.function.Predicate;
 @Immutable
 public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
 {
-	private static final long serialVersionUID = 1107932890158514157L;
-	
-	@SafeVarargs
-	public static <E> ArrayList<E> apply(E... elements)
-	{
-		return new ArrayList<>(elements, true);
-	}
-	
-	@SafeVarargs
-	public static <E> ArrayList<E> fromArray(E... elements)
-	{
-		return new ArrayList<>(elements);
-	}
-	
-	public static <E> Builder<E> builder()
-	{
-		return new Builder<>();
-	}
-	
-	public static <E> Builder<E> builder(int capacity)
-	{
-		return new Builder<>(capacity);
-	}
-	
 	public static class Builder<E> implements ImmutableList.Builder<E>
 	{
 		private Object[] elements;
 		private int      size;
-		
+
 		public Builder()
 		{
 			this.elements = new Object[DEFAULT_CAPACITY];
 		}
-		
+
 		public Builder(int capacity)
 		{
 			this.elements = new Object[capacity];
 		}
-		
+
 		@Override
 		public void add(E element)
 		{
@@ -61,7 +37,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 			{
 				throw new IllegalStateException("Already built");
 			}
-			
+
 			int index = this.size++;
 			if (index >= this.elements.length)
 			{
@@ -71,7 +47,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 			}
 			this.elements[index] = element;
 		}
-		
+
 		@Override
 		public ArrayList<E> build()
 		{
@@ -79,13 +55,37 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 			{
 				return null;
 			}
-			
+
 			ArrayList<E> list = new ArrayList<>((E[]) this.elements, this.size, true);
 			this.size = -1;
 			return list;
 		}
 	}
-	
+
+	private static final long serialVersionUID = 1107932890158514157L;
+
+	@SafeVarargs
+	public static <E> ArrayList<E> apply(E... elements)
+	{
+		return new ArrayList<>(elements, true);
+	}
+
+	@SafeVarargs
+	public static <E> ArrayList<E> fromArray(E... elements)
+	{
+		return new ArrayList<>(elements);
+	}
+
+	public static <E> Builder<E> builder()
+	{
+		return new Builder<>();
+	}
+
+	public static <E> Builder<E> builder(int capacity)
+	{
+		return new Builder<>(capacity);
+	}
+
 	public ArrayList()
 	{
 		super();
@@ -294,19 +294,19 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		int size = Set.sortDistinct((E[]) array, this.size, comparator);
 		return new SortedArrayList<>((E[]) array, size, true, comparator);
 	}
-	
+
 	@Override
 	public ImmutableList<E> copy()
 	{
 		return new ArrayList<>((E[]) this.elements, this.size, true);
 	}
-	
+
 	@Override
 	public MutableList<E> mutable()
 	{
-		return new dyvil.collection.mutable.ArrayList<>((E[]) this.elements, this.size);
+		return this.mutableCopy();
 	}
-	
+
 	@Override
 	public java.util.List<E> toJava()
 	{

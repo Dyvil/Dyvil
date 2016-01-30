@@ -81,9 +81,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public MutableList<E> withCapacity(int newCapacity)
+	public MutableList<E> copy(int capacity)
 	{
-		Object[] newArray = new Object[Math.max(this.size, newCapacity)];
+		Object[] newArray = new Object[Math.max(this.size, capacity)];
 		System.arraycopy(this.elements, 0, newArray, 0, this.size);
 		return new ArrayList<>((E[]) newArray, this.size, true);
 	}
@@ -380,24 +380,12 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public MutableList<E> copy()
 	{
-		return new ArrayList<>((E[]) this.elements, this.size);
+		return this.mutableCopy();
 	}
-	
-	@Override
-	public <R> MutableList<R> emptyCopy()
-	{
-		return new ArrayList<>(this.size);
-	}
-	
-	@Override
-	public <R> MutableList<R> emptyCopy(int newCapacity)
-	{
-		return new ArrayList<>(newCapacity);
-	}
-	
+
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayList<>((E[]) this.elements, this.size);
+		return this.immutableCopy();
 	}
 }

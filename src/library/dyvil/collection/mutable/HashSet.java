@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashSet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -25,12 +22,13 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 	
 	public static <E> HashSet<E> apply()
 	{
-		return new HashSet();
+		return new HashSet<>();
 	}
 	
+	@SafeVarargs
 	public static <E> HashSet<E> apply(E... elements)
 	{
-		return new HashSet(elements);
+		return new HashSet<>(elements);
 	}
 	
 	public HashSet()
@@ -78,6 +76,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		this.defaultThreshold();
 	}
 	
+	@SafeVarargs
 	public HashSet(E... elements)
 	{
 		super(elements);
@@ -110,7 +109,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 	@Override
 	protected void addElement(int hash, E element, int index)
 	{
-		HashElement[] tab = this.elements;
+		HashElement<E>[] tab = this.elements;
 		if (this.size >= this.threshold)
 		{
 			// Rehash / flatten the table if the threshold is exceeded
@@ -121,7 +120,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 			index = index(hash, tab.length);
 		}
 		
-		tab[index] = new HashElement(element, hash, tab[index]);
+		tab[index] = new HashElement<>(element, hash, tab[index]);
 		this.size++;
 	}
 	
@@ -171,7 +170,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		// because we can be sure that the size will not grow, and no re-hash /
 		// table growing will be required.
 		int len = MathUtils.powerOfTwo(this.size);
-		HashElement[] newElements = new HashElement[len];
+		HashElement<E>[] newElements = (HashElement<E>[]) new HashElement[len];
 		int size = 0;
 		
 		for (HashElement<E> element : this.elements)
@@ -194,7 +193,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 				}
 				
 				size++;
-				newElements[index] = new HashElement<E>(newElement, hash, newElements[index]);
+				newElements[index] = new HashElement<>(newElement, hash, newElements[index]);
 			}
 		}
 		
@@ -207,7 +206,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 	{
 		// To simplify the implementation of this method, we create a temporary
 		// copy that is used to collect all new elements produced by the mapper.
-		HashSet<E> copy = new HashSet<E>(this.size << 2, this.loadFactor);
+		HashSet<E> copy = new HashSet<>(this.size << 2, this.loadFactor);
 		for (E element : this)
 		{
 			for (E newElement : mapper.apply(element))
@@ -226,18 +225,12 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		return new HashSet<E>(this);
+		return this.mutableCopy();
 	}
-	
-	@Override
-	public <R> MutableSet<R> emptyCopy()
-	{
-		return new HashSet<R>(this.size);
-	}
-	
+
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return new dyvil.collection.immutable.HashSet<E>(this);
+		return this.immutableCopy();
 	}
 }

@@ -1,7 +1,6 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 
@@ -51,6 +50,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		this.size = set.size;
 	}
 	
+	@SafeVarargs
 	public AbstractIdentityHashSet(E... elements)
 	{
 		this(elements.length);
@@ -300,7 +300,43 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 		}
 	}
-	
+
+	@Override
+	public <R> MutableSet<R> emptyCopy()
+	{
+		return new dyvil.collection.mutable.IdentityHashSet<>();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.IdentityHashSet<>(capacity);
+	}
+
+	@Override
+	public MutableSet<E> mutableCopy()
+	{
+		return new dyvil.collection.mutable.IdentityHashSet<>(this);
+	}
+
+	@Override
+	public ImmutableSet<E> immutableCopy()
+	{
+		return new dyvil.collection.immutable.IdentityHashSet<>(this);
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.immutable.IdentityHashSet.builder();
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.IdentityHashSet.builder(capacity);
+	}
+
 	@Override
 	public java.util.Set<E> toJava()
 	{
@@ -334,15 +370,12 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	{
 		out.defaultWriteObject();
 		
-		int len = this.table.length;
-		
 		out.writeInt(this.size);
-		out.writeInt(len);
+		out.writeInt(this.table.length);
 		
-		for (int i = 0; i < len; i++)
+		for (Object key : this.table)
 		{
 			// Avoid the NULL object
-			Object key = this.table[i];
 			if (key != null)
 			{
 				out.writeObject(unmaskNull(key));

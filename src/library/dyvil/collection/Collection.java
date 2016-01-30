@@ -628,6 +628,10 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a copy of this collection
 	 */
 	Collection<E> copy();
+
+	<RE> MutableCollection<RE> emptyCopy();
+
+	<RE> MutableCollection<RE> emptyCopy(int capacity);
 	
 	/**
 	 * Returns a mutable collection that contains the exact same elements as
@@ -668,6 +672,10 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return an immutable copy of this collection
 	 */
 	ImmutableCollection<E> immutableCopy();
+
+	<RE> ImmutableCollection.Builder<RE> immutableBuilder();
+
+	<RE> ImmutableCollection.Builder<RE> immutableBuilder(int capacity);
 	
 	/**
 	 * Returns a view on the elements of this collection. Immutable collections

@@ -11,56 +11,56 @@ import java.util.Comparator;
 @Immutable
 public class TreeSet<E> extends MapBasedSet<E>
 {
-	private static final long serialVersionUID = -6636571715777235576L;
-	
-	public static <E> TreeSet<E> apply()
-	{
-		return new TreeSet<>();
-	}
-	
-	@SafeVarargs
-	public static <E> TreeSet<E> apply(E... elements)
-	{
-		return new TreeSet<>(elements);
-	}
-	
-	public static <E> Builder<E> builder()
-	{
-		return new Builder<>();
-	}
-	
-	public static <E> Builder<E> builder(Comparator<? super E> comparator)
-	{
-		return new Builder<>(comparator);
-	}
-	
 	public static class Builder<E> implements ImmutableSet.Builder<E>
 	{
 		private TreeMap.Builder<E, Boolean> mapBuilder;
-		
+
 		public Builder()
 		{
 			this.mapBuilder = new TreeMap.Builder<>();
 		}
-		
+
 		public Builder(Comparator<? super E> comparator)
 		{
 			this.mapBuilder = new TreeMap.Builder<>(comparator);
 		}
-		
+
 		@Override
 		public void add(E element)
 		{
 			this.mapBuilder.put(element, true);
 		}
-		
+
 		@Override
 		public ImmutableSet<E> build()
 		{
 			return new TreeSet<>(this.mapBuilder.build());
 		}
 	}
-	
+
+	private static final long serialVersionUID = -6636571715777235576L;
+
+	public static <E> TreeSet<E> apply()
+	{
+		return new TreeSet<>();
+	}
+
+	@SafeVarargs
+	public static <E> TreeSet<E> apply(E... elements)
+	{
+		return new TreeSet<>(elements);
+	}
+
+	public static <E> Builder<E> builder()
+	{
+		return new Builder<>();
+	}
+
+	public static <E> Builder<E> builder(Comparator<? super E> comparator)
+	{
+		return new Builder<>(comparator);
+	}
+
 	public TreeSet()
 	{
 		super(new TreeMap<>());

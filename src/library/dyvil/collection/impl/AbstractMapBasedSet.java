@@ -1,8 +1,7 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Entry;
-import dyvil.collection.Map;
-import dyvil.collection.Set;
+import dyvil.collection.*;
+
 import java.lang.Boolean;
 
 import java.util.Collections;
@@ -39,6 +38,42 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 		{
 			store[index++] = e.getKey();
 		}
+	}
+
+	@Override
+	public <R> MutableSet<R> emptyCopy()
+	{
+		return new dyvil.collection.mutable.MapBasedSet<>(this.map().emptyCopy());
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return null;
+	}
+
+	@Override
+	public MutableSet<E> mutableCopy()
+	{
+		return new dyvil.collection.mutable.MapBasedSet<>(this.map().mutableCopy());
+	}
+
+	@Override
+	public ImmutableSet<E> immutableCopy()
+	{
+		return new dyvil.collection.immutable.MapBasedSet<>(this.map().immutableCopy());
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.immutable.MapBasedSet.builder(this.map().immutableBuilder());
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.MapBasedSet.builder(this.map().immutableBuilder(capacity));
 	}
 	
 	@Override

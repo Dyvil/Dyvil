@@ -30,7 +30,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	
 	public static <E> EmptySet<E> apply()
 	{
-		return instance;
+		return (EmptySet<E>) instance;
 	}
 	
 	private EmptySet()
@@ -52,7 +52,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return EmptyIterator.instance;
+		return (Iterator<E>) EmptyIterator.instance;
 	}
 	
 	@Override
@@ -148,17 +148,41 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	{
 		return this;
 	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy()
+	{
+		return MutableSet.apply();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return MutableSet.withCapacity(capacity);
+	}
 	
 	@Override
 	public MutableSet<E> mutable()
 	{
 		return MutableSet.apply();
 	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return ImmutableSet.builder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return ImmutableSet.builder(capacity);
+	}
 	
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		return Collections.EMPTY_SET;
+		return (java.util.Set<E>) Collections.EMPTY_SET;
 	}
 	
 	@Override

@@ -521,7 +521,13 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	
 	@Override
 	List<E> copy();
-	
+
+	@Override
+	<RE> MutableList<RE> emptyCopy();
+
+	@Override
+	<RE> MutableList<RE> emptyCopy(int capacity);
+
 	@Override
 	MutableList<E> mutable();
 	
@@ -533,7 +539,13 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	
 	@Override
 	ImmutableList<E> immutableCopy();
-	
+
+	@Override
+	<RE> ImmutableList.Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> ImmutableList.Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	ImmutableList<E> view();
 	

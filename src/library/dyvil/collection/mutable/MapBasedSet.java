@@ -223,18 +223,12 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	@Override
 	public MutableSet<E> copy()
 	{
-		return new MapBasedSet<>(this.map.copy());
+		return this.mutableCopy();
 	}
-	
-	@Override
-	public <R> MutableSet<R> emptyCopy()
-	{
-		return new MapBasedSet<>(this.map.emptyCopy());
-	}
-	
+
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return new dyvil.collection.immutable.MapBasedSet<>(this.map.immutable());
+		return this.immutableCopy();
 	}
 }

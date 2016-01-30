@@ -686,17 +686,35 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 	
 	@Override
-	public ImmutableList<E> immutable()
-	{
-		return ImmutableList.linked(this);
-	}
-	
-	@Override
 	public <R> MutableList<R> emptyCopy()
 	{
 		return new LinkedList<>();
 	}
-	
+
+	@Override
+	public <R> MutableList<R> emptyCopy(int newCapacity)
+	{
+		return this.emptyCopy();
+	}
+
+	@Override
+	public ImmutableList<E> immutable()
+	{
+		return ImmutableList.linked(this);
+	}
+
+	@Override
+	public <RE> ImmutableList.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.ImmutableList.builder(); // TODO linked builder
+	}
+
+	@Override
+	public <RE> ImmutableList.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.ImmutableList.builder(capacity);
+	}
+
 	@Override
 	public LinkedList<E> copy()
 	{

@@ -29,7 +29,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	
 	public static <E> SingletonList<E> apply(E element)
 	{
-		return new SingletonList(element);
+		return new SingletonList<>(element);
 	}
 	
 	public SingletonList(E element)
@@ -52,13 +52,13 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new SingletonIterator<E>(this.element);
+		return new SingletonIterator<>(this.element);
 	}
 	
 	@Override
 	public Iterator<E> reverseIterator()
 	{
-		return new SingletonIterator<E>(this.element);
+		return new SingletonIterator<>(this.element);
 	}
 	
 	@Override
@@ -144,7 +144,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return new PrependList<E>(this.element, (ImmutableList<E>) ImmutableList.linked(collection));
+		return new PrependList<>(this.element, (ImmutableList<E>) ImmutableList.linked(collection));
 	}
 	
 	@Override
@@ -152,7 +152,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (Objects.equals(this.element, element))
 		{
-			return EmptyList.instance;
+			return (ImmutableList<E>) EmptyList.instance;
 		}
 		return this;
 	}
@@ -162,7 +162,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (collection.contains(this.element))
 		{
-			return EmptyList.instance;
+			return (ImmutableList<E>) EmptyList.instance;
 		}
 		return this;
 	}
@@ -172,7 +172,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		if (!collection.contains(this.element))
 		{
-			return EmptyList.instance;
+			return (ImmutableList<E>) EmptyList.instance;
 		}
 		return this;
 	}
@@ -180,7 +180,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return new SingletonList(mapper.apply(this.element));
+		return new SingletonList<>(mapper.apply(this.element));
 	}
 	
 	@Override
@@ -196,7 +196,7 @@ public class SingletonList<E> implements ImmutableList<E>
 		{
 			return this;
 		}
-		return EmptyList.instance;
+		return (ImmutableList<E>) EmptyList.instance;
 	}
 	
 	@Override
@@ -252,13 +252,37 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return new SingletonList(this.element);
+		return new SingletonList<>(this.element);
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy()
+	{
+		return MutableList.apply();
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy(int capacity)
+	{
+		return MutableList.withCapacity(capacity);
 	}
 	
 	@Override
 	public MutableList<E> mutable()
 	{
 		return MutableList.apply(this.element);
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return ImmutableList.builder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return ImmutableList.builder(capacity);
 	}
 	
 	@Override
@@ -268,11 +292,14 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public String toString()
 	{
-		return new StringBuilder().append('[').append(this.element).append(']').toString();
+		final String elementToString = String.valueOf(this.element);
+		// No String concat to make use of the known length
+		return new StringBuilder(elementToString + 2).append('[').append(elementToString).append(']').toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{

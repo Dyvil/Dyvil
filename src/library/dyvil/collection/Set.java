@@ -198,7 +198,13 @@ public interface Set<E> extends Collection<E>
 	
 	@Override
 	Set<E> copy();
-	
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy();
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy(int capacity);
+
 	@Override
 	MutableSet<E> mutable();
 	
@@ -210,7 +216,13 @@ public interface Set<E> extends Collection<E>
 	
 	@Override
 	ImmutableSet<E> immutableCopy();
-	
+
+	@Override
+	<RE> ImmutableSet.Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	ImmutableSet<E> view();
 	

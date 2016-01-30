@@ -415,7 +415,13 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	ImmutableList<E> copy();
-	
+
+	@Override
+	<RE> MutableList<RE> emptyCopy();
+
+	@Override
+	<RE> MutableList<RE> emptyCopy(int capacity);
+
 	@Override
 	MutableList<E> mutable();
 	
@@ -436,7 +442,13 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	{
 		return this.copy();
 	}
-	
+
+	@Override
+	<RE> Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	default ImmutableList<E> view()
 	{

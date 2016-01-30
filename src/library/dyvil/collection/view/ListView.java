@@ -42,7 +42,7 @@ public class ListView<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return this.list.isImmutable() ? this.list.iterator() : new ImmutableIterator(this.list.iterator());
+		return this.list.isImmutable() ? this.list.iterator() : new ImmutableIterator<>(this.list.iterator());
 	}
 	
 	@Override
@@ -50,7 +50,7 @@ public class ListView<E> implements ImmutableList<E>
 	{
 		return this.list.isImmutable() ?
 				this.list.reverseIterator() :
-				new ImmutableIterator(this.list.reverseIterator());
+				new ImmutableIterator<>(this.list.reverseIterator());
 	}
 	
 	@Override
@@ -98,85 +98,85 @@ public class ListView<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> subList(int startIndex, int length)
 	{
-		return new ListView(this.list.subList(startIndex, length));
+		return new ListView<>(this.list.subList(startIndex, length));
 	}
 	
 	@Override
 	public ImmutableList<E> $plus(E element)
 	{
-		return new ListView(this.list.$plus(element));
+		return new ListView<>(this.list.$plus(element));
 	}
 	
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return new ListView(this.list.$plus$plus(collection));
+		return new ListView<>(this.list.$plus$plus(collection));
 	}
 	
 	@Override
 	public ImmutableList<E> $minus(Object element)
 	{
-		return new ListView(this.list.$minus(element));
+		return new ListView<>(this.list.$minus(element));
 	}
 	
 	@Override
 	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
 	{
-		return new ListView(this.list.$minus$minus(collection));
+		return new ListView<>(this.list.$minus$minus(collection));
 	}
 	
 	@Override
 	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
 	{
-		return new ListView(this.list.$amp(collection));
+		return new ListView<>(this.list.$amp(collection));
 	}
 	
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return new ListView(this.list.mapped(mapper));
+		return new ListView<>(this.list.mapped(mapper));
 	}
 	
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return new ListView(this.list.flatMapped(mapper));
+		return new ListView<>(this.list.flatMapped(mapper));
 	}
 	
 	@Override
 	public ImmutableList<E> filtered(Predicate<? super E> condition)
 	{
-		return new ListView(this.list.filtered(condition));
+		return new ListView<>(this.list.filtered(condition));
 	}
 	
 	@Override
 	public ImmutableList<E> reversed()
 	{
-		return new ListView(this.list.reversed());
+		return new ListView<>(this.list.reversed());
 	}
 	
 	@Override
 	public ImmutableList<E> sorted()
 	{
-		return new ListView(this.list.sorted());
+		return new ListView<>(this.list.sorted());
 	}
 	
 	@Override
 	public ImmutableList<E> sorted(Comparator<? super E> comparator)
 	{
-		return new ListView(this.list.sorted(comparator));
+		return new ListView<>(this.list.sorted(comparator));
 	}
 	
 	@Override
 	public ImmutableList<E> distinct()
 	{
-		return new ListView(this.list.distinct());
+		return new ListView<>(this.list.distinct());
 	}
 	
 	@Override
 	public ImmutableList<E> distinct(Comparator<? super E> comparator)
 	{
-		return new ListView(this.list.distinct());
+		return new ListView<>(this.list.distinct());
 	}
 	
 	@Override
@@ -194,13 +194,37 @@ public class ListView<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return new ListView(this.list.copy());
+		return new ListView<>(this.list.copy());
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy()
+	{
+		return this.list.emptyCopy();
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy(int capacity)
+	{
+		return this.list.emptyCopy(capacity);
 	}
 	
 	@Override
 	public MutableList<E> mutable()
 	{
 		return this.list.mutable();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return this.list.immutableBuilder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return this.list.immutableBuilder(capacity);
 	}
 	
 	@Override

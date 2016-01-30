@@ -26,7 +26,7 @@ public class AppendList<E> implements ImmutableList<E>
 	
 	public AppendList(E element)
 	{
-		this.head = EmptyList.instance;
+		this.head = (ImmutableList<E>) EmptyList.instance;
 		this.tail = element;
 		this.size = 1;
 	}
@@ -47,13 +47,13 @@ public class AppendList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new AppendIterator<E>(this.head.iterator(), this.tail);
+		return new AppendIterator<>(this.head.iterator(), this.tail);
 	}
 	
 	@Override
 	public Iterator<E> reverseIterator()
 	{
-		return new PrependIterator<E>(this.tail, this.head.reverseIterator());
+		return new PrependIterator<>(this.tail, this.head.reverseIterator());
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public class AppendList<E> implements ImmutableList<E>
 	{
 		if (startIndex + length == this.size - 1)
 		{
-			return new AppendList<E>(this.head.subList(startIndex, length - 1), this.tail);
+			return new AppendList<>(this.head.subList(startIndex, length - 1), this.tail);
 		}
 		return this.head.subList(startIndex, length - 1);
 	}
@@ -93,7 +93,7 @@ public class AppendList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> $plus(E element)
 	{
-		return new AppendList<E>(this, element);
+		return new AppendList<>(this, element);
 	}
 	
 	@Override
@@ -102,7 +102,7 @@ public class AppendList<E> implements ImmutableList<E>
 		AppendList<E> ll = this;
 		for (E element : collection)
 		{
-			ll = new AppendList<E>(ll, element);
+			ll = new AppendList<>(ll, element);
 		}
 		return ll;
 	}
@@ -114,7 +114,7 @@ public class AppendList<E> implements ImmutableList<E>
 		{
 			return this.head.$minus(element);
 		}
-		return new AppendList<E>(this.head.$minus(element), this.tail);
+		return new AppendList<>(this.head.$minus(element), this.tail);
 	}
 	
 	@Override
@@ -124,7 +124,7 @@ public class AppendList<E> implements ImmutableList<E>
 		{
 			return this.head.$minus$minus(collection);
 		}
-		return new AppendList<E>((ImmutableList<E>) this.head.$minus$minus(collection), this.tail);
+		return new AppendList<>((ImmutableList<E>) this.head.$minus$minus(collection), this.tail);
 	}
 	
 	@Override
@@ -134,13 +134,13 @@ public class AppendList<E> implements ImmutableList<E>
 		{
 			return this.head.$amp(collection);
 		}
-		return new AppendList<E>((ImmutableList<E>) this.head.$amp(collection), this.tail);
+		return new AppendList<>((ImmutableList<E>) this.head.$amp(collection), this.tail);
 	}
 	
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return new AppendList<R>(this.head.mapped(mapper), mapper.apply(this.tail));
+		return new AppendList<>(this.head.mapped(mapper), mapper.apply(this.tail));
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ public class AppendList<E> implements ImmutableList<E>
 		ImmutableList<R> head = this.head.flatMapped(mapper);
 		for (R element : mapper.apply(this.tail))
 		{
-			head = new AppendList<R>(head, element);
+			head = new AppendList<>(head, element);
 		}
 		return head;
 	}
@@ -161,21 +161,21 @@ public class AppendList<E> implements ImmutableList<E>
 		{
 			return this.head.filtered(condition);
 		}
-		return new AppendList<E>(this.head.filtered(condition), this.tail);
+		return new AppendList<>(this.head.filtered(condition), this.tail);
 	}
 	
 	@Override
 	public ImmutableList<E> reversed()
 	{
-		return new PrependList(this.tail, this.head.reversed());
+		return new PrependList<>(this.tail, this.head.reversed());
 	}
 	
 	private static <E> ImmutableList<E> fromArray(Object[] array, int length)
 	{
-		ImmutableList<E> list = EmptyList.instance;
+		ImmutableList<E> list = (ImmutableList<E>) EmptyList.instance;
 		for (int i = 0; i < length; i++)
 		{
-			list = new AppendList<E>(list, (E) array[i]);
+			list = new AppendList<>(list, (E) array[i]);
 		}
 		return list;
 	}
@@ -243,16 +243,40 @@ public class AppendList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return new AppendList<E>(this.head.copy(), this.tail);
+		return new AppendList<>(this.head.copy(), this.tail);
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy()
+	{
+		return MutableList.apply();
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy(int capacity)
+	{
+		return MutableList.withCapacity(capacity);
 	}
 	
 	@Override
 	public MutableList<E> mutable()
 	{
-		LinkedList<E> list = new LinkedList<E>();
+		LinkedList<E> list = new LinkedList<>();
 		list.addAll(this.head);
 		list.addLast(this.tail);
 		return list;
+	}
+
+	@Override
+	public <RE> ImmutableList.Builder<RE> immutableBuilder()
+	{
+		return null;
+	}
+
+	@Override
+	public <RE> ImmutableList.Builder<RE> immutableBuilder(int capacity)
+	{
+		return null;
 	}
 	
 	@Override
