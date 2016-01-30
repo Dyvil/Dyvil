@@ -376,7 +376,13 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	ImmutableMap<K, V> copy();
-	
+
+	@Override
+	<RK, RV> MutableMap<RK, RV> emptyCopy();
+
+	@Override
+	<RK, RV> MutableMap<RK, RV> emptyCopy(int capacity);
+
 	@Override
 	MutableMap<K, V> mutable();
 	
@@ -385,7 +391,13 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		return this.mutable();
 	}
-	
+
+	@Override
+	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder();
+
+	@Override
+	<RK, RV> Builder<RK, RV> immutableBuilder(int capacity);
+
 	@Override
 	default ImmutableMap<K, V> immutable()
 	{

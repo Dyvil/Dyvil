@@ -16,29 +16,79 @@ import java.util.function.BiPredicate;
 @Immutable
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableMap<K, V>
 {
+	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
+	{
+		private TupleMap<K, V> map;
+
+		public Builder()
+		{
+			this.map = new TupleMap<>(DEFAULT_CAPACITY);
+		}
+
+		public Builder(int capacity)
+		{
+			this.map = new TupleMap<>(capacity);
+		}
+
+		@Override
+		public void put(K key, V value)
+		{
+			if (this.map == null)
+			{
+				throw new IllegalStateException("Already built");
+			}
+
+			this.map.putInternal(new Tuple2<K, V>(key, value));
+		}
+
+		@Override
+		public void put(Entry<? extends K, ? extends V> entry)
+		{
+			if (this.map == null)
+			{
+				throw new IllegalStateException("Already built");
+			}
+
+			this.map.putInternal((Tuple2<K, V>) entry.toTuple());
+		}
+
+		@Override
+		public TupleMap<K, V> build()
+		{
+			final TupleMap<K, V> map = this.map;
+			this.map = null;
+			return map;
+		}
+	}
+
 	private static final long serialVersionUID = -5372836862143742212L;
-	
+
 	@SafeVarargs
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
 		return new TupleMap<>(entries, true);
 	}
-	
+
 	public static <K, V> TupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
 	{
 		return new TupleMap<>(entries);
 	}
-	
+
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<>();
 	}
-	
+
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new Builder<>(capacity);
+	}
+
 	protected TupleMap(int capacity)
 	{
 		super(capacity);
 	}
-	
+
 	@SafeVarargs
 	public TupleMap(Entry<K, V>... entries)
 	{
@@ -76,51 +126,6 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		super(map);
 	}
 
-	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
-	{
-		private TupleMap<K, V> map;
-		
-		public Builder()
-		{
-			this.map = new TupleMap<>(DEFAULT_CAPACITY);
-		}
-		
-		public Builder(int capacity)
-		{
-			this.map = new TupleMap<>(capacity);
-		}
-		
-		@Override
-		public void put(K key, V value)
-		{
-			if (this.map == null)
-			{
-				throw new IllegalStateException("Already built");
-			}
-			
-			this.map.putInternal(new Tuple2<K, V>(key, value));
-		}
-		
-		@Override
-		public void put(Entry<? extends K, ? extends V> entry)
-		{
-			if (this.map == null)
-			{
-				throw new IllegalStateException("Already built");
-			}
-			
-			this.map.putInternal((Tuple2<K, V>) entry.toTuple());
-		}
-		
-		@Override
-		public TupleMap<K, V> build()
-		{
-			final TupleMap<K, V> map = this.map;
-			this.map = null;
-			return map;
-		}
-	}
-	
 	@Override
 	protected void removeAt(int index)
 	{
@@ -336,11 +341,35 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	{
 		return new TupleMap<>(this);
 	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.TupleMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.TupleMap<>(capacity);
+	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
 		return new dyvil.collection.mutable.TupleMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return builder(capacity);
 	}
 	
 	@Override

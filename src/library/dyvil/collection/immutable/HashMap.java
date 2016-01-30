@@ -286,11 +286,35 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	{
 		return new HashMap<K, V>(this);
 	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.HashMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.HashMap<>(capacity);
+	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
 		return new dyvil.collection.mutable.HashMap<K, V>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return builder(capacity);
 	}
 	
 	@Override

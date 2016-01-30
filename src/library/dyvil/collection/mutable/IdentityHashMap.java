@@ -24,12 +24,13 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
-		return new IdentityHashMap();
+		return new IdentityHashMap<>();
 	}
 	
+	@SafeVarargs
 	public static <K, V> IdentityHashMap<K, V> apply(Tuple2<K, V>... entries)
 	{
-		return new IdentityHashMap(entries);
+		return new IdentityHashMap<>(entries);
 	}
 	
 	public IdentityHashMap()
@@ -73,6 +74,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.updateThreshold(this.table.length >> 1);
 	}
 	
+	@SafeVarargs
 	public IdentityHashMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
@@ -314,18 +316,36 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new IdentityHashMap(this);
+		return new IdentityHashMap<>(this);
 	}
 	
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
-		return new IdentityHashMap(this.size);
+		return new IdentityHashMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new IdentityHashMap<>(this.size);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.IdentityHashMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.IdentityHashMap.builder(capacity);
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.IdentityHashMap<K, V>(this);
+		return new dyvil.collection.immutable.IdentityHashMap<>(this);
 	}
 }

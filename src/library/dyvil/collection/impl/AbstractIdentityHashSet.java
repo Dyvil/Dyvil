@@ -6,6 +6,7 @@ import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -303,44 +304,12 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		return new java.util.AbstractSet<E>()
+		java.util.IdentityHashMap<E, Boolean> map = new java.util.IdentityHashMap<>(this.size);
+		for (E element : this)
 		{
-			@Override
-			public int size()
-			{
-				return AbstractIdentityHashSet.this.size;
-			}
-			
-			@Override
-			public Iterator<E> iterator()
-			{
-				return AbstractIdentityHashSet.this.iterator();
-			}
-			
-			@Override
-			public boolean contains(Object o)
-			{
-				return AbstractIdentityHashSet.this.contains(o);
-			}
-			
-			@Override
-			public void clear()
-			{
-				AbstractIdentityHashSet.this.clear();
-			}
-			
-			@Override
-			public boolean add(E e)
-			{
-				return AbstractIdentityHashSet.this.add(e);
-			}
-			
-			@Override
-			public boolean remove(Object o)
-			{
-				return AbstractIdentityHashSet.this.remove(o);
-			}
-		};
+			map.put(element, true);
+		}
+		return Collections.newSetFromMap(map);
 	}
 	
 	@Override

@@ -731,10 +731,18 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	// Copying and Views
 	
 	Map<K, V> copy();
+
+	<RK, RV> MutableMap<RK, RV> emptyCopy();
+
+	<RK, RV> MutableMap<RK, RV> emptyCopy(int capacity);
 	
 	MutableMap<K, V> mutable();
 	
 	MutableMap<K, V> mutableCopy();
+
+	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder();
+
+	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity);
 	
 	ImmutableMap<K, V> immutable();
 	

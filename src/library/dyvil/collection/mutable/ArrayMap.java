@@ -221,18 +221,36 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new ArrayMap(this);
+		return new ArrayMap<>(this);
 	}
 	
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
-		return new ArrayMap();
+		return new ArrayMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new ArrayMap<>(capacity);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.ArrayMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.ArrayMap.builder(capacity);
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayMap(this);
+		return new dyvil.collection.immutable.ArrayMap<>(this);
 	}
 }

@@ -179,11 +179,35 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	{
 		return new MapView(this.map.copy());
 	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return this.map.emptyCopy();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return this.map.emptyCopy(capacity);
+	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
 		return this.map.mutable();
+	}
+
+	@Override
+	public <RK, RV> Builder<RK, RV> immutableBuilder()
+	{
+		return this.map.immutableBuilder();
+	}
+
+	@Override
+	public <RK, RV> Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return this.map.immutableBuilder(capacity);
 	}
 	
 	@Override

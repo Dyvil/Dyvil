@@ -221,11 +221,35 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	{
 		return this;
 	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return MutableMap.apply();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return MutableMap.apply(capacity);
+	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
 		return MutableMap.apply();
+	}
+
+	@Override
+	public <RK, RV> Builder<RK, RV> immutableBuilder()
+	{
+		return ImmutableMap.builder();
+	}
+
+	@Override
+	public <RK, RV> Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return null;
 	}
 	
 	@Override

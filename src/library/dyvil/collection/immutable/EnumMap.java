@@ -374,11 +374,35 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	{
 		return new EnumMap<>(this);
 	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return MutableMap.apply();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return MutableMap.apply(capacity);
+	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
 		return new dyvil.collection.mutable.EnumMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return ImmutableMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return ImmutableMap.builder(capacity);
 	}
 	
 	@Override

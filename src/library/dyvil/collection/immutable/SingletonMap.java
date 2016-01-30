@@ -257,11 +257,35 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	{
 		return new SingletonMap<>(this.key, this.value);
 	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return MutableMap.apply();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return MutableMap.apply(capacity);
+	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
 		return MutableMap.apply(new Tuple2<>(this.key, this.value));
+	}
+
+	@Override
+	public <RK, RV> Builder<RK, RV> immutableBuilder()
+	{
+		return ImmutableMap.builder();
+	}
+
+	@Override
+	public <RK, RV> Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return ImmutableMap.builder(capacity);
 	}
 	
 	@Override

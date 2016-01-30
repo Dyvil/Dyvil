@@ -13,9 +13,6 @@ import java.util.function.Predicate;
 @ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
-	@DyvilModifiers(Modifiers.INTERNAL)
-	Object VALUE = new Object();
-	
 	static <E> ImmutableSet<E> empty()
 	{
 		return ImmutableSet.apply();

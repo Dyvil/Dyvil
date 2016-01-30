@@ -293,7 +293,25 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
-		return new EnumMap(this.type);
+		return MutableMap.apply();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return MutableMap.apply(capacity);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return ImmutableMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return ImmutableMap.builder();
 	}
 	
 	@Override

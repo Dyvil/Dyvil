@@ -183,7 +183,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		return this.comparator;
 	}
 	
-	protected static final int compare(Comparator comparator, Object k1, Object k2)
+	protected static int compare(Comparator comparator, Object k1, Object k2)
 	{
 		return comparator == null ? ((Comparable) k1).compareTo(k2) : comparator.compare(k1, k2);
 	}
