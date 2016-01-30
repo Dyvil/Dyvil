@@ -260,36 +260,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new TupleMap<>(this);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new TupleMap<>();
-	}
-
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
-	{
-		return new TupleMap<>(capacity);
-	}
-
-	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
-	{
-		return dyvil.collection.immutable.TupleMap.builder();
-	}
-
-	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
-	{
-		return dyvil.collection.immutable.TupleMap.builder(capacity);
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.TupleMap<>(this);
+		return this.immutableCopy();
 	}
 }
