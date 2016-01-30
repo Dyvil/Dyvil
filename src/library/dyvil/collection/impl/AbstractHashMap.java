@@ -1,9 +1,10 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.math.MathUtils;
-import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -21,10 +22,10 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		private static final long serialVersionUID = 6421167357975687099L;
 		
-		public transient K         key;
-		public transient V         value;
-		public transient int       hash;
-		public transient HashEntry next;
+		public transient K               key;
+		public transient V               value;
+		public transient int             hash;
+		public transient HashEntry<K, V> next;
 		
 		public HashEntry(K key, V value, int hash)
 		{
@@ -33,7 +34,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			this.hash = hash;
 		}
 		
-		public HashEntry(K key, V value, int hash, HashEntry next)
+		public HashEntry(K key, V value, int hash, HashEntry<K, V> next)
 		{
 			this.key = key;
 			this.value = value;
@@ -86,7 +87,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			
 			this.key = (K) in.readObject();
 			this.value = (V) in.readObject();
-			this.next = (HashEntry) in.readObject();
+			this.next = (HashEntry<K, V>) in.readObject();
 			this.hash = hash(this.key);
 		}
 	}
@@ -105,10 +106,18 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			// advance to first entry
 			if (t != null && AbstractHashMap.this.size > 0)
 			{
-				do
+				this.advance(t);
+			}
+		}
+
+		private void advance(HashEntry<K, V>[] t)
+		{
+			while (true)
+			{
+				if (!(this.index < t.length && (this.next = t[this.index++]) == null))
 				{
+					break;
 				}
-				while (this.index < t.length && (this.next = t[this.index++]) == null);
 			}
 		}
 		
@@ -128,10 +137,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			}
 			if ((this.next = (this.current = e).next) == null && (t = AbstractHashMap.this.entries) != null)
 			{
-				do
-				{
-				}
-				while (this.index < t.length && (this.next = t[this.index++]) == null);
+				this.advance(t);
 			}
 			return e;
 		}
@@ -157,8 +163,8 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public static final float DEFAULT_LOAD_FACTOR = 0.75F;
 	public static final int   MAX_ARRAY_SIZE      = Integer.MAX_VALUE - 8;
 	
-	protected transient int         size;
-	protected transient HashEntry[] entries;
+	protected transient int               size;
+	protected transient HashEntry<K, V>[] entries;
 	
 	public AbstractHashMap()
 	{
@@ -170,14 +176,14 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		{
 			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
-		this.entries = new HashEntry[MathUtils.powerOfTwo(grow(capacity))];
+		this.entries = (HashEntry<K, V>[]) new HashEntry[MathUtils.powerOfTwo(grow(capacity))];
 	}
 	
 	public AbstractHashMap(Map<K, V> map)
 	{
 		int size = map.size();
 		int length = MathUtils.powerOfTwo(grow(size));
-		HashEntry[] entries = this.entries = new HashEntry[length];
+		HashEntry<K, V>[] entries = this.entries = (HashEntry<K, V>[]) new HashEntry[length];
 		this.size = size;
 		
 		// Assume unique elements
@@ -186,7 +192,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			K key = entry.getKey();
 			int hash = hash(key);
 			int i = index(hash, length);
-			entries[i] = new HashEntry(key, entry.getValue(), hash, entries[i]);
+			entries[i] = new HashEntry<>(key, entry.getValue(), hash, entries[i]);
 		}
 	}
 	
@@ -194,14 +200,14 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		int size = this.size = map.size;
 		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
-		HashEntry[] newEntries = this.entries = new HashEntry[length];
+		HashEntry<K, V>[] newEntries = this.entries = (HashEntry<K, V>[]) new HashEntry[length];
 		
 		for (HashEntry<K, V> e : map.entries)
 		{
 			while (e != null)
 			{
 				int index = index(e.hash, length);
-				HashEntry<K, V> newEntry = new HashEntry<K, V>(e.key, e.value, e.hash);
+				HashEntry<K, V> newEntry = new HashEntry<>(e.key, e.value, e.hash);
 				if (newEntries[index] != null)
 				{
 					newEntry.next = newEntries[index];
@@ -213,21 +219,22 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	public AbstractHashMap(Tuple2<K, V>... tuples)
+	@SafeVarargs
+	public AbstractHashMap(Entry<K, V>... entries)
 	{
-		int length = MathUtils.powerOfTwo(grow(tuples.length));
+		int length = MathUtils.powerOfTwo(grow(entries.length));
 		int size = 0;
-		HashEntry[] entries = this.entries = new HashEntry[length];
+		HashEntry<K, V>[] hashTable = this.entries = (HashEntry<K, V>[]) new HashEntry[length];
 		
 		outer:
-		for (Tuple2 entry : tuples)
+		for (Entry<K, V> entry : entries)
 		{
-			Object key = entry._1;
-			Object value = entry._2;
+			K key = entry.getKey();
+			V value = entry.getValue();
 			
 			int hash = hash(key);
 			int i = index(hash, length);
-			for (HashEntry e = entries[i]; e != null; e = e.next)
+			for (HashEntry e = hashTable[i]; e != null; e = e.next)
 			{
 				Object k;
 				if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
@@ -237,7 +244,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 				}
 			}
 			
-			entries[i] = new HashEntry(key, value, hash, entries[i]);
+			hashTable[i] = new HashEntry<>(key, value, hash, hashTable[i]);
 			size++;
 		}
 		
@@ -290,7 +297,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			newCapacity = MAX_ARRAY_SIZE;
 		}
 		
-		HashEntry[] newMap = this.entries = new HashEntry[newCapacity];
+		HashEntry[] newMap = this.entries = (HashEntry<K, V>[]) new HashEntry[newCapacity];
 		for (int i = oldCapacity; i-- > 0; )
 		{
 			HashEntry e = oldMap[i];
@@ -485,7 +492,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public boolean contains(Object key, Object value)
 	{
 		HashEntry<K, V> entry = this.getEntry(key);
-		return entry == null ? false : Objects.equals(entry.value, value);
+		return entry != null && Objects.equals(entry.value, value);
 	}
 	
 	protected HashEntry<K, V> getEntry(Object key)
@@ -525,7 +532,43 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public Option<V> getOption(Object key)
 	{
 		HashEntry<K, V> entry = this.getEntry(key);
-		return entry == null ? None.instance : new Some(entry.value);
+		return entry == null ? None.instance : new Some<>(entry.value);
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.HashMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.HashMap<>(capacity);
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.HashMap<>(this);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.HashMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.HashMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.HashMap.builder(capacity);
 	}
 	
 	@Override
@@ -584,12 +627,12 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		out.writeInt(len);
 		
 		// Write key-value pairs, sequentially
-		for (int i = 0; i < len; i++)
+		for (HashEntry<K, V> entry : this.entries)
 		{
-			for (HashEntry<K, V> entry = this.entries[i]; entry != null; entry = entry.next)
+			for (HashEntry<K, V> subEntry = entry; subEntry != null; subEntry = subEntry.next)
 			{
-				out.writeObject(entry.key);
-				out.writeObject(entry.value);
+				out.writeObject(subEntry.key);
+				out.writeObject(subEntry.value);
 			}
 		}
 	}
@@ -601,7 +644,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		this.size = in.readInt();
 		int len = in.readInt();
 		
-		this.entries = new HashEntry[len];
+		this.entries = (HashEntry<K, V>[]) new HashEntry[len];
 		for (int i = 0; i < len; i++)
 		{
 			this.putInternal((K) in.readObject(), (V) in.readObject());

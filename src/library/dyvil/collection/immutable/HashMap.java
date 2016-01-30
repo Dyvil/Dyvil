@@ -1,10 +1,9 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.lang.literal.ArrayConvertible;
-import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -18,19 +17,20 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 {
 	private static final long serialVersionUID = -1489214367993445801L;
 	
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)
 	{
-		return new HashMap<K, V>(entries);
+		return new HashMap<>(entries);
 	}
 	
 	public static <K, V> Builder<K, V> builder()
 	{
-		return new Builder<K, V>();
+		return new Builder<>();
 	}
 	
 	public static <K, V> Builder<K, V> builder(int capacity)
 	{
-		return new Builder<K, V>(capacity);
+		return new Builder<>(capacity);
 	}
 	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
@@ -39,12 +39,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		
 		public Builder()
 		{
-			this.map = new HashMap<K, V>();
+			this.map = new HashMap<>();
 		}
 		
 		public Builder(int capacity)
 		{
-			this.map = new HashMap<K, V>(capacity);
+			this.map = new HashMap<>(capacity);
 		}
 		
 		@Override
@@ -88,7 +88,8 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		super(map);
 	}
 	
-	public HashMap(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public HashMap(Entry<K, V>... entries)
 	{
 		super(entries);
 	}
@@ -96,7 +97,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	protected void addEntry(int hash, K key, V value, int index)
 	{
-		this.entries[index] = new HashEntry(key, value, hash, this.entries[index]);
+		this.entries[index] = new HashEntry<>(key, value, hash, this.entries[index]);
 		this.size++;
 	}
 	
@@ -109,7 +110,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this);
+		HashMap<K, V> copy = new HashMap<>(this);
 		copy.ensureCapacity(this.size + 1);
 		copy.putInternal(key, value);
 		return copy;
@@ -118,7 +119,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this);
+		HashMap<K, V> copy = new HashMap<>(this);
 		copy.putInternal(map);
 		return copy;
 	}
@@ -126,7 +127,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$at(Object key)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
@@ -141,7 +142,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
@@ -157,7 +158,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			V entryValue = entry.getValue();
@@ -172,7 +173,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
@@ -188,7 +189,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K entryKey = entry.getKey();
@@ -203,7 +204,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		HashMap<NK, V> copy = new HashMap<NK, V>(this.size);
+		HashMap<NK, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			V value = entry.getValue();
@@ -215,7 +216,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		HashMap<K, NV> copy = new HashMap<K, NV>(this.size);
+		HashMap<K, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
@@ -227,7 +228,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		HashMap<NK, NV> copy = new HashMap<NK, NV>(this.size);
+		HashMap<NK, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry.getKey(), entry.getValue());
@@ -242,7 +243,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		HashMap<NK, NV> copy = new HashMap<NK, NV>(this.size);
+		HashMap<NK, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry.getKey(), entry.getValue()))
@@ -257,7 +258,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		HashMap<K, V> copy = new HashMap<K, V>(this.size);
+		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
@@ -273,7 +274,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		HashMap<V, K> copy = new HashMap<V, K>(this.size);
+		HashMap<V, K> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			copy.putInternal(entry.getValue(), entry.getKey());
@@ -284,25 +285,13 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new HashMap<K, V>(this);
+		return this.immutableCopy();
 	}
 
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new dyvil.collection.mutable.HashMap<>();
-	}
-
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
-	{
-		return new dyvil.collection.mutable.HashMap<>(capacity);
-	}
-	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.HashMap<K, V>(this);
+		return this.mutableCopy();
 	}
 
 	@Override
