@@ -1,7 +1,9 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -1261,6 +1263,30 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			level++;
 		}
 		return level;
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.TreeMap<>();
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.TreeMap<>(this, this.comparator);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.TreeMap<>(this, this.comparator);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.TreeMap.builder();
 	}
 	
 	@Override

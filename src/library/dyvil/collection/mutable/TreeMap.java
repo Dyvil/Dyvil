@@ -174,24 +174,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new TreeMap<>(this, this.comparator);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new TreeMap<>();
-	}
-
-	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
-	{
-		return dyvil.collection.immutable.TreeMap.builder();
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.TreeMap<>(this, this.comparator);
+		return this.immutableCopy();
 	}
 }

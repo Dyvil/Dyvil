@@ -86,7 +86,8 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 
 	@SafeVarargs
-	public TreeMap(Entry<? extends K, ? extends V>... entries) {
+	public TreeMap(Entry<? extends K, ? extends V>... entries)
+	{
 		super(entries);
 	}
 	
@@ -280,19 +281,13 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new TreeMap<>(this, this.comparator);
+		return this.immutableCopy();
 	}
 
 	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new dyvil.collection.mutable.TreeMap<>();
-	}
-	
-	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.TreeMap<>(this, this.comparator);
+		return this.mutableCopy();
 	}
 
 	@Override
