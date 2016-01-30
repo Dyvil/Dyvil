@@ -758,19 +758,46 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	@Override
 	String toString();
 	
+	default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	{
+		StringBuilder builder = new StringBuilder();
+		this.toString(builder, prefix, entrySeparator, keyValueSeparator, postfix);
+		return builder.toString();
+	}
+
+	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	{
+		builder.append(prefix);
+		if (this.isEmpty())
+		{
+			builder.append(postfix);
+			return;
+		}
+
+		Iterator<Entry<K, V>> iterator = this.iterator();
+		Entry<K, V> first = iterator.next();
+		builder.append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+		while (iterator.hasNext())
+		{
+			first = iterator.next();
+			builder.append(entrySeparator).append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+		}
+		builder.append(postfix);
+	}
+
 	@Override
 	boolean equals(Object obj);
-	
+
 	@Override
 	int hashCode();
-	
+
 	static <K, V> String mapToString(Map<K, V> map)
 	{
 		if (map.isEmpty())
 		{
 			return "[]";
 		}
-		
+
 		StringBuilder builder = new StringBuilder("[ ");
 		Iterator<Entry<K, V>> iterator = map.iterator();
 		while (true)
@@ -788,29 +815,30 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		}
 		return builder.append(" ]").toString();
 	}
-	
+
 	static <K, V> boolean mapEquals(Map<K, V> map, Object obj)
 	{
 		return obj instanceof Map && mapEquals(map, (Map<K, V>) obj);
 	}
-	
+
 	static <K, V> boolean mapEquals(Map<K, V> map1, Map<K, V> map2)
 	{
 		if (map1.size() != map2.size())
 		{
 			return false;
 		}
-		
-		for (Entry<K, V> e : map1)
+
+		// One-sided comparison is ok since we check for equal size
+		for (Entry<K, V> entry : map1)
 		{
-			if (!map2.contains(e))
+			if (!map2.contains(entry))
 			{
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	static <K, V> int mapHashCode(Map<K, V> map)
 	{
 		int sum = 0;
@@ -828,32 +856,5 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 			product *= hash;
 		}
 		return sum * 31 + product;
-	}
-	
-	default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
-	{
-		StringBuilder builder = new StringBuilder();
-		this.toString(builder, prefix, entrySeparator, keyValueSeparator, postfix);
-		return builder.toString();
-	}
-	
-	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
-	{
-		builder.append(prefix);
-		if (this.isEmpty())
-		{
-			builder.append(postfix);
-			return;
-		}
-		
-		Iterator<Entry<K, V>> iterator = this.iterator();
-		Entry<K, V> first = iterator.next();
-		builder.append(first.getKey()).append(keyValueSeparator).append(first.getValue());
-		while (iterator.hasNext())
-		{
-			first = iterator.next();
-			builder.append(entrySeparator).append(first.getKey()).append(keyValueSeparator).append(first.getValue());
-		}
-		builder.append(postfix);
 	}
 }

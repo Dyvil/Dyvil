@@ -201,21 +201,19 @@ public final class DyvilLexer
 						buf.append(currentChar);
 						break;
 					}
-					else if (currentChar == '.')
+
+					switch (currentChar)
 					{
+					case '.':
 						if (!LexerUtil.isDigit(code.charAt(i + 1)))
 						{
 							addToken = true;
 							reparse = true;
-							break typeswitch;
+							break;
 						}
 						type = DOUBLE;
 						buf.append('.');
-						break;
-					}
-
-					switch (currentChar)
-					{
+						break typeswitch;
 					case 'e':
 					case 'E':
 						type = DOUBLE;
@@ -330,8 +328,6 @@ public final class DyvilLexer
 						buf.append('-');
 						break typeswitch;
 					}
-
-					addToken = true;
 				}
 
 				addToken = true;
@@ -583,7 +579,7 @@ public final class DyvilLexer
 			return new SymbolToken(this.symbols, prev, i, line, start);
 		}
 		case SPECIAL_IDENTIFIER:
-			return new IdentifierToken(prev, Name.getSpecial(s), type, line, start, start + len);
+			return new IdentifierToken(prev, Name.getSpecial(s), type, line, start, start + len + 2);
 		case SYMBOL:
 		case BaseSymbols.DOT:
 		case BaseSymbols.COLON:
@@ -609,7 +605,7 @@ public final class DyvilLexer
 		case INT | MOD_HEX:
 			return this.intToken(prev, s, line, start, len, 16, false);
 		case LONG:
-			return this.intToken(prev, s, line, start, len, 10, true);
+			return this.intToken(prev, s, line, start, len + 1, 10, true);
 		case LONG | MOD_BIN:
 			return this.intToken(prev, s, line, start, len, 2, true);
 		case LONG | MOD_OCT:
@@ -617,15 +613,15 @@ public final class DyvilLexer
 		case LONG | MOD_HEX:
 			return this.intToken(prev, s, line, start, len, 16, true);
 		case FLOAT:
-			return new FloatToken(prev, Float.parseFloat(s), line, start, start + len);
+			return new FloatToken(prev, Float.parseFloat(s), line, start, start + len + 1);
 		case FLOAT | MOD_HEX:
 			return new FloatToken(prev, Float.parseFloat(s.substring(2)), line, start, start + len);
 		case DOUBLE:
-			return new DoubleToken(prev, Double.parseDouble(s), line, start, start + len);
+			return new DoubleToken(prev, Double.parseDouble(s), line, start, start + len + 1);
 		case DOUBLE | MOD_HEX:
 			return new DoubleToken(prev, Double.parseDouble(s.substring(2)), line, start, start + len);
 		case STRING:
-			return new StringToken(prev, STRING, s.substring(1), line, start, start + len);
+			return new StringToken(prev, STRING, s.substring(1), line, start, start + len + 1);
 		case STRING_START:
 			return new StringToken(prev, STRING_START, s.substring(1), line, start, start + len);
 		case STRING_PART:

@@ -9,16 +9,6 @@ import dyvil.reflect.Modifiers;
 @LongConvertible
 public interface Integer extends Number
 {
-	static Int apply(int v)
-	{
-		return Int.apply(v);
-	}
-	
-	static Long apply(long v)
-	{
-		return Long.apply(v);
-	}
-	
 	@DyvilModifiers(Modifiers.PREFIX)
 	Integer $tilde();
 	
