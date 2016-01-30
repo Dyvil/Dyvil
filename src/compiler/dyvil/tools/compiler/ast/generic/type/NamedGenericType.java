@@ -117,7 +117,7 @@ public class NamedGenericType extends GenericType
 			}
 		}
 
-		// resolveType0 is used to avoid Type Variable -> Default Value replacement done be replaceType
+		// resolveType0 is used to avoid Type Variable -> Default Value replacement done by replaceType
 		final IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
 
 		if (!resolved.isResolved())
