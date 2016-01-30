@@ -1,8 +1,9 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
-import dyvil.tuple.Tuple2;
+import dyvil.collection.MutableMap;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -104,14 +105,14 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.size = size;
 	}
 	
-	public AbstractArrayMap(Object[] keys, Object[] values, boolean trusted)
+	public AbstractArrayMap(Object[] keys, Object[] values, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.keys = keys;
 		this.values = values;
 		this.size = keys.length;
 	}
 	
-	public AbstractArrayMap(Object[] keys, Object[] values, int size, boolean trusted)
+	public AbstractArrayMap(Object[] keys, Object[] values, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.keys = keys;
 		this.values = values;
@@ -140,30 +141,30 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.values = map.values.clone();
 	}
 	
-	public AbstractArrayMap(Tuple2<K, V>... tuples)
+	@SafeVarargs
+	public AbstractArrayMap(Entry<K, V>... entries)
 	{
-		int len = tuples.length;
+		int len = entries.length;
 		Object[] keys = this.keys = new Object[len];
 		Object[] values = this.values = new Object[len];
 		
 		int size = 0;
 		
 		outer:
-		for (int i = 0; i < len; i++)
+		for (Entry<K, V> entry : entries)
 		{
-			Tuple2 entry = tuples[i];
-			Object key = entry._1;
+			K key = entry.getKey();
 			for (int j = 0; j < size; j++)
 			{
 				if (Objects.equals(key, keys[j]))
 				{
-					values[j] = entry._2;
+					values[j] = entry.getValue();
 					continue outer;
 				}
 			}
 			
 			keys[size] = key;
-			values[size] = entry._2;
+			values[size] = entry.getValue();
 			size++;
 		}
 		
@@ -419,19 +420,19 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 			{
 				if (this.keys[i] == null)
 				{
-					return new Some(this.values[i]);
+					return new Some<>((V) this.values[i]);
 				}
 			}
-			return None.instance;
+			return (Option<V>) None.instance;
 		}
 		for (int i = 0; i < this.size; i++)
 		{
 			if (key.equals(this.keys[i]))
 			{
-				return new Some(this.values[i]);
+				return new Some<>((V) this.values[i]);
 			}
 		}
-		return None.instance;
+		return (Option<V>) None.instance;
 	}
 	
 	@Override
@@ -454,7 +455,43 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	{
 		System.arraycopy(this.values, 0, store, index, this.size);
 	}
-	
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.ArrayMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.ArrayMap<>(capacity);
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.ArrayMap<>(this);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.ArrayMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.ArrayMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.ArrayMap.builder(capacity);
+	}
+
 	@Override
 	public java.util.Map<K, V> toJava()
 	{
