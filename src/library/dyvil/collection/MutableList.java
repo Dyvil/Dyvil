@@ -62,8 +62,16 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	// Non-mutating Operations
 	
 	@Override
-	MutableList<E> subList(int startIndex, int length);
-	
+	default MutableList<E> subList(int startIndex, int length)
+	{
+		MutableList<E> result = this.emptyCopy(length);
+		for (int i = 0; i < length; i++)
+		{
+			result.add(this.get(startIndex + i));
+		}
+		return result;
+	}
+
 	default MutableList<E> withCapacity(int newCapacity)
 	{
 		return this.copy();
@@ -175,13 +183,18 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		}
 		return copy;
 	}
-	
-	/*
-	 * Copying + in-place reversing the list is generally really slow, so force
-	 * implementors to implement this method.
-	 */
+
 	@Override
-	List<E> reversed();
+	default List<E> reversed()
+	{
+		MutableList<E> result = this.emptyCopy(this.size());
+		for (Iterator<E> iterator = this.reverseIterator(); iterator.hasNext(); )
+		{
+			E element = iterator.next();
+			result.add(element);
+		}
+		return result;
+	}
 	
 	@Override
 	default MutableList<E> sorted()

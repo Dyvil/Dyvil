@@ -780,12 +780,13 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		{
 			return false;
 		}
-		
-		for (Object o : c1)
+
+		// One-sided comparison is ok since we check for equal size
+		for (E element : c1)
 		{
-			if (!c2.contains(o))
+			if (!c2.contains(element))
 			{
-				return c2.contains(o);
+				return c2.contains(element);
 			}
 		}
 		return true;

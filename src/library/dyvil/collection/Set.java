@@ -229,7 +229,7 @@ public interface Set<E> extends Collection<E>
 	
 	static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
-		return Collection.unorderedEquals(c1, c2);
+		return c1.size() == c2.size() && Collection.unorderedEquals(c1, c2);
 	}
 	
 	static <E> int setHashCode(Set<E> set)

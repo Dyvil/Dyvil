@@ -190,20 +190,18 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * {@code startIndex}. If the {@code startIndex} or the end index ({@code startIndex + length}) exceeds the size of
 	 * this list, an exception will be thrown.
 	 * <p>
-	 * Note that for {@linkplain MutableList mutable lists}, it is not guaranteed that changes to the sub-list will be
-	 * reflected in the list it was created from. Although it is not an absolute requirement, implementations should
-	 * return a list that, when mutated, does <b>not</b> reflect the changes in this list. This behavior is implemented
-	 * in all {@linkplain MutableList mutable list} implementations of the <i>Dyvil Collection Framework</i>.
+	 * For mutable lists, this method returns a list that is not connected to this one. Changes to either this list or
+	 * the result are not reflected in the other list.
 	 *
 	 * @param startIndex
 	 * 		the start index of the sub list
 	 * @param length
 	 * 		the length of the sub list
 	 *
-	 * @return a sub-list with {@code length} elements starting from the {@code startIndex}
+	 * @return a list with {@code length} elements starting from the {@code startIndex}
 	 */
 	List<E> subList(int startIndex, int length);
-	
+
 	@Override
 	List<E> $plus(E element);
 	
@@ -401,7 +399,17 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 */
 	@Override
 	boolean remove(Object element);
-	
+
+	/**
+	 * Removes the first occurrence of the given {@code element} from this list. Unlike {@link #remove(Object)}, this
+	 * methods removes at most one occurrence. Iff the element was found within this list, it is removed and {@code
+	 * true} is returned. Otherwise, this methods returns {@code false}.
+	 *
+	 * @param element
+	 * 		the element to remove
+	 *
+	 * @return true, if the element was found
+	 */
 	default boolean removeFirst(Object element)
 	{
 		final int index = this.indexOf(element);
@@ -413,7 +421,17 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		this.removeAt(index);
 		return true;
 	}
-	
+
+	/**
+	 * Removes the last occurence of the given {@code element} from this list. Unlike {@link #remove(Object)}, this
+	 * methods removes at most one occurrence. Iff the element was found within this list, it is removed and {@code
+	 * true} is returned. Otherwise, this methods returns {@code false}.
+	 *
+	 * @param element
+	 * 		the element to remove
+	 *
+	 * @return true, if the element was found
+	 */
 	default boolean removeLast(Object element)
 	{
 		final int index = this.lastIndexOf(element);
@@ -441,7 +459,10 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	
 	@Override
 	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
+
+	/**
+	 * Reverses the elements in this list.
+	 */
 	void reverse();
 	
 	/**
@@ -458,9 +479,18 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * 		the comparator that defines the order of the elements
 	 */
 	void sort(Comparator<? super E> comparator);
-	
+
+	/**
+	 * Removes all duplicate elements from this list.
+	 */
 	void distinguish();
-	
+
+	/**
+	 * Removes all duplicate elements from this list and sorts it using the given {@code comparator}.
+	 *
+	 * @param comparator
+	 * 		the comparator used to sort the list.
+	 */
 	void distinguish(Comparator<? super E> comparator);
 	
 	// Search Operations
@@ -514,7 +544,14 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 
 	static void rangeCheck(int index, int size)
 	{
-
+		if (index < 0)
+		{
+			throw new IndexOutOfBoundsException("List index out of bounds: index < 0: " + index + " < 0");
+		}
+		if (index >= size)
+		{
+			throw new IndexOutOfBoundsException("List index out of bounds: index >= size: " + index + " >= " + size);
+		}
 	}
 	
 	static <E> boolean listEquals(List<E> list, Object o)
