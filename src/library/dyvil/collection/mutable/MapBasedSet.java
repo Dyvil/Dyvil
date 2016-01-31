@@ -138,10 +138,11 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		this.map.clear();
 	}
 	
+	@SuppressWarnings("PointlessBooleanExpression")
 	@Override
 	public boolean add(E element)
 	{
-		return !this.map.put(element, true);
+		return this.map.put(element, true) == null;
 	}
 	
 	@Override
