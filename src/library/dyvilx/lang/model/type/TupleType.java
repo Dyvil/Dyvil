@@ -1,37 +1,44 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
+@ClassParameters(names = { "types" })
 public class TupleType implements Type
 {
-	protected Type[] types;
-	protected Class  theClass;
+	protected final Type<?>[] types;
+	protected final Class<?>  theClass;
 	
-	public static TupleType apply(Type... types)
+	public static TupleType apply(Type<?>... types)
 	{
 		return new TupleType(types);
 	}
 	
-	public TupleType(Type... types)
+	public TupleType(Type<?>... types)
 	{
 		this.types = types;
+
+		Class<?> theClass;
+		try
+		{
+			theClass = Class.forName(this.qualifiedName());
+		}
+		catch (ClassNotFoundException ex)
+		{
+			theClass = null;
+		}
+		this.theClass = theClass;
+	}
+
+	public Type<?>[] types()
+	{
+		return this.types;
 	}
 	
 	@Override
 	public Class erasure()
 	{
-		if (this.theClass == null)
-		{
-			try
-			{
-				return this.theClass = Class.forName(this.qualifiedName());
-			}
-			catch (ClassNotFoundException ex)
-			{
-				return null;
-			}
-		}
 		return this.theClass;
 	}
 	

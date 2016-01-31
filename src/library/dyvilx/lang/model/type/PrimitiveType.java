@@ -1,6 +1,6 @@
 package dyvilx.lang.model.type;
 
-public class PrimitiveType implements Type
+public final class PrimitiveType implements Type
 {
 	public static final int VOID_CODE    = 0;
 	public static final int BOOLEAN_CODE = 1;
@@ -13,109 +13,43 @@ public class PrimitiveType implements Type
 	public static final int DOUBLE_CODE  = 8;
 	
 	private static final PrimitiveType[] LOOKUP = new PrimitiveType[9];
-	
+
+	public static PrimitiveType VOID    = new PrimitiveType(VOID_CODE, void.class);
+	public static PrimitiveType BOOLEAN = new PrimitiveType(BOOLEAN_CODE, boolean.class);
+	public static PrimitiveType BYTE    = new PrimitiveType(BYTE_CODE, byte.class);
+	public static PrimitiveType SHORT   = new PrimitiveType(SHORT_CODE, short.class);
+	public static PrimitiveType CHAR    = new PrimitiveType(CHAR_CODE, char.class);
+	public static PrimitiveType INT     = new PrimitiveType(INT_CODE, int.class);
+	public static PrimitiveType LONG    = new PrimitiveType(LONG_CODE, long.class);
+	public static PrimitiveType FLOAT   = new PrimitiveType(FLOAT_CODE, float.class);
+	public static PrimitiveType DOUBLE  = new PrimitiveType(DOUBLE_CODE, double.class);
+
 	private final int   id;
 	private final Class theClass;
-	
-	static
-	{
-		for (int i = VOID_CODE; i <= DOUBLE_CODE; i++)
-		{
-			LOOKUP[i] = new PrimitiveType(i);
-		}
-	}
-	
+
 	public static PrimitiveType apply(int id)
 	{
 		return LOOKUP[id];
 	}
-	
-	protected PrimitiveType(int id)
+
+	public static PrimitiveType apply(Class<?> theClass)
 	{
-		this.id = id;
-		switch (id)
+		for (PrimitiveType type : LOOKUP)
 		{
-		case VOID_CODE:
-			this.theClass = void.class;
-			return;
-		case BOOLEAN_CODE:
-			this.theClass = boolean.class;
-			return;
-		case BYTE_CODE:
-			this.theClass = byte.class;
-			return;
-		case SHORT_CODE:
-			this.theClass = short.class;
-			return;
-		case CHAR_CODE:
-			this.theClass = char.class;
-			return;
-		case INT_CODE:
-			this.theClass = int.class;
-			return;
-		case LONG_CODE:
-			this.theClass = long.class;
-			return;
-		case FLOAT_CODE:
-			this.theClass = float.class;
-			return;
-		case DOUBLE_CODE:
-			this.theClass = double.class;
-			return;
-		default:
-			throw new IllegalArgumentException("id");
+			if (type.theClass == theClass)
+			{
+				return type;
+			}
 		}
+		return null;
 	}
 	
-	public PrimitiveType(Class theClass)
+	private PrimitiveType(int id, Class<?> theClass)
 	{
+		this.id = id;
 		this.theClass = theClass;
-		if (theClass == void.class)
-		{
-			this.id = VOID_CODE;
-			return;
-		}
-		if (theClass == boolean.class)
-		{
-			this.id = BOOLEAN_CODE;
-			return;
-		}
-		if (theClass == byte.class)
-		{
-			this.id = BYTE_CODE;
-			return;
-		}
-		if (theClass == short.class)
-		{
-			this.id = SHORT_CODE;
-			return;
-		}
-		if (theClass == char.class)
-		{
-			this.id = CHAR_CODE;
-			return;
-		}
-		if (theClass == int.class)
-		{
-			this.id = INT_CODE;
-			return;
-		}
-		if (theClass == long.class)
-		{
-			this.id = LONG_CODE;
-			return;
-		}
-		if (theClass == float.class)
-		{
-			this.id = FLOAT_CODE;
-			return;
-		}
-		if (theClass == double.class)
-		{
-			this.id = DOUBLE_CODE;
-			return;
-		}
-		throw new IllegalAccessError("class");
+
+		LOOKUP[id] = this;
 	}
 	
 	@Override
