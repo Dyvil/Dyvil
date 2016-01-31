@@ -249,10 +249,10 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	boolean putIfAbsent(K key, V value);
+	V putIfAbsent(K key, V value);
 	
 	@Override
-	default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	default V putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		return this.putIfAbsent(entry.getKey(), entry.getValue());
 	}

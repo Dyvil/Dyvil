@@ -262,14 +262,14 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	@Mutating
-	default boolean putIfAbsent(K key, V value)
+	default V putIfAbsent(K key, V value)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
 	
 	@Override
 	@Mutating
-	default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	default V putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}

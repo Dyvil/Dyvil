@@ -54,15 +54,13 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	boolean isImmutable();
 	
 	/**
-	 * Returns the size of this map, i.e. the number of mappings contained in
-	 * this map.
+	 * Returns the size of this map, i.e. the number of mappings contained in this map.
 	 */
 	int size();
 	
 	/**
-	 * Returns true if and if only this map contains no mappings. The standard
-	 * implementation defines a map as empty if it's size as calculated by
-	 * {@link #size()} is exactly {@code 0}.
+	 * Returns true if and if only this map contains no mappings. The standard implementation defines a map as empty if
+	 * it's size as calculated by {@link #size()} is exactly {@code 0}.
 	 *
 	 * @return true, if this map contains no mappings
 	 */
@@ -82,9 +80,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Creates and returns an {@link Iterator} over the mappings of this map,
-	 * packed in {@linkplain Entry Tuples} containing the key as their first
-	 * value and the value as their second value.
+	 * Creates and returns an {@link Iterator} over the mappings of this map, packed in {@linkplain Entry Tuples}
+	 * containing the key as their first value and the value as their second value.
 	 *
 	 * @return an iterator over the mappings of this map
 	 */
@@ -92,9 +89,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	Iterator<Entry<K, V>> iterator();
 	
 	/**
-	 * Creates and returns an {@link Spliterator} over the mappings of this map,
-	 * packed in {@linkplain Entry Tuples} containing the key as their first
-	 * value and the value as their second value.
+	 * Creates and returns an {@link Spliterator} over the mappings of this map, packed in {@linkplain Entry Tuples}
+	 * containing the key as their first value and the value as their second value.
 	 *
 	 * @return an iterator over the mappings of this map
 	 */
@@ -267,8 +263,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping for the given
-	 * {@code key}.
+	 * Returns true if and if only this map contains a mapping for the given {@code key}.
 	 *
 	 * @param key
 	 * 		the key
@@ -281,8 +276,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping that maps the
-	 * given {@code key} to the given {@code value}.
+	 * Returns true if and if only this map contains a mapping that maps the given {@code key} to the given {@code
+	 * value}.
 	 *
 	 * @param key
 	 * 		the key
@@ -297,10 +292,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping that maps the
-	 * key, as given by the first value of the {@code entry} to the value, as
-	 * given by the second value of the {@code entry}. The default
-	 * implementation of this method delegates to the {@link #$minus(Object, Object)} method.
+	 * Returns true if and if only this map contains a mapping that maps the key, as given by the first value of the
+	 * {@code entry} to the value, as given by the second value of the {@code entry}. The default implementation of this
+	 * method delegates to the {@link #$minus(Object, Object)} method.
 	 *
 	 * @param entry
 	 * 		the entry
@@ -313,8 +307,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping to the given
-	 * {@code value}.
+	 * Returns true if and if only this map contains a mapping to the given {@code value}.
 	 *
 	 * @param value
 	 * 		the value
@@ -327,8 +320,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping for the given
-	 * {@code key}.
+	 * Returns true if and if only this map contains a mapping for the given {@code key}.
 	 *
 	 * @param key
 	 * 		the key
@@ -349,8 +341,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping to the given
-	 * {@code value}.
+	 * Returns true if and if only this map contains a mapping to the given {@code value}.
 	 *
 	 * @param value
 	 * 		the value
@@ -371,8 +362,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping that maps the
-	 * given {@code key} to the given {@code value}.
+	 * Returns true if and if only this map contains a mapping that maps the given {@code key} to the given {@code
+	 * value}.
 	 *
 	 * @param key
 	 * 		the key
@@ -395,11 +386,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Returns true if and if only this map contains a mapping that maps the
-	 * key, as given by the first value of the {@code entry} to the value, as
-	 * given by the second value of the {@code entry}. The default
-	 * implementation of this method delegates to the {@link #$qmark(Object,
-	 * Object)} method.
+	 * Returns true if and if only this map contains a mapping that maps the key, as given by the first value of the
+	 * {@code entry} to the value, as given by the second value of the {@code entry}. The default implementation of this
+	 * method delegates to the {@link #$qmark(Object, Object)} method.
 	 *
 	 * @param entry
 	 * 		the entry
@@ -412,9 +401,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Gets and returns the value for the given {@code key}. If no mapping for
-	 * the {@code key} exists, {@code null} is returned. This alias forwarder
-	 * for Dyvil Subscript Syntax delegates to {@link #get(Object)}.
+	 * Gets and returns the value for the given {@code key}. If no mapping for the {@code key} exists, {@code null} is
+	 * returned. This alias forwarder for Dyvil Subscript Syntax delegates to {@link #get(Object)}.
 	 *
 	 * @param key
 	 * 		the key
@@ -445,8 +433,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	}
 	
 	/**
-	 * Gets and returns the value for the given {@code key}. If no mapping for
-	 * the {@code key} exists, {@code null} is returned.
+	 * Gets and returns the value for the given {@code key}. If no mapping for the {@code key} exists, {@code null} is
+	 * returned.
 	 *
 	 * @param key
 	 * 		the key
@@ -456,27 +444,23 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	V get(Object key);
 	
 	/**
-	 * Gets and returns an optional value for the given {@code key}. If no
-	 * mapping for the {@code key} exists, {@link None} is returned, otherwise,
-	 * the mapped value is wrapped in a {@link Some}.
+	 * Gets and returns an optional value for the given {@code key}. If no mapping for the {@code key} exists, {@link
+	 * None} is returned, otherwise, the mapped value is wrapped in a {@link Some}.
 	 *
 	 * @param key
 	 * 		the key
 	 *
-	 * @return an option containing the value, or None if not mapping exists for
-	 * the key
+	 * @return an option containing the value, or None if not mapping exists for the key
 	 */
 	Option<V> getOption(Object key);
 	
 	// Non-mutating Operations
 	
 	/**
-	 * Returns a map that contains all entries of this map plus the new entry
-	 * specified by {@code key} and {@code value} as if it were added by {@link
-	 * #subscript_$eq(Object, Object)}. If the {@code key} is already present in
-	 * this map, a map is returned that uses the given {@code value} instead of
-	 * the previous value for the {@code key}, and that has the same size as
-	 * this map.
+	 * Returns a map that contains all entries of this map plus the new entry specified by {@code key} and {@code value}
+	 * as if it were added by {@link #subscript_$eq(Object, Object)}. If the {@code key} is already present in this map,
+	 * a map is returned that uses the given {@code value} instead of the previous value for the {@code key}, and that
+	 * has the same size as this map.
 	 *
 	 * @param key
 	 * 		the key
@@ -488,11 +472,10 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	Map<K, V> $plus(K key, V value);
 	
 	/**
-	 * Returns a map that contains all entries of this map plus the new {@code
-	 * entry}, as if it were added by {@link #subscript_$eq(Object, Object)}. If
-	 * the {@code key} is already present in this map, a map is returned that
-	 * uses the given {@code value} instead of the previous value for the {@code
-	 * key}, and that has the same size as this map.
+	 * Returns a map that contains all entries of this map plus the new {@code entry}, as if it were added by {@link
+	 * #subscript_$eq(Object, Object)}. If the {@code key} is already present in this map, a map is returned that uses
+	 * the given {@code value} instead of the previous value for the {@code key}, and that has the same size as this
+	 * map.
 	 *
 	 * @param entry
 	 * 		the entry
@@ -504,11 +487,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	Map<K, V> $plus(Entry<? extends K, ? extends V> entry);
 	
 	/**
-	 * Returns a map that contains all entries of this map plus all entries of
-	 * the given {@code map}, as if they were added by {@link
-	 * #subscript_$eq(Object, Object)}. If a key in the given map is already
-	 * present in this map, a map is returned that uses the value from the given
-	 * {@code map} for that key.
+	 * Returns a map that contains all entries of this map plus all entries of the given {@code map}, as if they were
+	 * added by {@link #subscript_$eq(Object, Object)}. If a key in the given map is already present in this map, a map
+	 * is returned that uses the value from the given {@code map} for that key.
 	 *
 	 * @param map
 	 * 		the second map to add entries from
@@ -526,17 +507,15 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	Map<K, V> $minus$colon(Object value);
 	
 	/**
-	 * Returns a new map containing all entries of this map minus the entries of
-	 * the given {@code map}. An entry of this map is not retained if the given
-	 * map contains the exact entry, which means both key and value have to
-	 * match. If entries should be removed based on keys only (ignoring values),
-	 * {@link #$minus$minus(Collection) --} should be used instead.
+	 * Returns a new map containing all entries of this map minus the entries of the given {@code map}. An entry of this
+	 * map is not retained if the given map contains the exact entry, which means both key and value have to match. If
+	 * entries should be removed based on keys only (ignoring values), {@link #$minus$minus(Collection) --} should be
+	 * used instead.
 	 *
 	 * @param map
 	 * 		the map whose entries should not be present in the resulting map
 	 *
-	 * @return a map that contains all entries of this map minus the entries of
-	 * the given map
+	 * @return a map that contains all entries of this map minus the entries of the given map
 	 */
 	Map<K, V> $minus$minus(Map<?, ?> map);
 	
@@ -617,10 +596,25 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	V put(K key, V value);
 	
 	V put(Entry<? extends K, ? extends V> entry);
-	
-	boolean putIfAbsent(K key, V value);
-	
-	boolean putIfAbsent(Entry<? extends K, ? extends V> entry);
+
+	/**
+	 * Inserts the given {@code value} for the {@code key} if no value is currently present for the key in this map.
+	 * This method returns the old value if it exists for the given key, and otherwise the given {@code value}. If the
+	 * given value cannot be stored in this {@link Map}, {@code null} is returned.
+	 *
+	 * @param key
+	 * 		the key
+	 * @param value
+	 * 		the value to insert
+	 *
+	 * @return the old value if it exists for the key; the given value otherwise
+	 */
+	V putIfAbsent(K key, V value);
+
+	/**
+	 * @see #putIfAbsent(Object,Object)
+	 */
+	V putIfAbsent(Entry<? extends K, ? extends V> entry);
 	
 	void putAll(Map<? extends K, ? extends V> map);
 	
@@ -751,11 +745,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	ImmutableMap<K, V> view();
 	
 	/**
-	 * Returns the Java Collection Framework equivalent of this map. The
-	 * returned map is not a view of this one, but an exact copy. Immutable maps
-	 * should return a map that is locked for mutation, which is usually ensured
-	 * by wrapping the map with {@link java.util.Collections#unmodifiableMap(java.util.Map)
-	 * Collections.unmodifiableMap}.
+	 * Returns the Java Collection Framework equivalent of this map. The returned map is not a view of this one, but an
+	 * exact copy. Immutable maps should return a map that is locked for mutation, which is usually ensured by wrapping
+	 * the map with {@link java.util.Collections#unmodifiableMap(java.util.Map) Collections.unmodifiableMap}.
 	 *
 	 * @return a java collection containing the elements of this collection
 	 */

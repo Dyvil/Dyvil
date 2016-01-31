@@ -114,25 +114,25 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
-		Object k = maskNull(key);
-		Object[] tab = this.table;
-		int len = tab.length;
-		int i = index(k, len);
+		final Object maskedKey = maskNull(key);
+		final Object[] table = this.table;
+		final int len = table.length;
+		int i = index(maskedKey, len);
 		
 		Object item;
-		while ((item = tab[i]) != null)
+		while ((item = table[i]) != null)
 		{
-			if (item == k)
+			if (item == maskedKey)
 			{
-				return false;
+				return (V) table[i + 1];
 			}
 			i = nextKeyIndex(i, len);
 		}
 		
-		this.addEntry(i, k, value);
-		return true;
+		this.addEntry(i, maskedKey, value);
+		return value;
 	}
 	
 	@Override

@@ -70,15 +70,16 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
-		if (this.contains(key, value))
+		final TreeEntry<K, V> entry = this.getEntry(key);
+		if (entry != null)
 		{
-			return false;
+			return entry.value;
 		}
 		
 		this.putInternal(key, value);
-		return true;
+		return value;
 	}
 	
 	@Override

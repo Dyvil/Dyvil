@@ -99,30 +99,31 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
 		return this.putIfAbsent(new Tuple2<>(key, value));
 	}
 	
 	@Override
-	public boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	public V putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		return this.putIfAbsent((Tuple2<K, V>) entry.toTuple());
 	}
 	
-	private boolean putIfAbsent(Tuple2<K, V> tuple)
+	private V putIfAbsent(Tuple2<K, V> tuple)
 	{
-		K key = tuple._1;
+		final K key = tuple._1;
 		for (int i = 0; i < this.size; i++)
 		{
-			if (Objects.equals(key, this.entries[i]._1))
+			final Tuple2<K, V> entry = this.entries[i];
+			if (Objects.equals(key, entry._1))
 			{
-				return false;
+				return entry._2;
 			}
 		}
 		
 		this.putNew(tuple);
-		return true;
+		return tuple._2;
 	}
 	
 	@Override

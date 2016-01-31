@@ -147,7 +147,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
 		int hash = hash(key);
 		int i = index(hash, this.entries.length);
@@ -156,12 +156,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 			Object k;
 			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 			{
-				return false;
+				return e.value;
 			}
 		}
 		
 		this.addEntry(hash, key, value, i);
-		return true;
+		return value;
 	}
 	
 	@Override

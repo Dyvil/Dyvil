@@ -92,18 +92,18 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
 			if (Objects.equals(key, this.keys[i]))
 			{
-				return false;
+				return (V) this.values[i];
 			}
 		}
 		
 		this.putNew(key, value);
-		return true;
+		return value;
 	}
 	
 	@Override
