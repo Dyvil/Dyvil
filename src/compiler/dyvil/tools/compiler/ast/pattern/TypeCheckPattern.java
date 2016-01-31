@@ -80,7 +80,7 @@ public class TypeCheckPattern implements IPattern
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.pattern.resolveField(name);
+		return this.pattern == null ? null : this.pattern.resolveField(name);
 	}
 	
 	@Override
@@ -109,7 +109,8 @@ public class TypeCheckPattern implements IPattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
