@@ -206,6 +206,8 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
+		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+
 		final IClass caseClass = this.type.getTheClass();
 		final int lineNumber = this.getLineNumber();
 
