@@ -149,9 +149,10 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			if (!Objects.equals(this.elements[i], element))
+			final Object thisElement = this.elements[i];
+			if (!Objects.equals(thisElement, element))
 			{
-				newArray[index++] = element;
+				newArray[index++] = thisElement;
 			}
 		}
 		return new ArraySet<>((E[]) newArray, index, true);
