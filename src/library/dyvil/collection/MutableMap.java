@@ -23,7 +23,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 		return new HashMap<>();
 	}
 
-	static <K, V> MutableMap<K, V> apply(int capacity)
+	static <K, V> MutableMap<K, V> withCapacity(int capacity)
 	{
 		return new HashMap<>(capacity);
 	}

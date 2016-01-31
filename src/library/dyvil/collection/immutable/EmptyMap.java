@@ -231,7 +231,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
 	{
-		return MutableMap.apply(capacity);
+		return MutableMap.withCapacity(capacity);
 	}
 	
 	@Override
@@ -249,7 +249,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public <RK, RV> Builder<RK, RV> immutableBuilder(int capacity)
 	{
-		return null;
+		return ImmutableMap.builder(capacity);
 	}
 	
 	@Override

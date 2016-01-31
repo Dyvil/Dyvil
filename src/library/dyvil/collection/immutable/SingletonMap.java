@@ -267,7 +267,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
 	{
-		return MutableMap.apply(capacity);
+		return MutableMap.withCapacity(capacity);
 	}
 	
 	@Override
