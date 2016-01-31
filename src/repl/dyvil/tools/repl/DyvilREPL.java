@@ -34,7 +34,7 @@ public final class DyvilREPL
 	
 	protected File dumpDir;
 	
-	private static final Map<String, ICommand> commands = new TreeMap<String, ICommand>();
+	private static final Map<String, ICommand> commands = new TreeMap<>();
 
 	private static boolean running;
 	
@@ -252,7 +252,7 @@ public final class DyvilREPL
 				break;
 			}
 			
-			printIndent(depth1);
+			this.printIndent(depth1);
 		}
 		
 		return buffer.toString();
