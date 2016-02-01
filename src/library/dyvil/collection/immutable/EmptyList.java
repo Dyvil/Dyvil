@@ -256,7 +256,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public <RE> Builder<RE> immutableBuilder()
 	{
-		return ImmutableList.builder();
+		return AppendList.builder();
 	}
 
 	@Override

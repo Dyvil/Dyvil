@@ -5,6 +5,7 @@ import dyvil.collection.Deque;
 import dyvil.collection.*;
 import dyvil.collection.List;
 import dyvil.collection.Set;
+import dyvil.collection.immutable.AppendList;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 
@@ -700,19 +701,19 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return ImmutableList.linked(this);
+		return AppendList.apply(this);
 	}
 
 	@Override
 	public <RE> ImmutableList.Builder<RE> immutableBuilder()
 	{
-		return dyvil.collection.ImmutableList.builder(); // TODO linked builder
+		return AppendList.builder();
 	}
 
 	@Override
 	public <RE> ImmutableList.Builder<RE> immutableBuilder(int capacity)
 	{
-		return dyvil.collection.ImmutableList.builder(capacity);
+		return AppendList.builder();
 	}
 
 	@Override

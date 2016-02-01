@@ -1,12 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -186,7 +186,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return ImmutableList.linked((Iterable<R>) mapper.apply(this.element));
+		return AppendList.apply(mapper.apply(this.element));
 	}
 	
 	@Override
@@ -276,7 +276,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	@Override
 	public <RE> Builder<RE> immutableBuilder()
 	{
-		return ImmutableList.builder();
+		return AppendList.builder();
 	}
 
 	@Override

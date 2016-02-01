@@ -86,32 +86,22 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	@SafeVarargs
 	static <E> ImmutableList<E> linked(E... elements)
 	{
-		ImmutableList<E> list = EmptyList.apply();
-		for (E element : elements)
-		{
-			list = new AppendList<>(list, element);
-		}
-		return list;
-	}
-	
-	static <E> ImmutableList<E> linked(Iterable<E> iterable)
-	{
-		ImmutableList<E> list = EmptyList.apply();
-		for (E element : iterable)
-		{
-			list = new AppendList<>(list, element);
-		}
-		return list;
+		return AppendList.apply(elements);
 	}
 	
 	static <E> Builder<E> builder()
 	{
-		return new ArrayList.Builder<>();
+		return ArrayList.builder();
 	}
 	
 	static <E> Builder<E> builder(int capacity)
 	{
-		return new ArrayList.Builder<>(capacity);
+		return ArrayList.builder(capacity);
+	}
+
+	static <E> Builder<E> linkedBuilder()
+	{
+		return AppendList.builder();
 	}
 	
 	// Accessors

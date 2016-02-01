@@ -17,12 +17,61 @@ import java.util.function.Predicate;
 @Immutable
 public class AppendList<E> implements ImmutableList<E>
 {
+	public static final class Builder<E> implements ImmutableList.Builder<E>
+	{
+		private ImmutableList<E> list = (ImmutableList<E>) EmptyList.instance;
+
+		@Override
+		public void add(E element)
+		{
+			if (this.list == null)
+			{
+				throw new IllegalStateException("Already built");
+			}
+			this.list = new AppendList<E>(this.list, element);
+		}
+
+		@Override
+		public ImmutableList<E> build()
+		{
+			final ImmutableList<E> list = this.list;
+			this.list = null;
+			return list;
+		}
+	}
+
 	private static final long serialVersionUID = 2683270385507677394L;
 	
 	private transient ImmutableList<E> head;
 	private transient E                tail;
 	
 	private transient int size;
+
+	@SafeVarargs
+	public static <E> ImmutableList<E> apply(E... elements)
+	{
+		ImmutableList<E> list = EmptyList.apply();
+		for (E element : elements)
+		{
+			list = new AppendList<>(list, element);
+		}
+		return list;
+	}
+
+	public static <E> ImmutableList<E> apply(Iterable<? extends E> iterable)
+	{
+		ImmutableList<E> list = EmptyList.apply();
+		for (E element : iterable)
+		{
+			list = new AppendList<>(list, element);
+		}
+		return list;
+	}
+
+	public static <E> Builder<E> builder()
+	{
+		return new Builder<>();
+	}
 	
 	public AppendList(E element)
 	{
@@ -270,13 +319,13 @@ public class AppendList<E> implements ImmutableList<E>
 	@Override
 	public <RE> ImmutableList.Builder<RE> immutableBuilder()
 	{
-		return null;
+		return builder();
 	}
 
 	@Override
 	public <RE> ImmutableList.Builder<RE> immutableBuilder(int capacity)
 	{
-		return null;
+		return builder();
 	}
 	
 	@Override

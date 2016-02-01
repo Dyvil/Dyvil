@@ -70,8 +70,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>(elements, true);
 	}
 
-	@SafeVarargs
-	public static <E> ArrayList<E> fromArray(E... elements)
+	public static <E> ArrayList<E> fromArray(E[] elements)
 	{
 		return new ArrayList<>(elements);
 	}
