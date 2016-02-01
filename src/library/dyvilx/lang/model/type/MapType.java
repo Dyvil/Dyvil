@@ -1,7 +1,9 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.collection.Map;
 
+@ClassParameters(names = { "keyType", "valueType" })
 public class MapType<K, V> implements Type<Map<K, V>>
 {
 	private Type<K> keyType;
@@ -21,7 +23,17 @@ public class MapType<K, V> implements Type<Map<K, V>>
 	@Override
 	public Class<Map<K, V>> erasure()
 	{
-		return (Class) Map.class;
+		return (Class<Map<K, V>>) (Class) Map.class;
+	}
+
+	public Type<K> keyType()
+	{
+		return this.keyType;
+	}
+
+	public Type<V> valueType()
+	{
+		return this.valueType;
 	}
 	
 	@Override

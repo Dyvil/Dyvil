@@ -86,32 +86,22 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	@SafeVarargs
 	static <E> ImmutableList<E> linked(E... elements)
 	{
-		ImmutableList<E> list = EmptyList.apply();
-		for (E element : elements)
-		{
-			list = new AppendList<>(list, element);
-		}
-		return list;
-	}
-	
-	static <E> ImmutableList<E> linked(Iterable<E> iterable)
-	{
-		ImmutableList<E> list = EmptyList.apply();
-		for (E element : iterable)
-		{
-			list = new AppendList<>(list, element);
-		}
-		return list;
+		return AppendList.apply(elements);
 	}
 	
 	static <E> Builder<E> builder()
 	{
-		return new ArrayList.Builder<>();
+		return ArrayList.builder();
 	}
 	
 	static <E> Builder<E> builder(int capacity)
 	{
-		return new ArrayList.Builder<>(capacity);
+		return ArrayList.builder(capacity);
+	}
+
+	static <E> Builder<E> linkedBuilder()
+	{
+		return AppendList.builder();
 	}
 	
 	// Accessors
@@ -415,7 +405,13 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	ImmutableList<E> copy();
-	
+
+	@Override
+	<RE> MutableList<RE> emptyCopy();
+
+	@Override
+	<RE> MutableList<RE> emptyCopy(int capacity);
+
 	@Override
 	MutableList<E> mutable();
 	
@@ -436,7 +432,13 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	{
 		return this.copy();
 	}
-	
+
+	@Override
+	<RE> Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	default ImmutableList<E> view()
 	{

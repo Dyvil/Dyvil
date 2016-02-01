@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 public class CollectionTests
 {
-	private static final Object[] SAMPLES = new Object[] { "abc", "def", "aA", "BB", null, Float.apply(3F),
+	private static final Object[] SAMPLES = new Object[] { "abc", "def", "Aa", "BB", null, Float.apply(3F),
 			Long.apply(1L), Int.apply(10) };
 	
 	@Test

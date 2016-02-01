@@ -1,34 +1,55 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.StringConvertible;
 
 @StringConvertible
 @ClassConvertible
+@ClassParameters(names = { "theClass" })
 public class NamedType<T> implements Type<T>
 {
 	protected final String   name;
-	protected       Class<T> theClass;
+	protected final Class<T> theClass;
 	
 	public static <T> NamedType<T> apply(String className)
 	{
-		return new NamedType(className);
+		return new NamedType<>(className);
 	}
 	
 	public static <T> NamedType<T> apply(Class<T> c)
 	{
-		return new NamedType(c);
+		return new NamedType<>(c);
 	}
 	
-	public NamedType(final String name)
+	public NamedType(String name)
 	{
 		this.name = name;
+
+		Class<T> theClass;
+		try
+		{
+			theClass = (Class<T>) Class.forName(this.name, false, ClassLoader.getSystemClassLoader());
+		}
+		catch (ClassNotFoundException ignored)
+		{
+			theClass = null;
+		}
+		this.theClass = theClass;
 	}
 	
-	public NamedType(final Class<T> theClass)
+	public NamedType(Class<T> theClass)
 	{
 		this.name = theClass.getCanonicalName();
 		this.theClass = theClass;
+	}
+
+	/*
+	 * To satisfy case class pattern matching
+	 */
+	public Class<T> theClass()
+	{
+		return this.theClass;
 	}
 	
 	@Override
@@ -46,17 +67,6 @@ public class NamedType<T> implements Type<T>
 	@Override
 	public Class<T> erasure()
 	{
-		if (this.theClass == null)
-		{
-			try
-			{
-				return this.theClass = (Class<T>) Class.forName(this.name, false, ClassLoader.getSystemClassLoader());
-			}
-			catch (ClassNotFoundException ex)
-			{
-				return null;
-			}
-		}
 		return this.theClass;
 	}
 	

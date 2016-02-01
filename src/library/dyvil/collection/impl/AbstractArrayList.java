@@ -1,8 +1,6 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.List;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -44,7 +42,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		this.size = size;
 	}
 	
-	public AbstractArrayList(E[] elements, int size, boolean trusted)
+	public AbstractArrayList(E[] elements, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;
@@ -333,11 +331,47 @@ public abstract class AbstractArrayList<E> implements List<E>
 	{
 		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
-	
+
+	@Override
+	public <R> MutableList<R> emptyCopy()
+	{
+		return new dyvil.collection.mutable.ArrayList<>();
+	}
+
+	@Override
+	public <R> MutableList<R> emptyCopy(int newCapacity)
+	{
+		return new dyvil.collection.mutable.ArrayList<>(newCapacity);
+	}
+
+	@Override
+	public MutableList<E> mutableCopy()
+	{
+		return new dyvil.collection.mutable.ArrayList<>((E[]) this.elements, this.size);
+	}
+
+	@Override
+	public ImmutableList<E> immutableCopy()
+	{
+		return new dyvil.collection.immutable.ArrayList<>((E[]) this.elements, this.size);
+	}
+
+	@Override
+	public <RE> ImmutableList.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.immutable.ArrayList.builder();
+	}
+
+	@Override
+	public <RE> ImmutableList.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.ArrayList.builder(capacity);
+	}
+
 	@Override
 	public java.util.List<E> toJava()
 	{
-		java.util.ArrayList<E> list = new java.util.ArrayList<E>(this.size);
+		java.util.ArrayList<E> list = new java.util.ArrayList<>(this.size);
 		for (int i = 0; i < this.size; i++)
 		{
 			list.add((E) this.elements[i]);

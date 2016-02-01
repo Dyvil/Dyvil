@@ -1,13 +1,14 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
-import dyvilx.lang.model.type.Type;
+import dyvil.collection.MutableMap;
 import dyvil.reflect.EnumReflection;
-import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
+import dyvilx.lang.model.type.Type;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -148,23 +149,25 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.size = map.size;
 	}
 	
-	public AbstractEnumMap(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public AbstractEnumMap(Entry<K, V>... entries)
 	{
 		this(getKeyType(entries));
 		
-		for (Tuple2<K, V> entry : entries)
+		for (Entry<K, V> entry : entries)
 		{
-			this.putInternal(entry._1, entry._2);
+			this.putInternal(entry.getKey(), entry.getValue());
 		}
 	}
 	
-	private static <K extends Enum<K>> Class<K> getKeyType(Tuple2<K, ?>[] tuples)
+	private static <K extends Enum<K>> Class<K> getKeyType(Entry<K, ?>[] tuples)
 	{
-		for (Tuple2<K, ?> entry : tuples)
+		for (Entry<K, ?> entry : tuples)
 		{
-			if (entry._1 != null)
+			final K key = entry.getKey();
+			if (key != null)
 			{
-				return entry._1.getDeclaringClass();
+				return key.getDeclaringClass();
 			}
 		}
 		
@@ -273,12 +276,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	@Override
 	public boolean containsKey(Object key)
 	{
-		if (!checkType(this.type, key))
-		{
-			return false;
-		}
-		
-		return this.values[index(key)] != null;
+		return checkType(this.type, key) && this.values[index(key)] != null;
 	}
 	
 	@Override
@@ -296,10 +294,9 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	@Override
 	public boolean containsValue(Object value)
 	{
-		int len = this.values.length;
-		for (int i = 0; i < len; i++)
+		for (Object thisValue : this.values)
 		{
-			if (Objects.equals(this.values[i], value))
+			if (Objects.equals(thisValue, value))
 			{
 				return true;
 			}
@@ -323,12 +320,48 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	{
 		if (!checkType(this.type, key))
 		{
-			return None.instance;
+			return (Option<V>) None.instance;
 		}
 		
-		return new Some(this.values[index(key)]);
+		return new Some<>((V) this.values[index(key)]);
 	}
-	
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return MutableMap.apply();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return MutableMap.withCapacity(capacity);
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.EnumMap<>(this);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.EnumMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return ImmutableMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return ImmutableMap.builder();
+	}
+
 	@Override
 	public java.util.Map<K, V> toJava()
 	{

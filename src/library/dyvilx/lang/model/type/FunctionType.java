@@ -1,39 +1,41 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
+@ClassParameters(names = { "returnType", "types" })
 public class FunctionType implements Type
 {
-	protected Type[] types;
-	protected Type   returnType;
-	protected Class  theClass;
+	protected final Type   returnType;
+	protected final Type[] types;
+	protected final Class  theClass;
 	
-	public static FunctionType apply(Type returnType, Type... types)
+	public static FunctionType apply(Type<?> returnType, Type<?>... inputTypes)
 	{
-		return new FunctionType(returnType, types);
+		return new FunctionType(returnType, inputTypes);
 	}
 	
-	public FunctionType(Type returnType, Type... types)
+	public FunctionType(Type<?> returnType, Type<?>... inputTypes)
 	{
 		this.returnType = returnType;
-		this.types = types;
+		this.types = inputTypes;
+
+		Class<?> theClass;
+		try
+		{
+			theClass = Class.forName(this.qualifiedName());
+		}
+		catch (ClassNotFoundException ex)
+		{
+			theClass = null;
+		}
+		this.theClass = theClass;
 	}
 	
 	@Override
-	public Class erasure()
+	public Class<?> erasure()
 	{
-		if (this.theClass == null)
-		{
-			try
-			{
-				return this.theClass = Class.forName(this.qualifiedName());
-			}
-			catch (ClassNotFoundException ex)
-			{
-				return null;
-			}
-		}
 		return this.theClass;
 	}
 	

@@ -22,6 +22,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 	{
 		return new HashMap<>();
 	}
+
+	static <K, V> MutableMap<K, V> withCapacity(int capacity)
+	{
+		return new HashMap<>(capacity);
+	}
 	
 	static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
 	{
@@ -135,7 +140,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	default Map<K, V> $minus$minus(Collection<?> keys)
+	default MutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
 		MutableMap<K, V> copy = this.copy();
 		copy.$minus$minus$eq(keys);
@@ -244,10 +249,10 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 	
 	@Override
-	boolean putIfAbsent(K key, V value);
+	V putIfAbsent(K key, V value);
 	
 	@Override
-	default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	default V putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		return this.putIfAbsent(entry.getKey(), entry.getValue());
 	}
@@ -376,11 +381,27 @@ public interface MutableMap<K, V> extends Map<K, V>
 		return this.copy();
 	}
 	
+	@Override
 	<NK, NV> MutableMap<NK, NV> emptyCopy();
-	
+
+	@Override
+	default <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return this.emptyCopy();
+	}
+
 	@Override
 	ImmutableMap<K, V> immutable();
-	
+
+	@Override
+	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder();
+
+	@Override
+	default <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return this.immutableBuilder();
+	}
+
 	@Override
 	default ImmutableMap<K, V> immutableCopy()
 	{

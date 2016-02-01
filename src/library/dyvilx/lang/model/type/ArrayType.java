@@ -1,16 +1,18 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.array.ObjectArray;
 import dyvil.lang.literal.TypeConvertible;
 
 @TypeConvertible
+@ClassParameters(names = { "componentType" })
 public class ArrayType<T> implements Type<T[]>
 {
 	protected final Type componentType;
 	
 	public static <T> ArrayType<T> apply(Type<T> type)
 	{
-		return new ArrayType(type);
+		return new ArrayType<>(type);
 	}
 	
 	public ArrayType(Type componentType)
@@ -19,9 +21,9 @@ public class ArrayType<T> implements Type<T[]>
 	}
 	
 	@Override
-	public Class erasure()
+	public Class<T[]> erasure()
 	{
-		return ObjectArray.getArrayType(this.componentType.erasure());
+		return (Class<T[]>) ObjectArray.getArrayType(this.componentType.erasure());
 	}
 	
 	@Override

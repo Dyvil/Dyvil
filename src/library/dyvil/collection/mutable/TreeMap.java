@@ -1,12 +1,12 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -21,17 +21,13 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	
 	public static <K, V> TreeMap<K, V> apply()
 	{
-		return new TreeMap();
+		return new TreeMap<>();
 	}
 	
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
 	{
-		TreeMap<K, V> map = new TreeMap();
-		for (Tuple2<K, V> entry : entries)
-		{
-			map.put(entry._1, entry._2);
-		}
-		return map;
+		return new TreeMap<>(entries);
 	}
 	
 	public TreeMap()
@@ -53,6 +49,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	{
 		super(m, comparator);
 	}
+
+	@SafeVarargs
+	public TreeMap(Entry<? extends K, ? extends V>... entries)
+	{
+		super(entries);
+	}
 	
 	@Override
 	public void clear()
@@ -68,15 +70,16 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
-		if (this.contains(key, value))
+		final TreeEntry<K, V> entry = this.getEntry(key);
+		if (entry != null)
 		{
-			return false;
+			return entry.value;
 		}
 		
 		this.putInternal(key, value);
-		return true;
+		return value;
 	}
 	
 	@Override
@@ -172,18 +175,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new TreeMap(this, this.comparator);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new TreeMap(this.comparator);
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.TreeMap(this, this.comparator);
+		return this.immutableCopy();
 	}
 }

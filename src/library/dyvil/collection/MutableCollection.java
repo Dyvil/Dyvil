@@ -85,19 +85,23 @@ public interface MutableCollection<E> extends Collection<E>
 	MutableCollection<E> copy();
 	
 	@Override
+	<R> MutableCollection<R> emptyCopy();
+
+	@Override
+	<RE> MutableCollection<RE> emptyCopy(int capacity);
+
+	@Override
 	default MutableCollection<E> mutable()
 	{
 		return this;
 	}
-	
+
 	@Override
 	default MutableCollection<E> mutableCopy()
 	{
 		return this.copy();
 	}
-	
-	<R> MutableCollection<R> emptyCopy();
-	
+
 	@Override
 	ImmutableCollection<E> immutable();
 	
@@ -106,7 +110,13 @@ public interface MutableCollection<E> extends Collection<E>
 	{
 		return this.immutable();
 	}
-	
+
+	@Override
+	<RE> ImmutableCollection.Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> ImmutableCollection.Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	ImmutableCollection<E> view();
 }

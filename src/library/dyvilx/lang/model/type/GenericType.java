@@ -1,44 +1,53 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.lang.literal.ClassConvertible;
 import dyvil.lang.literal.StringConvertible;
 
 @StringConvertible
 @ClassConvertible
+@ClassParameters(names = { "theClass", "generics" })
 public class GenericType<T> extends NamedType<T>
 {
 	protected final Type[] generics;
 	
+	@SuppressWarnings("MethodOverridesStaticMethodOfSuperclass")
 	public static <T> GenericType<T> apply(String className)
 	{
-		return new GenericType(className);
+		return new GenericType<>(className);
 	}
 	
-	public static <T> GenericType<T> apply(String className, Type... generics)
+	public static <T> GenericType<T> apply(String className, Type<?>... generics)
 	{
-		return new GenericType(className, generics);
+		return new GenericType<>(className, generics);
 	}
 	
+	@SuppressWarnings("MethodOverridesStaticMethodOfSuperclass")
 	public static <T> GenericType apply(Class<T> c)
 	{
-		return new GenericType(c);
+		return new GenericType<>(c);
 	}
 	
-	public static <T> GenericType<T> apply(Class<T> c, Type... generics)
+	public static <T> GenericType<T> apply(Class<T> c, Type<?>... generics)
 	{
-		return new GenericType(c, generics);
+		return new GenericType<>(c, generics);
 	}
 	
-	public GenericType(String className, Type... generics)
+	public GenericType(String className, Type<?>... generics)
 	{
 		super(className);
 		this.generics = generics;
 	}
 	
-	public GenericType(Class<T> theClass, Type... generics)
+	public GenericType(Class<T> theClass, Type<?>... generics)
 	{
 		super(theClass);
 		this.generics = generics;
+	}
+
+	public Type<?>[] generics()
+	{
+		return this.generics;
 	}
 	
 	@Override
@@ -75,9 +84,9 @@ public class GenericType<T> extends NamedType<T>
 		if (len > 0)
 		{
 			builder.append('<');
-			for (int i = 0; i < len; i++)
+			for (Type generic : this.generics)
 			{
-				this.generics[i].appendGenericSignature(builder);
+				generic.appendGenericSignature(builder);
 			}
 			builder.append('>');
 		}

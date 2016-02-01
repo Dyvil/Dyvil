@@ -1,7 +1,9 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.tuple.Tuple2;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -360,6 +362,42 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		{
 			store[index++] = this.entries[i]._2;
 		}
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.TupleMap<>();
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.TupleMap<>(capacity);
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.TupleMap<>(this);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.TupleMap<>(this);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.TupleMap.builder();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.TupleMap.builder(capacity);
 	}
 	
 	@Override

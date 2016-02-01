@@ -11,7 +11,7 @@ public interface Type<T>
 {
 	static <T> Type<T> apply()
 	{
-		return UnknownType.instance;
+		return (Type<T>) UnknownType.instance;
 	}
 	
 	static <T> Type<T> apply(String className)
@@ -19,7 +19,7 @@ public interface Type<T>
 		return new NamedType<>(className);
 	}
 	
-	static <T> Type<T> apply(String className, Type... generics)
+	static <T> Type<T> apply(String className, Type<?>... generics)
 	{
 		return new GenericType<>(className, generics);
 	}
@@ -28,12 +28,12 @@ public interface Type<T>
 	{
 		if (c.isPrimitive())
 		{
-			return new PrimitiveType(c);
+			return (Type<T>) PrimitiveType.apply(c);
 		}
-		return new NamedType(c);
+		return new NamedType<>(c);
 	}
 	
-	static <T> Type<T> apply(Class<T> c, Type... generics)
+	static <T> Type<T> apply(Class<T> c, Type<?>... generics)
 	{
 		return new GenericType<>(c, generics);
 	}

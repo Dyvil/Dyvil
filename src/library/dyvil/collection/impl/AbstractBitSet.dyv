@@ -208,6 +208,14 @@ public abstract class AbstractBitSet implements Set[int]
 		}
 	}
 
+	public override MutableSet[RE] emptyCopy[RE]() = MutableSet.[RE]()
+
+	public override MutableSet[RE] emptyCopy[RE](int capacity) = MutableSet.[RE]withCapacity(capacity)
+
+	public override ImmutableSet.Builder[RE] immutableBuilder[RE]() = ImmutableSet.[RE]builder
+
+	public override ImmutableSet.Builder[RE] immutableBuilder[RE](int capacity) = ImmutableSet.[RE]builder(capacity)
+
 	public override java.util.Set[int] toJava()
 	{
 		final java.util.Set[int] hashSet = new java.util.HashSet[int]

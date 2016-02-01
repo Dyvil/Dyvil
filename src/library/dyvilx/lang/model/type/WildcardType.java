@@ -7,12 +7,12 @@ public class WildcardType<T> implements Type<T>
 	protected final Variance variance;
 	protected final Type     bound;
 	
-	public static <T> WildcardType<T> apply(Variance variance, Type upperBounds)
+	public static <T> WildcardType<T> apply(Variance variance, Type<? extends T> bound)
 	{
-		return new WildcardType(variance, upperBounds);
+		return new WildcardType<>(variance, bound);
 	}
 	
-	public WildcardType(Variance variance, Type bound)
+	public WildcardType(Variance variance, Type<? extends T> bound)
 	{
 		this.variance = variance;
 		this.bound = bound;

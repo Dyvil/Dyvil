@@ -1,12 +1,12 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -23,12 +23,13 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	
 	public static <K, V> HashMap<K, V> apply()
 	{
-		return new HashMap();
+		return new HashMap<>();
 	}
 	
-	public static <K, V> HashMap<K, V> apply(Tuple2<K, V>... tuples)
+	@SafeVarargs
+	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)
 	{
-		return new HashMap(tuples);
+		return new HashMap<>(entries);
 	}
 	
 	public HashMap()
@@ -70,9 +71,10 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 		super(map);
 	}
 	
-	public HashMap(Tuple2<K, V>... tuples)
+	@SafeVarargs
+	public HashMap(Entry<K, V>... entries)
 	{
-		super(tuples);
+		super(entries);
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		this.threshold = (int) (this.entries.length * DEFAULT_LOAD_FACTOR);
 	}
@@ -123,7 +125,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	@Override
 	protected void addEntry(int hash, K key, V value, int index)
 	{
-		HashEntry[] tab = this.entries;
+		HashEntry<K, V>[] tab = this.entries;
 		if (this.size >= this.threshold)
 		{
 			// Rehash / flatten the table if the threshold is exceeded
@@ -134,7 +136,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 			index = index(hash, tab.length);
 		}
 		
-		tab[index] = new HashEntry(key, value, hash, tab[index]);
+		tab[index] = new HashEntry<>(key, value, hash, tab[index]);
 		this.size++;
 	}
 	
@@ -145,7 +147,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
 		int hash = hash(key);
 		int i = index(hash, this.entries.length);
@@ -154,12 +156,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 			Object k;
 			if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
 			{
-				return false;
+				return e.value;
 			}
 		}
 		
 		this.addEntry(hash, key, value, i);
-		return true;
+		return value;
 	}
 	
 	@Override
@@ -351,20 +353,14 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	}
 	
 	@Override
-	public HashMap<K, V> copy()
+	public MutableMap<K, V> copy()
 	{
-		return new HashMap<K, V>(this);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new HashMap(this.size, this.loadFactor);
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.HashMap(this);
+		return this.immutableCopy();
 	}
 }

@@ -572,8 +572,9 @@ public class Property extends Member implements IProperty
 
 		if (setterParameterName != this.name)
 		{
-			// TODO Formatting
-			buffer.append('(').append(setterParameterName).append(')');
+			Formatting.appendSeparator(buffer, "property.setter.parameter.open_paren", '(');
+			buffer.append(setterParameterName);
+			Formatting.appendSeparator(buffer, "property.setter.parameter.close_paren", ')');
 		}
 
 		if (setterValue != null)

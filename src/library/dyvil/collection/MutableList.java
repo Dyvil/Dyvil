@@ -18,6 +18,10 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	{
 		return new ArrayList<>();
 	}
+
+	static <RE> MutableList<RE> withCapacity(int capacity) {
+		return new ArrayList<>(capacity);
+	}
 	
 	static <E> MutableList<E> apply(E element)
 	{
@@ -62,11 +66,14 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	// Non-mutating Operations
 	
 	@Override
-	MutableList<E> subList(int startIndex, int length);
-	
-	default MutableList<E> withCapacity(int newCapacity)
+	default MutableList<E> subList(int startIndex, int length)
 	{
-		return this.copy();
+		MutableList<E> result = this.emptyCopy(length);
+		for (int i = 0; i < length; i++)
+		{
+			result.add(this.get(startIndex + i));
+		}
+		return result;
 	}
 	
 	@Override
@@ -121,7 +128,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	@Override
 	default MutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		MutableList<E> copy = this.withCapacity(this.size() + collection.size());
+		MutableList<E> copy = this.copy(this.size() + collection.size());
 		copy.$plus$plus$eq(collection);
 		return copy;
 	}
@@ -139,8 +146,9 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		}
 		return copy;
 	}
-	
+
 	@Override
+	@SuppressWarnings("unchecked")
 	default <R> MutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
 		MutableList<R> copy = (MutableList<R>) this.copy();
@@ -175,13 +183,18 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		}
 		return copy;
 	}
-	
-	/*
-	 * Copying + in-place reversing the list is generally really slow, so force
-	 * implementors to implement this method.
-	 */
+
 	@Override
-	List<E> reversed();
+	default List<E> reversed()
+	{
+		MutableList<E> result = this.emptyCopy(this.size());
+		for (Iterator<E> iterator = this.reverseIterator(); iterator.hasNext(); )
+		{
+			E element = iterator.next();
+			result.add(element);
+		}
+		return result;
+	}
 	
 	@Override
 	default MutableList<E> sorted()
@@ -279,6 +292,11 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	
 	@Override
 	MutableList<E> copy();
+
+	default MutableList<E> copy(int capacity)
+	{
+		return this.copy();
+	}
 	
 	@Override
 	default MutableList<E> mutable()
@@ -295,6 +313,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	@Override
 	<R> MutableList<R> emptyCopy();
 	
+	@Override
 	default <R> MutableList<R> emptyCopy(int newCapacity)
 	{
 		return this.emptyCopy();
@@ -308,7 +327,13 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	{
 		return this.immutable();
 	}
-	
+
+	@Override
+	<RE> ImmutableList.Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> ImmutableList.Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	default ImmutableList<E> view()
 	{

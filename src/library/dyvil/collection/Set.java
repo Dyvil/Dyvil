@@ -13,9 +13,6 @@ import java.util.function.Predicate;
 @ArrayConvertible
 public interface Set<E> extends Collection<E>
 {
-	@DyvilModifiers(Modifiers.INTERNAL)
-	Object VALUE = new Object();
-	
 	static <E> ImmutableSet<E> empty()
 	{
 		return ImmutableSet.apply();
@@ -201,7 +198,13 @@ public interface Set<E> extends Collection<E>
 	
 	@Override
 	Set<E> copy();
-	
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy();
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy(int capacity);
+
 	@Override
 	MutableSet<E> mutable();
 	
@@ -213,7 +216,13 @@ public interface Set<E> extends Collection<E>
 	
 	@Override
 	ImmutableSet<E> immutableCopy();
-	
+
+	@Override
+	<RE> ImmutableSet.Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	ImmutableSet<E> view();
 	
@@ -229,7 +238,7 @@ public interface Set<E> extends Collection<E>
 	
 	static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
-		return Collection.unorderedEquals(c1, c2);
+		return c1.size() == c2.size() && Collection.unorderedEquals(c1, c2);
 	}
 	
 	static <E> int setHashCode(Set<E> set)

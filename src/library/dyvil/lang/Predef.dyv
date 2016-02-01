@@ -68,10 +68,7 @@ public final class Predef
 	public static java.util.concurrent.Callable[T] callable[T](=> T f) = => f()
 
 	public static java.lang.Thread thread(=> void f) = new java.lang.Thread() {
-		public override void run()
-		{
-			f()
-		}
+		public override void run() = f()
 	}
 	
 	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ],
@@ -142,7 +139,7 @@ public final class Predef
 
 	public static void assert(boolean condition) = if (!condition) throw new AssertionError()
 
-	public static void assert(boolean condition, => any message) = if (!condition) throw new AssertionError(message)
+	public static void assert(boolean condition, => any message) = if (!condition) throw new AssertionError(message())
 	
 	// Print
 	
@@ -171,24 +168,24 @@ public final class Predef
 	public static void println(String s) = System.out.println(s)
 	
 	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
-	
-	public static void println(boolean... v) = System.out.println(v.toString);
-	
-	public static void println(byte... v) = System.out.println(v.toString);
-	
-	public static void println(short... v) = System.out.println(v.toString);
-	
-	public static void println(char... v) = System.out.println(v.toString);
-	
-	public static void println(int... v) = System.out.println(v.toString);
-	
-	public static void println(long... v) = System.out.println(v.toString);
-	
-	public static void println(float... v) = System.out.println(v.toString);
-	
-	public static void println(double... v) = System.out.println(v.toString);
-	
-	public static void println(Object... v) = System.out.println(v.toString);
+
+	public static void println(boolean... v) = System.out.println(v.toString)
+
+	public static void println(byte... v) = System.out.println(v.toString)
+
+	public static void println(short... v) = System.out.println(v.toString)
+
+	public static void println(char... v) = System.out.println(v.toString)
+
+	public static void println(int... v) = System.out.println(v.toString)
+
+	public static void println(long... v) = System.out.println(v.toString)
+
+	public static void println(float... v) = System.out.println(v.toString)
+
+	public static void println(double... v) = System.out.println(v.toString)
+
+	public static void println(Object... v) = System.out.println(v.toString)
 	
 	// Tuples
 	

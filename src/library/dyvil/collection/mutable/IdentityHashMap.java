@@ -24,12 +24,13 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
-		return new IdentityHashMap();
+		return new IdentityHashMap<>();
 	}
 	
+	@SafeVarargs
 	public static <K, V> IdentityHashMap<K, V> apply(Tuple2<K, V>... entries)
 	{
-		return new IdentityHashMap(entries);
+		return new IdentityHashMap<>(entries);
 	}
 	
 	public IdentityHashMap()
@@ -73,6 +74,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.updateThreshold(this.table.length >> 1);
 	}
 	
+	@SafeVarargs
 	public IdentityHashMap(Tuple2<K, V>... entries)
 	{
 		super(entries);
@@ -112,25 +114,25 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
-		Object k = maskNull(key);
-		Object[] tab = this.table;
-		int len = tab.length;
-		int i = index(k, len);
+		final Object maskedKey = maskNull(key);
+		final Object[] table = this.table;
+		final int len = table.length;
+		int i = index(maskedKey, len);
 		
 		Object item;
-		while ((item = tab[i]) != null)
+		while ((item = table[i]) != null)
 		{
-			if (item == k)
+			if (item == maskedKey)
 			{
-				return false;
+				return (V) table[i + 1];
 			}
 			i = nextKeyIndex(i, len);
 		}
 		
-		this.addEntry(i, k, value);
-		return true;
+		this.addEntry(i, maskedKey, value);
+		return value;
 	}
 	
 	@Override
@@ -314,18 +316,12 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new IdentityHashMap(this);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new IdentityHashMap(this.size);
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.IdentityHashMap<K, V>(this);
+		return this.immutableCopy();
 	}
 }

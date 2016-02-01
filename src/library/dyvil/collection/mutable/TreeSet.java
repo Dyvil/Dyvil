@@ -1,6 +1,5 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Set;
 import dyvil.lang.literal.ArrayConvertible;
 
 import java.util.Comparator;
@@ -15,6 +14,7 @@ public class TreeSet<E> extends MapBasedSet<E>
 		return new TreeSet<E>();
 	}
 	
+	@SafeVarargs
 	public static <E> TreeSet<E> apply(E... elements)
 	{
 		return new TreeSet<E>(elements);
@@ -22,21 +22,22 @@ public class TreeSet<E> extends MapBasedSet<E>
 	
 	public TreeSet()
 	{
-		super(new TreeMap<E, Object>());
+		super(new TreeMap<>());
 	}
 	
 	public TreeSet(Comparator<? super E> comparator)
 	{
-		super(new TreeMap<E, Object>(comparator));
+		super(new TreeMap<>(comparator));
 	}
 	
+	@SafeVarargs
 	public TreeSet(E... elements)
 	{
 		this();
 		
 		for (E element : elements)
 		{
-			this.map.put(element, Set.VALUE);
+			this.map.put(element, true);
 		}
 	}
 }

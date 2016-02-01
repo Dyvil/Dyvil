@@ -27,7 +27,7 @@ public class PrependList<E> implements ImmutableList<E>
 	public PrependList(E element)
 	{
 		this.head = element;
-		this.tail = EmptyList.instance;
+		this.tail = (ImmutableList<E>) EmptyList.instance;
 		this.size = 1;
 	}
 	
@@ -53,13 +53,13 @@ public class PrependList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new PrependIterator<E>(this.head, this.tail.iterator());
+		return new PrependIterator<>(this.head, this.tail.iterator());
 	}
 	
 	@Override
 	public Iterator<E> reverseIterator()
 	{
-		return new AppendIterator<E>(this.tail.reverseIterator(), this.head);
+		return new AppendIterator<>(this.tail.reverseIterator(), this.head);
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public class PrependList<E> implements ImmutableList<E>
 	{
 		if (startIndex == 0)
 		{
-			return new PrependList<E>(this.head, this.tail.subList(startIndex - 1, length - 1));
+			return new PrependList<>(this.head, this.tail.subList(startIndex - 1, length - 1));
 		}
 		return this.tail.subList(startIndex - 1, length - 1);
 	}
@@ -95,13 +95,13 @@ public class PrependList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> $plus(E element)
 	{
-		return new PrependList<E>(this.head, this.tail.$plus(element));
+		return new PrependList<>(this.head, this.tail.$plus(element));
 	}
 	
 	@Override
 	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return new PrependList<E>(this.head, (ImmutableList<E>) this.tail.$plus$plus(collection));
+		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.$plus$plus(collection));
 	}
 	
 	@Override
@@ -111,7 +111,7 @@ public class PrependList<E> implements ImmutableList<E>
 		{
 			return this.tail.$minus(element);
 		}
-		return new PrependList<E>(this.head, this.tail.$minus(element));
+		return new PrependList<>(this.head, this.tail.$minus(element));
 	}
 	
 	@Override
@@ -121,7 +121,7 @@ public class PrependList<E> implements ImmutableList<E>
 		{
 			return this.tail.$minus$minus(collection);
 		}
-		return new PrependList<E>(this.head, (ImmutableList<E>) this.tail.$minus$minus(collection));
+		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.$minus$minus(collection));
 	}
 	
 	@Override
@@ -131,28 +131,28 @@ public class PrependList<E> implements ImmutableList<E>
 		{
 			return this.tail.$amp(collection);
 		}
-		return new PrependList<E>(this.head, (ImmutableList<E>) this.tail.$amp(collection));
+		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.$amp(collection));
 	}
 	
 	@Override
 	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return new PrependList<R>(mapper.apply(this.head), this.tail.mapped(mapper));
+		return new PrependList<>(mapper.apply(this.head), this.tail.mapped(mapper));
 	}
 	
 	@Override
 	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		ImmutableList<R> head = EmptyList.instance;
+		ImmutableList<R> head = (ImmutableList<R>) EmptyList.instance;
 		for (R element : mapper.apply(this.head))
 		{
-			head = new AppendList<R>(head, element);
+			head = new AppendList<>(head, element);
 		}
 		for (E element : this.tail)
 		{
 			for (R result : mapper.apply(element))
 			{
-				head = new AppendList<R>(head, result);
+				head = new AppendList<>(head, result);
 			}
 		}
 		return head;
@@ -165,21 +165,21 @@ public class PrependList<E> implements ImmutableList<E>
 		{
 			return this.tail.filtered(condition);
 		}
-		return new PrependList<E>(this.head, this.tail.filtered(condition));
+		return new PrependList<>(this.head, this.tail.filtered(condition));
 	}
 	
 	@Override
 	public ImmutableList<E> reversed()
 	{
-		return new AppendList(this.tail.reversed(), this.head);
+		return new AppendList<>(this.tail.reversed(), this.head);
 	}
 	
 	private static <E> ImmutableList<E> fromArray(Object[] array, int length)
 	{
-		ImmutableList<E> list = EmptyList.instance;
+		ImmutableList<E> list = (ImmutableList<E>) EmptyList.instance;
 		for (int i = length - 1; i >= 0; i--)
 		{
-			list = new PrependList<E>((E) array[i], list);
+			list = new PrependList<>((E) array[i], list);
 		}
 		return list;
 	}
@@ -248,16 +248,40 @@ public class PrependList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return new PrependList<E>(this.head, this.tail.copy());
+		return new PrependList<>(this.head, this.tail.copy());
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy()
+	{
+		return MutableList.apply();
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy(int capacity)
+	{
+		return MutableList.withCapacity(capacity);
 	}
 	
 	@Override
 	public MutableList<E> mutable()
 	{
-		LinkedList<E> list = new LinkedList<E>();
+		LinkedList<E> list = new LinkedList<>();
 		list.addFirst(this.head);
 		list.addAll(this.tail);
 		return list;
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return ImmutableList.builder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return ImmutableList.builder(capacity);
 	}
 	
 	@Override

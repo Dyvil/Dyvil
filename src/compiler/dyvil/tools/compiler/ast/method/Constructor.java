@@ -340,7 +340,10 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value.checkTypes(markers, this);
 		}
-		// TODO Abstract Constructor Error
+		else
+		{
+			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
+		}
 	}
 	
 	@Override

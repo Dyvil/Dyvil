@@ -106,21 +106,22 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
 		if (!checkType(this.type, key))
 		{
-			return false;
+			return null;
 		}
 		
-		int index = index(key);
-		if (this.values[index] == null)
+		final int index = index(key);
+		final V thisValue = (V) this.values[index];
+		if (thisValue == null)
 		{
 			this.values[index] = value;
 			this.size++;
-			return true;
+			return value;
 		}
-		return false;
+		return thisValue;
 	}
 	
 	@Override
@@ -268,7 +269,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public <U, R> MutableMap<U, R> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
 	{
-		MutableMap<U, R> map = new ArrayMap(this.size);
+		MutableMap<U, R> map = MutableMap.withCapacity(this.size << 2);
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
 		{
@@ -287,18 +288,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new EnumMap<>(this);
+		return this.mutableCopy();
 	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new EnumMap(this.type);
-	}
-	
+
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.EnumMap<>(this);
+		return this.immutableCopy();
 	}
 }

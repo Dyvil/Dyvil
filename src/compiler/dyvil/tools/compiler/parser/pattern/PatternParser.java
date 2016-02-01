@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.parser.pattern;
 
 import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.pattern.*;
 import dyvil.tools.compiler.ast.pattern.constant.*;
 import dyvil.tools.compiler.ast.pattern.operator.AndPattern;
 import dyvil.tools.compiler.ast.pattern.operator.OrPattern;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
@@ -17,16 +17,15 @@ import dyvil.tools.compiler.util.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-public class PatternParser extends Parser
+public class PatternParser extends Parser implements ITypeConsumer
 {
-	private static final int END             = -1;
 	private static final int PATTERN         = 0;
 	private static final int NEGATIVE_NUMBER = 1;
-	private static final int TUPLE_END       = 2;
-	private static final int CASE_CLASS_END  = 4;
+	private static final int TYPE_END        = 2;
+	private static final int TUPLE_END       = 4;
+	private static final int CASE_CLASS_END  = 8;
 
 	private static final int OPERATOR_OR  = 1;
 	private static final int OPERATOR_AND = 2;
@@ -35,7 +34,8 @@ public class PatternParser extends Parser
 	
 	private IPattern pattern;
 
-	private int operator;
+	private int   operator;
+	private IType type;
 	
 	public PatternParser(IPatternConsumer consumer)
 	{
@@ -108,31 +108,8 @@ public class PatternParser extends Parser
 					return;
 				}
 
-				final IToken nextToken = token.next();
-				final int nextType = nextToken.type();
-				final ICodePosition position = token.raw();
-				final IType namedType = new NamedType(position, token.nameValue());
-
-				if (nextType == BaseSymbols.OPEN_PARENTHESIS)
-				{
-					final CaseClassPattern ccp = new CaseClassPattern(position, namedType);
-					pm.pushParser(new PatternListParser(ccp));
-					pm.skip();
-					this.pattern = ccp;
-					this.mode = CASE_CLASS_END;
-					return;
-				}
-				if (ParserUtil.isIdentifier(nextType))
-				{
-					this.pattern = new BindingPattern(nextToken.raw(), namedType, nextToken.nameValue());
-					pm.skip();
-					this.mode = END;
-					return;
-				}
-
-				this.pattern = new ObjectPattern(token.raw(), namedType);
-				this.mode = END;
-
+				this.mode = TYPE_END;
+				pm.pushParser(pm.newTypeParser(this), true);
 				return;
 			}
 			if (type == DyvilKeywords.VAR)
@@ -191,8 +168,31 @@ public class PatternParser extends Parser
 				pm.reparse();
 				return;
 			}
+		case TYPE_END:
+		{
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				final CaseClassPattern ccp = new CaseClassPattern(token, this.type);
+				pm.pushParser(new PatternListParser(ccp));
+				this.pattern = ccp;
+				this.mode = CASE_CLASS_END;
+				return;
+			}
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.pattern = new BindingPattern(token.raw(), this.type, token.nameValue());
+				this.mode = END;
+				return;
+			}
+
+			this.pattern = new ObjectPattern(this.type.getPosition(), this.type);
+			this.mode = END;
+			pm.reparse();
+			return;
+		}
 		case TUPLE_END:
 			this.mode = END;
+			this.pattern.expandPosition(token);
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "pattern.tuple.close_paren");
@@ -200,6 +200,7 @@ public class PatternParser extends Parser
 			return;
 		case CASE_CLASS_END:
 			this.mode = END;
+			this.pattern.expandPosition(token);
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "pattern.case_class.close_paren");
@@ -248,5 +249,11 @@ public class PatternParser extends Parser
 			return new DoublePattern(token.raw(), token.doubleValue());
 		}
 		return null;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 }

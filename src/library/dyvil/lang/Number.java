@@ -11,26 +11,6 @@ import dyvil.lang.literal.LongConvertible;
 @DoubleConvertible
 public interface Number extends Rangeable<Number>
 {
-	static Int apply(int v)
-	{
-		return Int.apply(v);
-	}
-	
-	static Long apply(long v)
-	{
-		return Long.apply(v);
-	}
-	
-	static Float apply(float v)
-	{
-		return Float.apply(v);
-	}
-	
-	static Double apply(double v)
-	{
-		return Double.apply(v);
-	}
-	
 	// Primitive value getters
 	
 	byte byteValue();
