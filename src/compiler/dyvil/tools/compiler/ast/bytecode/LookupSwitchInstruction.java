@@ -1,10 +1,9 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class LookupSwitchInstruction implements IInstruction
 {
@@ -20,20 +19,9 @@ public class LookupSwitchInstruction implements IInstruction
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, Bytecode bytecode)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		int len = this.handlers.length;
-		dyvil.tools.asm.Label[] labels = new dyvil.tools.asm.Label[len];
-		for (int i = 0; i < len; i++)
-		{
-			labels[i] = this.handlers[i].target;
-		}
-		writer.writeLookupSwitch(this.defaultHandler.target, this.keys, labels);
+		writer.visitLookupSwitchInsn(this.defaultHandler, this.keys, this.handlers);
 	}
 	
 	@Override

@@ -130,6 +130,21 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		/*
+			synchonized (obj) {
+				statements...
+			}
+			->
+			Object lock = obj
+			_monitorEnter(lock)
+			try {
+				statements...
+			}
+			finally {
+				_monitorExit(lock)
+			}
+		 */
+
 		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label handlerStart = new dyvil.tools.asm.Label();

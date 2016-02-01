@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
-import dyvil.tools.compiler.ast.bytecode.Bytecode;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constant.*;
@@ -30,7 +29,6 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.bytecode.BytecodeParser;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
@@ -198,15 +196,6 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new StatementListParser(this), true);
 				return;
 			case DyvilSymbols.AT:
-				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET)
-				{
-					Bytecode bc = new Bytecode(token);
-					pm.skip();
-					pm.pushParser(new BytecodeParser(bc));
-					this.mode = BYTECODE_END;
-					this.value = bc;
-					return;
-				}
 				Annotation a = new Annotation();
 				pm.pushParser(new AnnotationParser(a));
 				this.value = new AnnotationValue(a);

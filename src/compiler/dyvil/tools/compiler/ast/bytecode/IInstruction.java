@@ -1,27 +1,11 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IInstruction extends IASTNode
+public interface IInstruction
 {
-	@Override
-	default ICodePosition getPosition()
-	{
-		return null;
-	}
-	
-	@Override
-	default void setPosition(ICodePosition position)
-	{
-	}
-	
-	void resolve(MarkerList markers, Bytecode bytecode);
-	
-	// Compilation
-	
-	void write(MethodWriter writer) throws BytecodeException;
+	void write(MethodVisitor visitor) throws BytecodeException;
+
+	void toString(String prefix, StringBuilder buffer);
 }

@@ -7,7 +7,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 {
-	ClassWriter getClassWriter();
 	
 	Frame getFrame();
 	
