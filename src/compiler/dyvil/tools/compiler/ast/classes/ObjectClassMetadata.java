@@ -36,9 +36,9 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		super.resolveTypes(markers, context);
+		super.resolveTypesHeader(markers, context);
 		
 		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
 		{
@@ -53,7 +53,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		
 		this.checkMethods();
 		
-		IClassBody body = this.theClass.getBody();
+		final IClassBody body = this.theClass.getBody();
 		if (body != null)
 		{
 			if (markers != null && body.constructorCount() > 0)
@@ -62,21 +62,27 @@ public final class ObjectClassMetadata extends ClassMetadata
 				                             this.theClass.getName().qualified));
 			}
 			
-			IField f = body.getField(Names.instance);
-			if (f != null)
+			final IField field = body.getField(Names.instance);
+			if (field != null)
 			{
-				this.instanceField = f;
-				return;
+				this.members |= INSTANCE_FIELD;
+				this.instanceField = field;
 			}
 		}
-		
-		Field f = new Field(this.theClass, Names.instance, this.theClass.getType(),
-		                    new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
-		this.instanceField = f;
+	}
+
+	@Override
+	public void resolveTypesGenerate(MarkerList markers, IContext context)
+	{
+		super.resolveTypesGenerate(markers, context);
+
+		final Field field = new Field(this.theClass, Names.instance, this.theClass.getType(),
+	                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
+		this.instanceField = field;
 		
 		this.constructor.setModifiers(new FlagModifierSet(Modifiers.PRIVATE));
 		ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
-		f.setValue(call);
+		field.setValue(call);
 	}
 	
 	@Override
@@ -109,7 +115,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		super.write(writer);
 		
 		String internalName = this.theClass.getInternalName();
-		if ((this.methods & TOSTRING) == 0)
+		if ((this.members & TOSTRING) == 0)
 		{
 			// Generate a toString() method that simply returns the name of this
 			// object type.
@@ -122,7 +128,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			mw.end(Types.STRING);
 		}
 		
-		if ((this.methods & EQUALS) == 0)
+		if ((this.members & EQUALS) == 0)
 		{
 			// Generate an equals(Object) method that compares the objects for
 			// identity
@@ -143,7 +149,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			mw.end();
 		}
 		
-		if ((this.methods & HASHCODE) == 0)
+		if ((this.members & HASHCODE) == 0)
 		{
 			MethodWriterImpl mw = new MethodWriterImpl(writer,
 			                                           writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I", null,
@@ -155,7 +161,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			mw.end();
 		}
 		
-		if ((this.methods & READ_RESOLVE) == 0)
+		if ((this.members & READ_RESOLVE) == 0)
 		{
 			MethodWriterImpl mw = new MethodWriterImpl(writer,
 			                                           writer.visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC,
@@ -164,7 +170,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			writeResolveMethod(mw, internalName);
 		}
 		
-		if ((this.methods & WRITE_REPLACE) == 0)
+		if ((this.members & WRITE_REPLACE) == 0)
 		{
 			MethodWriterImpl mw = new MethodWriterImpl(writer,
 			                                           writer.visitMethod(Modifiers.PRIVATE | Modifiers.SYNTHETIC,

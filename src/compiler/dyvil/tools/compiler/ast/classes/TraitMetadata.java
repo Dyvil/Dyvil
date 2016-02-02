@@ -21,7 +21,7 @@ public class TraitMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 		if (this.theClass instanceof ExternalClass)
 		{

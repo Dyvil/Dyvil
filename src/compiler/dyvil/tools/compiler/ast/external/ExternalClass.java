@@ -82,7 +82,8 @@ public final class ExternalClass extends AbstractClass
 	private void resolveMetadata()
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
-		this.metadata.resolveTypes(null, this);
+		this.metadata.resolveTypesHeader(null, this);
+		this.metadata.resolveTypesBody(null, this);
 	}
 	
 	private void resolveGenerics()

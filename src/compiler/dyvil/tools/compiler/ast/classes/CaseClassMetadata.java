@@ -30,9 +30,9 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		super.resolveTypes(markers, context);
+		super.resolveTypesHeader(markers, context);
 		
 		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
 		{
@@ -46,25 +46,35 @@ public final class CaseClassMetadata extends ClassMetadata
 		super.resolveTypesBody(markers, context);
 		
 		this.checkMethods();
-		
-		if ((this.methods & APPLY) == 0)
+	}
+
+	@Override
+	public void resolveTypesGenerate(MarkerList markers, IContext context)
+	{
+		super.resolveTypesGenerate(markers, context);
+
+		if ((this.members & APPLY) != 0)
 		{
-			CodeMethod m = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
-			                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
-			IParameter[] parameters = this.theClass.getParameters();
-			int parameterCount = this.theClass.parameterCount();
-			
-			m.setParameters(parameters, parameterCount);
-			m.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
-			
-			if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
-			{
-				m.setVarargs();
-			}
-			
-			m.resolveTypes(markers, context);
-			this.applyMethod = m;
+			return;
 		}
+
+		// Generate the apply method signature
+
+		CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
+		                                        new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		IParameter[] parameters = this.theClass.getParameters();
+		int parameterCount = this.theClass.parameterCount();
+
+		applyMethod.setParameters(parameters, parameterCount);
+		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
+
+		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
+		{
+			applyMethod.setVarargs();
+		}
+
+		applyMethod.resolveTypes(markers, context);
+		this.applyMethod = applyMethod;
 	}
 	
 	@Override
@@ -86,7 +96,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		super.write(writer);
 		MethodWriter mw;
 		
-		if ((this.methods & APPLY) == 0)
+		if ((this.members & APPLY) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers().toFlags(), "apply",
 			                                                     this.applyMethod.getDescriptor(),
@@ -107,7 +117,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		}
 		
 		String internal = this.theClass.getInternalName();
-		if ((this.methods & EQUALS) == 0)
+		if ((this.members & EQUALS) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals",
 			                                                     "(Ljava/lang/Object;)Z", null, null));
@@ -118,7 +128,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw.end();
 		}
 		
-		if ((this.methods & HASHCODE) == 0)
+		if ((this.members & HASHCODE) == 0)
 		{
 			mw = new MethodWriterImpl(writer,
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I",
@@ -129,7 +139,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw.end();
 		}
 		
-		if ((this.methods & TOSTRING) == 0)
+		if ((this.members & TOSTRING) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString",
 			                                                     "()Ljava/lang/String;", null, null));

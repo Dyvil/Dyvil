@@ -21,9 +21,6 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassAccess implements IValue
 {
-	private static final byte OBJECT_ACCESS = 1;
-	private static final byte APPLY_CALL    = 2;
-	
 	protected ICodePosition position;
 	protected IType         type;
 	
@@ -105,32 +102,33 @@ public final class ClassAccess implements IValue
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		Name name = this.type.getName();
-		IDataMember f = context.resolveField(name);
-		if (f != null)
+		this.type.resolve(markers, context);
+
+		final Name name = this.type.getName();
+		final IDataMember field = context.resolveField(name);
+		if (field != null)
 		{
-			FieldAccess access = new FieldAccess(this.position);
-			access.name = name;
-			access.field = f;
-			return access;
+			final FieldAccess fieldAccess = new FieldAccess(this.position);
+			fieldAccess.name = name;
+			fieldAccess.field = field;
+			return fieldAccess;
 		}
 		
-		IMethod m = IContext.resolveMethod(context, null, name, EmptyArguments.INSTANCE);
-		if (m != null)
+		final IMethod method = IContext.resolveMethod(context, null, name, EmptyArguments.INSTANCE);
+		if (method != null)
 		{
-			MethodCall call = new MethodCall(this.position);
-			call.name = name;
-			call.method = m;
-			call.dotless = true;
-			call.arguments = EmptyArguments.INSTANCE;
-			return call;
+			final MethodCall methodCall = new MethodCall(this.position);
+			methodCall.name = name;
+			methodCall.method = method;
+			methodCall.dotless = true;
+			methodCall.arguments = EmptyArguments.INSTANCE;
+			return methodCall;
 		}
 		
 		if (!this.type.isResolved())
 		{
-			markers.add(
-					Markers.semantic(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
-					                 this.type.toString()));
+			markers.add(Markers.semantic(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
+			                             this.type.toString()));
 		}
 		
 		return this;
@@ -145,6 +143,8 @@ public final class ClassAccess implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.type.check(markers, context);
+
 		IClass iclass = this.type.getTheClass();
 		if (iclass == null)
 		{
@@ -183,8 +183,11 @@ public final class ClassAccess implements IValue
 			if (field != null)
 			{
 				field.writeGet(writer, null, this.getLineNumber());
+				return;
 			}
 		}
+
+		throw new BytecodeException("Object access was not compiled correctly");
 	}
 
 	@Override
@@ -196,6 +199,6 @@ public final class ClassAccess implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.type.toString("", buffer);
+		this.type.toString(prefix, buffer);
 	}
 }
