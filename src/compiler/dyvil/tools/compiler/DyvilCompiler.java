@@ -1,6 +1,6 @@
 package dyvil.tools.compiler;
 
-import dyvil.io.AppendableOutputStream;
+import dyvil.io.AppendablePrintStream;
 import dyvil.io.FileUtils;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -260,7 +260,7 @@ public final class DyvilCompiler
 
 				if (thrown != null)
 				{
-					thrown.printStackTrace(new AppendableOutputStream(builder));
+					thrown.printStackTrace(new AppendablePrintStream(builder));
 				}
 				return builder.toString();
 			}
