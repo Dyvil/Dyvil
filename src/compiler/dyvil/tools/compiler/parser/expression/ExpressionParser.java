@@ -50,8 +50,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	
 	public static final int ACCESS     = 0x2;
 	public static final int DOT_ACCESS = 0x4;
-	
-	public static final int STATEMENT              = 0x8;
+
 	public static final int TYPE                   = 0x10;
 	public static final int CONSTRUCTOR            = 0x20;
 	public static final int CONSTRUCTOR_END        = 0x40;
@@ -231,7 +230,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(pm.newExpressionParser(((ICase) this.value)::setCondition));
 				return;
 			}
-			//$FALL-THROUGH$
+			// Fallthrough
 		case PATTERN_END:
 			if (type == DyvilSymbols.ARROW_OPERATOR || type == BaseSymbols.COLON)
 			{
@@ -356,7 +355,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			if (nextType == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.skip();
-				IArguments arguments = this.parseArguments(pm, next.next());
+				IArguments arguments = parseArguments(pm, next.next());
 				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), arguments);
 				amc.setGenericData(genericData);
 				
@@ -479,7 +478,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				// Parse an apply call
 				// e.g. 1("a"), this("stuff"), "myString"(2)
 				this.value = new ApplyMethodCall(this.value.getPosition(), this.value,
-				                                 this.parseArguments(pm, token.next()));
+				                                 parseArguments(pm, token.next()));
 				this.mode = PARAMETERS_END;
 				return;
 			}
@@ -551,20 +550,17 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	}
 	
 	/**
-	 * Parses an argument list and creates the appropriate AST representation.
-	 * The following instances can be created by this method:
+	 * Parses an argument list and creates the appropriate AST representation. The following instances can be created by
+	 * this method:
 	 * <p>
-	 * <ul> <li>{@link EmptyArguments} - For empty argument lists:<br> <code>
-	 * this.call() </code> <li>{@link ArgumentList} - For simple indexed
-	 * argument lists:<br> <code> this.call(1, "abc", null) </code> <li>{@link
-	 * ArgumentMap} - For named argument lists / maps:<br> <code>
-	 * this.call(index: 1, string: "abc") </code> </ul>
+	 * <ul> <li>{@link EmptyArguments} - For empty argument lists:<br> <code> this.call() </code> <li>{@link
+	 * ArgumentList} - For simple indexed argument lists:<br> <code> this.call(1, "abc", null) </code> <li>{@link
+	 * ArgumentMap} - For named argument lists / maps:<br> <code> this.call(index: 1, string: "abc") </code> </ul>
 	 *
 	 * @param pm
 	 * 		the current parsing context manager.
 	 * @param next
-	 * 		the next token. The current token is assumed to be the opening
-	 * 		parenthesis of the argument list.
+	 * 		the next token. The current token is assumed to be the opening parenthesis of the argument list.
 	 *
 	 * @return the appropriate AST representation for the type of argument list.
 	 */
@@ -660,7 +656,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				this.value = call;
 				this.mode = PARAMETERS_END;
 				pm.skip();
-				call.setArguments(this.parseArguments(pm, next.next()));
+				call.setArguments(parseArguments(pm, next.next()));
 				return;
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
 				SubscriptGetter getter = new SubscriptGetter(token, new FieldAccess(token.raw(), this.value, name));
@@ -743,14 +739,19 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				// Handle associativity
 				switch (operator.type)
 				{
-				case Operator.INFIX_LEFT:
-					this.valueConsumer.setValue(this.value);
-					pm.popParser(true);
-					return;
 				case Operator.INFIX_NONE:
-					pm.report(Markers.semanticError(token, "expression.operator.invalid", name.toString()));
+					pm.report(Markers.syntaxError(token, "expression.operator.invalid", name.toString()));
 					return;
+				case Operator.INFIX_LEFT:
+					if (this.operator.type != Operator.INFIX_RIGHT)
+					{
+						this.valueConsumer.setValue(this.value);
+						pm.popParser(true);
+						return;
+					}
+					break;
 				case Operator.INFIX_RIGHT:
+					break;
 				}
 			}
 		}
@@ -760,9 +761,8 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	}
 	
 	/**
-	 * Parses an APPLY call, without parenthesis. It might be possible that
-	 * {@code pm.reparse()} has to be called after this method, depending on the
-	 * token that is passed. E.g.:
+	 * Parses an APPLY call, without parenthesis. It might be possible that {@code pm.reparse()} has to be called after
+	 * this method, depending on the token that is passed. E.g.:
 	 * <p>
 	 * <p>
 	 * <pre>
@@ -774,8 +774,7 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 	 * @param pm
 	 * 		the current parsing context manager
 	 * @param token
-	 * 		the first token of the expression that is a parameter to the APPLY
-	 * 		method
+	 * 		the first token of the expression that is a parameter to the APPLY method
 	 * @param sa
 	 * 		the argument container
 	 * @param op

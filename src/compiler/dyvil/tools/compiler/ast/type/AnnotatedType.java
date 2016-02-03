@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -266,7 +267,16 @@ public class AnnotatedType implements IType, ITyped
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolveType(markers, context);
+		if (this.type == null)
+		{
+			markers.add(Markers.semanticError(this.annotation.getPosition(), "type.annotated.invalid"));
+			this.type = Types.UNKNOWN;
+		}
+		else
+		{
+			this.type = this.type.resolveType(markers, context);
+		}
+
 		this.annotation.resolveTypes(markers, context);
 		return this;
 	}
@@ -481,8 +491,11 @@ public class AnnotatedType implements IType, ITyped
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.annotation.toString(prefix, buffer);
-		buffer.append(' ');
-		this.type.toString(prefix, buffer);
+		if (this.type != null)
+		{
+			buffer.append(' ');
+			this.type.toString(prefix, buffer);
+		}
 	}
 	
 	@Override

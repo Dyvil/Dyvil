@@ -3,15 +3,12 @@ package dyvil.tools.compiler.parser.annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
-import dyvil.tools.compiler.ast.type.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
 import dyvil.tools.compiler.util.ParserUtil;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public class AnnotationParser extends Parser
@@ -40,19 +37,14 @@ public class AnnotationParser extends Parser
 		switch (this.mode)
 		{
 		case NAME:
-			if (ParserUtil.isIdentifier(type))
-			{
-				Name name = token.nameValue();
-				ICodePosition position = token.raw();
-				this.annotation.setPosition(position);
-				this.annotation.setType(new NamedType(position, name));
-				
-				this.mode = PARAMETERS_START;
-				return;
-			}
-			pm.report(token, "annotation.name");
+			this.annotation.setPosition(token.prev());
+
+			pm.pushParser(pm.newTypeParser(this.annotation), true);
+			this.mode = PARAMETERS_START;
 			return;
 		case PARAMETERS_START:
+			this.annotation.expandPosition(token.prev());
+
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				IToken next = token.next();
