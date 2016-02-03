@@ -1,154 +1,149 @@
-package dyvil.tools.compiler.backend;
+package dyvil.io;
 
 import java.io.*;
 
-public class ObjectWriter extends OutputStream implements DataOutput
+public class StringPoolWriter extends FilterOutputStream implements DataOutput
 {
-	protected static final int FILE_VERSION = 1;
-	
 	private int constantPoolSize;
 	private String[] constantPool = new String[16];
 	
-	private ByteArrayOutputStream bufferData;
-	private DataOutputStream      buffer;
+	private ByteArrayOutputStream dataBytes;
+	private DataOutputStream      dataOutputStream;
 	
-	public ObjectWriter()
+	public StringPoolWriter(OutputStream target)
 	{
-		this.buffer = new DataOutputStream(this.bufferData = new ByteArrayOutputStream());
+		super(target);
+		this.dataOutputStream = new DataOutputStream(this.dataBytes = new ByteArrayOutputStream());
 	}
 	
 	@Override
 	public void write(int b) throws IOException
 	{
-		this.buffer.write(b);
+		this.dataOutputStream.write(b);
 	}
 	
 	@Override
 	public void write(byte[] b) throws IOException
 	{
-		this.buffer.write(b);
+		this.dataOutputStream.write(b);
 	}
 	
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException
 	{
-		this.buffer.write(b, off, len);
+		this.dataOutputStream.write(b, off, len);
 	}
 	
 	@Override
 	public void writeBoolean(boolean v) throws IOException
 	{
-		this.buffer.writeBoolean(v);
+		this.dataOutputStream.writeBoolean(v);
 	}
 	
 	@Override
 	public void writeByte(int v) throws IOException
 	{
-		this.buffer.writeByte(v);
+		this.dataOutputStream.writeByte(v);
 	}
 	
 	@Override
 	public void writeShort(int v) throws IOException
 	{
-		this.buffer.writeShort(v);
+		this.dataOutputStream.writeShort(v);
 	}
 	
 	@Override
 	public void writeChar(int v) throws IOException
 	{
-		this.buffer.writeChar(v);
+		this.dataOutputStream.writeChar(v);
 	}
 	
 	@Override
 	public void writeInt(int v) throws IOException
 	{
-		this.buffer.writeInt(v);
+		this.dataOutputStream.writeInt(v);
 	}
 	
 	@Override
 	public void writeLong(long v) throws IOException
 	{
-		this.buffer.writeLong(v);
+		this.dataOutputStream.writeLong(v);
 	}
 	
 	@Override
 	public void writeFloat(float v) throws IOException
 	{
-		this.buffer.writeFloat(v);
+		this.dataOutputStream.writeFloat(v);
 	}
 	
 	@Override
 	public void writeDouble(double v) throws IOException
 	{
-		this.buffer.writeDouble(v);
+		this.dataOutputStream.writeDouble(v);
 	}
 	
 	@Override
 	public void writeBytes(String s) throws IOException
 	{
-		this.buffer.writeBytes(s);
+		this.dataOutputStream.writeBytes(s);
 	}
 	
 	@Override
 	public void writeChars(String s) throws IOException
 	{
-		this.buffer.writeChars(s);
+		this.dataOutputStream.writeChars(s);
 	}
-	
+
 	@Override
 	public void writeUTF(String s) throws IOException
+	{
+		final int index = this.poolIndex(s);
+		this.dataOutputStream.writeShort(index);
+	}
+
+	protected int poolIndex(String s)
 	{
 		int hash = s.hashCode();
 		for (int i = 0; i < this.constantPoolSize; i++)
 		{
-			String constPoolEntry = this.constantPool[i];
+			final String constPoolEntry = this.constantPool[i];
 			if (constPoolEntry.hashCode() == hash && s.equals(constPoolEntry))
 			{
 				// Found the string in the constant pool
-				this.buffer.writeShort(i);
-				return;
+				return i;
 			}
 		}
-		
-		int index = this.constantPoolSize++;
+
+		// Resize the constant pool
+
+		final int index = this.constantPoolSize++;
 		if (index >= this.constantPool.length)
 		{
 			String[] temp = new String[index << 1];
 			System.arraycopy(this.constantPool, 0, temp, 0, this.constantPool.length);
 			this.constantPool = temp;
 		}
-		
+
 		this.constantPool[index] = s;
-		this.buffer.writeShort(index);
+		return index;
 	}
-	
-	public void writeTo(OutputStream os) throws IOException
+
+	@Override
+	public void close() throws IOException
 	{
-		DataOutputStream dos = new DataOutputStream(os);
-		
-		// Write the .dyo File Version
-		dos.writeShort(FILE_VERSION);
-		
+		DataOutputStream constantPoolOutput = new DataOutputStream(this.out);
+
 		// Write the constant pool
-		dos.writeShort(this.constantPoolSize);
+		constantPoolOutput.writeShort(this.constantPoolSize);
 		for (int i = 0; i < this.constantPoolSize; i++)
 		{
-			dos.writeUTF(this.constantPool[i]);
+			constantPoolOutput.writeUTF(this.constantPool[i]);
 		}
-		
-		this.bufferData.writeTo(os);
-	}
-	
-	@Override
-	public void close()
-	{
-		try
-		{
-			this.buffer.close();
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
+
+		this.dataBytes.writeTo(this.out);
+
+		// No need to close dataOutputStream, dataBytes or constantPoolOutput
+
+		super.close();
 	}
 }
