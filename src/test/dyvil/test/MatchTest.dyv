@@ -9,7 +9,7 @@ public class MatchTest
 		lookup()
 		stringTable()
 		stringLookup()
-		// stringCollision()
+		stringCollision()
 		expression()
 		tuples()
 		orPatterns()
@@ -88,13 +88,17 @@ public class MatchTest
 	
 	private static void stringCollision()
 	{
-		/* "BBBB" match {
-			case "AaAa": println "1"
-			case "AaBB": println "2"
-			case "BBAa": println "3"
-			case "BBBB": println "4"
+		int value = _
+
+		"BBBB" match {
+			case "BBBB": value = 4
+			case "BBAa": value = 3
+			case "AaBB": value = 2
+			case "AaAa": value = 1
 			case _ :
-		}*/
+		}
+
+		Main.test("Match String -> Collision", 4, value)
 	}
 	
 	private static void expression()

@@ -95,7 +95,8 @@ public final class MatchExpr implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			if (!this.cases[i].action.isUsableAsStatement())
+			final IValue action = this.cases[i].action;
+			if (action != null && !action.isUsableAsStatement())
 			{
 				return false;
 			}
@@ -244,7 +245,11 @@ public final class MatchExpr implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].action.resolveStatement(context, markers);
+			final IValue action = this.cases[i].action;
+			if (action != null)
+			{
+				action.resolveStatement(context, markers);
+			}
 		}
 	}
 	
