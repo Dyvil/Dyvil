@@ -260,7 +260,7 @@ public final class DyvilREPL
 
 	private void printIndent(int indent)
 	{
-		this.output.print("  ");
+		this.output.print("| ");
 		for (int j = 0; j < indent; j++)
 		{
 			this.output.print("    ");
