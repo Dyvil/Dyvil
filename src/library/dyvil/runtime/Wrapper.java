@@ -48,9 +48,9 @@ public enum Wrapper
 			int k = hashPrimitive(localWrapper.primitiveClass);
 			int l = hashWrapper(localWrapper.wrapperClass);
 			int i1 = hashChar(localWrapper.basicTypeChar);
-			assert FROM_PRIMITIVE[k] == null;
-			assert FROM_WRAPPER[l] == null;
-			assert FROM_CHAR[i1] == null;
+			// assert FROM_PRIMITIVE[k] == null;
+			// assert FROM_WRAPPER[l] == null;
+			// assert FROM_CHAR[i1] == null;
 			FROM_PRIMITIVE[k] = localWrapper;
 			FROM_WRAPPER[l] = localWrapper;
 			FROM_CHAR[i1] = localWrapper;

@@ -21,11 +21,11 @@ public class MatchTest
 		String value = _
 
 		1 match {
-			case 0: value = "zero"
-			case 1: value = "one"
-			case 2: value = "two"
-			case _ : value = "something else"
-		};
+			case 0 => value = "zero"
+			case 1 => value = "one"
+			case 2 => value = "two"
+			case _ => value = "else"
+		}
 
 		Main.test("Match -> TableSwitch", "one", value)
 	}
@@ -35,12 +35,12 @@ public class MatchTest
 		String value = _
 
 		2 match {
-			case 0: value = "null"
-			case 1: value = "one"
-			case 2: value = "two"
-			case 5: value = "five"
-			case 6: value = "six"
-		};
+			case 0 => value = "null"
+			case 1 => value = "one"
+			case 2 => value = "two"
+			case 5 => value = "five"
+			case 6 => value = "six"
+		}
 
 		Main.test("Match -> TableSwitch (with holes)", "two", value)
 	}
@@ -50,11 +50,11 @@ public class MatchTest
 		String value = _
 
 		10 match {
-			case 1: value = "1"
-			case 10: value = "10"
-			case 100: value = "100"
-			case _ : value = "something else"
-		};
+			case 1   => value = "1"
+			case 10  => value = "10"
+			case 100 => value = "100"
+			case _   => value = "something else"
+		}
 
 		Main.test("Match -> LookupSwitch", "10", value)
 	}
@@ -64,11 +64,11 @@ public class MatchTest
 		String value = _
 
 		"a" match {
-			case "a" : value = "A"
-			case "b": value = "B"
-			case "c": value = "C"
-			case _ : value = "..."
-		};
+			case "a" => value = "A"
+			case "b" => value = "B"
+			case "c" => value = "C"
+			case _   => value = "..."
+		}
 
 		Main.test("Match String -> TableSwitch", "A", value)
 	}
@@ -78,35 +78,38 @@ public class MatchTest
 		String value = _
 
 		"abc" match {
-			case "abc": value = "ABC"
-			case "def": value = "DEF"
-			case _ : value = "..."
-		};
+			case "abc" => value = "ABC"
+			case "def" => value = "DEF"
+			case _     => value = "..."
+		}
 		
 		Main.test("Match String -> LookupSwitch", "ABC", value)
 	}
 	
 	private static void stringCollision()
 	{
-		int value = _
+		int value = 0
 
-		"BBBB" match {
-			case "BBBB": value = 4
-			case "BBAa": value = 3
-			case "AaBB": value = 2
-			case "AaAa": value = 1
-			case _ :
+		"AaBB" match {
+			case "Aa"   => value = 1
+			case "BB"   => value = 2
+			case "AaAa" => value = 3
+			case "BBBB" => value = 4
+			case "BBAa" | "AaBB" => value = 5
+			case "ABC"  => value = 6
+			case "DEF"  => value = 7
+			case _      =>
 		}
 
-		Main.test("Match String -> Collision", 4, value)
+		Main.test("Match String -> Collision", 5, value)
 	}
 	
 	private static void expression()
 	{
 		auto result = 10 match {
-			case 0: "a"
-			case 1: "b"
-			case var x: x.toString
+			case 0     => "a"
+			case 1     => "b"
+			case var x => x.toString
 		}
 
 		Main.test("Match Expression", "10", result)
@@ -133,10 +136,10 @@ public class MatchTest
 		for (int i : 0 .. 10)
 		{
 			i match {
-				case 1 | 2 | 3	: array += 0
-				case 4 | 5 | 6	: array += 1
-				case 7 | 8 | 9	: array += 2
-				case 0 | 10		: array += 3
+				case 1 | 2 | 3 => array += 0
+				case 4 | 5 | 6 => array += 1
+				case 7 | 8 | 9 => array += 2
+				case 0 | 10	   => array += 3
 			}
 		}
 

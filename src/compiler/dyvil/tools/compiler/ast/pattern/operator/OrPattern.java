@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.pattern.operator;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -28,6 +29,22 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
+	public IPattern resolve(MarkerList markers, IContext context)
+	{
+		super.resolveChildren(markers, context);
+
+		if (this.left.isExhaustive())
+		{
+			return this.left;
+		}
+		if (this.right.isExhaustive())
+		{
+			return this.right;
+		}
+		return this;
+	}
+
+	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		this.left = this.left.withType(type, markers);
@@ -42,26 +59,15 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	public int switchCases()
+	public int subPatterns()
 	{
-		return this.left.switchCases() + this.right.switchCases();
+		return this.left.subPatterns() + this.right.subPatterns();
 	}
 
 	@Override
 	public boolean switchCheck()
 	{
 		return this.left.switchCheck() || this.right.switchCheck();
-	}
-
-	@Override
-	public int switchValue(int index)
-	{
-		final int leftCount = this.left.switchCases();
-		if (index < leftCount)
-		{
-			return this.left.switchValue(index);
-		}
-		return this.right.switchValue(index - leftCount);
 	}
 
 	@Override
@@ -77,7 +83,19 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
+	public IPattern subPattern(int index)
+	{
+		final int leftCount = this.left.subPatterns();
+		if (index < leftCount)
+		{
+			return this.left.subPattern(index);
+		}
+		return this.right.subPattern(index - leftCount);
+	}
+
+	@Override
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 

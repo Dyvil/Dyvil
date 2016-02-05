@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -68,13 +69,13 @@ public final class StringPattern extends Pattern
 	}
 	
 	@Override
-	public int switchCases()
+	public int subPatterns()
 	{
 		return 1;
 	}
 	
 	@Override
-	public int switchValue(int index)
+	public int switchValue()
 	{
 		return this.value.hashCode();
 	}
@@ -112,7 +113,13 @@ public final class StringPattern extends Pattern
 		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
 		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
