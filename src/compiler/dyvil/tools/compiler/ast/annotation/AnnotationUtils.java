@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.ast.annotation;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;

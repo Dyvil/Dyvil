@@ -6,9 +6,12 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeParameterized;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.parameter.IParameterized;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
@@ -20,10 +23,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class Util
 {
-	public static void memberSignatureToString(IMember member, StringBuilder buf)
+	// region Member & AST toString
+
+	public static void memberSignatureToString(IMember member, StringBuilder stringBuilder)
 	{
-		member.getType().toString("", buf);
-		buf.append(' ').append(member.getName());
+		member.getType().toString("", stringBuilder);
+		stringBuilder.append(' ').append(member.getName());
 	}
 
 	public static String methodSignatureToString(IMethod method)
@@ -33,75 +38,60 @@ public class Util
 		return stringBuilder.toString();
 	}
 	
-	public static void methodSignatureToString(IMethod method, StringBuilder buf)
+	public static void methodSignatureToString(IMethod method, StringBuilder stringBuilder)
 	{
-		memberSignatureToString(method, buf);
+		memberSignatureToString(method, stringBuilder);
 		
-		int typeVariables = method.typeParameterCount();
-		if (typeVariables > 0)
-		{
-			buf.append('[');
-			method.getTypeParameter(0).toString("", buf);
-			for (int i = 1; i < typeVariables; i++)
-			{
-				buf.append(", ");
-				method.getTypeParameter(i).toString("", buf);
-			}
-			buf.append(']');
-		}
+		typeParametersToString(method, stringBuilder);
 		
+		parametersToString(method, stringBuilder);
+	}
+
+	public static void classSignatureToString(IClass iClass, StringBuilder stringBuilder)
+	{
+		ModifierUtil.writeClassType(iClass.getModifiers().toFlags(), stringBuilder);
+
+		stringBuilder.append(iClass.getName());
+
+		typeParametersToString(iClass, stringBuilder);
+
+		parametersToString(iClass, stringBuilder);
+	}
+
+	private static void parametersToString(IParameterized parameterized, StringBuilder buf)
+	{
 		buf.append('(');
-		
-		int params = method.parameterCount();
+
+		int params = parameterized.parameterCount();
 		if (params > 0)
 		{
-			method.getParameter(0).getType().toString("", buf);
+			parameterized.getParameter(0).getType().toString("", buf);
 			for (int i = 1; i < params; i++)
 			{
 				buf.append(", ");
-				method.getParameter(i).getType().toString("", buf);
+				parameterized.getParameter(i).getType().toString("", buf);
 			}
 		}
-		
+
 		buf.append(')');
 	}
-	
-	public static void classSignatureToString(IClass iclass, StringBuilder buf)
+
+	private static void typeParametersToString(ITypeParameterized typeParameterized, StringBuilder buf)
 	{
-		iclass.getModifiers().toString(buf);
-		buf.append(iclass.getName());
-		
-		int typeVariables = iclass.typeParameterCount();
+		int typeVariables = typeParameterized.typeParameterCount();
 		if (typeVariables > 0)
 		{
 			buf.append('[');
-			
-			iclass.getTypeParameter(0).toString("", buf);
+			typeParameterized.getTypeParameter(0).toString("", buf);
 			for (int i = 1; i < typeVariables; i++)
 			{
 				buf.append(", ");
-				iclass.getTypeParameter(i).toString("", buf);
+				typeParameterized.getTypeParameter(i).toString("", buf);
 			}
-			
 			buf.append(']');
 		}
-		
-		int params = iclass.parameterCount();
-		if (params > 0)
-		{
-			buf.append('(');
-			
-			iclass.getParameter(0).getType().toString("", buf);
-			for (int i = 1; i < params; i++)
-			{
-				buf.append(", ");
-				iclass.getParameter(i).getType().toString("", buf);
-			}
-			
-			buf.append(')');
-		}
 	}
-	
+
 	public static void astToString(String prefix, IASTNode[] array, int size, String separator, StringBuilder buffer)
 	{
 		if (size <= 0)
@@ -116,7 +106,37 @@ public class Util
 			array[i].toString(prefix, buffer);
 		}
 	}
+
 	
+	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)
+	{
+		if (value.valueTag() != IValue.STATEMENT_LIST)
+		{
+			return false;
+		}
+
+		if (Formatting.getBoolean("statement.open_brace.newline_before"))
+		{
+			buffer.append('\n').append(prefix);
+		}
+		else
+		{
+			buffer.append(' ');
+		}
+
+		value.toString(prefix, buffer);
+		return true;
+	}
+
+	public static String toString(IClassMember member, String type)
+	{
+		return Markers.getSemantic("member.named", Markers.getSemantic("member." + type), member.getName());
+	}
+
+	// endregion
+
+	// region Name transformations
+
 	public static String getAdder(String methodName)
 	{
 		StringBuilder builder = new StringBuilder("add");
@@ -128,7 +148,7 @@ public class Util
 		}
 		return builder.toString();
 	}
-	
+
 	public static String getSetter(String methodName)
 	{
 		StringBuilder builder = new StringBuilder("set");
@@ -140,7 +160,7 @@ public class Util
 		}
 		return builder.toString();
 	}
-	
+
 	public static String getGetter(String methodName)
 	{
 		StringBuilder builder = new StringBuilder("get");
@@ -151,79 +171,6 @@ public class Util
 			builder.append(methodName.charAt(i));
 		}
 		return builder.toString();
-	}
-	
-	public static IValue prependValue(IValue prepend, IValue value)
-	{
-		if (value instanceof IValueList)
-		{
-			((IValueList) value).addValue(0, prepend);
-			return value;
-		}
-		else if (value != null)
-		{
-			StatementList list = new StatementList(null);
-			list.addValue(prepend);
-			list.addValue(value);
-			return list;
-		}
-		
-		return prepend;
-	}
-	
-	public static IValue constant(IValue value, MarkerList markers)
-	{
-		IValue value1 = value.toConstant(markers);
-		if (value1 == null)
-		{
-			markers.add(
-					Markers.semantic(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
-			return value.getType().getDefaultValue();
-		}
-		
-		return value1;
-	}
-	
-	public static String toTime(long nanos)
-	{
-		if (nanos < 1000L)
-		{
-			return nanos + " ns";
-		}
-		if (nanos < 1000000L)
-		{
-			return nanos / 1000000D + " ms";
-		}
-		
-		long l = 0L;
-		StringBuilder builder = new StringBuilder();
-		if (nanos >= 60_000_000_000L) // minutes
-		{
-			l = nanos / 60_000_000_000L;
-			builder.append(l).append(" min ");
-			nanos -= l * 60_000_000_000L;
-		}
-		if (nanos >= 1_000_000_000L) // seconds
-		{
-			l = nanos / 1_000_000_000L;
-			builder.append(l).append(" s ");
-			nanos -= l * 1_000_000_000L;
-		}
-		if (nanos >= 1_000_000L)
-		{
-			l = nanos / 1_000_000L;
-			builder.append(l).append(" ms ");
-			nanos -= l * 1_000_000L;
-		}
-		return builder.deleteCharAt(builder.length() - 1).toString();
-	}
-	
-	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
-	{
-		Marker marker = Markers.semantic(value.getPosition(), key, args);
-		marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
-		marker.addInfo(Markers.getSemantic("value.type", value.getType()));
-		markers.add(marker);
 	}
 
 	public static boolean hasEq(Name name)
@@ -267,27 +214,82 @@ public class Util
 		return name;
 	}
 
-	public static String toString(IClassMember member, String type)
-	{
-		return Markers.getSemantic("member.named", Markers.getSemantic("member." + type), member.getName());
-	}
+	// endregion
 
-	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)
+	// region Value transformations
+
+	public static IValue prependValue(IValue prepend, IValue value)
 	{
-		if (value.valueTag() == IValue.STATEMENT_LIST)
+		if (value instanceof IValueList)
 		{
-			if (Formatting.getBoolean("statement.open_brace.newline_before"))
-			{
-				buffer.append('\n').append(prefix);
-			}
-			else
-			{
-				buffer.append(' ');
-			}
-
-			value.toString(prefix, buffer);
-			return true;
+			((IValueList) value).addValue(0, prepend);
+			return value;
 		}
-		return false;
+		else if (value != null)
+		{
+			StatementList list = new StatementList(null);
+			list.addValue(prepend);
+			list.addValue(value);
+			return list;
+		}
+
+		return prepend;
 	}
+
+	public static IValue constant(IValue value, MarkerList markers)
+	{
+		final IValue constant = value.toConstant(markers);
+		if (constant == null)
+		{
+			markers.add(Markers.semantic(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
+			return value.getType().getDefaultValue();
+		}
+
+		return constant;
+	}
+
+	// endregion
+
+	// region Misc
+
+	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
+	{
+		Marker marker = Markers.semantic(value.getPosition(), key, args);
+		marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
+		marker.addInfo(Markers.getSemantic("value.type", value.getType()));
+		markers.add(marker);
+	}
+
+	public static String toTime(long nanos)
+	{
+		if (nanos < 1_000_000L)
+		{
+			return nanos + " ns";
+		}
+
+		long l;
+		StringBuilder builder = new StringBuilder();
+		if (nanos >= 60_000_000_000L) // minutes
+		{
+			l = nanos / 60_000_000_000L;
+			builder.append(l).append(" min ");
+			nanos -= l * 60_000_000_000L;
+		}
+		if (nanos >= 1_000_000_000L) // seconds
+		{
+			l = nanos / 1_000_000_000L;
+			builder.append(l).append(" s ");
+			nanos -= l * 1_000_000_000L;
+		}
+		if (nanos >= 1_000_000L) // milliseconds
+		{
+			l = nanos / 1_000_000L;
+			builder.append(l).append(" ms ");
+			// nanos -= l * 1_000_000L;
+		}
+
+		return builder.deleteCharAt(builder.length() - 1).toString();
+	}
+
+	// endregion
 }

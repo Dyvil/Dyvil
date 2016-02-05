@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.util.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
 
 public class SimpleFieldVisitor implements FieldVisitor
 {

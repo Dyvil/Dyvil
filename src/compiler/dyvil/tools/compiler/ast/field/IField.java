@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.util.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
 
 public interface IField extends IClassMember, IDataMember
 {

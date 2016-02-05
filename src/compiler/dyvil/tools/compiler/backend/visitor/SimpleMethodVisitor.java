@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.util.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor

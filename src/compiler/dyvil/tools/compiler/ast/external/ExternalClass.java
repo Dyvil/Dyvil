@@ -38,7 +38,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.sources.DyvilFileType;
-import dyvil.tools.compiler.util.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
