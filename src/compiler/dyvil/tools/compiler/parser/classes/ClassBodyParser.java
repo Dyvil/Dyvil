@@ -54,7 +54,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	private static final byte PROPERTY    = 2;
 	private static final byte METHOD      = 3;
 	private static final byte CONSTRUCTOR = 4;
-	private static final byte INITALIZER  = 5;
+	private static final byte INITIALIZER = 5;
 	
 	protected IClass             theClass;
 	protected IClassBodyConsumer consumer;
@@ -126,10 +126,10 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					}
 					else
 					{
-						this.memberKind = INITALIZER;
+						this.memberKind = INITIALIZER;
 					}
 
-					this.mode = TYPE;
+					this.mode = METHOD_END;
 					pm.pushParser(new StatementListParser(initializer));
 					return;
 				}
@@ -356,7 +356,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			case CONSTRUCTOR:
 				this.consumer.addConstructor((IConstructor) this.member);
 				break;
-			case INITALIZER:
+			case INITIALIZER:
 				this.consumer.addInitializer((IInitializer) this.member);
 				break;
 			}
