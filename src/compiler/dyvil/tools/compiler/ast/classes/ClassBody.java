@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -394,13 +395,17 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].resolveTypes(markers, context);
 		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].resolveTypes(markers, context);
+		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].resolveTypes(markers, context);
 		}
-		for (int i = 0; i < this.methodCount; i++)
+		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.methods[i].resolveTypes(markers, context);
+			this.initializers[i].resolveTypes(markers, context);
 		}
 	}
 	
@@ -420,13 +425,17 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].resolve(markers, context);
 		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].resolve(markers, context);
+		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].resolve(markers, context);
 		}
-		for (int i = 0; i < this.methodCount; i++)
+		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.methods[i].resolve(markers, context);
+			this.initializers[i].resolve(markers, context);
 		}
 	}
 	
@@ -446,14 +455,17 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].checkTypes(markers, context);
 		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].checkTypes(markers, context);
+		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].checkTypes(markers, context);
 		}
-		
-		for (int i = 0; i < this.methodCount; i++)
+		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.methods[i].checkTypes(markers, context);
+			this.initializers[i].checkTypes(markers, context);
 		}
 	}
 
@@ -557,13 +569,17 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].check(markers, context);
 		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].check(markers, context);
+		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].check(markers, context);
 		}
-		for (int i = 0; i < this.methodCount; i++)
+		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.methods[i].check(markers, context);
+			this.initializers[i].check(markers, context);
 		}
 	}
 	
@@ -582,20 +598,24 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].foldConstants();
 		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].foldConstants();
+		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].foldConstants();
 		}
-		for (int i = 0; i < this.methodCount; i++)
+		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.methods[i].foldConstants();
+			this.initializers[i].foldConstants();
 		}
 	}
 	
 	@Override
 	public void cleanup()
 	{
-		IClass iclass = this.theClass;
+		final IClass iclass = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].cleanup(iclass, iclass);
@@ -608,13 +628,17 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].cleanup(iclass, iclass);
 		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].cleanup(iclass, iclass);
+		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].cleanup(iclass, iclass);
 		}
-		for (int i = 0; i < this.methodCount; i++)
+		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.methods[i].cleanup(iclass, iclass);
+			this.initializers[i].cleanup(iclass, iclass);
 		}
 	}
 	
@@ -645,16 +669,7 @@ public class ClassBody implements IClassBody
 	{
 		if (this.classCount > 0)
 		{
-			for (int i = 0; i < this.classCount; i++)
-			{
-				this.classes[i].toString(prefix, buffer);
-				buffer.append('\n');
-				if (i + 1 < this.classCount)
-				{
-					buffer.append('\n');
-				}
-			}
-			buffer.append('\n');
+			this.membersToString(prefix, this.classes, this.classCount, buffer);
 		}
 
 		if (this.fieldCount > 0)
@@ -675,44 +690,39 @@ public class ClassBody implements IClassBody
 
 		if (this.constructorCount > 0)
 		{
-			for (int i = 0; i < this.constructorCount; i++)
-			{
-				this.constructors[i].toString(prefix, buffer);
-				buffer.append('\n');
-				if (i + 1 < this.constructorCount)
-				{
-					buffer.append('\n');
-				}
-			}
-			buffer.append('\n');
+			this.membersToString(prefix, this.constructors, this.constructorCount, buffer);
+		}
+
+		if (this.initializerCount > 0)
+		{
+			this.membersToString(prefix, this.initializers, this.initializerCount, buffer);
 		}
 
 		if (this.propertyCount > 0)
 		{
-			for (int i = 0; i < this.propertyCount; i++)
-			{
-				this.properties[i].toString(prefix, buffer);
-				buffer.append('\n');
-				if (i + 1 < this.propertyCount)
-				{
-					buffer.append('\n');
-				}
-			}
-			buffer.append('\n');
+			this.membersToString(prefix, this.properties, this.propertyCount, buffer);
 		}
 
 		if (this.methodCount > 0)
 		{
 			for (int i = 0; i < this.methodCount; i++)
 			{
-				IMethod method = this.methods[i];
-				method.toString(prefix, buffer);
+				this.methods[i].toString(prefix, buffer);
 				buffer.append('\n');
 				if (i + 1 < this.methodCount)
 				{
 					buffer.append('\n');
 				}
 			}
+		}
+	}
+
+	private void membersToString(String prefix, IASTNode[] constructors, int count, StringBuilder buffer)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			constructors[i].toString(prefix, buffer);
+			buffer.append('\n');
 		}
 	}
 }

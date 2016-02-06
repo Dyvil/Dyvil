@@ -468,15 +468,13 @@ public class CodeClass extends AbstractClass
 		{
 			this.writeClassParameters(writer);
 		}
-		
-		int fields = 0;
-		int properties = 0;
+
 		if (this.body != null)
 		{
 			final int methods = this.body.methodCount();
 			final int constructors = this.body.constructorCount();
-			fields = this.body.fieldCount();
-			properties = this.body.propertyCount();
+			final int fields = this.body.fieldCount();
+			final int properties = this.body.propertyCount();
 			
 			int classes = this.body.classCount();
 			for (int i = 0; i < classes; i++)
@@ -522,6 +520,7 @@ public class CodeClass extends AbstractClass
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
 	{
 		AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/_internal/ClassParameters;", false);
+		assert av != null;
 		AnnotationVisitor array = av.visitArray("names");
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -549,6 +548,10 @@ public class CodeClass extends AbstractClass
 			{
 				this.body.getProperty(i).writeInit(writer);
 			}
+			for (int i = 0, count = this.body.initializerCount(); i < count; i++)
+			{
+				this.body.getInitializer(i).writeInit(writer);
+			}
 		}
 
 		for (int i = 0; i < this.compilableCount; i++)
@@ -571,6 +574,10 @@ public class CodeClass extends AbstractClass
 			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
 			{
 				this.body.getProperty(i).writeStaticInit(writer);
+			}
+			for (int i = 0, count = this.body.initializerCount(); i < count; i++)
+			{
+				this.body.getInitializer(i).writeStaticInit(writer);
 			}
 		}
 
