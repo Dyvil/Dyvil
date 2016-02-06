@@ -130,4 +130,31 @@ public class Builder implements Value, BuilderVisitor, Expandable
 			buffer.append(prefix).append('}');
 		}
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof Builder))
+		{
+			return false;
+		}
+
+		final Builder builder = (Builder) o;
+
+		return this.name == builder.name && this.parameters.equals(builder.parameters) && this.node
+				.equals(builder.node);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.name.hashCode();
+		result = 31 * result + this.parameters.hashCode();
+		result = 31 * result + this.node.hashCode();
+		return result;
+	}
 }

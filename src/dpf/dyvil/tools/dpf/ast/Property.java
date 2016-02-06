@@ -2,13 +2,13 @@ package dyvil.tools.dpf.ast;
 
 import dyvil.collection.Map;
 import dyvil.tools.dpf.ast.value.Value;
-import dyvil.tools.dpf.ast.value.ValueCreator;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.dpf.visitor.NodeVisitor;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Property extends ValueCreator implements NodeElement, Expandable
+public class Property extends DPFValueVisitor implements NodeElement, Expandable
 {
 	protected Name  name;
 	protected Value value;
@@ -80,5 +80,31 @@ public class Property extends ValueCreator implements NodeElement, Expandable
 	{
 		buffer.append(this.name).append(" = ");
 		this.value.toString(prefix, buffer);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof Property))
+		{
+			return false;
+		}
+
+		final Property other = (Property) obj;
+		return this.name == other.name // equal name
+				&& this.value.equals(other.value); // equal value
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = this.name.hashCode();
+		result = prime * result + this.value.hashCode();
+		return result;
 	}
 }

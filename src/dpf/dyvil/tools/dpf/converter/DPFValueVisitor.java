@@ -1,10 +1,13 @@
-package dyvil.tools.dpf.ast.value;
+package dyvil.tools.dpf.converter;
 
 import dyvil.tools.dpf.ast.builder.Builder;
+import dyvil.tools.dpf.ast.value.*;
+import dyvil.tools.dpf.ast.value.NameAccess;
+import dyvil.tools.dpf.ast.value.StringInterpolation;
 import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
 
-public abstract class ValueCreator implements ValueVisitor
+public abstract class DPFValueVisitor implements ValueVisitor
 {
 	protected abstract void setValue(Value value);
 	
@@ -41,7 +44,7 @@ public abstract class ValueCreator implements ValueVisitor
 	@Override
 	public StringInterpolationVisitor visitStringInterpolation()
 	{
-		StringInterpolation stringInterpolation = new StringInterpolation();
+		dyvil.tools.dpf.ast.value.StringInterpolation stringInterpolation = new StringInterpolation();
 		this.setValue(stringInterpolation);
 		return stringInterpolation;
 	}
@@ -49,13 +52,13 @@ public abstract class ValueCreator implements ValueVisitor
 	@Override
 	public void visitName(Name name)
 	{
-		this.setValue(new NameAccess(name));
+		this.setValue(new dyvil.tools.dpf.ast.value.NameAccess(name));
 	}
 	
 	@Override
 	public ValueVisitor visitValueAccess(Name name)
 	{
-		NameAccess access = new NameAccess(name);
+		dyvil.tools.dpf.ast.value.NameAccess access = new NameAccess(name);
 		this.setValue(access);
 		return access;
 	}

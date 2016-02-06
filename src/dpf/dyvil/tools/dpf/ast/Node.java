@@ -1,5 +1,6 @@
 package dyvil.tools.dpf.ast;
 
+import dyvil.collection.Collection;
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
@@ -165,5 +166,35 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 			nodeAccess.toString(prefix, buffer);
 			buffer.append('\n');
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof Node))
+		{
+			return false;
+		}
+
+		final Node other = (Node) obj;
+		return this.name == other.name // equal name
+				&& Collection.unorderedEquals(this.properties, other.properties) // equal properties
+				&& Collection.unorderedEquals(this.nodes, other.nodes) // equal direct nodes
+				&& Collection.unorderedEquals(this.nodeAccesses, other.nodeAccesses); // equal access nodes
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = this.name.hashCode();
+		result = prime * result + Collection.unorderedHashCode(this.properties);
+		result = prime * result + Collection.unorderedHashCode(this.nodes);
+		result = prime * result + Collection.unorderedHashCode(this.nodeAccesses);
+		return result;
 	}
 }

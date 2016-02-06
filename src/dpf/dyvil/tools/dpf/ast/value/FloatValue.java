@@ -50,4 +50,26 @@ public class FloatValue implements Constant
 	{
 		buffer.append(this.value).append('F');
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof FloatValue))
+		{
+			return false;
+		}
+
+		final FloatValue that = (FloatValue) o;
+		return Float.compare(that.value, this.value) == 0;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return (this.value != +0.0f ? Float.floatToIntBits(this.value) : 0);
+	}
 }

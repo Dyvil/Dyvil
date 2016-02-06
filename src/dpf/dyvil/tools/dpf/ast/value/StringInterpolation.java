@@ -4,12 +4,13 @@ import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 
-public class StringInterpolation extends ValueCreator implements Value, StringInterpolationVisitor, Expandable
+public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
 {
 	protected List<String> strings = new ArrayList<>();
 	protected List<Value>  values  = new ArrayList<>();
@@ -114,5 +115,29 @@ public class StringInterpolation extends ValueCreator implements Value, StringIn
 			LexerUtil.appendStringLiteralBody(this.strings.get(i + 1), buffer);
 		}
 		buffer.append('"');
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof StringInterpolation))
+		{
+			return false;
+		}
+
+		final StringInterpolation that = (StringInterpolation) o;
+		return this.strings.equals(that.strings) && this.values.equals(that.values);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.strings.hashCode();
+		result = 31 * result + (this.values != null ? this.values.hashCode() : 0);
+		return result;
 	}
 }

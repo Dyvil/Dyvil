@@ -85,7 +85,7 @@ public class DPFTests
 			final RootNode rootNode = new RootNode();
 			binaryReader.readNodes(rootNode);
 
-			assertEquals(this.rootNode.toString(), rootNode.toString());
+			assertEquals(this.rootNode, rootNode);
 		}
 		catch (RuntimeException ex)
 		{

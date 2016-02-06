@@ -4,13 +4,14 @@ import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayMap;
 import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.dpf.visitor.MapVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tuple.Tuple2;
 
 import java.util.function.BiFunction;
 
-public class MapValue extends ValueCreator implements Value, MapVisitor, Expandable
+public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expandable
 {
 	protected Map<Value, Value> entries = new ArrayMap<>();
 
@@ -117,5 +118,27 @@ public class MapValue extends ValueCreator implements Value, MapVisitor, Expanda
 			values[i].toString(prefix1, buffer);
 		}
 		buffer.append('\n').append(prefix).append('}');
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof MapValue))
+		{
+			return false;
+		}
+
+		MapValue that = (MapValue) o;
+		return this.entries.equals(that.entries);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.entries.hashCode();
 	}
 }

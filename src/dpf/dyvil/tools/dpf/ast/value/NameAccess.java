@@ -2,11 +2,14 @@ package dyvil.tools.dpf.ast.value;
 
 import dyvil.collection.Map;
 import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 
-public class NameAccess extends ValueCreator implements Value, Expandable
+import java.util.Objects;
+
+public class NameAccess extends DPFValueVisitor implements Value, Expandable
 {
 	protected final Name  name;
 	protected       Value value;
@@ -83,5 +86,29 @@ public class NameAccess extends ValueCreator implements Value, Expandable
 			buffer.append('.');
 		}
 		buffer.append(this.name);
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof NameAccess))
+		{
+			return false;
+		}
+
+		final NameAccess that = (NameAccess) o;
+		return this.name == that.name && Objects.equals(this.value, that.value);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.name.hashCode();
+		result = 31 * result + this.value.hashCode();
+		return result;
 	}
 }
