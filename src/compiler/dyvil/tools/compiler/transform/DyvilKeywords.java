@@ -29,8 +29,9 @@ public class DyvilKeywords
 	public static final int IMPLICIT     = Tokens.KEYWORD | 0x00170000;
 	public static final int IMPORT       = Tokens.KEYWORD | 0x00180000;
 	public static final int INCLUDE      = Tokens.KEYWORD | 0x00190000;
-	public static final int INLINE       = Tokens.KEYWORD | 0x001A0000;
 	public static final int INFIX        = Tokens.KEYWORD | 0x001B0000;
+	public static final int INIT         = Tokens.KEYWORD | 0x003E0000;
+	public static final int INLINE       = Tokens.KEYWORD | 0x001A0000;
 	public static final int INTERFACE    = Tokens.KEYWORD | 0x001C0000;
 	public static final int INTERNAL     = Tokens.KEYWORD | 0x001D0000;
 	public static final int IS           = Tokens.KEYWORD | 0x001E0000;
@@ -120,10 +121,12 @@ public class DyvilKeywords
 			return IMPORT;
 		case "include":
 			return INCLUDE;
-		case "inline":
-			return INLINE;
 		case "infix":
 			return INFIX;
+		case "init":
+			return INIT;
+		case "inline":
+			return INLINE;
 		case "interface":
 			return INTERFACE;
 		case "internal":
@@ -250,10 +253,12 @@ public class DyvilKeywords
 			return "import";
 		case INCLUDE:
 			return "include";
-		case INLINE:
-			return "inline";
+		case INIT:
+			return "init";
 		case INFIX:
 			return "infix";
+		case INLINE:
+			return "inline";
 		case INTERFACE:
 			return "interface";
 		case INTERNAL:
