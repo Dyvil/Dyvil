@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.modifiers;
 
+import dyvil.collection.iterator.EmptyIterator;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.util.Iterator;
 
 public class FlagModifierSet implements ModifierSet
 {
@@ -13,6 +16,12 @@ public class FlagModifierSet implements ModifierSet
 	public FlagModifierSet(int flags)
 	{
 		this.flags = flags;
+	}
+
+	@Override
+	public Iterator<Modifier> iterator()
+	{
+		return EmptyIterator.apply();
 	}
 
 	@Override
