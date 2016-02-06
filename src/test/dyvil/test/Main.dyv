@@ -22,6 +22,7 @@ public class Main
 		LambdaTest.main(args)
 		MatchTest.main(args)
 		FibonacciTest.main(args)
+		PrimitiveTest main args
 		PropertyTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)
