@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -28,13 +29,15 @@ public class ClassBody implements IClassBody
 	
 	private IField[] fields = new IField[3];
 	private int fieldCount;
-	private IConstructor[] constructors = new IConstructor[1];
-	private int constructorCount;
-	private IMethod[] methods = new IMethod[3];
-	private int methodCount;
 	private IProperty[] properties = new IProperty[3];
 	private int propertyCount;
-	
+	private IMethod[] methods = new IMethod[3];
+	private int methodCount;
+	private IConstructor[] constructors = new IConstructor[1];
+	private int constructorCount;
+	private IInitializer[] initializers = new IInitializer[1];
+	private int initializerCount;
+
 	protected IMethod functionalMethod;
 	
 	public ClassBody(IClass iclass)
@@ -195,6 +198,87 @@ public class ClassBody implements IClassBody
 		}
 		return null;
 	}
+
+	// Methods
+
+	@Override
+	public int methodCount()
+	{
+		return this.methodCount;
+	}
+
+	@Override
+	public void addMethod(IMethod method)
+	{
+		int index = this.methodCount++;
+		if (index >= this.methods.length)
+		{
+			IMethod[] temp = new IMethod[this.methodCount];
+			System.arraycopy(this.methods, 0, temp, 0, index);
+			this.methods = temp;
+		}
+		this.methods[index] = method;
+	}
+
+	@Override
+	public IMethod getMethod(int index)
+	{
+		return this.methods[index];
+	}
+
+	@Override
+	public IMethod getMethod(Name name)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IMethod m = this.methods[i];
+			if (m.getName() == name)
+			{
+				return m;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].getMethodMatches(list, receiver, name, arguments);
+		}
+	}
+
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		if (this.functionalMethod != null)
+		{
+			return this.functionalMethod;
+		}
+
+		boolean found = false;
+		IMethod match = null;
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IMethod m = this.methods[i];
+			if (m.isAbstract())
+			{
+				if (found)
+				{
+					return null;
+				}
+
+				found = true;
+				match = m;
+			}
+		}
+		return this.functionalMethod = match;
+	}
 	
 	// Constructors
 	
@@ -264,87 +348,35 @@ public class ClassBody implements IClassBody
 			}
 		}
 	}
-	
-	// Methods
-	
+
+	// Initializers
+
 	@Override
-	public int methodCount()
+	public int initializerCount()
 	{
-		return this.methodCount;
-	}
-	
-	@Override
-	public void addMethod(IMethod method)
-	{
-		int index = this.methodCount++;
-		if (index >= this.methods.length)
-		{
-			IMethod[] temp = new IMethod[this.methodCount];
-			System.arraycopy(this.methods, 0, temp, 0, index);
-			this.methods = temp;
-		}
-		this.methods[index] = method;
-	}
-	
-	@Override
-	public IMethod getMethod(int index)
-	{
-		return this.methods[index];
-	}
-	
-	@Override
-	public IMethod getMethod(Name name)
-	{
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IMethod m = this.methods[i];
-			if (m.getName() == name)
-			{
-				return m;
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
-	{
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			this.properties[i].getMethodMatches(list, receiver, name, arguments);
-		}
+		return this.initializerCount;
 	}
 
 	@Override
-	public IMethod getFunctionalMethod()
+	public void addInitializer(IInitializer initializer)
 	{
-		if (this.functionalMethod != null)
+		int index = this.initializerCount++;
+		if (index >= this.initializers.length)
 		{
-			return this.functionalMethod;
+			IInitializer[] temp = new IInitializer[this.initializerCount];
+			System.arraycopy(this.initializers, 0, temp, 0, index);
+			this.initializers = temp;
 		}
-		
-		boolean found = false;
-		IMethod match = null;
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IMethod m = this.methods[i];
-			if (m.isAbstract())
-			{
-				if (found)
-				{
-					return null;
-				}
-				
-				found = true;
-				match = m;
-			}
-		}
-		return this.functionalMethod = match;
+		this.initializers[index] = initializer;
 	}
+
+	@Override
+	public IInitializer getInitializer(int index)
+	{
+		return this.initializers[index];
+	}
+
+	// Phases
 	
 	@Override
 	public void resolveTypes(MarkerList markers)
@@ -424,7 +456,7 @@ public class ClassBody implements IClassBody
 			this.methods[i].checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
 	{
@@ -459,7 +491,7 @@ public class ClassBody implements IClassBody
 		return method.checkOverride(markers, checkedClass, candidate, typeContext) && !method
 				.hasModifier(Modifiers.ABSTRACT);
 	}
-	
+
 	@Override
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)
 	{
@@ -504,9 +536,8 @@ public class ClassBody implements IClassBody
 		if (candidate.hasModifier(Modifiers.ABSTRACT) && !checkedClass.hasModifier(Modifiers.ABSTRACT))
 		{
 			// Create an abstract method error
-			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract",
-			                             checkedClass.getName(), candidate.getName(),
-			                             this.theClass.getName()));
+			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract", checkedClass.getName(),
+			                             candidate.getName(), this.theClass.getName()));
 		}
 	}
 	

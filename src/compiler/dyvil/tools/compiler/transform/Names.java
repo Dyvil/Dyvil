@@ -5,6 +5,7 @@ import dyvil.tools.parsing.Name;
 public final class Names
 {
 	public static final Name instance      = Name.getQualified("instance");
+	public static final Name init          = Name.getQualified("init");
 	public static final Name get           = Name.getQualified("get");
 	public static final Name set           = Name.getQualified("set");
 	public static final Name apply         = Name.getQualified("apply");
