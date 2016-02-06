@@ -238,24 +238,13 @@ public interface Set<E> extends Collection<E>
 	
 	static <E> boolean setEquals(Set<E> c1, Set<E> c2)
 	{
-		return c1.size() == c2.size() && Collection.unorderedEquals(c1, c2);
+		// size checked in unorderedEquals
+		return Collection.unorderedEquals(c1, c2);
 	}
 	
 	static <E> int setHashCode(Set<E> set)
 	{
-		int sum = 0;
-		int product = 1;
-		for (E element : set)
-		{
-			if (element == null)
-			{
-				continue;
-			}
-			int hash = element.hashCode();
-			sum += hash;
-			product *= hash;
-		}
-		return sum * 31 + product;
+		return Collection.unorderedHashCode(set);
 	}
 
 	@DyvilModifiers(Modifiers.INTERNAL)

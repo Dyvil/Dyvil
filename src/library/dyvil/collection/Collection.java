@@ -794,10 +794,27 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		{
 			if (!c2.contains(element))
 			{
-				return c2.contains(element);
+				return false;
 			}
 		}
 		return true;
+	}
+
+	static <E> int unorderedHashCode(Collection<E> collection)
+	{
+		int sum = 0;
+		int product = 1;
+		for (E element : collection)
+		{
+			if (element == null)
+			{
+				continue;
+			}
+			int hash = element.hashCode();
+			sum += hash;
+			product *= hash;
+		}
+		return sum * 31 + product;
 	}
 	
 	static <E> boolean isSorted(E[] array, int size)
