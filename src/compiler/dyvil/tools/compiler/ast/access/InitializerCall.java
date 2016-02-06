@@ -192,7 +192,7 @@ public class InitializerCall implements ICall
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.isSuper ? "super.new" : "this.new");
+		buffer.append(this.isSuper ? "super.init" : "this.init");
 		this.arguments.toString(prefix, buffer);
 	}
 }
