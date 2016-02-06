@@ -3,6 +3,8 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.Constructor;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -86,7 +88,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				// no error
 				pm.popParser();
 				return;
-			case BaseSymbols.CLOSE_CURLY_BRACKET:
+			case BaseSymbols.CLOSE_CURLY_BRACKET: // end of body
 				pm.popParser(true);
 				return;
 			case BaseSymbols.SEMICOLON:
@@ -96,7 +98,9 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				}
 				this.reset();
 				return;
-			case DyvilKeywords.NEW:
+			case DyvilKeywords.INIT: // constructor declaration or initializer
+				// Fallthrough to constructor declaration
+			case DyvilKeywords.NEW: // legacy, TODO drop 'new' support
 				if (this.theClass == null)
 				{
 					this.mode = TYPE;
