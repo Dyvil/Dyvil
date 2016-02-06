@@ -887,13 +887,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new TypeParser(tv));
 				return true;
 			case BaseSymbols.DOT:
-				// this.new
-				IToken next2 = next.next();
-				if (next2.type() == DyvilKeywords.NEW)
+				// this.init or this.new
+				if (this.parseInitializer(pm, next, false))
 				{
-					this.value = new InitializerCall(next2.raw(), false);
-					pm.skip(2);
-					this.mode = CONSTRUCTOR_PARAMETERS;
 					return true;
 				}
 			}
@@ -915,13 +911,9 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 				pm.pushParser(new TypeParser(sv));
 				return true;
 			case BaseSymbols.DOT:
-				// super.new
-				IToken next2 = next.next();
-				if (next2.type() == DyvilKeywords.NEW)
+				// super.init or super.new
+				if (this.parseInitializer(pm, next, true))
 				{
-					this.value = new InitializerCall(next2.raw(), true);
-					pm.skip(2);
-					this.mode = CONSTRUCTOR_PARAMETERS;
 					return true;
 				}
 			}
@@ -1092,6 +1084,20 @@ public final class ExpressionParser extends Parser implements ITypeConsumer, IVa
 			this.value = statement;
 			return true;
 		}
+		}
+		return false;
+	}
+
+	private boolean parseInitializer(IParserManager pm, IToken next, boolean isSuper)
+	{
+		final IToken next2 = next.next();
+		final int next2Type = next2.type();
+		if (next2Type == DyvilKeywords.INIT || next2Type == DyvilKeywords.NEW)
+		{
+			this.value = new InitializerCall(next2.raw(), isSuper);
+			pm.skip(2);
+			this.mode = CONSTRUCTOR_PARAMETERS;
+			return true;
 		}
 		return false;
 	}

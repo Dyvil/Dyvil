@@ -257,12 +257,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		
 		// Check for illegal modifiers
-		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.METHOD_MODIFIERS;
-		if (illegalModifiers != 0)
-		{
-			markers.add(Markers.semanticError(this.position, "method.illegal_modifiers", this.name,
-			                                  ModifierUtil.fieldModifiersToString(illegalModifiers)));
-		}
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, "method", Modifiers.METHOD_MODIFIERS);
 		
 		// Check illegal modifier combinations
 		ModifierUtil.checkMethodModifiers(markers, this, this.modifiers.toFlags(), this.value != null, "method");

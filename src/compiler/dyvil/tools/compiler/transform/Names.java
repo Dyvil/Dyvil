@@ -5,16 +5,15 @@ import dyvil.tools.parsing.Name;
 public final class Names
 {
 	public static final Name instance      = Name.getQualified("instance");
+	public static final Name init          = Name.getQualified("init");
 	public static final Name get           = Name.getQualified("get");
 	public static final Name set           = Name.getQualified("set");
-	public static final Name init          = Name.getQualified("init");
 	public static final Name apply         = Name.getQualified("apply");
 	public static final Name unapply       = Name.getQualified("unapply");
 	public static final Name update        = Name.getQualified("update");
 	public static final Name subscript     = Name.getQualified("subscript");
 	public static final Name subscriptRef  = Name.getQualified("subscriptRef");
 	public static final Name subscript_$eq = Name.get("subscript_=", "subscript_$eq");
-	public static final Name match         = Name.getQualified("match");
 	public static final Name length        = Name.getQualified("length");
 	public static final Name equals        = Name.getQualified("equals");
 	public static final Name hashCode      = Name.getQualified("hashCode");

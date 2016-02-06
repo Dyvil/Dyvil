@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.modifiers;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -285,6 +286,33 @@ public final class ModifierUtil
 			return Modifiers.OBJECT_CLASS;
 		}
 		return -1;
+	}
+
+	public static void checkModifiers(MarkerList markers, IMember member, ModifierSet modifierSet, String type, int allowedModifiers)
+	{
+		StringBuilder stringBuilder = null;
+		for (Modifier modifier : modifierSet)
+		{
+			if ((modifier.intValue() & allowedModifiers) == 0)
+			{
+				if (stringBuilder == null)
+				{
+					stringBuilder = new StringBuilder();
+				}
+				else
+				{
+					stringBuilder.append(", ");
+				}
+				modifier.toString(stringBuilder);
+			}
+		}
+
+		if (stringBuilder != null)
+		{
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal",
+			                                  Markers.getSemantic("member." + type, member.getName()),
+			                                  stringBuilder.toString()));
+		}
 	}
 	
 	public static void checkMethodModifiers(MarkerList markers, IClassMember member, int modifiers, boolean hasValue, String type)

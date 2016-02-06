@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.method;
+package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -267,7 +268,7 @@ public class Constructor extends Member implements IConstructor
 			this.exceptions[i].resolve(markers, this);
 		}
 		
-		this.resolveSuperConstructors(markers, context);
+		this.resolveSuperConstructors(markers);
 		
 		if (this.value != null)
 		{
@@ -287,7 +288,7 @@ public class Constructor extends Member implements IConstructor
 		}
 	}
 	
-	private void resolveSuperConstructors(MarkerList markers, IContext context)
+	private void resolveSuperConstructors(MarkerList markers)
 	{
 		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
 		{
@@ -695,10 +696,10 @@ public class Constructor extends Member implements IConstructor
 
 		switch (IContext.getVisibility(context, this))
 		{
-		case IContext.INTERNAL:
+		case INTERNAL:
 			markers.add(Markers.semantic(position, "constructor.access.internal", this.theClass.getName()));
 			break;
-		case IContext.INVISIBLE:
+		case INVISIBLE:
 			markers.add(Markers.semantic(position, "constructor.access.invisible", this.theClass.getName()));
 			break;
 		}
