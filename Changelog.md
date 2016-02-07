@@ -1,3 +1,116 @@
+Dyvil v0.16.0
+=============
+
+- Added Initializer Blocks. #118
+- Added the `init` keyword.
+- Initializer Calls now use the `init` or `new` keyword.
+- Constructors can now be declared using the `init` or `new` keyword.
+- Annotations can now use arbitrary types rather than just a single identifier.
+- Reference Types and Operators now use the `&` symbol. #183
+- Parameters with the explicit type `auto` now cause a compilation error.
+- Field References can now be used in Patterns. #189
+- Improved Operator associativity for mixed left- and right-associative operators with the same precedence.
+- Pattern Matching now supports usage of qualified and generic Types for Binding, Case Class and Object Patterns.
+- Removed Bytecode Statements. #177
+
+## Dyvil Library v0.16.0
+
+- The `Predef.operator==` and `.operator!=` methods now check for nullness before invoking `equals`.
+- Added the `Collection.emptyCopy` and `Collection.immutableBuilder` methods.
+- Added the `Map.emptyCopy` and `Map.immutableBuilder` methods.
+- Added the ANSI Color codes as constants to the `dyvil.io.Console` class.
+- Added the `dyvil.reflect.Modifiers.VARIABLE_MODIFIERS` constant.
+- Added the static `Collection.unorderedHashCode(Collection)` method from the `Set.setEquals(Set, Set)` method.
+- Added the `Predef.function1`, `.function2` and `.function3` methods.
+- Added a Builder implementation that produces `AppendList`s.
+- Updated the `dyvil.io.AppendablePrintStream` and `.LoggerPrintStream` classes.
+- Updated the `Set.setEquals` method to use `Collection.unorderedHashCode`.
+- Updated documentation in the `Modifiers` class.
+- Updated the `Map[K, V].putIfAbsent(K, V)` method to return either the old value or the given value rather than a boolean.
+- Updated the Classes in the `dyvilx.lang.model.type` package to be usable in Pattern Matching.
+- Updated `MapBasedSet`s.
+- Updated the `dyvil.collection.List` documentation.
+- Made the StringPoolWriter and -Reader classes from the compiler public and updated their API.
+- Fixed the `dyvil.Analysis` file being a class file (`.dyv`) rather than a header (`.dyh`).
+- Fixed the `MapBasedSet.add(E)` method implementation.
+- Fixed the `ArraySet.operator -` implementation.
+- Fixed the `Predef.assert(boolean, => any)` method not calling the closure.
+- Renamed the `MutableMap.apply(int)` method to `withCapacity`.
+- Cleaned up most Collection implementation classes.
+- Cleaned up the EnumMap classes.
+- Cleaned up the TupleMap classes.
+- Cleaned up the TreeMap classes.
+- Cleaned up the IdentityHashMap classes.
+- Cleaned up the HashMap classes.
+- Cleaned up the ArrayMap classes.
+- Cleaned up the DynamicLinker class.
+- Removed the `Number.apply` and `Integer.apply` methods.
+
+## Dyvil Compiler v0.16.0
+
+- Object Patterns now work correctly in combination with the Array Operator `=>`. #190
+- Compound Calls are no longer resolved if the receiver is unresolved.
+- Generic Types referencing non-generic classes now cause a compiler error.
+- Override Return Type Check Errors are no longer reported if either type is unresolved.
+- Named Argument Lists now check for duplicate keys.
+- Marker Output now groups additional information between the title and the source line.
+- Added the `IMember.getKind()` method and the `MemberKind` enum to describe the kinds of different members (fields, properties, variables, methods, …).
+- Added the `ModifierUtil.JAVA_MODIFIER_MASK` constant.
+- Added an error for Constructors without an implementation.
+- Added formatting properties for Property Setters.
+- Added Constant Folding for String.length.
+- Updated the Constant Folding mechanism to work in more cases.
+- Updated the way members are checked for invalid modifiers.
+- Updated the `dyvil.tools.compiler.util.Util` class.
+- Updated the Compiler Phase classes.
+- Updated the FileFinder class in the compiler.
+- Updated the Instruction Classes to remove unneccessary features.
+- Improved Constructor parsing in contexts where constructors are disallowed.
+- Simplified semantic analysis for Class and Method Parameters.
+- Fixed Match Expressions with Strings with colliding hashes generating invalid / not working bytecode. #187
+- Fixed Match Expressions with empty case actions causing compiler errors.
+- Fixed Constructors causing compiler errors when occuring in invalid contexts.
+- Fixed implicit type promotion between primitives working incorrectly.
+- Fixed errors during the PRINT phase causing compilation to halt.
+- Fixed external Object Classes causing compiler errors.
+- Fixed Case Class Patterns working incorrectly when the matched value is on the stack.
+- Fixed Inner Classes being resolved incorrectly for external classes.
+- Fixed Token Lengths being computed incorrectly for Long, Float, Double, String and Backtick Identifier Tokens.
+- Fixed Annotation Markers for invalid Element Types using invalid localization keys.
+- Fixed Lambda Return Types being checked incorrectly for generic target methods.
+- Fixed Try-Catch Statements causing error markers everywhere.
+- Fixed Receiver Type compilation causing compiler errors in some cases.
+- Fixed Receiver Types not being persisted in the bytecode. #182
+- Moved constructor classes to the `dyvil.tools.compiler.ast.constructor` package.
+- Moved the `AnnotationUtil.writeModifiers(…)` method to `dyvil.tools.compiler.ast.modifier.ModifierUtil`.
+- Moved the `dyvil.tools.compiler.util.AnnotationsUtils` class to `dyvil.tools.compiler.ast.annotation`.
+- Moved the `dyvil.tools.compiler.util.ParserUtil` class to `dyvil.tools.compiler.parser`.
+- Renamed the `dyvil.tools.compiler.ast.annotation.AnnotationUtils` class to `AnnotationUtil`.
+- Removed the `MethodWriter.getClassWriter()` method.
+
+## Dyvil REPL v0.9.0
+
+- The REPL now displays a pipe (`|`) character at the beginning of a multi-line input.
+- The `:complete` REPL command no longer shows static methods for concrete instances.
+- The `:complete` REPL command now outputs a message when no completions were found.
+- Improved the `:help` REPL output format.
+- Fixed the `:complete` REPL command not showing class parameters.
+
+## Dyvil Property Format v0.4.0
+
+- Added a DPF visitor for conversion to a special binary format. #184
+- Added a DPF visitor that ignores all input.
+- Implemented the `equals` and `hashCode` methods for all DPF AST classes.
+- Improved the DPF Parser API.
+- Fixed REPL class definition output message not showing the class kind.
+- Fixed error reporting in the REPL working incorrectly for compiler errors.
+- Fixed DPF Builder expressions being parsed incorrectly.
+- Fixed DPF Builders accepting visitors incorrectly.
+- Renamed the `dyvil.tools.dpf.flatmapper` package to `flatmap`.
+- Moved and renamed the `dyvil.tools.dpf.ast.value.ValueCreator` class to to `dyvil.tools.dpf.converter.DPFValueVisitor`.
+- Moved the `dyvil.tools.dpf.Parser` class to `dyvil.tools.dpf.converter.string`.
+- Moved the `dyvil.tools.util.Printer` class to `dyvil.tools.dpf.converter.string`.
+
 Dyvil v0.15.0
 =============
 
