@@ -24,7 +24,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -437,9 +437,9 @@ public class CodeMethod extends AbstractMethod
 
 		final String internalThisClassName = this.theClass.getInternalName();
 		final String[] exceptionTypes = this.getInternalExceptions();
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & 0xFFFF, this.name.qualified,
-		                                                                  this.getDescriptor(), this.getSignature(),
-		                                                                  exceptionTypes));
+		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & ModifierUtil.JAVA_MODIFIER_MASK,
+		                                                                  this.name.qualified, this.getDescriptor(),
+		                                                                  this.getSignature(), exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
@@ -561,13 +561,13 @@ public class CodeMethod extends AbstractMethod
 			final String signature = this.receiverType.getSignature();
 			if (signature != null)
 			{
-				AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtils.RECEIVER_TYPE, false);
+				AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
 				annotationVisitor.visit("value", signature);
 				annotationVisitor.visitEnd();
 			}
 		}
 
-		AnnotationUtils.writeModifiers(mw, this.modifiers);
+		ModifierUtil.writeModifiers(mw, this.modifiers);
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

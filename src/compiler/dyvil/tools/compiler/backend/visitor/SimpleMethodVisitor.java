@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.parsing.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor
@@ -43,7 +43,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String type, boolean visible)
 	{
 		IParameter param = this.method.getParameter_(parameter);
-		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
+		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(param.getModifiers());
 		}
@@ -55,11 +55,11 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		if (AnnotationUtils.DYVIL_MODIFIERS.equals(type))
+		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(this.method.getModifiers());
 		}
-		if (AnnotationUtils.RECEIVER_TYPE.equals(type))
+		if (AnnotationUtil.RECEIVER_TYPE.equals(type))
 		{
 			return new ReceiverTypeVisitor((IMethod) this.method);
 		}

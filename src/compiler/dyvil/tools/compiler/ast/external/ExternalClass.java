@@ -38,7 +38,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.sources.DyvilFileType;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -564,9 +564,9 @@ public final class ExternalClass extends AbstractClass
 	{
 		switch (type)
 		{
-		case AnnotationUtils.DYVIL_MODIFIERS:
+		case AnnotationUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.modifiers);
-		case AnnotationUtils.CLASS_PARAMETERS:
+		case AnnotationUtil.CLASS_PARAMETERS:
 			return new ClassParameterAnnotationVisitor(this);
 		}
 

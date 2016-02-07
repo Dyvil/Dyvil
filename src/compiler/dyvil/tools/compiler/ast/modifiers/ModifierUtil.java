@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.asm.AnnotatableVisitor;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -14,6 +16,11 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ModifierUtil
 {
+	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
+
+	private static final int MODIFIERS_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
+			& ~Modifiers.DEPRECATED & ~Modifiers.FUNCTIONAL & ~Modifiers.OVERRIDE; // exclude source-only modifiers
+
 	private ModifierUtil()
 	{
 	}
@@ -369,6 +376,20 @@ public final class ModifierUtil
 		{
 			markers.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented",
 			                                  Util.toString(member, type)));
+		}
+	}
+
+	public static void writeModifiers(AnnotatableVisitor mw, ModifierSet modifiers)
+	{
+		if (modifiers == null)
+		{
+			return;
+		}
+
+		final int dyvilModifiers = modifiers.toFlags() & MODIFIERS_MASK;
+		if (dyvilModifiers != 0)
+		{
+			mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true).visit("value", dyvilModifiers);
 		}
 	}
 }

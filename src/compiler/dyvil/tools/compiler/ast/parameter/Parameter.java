@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,7 +20,6 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtils;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -274,7 +274,7 @@ public abstract class Parameter extends Member implements IParameter
 			}
 		}
 
-		AnnotationUtils.writeModifiers(visitor, this.modifiers);
+		ModifierUtil.writeModifiers(visitor, this.modifiers);
 		
 		this.type.writeAnnotations(writer, TypeReference.newFormalParameterReference(this.index), "");
 
