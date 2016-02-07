@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -135,6 +135,13 @@ public class NamedGenericType extends GenericType
 		// Convert the non-generic class type to a generic one
 		if (!resolved.isGenericType())
 		{
+			if (!iClass.isTypeParameterized())
+			{
+				markers.add(
+						Markers.semanticError(this.position, "type.generic.class_not_generic", iClass.getFullName()));
+				return new ClassType(iClass);
+			}
+
 			typeVariables = iClass.getTypeParameters();
 
 			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
@@ -163,8 +170,8 @@ public class NamedGenericType extends GenericType
 			final IType type = this.typeArguments[i];
 			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
 			{
-				final Marker marker = Markers.semantic(type.getPosition(), "generic.type.incompatible",
-				                                       typeVariable.getName().qualified);
+				final Marker marker = Markers
+						.semantic(type.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified);
 				marker.addInfo(Markers.getSemantic("generic.type", type));
 				marker.addInfo(Markers.getSemantic("typevariable", typeVariable));
 				markers.add(marker);

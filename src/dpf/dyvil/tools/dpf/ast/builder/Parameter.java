@@ -3,12 +3,12 @@ package dyvil.tools.dpf.ast.builder;
 import dyvil.collection.Map;
 import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.ast.value.Value;
-import dyvil.tools.dpf.ast.value.ValueCreator;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class Parameter extends ValueCreator implements IASTNode, Expandable
+public class Parameter extends DPFValueVisitor implements IASTNode, Expandable
 {
 	private Name  name;
 	private Value value;
@@ -67,5 +67,29 @@ public class Parameter extends ValueCreator implements IASTNode, Expandable
 			buffer.append(this.name).append(": ");
 		}
 		this.value.toString(prefix, buffer);
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof Parameter))
+		{
+			return false;
+		}
+
+		final Parameter that = (Parameter) o;
+		return this.name == that.name && this.value.equals(that.value);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.name != null ? this.name.hashCode() : 0;
+		result = 31 * result + this.value.hashCode();
+		return result;
 	}
 }

@@ -1,11 +1,10 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.asm.Handle;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.util.Printer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class InvokeDynamicInstruction implements IInstruction
 {
@@ -23,14 +22,9 @@ public class InvokeDynamicInstruction implements IInstruction
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, Bytecode bytecode)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeInvokeDynamic(this.name, this.type, this.bsm, this.bsmArguments);
+		writer.visitInvokeDynamicInsn(this.name, this.type, this.bsm, this.bsmArguments);
 	}
 	
 	@Override

@@ -1,14 +1,16 @@
 package dyvilx.lang.model.type;
 
+import dyvil.annotation._internal.ClassParameters;
 import dyvil.collection.List;
 
+@ClassParameters(names = { "elementType" })
 public class ListType<E> implements Type<List<E>>
 {
 	private Type<E> elementType;
 
 	public static <E> ListType<E> apply(Type<E> elementType)
 	{
-		return new ListType<E>(elementType);
+		return new ListType<>(elementType);
 	}
 
 	public ListType(Type<E> elementType)
@@ -19,7 +21,12 @@ public class ListType<E> implements Type<List<E>>
 	@Override
 	public Class<List<E>> erasure()
 	{
-		return (Class) List.class;
+		return (Class<List<E>>) (Class) List.class;
+	}
+
+	public Type<E> elementType()
+	{
+		return this.elementType;
 	}
 	
 	@Override

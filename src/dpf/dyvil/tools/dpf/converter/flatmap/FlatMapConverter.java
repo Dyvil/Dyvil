@@ -1,8 +1,8 @@
-package dyvil.tools.dpf.converter.flatmapper;
+package dyvil.tools.dpf.converter.flatmap;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
-import dyvil.tools.dpf.Parser;
+import dyvil.tools.dpf.converter.string.Parser;
 import dyvil.tools.dpf.converter.DyvilValueVisitor;
 import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
@@ -24,7 +24,7 @@ public class FlatMapConverter implements NodeVisitor
 	{
 		Parser parser = new Parser(new MarkerList(), content);
 		FlatMapConverter converter = new FlatMapConverter(map);
-		parser.accept(converter);
+		parser.parseNodeBody(converter);
 	}
 
 	public FlatMapConverter(Map<String, Object> map)

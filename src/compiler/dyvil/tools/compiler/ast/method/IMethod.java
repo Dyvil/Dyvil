@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -19,6 +20,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IMethod extends IClassMember, ICallableMember, IMethodSignature, IContext
 {
+	@Override
+	default MemberKind getKind()
+	{
+		return MemberKind.METHOD;
+	}
+
 	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
 	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);

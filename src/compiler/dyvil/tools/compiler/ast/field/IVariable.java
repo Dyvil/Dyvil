@@ -1,10 +1,17 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.type.IType;
 
 public interface IVariable extends IDataMember
 {
+	@Override
+	default MemberKind getKind()
+	{
+		return MemberKind.VARIABLE;
+	}
+
 	@Override
 	default boolean isField()
 	{

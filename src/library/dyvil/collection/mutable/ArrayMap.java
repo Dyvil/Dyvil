@@ -1,12 +1,12 @@
 package dyvil.collection.mutable;
 
+import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -20,12 +20,13 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	
 	public static <K, V> ArrayMap<K, V> apply()
 	{
-		return new ArrayMap<K, V>(DEFAULT_CAPACITY);
+		return new ArrayMap<>(DEFAULT_CAPACITY);
 	}
 	
-	public static <K, V> ArrayMap<K, V> apply(Tuple2<K, V>... tuples)
+	@SafeVarargs
+	public static <K, V> ArrayMap<K, V> apply(Entry<K, V>... entries)
 	{
-		return new ArrayMap(tuples);
+		return new ArrayMap<>(entries);
 	}
 	
 	public ArrayMap()
@@ -45,7 +46,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	
 	public ArrayMap(K[] keys, V[] values, int size)
 	{
-		super(keys, values);
+		super(keys, values, size);
 	}
 	
 	public ArrayMap(Object[] keys, Object[] values, boolean trusted)
@@ -68,9 +69,10 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 		super(map);
 	}
 	
-	public ArrayMap(Tuple2<K, V>... tuples)
+	@SafeVarargs
+	public ArrayMap(Entry<K, V>... entries)
 	{
-		super(tuples);
+		super(entries);
 	}
 	
 	@Override
@@ -90,18 +92,18 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	}
 	
 	@Override
-	public boolean putIfAbsent(K key, V value)
+	public V putIfAbsent(K key, V value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
 			if (Objects.equals(key, this.keys[i]))
 			{
-				return false;
+				return (V) this.values[i];
 			}
 		}
 		
 		this.putNew(key, value);
-		return true;
+		return value;
 	}
 	
 	@Override
@@ -221,18 +223,12 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	@Override
 	public MutableMap<K, V> copy()
 	{
-		return new ArrayMap(this);
-	}
-	
-	@Override
-	public <RK, RV> MutableMap<RK, RV> emptyCopy()
-	{
-		return new ArrayMap();
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{
-		return new dyvil.collection.immutable.ArrayMap(this);
+		return this.immutableCopy();
 	}
 }

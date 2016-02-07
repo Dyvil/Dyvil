@@ -1,10 +1,19 @@
 package dyvil.tools.compiler.ast.modifiers;
 
+import dyvil.collection.iterator.EmptyIterator;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.util.Iterator;
 
 public class EmptyModifiers implements ModifierSet
 {
 	public static final EmptyModifiers INSTANCE = new EmptyModifiers();
+
+	@Override
+	public Iterator<Modifier> iterator()
+	{
+		return EmptyIterator.apply();
+	}
 
 	@Override
 	public boolean hasModifier(Modifier modifier)

@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.bytecode;
 
-import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.asm.Label;
+import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public class TryCatchInstruction implements IInstruction
 {
@@ -21,14 +20,9 @@ public class TryCatchInstruction implements IInstruction
 	}
 	
 	@Override
-	public void resolve(MarkerList markers, Bytecode bytecode)
+	public void write(MethodVisitor writer) throws BytecodeException
 	{
-	}
-	
-	@Override
-	public void write(MethodWriter writer) throws BytecodeException
-	{
-		writer.writeCatchBlock(this.start.target, this.end.target, this.handler.target, this.type);
+		writer.visitTryCatchBlock(this.start, this.end, this.handler, this.type);
 	}
 	
 	@Override

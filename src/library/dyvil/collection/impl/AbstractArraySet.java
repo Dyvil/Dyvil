@@ -1,7 +1,6 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -31,7 +30,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		this.size = Set.distinct(this.elements, size);
 	}
 	
-	public AbstractArraySet(Object[] elements, int size, boolean trusted)
+	public AbstractArraySet(Object[] elements, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;
@@ -58,6 +57,11 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		
 		this.elements = array;
 		this.size = index;
+	}
+
+	protected void addInternal(E element)
+	{
+
 	}
 	
 	@Override
@@ -198,7 +202,43 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	{
 		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
-	
+
+	@Override
+	public <R> MutableSet<R> emptyCopy()
+	{
+		return new dyvil.collection.mutable.ArraySet<>();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.ArraySet<>(capacity);
+	}
+
+	@Override
+	public MutableSet<E> mutableCopy()
+	{
+		return new dyvil.collection.mutable.ArraySet<>((E[]) this.elements, this.size);
+	}
+
+	@Override
+	public ImmutableSet<E> immutableCopy()
+	{
+		return new dyvil.collection.immutable.ArraySet<>((E[]) this.elements, this.size);
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.immutable.ArraySet.builder();
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.ArraySet.builder(capacity);
+	}
+
 	@Override
 	public java.util.Set<E> toJava()
 	{

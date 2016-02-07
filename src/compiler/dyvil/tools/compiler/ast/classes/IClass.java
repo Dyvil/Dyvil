@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParameterized;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterized;
@@ -24,6 +25,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClass extends IClassMember, ITypeParameterized, IContext, IParameterized, IClassCompilableList
 {
+	@Override
+	default MemberKind getKind()
+	{
+		return MemberKind.CLASS;
+	}
+
 	@Override
 	default void setTheClass(IClass iclass)
 	{

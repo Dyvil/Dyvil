@@ -60,21 +60,13 @@ public class SortedArrayList<E> extends ArrayList<E>
 	@Override
 	public boolean isSorted()
 	{
-		if (this.comparator == null)
-		{
-			return true;
-		}
-		return super.isSorted();
+		return this.comparator == null || super.isSorted();
 	}
 	
 	@Override
 	public boolean isSorted(Comparator<? super E> comparator)
 	{
-		if (comparator == this.comparator)
-		{
-			return true;
-		}
-		return super.isSorted(comparator);
+		return comparator == this.comparator || super.isSorted(comparator);
 	}
 	
 	@Override
@@ -96,7 +88,7 @@ public class SortedArrayList<E> extends ArrayList<E>
 		int size = this.comparator != null ?
 				Set.sortDistinct((E[]) array, this.size, this.comparator) :
 				Set.distinctSorted(array, this.size);
-		return new SortedArrayList(array, size, true, this.comparator);
+		return new SortedArrayList<>((E[]) array, size, true, this.comparator);
 	}
 	
 	@Override
@@ -107,12 +99,12 @@ public class SortedArrayList<E> extends ArrayList<E>
 		int size = this.comparator != comparator ?
 				Set.sortDistinct((E[]) array, this.size, comparator) :
 				Set.distinctSorted(array, this.size);
-		return new SortedArrayList(array, size, true, comparator);
+		return new SortedArrayList<>((E[]) array, size, true, comparator);
 	}
 	
 	@Override
 	public ImmutableList<E> copy()
 	{
-		return new SortedArrayList(this.elements, this.size, true, this.comparator);
+		return new SortedArrayList<>((E[]) this.elements, this.size, true, this.comparator);
 	}
 }

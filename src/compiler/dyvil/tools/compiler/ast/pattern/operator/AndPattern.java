@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.pattern.operator;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
@@ -30,6 +31,22 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
+	public IPattern resolve(MarkerList markers, IContext context)
+	{
+		super.resolveChildren(markers, context);
+
+		if (this.left.isExhaustive())
+		{
+			return this.right;
+		}
+		if (this.right.isExhaustive())
+		{
+			return this.left;
+		}
+		return this;
+	}
+
+	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		this.left = this.left.withType(type, markers);
@@ -55,7 +72,7 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
-	public int switchCases()
+	public int subPatterns()
 	{
 		return -1;
 	}
@@ -67,7 +84,7 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
-	public int switchValue(int index)
+	public int switchValue()
 	{
 		return 0;
 	}

@@ -70,11 +70,9 @@ public abstract class BinaryPattern implements IPattern
 		return this.left.isType(type) && this.right.isType(type);
 	}
 
-	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	protected void resolveChildren(MarkerList markers, IContext context)
 	{
 		this.left = this.left.resolve(markers, context);
 		this.right = this.right.resolve(markers, context);
-		return this;
 	}
 }

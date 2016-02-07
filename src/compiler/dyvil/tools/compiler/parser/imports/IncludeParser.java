@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;

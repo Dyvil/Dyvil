@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.FieldThis;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.Types;

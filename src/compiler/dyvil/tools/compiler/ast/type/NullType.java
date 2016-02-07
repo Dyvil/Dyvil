@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -21,6 +21,8 @@ import java.io.IOException;
 
 public class NullType implements IRawType
 {
+	public static final String NULL_INTERNAL = "dyvil/lang/Null";
+
 	@Override
 	public int typeTag()
 	{
@@ -87,7 +89,7 @@ public class NullType implements IRawType
 	@Override
 	public String getInternalName()
 	{
-		return "dyvil/lang/Null";
+		return NULL_INTERNAL;
 	}
 	
 	@Override

@@ -15,37 +15,20 @@ import java.util.function.Predicate;
 @Immutable
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements ImmutableSet<E>
 {
-	private static final long serialVersionUID = -1347044009183554635L;
-	
-	public static <E> IdentityHashSet<E> apply(E... elements)
-	{
-		return new IdentityHashSet<E>(elements);
-	}
-	
-	public static <E> Builder<E> builder()
-	{
-		return new Builder<E>();
-	}
-	
-	public static <E> Builder<E> builder(int capacity)
-	{
-		return new Builder<E>(capacity);
-	}
-	
 	public static class Builder<E> implements ImmutableSet.Builder<E>
 	{
 		private IdentityHashSet<E> set;
-		
+
 		public Builder()
 		{
-			this.set = new IdentityHashSet<E>(DEFAULT_CAPACITY);
+			this.set = new IdentityHashSet<>(DEFAULT_CAPACITY);
 		}
-		
+
 		public Builder(int capacity)
 		{
-			this.set = new IdentityHashSet<E>(capacity);
+			this.set = new IdentityHashSet<>(capacity);
 		}
-		
+
 		@Override
 		public void add(E element)
 		{
@@ -53,10 +36,10 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 			{
 				throw new IllegalStateException("Already built!");
 			}
-			
+
 			this.set.addInternal(element);
 		}
-		
+
 		@Override
 		public ImmutableSet<E> build()
 		{
@@ -65,7 +48,25 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 			return set;
 		}
 	}
-	
+
+	private static final long serialVersionUID = -1347044009183554635L;
+
+	@SafeVarargs
+	public static <E> IdentityHashSet<E> apply(E... elements)
+	{
+		return new IdentityHashSet<>(elements);
+	}
+
+	public static <E> Builder<E> builder()
+	{
+		return new Builder<>();
+	}
+
+	public static <E> Builder<E> builder(int capacity)
+	{
+		return new Builder<>(capacity);
+	}
+
 	protected IdentityHashSet()
 	{
 		super(DEFAULT_CAPACITY);
@@ -91,6 +92,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		super(set);
 	}
 	
+	@SafeVarargs
 	public IdentityHashSet(E... elements)
 	{
 		super(elements);
@@ -99,7 +101,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<E> $plus(E element)
 	{
-		IdentityHashSet<E> copy = new IdentityHashSet(this);
+		IdentityHashSet<E> copy = new IdentityHashSet<>(this);
 		copy.ensureCapacity(this.size + 1);
 		copy.addInternal(element);
 		return copy;
@@ -108,7 +110,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<E> $minus(Object element)
 	{
-		IdentityHashSet<E> copy = new IdentityHashSet(this.size);
+		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size);
 		for (E e : this)
 		{
 			if (element != e)
@@ -122,7 +124,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
-		IdentityHashSet<E> copy = new IdentityHashSet(this.size);
+		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size);
 		for (E e : this)
 		{
 			if (!collection.contains(e))
@@ -136,7 +138,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
 	{
-		IdentityHashSet<E> copy = new IdentityHashSet(this.size);
+		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size);
 		for (E e : this)
 		{
 			if (collection.contains(e))
@@ -150,7 +152,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
-		IdentityHashSet<E> copy = new IdentityHashSet(this.size + collection.size());
+		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size + collection.size());
 		for (E e : this)
 		{
 			copy.addInternal(e);
@@ -165,7 +167,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
 	{
-		IdentityHashSet<E> copy = new IdentityHashSet(this.size + collection.size());
+		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size + collection.size());
 		for (E e : this)
 		{
 			if (!collection.contains(e))
@@ -186,7 +188,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		IdentityHashSet<R> copy = new IdentityHashSet(this.size);
+		IdentityHashSet<R> copy = new IdentityHashSet<>(this.size);
 		for (E e : this)
 		{
 			copy.addInternal(mapper.apply(e));
@@ -197,7 +199,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		IdentityHashSet<R> copy = new IdentityHashSet(this.size << 2);
+		IdentityHashSet<R> copy = new IdentityHashSet<>(this.size << 2);
 		for (E e : this)
 		{
 			for (R result : mapper.apply(e))
@@ -211,7 +213,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<E> filtered(Predicate<? super E> condition)
 	{
-		IdentityHashSet<E> set = new IdentityHashSet(this.size);
+		IdentityHashSet<E> set = new IdentityHashSet<>(this.size);
 		for (E e : this)
 		{
 			if (condition.test(e))
@@ -225,12 +227,12 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	@Override
 	public ImmutableSet<E> copy()
 	{
-		return new IdentityHashSet<E>(this);
+		return this.immutableCopy();
 	}
 	
 	@Override
 	public MutableSet<E> mutable()
 	{
-		return new dyvil.collection.mutable.IdentityHashSet<E>(this);
+		return this.mutableCopy();
 	}
 }

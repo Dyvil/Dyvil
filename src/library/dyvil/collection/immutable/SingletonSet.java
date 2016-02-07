@@ -27,7 +27,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	
 	public static <E> SingletonSet<E> apply(E element)
 	{
-		return new SingletonSet(element);
+		return new SingletonSet<>(element);
 	}
 	
 	public SingletonSet(E element)
@@ -50,7 +50,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return new SingletonIterator<E>(this.element);
+		return new SingletonIterator<>(this.element);
 	}
 	
 	@Override
@@ -106,7 +106,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	{
 		if (!collection.contains(this))
 		{
-			return new ArraySet(collection);
+			return new ArraySet<>(collection);
 		}
 		
 		Object[] array = new Object[1 + collection.size()];
@@ -125,7 +125,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 			
 			array[index++] = element;
 		}
-		return new ArraySet(array, index, true);
+		return new ArraySet<>((E[]) array, index, true);
 	}
 	
 	@Override
@@ -133,7 +133,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	{
 		if (!collection.contains(this.element))
 		{
-			return new ArraySet(collection);
+			return new ArraySet<>(collection);
 		}
 		
 		Object[] array = new Object[1 + collection.size()];
@@ -152,7 +152,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 			
 			array[index++] = element;
 		}
-		return new ArraySet(array, index, true);
+		return new ArraySet<>((E[]) array, index, true);
 	}
 	
 	@Override
@@ -202,11 +202,35 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	{
 		return ImmutableSet.apply(this.element);
 	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy()
+	{
+		return MutableSet.apply();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return MutableSet.withCapacity(capacity);
+	}
 	
 	@Override
 	public MutableSet<E> mutable()
 	{
 		return MutableSet.apply(this.element);
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return ImmutableSet.builder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return ImmutableSet.builder(capacity);
 	}
 	
 	@Override
@@ -214,11 +238,14 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	{
 		return Collections.singleton(this.element);
 	}
-	
+
 	@Override
+	@SuppressWarnings("StringBufferReplaceableByString")
 	public String toString()
 	{
-		return new StringBuilder().append('[').append(this.element).append(']').toString();
+		final String elementToString = String.valueOf(this.element);
+		// No String concat to make use of the known length
+		return new StringBuilder(elementToString + 2).append('[').append(elementToString).append(']').toString();
 	}
 	
 	@Override

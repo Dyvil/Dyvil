@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -42,16 +42,17 @@ public final class PrimitiveType implements IType
 	public static final int FLOAT_CODE   = 7;
 	public static final int DOUBLE_CODE  = 8;
 	
-	private static final long PROMOTION_BITS = 0x3C3C0CFC;
+	private static final long PROMOTION_BITS;
 	
 	static
 	{
 		// Code to generate the value of PROMOTION_BITS. Uncomment as needed.
 		// @formatter:off
-		/*
+		/* toggle
 		long promoBits = 0L;
 		promoBits |= bitMask(BYTE_CODE, SHORT_CODE) | bitMask(BYTE_CODE, CHAR_CODE) | bitMask(BYTE_CODE, INT_CODE);
 		promoBits |= bitMask(SHORT_CODE, CHAR_CODE) | bitMask(SHORT_CODE, INT_CODE);
+		promoBits |= bitMask(CHAR_CODE, INT_CODE);
 		// Integer types can be promoted to long, float and double
 		for (int i = BYTE_CODE; i <= INT_CODE; i++)
 		{
@@ -62,7 +63,9 @@ public final class PrimitiveType implements IType
 		promoBits |= bitMask(LONG_CODE, DOUBLE_CODE);
 		promoBits |= bitMask(FLOAT_CODE, DOUBLE_CODE);
 		PROMOTION_BITS = promoBits;
-		*/
+		/*/
+		PROMOTION_BITS = 0x7E1E1E0E06020000L;
+		//*/
 		// @formatter:on
 	}
 	
@@ -338,14 +341,14 @@ public final class PrimitiveType implements IType
 		return m + 1;
 	}
 	
-	private static int bitMask(int from, int to)
+	private static long bitMask(int from, int to)
 	{
-		return 1 << (from | to << 3);
+		return 1L << ((from - 1) | ((to - 1) << 3));
 	}
 	
 	private static boolean isPromotable(int from, int to)
 	{
-		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0;
+		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
 	}
 	
 	@Override

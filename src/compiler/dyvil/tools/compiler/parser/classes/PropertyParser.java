@@ -11,8 +11,9 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -93,14 +94,14 @@ public class PropertyParser extends Parser implements IValueConsumer
 					this.target = SETTER;
 					return;
 				}
-				if (name == Names.init)
-				{
-					this.property.setInitializerPosition(token.raw());
-					this.mode = SEPARATOR;
-					this.target = INITIALIZER;
-					return;
-				}
 				pm.report(token, "property.tag.unknown");
+				return;
+			}
+			if (type == DyvilKeywords.INIT)
+			{
+				this.property.setInitializerPosition(token.raw());
+				this.mode = SEPARATOR;
+				this.target = INITIALIZER;
 				return;
 			}
 			pm.report(token, "property.tag");

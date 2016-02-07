@@ -1,10 +1,9 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
-import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,24 +17,20 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 {
 	private static final long serialVersionUID = 2012245218476747334L;
 	
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
 	{
-		TreeMap<K, V> map = new TreeMap();
-		for (Tuple2<K, V> entry : entries)
-		{
-			map.putInternal(entry._1, entry._2);
-		}
-		return map;
+		return new TreeMap<>(entries);
 	}
 	
 	public static <K, V> Builder<K, V> builder()
 	{
-		return new Builder<K, V>();
+		return new Builder<>();
 	}
 	
 	public static <K, V> Builder<K, V> builder(Comparator<? super K> comparator)
 	{
-		return new Builder<K, V>(comparator);
+		return new Builder<>(comparator);
 	}
 	
 	protected static final class Builder<K, V> implements ImmutableMap.Builder<K, V>
@@ -44,12 +39,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 		
 		public Builder()
 		{
-			this.map = new TreeMap<K, V>();
+			this.map = new TreeMap<>();
 		}
 		
 		public Builder(Comparator<? super K> comparator)
 		{
-			this.map = new TreeMap<K, V>(comparator);
+			this.map = new TreeMap<>(comparator);
 		}
 		
 		@Override
@@ -89,11 +84,17 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	{
 		super(map, comparator);
 	}
+
+	@SafeVarargs
+	public TreeMap(Entry<? extends K, ? extends V>... entries)
+	{
+		super(entries);
+	}
 	
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		copy.putInternal(key, value);
 		return copy;
 	}
@@ -101,7 +102,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
 			copy.putInternal(entry.getKey(), entry.getValue());
@@ -112,7 +113,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$at(Object key)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		boolean found = false;
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
@@ -131,7 +132,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		boolean found = false;
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
@@ -154,7 +155,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			V entryValue = entry.getValue();
@@ -169,7 +170,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			K entryKey = entry.getKey();
@@ -185,7 +186,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			K entryKey = entry.getKey();
@@ -200,7 +201,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		TreeMap<NK, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<NK, V> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			V value = entry.value;
@@ -212,7 +213,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		TreeMap<K, NV> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, NV> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			K key = entry.key;
@@ -224,7 +225,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		TreeMap<NK, NV> copy = new TreeMap(this, this.comparator);
+		TreeMap<NK, NV> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry.key, entry.value);
@@ -239,7 +240,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		TreeMap<NK, NV> copy = new TreeMap(this, this.comparator);
+		TreeMap<NK, NV> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry.key, entry.value))
@@ -253,7 +254,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		TreeMap<K, V> copy = new TreeMap(this, this.comparator);
+		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			K key = entry.key;
@@ -269,7 +270,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		TreeMap<V, K> copy = new TreeMap(this);
+		TreeMap<V, K> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			copy.putInternal(entry.value, entry.key);
@@ -280,13 +281,19 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new TreeMap(this, this.comparator);
+		return this.immutableCopy();
 	}
-	
+
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.TreeMap(this, this.comparator);
+		return this.mutableCopy();
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return builder();
 	}
 	
 	@Override

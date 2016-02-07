@@ -12,11 +12,11 @@ public class UnknownType<T> implements Type<T>
 	
 	public static <T> UnknownType<T> apply()
 	{
-		return instance;
+		return (UnknownType<T>) instance;
 	}
 	
 	@Override
-	public Class erasure()
+	public Class<T> erasure()
 	{
 		return null;
 	}

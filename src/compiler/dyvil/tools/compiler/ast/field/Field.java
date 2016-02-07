@@ -314,13 +314,7 @@ public class Field extends Member implements IField
 			markers.add(Markers.semantic(this.position, "field.type.void"));
 		}
 		
-		int illegalModifiers = this.modifiers.toFlags() & ~Modifiers.FIELD_MODIFIERS;
-		if (illegalModifiers != 0)
-		{
-			markers.add(
-					Markers.semanticError(this.position, "modifiers.illegal", Markers.getSemantic("field", this.name),
-					                      ModifierUtil.methodModifiersToString(illegalModifiers)));
-		}
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.FIELD_MODIFIERS);
 	}
 	
 	@Override

@@ -11,14 +11,14 @@ import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -52,6 +52,12 @@ public final class ClassParameter extends Parameter implements IField
 	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
 	{
 		super(position, name, type, modifiers);
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.CLASS_PARAMETER;
 	}
 
 	@Override
@@ -123,21 +129,18 @@ public final class ClassParameter extends Parameter implements IField
 			{
 				if (instance.valueTag() != IValue.CLASS_ACCESS)
 				{
-					markers.add(Markers
-							            .semantic(position, "classparameter.access.static", this.name.unqualified));
+					markers.add(Markers.semantic(position, "classparameter.access.static", this.name.unqualified));
 					return null;
 				}
 			}
 			else if (instance.valueTag() == IValue.CLASS_ACCESS)
 			{
-				markers.add(
-						Markers.semantic(position, "classparameter.access.instance", this.name.unqualified));
+				markers.add(Markers.semantic(position, "classparameter.access.instance", this.name.unqualified));
 			}
 		}
 		else if (!this.hasModifier(Modifiers.STATIC))
 		{
-			markers.add(
-					Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
+			markers.add(Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
 			return new ThisExpr(position, this.theClass.getType(), context, markers);
 		}
 		
@@ -149,18 +152,17 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
 		{
-			markers.add(
-					Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
+			markers.add(Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
 		else if (this.hasModifier(Modifiers.FINAL))
 		{
 			markers.add(Markers.semantic(position, "classparameter.assign.final", this.name.unqualified));
 		}
 		
-		IValue value1 = newValue.withType(this.type, null, markers, context);
-		if (value1 == null)
+		final IValue typed = newValue.withType(this.type, null, markers, context);
+		if (typed == null)
 		{
-			Marker marker = Markers
+			final Marker marker = Markers
 					.semantic(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
 			marker.addInfo(Markers.getSemantic("classparameter.type", this.type));
 			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
@@ -168,69 +170,27 @@ public final class ClassParameter extends Parameter implements IField
 		}
 		else
 		{
-			newValue = value1;
+			newValue = typed;
 		}
 		
 		return newValue;
 	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		super.resolve(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.resolve(markers, context);
-			
-			IValue value1 = this.defaultValue.withType(this.type, null, markers, context);
-			if (value1 == null)
-			{
-				Marker marker = Markers
-						.semantic(this.defaultValue.getPosition(), "classparameter.type.incompatible",
-						          this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("classparameter.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.defaultValue = value1;
-			}
-			
-			this.defaultValue = Util.constant(this.defaultValue, markers);
-			return;
-		}
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(
-					Markers.semantic(this.position, "classparameter.type.nodefault", this.name.unqualified));
-			this.type = Types.ANY;
-		}
-	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.check(markers, context);
-		}
-		
-		if (this.type == Types.VOID)
-		{
-			markers.add(Markers.semantic(this.position, "classparameter.type.void"));
-		}
+
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String desc = this.getDescription();
 		FieldVisitor fv = writer
-				.visitField(this.modifiers.toFlags() & 0xFFFF, this.name.qualified, desc, this.getSignature(), null);
+				.visitField(this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK, this.name.qualified, desc,
+				            this.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}

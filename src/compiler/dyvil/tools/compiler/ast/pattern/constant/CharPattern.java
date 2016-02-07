@@ -84,13 +84,13 @@ public final class CharPattern extends Pattern
 	}
 	
 	@Override
-	public int switchCases()
+	public int subPatterns()
 	{
 		return 1;
 	}
 	
 	@Override
-	public int switchValue(int index)
+	public int switchValue()
 	{
 		if (this.type == CHAR)
 		{
@@ -102,13 +102,13 @@ public final class CharPattern extends Pattern
 	@Override
 	public int minValue()
 	{
-		return this.switchValue(0);
+		return this.switchValue();
 	}
 	
 	@Override
 	public int maxValue()
 	{
-		return this.switchValue(0);
+		return this.switchValue();
 	}
 	
 	@Override

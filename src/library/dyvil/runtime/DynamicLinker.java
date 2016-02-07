@@ -25,7 +25,7 @@ public class DynamicLinker
 	}
 	
 	private static final MethodHandle CHECK_CLASS;
-	private static final MethodHandle FALLBACK;
+	private static final MethodHandle INVOKE_DYNAMIC;
 	
 	static
 	{
@@ -34,7 +34,7 @@ public class DynamicLinker
 		{
 			CHECK_CLASS = lookup.findStatic(DynamicLinker.class, "checkClass",
 			                                MethodType.methodType(boolean.class, Class.class, Object.class));
-			FALLBACK = lookup.findStatic(DynamicLinker.class, "fallback", MethodType
+			INVOKE_DYNAMIC = lookup.findStatic(DynamicLinker.class, "invokeDynamic", MethodType
 					.methodType(Object.class, InliningCacheCallSite.class, Object[].class));
 		}
 		catch (ReflectiveOperationException e)
@@ -48,11 +48,24 @@ public class DynamicLinker
 		return linkExtension(lookup, name, type, null);
 	}
 	
+	public static CallSite linkExtension(Lookup lookup, String name, MethodType type, MethodHandle fallbackImplementation)
+	{
+		final InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type, fallbackImplementation);
+
+		// Creates a MethodHandle that, when called, passes the parameters to the 'invokeDynamic' method, with the above
+		// callSite as the first argument
+		final MethodHandle invokeDynamic = INVOKE_DYNAMIC.bindTo(callSite)
+		                                                 .asCollector(Object[].class, type.parameterCount())
+		                                                 .asType(type);
+		callSite.setTarget(invokeDynamic);
+		return callSite;
+	}
+
 	public static boolean checkClass(Class<?> clazz, Object receiver)
 	{
 		return receiver.getClass() == clazz;
 	}
-	
+
 	public static Method findMethod(Class<?> receiver, String name, Class[] parameterTypes) throws Throwable
 	{
 		do
@@ -61,65 +74,58 @@ public class DynamicLinker
 			{
 				return receiver.getDeclaredMethod(name, parameterTypes);
 			}
-			catch (NoSuchMethodException ex)
+			catch (NoSuchMethodException ignored)
 			{
 			}
-			
+
 			receiver = receiver.getSuperclass();
 		}
 		while (receiver != null);
 		return null;
 	}
-	
-	public static Object fallback(InliningCacheCallSite callSite, Object[] args) throws Throwable
+
+	public static Object invokeDynamic(InliningCacheCallSite callSite, Object[] args) throws Throwable
 	{
-		MethodType type = callSite.type();
+		final MethodType type = callSite.type();
 		if (callSite.depth >= InliningCacheCallSite.MAX_DEPTH)
 		{
 			// revert to a vtable call
-			MethodHandle target = callSite.lookup
+			final MethodHandle virtualTarget = callSite.lookup
 					.findVirtual(type.parameterType(0), callSite.name, type.dropParameterTypes(0, 1));
-			callSite.setTarget(target);
-			return target.invokeWithArguments(args);
+			callSite.setTarget(virtualTarget);
+			return virtualTarget.invokeWithArguments(args);
 		}
-		
-		Object receiver = args[0];
+
+		final Object receiver = args[0];
 		if (receiver == null)
 		{
 			return null;
 		}
-		
-		Class<?> receiverClass = receiver.getClass();
-		Method m = findMethod(receiverClass, callSite.name, type.dropParameterTypes(0, 1).parameterArray());
-		
-		if (m == null)
+
+		final Class<?> receiverClass = receiver.getClass();
+
+		final Method implementationMethod = findMethod(receiverClass, callSite.name, type.dropParameterTypes(0, 1).parameterArray());
+
+		if (implementationMethod != null)
 		{
-			MethodHandle fallback = callSite.fallback;
-			if (fallback == null)
-			{
-				throw new NoSuchMethodError(callSite.name);
-			}
-			return fallback.invokeWithArguments(args);
+			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(type);
+
+			MethodHandle test = CHECK_CLASS.bindTo(receiverClass);
+			test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
+
+			final MethodHandle guard = MethodHandles.guardWithTest(test, target, callSite.getTarget());
+			callSite.depth++;
+
+			callSite.setTarget(guard);
+			return target.invokeWithArguments(args);
 		}
-		
-		MethodHandle target = callSite.lookup.unreflect(m);
-		target = target.asType(type);
-		
-		MethodHandle test = CHECK_CLASS.bindTo(receiverClass);
-		test = test.asType(test.type().changeParameterType(0, type.parameterType(0)));
-		
-		MethodHandle guard = MethodHandles.guardWithTest(test, target, callSite.getTarget());
-		callSite.depth++;
-		
-		callSite.setTarget(guard);
-		return target.invokeWithArguments(args);
-	}
-	
-	public static CallSite linkExtension(Lookup lookup, String name, MethodType type, MethodHandle fallback)
-	{
-		InliningCacheCallSite callSite = new InliningCacheCallSite(lookup, name, type, fallback);
-		MethodHandle fb = FALLBACK.bindTo(callSite).asCollector(Object[].class, type.parameterCount()).asType(type);
-		callSite.setTarget(fb);
-		return callSite;
+
+		final MethodHandle fallbackMethod = callSite.fallback;
+		if (fallbackMethod != null)
+		{
+			return fallbackMethod.invokeWithArguments(args);
+		}
+
+		throw new NoSuchMethodError(callSite.name);
 	}
 }

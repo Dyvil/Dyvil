@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.Collection;
@@ -9,7 +10,6 @@ import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
-import dyvil.annotation.Immutable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -28,7 +28,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	
 	public static <E> EmptyList<E> apply()
 	{
-		return instance;
+		return (EmptyList<E>) instance;
 	}
 	
 	private EmptyList()
@@ -50,13 +50,13 @@ public final class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return EmptyIterator.instance;
+		return (Iterator<E>) EmptyIterator.instance;
 	}
 	
 	@Override
 	public Iterator<E> reverseIterator()
 	{
-		return EmptyIterator.instance;
+		return (Iterator<E>) EmptyIterator.instance;
 	}
 	
 	@Override
@@ -234,17 +234,41 @@ public final class EmptyList<E> implements ImmutableList<E>
 	{
 		return this;
 	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy()
+	{
+		return MutableList.apply();
+	}
+
+	@Override
+	public <RE> MutableList<RE> emptyCopy(int capacity)
+	{
+		return MutableList.withCapacity(capacity);
+	}
 	
 	@Override
 	public MutableList<E> mutable()
 	{
 		return MutableList.apply();
 	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return AppendList.builder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return ImmutableList.builder(capacity);
+	}
 	
 	@Override
 	public java.util.List<E> toJava()
 	{
-		return Collections.EMPTY_LIST;
+		return (java.util.List<E>) Collections.EMPTY_LIST;
 	}
 	
 	@Override
@@ -256,7 +280,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public boolean equals(Object obj)
 	{
-		return List.listEquals(this, obj);
+		return dyvil.collection.List.listEquals(this, obj);
 	}
 	
 	@Override

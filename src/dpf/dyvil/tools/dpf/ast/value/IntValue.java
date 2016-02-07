@@ -34,6 +34,7 @@ public class IntValue implements Constant
 	}
 
 	@Override
+
 	public void appendString(StringBuilder builder)
 	{
 		builder.append(this.value);
@@ -49,5 +50,27 @@ public class IntValue implements Constant
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.value);
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof IntValue))
+		{
+			return false;
+		}
+
+		final IntValue that = (IntValue) o;
+		return this.value == that.value;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.value;
 	}
 }

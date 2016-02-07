@@ -8,7 +8,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -129,8 +130,7 @@ public final class Variable extends Member implements IVariable
 		{
 			if (newValue.isResolved())
 			{
-				Marker marker = Markers
-						.semantic(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+				Marker marker = Markers.semantic(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("variable.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 				markers.add(marker);
@@ -206,8 +206,7 @@ public final class Variable extends Member implements IVariable
 		{
 			if (this.value.isResolved())
 			{
-				Marker marker = Markers
-						.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
+				Marker marker = Markers.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("variable.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
@@ -237,7 +236,12 @@ public final class Variable extends Member implements IVariable
 		super.check(markers, context);
 		
 		this.value.check(markers, context);
-		
+
+		if (this.modifiers != null)
+		{
+			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.VARIABLE_MODIFIERS);
+		}
+
 		if (this.type == Types.VOID)
 		{
 			markers.add(Markers.semantic(this.position, "variable.type.void"));

@@ -1,11 +1,10 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -15,42 +14,20 @@ import java.util.function.BiPredicate;
 @Immutable
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements ImmutableMap<K, V>
 {
-	private static final long serialVersionUID = 7106880090218416170L;
-	
-	public static <K, V> IdentityHashMap<K, V> apply()
-	{
-		return new IdentityHashMap();
-	}
-	
-	public static <K, V> IdentityHashMap<K, V> apply(Tuple2<K, V>... entries)
-	{
-		return new IdentityHashMap(entries);
-	}
-	
-	public static <K, V> Builder<K, V> builder()
-	{
-		return new Builder<K, V>();
-	}
-	
-	public static <K, V> Builder<K, V> builder(int capacity)
-	{
-		return new Builder<K, V>(capacity);
-	}
-	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
 		private IdentityHashMap<K, V> map;
-		
+
 		public Builder()
 		{
-			this.map = new IdentityHashMap<K, V>();
+			this.map = new IdentityHashMap<>();
 		}
-		
+
 		public Builder(int capacity)
 		{
-			this.map = new IdentityHashMap<K, V>(capacity);
+			this.map = new IdentityHashMap<>(capacity);
 		}
-		
+
 		@Override
 		public void put(K key, V value)
 		{
@@ -58,10 +35,10 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			{
 				throw new IllegalStateException("Already built!");
 			}
-			
+
 			this.map.putInternal(key, value);
 		}
-		
+
 		@Override
 		public IdentityHashMap<K, V> build()
 		{
@@ -70,12 +47,35 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			return map;
 		}
 	}
-	
+
+	private static final long serialVersionUID = 7106880090218416170L;
+
+	public static <K, V> IdentityHashMap<K, V> apply()
+	{
+		return new IdentityHashMap<>();
+	}
+
+	@SafeVarargs
+	public static <K, V> IdentityHashMap<K, V> apply(Entry<K, V>... entries)
+	{
+		return new IdentityHashMap<>(entries);
+	}
+
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder<>();
+	}
+
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new Builder<>(capacity);
+	}
+
 	protected IdentityHashMap()
 	{
 		super(AbstractIdentityHashMap.DEFAULT_CAPACITY);
 	}
-	
+
 	protected IdentityHashMap(int capacity)
 	{
 		super(capacity);
@@ -91,7 +91,8 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		super(map);
 	}
 	
-	public IdentityHashMap(Tuple2<K, V>... entries)
+	@SafeVarargs
+	public IdentityHashMap(Entry<K, V>... entries)
 	{
 		super(entries);
 	}
@@ -99,7 +100,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $plus(K key, V value)
 	{
-		IdentityHashMap<K, V> map = new IdentityHashMap(this);
+		IdentityHashMap<K, V> map = new IdentityHashMap<>(this);
 		map.ensureCapacity(this.size + 1);
 		map.putInternal(key, value);
 		return map;
@@ -108,7 +109,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this);
 		copy.ensureCapacity(this.size + map.size());
 		copy.putInternal(map);
 		return copy;
@@ -117,7 +118,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus$at(Object key)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K k = entry.getKey();
@@ -132,7 +133,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus(Object key, Object value)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K k = entry.getKey();
@@ -148,7 +149,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus$colon(Object value)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			V v = entry.getValue();
@@ -163,7 +164,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K k = entry.getKey();
@@ -179,7 +180,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K k = entry.getKey();
@@ -194,7 +195,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
-		IdentityHashMap<NK, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<NK, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			V value = entry.getValue();
@@ -206,7 +207,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		IdentityHashMap<K, NV> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, NV> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
@@ -218,7 +219,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		IdentityHashMap<NK, NV> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<NK, NV> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			Entry<? extends NK, ? extends NV> result = mapper.apply(entry.getKey(), entry.getValue());
@@ -233,7 +234,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		IdentityHashMap<NK, NV> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<NK, NV> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			for (Entry<? extends NK, ? extends NV> result : mapper.apply(entry.getKey(), entry.getValue()))
@@ -247,7 +248,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
@@ -263,7 +264,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		IdentityHashMap<V, K> copy = new IdentityHashMap(this.size);
+		IdentityHashMap<V, K> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			copy.putInternal(entry.getValue(), entry.getKey());
@@ -274,12 +275,12 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new IdentityHashMap<K, V>(this);
+		return this.immutableCopy();
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.IdentityHashMap<K, V>(this);
+		return this.mutableCopy();
 	}
 }

@@ -9,6 +9,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -19,7 +20,7 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
@@ -565,7 +566,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		Util.methodSignatureToString(method, buf);
 		this.repl.getOutput().println(buf.append('\'').toString());
 	}
-	
+
+	@Override
+	public void addInitializer(IInitializer initializer)
+	{
+	}
+
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{

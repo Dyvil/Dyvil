@@ -53,7 +53,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 		// Add the java.lang.Annotation interface
 		if (!this.theClass.isSubTypeOf(Annotation.Types.ANNOTATION))

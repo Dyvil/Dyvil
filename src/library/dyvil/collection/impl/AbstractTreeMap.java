@@ -1,7 +1,9 @@
 package dyvil.collection.impl;
 
 import dyvil.collection.Entry;
+import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
+import dyvil.collection.MutableMap;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -15,7 +17,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	protected static final class TreeEntry<K, V> implements dyvil.collection.Entry<K, V>
 	{
 		private static final long serialVersionUID = -8592912850607607269L;
-		
+
 		public transient K key;
 		public transient V value;
 		protected transient TreeEntry<K, V> left  = null;
@@ -78,9 +80,9 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			
 			this.key = (K) in.readObject();
 			this.value = (V) in.readObject();
-			this.left = (TreeEntry) in.readObject();
-			this.right = (TreeEntry) in.readObject();
-			this.parent = (TreeEntry) in.readObject();
+			this.left = (TreeEntry<K, V>) in.readObject();
+			this.right = (TreeEntry<K, V>) in.readObject();
+			this.parent = (TreeEntry<K, V>) in.readObject();
 			this.color = in.readBoolean();
 		}
 	}
@@ -177,13 +179,24 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			this.putInternal(entry.getKey(), entry.getValue());
 		}
 	}
+
+	@SafeVarargs
+	public AbstractTreeMap(Entry<? extends K, ? extends V>... entries)
+	{
+		this.comparator = null;
+		for (Entry<? extends K, ? extends V> entry : entries)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
 	
 	public Comparator<? super K> comparator()
 	{
 		return this.comparator;
 	}
 	
-	protected static final int compare(Comparator comparator, Object k1, Object k2)
+	@SuppressWarnings("unchecked")
+	protected static int compare(Comparator comparator, Object k1, Object k2)
 	{
 		return comparator == null ? ((Comparable) k1).compareTo(k2) : comparator.compare(k1, k2);
 	}
@@ -197,27 +210,19 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public boolean isSorted()
 	{
-		if (this.comparator == null)
-		{
-			return true;
-		}
-		return Map.super.isSorted();
+		return this.comparator == null || Map.super.isSorted();
 	}
 	
 	@Override
 	public boolean isSorted(Comparator<? super K> comparator)
 	{
-		if (comparator == this.comparator)
-		{
-			return true;
-		}
-		return Map.super.isSorted(comparator);
+		return comparator == this.comparator || Map.super.isSorted(comparator);
 	}
 	
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
-		return new TreeEntryIterator(this.getFirstEntry())
+		return new TreeEntryIterator<Entry<K, V>>(this.getFirstEntry())
 		{
 			@Override
 			public Entry<K, V> next()
@@ -230,7 +235,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public Spliterator<Entry<K, V>> spliterator()
 	{
-		return new EntrySpliterator<K, V>(this, null, null, 0, -1);
+		return new EntrySpliterator<>(this, null, null, 0, -1);
 	}
 	
 	@Override
@@ -249,7 +254,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public final Spliterator<K> keySpliterator()
 	{
-		return new KeySpliterator<K, V>(this, null, null, 0, -1);
+		return new KeySpliterator<>(this, null, null, 0, -1);
 	}
 	
 	@Override
@@ -268,7 +273,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public Spliterator<V> valueSpliterator()
 	{
-		return new ValueSpliterator<K, V>(this, null, null, 0, -1);
+		return new ValueSpliterator<>(this, null, null, 0, -1);
 	}
 	
 	static class TreeMapSpliterator<K, V>
@@ -595,8 +600,9 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			return (this.side == 0 ? Spliterator.SIZED : 0) | Spliterator.DISTINCT | Spliterator.SORTED
 					| Spliterator.ORDERED;
 		}
-		
+
 		@Override
+		@SuppressWarnings("unchecked")
 		public Comparator<Entry<K, V>> getComparator()
 		{
 			if (this.tree.comparator != null)
@@ -606,7 +612,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			return (Comparator) Entry.<Comparable, V>comparingByKey();
 		}
 	}
-	
+
 	@Override
 	public boolean containsKey(Object key)
 	{
@@ -629,13 +635,8 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		TreeEntry<K, V> entry = this.getEntry(key);
-		if (entry == null)
-		{
-			return false;
-		}
-		
-		return Objects.equals(value, entry.value);
+		final TreeEntry<K, V> entry = this.getEntry(key);
+		return entry != null && Objects.equals(value, entry.value);
 	}
 	
 	@Override
@@ -649,7 +650,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	public Option<V> getOption(Object key)
 	{
 		TreeEntry<K, V> p = this.getEntry(key);
-		return p == null ? None.instance : new Some(p.value);
+		return p == null ? None.instance : new Some<>(p.value);
 	}
 	
 	protected final V putInternal(K key, V value)
@@ -738,33 +739,32 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		{
 			K k = (K) key;
 			Comparator<? super K> cpr = this.comparator;
-			if (cpr != null)
+			TreeEntry<K, V> p = this.root;
+			while (p != null)
 			{
-				TreeEntry<K, V> p = this.root;
-				while (p != null)
+				int cmp = cpr.compare(k, p.key);
+				if (cmp < 0)
 				{
-					int cmp = cpr.compare(k, p.key);
-					if (cmp < 0)
-					{
-						p = p.left;
-					}
-					else if (cmp > 0)
-					{
-						p = p.right;
-					}
-					else
-					{
-						return p;
-					}
+					p = p.left;
+				}
+				else if (cmp > 0)
+				{
+					p = p.right;
+				}
+				else
+				{
+					return p;
 				}
 			}
 			return null;
 		}
+
 		if (key == null)
 		{
 			throw new NullPointerException();
 		}
-		@SuppressWarnings("unchecked") Comparable<? super K> k = (Comparable<? super K>) key;
+
+		Comparable<? super K> k = (Comparable<? super K>) key;
 		TreeEntry<K, V> p = this.root;
 		while (p != null)
 		{
@@ -895,6 +895,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		return p == null ? null : p.right;
 	}
 	
+	@SuppressWarnings("PointlessBooleanExpression")
 	protected void fixAfterInsertion(TreeEntry<K, V> x)
 	{
 		x.color = RED;
@@ -1005,6 +1006,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		}
 	}
 	
+	@SuppressWarnings("PointlessBooleanExpression")
 	private void fixAfterDeletion(TreeEntry<K, V> x)
 	{
 		while (x != this.root && colorOf(x) == BLACK)
@@ -1080,6 +1082,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		setColor(x, BLACK);
 	}
 	
+	@SuppressWarnings("PointlessBooleanExpression")
 	protected void deleteEntry(TreeEntry<K, V> p)
 	{
 		this.size--;
@@ -1150,7 +1153,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		this.root = buildFromSorted(0, 0, size - 1, computeRedLevel(size), iterator);
 	}
 	
-	private static final <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel, Iterator<? extends Entry<? extends K, ? extends V>> iterator)
+	private static <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel, Iterator<? extends Entry<? extends K, ? extends V>> iterator)
 	{
 		if (hi < lo)
 		{
@@ -1167,7 +1170,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		
 		// extract key and/or value from iterator
 		Entry<? extends K, ? extends V> entry = iterator.next();
-		TreeEntry<K, V> middle = new TreeEntry<K, V>(entry.getKey(), entry.getValue(), null);
+		TreeEntry<K, V> middle = new TreeEntry<>(entry.getKey(), entry.getValue(), null);
 		
 		// color nodes in non-full bottommost level red
 		if (level == redLevel)
@@ -1184,6 +1187,8 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		if (mid < hi)
 		{
 			TreeEntry<K, V> right = buildFromSorted(level + 1, mid + 1, hi, redLevel, iterator);
+			assert right != null;
+
 			middle.right = right;
 			right.parent = middle;
 		}
@@ -1204,7 +1209,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		}
 	}
 	
-	private static final <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel, java.io.ObjectInputStream str)
+	private static <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel, java.io.ObjectInputStream str)
 			throws java.io.IOException, ClassNotFoundException
 	{
 		if (hi < lo)
@@ -1224,7 +1229,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		K key = (K) str.readObject();
 		V value = (V) str.readObject();
 		
-		TreeEntry<K, V> middle = new TreeEntry<K, V>(key, value, null);
+		TreeEntry<K, V> middle = new TreeEntry<>(key, value, null);
 		
 		// color nodes in non-full bottommost level red
 		if (level == redLevel)
@@ -1241,6 +1246,8 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		if (mid < hi)
 		{
 			TreeEntry<K, V> right = buildFromSorted(level + 1, mid + 1, hi, redLevel, str);
+			assert right != null;
+
 			middle.right = right;
 			right.parent = middle;
 		}
@@ -1256,6 +1263,30 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 			level++;
 		}
 		return level;
+	}
+
+	@Override
+	public <RK, RV> MutableMap<RK, RV> emptyCopy()
+	{
+		return new dyvil.collection.mutable.TreeMap<>();
+	}
+
+	@Override
+	public MutableMap<K, V> mutableCopy()
+	{
+		return new dyvil.collection.mutable.TreeMap<>(this, this.comparator);
+	}
+
+	@Override
+	public ImmutableMap<K, V> immutableCopy()
+	{
+		return new dyvil.collection.immutable.TreeMap<>(this, this.comparator);
+	}
+
+	@Override
+	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	{
+		return dyvil.collection.immutable.TreeMap.builder();
 	}
 	
 	@Override

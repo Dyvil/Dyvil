@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.statement.loop.ForStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;

@@ -81,6 +81,14 @@ public class REPLVariable extends Field
 		try
 		{
 			this.theClass = this.generateClass(this.className, compilableList);
+		}
+		catch (Throwable throwable)
+		{
+			throwable.printStackTrace(repl.getErrorOutput());
+		}
+
+		try
+		{
 			this.updateValue(repl);
 		}
 		catch (Throwable t)

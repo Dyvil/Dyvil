@@ -32,6 +32,7 @@ public interface IPattern extends IASTNode, ITyped
 	
 	int CASE_CLASS = 24;
 	int OBJECT     = 25;
+	int FIELD      = 26;
 	
 	int BINDING   = 32;
 	int WILDCARD  = 33;
@@ -90,9 +91,9 @@ public interface IPattern extends IASTNode, ITyped
 		return false;
 	}
 	
-	default int switchCases()
+	default int subPatterns()
 	{
-		return 0;
+		return 1;
 	}
 	
 	default boolean switchCheck()
@@ -100,7 +101,7 @@ public interface IPattern extends IASTNode, ITyped
 		return false;
 	}
 	
-	default int switchValue(int index)
+	default int switchValue()
 	{
 		return -1;
 	}
@@ -113,6 +114,11 @@ public interface IPattern extends IASTNode, ITyped
 	default int maxValue()
 	{
 		return -1;
+	}
+
+	default IPattern subPattern(int index)
+	{
+		return this;
 	}
 
 	static void loadVar(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException

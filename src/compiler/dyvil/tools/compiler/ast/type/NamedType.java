@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -50,11 +50,33 @@ public class NamedType implements IRawType, ITypeConsumer
 	{
 		return NAMED;
 	}
-	
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
+	}
+
+	public IType getParent()
+	{
+		return this.parent;
+	}
+
+	public void setParent(IType parent)
+	{
+		this.parent = parent;
 	}
 
 	@Override

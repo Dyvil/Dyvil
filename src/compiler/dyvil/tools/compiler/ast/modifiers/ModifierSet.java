@@ -5,9 +5,13 @@ import dyvil.tools.parsing.marker.MarkerList;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Iterator;
 
-public interface ModifierSet
+public interface ModifierSet extends Iterable<Modifier>
 {
+	@Override
+	Iterator<Modifier> iterator();
+
 	boolean hasModifier(Modifier modifier);
 
 	boolean hasIntModifier(int modifier);

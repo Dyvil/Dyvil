@@ -52,4 +52,27 @@ public class StringValue implements Constant
 	{
 		LexerUtil.appendStringLiteral(this.value, buffer);
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof StringValue))
+		{
+			return false;
+		}
+
+		StringValue that = (StringValue) o;
+
+		return this.value.equals(that.value);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.value.hashCode();
+	}
 }

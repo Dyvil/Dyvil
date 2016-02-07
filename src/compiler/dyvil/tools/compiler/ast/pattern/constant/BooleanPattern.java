@@ -52,13 +52,13 @@ public final class BooleanPattern extends Pattern
 	}
 	
 	@Override
-	public int switchCases()
+	public int subPatterns()
 	{
 		return 1;
 	}
 	
 	@Override
-	public int switchValue(int index)
+	public int switchValue()
 	{
 		return this.value ? 1 : 0;
 	}

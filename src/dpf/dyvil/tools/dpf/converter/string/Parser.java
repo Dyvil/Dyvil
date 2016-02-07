@@ -1,4 +1,4 @@
-package dyvil.tools.dpf;
+package dyvil.tools.dpf.converter.string;
 
 import dyvil.io.FileUtils;
 import dyvil.tools.dpf.ast.RootNode;
@@ -15,14 +15,15 @@ import java.io.File;
 
 public class Parser
 {
-	private String        code;
 	private TokenIterator tokens;
 	private MarkerList    markers;
 	
 	public Parser(MarkerList markers, String code)
 	{
-		this.code = code;
 		this.markers = markers;
+
+		final DyvilLexer lexer = new DyvilLexer(markers, BaseSymbols.INSTANCE);
+		this.tokens = lexer.tokenize(code);
 	}
 	
 	public static RootNode parse(File file)
@@ -34,29 +35,24 @@ public class Parser
 	{
 		MarkerList markers = new MarkerList();
 		RootNode file = new RootNode();
-		new Parser(markers, code).accept(file);
+		new Parser(markers, code).parseNodeBody(file);
 		return file;
 	}
 	
-	public void accept(NodeVisitor visitor)
+	public void parseNodeBody(NodeVisitor visitor)
 	{
-		if (this.tokens == null)
+		while (true)
 		{
-			DyvilLexer lexer = new DyvilLexer(this.markers, BaseSymbols.INSTANCE);
-			this.tokens = lexer.tokenize(this.code);
+			if (!(this.tokens.hasNext() && this.parseNodeElement(visitor)))
+			{
+				break;
+			}
 		}
-		
-		this.parseNodeElements(visitor);
+
+		visitor.visitEnd();
 	}
 	
-	private void parseNodeElements(NodeVisitor visitor)
-	{
-		while (this.tokens.hasNext() && this.parseNodeElement(visitor))
-		{
-		}
-	}
-	
-	private boolean parseNodeElement(NodeVisitor visitor)
+	public boolean parseNodeElement(NodeVisitor visitor)
 	{
 		IToken token = this.tokens.next();
 		switch (token.type())
@@ -69,7 +65,7 @@ public class Parser
 				return true;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.tokens.next();
-				this.parseNodeElements(visitor.visitNode(token.nameValue()));
+				this.parseNodeBody(visitor.visitNode(token.nameValue()));
 				return true;
 			case BaseSymbols.DOT:
 				this.tokens.next();
@@ -90,7 +86,7 @@ public class Parser
 		return true;
 	}
 	
-	private void parseValue(ValueVisitor valueVisitor)
+	public void parseValue(ValueVisitor valueVisitor)
 	{
 		IToken token = this.tokens.next();
 		switch (token.type())
@@ -228,7 +224,7 @@ public class Parser
 		}
 	}
 	
-	private void parseStringInterpolation(StringInterpolationVisitor visitor)
+	public void parseStringInterpolation(StringInterpolationVisitor visitor)
 	{
 		IToken token = this.tokens.lastReturned();
 		visitor.visitStringPart(token.stringValue());
@@ -272,11 +268,11 @@ public class Parser
 		visitor.visitName(token.nameValue());
 	}
 	
-	private void parseBuilder(BuilderVisitor visitor)
+	public void parseBuilder(BuilderVisitor visitor)
 	{
 		// button = Button(text: 'Hello') { visible = false }
 		
-		IToken token = this.tokens.next();
+		final IToken token = this.tokens.next();
 		switch (token.type())
 		{
 		case BaseSymbols.OPEN_PARENTHESIS:
@@ -286,18 +282,20 @@ public class Parser
 				this.tokens.next();
 				this.parseBuilderNode(visitor);
 			}
+			visitor.visitEnd();
 			return;
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 			this.parseBuilderNode(visitor);
+			visitor.visitEnd();
 			return;
 		}
 	}
 	
 	private void parseBuilderNode(BuilderVisitor visitor)
 	{
-		this.parseNodeElements(visitor.visitNode());
+		this.parseNodeBody(visitor.visitNode());
 		
-		IToken token = this.tokens.next();
+		final IToken token = this.tokens.lastReturned();
 		if (token.type() != BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			this.markers.add(new SyntaxError(token, "Invalid Builder - '}' expected"));
@@ -310,7 +308,6 @@ public class Parser
 		if (token.type() == BaseSymbols.CLOSE_PARENTHESIS)
 		{
 			this.tokens.next();
-			visitor.visitEnd();
 			return;
 		}
 		
@@ -331,12 +328,11 @@ public class Parser
 			switch (token.type())
 			{
 			case BaseSymbols.CLOSE_PARENTHESIS:
-				visitor.visitEnd();
 				return;
 			case BaseSymbols.COMMA:
 			case BaseSymbols.SEMICOLON:
 				token = token.next();
-				continue;
+				// continue;
 			}
 		}
 	}

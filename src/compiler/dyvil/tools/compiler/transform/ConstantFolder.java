@@ -6,264 +6,275 @@ import dyvil.tools.parsing.Name;
 
 import static dyvil.tools.compiler.ast.expression.IValue.*;
 
-public class ConstantFolder
+public final class ConstantFolder
 {
-	public static IValue apply(Name op, IValue v1)
+	private ConstantFolder()
 	{
-		switch (v1.valueTag())
+		// no instances
+	}
+
+	public static IValue applyUnary(Name op, IValue operand)
+	{
+		switch (operand.valueTag())
 		{
 		case BOOLEAN:
-			return applyBoolean((BooleanValue) v1, op);
+			return applyPrefixBoolean(op, (BooleanValue) operand);
 		case INT:
-			return applyInt((IntValue) v1, op);
+			return applyPrefixInt(op, (IntValue) operand);
 		case LONG:
-			return applyLong((LongValue) v1, op);
+			return applyPrefixLong(op, (LongValue) operand);
 		case FLOAT:
-			return applyFloat((FloatValue) v1, op);
+			return applyPrefixFloat(op, (FloatValue) operand);
 		case DOUBLE:
-			return applyDouble((DoubleValue) v1, op);
+			return applyPrefixDouble(op, (DoubleValue) operand);
+		case STRING:
+			if (op == Names.length)
+			{
+				return new IntValue(operand.stringSize());
+			}
 		}
 		return null;
 	}
 	
-	public static IValue apply(IValue v1, Name op, IValue v2)
+	public static IValue applyInfix(IValue lhs, Name op, IValue rhs)
 	{
-		int t1 = v1.valueTag();
-		int t2 = v2.valueTag();
-		if (isNumeric(t1) && isNumeric(t2))
+		final int lhsType = lhs.valueTag();
+		final int rhsType = rhs.valueTag();
+		if (isNumeric(lhsType) && isNumeric(rhsType))
 		{
-			int type = Math.max(t1, t2);
-			switch (type)
+			final int maxType = Math.max(rhsType, lhsType);
+			switch (maxType)
 			{
 			case CHAR:
 			case INT:
-				return applyInt(v1, op, v2);
+				return applyInfixInt(lhs, op, rhs);
 			case LONG:
-				return applyLong(v1, op, v2);
+				return applyInfixLong(lhs, op, rhs);
 			case FLOAT:
-				return applyFloat(v1, op, v2);
+				return applyInfixFloat(lhs, op, rhs);
 			case DOUBLE:
-				return applyDouble(v1, op, v2);
+				return applyInfixDouble(lhs, op, rhs);
 			}
 		}
-		if (t1 == STRING && t2 == STRING && Names.plus.equals(op))
+		if (rhsType == STRING && lhsType == STRING && op == Names.plus)
 		{
-			return new StringValue(v1.stringValue() + v2.stringValue());
+			// Use concat instead of + because the strings are known to be non-null
+			return new StringValue(lhs.stringValue().concat(rhs.stringValue()));
 		}
 		return null;
 	}
 	
-	private static IValue applyBoolean(BooleanValue v, Name op)
+	private static IValue applyPrefixBoolean(Name op, BooleanValue operand)
 	{
 		if (op == Names.bang)
 		{
-			return new BooleanValue(!v.booleanValue());
+			return new BooleanValue(!operand.booleanValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyInt(IntValue v, Name op)
+	private static IValue applyPrefixInt(Name op, IntValue operand)
 	{
 		if (op == Names.tilde)
 		{
-			return new IntValue(~v.intValue());
+			return new IntValue(~operand.intValue());
 		}
 		if (op == Names.minus)
 		{
-			return new IntValue(-v.intValue());
+			return new IntValue(-operand.intValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyLong(LongValue v, Name op)
+	private static IValue applyPrefixLong(Name op, LongValue operand)
 	{
 		if (op == Names.tilde)
 		{
-			return new LongValue(~v.longValue());
+			return new LongValue(~operand.longValue());
 		}
 		if (op == Names.minus)
 		{
-			return new LongValue(-v.longValue());
+			return new LongValue(-operand.longValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyFloat(FloatValue v, Name op)
+	private static IValue applyPrefixFloat(Name op, FloatValue operand)
 	{
 		if (op == Names.minus)
 		{
-			return new FloatValue(-v.floatValue());
+			return new FloatValue(-operand.floatValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyDouble(DoubleValue v, Name op)
+	private static IValue applyPrefixDouble(Name op, DoubleValue operand)
 	{
 		if (op == Names.minus)
 		{
-			return new DoubleValue(-v.doubleValue());
+			return new DoubleValue(-operand.doubleValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyInt(IValue v1, Name op, IValue v2)
+	private static IValue applyInfixInt(IValue lhs, Name op, IValue rhs)
 	{
 		if (op == Names.plus)
 		{
-			return new IntValue(v1.intValue() + v2.intValue());
+			return new IntValue(lhs.intValue() + rhs.intValue());
 		}
 		if (op == Names.minus)
 		{
-			return new IntValue(v1.intValue() - v2.intValue());
+			return new IntValue(lhs.intValue() - rhs.intValue());
 		}
 		if (op == Names.times)
 		{
-			return new IntValue(v1.intValue() * v2.intValue());
+			return new IntValue(lhs.intValue() * rhs.intValue());
 		}
 		if (op == Names.div)
 		{
-			float i2 = v2.floatValue();
-			return i2 == 0F ? null : new FloatValue(v1.floatValue() / i2);
+			final float rhsFloat = rhs.floatValue();
+			return rhsFloat == 0F ? null : new FloatValue(lhs.floatValue() / rhsFloat);
 		}
 		if (op == Names.bslash)
 		{
-			int i2 = v2.intValue();
-			return i2 == 0 ? null : new IntValue(v1.intValue() / i2);
+			final int rhsInt = rhs.intValue();
+			return rhsInt == 0 ? null : new IntValue(lhs.intValue() / rhsInt);
 		}
 		if (op == Names.percent)
 		{
-			int i2 = v2.intValue();
-			return i2 == 0 ? null : new IntValue(v1.intValue() % i2);
+			final int rhsInt = rhs.intValue();
+			return rhsInt == 0 ? null : new IntValue(lhs.intValue() % rhsInt);
 		}
 		if (op == Names.amp)
 		{
-			return new IntValue(v1.intValue() & v2.intValue());
+			return new IntValue(lhs.intValue() & rhs.intValue());
 		}
 		if (op == Names.bar)
 		{
-			return new IntValue(v1.intValue() | v2.intValue());
+			return new IntValue(lhs.intValue() | rhs.intValue());
 		}
 		if (op == Names.up)
 		{
-			return new IntValue(v1.intValue() ^ v2.intValue());
+			return new IntValue(lhs.intValue() ^ rhs.intValue());
 		}
 		if (op == Names.ltlt)
 		{
-			return new IntValue(v1.intValue() << v2.intValue());
+			return new IntValue(lhs.intValue() << rhs.intValue());
 		}
 		if (op == Names.gtgt)
 		{
-			return new IntValue(v1.intValue() >> v2.intValue());
+			return new IntValue(lhs.intValue() >> rhs.intValue());
 		}
 		if (op == Names.gtgtgt)
 		{
-			return new IntValue(v1.intValue() >>> v2.intValue());
+			return new IntValue(lhs.intValue() >>> rhs.intValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyLong(IValue v1, Name op, IValue v2)
+	private static IValue applyInfixLong(IValue lhs, Name op, IValue rhs)
 	{
 		if (op == Names.plus)
 		{
-			return new LongValue(v1.longValue() + v2.longValue());
+			return new LongValue(lhs.longValue() + rhs.longValue());
 		}
 		if (op == Names.minus)
 		{
-			return new LongValue(v1.longValue() - v2.longValue());
+			return new LongValue(lhs.longValue() - rhs.longValue());
 		}
 		if (op == Names.times)
 		{
-			return new LongValue(v1.longValue() * v2.longValue());
+			return new LongValue(lhs.longValue() * rhs.longValue());
 		}
 		if (op == Names.div)
 		{
-			double l2 = v2.doubleValue();
-			return l2 == 0D ? null : new DoubleValue(v1.longValue() / l2);
+			final double rhsDouble = rhs.doubleValue();
+			return rhsDouble == 0D ? null : new DoubleValue(lhs.longValue() / rhsDouble);
 		}
 		if (op == Names.bslash)
 		{
-			long l2 = v2.longValue();
-			return l2 == 0L ? null : new LongValue(v1.longValue() / l2);
+			final long rhsLong = rhs.longValue();
+			return rhsLong == 0L ? null : new LongValue(lhs.longValue() / rhsLong);
 		}
 		if (op == Names.percent)
 		{
-			long l2 = v2.longValue();
-			return l2 == 0L ? null : new LongValue(v1.longValue() % l2);
+			final long rhsLong = rhs.longValue();
+			return rhsLong == 0L ? null : new LongValue(lhs.longValue() % rhsLong);
 		}
 		if (op == Names.amp)
 		{
-			return new LongValue(v1.longValue() & v2.longValue());
+			return new LongValue(lhs.longValue() & rhs.longValue());
 		}
 		if (op == Names.bar)
 		{
-			return new LongValue(v1.longValue() | v2.longValue());
+			return new LongValue(lhs.longValue() | rhs.longValue());
 		}
 		if (op == Names.up)
 		{
-			return new LongValue(v1.longValue() ^ v2.longValue());
+			return new LongValue(lhs.longValue() ^ rhs.longValue());
 		}
 		if (op == Names.ltlt)
 		{
-			return new LongValue(v1.longValue() << v2.longValue());
+			return new LongValue(lhs.longValue() << rhs.longValue());
 		}
 		if (op == Names.gtgt)
 		{
-			return new LongValue(v1.longValue() >> v2.longValue());
+			return new LongValue(lhs.longValue() >> rhs.longValue());
 		}
 		if (op == Names.gtgtgt)
 		{
-			return new LongValue(v1.longValue() >>> v2.longValue());
+			return new LongValue(lhs.longValue() >>> rhs.longValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyFloat(IValue v1, Name op, IValue v2)
+	private static IValue applyInfixFloat(IValue lhs, Name op, IValue rhs)
 	{
 		if (op == Names.plus)
 		{
-			return new FloatValue(v1.floatValue() + v2.floatValue());
+			return new FloatValue(lhs.floatValue() + rhs.floatValue());
 		}
 		if (op == Names.minus)
 		{
-			return new FloatValue(v1.floatValue() - v2.floatValue());
+			return new FloatValue(lhs.floatValue() - rhs.floatValue());
 		}
 		if (op == Names.times)
 		{
-			return new FloatValue(v1.floatValue() * v2.floatValue());
+			return new FloatValue(lhs.floatValue() * rhs.floatValue());
 		}
 		if (op == Names.div)
 		{
-			return new FloatValue(v1.floatValue() / v2.floatValue());
+			return new FloatValue(lhs.floatValue() / rhs.floatValue());
 		}
 		if (op == Names.percent)
 		{
-			return new FloatValue(v1.floatValue() % v2.floatValue());
+			return new FloatValue(lhs.floatValue() % rhs.floatValue());
 		}
 		return null;
 	}
 	
-	private static IValue applyDouble(IValue v1, Name op, IValue v2)
+	private static IValue applyInfixDouble(IValue lhs, Name op, IValue rhs)
 	{
 		if (op == Names.plus)
 		{
-			return new DoubleValue(v1.doubleValue() + v2.doubleValue());
+			return new DoubleValue(lhs.doubleValue() + rhs.doubleValue());
 		}
 		if (op == Names.minus)
 		{
-			return new DoubleValue(v1.doubleValue() - v2.doubleValue());
+			return new DoubleValue(lhs.doubleValue() - rhs.doubleValue());
 		}
 		if (op == Names.times)
 		{
-			return new DoubleValue(v1.doubleValue() * v2.doubleValue());
+			return new DoubleValue(lhs.doubleValue() * rhs.doubleValue());
 		}
 		if (op == Names.div)
 		{
-			return new DoubleValue(v1.doubleValue() / v2.doubleValue());
+			return new DoubleValue(lhs.doubleValue() / rhs.doubleValue());
 		}
 		if (op == Names.percent)
 		{
-			return new DoubleValue(v1.doubleValue() % v2.doubleValue());
+			return new DoubleValue(lhs.doubleValue() % rhs.doubleValue());
 		}
 		return null;
 	}

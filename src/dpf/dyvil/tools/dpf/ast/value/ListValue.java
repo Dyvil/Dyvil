@@ -5,13 +5,14 @@ import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
 import dyvil.tools.dpf.visitor.ListVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 import dyvil.tools.parsing.ast.IASTNode;
 
 import java.util.function.Function;
 
-public class ListValue extends ValueCreator implements Value, ListVisitor, Expandable
+public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Expandable
 {
 	protected List<Value> elements;
 	
@@ -103,5 +104,27 @@ public class ListValue extends ValueCreator implements Value, ListVisitor, Expan
 			copy.elements = this.elements.mapped(valueFunction);
 			return copy;
 		}
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof ListValue))
+		{
+			return false;
+		}
+
+		final ListValue that = (ListValue) o;
+		return this.elements.equals(that.elements);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return this.elements.hashCode();
 	}
 }

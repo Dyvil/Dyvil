@@ -50,4 +50,26 @@ public class LongValue implements Constant
 	{
 		buffer.append(this.value).append('L');
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof LongValue))
+		{
+			return false;
+		}
+
+		final LongValue that = (LongValue) o;
+		return this.value == that.value;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return (int) (this.value ^ (this.value >>> 32));
+	}
 }

@@ -1,11 +1,11 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
@@ -50,6 +50,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		this.size = set.size;
 	}
 	
+	@SafeVarargs
 	public AbstractIdentityHashSet(E... elements)
 	{
 		this(elements.length);
@@ -299,48 +300,52 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 		}
 	}
-	
+
+	@Override
+	public <R> MutableSet<R> emptyCopy()
+	{
+		return new dyvil.collection.mutable.IdentityHashSet<>();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return new dyvil.collection.mutable.IdentityHashSet<>(capacity);
+	}
+
+	@Override
+	public MutableSet<E> mutableCopy()
+	{
+		return new dyvil.collection.mutable.IdentityHashSet<>(this);
+	}
+
+	@Override
+	public ImmutableSet<E> immutableCopy()
+	{
+		return new dyvil.collection.immutable.IdentityHashSet<>(this);
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder()
+	{
+		return dyvil.collection.immutable.IdentityHashSet.builder();
+	}
+
+	@Override
+	public <RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity)
+	{
+		return dyvil.collection.immutable.IdentityHashSet.builder(capacity);
+	}
+
 	@Override
 	public java.util.Set<E> toJava()
 	{
-		return new java.util.AbstractSet<E>()
+		java.util.IdentityHashMap<E, Boolean> map = new java.util.IdentityHashMap<>(this.size);
+		for (E element : this)
 		{
-			@Override
-			public int size()
-			{
-				return AbstractIdentityHashSet.this.size;
-			}
-			
-			@Override
-			public Iterator<E> iterator()
-			{
-				return AbstractIdentityHashSet.this.iterator();
-			}
-			
-			@Override
-			public boolean contains(Object o)
-			{
-				return AbstractIdentityHashSet.this.contains(o);
-			}
-			
-			@Override
-			public void clear()
-			{
-				AbstractIdentityHashSet.this.clear();
-			}
-			
-			@Override
-			public boolean add(E e)
-			{
-				return AbstractIdentityHashSet.this.add(e);
-			}
-			
-			@Override
-			public boolean remove(Object o)
-			{
-				return AbstractIdentityHashSet.this.remove(o);
-			}
-		};
+			map.put(element, true);
+		}
+		return Collections.newSetFromMap(map);
 	}
 	
 	@Override
@@ -365,15 +370,12 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	{
 		out.defaultWriteObject();
 		
-		int len = this.table.length;
-		
 		out.writeInt(this.size);
-		out.writeInt(len);
+		out.writeInt(this.table.length);
 		
-		for (int i = 0; i < len; i++)
+		for (Object key : this.table)
 		{
 			// Avoid the NULL object
-			Object key = this.table[i];
 			if (key != null)
 			{
 				out.writeObject(unmaskNull(key));

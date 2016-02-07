@@ -10,6 +10,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotated
 {
+	MemberKind getKind();
+
 	int getAccessLevel();
 	
 	// States

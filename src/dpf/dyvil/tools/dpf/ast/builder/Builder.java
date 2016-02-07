@@ -59,15 +59,16 @@ public class Builder implements Value, BuilderVisitor, Expandable
 	@Override
 	public void accept(ValueVisitor visitor)
 	{
-		BuilderVisitor v = visitor.visitBuilder(this.name);
-		for (Parameter p : this.parameters)
+		final BuilderVisitor builderVisitor = visitor.visitBuilder(this.name);
+		for (Parameter parameter : this.parameters)
 		{
-			p.getValue().accept(v.visitParameter(p.getName()));
+			parameter.getValue().accept(builderVisitor.visitParameter(parameter.getName()));
 		}
 		if (this.node != null)
 		{
-			this.node.accept(v.visitNode());
+			this.node.acceptBody(builderVisitor.visitNode());
 		}
+		builderVisitor.visitEnd();
 	}
 
 	@Override
@@ -128,5 +129,32 @@ public class Builder implements Value, BuilderVisitor, Expandable
 			this.node.bodyToString(prefix + '\t', buffer);
 			buffer.append(prefix).append('}');
 		}
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof Builder))
+		{
+			return false;
+		}
+
+		final Builder builder = (Builder) o;
+
+		return this.name == builder.name && this.parameters.equals(builder.parameters) && this.node
+				.equals(builder.node);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.name.hashCode();
+		result = 31 * result + this.parameters.hashCode();
+		result = 31 * result + this.node.hashCode();
+		return result;
 	}
 }

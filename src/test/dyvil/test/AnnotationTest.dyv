@@ -10,7 +10,7 @@ public class AnnotationTest
 
 	@Inner(name: "inner")
 	@Outer(inner: @Inner(name: "Nested"))
-    public static void main((@NonNull [@NonNull String]) args)
+    public static void main((@NonNull() [@NonNull String]) args)
 	{
 		
 	}

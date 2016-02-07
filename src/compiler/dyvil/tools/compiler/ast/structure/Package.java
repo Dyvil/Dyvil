@@ -17,7 +17,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.library.Library;
-import dyvil.tools.compiler.sources.FileType;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -256,7 +256,7 @@ public class Package implements INamed, IDefaultContext
 	
 	private IClass loadClass(Name name, String qualifiedName)
 	{
-		String fileName = this.getInternalName() + qualifiedName + FileType.CLASS_EXTENSION;
+		String fileName = this.getInternalName() + qualifiedName + DyvilFileType.CLASS_EXTENSION;
 		
 		for (Library library : DyvilCompiler.config.libraries)
 		{
@@ -272,7 +272,7 @@ public class Package implements INamed, IDefaultContext
 	
 	private IDyvilHeader loadHeader(Name name)
 	{
-		String fileName = this.getInternalName() + name.qualified + FileType.OBJECT_EXTENSION;
+		String fileName = this.getInternalName() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
 		for (Library library : DyvilCompiler.config.libraries)
 		{
 			IDyvilHeader header = this.loadHeader(fileName, name, library);

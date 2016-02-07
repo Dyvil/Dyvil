@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -37,8 +37,8 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
-import dyvil.tools.compiler.sources.FileType;
-import dyvil.tools.compiler.util.AnnotationUtils;
+import dyvil.tools.compiler.sources.DyvilFileType;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -82,7 +82,8 @@ public final class ExternalClass extends AbstractClass
 	private void resolveMetadata()
 	{
 		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
-		this.metadata.resolveTypes(null, this);
+		this.metadata.resolveTypesHeader(null, this);
+		this.metadata.resolveTypesBody(null, this);
 	}
 	
 	private void resolveGenerics()
@@ -150,7 +151,7 @@ public final class ExternalClass extends AbstractClass
 			String internal = entry.getValue();
 			
 			// Resolve the class name
-			String fileName = internal + FileType.CLASS_EXTENSION;
+			String fileName = internal + DyvilFileType.CLASS_EXTENSION;
 			IClass c = Package.loadClass(fileName, name);
 			if (c != null)
 			{
@@ -563,9 +564,9 @@ public final class ExternalClass extends AbstractClass
 	{
 		switch (type)
 		{
-		case AnnotationUtils.DYVIL_MODIFIERS:
+		case AnnotationUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.modifiers);
-		case AnnotationUtils.CLASS_PARAMETERS:
+		case AnnotationUtil.CLASS_PARAMETERS:
 			return new ClassParameterAnnotationVisitor(this);
 		}
 

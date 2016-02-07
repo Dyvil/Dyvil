@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.parsing.Name;
@@ -68,7 +69,7 @@ public class CompleteCommand implements ICommand
 			IType type = variable.getType();
 			repl.getOutput().println("Available completions for '" + varName + "' of type '" + type + "':");
 			
-			this.printCompletions(repl, memberStart, type);
+			this.printCompletions(repl, memberStart, type, false);
 			return;
 		}
 		
@@ -77,7 +78,7 @@ public class CompleteCommand implements ICommand
 		{
 			// Type Completions
 			repl.getOutput().println("Available completions for type '" + type + "':");
-			this.printCompletions(repl, memberStart, type);
+			this.printCompletions(repl, memberStart, type, true);
 			return;
 		}
 		
@@ -86,16 +87,18 @@ public class CompleteCommand implements ICommand
 		return;
 	}
 	
-	private void printCompletions(DyvilREPL repl,  String memberStart, IType type)
+	private void printCompletions(DyvilREPL repl, String memberStart, IType type, boolean statics)
 	{
 		Set<String> fields = new TreeSet<>();
 		Set<String> properties = new TreeSet<>();
 		Set<String> methods = new TreeSet<>();
 		
-		this.findCompletions(type, fields, properties, methods, memberStart, true, new IdentityHashSet<>());
-		
+		this.findCompletions(type, fields, properties, methods, memberStart, statics, new IdentityHashSet<>());
+
+		boolean output = false;
 		if (!fields.isEmpty())
 		{
+			output = true;
 			repl.getOutput().println("Fields:");
 			for (String field : fields)
 			{
@@ -105,6 +108,7 @@ public class CompleteCommand implements ICommand
 		}
 		if (!properties.isEmpty())
 		{
+			output = true;
 			repl.getOutput().println("Properties:");
 			for (String property : properties)
 			{
@@ -114,11 +118,23 @@ public class CompleteCommand implements ICommand
 		}
 		if (!methods.isEmpty())
 		{
+			output = true;
 			repl.getOutput().println("Methods:");
 			for (String method : methods)
 			{
 				repl.getOutput().print('\t');
 				repl.getOutput().println(method);
+			}
+		}
+		if (!output)
+		{
+			if (statics)
+			{
+				repl.getOutput().println("No static completions available for type " + type);
+			}
+			else
+			{
+				repl.getOutput().println("No completions available for type " + type);
 			}
 		}
 	}
@@ -142,9 +158,11 @@ public class CompleteCommand implements ICommand
 				methods.add(getSignature(Types.UNKNOWN, method));
 			}
 		}
-		
+
+		boolean output = false;
 		if (!fields.isEmpty())
 		{
+			output = true;
 			repl.getOutput().println("Fields:");
 			for (String field : fields)
 			{
@@ -154,12 +172,18 @@ public class CompleteCommand implements ICommand
 		}
 		if (!methods.isEmpty())
 		{
+			output = true;
 			repl.getOutput().println("Methods:");
 			for (String method : methods)
 			{
 				repl.getOutput().print('\t');
 				repl.getOutput().println(method);
 			}
+		}
+
+		if (!output)
+		{
+			repl.getOutput().println("No completions available");
 		}
 	}
 	
@@ -171,51 +195,63 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 		dejaVu.add(iclass);
-		
-		IClassBody body = iclass.getBody();
+
+		// Add members
+		for (int i = 0, count = iclass.parameterCount(); i < count; i++)
+		{
+			final IParameter parameter = iclass.getParameter(i);
+			if (matches(start, parameter, statics))
+			{
+				fields.add(getSignature(type, parameter));
+			}
+		}
+
+		final IClassBody body = iclass.getBody();
 		if (body != null)
 		{
-			int count = body.fieldCount();
-			for (int i = 0; i < count; i++)
+			for (int i = 0, count = body.fieldCount(); i < count; i++)
 			{
-				IField field = body.getField(i);
+				final IField field = body.getField(i);
 				if (matches(start, field, statics))
 				{
-					properties.add(getSignature(type, field));
+					fields.add(getSignature(type, field));
 				}
 			}
-			
-			count = body.propertyCount();
-			for (int i = 0; i < count; i++)
+
+			for (int i = 0, count = body.propertyCount(); i < count; i++)
 			{
-				IProperty property = body.getProperty(i);
+				final IProperty property = body.getProperty(i);
 				if (matches(start, property, statics))
 				{
 					properties.add(getSignature(type, property));
 				}
 			}
-			
-			count = body.methodCount();
-			for (int i = 0; i < count; i++)
+
+			for (int i = 0, count = body.methodCount(); i < count; i++)
 			{
-				IMethod method = body.getMethod(i);
+				final IMethod method = body.getMethod(i);
 				if (matches(start, method, statics))
 				{
 					methods.add(getSignature(type, method));
 				}
 			}
 		}
-		
-		IType superType = iclass.getSuperType();
+
+		if (statics)
+		{
+			return;
+		}
+
+		// Recursively scan super types
+		final IType superType = iclass.getSuperType();
 		if (superType != null)
 		{
 			this.findCompletions(superType.getConcreteType(type), fields, properties, methods, start, false, dejaVu);
 		}
-		
-		int itfCount = iclass.interfaceCount();
-		for (int i = 0; i < itfCount; i++)
+
+		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
 		{
-			IType superInterface = iclass.getInterface(i);
+			final IType superInterface = iclass.getInterface(i);
 			if (superInterface != null)
 			{
 				this.findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, false,
@@ -232,7 +268,7 @@ public class CompleteCommand implements ICommand
 		}
 		
 		int modifiers = member.getModifiers().toFlags();
-		return (modifiers & Modifiers.PUBLIC) != 0 && !(!statics && (modifiers & Modifiers.STATIC) != 0);
+		return (modifiers & Modifiers.PUBLIC) != 0 && statics == ((modifiers & Modifiers.STATIC) != 0);
 	}
 	
 	private static String getSignature(IType type, IMember member)

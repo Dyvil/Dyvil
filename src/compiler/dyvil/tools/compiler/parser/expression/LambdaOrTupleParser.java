@@ -13,7 +13,7 @@ import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.ParserUtil;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 

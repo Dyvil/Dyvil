@@ -31,7 +31,14 @@ public class PrintPhase implements ICompilerPhase
 		DyvilCompiler.log("--- Syntax Trees at the end of " + this.predecessor.getName() + " ---");
 		for (ICompilationUnit unit : units)
 		{
-			DyvilCompiler.log(unit.getInputFile() + ":\n" + unit.toString());
+			try
+			{
+				DyvilCompiler.log(unit.getInputFile() + ":\n" + unit.toString());
+			}
+			catch (Throwable throwable)
+			{
+				DyvilCompiler.error("Failed to print Syntax Tree for source file " + unit.getInputFile(), throwable);
+			}
 		}
 	}
 	

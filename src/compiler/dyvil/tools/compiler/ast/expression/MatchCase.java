@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -21,9 +20,7 @@ public class MatchCase implements ICase, IDefaultContext
 	protected IPattern pattern;
 	protected IValue   condition;
 	protected IValue   action;
-	
-	protected Label switchLabel;
-	
+
 	@Override
 	public IPattern getPattern()
 	{
@@ -167,7 +164,15 @@ public class MatchCase implements ICase, IDefaultContext
 			this.action = this.action.cleanup(context1, compilableList);
 		}
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		this.toString("", stringBuilder);
+		return stringBuilder.toString();
+	}
+
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("case ");

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.method;
+package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -14,7 +14,9 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -32,6 +34,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -57,23 +60,20 @@ public class Constructor extends Member implements IConstructor
 	
 	public Constructor(IClass iclass)
 	{
+		super(Names.init, Types.VOID);
 		this.theClass = iclass;
-		this.type = iclass.getType();
 	}
 	
 	public Constructor(IClass iclass, ModifierSet modifiers)
 	{
-		super(null, null, modifiers);
-		this.theClass = iclass;
-		this.type = iclass.getType();
+		this(null, iclass, modifiers);
 	}
 	
 	public Constructor(ICodePosition position, IClass iclass, ModifierSet modifiers)
 	{
-		super(null, null, modifiers);
+		super(Names.init, Types.VOID, modifiers);
 		this.position = position;
 		this.theClass = iclass;
-		this.type = iclass.getType();
 	}
 	
 	@Override
@@ -267,7 +267,7 @@ public class Constructor extends Member implements IConstructor
 			this.exceptions[i].resolve(markers, this);
 		}
 		
-		this.resolveSuperConstructors(markers, context);
+		this.resolveSuperConstructors(markers);
 		
 		if (this.value != null)
 		{
@@ -287,7 +287,7 @@ public class Constructor extends Member implements IConstructor
 		}
 	}
 	
-	private void resolveSuperConstructors(MarkerList markers, IContext context)
+	private void resolveSuperConstructors(MarkerList markers)
 	{
 		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
 		{
@@ -340,7 +340,10 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value.checkTypes(markers, this);
 		}
-		// TODO Abstract Constructor Error
+		else
+		{
+			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
+		}
 	}
 	
 	@Override
@@ -692,10 +695,10 @@ public class Constructor extends Member implements IConstructor
 
 		switch (IContext.getVisibility(context, this))
 		{
-		case IContext.INTERNAL:
+		case INTERNAL:
 			markers.add(Markers.semantic(position, "constructor.access.internal", this.theClass.getName()));
 			break;
-		case IContext.INVISIBLE:
+		case INVISIBLE:
 			markers.add(Markers.semantic(position, "constructor.access.invisible", this.theClass.getName()));
 			break;
 		}
@@ -760,7 +763,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers.toFlags() & 0xFFFF;
+		int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(),
 		                                                                  this.getSignature(), this.getExceptions()));
 

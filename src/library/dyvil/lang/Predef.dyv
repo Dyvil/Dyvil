@@ -20,23 +20,26 @@ public final class Predef
 	
 	@Intrinsic([ LOAD_0, NONNULL ])
 	public infix boolean isNonNull(Object o) = o.isNonNull
-	
-	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS ])
-	public infix boolean operator ==(Object o1, Object o2) = o1 equals o2
-	
+
+	// Structural Equality (equals)
+	public infix boolean operator ==(Object o1, Object o2)
+	{
+		if (o1.isNull)	return o2.isNull
+		else			return o1 equals o2
+	}
+
+	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
 	public infix boolean operator ===(Object o1, Object o2) = o1 === o2
-	
-	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS, BNOT ])
-	public infix boolean operator !=(Object o1, Object o2) = !(o1 equals o2)
-	
+
+	// Structural Inequality (!equals)
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
+			   strings: [ "dyvil/lang/Predef", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	public infix boolean operator !=(Object o1, Object o2) = !(o1 == o2)
+
+	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
 	public infix boolean operator !==(Object o1, Object o2) = o1 !== o2
-
-	public infix R operator ?[R](boolean condition, => R result1, => R result2) {
-		if (condition)	return result1.apply
-		else			return result2.apply
-	}
 	
 	// Lists
 	
@@ -58,10 +61,21 @@ public final class Predef
 
 	public static void inc(var double d, double n = 1D) = d += n
 	
-	// Closures
+	// Functions
 	
 	@Intrinsic([ LOAD_0 ])
-	public static => T function[T](=> T f) = f
+	public static => R function[R](=> R f) = f
+
+	@Intrinsic([ LOAD_0 ])
+	public static P1 => R function1[P1, R](P1 => R f) = f
+
+	@Intrinsic([ LOAD_0 ])
+	public static (P1, P2) => R function2[P1, P2, R]((P1, P2) => R f) = f
+
+	@Intrinsic([ LOAD_0 ])
+	public static (P1, P2, P3) => R function3[P1, P2, P3, R]((P1, P2, P3) => R f) = f
+
+	// Function Conversions
 
 	public static java.lang.Runnable runnable(=> void f) = => f()
 
@@ -70,27 +84,35 @@ public final class Predef
 	public static java.lang.Thread thread(=> void f) = new java.lang.Thread() {
 		public override void run() = f()
 	}
+
+	// Usuful Globals
 	
 	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ],
-			strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+			   strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
 	public static R run[R](=> R f) = f()
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ],
-			strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
+			   strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static infix R run[T, R](T self, extension T => R f) = f(self)
 
 	@Intrinsic(value: [ LOAD_0, DUP, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2, POP ],
-			strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
+			   strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static infix T use[T](T self, extension T => void f) { f(self); return self }
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ],
-			strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
+			   strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static R with[T, R](T receiver, T => R f) = f(receiver)
 	
-	public static void repeat(int n, => void f) = for (int i : 0 ..< n) f()
+	public static void repeat(int n, => void f)
+	{
+		for (int i : 0 ..< n)
+		{
+			f()
+		}
+	}
 	
 	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ],
-			strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+			   strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
 	public static long measureMillis(=> void f)
 	{
 		long millis = System.currentTimeMillis
@@ -99,7 +121,7 @@ public final class Predef
 	}
 	
 	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ],
-			strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
+			   strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
 	public static long measureNanos(=> void f)
 	{
 		long nanos = System.nanoTime
@@ -164,7 +186,7 @@ public final class Predef
 	public static void println(double v) = System.out.println(v.toString)
 	
 	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ],
-			strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "(Ljava/lang/String;)V" ])
+			   strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "(Ljava/lang/String;)V" ])
 	public static void println(String s) = System.out.println(s)
 	
 	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
@@ -190,11 +212,11 @@ public final class Predef
 	// Tuples
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ],
-			strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
+			   strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
 	public infix (A, B) ->[A, B](A a, B b) = (a, b)
 	
 	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ],
-			strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
+			   strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
 	public infix (B, A) <-[A, B](A a, B b) = (b, a)
 	
 	public static void ???() = throw new UnsupportedOperationException("Not Implemented!")

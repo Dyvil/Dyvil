@@ -1,6 +1,6 @@
 package dyvil.tools.compiler;
 
-import dyvil.io.AppendableOutputStream;
+import dyvil.io.AppendablePrintStream;
 import dyvil.io.FileUtils;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -8,6 +8,7 @@ import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.TestThread;
@@ -151,6 +152,7 @@ public final class DyvilCompiler
 		log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
 		
 		// Scan for Packages and Compilation Units
+		DyvilFileType.setupFileFinder(fileFinder);
 		config.findUnits(fileFinder);
 		
 		int fileCount = fileFinder.files.size();
@@ -258,7 +260,7 @@ public final class DyvilCompiler
 
 				if (thrown != null)
 				{
-					thrown.printStackTrace(new AppendableOutputStream(builder));
+					thrown.printStackTrace(new AppendablePrintStream(builder));
 				}
 				return builder.toString();
 			}

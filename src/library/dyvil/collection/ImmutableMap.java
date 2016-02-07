@@ -262,14 +262,14 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	@Mutating
-	default boolean putIfAbsent(K key, V value)
+	default V putIfAbsent(K key, V value)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
 	
 	@Override
 	@Mutating
-	default boolean putIfAbsent(Entry<? extends K, ? extends V> entry)
+	default V putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
@@ -376,7 +376,16 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	ImmutableMap<K, V> copy();
-	
+
+	@Override
+	<RK, RV> MutableMap<RK, RV> emptyCopy();
+
+	@Override
+	default <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
+	{
+		return this.emptyCopy();
+	}
+
 	@Override
 	MutableMap<K, V> mutable();
 	
@@ -385,7 +394,16 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		return this.mutable();
 	}
-	
+
+	@Override
+	<RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder();
+
+	@Override
+	default <RK, RV> Builder<RK, RV> immutableBuilder(int capacity)
+	{
+		return this.immutableBuilder();
+	}
+
 	@Override
 	default ImmutableMap<K, V> immutable()
 	{

@@ -19,6 +19,10 @@ public final class CompoundCall
 
 	protected static IValue resolveCall(MarkerList markers, IContext context, ICodePosition position, IValue receiver, Name name, IArguments arguments)
 	{
+		if (!receiver.isResolved())
+		{
+			return null;
+		}
 		if (arguments.isEmpty())
 		{
 			return null;
@@ -90,7 +94,8 @@ public final class CompoundCall
 				return null;
 			}
 
-			final FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.field, methodCall);
+			final FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.field,
+			                                                       methodCall);
 			return helper.finish(assignment);
 		}
 

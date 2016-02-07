@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.io.FileUtils;
+import dyvil.io.StringPoolReader;
+import dyvil.io.StringPoolWriter;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -10,7 +12,7 @@ import java.io.*;
 public class ObjectFormat
 {
 	private static final int FILE_VERSION = 1;
-	
+
 	public static void write(File file, IDyvilHeader header)
 	{
 		if (!FileUtils.create(file))
@@ -19,15 +21,12 @@ public class ObjectFormat
 			return;
 		}
 		
-		try (ObjectWriter writer = new ObjectWriter();
-		     OutputStream fo = new BufferedOutputStream(new FileOutputStream(file)))
+		try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
 		{
 			writer.writeShort(FILE_VERSION);
 			header.write(writer);
-			
-			// Directly write the DyO byte code to the file output to save some
-			// unnecessary byte array allocations
-			writer.writeTo(fo);
+
+			// Bytes are written when the StringPoolWriter closes
 		}
 		catch (Throwable ex)
 		{
@@ -40,9 +39,9 @@ public class ObjectFormat
 	
 	public static DyvilHeader read(InputStream is, DyvilHeader header)
 	{
-		try (ObjectReader reader = new ObjectReader(new DataInputStream(is)))
+		try (StringPoolReader reader = new StringPoolReader(is))
 		{
-			int fileVersion = reader.readShort();
+			final int fileVersion = reader.readShort();
 			if (fileVersion > FILE_VERSION)
 			{
 				throw new IllegalStateException("Unknown Dyvil Header File Version: " + fileVersion);

@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -192,7 +192,7 @@ public class InitializerCall implements ICall
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.isSuper ? "super.new" : "this.new");
+		buffer.append(this.isSuper ? "super.init" : "this.init");
 		this.arguments.toString(prefix, buffer);
 	}
 }

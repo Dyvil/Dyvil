@@ -20,69 +20,18 @@ import java.util.function.BiPredicate;
 @Immutable
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
 {
-	private static final long serialVersionUID = -2305035920228304893L;
-	
-	@SafeVarargs
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
-	{
-		return new EnumMap<>(entries);
-	}
-	
-	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
-	{
-		return new Builder<>(type.erasure());
-	}
-	
-	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
-	{
-		return new Builder<>(type);
-	}
-
-	@DyvilModifiers(Modifiers.INTERNAL)
-	private
-	EnumMap(Class<K> type, K[] keys, V[] values, int size)
-	{
-		super(type, keys, values, size);
-	}
-	
-	public EnumMap(Class<K> type)
-	{
-		super(type);
-	}
-	
-	public EnumMap(Type<K> type)
-	{
-		super(type.erasure());
-	}
-	
-	public EnumMap(Map<K, V> map)
-	{
-		super(map);
-	}
-	
-	public EnumMap(AbstractEnumMap<K, V> map)
-	{
-		super(map);
-	}
-	
-	@SafeVarargs
-	public EnumMap(Tuple2<K, V>... tuples)
-	{
-		super(tuples);
-	}
-	
 	public static class Builder<K extends Enum<K>, V> implements ImmutableMap.Builder<K, V>
 	{
 		private Class<K> type;
 		private Object[] values;
 		private int      size;
-		
+
 		public Builder(Class<K> type)
 		{
 			this.type = type;
 			this.values = new Object[EnumReflection.getEnumCount(type)];
 		}
-		
+
 		@Override
 		public void put(K key, V value)
 		{
@@ -94,7 +43,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			{
 				return;
 			}
-			
+
 			int index = index(key);
 			if (this.values[index] == null)
 			{
@@ -102,17 +51,67 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			}
 			this.values[index] = value;
 		}
-		
+
 		@Override
 		public EnumMap<K, V> build()
 		{
-			EnumMap<K, V> map = new EnumMap(this.type, EnumReflection.getEnumConstants(this.type), this.values,
-			                                this.size);
+			EnumMap<K, V> map = new EnumMap<>(this.type, EnumReflection.getEnumConstants(this.type), (V[]) this.values,
+			                                  this.size);
 			this.size = -1;
 			return map;
 		}
 	}
-	
+
+	private static final long serialVersionUID = -2305035920228304893L;
+
+	@SafeVarargs
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
+	{
+		return new EnumMap<>(entries);
+	}
+
+	public static <K extends Enum<K>, V> Builder<K, V> builder(Type<K> type)
+	{
+		return new Builder<>(type.erasure());
+	}
+
+	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
+	{
+		return new Builder<>(type);
+	}
+
+	@DyvilModifiers(Modifiers.INTERNAL)
+	private EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	{
+		super(type, keys, values, size);
+	}
+
+	public EnumMap(Class<K> type)
+	{
+		super(type);
+	}
+
+	public EnumMap(Type<K> type)
+	{
+		super(type.erasure());
+	}
+
+	public EnumMap(Map<K, V> map)
+	{
+		super(map);
+	}
+
+	public EnumMap(AbstractEnumMap<K, V> map)
+	{
+		super(map);
+	}
+
+	@SafeVarargs
+	public EnumMap(Tuple2<K, V>... tuples)
+	{
+		super(tuples);
+	}
+
 	@Override
 	protected void removeAt(int index)
 	{
@@ -135,7 +134,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			newSize++;
 		}
 		newValues[index] = value;
-		return new EnumMap(this.type, this.keys, newValues, newSize);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, newSize);
 	}
 	
 	@Override
@@ -155,7 +154,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			}
 			newValues[index] = value;
 		}
-		return new EnumMap(this.type, this.keys, newValues, newSize);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, newSize);
 	}
 	
 	@Override
@@ -174,7 +173,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		
 		Object[] newValues = this.values.clone();
 		newValues[index] = null;
-		return new EnumMap(this.type, this.keys, newValues, this.size - 1);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, this.size - 1);
 	}
 	
 	@Override
@@ -193,7 +192,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		
 		Object[] newValues = this.values.clone();
 		newValues[index] = null;
-		return new EnumMap(this.type, this.keys, newValues, this.size - 1);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, this.size - 1);
 	}
 	
 	@Override
@@ -211,7 +210,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 				newSize--;
 			}
 		}
-		return new EnumMap(this.type, this.keys, newValues, newSize);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, newSize);
 	}
 	
 	@Override
@@ -231,7 +230,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 				newValues[index] = null;
 			}
 		}
-		return new EnumMap(this.type, this.keys, newValues, newSize);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, newSize);
 	}
 	
 	@Override
@@ -250,14 +249,14 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 				newValues[index] = null;
 			}
 		}
-		return new EnumMap(this.type, this.keys, newValues, newSize);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, newSize);
 	}
 	
 	@Override
 	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
 		int len = this.values.length;
-		ImmutableMap.Builder<NK, V> builder = new ArrayMap.Builder(this.size);
+		ImmutableMap.Builder<NK, V> builder = new ArrayMap.Builder<>(this.size);
 		
 		for (int i = 0; i < len; i++)
 		{
@@ -284,13 +283,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 				newValues[i] = mapper.apply(this.keys[i], (V) value);
 			}
 		}
-		return new EnumMap(this.type, this.keys, newValues, this.size);
+		return new EnumMap<>(this.type, this.keys, (NV[]) newValues, this.size);
 	}
 	
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
-		ImmutableMap.Builder<NK, NV> builder = new ArrayMap.Builder(this.size);
+		ImmutableMap.Builder<NK, NV> builder = new ArrayMap.Builder<>(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -314,7 +313,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
-		ImmutableMap.Builder<NK, NV> builder = new ArrayMap.Builder(this.size);
+		ImmutableMap.Builder<NK, NV> builder = new ArrayMap.Builder<>(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -353,13 +352,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 				}
 			}
 		}
-		return new EnumMap(this.type, this.keys, newValues, newSize);
+		return new EnumMap<>(this.type, this.keys, (V[]) newValues, newSize);
 	}
 	
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		ImmutableMap.Builder<V, K> builder = new ArrayMap.Builder(this.size);
+		ImmutableMap.Builder<V, K> builder = new ArrayMap.Builder<>(this.size);
 		
 		int len = this.values.length;
 		for (int i = 0; i < len; i++)
@@ -372,15 +371,14 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
-		return new EnumMap<>(this);
+		return this.immutableCopy();
 	}
 	
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return new dyvil.collection.mutable.EnumMap<>(this);
+		return this.mutableCopy();
 	}
-	
 	@Override
 	public java.util.Map<K, V> toJava()
 	{

@@ -52,13 +52,13 @@ public final class IntPattern extends Pattern
 	}
 	
 	@Override
-	public int switchCases()
+	public int subPatterns()
 	{
 		return 1;
 	}
 	
 	@Override
-	public int switchValue(int index)
+	public int switchValue()
 	{
 		return this.value;
 	}
@@ -83,7 +83,13 @@ public final class IntPattern extends Pattern
 		writer.writeLDC(this.value);
 		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return java.lang.Integer.toString(this.value);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

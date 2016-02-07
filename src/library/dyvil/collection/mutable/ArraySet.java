@@ -1,8 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -18,17 +16,18 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 	
 	public static <E> ArraySet<E> apply()
 	{
-		return new ArraySet();
+		return new ArraySet<>();
 	}
 	
+	@SafeVarargs
 	public static <E> ArraySet<E> apply(E... elements)
 	{
-		return new ArraySet(elements, true);
+		return new ArraySet<>(elements, true);
 	}
-	
-	public static <E> ArraySet<E> fromArray(E... elements)
+
+	public static <E> ArraySet<E> fromArray(E[] elements)
 	{
-		return new ArraySet(elements);
+		return new ArraySet<>(elements);
 	}
 	
 	public ArraySet()
@@ -41,6 +40,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		super(new Object[size], 0, true);
 	}
 	
+	@SafeVarargs
 	public ArraySet(E... elements)
 	{
 		super(elements);
@@ -135,18 +135,12 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 	@Override
 	public MutableSet<E> copy()
 	{
-		return new ArraySet(this.elements, this.size);
-	}
-	
-	@Override
-	public <R> MutableSet<R> emptyCopy()
-	{
-		return new ArraySet(this.size);
+		return this.mutableCopy();
 	}
 	
 	@Override
 	public ImmutableSet<E> immutable()
 	{
-		return new dyvil.collection.immutable.ArraySet<E>((E[]) this.elements, this.size);
+		return this.immutableCopy();
 	}
 }

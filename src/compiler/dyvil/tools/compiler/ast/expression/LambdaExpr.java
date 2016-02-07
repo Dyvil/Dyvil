@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.MapTypeContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -215,7 +215,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				this.returnType = valueType;
 			}
 			
-			final IValue typedReturnValue = this.value.withType(this.returnType, this.returnType, markers, combinedContext);
+			final IValue typedReturnValue = this.value
+					.withType(this.returnType, this.returnType, markers, combinedContext);
 			if (typedReturnValue == null)
 			{
 				Marker marker = Markers.semantic(this.value.getPosition(), "lambda.type");
@@ -405,7 +406,18 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			param.resolveTypes(markers, context);
+			if (param.getType() == Types.UNKNOWN)
+			{
+				// Avoid invalid parameter type error
+				// TODO use custom Parameter subclass
+				param.setType(null);
+				param.resolveTypes(markers, context);
+				param.setType(Types.UNKNOWN);
+			}
+			else
+			{
+				param.resolveTypes(markers, context);
+			}
 		}
 		
 		this.value.resolveTypes(markers, new CombiningContext(this, context));
@@ -615,9 +627,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 	
 	/**
-	 * @return the descriptor that contains the captured instance and captured
-	 * variables (if present) as the argument types and the instantiated
-	 * method type as the return type.
+	 * @return the descriptor that contains the captured instance and captured variables (if present) as the argument
+	 * types and the instantiated method type as the return type.
 	 */
 	private String getInvokeDescriptor()
 	{
@@ -631,8 +642,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 	
 	/**
-	 * @return the specialized method type of the SAM method, as opposed to
-	 * {@link IMethod#getDescriptor()}.
+	 * @return the specialized method type of the SAM method, as opposed to {@link IMethod#getDescriptor()}.
 	 */
 	private String getSpecialDescriptor()
 	{
@@ -648,9 +658,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 	
 	/**
-	 * @return the descriptor of the (synthetic) lambda callback method,
-	 * including captured variables, parameter types and the return
-	 * type.
+	 * @return the descriptor of the (synthetic) lambda callback method, including captured variables, parameter types
+	 * and the return type.
 	 */
 	private String getLambdaDescriptor()
 	{

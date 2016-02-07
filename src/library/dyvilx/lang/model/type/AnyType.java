@@ -1,10 +1,8 @@
 package dyvilx.lang.model.type;
 
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
 
-@NilConvertible
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 public class AnyType implements Type<Object>
 {

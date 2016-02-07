@@ -16,7 +16,12 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
 	static <E> MutableSet<E> apply()
 	{
-		return new HashSet<E>();
+		return new HashSet<>();
+	}
+
+	static <E> MutableSet<E> withCapacity(int capacity)
+	{
+		return new HashSet<>(capacity);
 	}
 	
 	@SafeVarargs
@@ -95,8 +100,9 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 		copy.$up$eq(collection);
 		return copy;
 	}
-	
+
 	@Override
+	@SuppressWarnings("unchecked")
 	default <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper)
 	{
 		MutableSet<R> copy = (MutableSet<R>) this.copy();
@@ -105,6 +111,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	default <R> MutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
 		MutableSet<R> copy = (MutableSet<R>) this.copy();
@@ -156,7 +163,10 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	
 	@Override
 	<R> MutableSet<R> emptyCopy();
-	
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy(int capacity);
+
 	@Override
 	ImmutableSet<E> immutable();
 	
@@ -165,7 +175,13 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	{
 		return this.immutable();
 	}
-	
+
+	@Override
+	<RE> ImmutableSet.Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	default ImmutableSet<E> view()
 	{

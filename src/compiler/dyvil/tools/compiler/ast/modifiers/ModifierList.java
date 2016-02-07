@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.modifiers;
 
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.parsing.marker.MarkerList;
+
+import java.util.Iterator;
 
 public class ModifierList implements ModifierSet
 {
@@ -15,6 +18,12 @@ public class ModifierList implements ModifierSet
 	public ModifierList(int intModifiers)
 	{
 		this.intModifiers = intModifiers;
+	}
+
+	@Override
+	public Iterator<Modifier> iterator()
+	{
+		return new ArrayIterator<Modifier>(this.modifiers, this.count);
 	}
 
 	@Override

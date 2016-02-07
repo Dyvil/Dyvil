@@ -628,6 +628,10 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a copy of this collection
 	 */
 	Collection<E> copy();
+
+	<RE> MutableCollection<RE> emptyCopy();
+
+	<RE> MutableCollection<RE> emptyCopy(int capacity);
 	
 	/**
 	 * Returns a mutable collection that contains the exact same elements as
@@ -668,6 +672,10 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return an immutable copy of this collection
 	 */
 	ImmutableCollection<E> immutableCopy();
+
+	<RE> ImmutableCollection.Builder<RE> immutableBuilder();
+
+	<RE> ImmutableCollection.Builder<RE> immutableBuilder(int capacity);
 	
 	/**
 	 * Returns a view on the elements of this collection. Immutable collections
@@ -786,10 +794,27 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		{
 			if (!c2.contains(element))
 			{
-				return c2.contains(element);
+				return false;
 			}
 		}
 		return true;
+	}
+
+	static <E> int unorderedHashCode(Collection<E> collection)
+	{
+		int sum = 0;
+		int product = 1;
+		for (E element : collection)
+		{
+			if (element == null)
+			{
+				continue;
+			}
+			int hash = element.hashCode();
+			sum += hash;
+			product *= hash;
+		}
+		return sum * 31 + product;
 	}
 	
 	static <E> boolean isSorted(E[] array, int size)

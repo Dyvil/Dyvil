@@ -34,7 +34,7 @@ public class SetView<E> implements ImmutableSet<E>
 	@Override
 	public Iterator<E> iterator()
 	{
-		return this.set.isImmutable() ? this.set.iterator() : new ImmutableIterator(this.set.iterator());
+		return this.set.isImmutable() ? this.set.iterator() : new ImmutableIterator<>(this.set.iterator());
 	}
 	
 	@Override
@@ -46,73 +46,97 @@ public class SetView<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<E> $plus(E element)
 	{
-		return new SetView(this.set.$plus(element));
+		return new SetView<>(this.set.$plus(element));
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
 	{
-		return new SetView(this.set.$plus$plus(collection));
+		return new SetView<>(this.set.$plus$plus(collection));
 	}
 	
 	@Override
 	public ImmutableSet<E> $minus(Object element)
 	{
-		return new SetView(this.set.$minus(element));
+		return new SetView<>(this.set.$minus(element));
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
 	{
-		return new SetView(this.set.$minus$minus(collection));
+		return new SetView<>(this.set.$minus$minus(collection));
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
 	{
-		return new SetView(this.set.$amp(collection));
+		return new SetView<>(this.set.$amp(collection));
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
 	{
-		return new SetView(this.set.$bar(collection));
+		return new SetView<>(this.set.$bar(collection));
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
 	{
-		return new SetView(this.set.$up(collection));
+		return new SetView<>(this.set.$up(collection));
 	}
 	
 	@Override
 	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
 	{
-		return new SetView(this.set.mapped(mapper));
+		return new SetView<>(this.set.mapped(mapper));
 	}
 	
 	@Override
 	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return new SetView(this.set.flatMapped(mapper));
+		return new SetView<>(this.set.flatMapped(mapper));
 	}
 	
 	@Override
 	public ImmutableSet<E> filtered(Predicate<? super E> condition)
 	{
-		return new SetView(this.set.filtered(condition));
+		return new SetView<>(this.set.filtered(condition));
 	}
 	
 	@Override
 	public ImmutableSet<E> copy()
 	{
-		return new SetView(this.set.copy());
+		return new SetView<>(this.set.copy());
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy()
+	{
+		return this.set.emptyCopy();
+	}
+
+	@Override
+	public <RE> MutableSet<RE> emptyCopy(int capacity)
+	{
+		return this.set.emptyCopy(capacity);
 	}
 	
 	@Override
 	public MutableSet<E> mutable()
 	{
 		return this.set.mutable();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder()
+	{
+		return this.set.immutableBuilder();
+	}
+
+	@Override
+	public <RE> Builder<RE> immutableBuilder(int capacity)
+	{
+		return this.set.immutableBuilder(capacity);
 	}
 	
 	@Override

@@ -93,4 +93,30 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 		buffer.append(this.name).append('.');
 		this.element.toString(prefix, buffer);
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+		{
+			return true;
+		}
+		if (obj == null || !(obj instanceof NodeAccess))
+		{
+			return false;
+		}
+
+		final NodeAccess other = (NodeAccess) obj;
+		return this.name == other.name // equal name
+				&& this.element.equals(other.element); // equal element
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = this.name.hashCode();
+		result = prime * result + this.element.hashCode();
+		return result;
+	}
 }

@@ -5,9 +5,9 @@ import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.method.Constructor;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
-import dyvil.tools.compiler.ast.method.IConstructor;
+import dyvil.tools.compiler.ast.constructor.Constructor;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -25,23 +25,25 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
 {
-	protected static final int CONSTRUCTOR = 1;
-	protected static final int APPLY       = 2;
-	protected static final int EQUALS      = 4;
-	protected static final int HASHCODE    = 8;
-	protected static final int TOSTRING    = 16;
-	
-	protected static final int WRITE_OBJECT  = 32;
-	protected static final int WRITE_REPLACE = 64;
-	protected static final int READ_OBJECT   = 128;
-	protected static final int READ_RESOLVE  = 256;
-	
+	protected static final int CONSTRUCTOR = 0x1;
+	protected static final int APPLY       = 0x2;
+	protected static final int EQUALS      = 0x4;
+	protected static final int HASHCODE    = 0x8;
+	protected static final int TOSTRING    = 0x10;
+
+	protected static final int WRITE_OBJECT  = 0x1001;
+	protected static final int READ_OBJECT   = 0x1004;
+	protected static final int READ_RESOLVE  = 0x1008;
+	protected static final int WRITE_REPLACE = 0x1002;
+
+	protected static final int INSTANCE_FIELD = 0x2001;
+
 	protected final IClass theClass;
 	
 	protected IConstructor constructor;
-	protected IValue superInitializer;
+	protected IValue       superInitializer;
 	
-	protected byte methods;
+	protected int members;
 	
 	public ClassMetadata(IClass iclass)
 	{
@@ -74,7 +76,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			if (method.parameterCount() == 1 && method.getParameter(0).getType().isSameType(Types.OBJECT))
 			{
-				this.methods |= EQUALS;
+				this.members |= EQUALS;
 			}
 			return;
 		}
@@ -82,7 +84,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			if (method.parameterCount() == 0)
 			{
-				this.methods |= HASHCODE;
+				this.members |= HASHCODE;
 			}
 			return;
 		}
@@ -90,7 +92,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			if (method.parameterCount() == 0)
 			{
-				this.methods |= TOSTRING;
+				this.members |= TOSTRING;
 			}
 			return;
 		}
@@ -109,7 +111,7 @@ public class ClassMetadata implements IClassMetadata
 					}
 				}
 				
-				this.methods |= APPLY;
+				this.members |= APPLY;
 			}
 			return;
 		}
@@ -117,7 +119,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			if (method.parameterCount() == 0 && method.getType().isSameType(Types.OBJECT))
 			{
-				this.methods |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
+				this.members |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
 				return;
 			}
 			return;
@@ -125,15 +127,21 @@ public class ClassMetadata implements IClassMetadata
 	}
 	
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		this.theClass.getSuperConstructorArguments().resolveTypes(markers, context);
+		final IArguments superConstructorArguments = this.theClass.getSuperConstructorArguments();
+		if (superConstructorArguments != null)
+		{
+			superConstructorArguments.resolveTypes(markers, context);
+		}
 	}
 	
 	@Override
 	public void resolveTypesBody(MarkerList markers, IContext context)
 	{
-		IClassBody body = this.theClass.getBody();
+		// Check if a constructor needs to be generated
+
+		final IClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
 		{
 			final IConstructor constructor = body
@@ -141,17 +149,26 @@ public class ClassMetadata implements IClassMetadata
 			if (constructor != null)
 			{
 				this.constructor = constructor;
-				this.methods |= CONSTRUCTOR;
-				return;
+				this.members |= CONSTRUCTOR;
 			}
 			
 			if (this.theClass.parameterCount() == 0)
 			{
-				this.methods |= CONSTRUCTOR;
-				return;
+				this.members |= CONSTRUCTOR;
 			}
 		}
-		
+	}
+
+	@Override
+	public void resolveTypesGenerate(MarkerList markers, IContext context)
+	{
+		if ((this.members & CONSTRUCTOR) != 0)
+		{
+			return;
+		}
+
+		// Generate the constructor signature
+
 		Constructor constructor = new Constructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
 		int parameterCount = this.theClass.parameterCount();
 
@@ -164,7 +181,6 @@ public class ClassMetadata implements IClassMetadata
 			                                    classParameter.getType(), classParameter.getModifiers());
 			parameters[i].setIndex(i);
 		}
-		//*/
 
 		constructor.setParameters(parameters, parameterCount);
 		
@@ -180,11 +196,13 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if ((this.methods & CONSTRUCTOR) != 0)
+		if ((this.members & CONSTRUCTOR) != 0)
 		{
 			return;
 		}
-		
+
+		// Generate the constructor body
+
 		final IType superType = this.theClass.getSuperType();
 		if (superType == null)
 		{
@@ -210,7 +228,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if ((this.methods & CONSTRUCTOR) == 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.superInitializer.checkTypes(markers, this.constructor);
 		}
@@ -219,7 +237,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if ((this.methods & CONSTRUCTOR) == 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.superInitializer.check(markers, this.constructor);
 		}
@@ -228,7 +246,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void foldConstants()
 	{
-		if ((this.methods & CONSTRUCTOR) == 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.superInitializer.foldConstants();
 		}
@@ -237,7 +255,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if ((this.methods & CONSTRUCTOR) == 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.superInitializer.cleanup(this.constructor, compilableList);
 		}
@@ -246,7 +264,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		if ((this.methods & CONSTRUCTOR) != 0)
+		if ((this.members & CONSTRUCTOR) != 0)
 		{
 			return;
 		}
@@ -261,7 +279,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if ((this.methods & CONSTRUCTOR) != 0)
+		if ((this.members & CONSTRUCTOR) != 0)
 		{
 			return;
 		}

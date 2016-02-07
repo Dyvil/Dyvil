@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.method;
+package dyvil.tools.compiler.ast.constructor;
 
 public final class ConstructorMatchList
 {

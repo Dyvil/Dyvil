@@ -50,4 +50,27 @@ public class DoubleValue implements Constant
 	{
 		buffer.append(this.value).append('D');
 	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || !(o instanceof DoubleValue))
+		{
+			return false;
+		}
+
+		final DoubleValue that = (DoubleValue) o;
+		return Double.compare(that.value, this.value) == 0;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		long temp = Double.doubleToLongBits(this.value);
+		return (int) (temp ^ (temp >>> 32));
+	}
 }

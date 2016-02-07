@@ -51,6 +51,11 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	{
 		return new ArraySet.Builder<>();
 	}
+
+	static <E> Builder<E> builder(int capacity)
+	{
+		return new ArraySet.Builder<>(capacity);
+	}
 	
 	// Accessors
 	
@@ -243,7 +248,13 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	
 	@Override
 	ImmutableSet<E> copy();
-	
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy();
+
+	@Override
+	<RE> MutableSet<RE> emptyCopy(int capacity);
+
 	@Override
 	MutableSet<E> mutable();
 	
@@ -264,7 +275,13 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	{
 		return this.copy();
 	}
-	
+
+	@Override
+	<RE> Builder<RE> immutableBuilder();
+
+	@Override
+	<RE> Builder<RE> immutableBuilder(int capacity);
+
 	@Override
 	default ImmutableSet<E> view()
 	{

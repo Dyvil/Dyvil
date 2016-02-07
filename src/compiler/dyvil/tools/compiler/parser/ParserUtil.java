@@ -1,8 +1,7 @@
-package dyvil.tools.compiler.util;
+package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -10,7 +9,7 @@ import dyvil.tools.parsing.token.IToken;
 
 public class ParserUtil
 {
-	// Token Type Utilities
+	// region Token Type Utilities
 	
 	public static boolean isIdentifier(int type)
 	{
@@ -75,6 +74,8 @@ public class ParserUtil
 		}
 		return pm.getOperator(token.nameValue()) != null;
 	}
+
+	// endregion
 	
 	public static IValue parsePrimitive(IToken token, int type)
 	{

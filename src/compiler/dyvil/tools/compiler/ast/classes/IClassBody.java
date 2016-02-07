@@ -1,17 +1,17 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.ConstructorMatchList;
-import dyvil.tools.compiler.ast.method.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -50,6 +50,28 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	IProperty getProperty(int index);
 	
 	IProperty getProperty(Name name);
+
+	// Methods
+
+	int methodCount();
+
+	@Override
+	void addMethod(IMethod method);
+
+	IMethod getMethod(int index);
+
+	IMethod getMethod(Name name);
+
+	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+
+	default IMethod getFunctionalMethod()
+	{
+		return null;
+	}
+
+	boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext);
+
+	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);
 	
 	// Constructors
 	
@@ -63,29 +85,16 @@ public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
 	IConstructor getConstructor(IParameter[] parameters, int parameterCount);
 	
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
-	
-	// Methods
-	
-	int methodCount();
-	
+
+	// Initializers
+
+	int initializerCount();
+
 	@Override
-	void addMethod(IMethod method);
-	
-	IMethod getMethod(int index);
-	
-	IMethod getMethod(Name name);
-	
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
-	
-	default IMethod getFunctionalMethod()
-	{
-		return null;
-	}
-	
-	boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext);
-	
-	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);
-	
+	void addInitializer(IInitializer initializer);
+
+	IInitializer getInitializer(int index);
+
 	// Phases
 	
 	void resolveTypes(MarkerList markers);
