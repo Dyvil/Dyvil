@@ -239,7 +239,12 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	int PARAMETER_MODIFIERS = FINAL | LAZY | VAR | MANDATED;
+	int PARAMETER_MODIFIERS = FINAL | LAZY | VAR | MANDATED | EXTENSION;
+
+	/**
+	 * The modifiers that can be applied to class parameters.
+	 */
+	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL;
 
 	/**
 	 * The modifiers that cna be applied to variables.

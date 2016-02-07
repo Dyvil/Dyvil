@@ -130,8 +130,7 @@ public final class Variable extends Member implements IVariable
 		{
 			if (newValue.isResolved())
 			{
-				Marker marker = Markers
-						.semantic(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
+				Marker marker = Markers.semantic(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("variable.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 				markers.add(marker);
@@ -207,8 +206,7 @@ public final class Variable extends Member implements IVariable
 		{
 			if (this.value.isResolved())
 			{
-				Marker marker = Markers
-						.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
+				Marker marker = Markers.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("variable.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
@@ -239,8 +237,11 @@ public final class Variable extends Member implements IVariable
 		
 		this.value.check(markers, context);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.VARIABLE_MODIFIERS);
-		
+		if (this.modifiers != null)
+		{
+			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.VARIABLE_MODIFIERS);
+		}
+
 		if (this.type == Types.VOID)
 		{
 			markers.add(Markers.semantic(this.position, "variable.type.void"));

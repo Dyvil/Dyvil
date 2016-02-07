@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -169,7 +170,15 @@ public final class MethodParameter extends Parameter
 			}
 		}
 	}
-	
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
+
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
+	}
+
 	@Override
 	public void write(MethodWriter writer)
 	{

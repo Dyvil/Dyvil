@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
@@ -282,8 +281,6 @@ public abstract class Parameter extends Member implements IParameter
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
 
 		if (this.defaultValue != null)
 		{

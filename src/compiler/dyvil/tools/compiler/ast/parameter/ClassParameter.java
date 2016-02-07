@@ -175,7 +175,15 @@ public final class ClassParameter extends Parameter implements IField
 		
 		return newValue;
 	}
-	
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
+
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
+	}
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
