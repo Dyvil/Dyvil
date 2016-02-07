@@ -34,6 +34,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -59,23 +60,20 @@ public class Constructor extends Member implements IConstructor
 	
 	public Constructor(IClass iclass)
 	{
+		super(Names.init, Types.VOID);
 		this.theClass = iclass;
-		this.type = iclass.getType();
 	}
 	
 	public Constructor(IClass iclass, ModifierSet modifiers)
 	{
-		super(null, null, modifiers);
-		this.theClass = iclass;
-		this.type = iclass.getType();
+		this(null, iclass, modifiers);
 	}
 	
 	public Constructor(ICodePosition position, IClass iclass, ModifierSet modifiers)
 	{
-		super(null, null, modifiers);
+		super(Names.init, Types.VOID, modifiers);
 		this.position = position;
 		this.theClass = iclass;
-		this.type = iclass.getType();
 	}
 	
 	@Override
