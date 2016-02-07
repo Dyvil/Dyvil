@@ -10,11 +10,11 @@ import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.*;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -37,13 +37,26 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 	private IType parentType;
 	private IType type;
+
+	private boolean namedOnly;
 	
 	public TypeParser(ITypeConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = NAME;
 	}
-	
+
+	public void setNamedOnly(boolean namedOnly)
+	{
+		this.namedOnly = namedOnly;
+	}
+
+	public TypeParser namedOnly()
+	{
+		this.setNamedOnly(true);
+		return this;
+	}
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -52,7 +65,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		{
 		case END:
 		{
-			if (type == Tokens.SYMBOL_IDENTIFIER)
+			if (type == Tokens.SYMBOL_IDENTIFIER && !this.namedOnly)
 			{
 				final Name name = token.nameValue();
 				if (name == Names.qmark)
@@ -75,57 +88,61 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			return;
 		}
 		case NAME:
-			switch (type)
+			if (!this.namedOnly)
 			{
-			case DyvilSymbols.AT:
-				Annotation a = new Annotation();
-				pm.pushParser(pm.newAnnotationParser(a));
-				this.type = new AnnotatedType(a);
-				this.mode = ANNOTATION_END;
-				return;
-			case BaseSymbols.OPEN_PARENTHESIS:
-				TupleType tupleType = new TupleType();
-				pm.pushParser(new TypeListParser(tupleType));
-				this.type = tupleType;
-				this.mode = TUPLE_END;
-				return;
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-			{
-				final ArrayType arrayType = new ArrayType();
 
-				switch (token.next().type())
+				switch (type)
 				{
-				case DyvilKeywords.FINAL:
-					arrayType.setMutability(Mutability.IMMUTABLE);
-					pm.skip();
-					break;
-				case DyvilKeywords.VAR:
-					arrayType.setMutability(Mutability.MUTABLE);
-					pm.skip();
-					break;
-				}
+				case DyvilSymbols.AT:
+					Annotation a = new Annotation();
+					pm.pushParser(pm.newAnnotationParser(a));
+					this.type = new AnnotatedType(a);
+					this.mode = ANNOTATION_END;
+					return;
+				case BaseSymbols.OPEN_PARENTHESIS:
+					TupleType tupleType = new TupleType();
+					pm.pushParser(new TypeListParser(tupleType));
+					this.type = tupleType;
+					this.mode = TUPLE_END;
+					return;
+				case BaseSymbols.OPEN_SQUARE_BRACKET:
+				{
+					final ArrayType arrayType = new ArrayType();
 
-				this.mode = ARRAY_COLON;
-				this.type = arrayType;
-				pm.pushParser(pm.newTypeParser(arrayType));
-				return;
-			}
-			case DyvilSymbols.ARROW_OPERATOR:
-			{
-				final LambdaType lambdaType = new LambdaType(token.raw());
-				pm.pushParser(pm.newTypeParser(lambdaType));
-				this.type = lambdaType;
-				this.mode = LAMBDA_END;
-				return;
-			}
-			case DyvilKeywords.NULL:
-				this.consumer.setType(Types.NULL);
-				pm.popParser();
-				return;
-			case DyvilSymbols.WILDCARD:
-				this.type = new WildcardType(token.raw());
-				this.mode = WILDCARD_TYPE;
-				return;
+					switch (token.next().type())
+					{
+					case DyvilKeywords.FINAL:
+						arrayType.setMutability(Mutability.IMMUTABLE);
+						pm.skip();
+						break;
+					case DyvilKeywords.VAR:
+						arrayType.setMutability(Mutability.MUTABLE);
+						pm.skip();
+						break;
+					}
+
+					this.mode = ARRAY_COLON;
+					this.type = arrayType;
+					pm.pushParser(pm.newTypeParser(arrayType));
+					return;
+				}
+				case DyvilSymbols.ARROW_OPERATOR:
+				{
+					final LambdaType lambdaType = new LambdaType(token.raw());
+					pm.pushParser(pm.newTypeParser(lambdaType));
+					this.type = lambdaType;
+					this.mode = LAMBDA_END;
+					return;
+				}
+				case DyvilKeywords.NULL:
+					this.consumer.setType(Types.NULL);
+					pm.popParser();
+					return;
+				case DyvilSymbols.WILDCARD:
+					this.type = new WildcardType(token.raw());
+					this.mode = WILDCARD_TYPE;
+					return;
+				}
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -137,7 +154,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.mode = GENERICS;
 					return;
 				case DyvilSymbols.ARROW_OPERATOR:
-					if (this.parentType == null)
+					if (this.parentType == null && !this.namedOnly)
 					{
 						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
 						lt.setPosition(next.raw());
@@ -179,7 +196,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final IToken nextToken = token.next();
-			if (nextToken.type() == DyvilSymbols.ARROW_OPERATOR)
+			if (nextToken.type() == DyvilSymbols.ARROW_OPERATOR && !this.namedOnly)
 			{
 				TupleType tupleType = (TupleType) this.type;
 				this.type = new LambdaType(tupleType);

@@ -50,7 +50,19 @@ public class NamedType implements IRawType, ITypeConsumer
 	{
 		return NAMED;
 	}
-	
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
 	@Override
 	public Name getName()
 	{

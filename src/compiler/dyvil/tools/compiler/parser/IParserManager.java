@@ -58,22 +58,22 @@ public interface IParserManager
 	
 	// Parser Factory Methods
 	
-	default Parser newExpressionParser(IValueConsumer valueConsumer)
+	default ExpressionParser newExpressionParser(IValueConsumer valueConsumer)
 	{
 		return new ExpressionParser(valueConsumer);
 	}
 	
-	default Parser newTypeParser(ITypeConsumer typeConsumer)
+	default TypeParser newTypeParser(ITypeConsumer typeConsumer)
 	{
 		return new TypeParser(typeConsumer);
 	}
 	
-	default Parser newAnnotationParser(IAnnotation annotation)
+	default AnnotationParser newAnnotationParser(IAnnotation annotation)
 	{
 		return new AnnotationParser(annotation);
 	}
 	
-	default Parser newTypeParameterParser(ITypeParameterized generic)
+	default TypeParameterParser newTypeParameterParser(ITypeParameterized generic)
 	{
 		return new TypeParameterParser(generic);
 	}

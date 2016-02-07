@@ -109,7 +109,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				}
 
 				this.mode = TYPE_END;
-				pm.pushParser(pm.newTypeParser(this), true);
+				pm.pushParser(pm.newTypeParser(this).namedOnly(), true);
 				return;
 			}
 			if (type == DyvilKeywords.VAR)

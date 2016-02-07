@@ -3,6 +3,11 @@ package dyvil.tools.compiler.parser;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.type.TypeParameterParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.token.IToken;
 
@@ -120,20 +125,26 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 	}
 	
 	@Override
-	public Parser newExpressionParser(IValueConsumer valueConsumer)
+	public ExpressionParser newExpressionParser(IValueConsumer valueConsumer)
 	{
 		return this.pm.newExpressionParser(valueConsumer);
 	}
 	
 	@Override
-	public Parser newTypeParser(ITypeConsumer typeConsumer)
+	public TypeParser newTypeParser(ITypeConsumer typeConsumer)
 	{
 		return this.pm.newTypeParser(typeConsumer);
 	}
 	
 	@Override
-	public Parser newAnnotationParser(IAnnotation annotation)
+	public AnnotationParser newAnnotationParser(IAnnotation annotation)
 	{
 		return this.pm.newAnnotationParser(annotation);
+	}
+
+	@Override
+	public TypeParameterParser newTypeParameterParser(ITypeParameterized typeParameterized)
+	{
+		return this.pm.newTypeParameterParser(typeParameterized);
 	}
 }
