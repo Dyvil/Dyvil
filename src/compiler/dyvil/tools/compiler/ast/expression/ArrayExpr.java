@@ -365,15 +365,15 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue v = this.values[i];
-			IValue v1 = v.toConstant(markers);
-			if (v1 == null)
+			final IValue value = this.values[i];
+			final IValue constant = value.toConstant(markers);
+			if (constant == null)
 			{
-				markers.add(Markers.semantic(v.getPosition(), "annotation.array.not_constant"));
+				markers.add(Markers.semantic(value.getPosition(), "annotation.array.not_constant"));
 			}
 			else
 			{
-				this.values[i] = v1;
+				this.values[i] = constant;
 			}
 		}
 		

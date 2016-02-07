@@ -1,10 +1,14 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.pattern.constant.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
@@ -70,8 +74,51 @@ public class FieldPattern implements IPattern
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
-		// TODO Inline Constant Primitives
+		if (!this.dataMember.hasModifier(Modifiers.CONST))
+		{
+			return this;
+		}
+
+		final IValue value = toConstant(this.dataMember.getValue());
+		if (value == null)
+		{
+			return this;
+		}
+
+		switch (value.valueTag())
+		{
+		case IValue.NULL:
+			return new NullPattern(this.position);
+		case IValue.INT:
+			return new IntPattern(this.position, value.intValue());
+		case IValue.LONG:
+			return new LongPattern(this.position, value.longValue());
+		case IValue.FLOAT:
+			return new FloatPattern(this.position, value.floatValue());
+		case IValue.DOUBLE:
+			return new DoublePattern(this.position, value.doubleValue());
+		case IValue.STRING:
+			return new StringPattern(this.position, value.stringValue());
+		}
 		return this;
+	}
+
+	private static IValue toConstant(IValue value)
+	{
+		int depth = DyvilCompiler.maxConstantDepth;
+
+		do
+		{
+			if (value == null || depth-- < 0)
+			{
+				return null;
+			}
+
+			value = value.foldConstants();
+		}
+		while (!value.isConstantOrField());
+
+		return value;
 	}
 
 	@Override
