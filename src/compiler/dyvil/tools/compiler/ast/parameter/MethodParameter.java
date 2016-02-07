@@ -5,17 +5,16 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -52,6 +51,12 @@ public final class MethodParameter extends Parameter
 	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
 	{
 		super(position, name, type, modifiers);
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.METHOD_PARAMETER;
 	}
 
 	@Override
@@ -162,50 +167,6 @@ public final class MethodParameter extends Parameter
 			{
 				this.type.setExtension(true);
 			}
-		}
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		super.resolve(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.resolve(markers, context);
-			
-			IValue value1 = this.type.convertValue(this.defaultValue, this.type, markers, context);
-			if (value1 == null)
-			{
-				Marker marker = Markers
-						.semantic(this.defaultValue.getPosition(), "parameter.type.incompatible",
-						          this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("parameter.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.defaultValue = value1;
-			}
-			
-			this.defaultValue = Util.constant(this.defaultValue, markers);
-		}
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		super.check(markers, context);
-		
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.check(markers, context);
-		}
-		
-		if (this.type == Types.VOID)
-		{
-			markers.add(Markers.semantic(this.position, "parameter.type.void"));
 		}
 	}
 	

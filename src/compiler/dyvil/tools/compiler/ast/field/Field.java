@@ -314,7 +314,7 @@ public class Field extends Member implements IField
 			markers.add(Markers.semantic(this.position, "field.type.void"));
 		}
 		
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, "field", Modifiers.FIELD_MODIFIERS);
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.FIELD_MODIFIERS);
 	}
 	
 	@Override

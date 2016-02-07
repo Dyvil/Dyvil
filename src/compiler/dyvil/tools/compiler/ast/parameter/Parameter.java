@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
@@ -20,7 +21,10 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -215,7 +219,7 @@ public abstract class Parameter extends Member implements IParameter
 			visitor.visit("classValue", value.toObject());
 		}
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -226,7 +230,42 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue.resolveTypes(markers, context);
 		}
 	}
-	
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		super.resolve(markers, context);
+
+		if (this.defaultValue != null)
+		{
+			this.defaultValue = this.defaultValue.resolve(markers, context);
+
+			final IValue typed = this.defaultValue.withType(this.type, null, markers, context);
+			if (typed == null)
+			{
+				final Marker marker = Markers
+						.semantic(this.defaultValue.getPosition(), this.getKind().getName() + ".type.incompatible",
+						          this.name.unqualified);
+				marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", this.type));
+				marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
+				markers.add(marker);
+			}
+			else
+			{
+				this.defaultValue = typed;
+			}
+
+			this.defaultValue = Util.constant(this.defaultValue, markers);
+			return;
+		}
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.nodefault",
+			                             this.name.unqualified));
+			this.type = Types.ANY;
+		}
+	}
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -237,7 +276,26 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue.checkTypes(markers, context);
 		}
 	}
-	
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
+
+		ModifierUtil
+				.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
+
+		if (this.defaultValue != null)
+		{
+			this.defaultValue.check(markers, context);
+		}
+
+		if (this.type == Types.VOID)
+		{
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
+		}
+	}
+
 	@Override
 	public void foldConstants()
 	{

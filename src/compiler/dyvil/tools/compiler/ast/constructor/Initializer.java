@@ -94,7 +94,7 @@ public class Initializer extends Member implements IInitializer
 	{
 		super.check(markers, context);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, "initializer", Modifiers.PRIVATE | Modifiers.STATIC);
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PRIVATE | Modifiers.STATIC);
 
 		if (this.value != null)
 		{

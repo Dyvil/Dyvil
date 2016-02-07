@@ -295,7 +295,7 @@ public final class ModifierUtil
 		return -1;
 	}
 
-	public static void checkModifiers(MarkerList markers, IMember member, ModifierSet modifierSet, String type, int allowedModifiers)
+	public static void checkModifiers(MarkerList markers, IMember member, ModifierSet modifierSet, int allowedModifiers)
 	{
 		StringBuilder stringBuilder = null;
 		for (Modifier modifier : modifierSet)
@@ -316,13 +316,12 @@ public final class ModifierUtil
 
 		if (stringBuilder != null)
 		{
-			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal",
-			                                  Markers.getSemantic("member." + type, member.getName()),
+			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
 			                                  stringBuilder.toString()));
 		}
 	}
 	
-	public static void checkMethodModifiers(MarkerList markers, IClassMember member, int modifiers, boolean hasValue, String type)
+	public static void checkMethodModifiers(MarkerList markers, IClassMember member, int modifiers, boolean hasValue)
 	{
 		boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
 		boolean isAbstract = (modifiers & Modifiers.ABSTRACT) != 0;
@@ -331,13 +330,13 @@ public final class ModifierUtil
 		// If the method does not have an implementation and is static
 		if (isStatic && isAbstract)
 		{
-			markers.add(Markers.semanticError(member.getPosition(), "modifiers.static.abstract",
-			                                  Util.toString(member, type)));
+			markers.add(
+					Markers.semanticError(member.getPosition(), "modifiers.static.abstract", Util.memberNamed(member)));
 		}
 		else if (isAbstract && isNative)
 		{
-			markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.abstract",
-			                                  Util.toString(member, type)));
+			markers.add(
+					Markers.semanticError(member.getPosition(), "modifiers.native.abstract", Util.memberNamed(member)));
 		}
 		else
 		{
@@ -346,7 +345,7 @@ public final class ModifierUtil
 				if (!hasValue)
 				{
 					markers.add(Markers.semanticError(member.getPosition(), "modifiers.static.unimplemented",
-					                                  Util.toString(member, type)));
+					                                  Util.memberNamed(member)));
 				}
 			}
 			if (isNative)
@@ -354,7 +353,7 @@ public final class ModifierUtil
 				if (!hasValue)
 				{
 					markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
-					                                  Util.toString(member, type)));
+					                                  Util.memberNamed(member)));
 				}
 			}
 			if (isAbstract)
@@ -363,19 +362,19 @@ public final class ModifierUtil
 				if (!theClass.isAbstract())
 				{
 					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",
-					                                  Util.toString(member, type), theClass.getName()));
+					                                  Util.memberNamed(member), theClass.getName()));
 				}
 				if (hasValue)
 				{
 					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.implemented",
-					                                  Util.toString(member, type)));
+					                                  Util.memberNamed(member)));
 				}
 			}
 		}
 		if (!hasValue && !isAbstract && !isNative)
 		{
-			markers.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented",
-			                                  Util.toString(member, type)));
+			markers.add(
+					Markers.semanticError(member.getPosition(), "modifiers.unimplemented", Util.memberNamed(member)));
 		}
 	}
 

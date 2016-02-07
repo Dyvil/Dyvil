@@ -253,7 +253,7 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, "class", Modifiers.CLASS_MODIFIERS);
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_MODIFIERS);
 
 		if (this.annotations != null)
 		{

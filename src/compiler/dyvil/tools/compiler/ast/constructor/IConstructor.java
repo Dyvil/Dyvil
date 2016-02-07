@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -16,6 +17,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IConstructor extends IClassMember, ICallableMember, ITypeList, IContext
 {
+	@Override
+	default MemberKind getKind()
+	{
+		return MemberKind.CONSTRUCTOR;
+	}
+
 	float getSignatureMatch(IArguments arguments);
 	
 	IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);

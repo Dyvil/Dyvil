@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameterized;
-import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -107,7 +106,6 @@ public class Util
 		}
 	}
 
-	
 	public static boolean formatStatementList(String prefix, StringBuilder buffer, IValue value)
 	{
 		if (value.valueTag() != IValue.STATEMENT_LIST)
@@ -128,9 +126,10 @@ public class Util
 		return true;
 	}
 
-	public static String toString(IClassMember member, String type)
+	public static String memberNamed(IMember member)
 	{
-		return Markers.getSemantic("member.named", Markers.getSemantic("member." + type), member.getName());
+		return Markers.getSemantic("member.named", Markers.getSemantic("member." + member.getKind().getName()),
+		                           member.getName());
 	}
 
 	// endregion
