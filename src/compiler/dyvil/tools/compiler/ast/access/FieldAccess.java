@@ -247,22 +247,21 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		
 		int depth = DyvilCompiler.maxConstantDepth;
-		IValue v = this;
+		IValue value = this;
 		
 		do
 		{
 			if (depth-- < 0)
 			{
-				markers.add(
-						Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name));
+				markers.add(Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name));
 				return this;
 			}
 			
-			v = v.foldConstants();
+			value = value.foldConstants();
 		}
-		while (!v.isConstantOrField());
+		while (!value.isConstantOrField());
 		
-		return v.toConstant(markers);
+		return value.toConstant(markers);
 	}
 	
 	@Override

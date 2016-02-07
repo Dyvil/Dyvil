@@ -78,6 +78,7 @@ public final class SemicolonInference
 				case DyvilKeywords.CONTINUE:
 				case DyvilKeywords.THIS:
 				case DyvilKeywords.SUPER:
+				case DyvilKeywords.NIL:
 					break; // continue inference checking
 				default:
 					return; // don't infer a semicolon

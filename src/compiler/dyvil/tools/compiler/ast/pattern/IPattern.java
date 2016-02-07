@@ -32,6 +32,7 @@ public interface IPattern extends IASTNode, ITyped
 	
 	int CASE_CLASS = 24;
 	int OBJECT     = 25;
+	int FIELD      = 26;
 	
 	int BINDING   = 32;
 	int WILDCARD  = 33;

@@ -12,6 +12,9 @@ public class MatchTest
 		stringCollision()
 		expression()
 		tuples()
+		caseClasses()
+		objects()
+		fields()
 		orPatterns()
 		andPatterns()
 	}
@@ -127,6 +130,79 @@ public class MatchTest
 		}
 
 		Main.test("Match Tuples", value, tuple.toString)
+	}
+
+	private static void caseClasses()
+	{
+		Option[int] option = Some(1)
+		int value = _
+
+		option match {
+			case Some(int i) => value = i
+			case _			 => value = -1
+		}
+
+		Main.test("Match Case Classes", 1, value)
+	}
+
+	private static void objects()
+	{
+		Option[int] option = nil
+		int value = _
+
+		option match {
+			case None => value = 1
+			case _	  => value = -1
+		}
+
+		Main.test("Match Objects", 1, value)
+	}
+
+	private const int ERROR = 0
+	private const int SUCCESS = 1
+
+	private const Int ERROR_BOXED = ERROR
+
+	private static void fields()
+	{
+		int value = _
+
+		// ------------------------------------------------------------
+
+		SUCCESS match {
+			case MatchTest.ERROR => value = ERROR
+			case SUCCESS		 => value = SUCCESS
+			case _			 	 => value = ERROR
+		}
+
+		Main.test("Match Fields", SUCCESS, value)
+
+		// ------------------------------------------------------------
+
+		ERROR_BOXED match {
+			case ERROR => value = SUCCESS
+			case _	   => value = ERROR
+		}
+
+		Main.test("Match Fields (Boxed -> Unboxed)", SUCCESS, value)
+
+		// ------------------------------------------------------------
+
+		ERROR match {
+			case ERROR_BOXED => value = SUCCESS
+			case _			 => value = ERROR
+		}
+
+		Main.test("Match Fields (Unboxed -> Boxed)", SUCCESS, value)
+
+		// ------------------------------------------------------------
+
+		(ERROR_BOXED as Object) match {
+			case ERROR => value = SUCCESS
+			case _	   => value = ERROR
+		}
+
+		Main.test("Match Fields (Object -> Unboxed)", SUCCESS, value)
 	}
 
 	private static void orPatterns()

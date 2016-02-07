@@ -69,6 +69,16 @@ public class NamedType implements IRawType, ITypeConsumer
 		return this.name;
 	}
 
+	public IType getParent()
+	{
+		return this.parent;
+	}
+
+	public void setParent(IType parent)
+	{
+		this.parent = parent;
+	}
+
 	@Override
 	public void setType(IType type)
 	{
