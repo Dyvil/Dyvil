@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.parsing.Name;
@@ -194,34 +195,41 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 		dejaVu.add(iclass);
-		
-		IClassBody body = iclass.getBody();
+
+		// Add members
+		for (int i = 0, count = iclass.parameterCount(); i < count; i++)
+		{
+			final IParameter parameter = iclass.getParameter(i);
+			if (matches(start, parameter, statics))
+			{
+				fields.add(getSignature(type, parameter));
+			}
+		}
+
+		final IClassBody body = iclass.getBody();
 		if (body != null)
 		{
-			int count = body.fieldCount();
-			for (int i = 0; i < count; i++)
+			for (int i = 0, count = body.fieldCount(); i < count; i++)
 			{
-				IField field = body.getField(i);
+				final IField field = body.getField(i);
 				if (matches(start, field, statics))
 				{
 					fields.add(getSignature(type, field));
 				}
 			}
-			
-			count = body.propertyCount();
-			for (int i = 0; i < count; i++)
+
+			for (int i = 0, count = body.propertyCount(); i < count; i++)
 			{
-				IProperty property = body.getProperty(i);
+				final IProperty property = body.getProperty(i);
 				if (matches(start, property, statics))
 				{
 					properties.add(getSignature(type, property));
 				}
 			}
-			
-			count = body.methodCount();
-			for (int i = 0; i < count; i++)
+
+			for (int i = 0, count = body.methodCount(); i < count; i++)
 			{
-				IMethod method = body.getMethod(i);
+				final IMethod method = body.getMethod(i);
 				if (matches(start, method, statics))
 				{
 					methods.add(getSignature(type, method));
@@ -233,17 +241,17 @@ public class CompleteCommand implements ICommand
 		{
 			return;
 		}
-		
-		IType superType = iclass.getSuperType();
+
+		// Recursively scan super types
+		final IType superType = iclass.getSuperType();
 		if (superType != null)
 		{
 			this.findCompletions(superType.getConcreteType(type), fields, properties, methods, start, false, dejaVu);
 		}
-		
-		int itfCount = iclass.interfaceCount();
-		for (int i = 0; i < itfCount; i++)
+
+		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
 		{
-			IType superInterface = iclass.getInterface(i);
+			final IType superInterface = iclass.getInterface(i);
 			if (superInterface != null)
 			{
 				this.findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, false,
