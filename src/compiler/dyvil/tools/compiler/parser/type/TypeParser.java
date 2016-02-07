@@ -73,7 +73,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.type = new OptionType(this.type);
 					return;
 				}
-				if (name == Names.times)
+				if (name == Names.amp || name == Names.times) // TODO Drop * support
 				{
 					this.type = new ReferenceType(this.type);
 					return;

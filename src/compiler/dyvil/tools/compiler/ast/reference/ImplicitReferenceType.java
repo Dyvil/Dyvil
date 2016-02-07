@@ -43,7 +43,7 @@ public class ImplicitReferenceType extends ReferenceType
 		final IReference ref = value.toReference();
 		if (ref != null)
 		{
-			return new ReferenceValue(value, ref);
+			return new ReferenceOperator(value, ref);
 		}
 
 		markers.add(Markers.semantic(value.getPosition(), "reference.expression.invalid"));

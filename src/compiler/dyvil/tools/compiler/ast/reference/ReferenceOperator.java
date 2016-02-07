@@ -8,10 +8,11 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class ReferenceValue implements IValue
+public class ReferenceOperator implements IValue
 {
 	protected IValue     value;
 	protected IReference reference;
@@ -19,12 +20,12 @@ public class ReferenceValue implements IValue
 	// Metadata
 	private IType type;
 
-	public ReferenceValue(IValue value)
+	public ReferenceOperator(IValue value)
 	{
 		this.value = value;
 	}
 
-	public ReferenceValue(IValue value, IReference reference)
+	public ReferenceOperator(IValue value, IReference reference)
 	{
 		this.value = value;
 		this.reference = reference;
@@ -191,13 +192,13 @@ public class ReferenceValue implements IValue
 	@Override
 	public String toString()
 	{
-		return "*" + this.value.toString();
+		return IASTNode.toString(this);
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('*');
+		buffer.append('&');
 		this.value.toString(prefix, buffer);
 	}
 }
