@@ -229,6 +229,13 @@ public abstract class Parameter extends Member implements IParameter
 		{
 			this.defaultValue.resolveTypes(markers, context);
 		}
+
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(
+					Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			this.type = Types.ANY;
+		}
 	}
 
 	@Override
@@ -258,12 +265,6 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue = Util.constant(this.defaultValue, markers);
 			return;
 		}
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.nodefault",
-			                             this.name.unqualified));
-			this.type = Types.ANY;
-		}
 	}
 
 	@Override
@@ -282,8 +283,7 @@ public abstract class Parameter extends Member implements IParameter
 	{
 		super.check(markers, context);
 
-		ModifierUtil
-				.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
 
 		if (this.defaultValue != null)
 		{
