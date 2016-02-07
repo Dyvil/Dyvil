@@ -20,23 +20,26 @@ public final class Predef
 	
 	@Intrinsic([ LOAD_0, NONNULL ])
 	public infix boolean isNonNull(Object o) = o.isNonNull
-	
-	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS ])
-	public infix boolean operator ==(Object o1, Object o2) = o1 equals o2
-	
+
+	// Structural Equality (equals)
+	public infix boolean operator ==(Object o1, Object o2)
+	{
+		if (o1.isNull)	return o2.isNull
+		else			return o1 equals o2
+	}
+
+	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
 	public infix boolean operator ===(Object o1, Object o2) = o1 === o2
-	
-	@Intrinsic([ LOAD_0, LOAD_1, OBJECT_EQUALS, BNOT ])
-	public infix boolean operator !=(Object o1, Object o2) = !(o1 equals o2)
-	
+
+	// Structural Inequality (!equals)
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
+			   strings: [ "dyvil/lang/Predef", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	public infix boolean operator !=(Object o1, Object o2) = !(o1 == o2)
+
+	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
 	public infix boolean operator !==(Object o1, Object o2) = o1 !== o2
-
-	public infix R operator ?[R](boolean condition, => R result1, => R result2) {
-		if (condition)	return result1.apply
-		else			return result2.apply
-	}
 	
 	// Lists
 	
