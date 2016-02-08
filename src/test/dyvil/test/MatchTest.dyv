@@ -134,15 +134,27 @@ public class MatchTest
 
 	private static void caseClasses()
 	{
-		Option[int] option = Some(1)
+		Option[int] intOption = Some 1
 		int value = _
 
-		option match {
+		intOption match {
 			case Some(int i) => value = i
 			case _			 => value = -1
 		}
 
-		Main.test("Match Case Classes", 1, value)
+		Main.test("Match Case Classes (primitive)", 1, value)
+
+		// ------------------------------------------------------------
+
+		Some[String] stringOption = Some "abc"
+		String value = _
+
+		stringOption match {
+			case Some(String s) => value = s
+			case _				=> value = null
+		}
+
+		Main.test("Match Case Classes (Object)", "abc", value)
 	}
 
 	private static void objects()
