@@ -153,9 +153,12 @@ public final class TuplePattern extends Pattern implements IPatternList
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
-		final int lineNumber = this.getLineNumber();
+		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
+		final int lineNumber = this.getLineNumber();
+		final IClass tupleClass = this.tupleType.getTheClass();
 		final String internalTupleClassName = this.tupleType.getInternalName();
+
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			if (this.patterns[i].getPatternType() == WILDCARD)
@@ -167,7 +170,10 @@ public final class TuplePattern extends Pattern implements IPatternList
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			matchedType.writeCast(writer, this.tupleType, lineNumber);
 			writer.writeFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
-			this.patterns[i].writeInvJump(writer, -1, Types.OBJECT, elseLabel);
+			final IType targetType = this.tupleType.resolveTypeSafely(tupleClass.getTypeParameter(i));
+
+			Types.OBJECT.writeCast(writer, targetType, lineNumber);
+			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
 		}
 	}
 	

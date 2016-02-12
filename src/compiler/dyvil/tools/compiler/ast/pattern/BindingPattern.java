@@ -126,7 +126,6 @@ public final class BindingPattern extends Pattern
 	{
 		if (this.variable != null)
 		{
-			this.variable.setType(this.type);
 			IPattern.loadVar(writer, varIndex, matchedType);
 			this.variable.writeInit(writer, null);
 		}

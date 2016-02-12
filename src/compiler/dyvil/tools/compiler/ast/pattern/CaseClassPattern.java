@@ -29,6 +29,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 	// Metadata
 	private IMethod[] getterMethods;
+	private IType[] paramTypes;
 	
 	public CaseClassPattern(ICodePosition position)
 	{
@@ -83,6 +84,8 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			markers.add(marker);
 			return this;
 		}
+
+		this.paramTypes = new IType[paramCount];
 		
 		for (int i = 0; i < paramCount; i++)
 		{
@@ -95,21 +98,24 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 
 			final IType paramType = param.getType().getConcreteType(type);
+			this.paramTypes[i] = paramType;
+
 			final IPattern typedPattern = pattern.withType(paramType, markers);
-			
+
 			if (typedPattern == null)
 			{
 				final Marker marker = Markers.semantic(this.position, "pattern.class.type", param.getName());
 				marker.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
 				marker.addInfo(Markers.getSemantic("classparameter.type", paramType));
 				markers.add(marker);
+
 			}
 			else
 			{
 				this.patterns[i] = typedPattern;
 			}
 		}
-		
+
 		if (type.classEquals(this.type))
 		{
 			// No additional type check required
@@ -224,26 +230,30 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			matchedType.writeCast(writer, this.type, lineNumber);
 
 			final IMethod method = this.getterMethods[i];
-			final IType targetType;
+			final IType targetType = this.paramTypes[i];
+			final IType memberType;
 
 			if (method != null)
 			{
-				targetType = method.getType();
+				memberType = method.getType();
+
 				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 			}
 			else
 			{
 				final IDataMember field = caseClass.getParameter(i);
+				memberType = field.getType();
 
-				// Get the field value
-				targetType = field.getType();
 				field.writeGet(writer, null, lineNumber);
 			}
 
+			memberType.writeCast(writer, targetType, lineNumber);
 			// Check the pattern
 			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
 		}
 	}
+
+
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

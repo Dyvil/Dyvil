@@ -155,6 +155,18 @@ public class MatchTest
 		}
 
 		Main.test("Match Case Classes (Object)", "abc", value)
+
+		// ------------------------------------------------------------
+
+		Some[int] intOption = Some 2
+		int value = _
+
+		intOption match {
+			case Some(int i) => value = i
+			case _			 => value = -1
+		}
+
+		Main.test("Match Case Classes (primitive 2)", 2, value)
 	}
 
 	private static void objects()
