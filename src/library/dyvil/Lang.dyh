@@ -28,8 +28,14 @@ import	dyvil.annotation.{
 
 import	java.lang._
 
-// Import the methods from Predef
-using	dyvil.lang.Predef._
+// Import the methods from former Predef classes
+using	dyvil.util.{
+					LanguageCommons._
+					LanguageFeatures._
+					ObjectExtensions._
+					StringExtensions._
+					FunctionConversions._
+				   }
 
 // Print Operators
 prefix	operator print		{ precedence 1 }

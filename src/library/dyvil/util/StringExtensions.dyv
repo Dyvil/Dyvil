@@ -1,0 +1,18 @@
+package dyvil.util
+
+using	dyvil.reflect.Opcodes._
+
+public final class StringExtensions
+{
+	private new() {}
+
+	@Intrinsic([ LOAD_0 ])
+	public static char $(char c) = c
+
+	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
+
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/String", "charAt", "(I)C" ])
+	public infix char subscript(String s, int index) = s charAt index
+
+	public infix String subscript(String s, Range[int] range) = s.substring(range.first, range.last + 1)
+}

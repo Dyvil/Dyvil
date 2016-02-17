@@ -1,0 +1,64 @@
+package dyvil.util
+
+using	dyvil.reflect.Opcodes._
+
+public final class LanguageCommons
+{
+	private new() {}
+
+	// Assertions
+
+	public static void assert(boolean condition) = if (!condition) throw new AssertionError()
+
+	public static void assert(boolean condition, => any message) = if (!condition) throw new AssertionError(message())
+
+	// Errors
+
+	public static void error(String message) = throw new Error(message)
+
+	public static void ???() = throw new UnsupportedOperationException("Not Implemented!")
+
+	// Output
+
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "()V" ])
+	public static void println() = System.out.println()
+
+	public static void println(boolean v) = System.out.println(if (v) "true" else "false")
+
+	public static void println(byte v) = System.out.println(v.toString)
+
+	public static void println(short v) = System.out.println(v.toString)
+
+	public static void println(char v) = System.out.println(v.toString)
+
+	public static void println(int v) = System.out.println(v.toString)
+
+	public static void println(long v) = System.out.println(v.toString)
+
+	public static void println(float v) = System.out.println(v.toString)
+
+	public static void println(double v) = System.out.println(v.toString)
+
+	@Intrinsic(value: [ GETSTATIC, 0, 1, 2, LOAD_0, INVOKEVIRTUAL, 3, 4, 5 ], strings: [ "java/lang/System", "out", "Ljava/io/PrintStream;", "java/io/PrintStream", "println", "(Ljava/lang/String;)V" ])
+	public static void println(String s) = System.out.println(s)
+
+	public static void println(Object o) = System.out.println(if (o == null) "null" else o.toString)
+
+	public static void println(boolean... v) = System.out.println(v.toString)
+
+	public static void println(byte... v) = System.out.println(v.toString)
+
+	public static void println(short... v) = System.out.println(v.toString)
+
+	public static void println(char... v) = System.out.println(v.toString)
+
+	public static void println(int... v) = System.out.println(v.toString)
+
+	public static void println(long... v) = System.out.println(v.toString)
+
+	public static void println(float... v) = System.out.println(v.toString)
+
+	public static void println(double... v) = System.out.println(v.toString)
+
+	public static void println(Object... v) = System.out.println(v.toString)
+}
