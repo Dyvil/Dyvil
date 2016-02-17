@@ -100,16 +100,16 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IValue value1 = this.value.withType(Types.THROWABLE, null, markers, context);
-		if (value1 == null)
+		IValue typedValue = this.value.withType(Types.THROWABLE, null, markers, context);
+		if (typedValue != null)
+		{
+			this.value = typedValue;
+		}
+		else if (this.value.isResolved())
 		{
 			Marker marker = Markers.semantic(this.value.getPosition(), "throw.type");
 			marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 			markers.add(marker);
-		}
-		else
-		{
-			this.value = value1;
 		}
 		
 		this.value.checkTypes(markers, context);

@@ -8,6 +8,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public class ImportListParser extends Parser
 {
+	private static final int IMPORT    = 0;
+	private static final int SEPARATOR = 1;
+
 	protected IImportList theImport;
 	
 	public ImportListParser(IImportList list)
@@ -18,23 +21,21 @@ public class ImportListParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == BaseSymbols.CLOSE_CURLY_BRACKET || type == BaseSymbols.SEMICOLON)
+		final int type = token.type();
+		switch (this.mode)
 		{
-			pm.popParser(true);
-			return;
-		}
-		
-		if (this.mode == 0)
-		{
+		case IMPORT:
 			pm.pushParser(new ImportParser(this.theImport::addImport), true);
-			this.mode = 1;
+			this.mode = SEPARATOR;
 			return;
-		}
-		if (this.mode == 1)
-		{
-			this.mode = 0;
-			if (type != BaseSymbols.COMMA)
+		case SEPARATOR:
+			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.popParser(true);
+				return;
+			}
+			this.mode = IMPORT;
+			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.reparse();
 				pm.report(token, "import.multi.comma");
