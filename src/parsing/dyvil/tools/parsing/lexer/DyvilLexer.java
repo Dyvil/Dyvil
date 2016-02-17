@@ -115,7 +115,7 @@ public final class DyvilLexer
 					if (LexerUtil.isIdentifierSymbol(currentChar))
 					{
 						buf.append(currentChar);
-						subtype = MOD_LETTER;
+						subtype = MOD_SYMBOL;
 						continue;
 					}
 					addToken = true;
