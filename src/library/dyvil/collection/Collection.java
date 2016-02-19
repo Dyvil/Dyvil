@@ -343,8 +343,6 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 	}
 	
-	// Mutating Operations
-	
 	/**
 	 * Removes the element given by {@code element} from this collection. This
 	 * method should throw an {@link ImmutableException} if this is an immutable
@@ -373,9 +371,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 			this.$minus$eq(e);
 		}
 	}
-	
-	// Mutating Operations
-	
+
 	/**
 	 * Removes all elements of this collection that are not present in the given
 	 * {@code collection}. This method should throw an
@@ -388,8 +384,6 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		this.intersect(collection);
 	}
-	
-	// Mutating Operations
 	
 	/**
 	 * Clears this collection such that all elements of this collection are
