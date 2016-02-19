@@ -87,7 +87,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeParameter == type.getTypeVariable();
+		return this.isSameType(type);
 	}
 	
 	@Override
@@ -105,13 +105,13 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.typeParameter == type.getTypeVariable();
+		return this.typeParameter == type.getReturnType().getTypeVariable();
 	}
 	
 	@Override
 	public boolean classEquals(IType type)
 	{
-		return this.typeParameter == type.getTypeVariable();
+		return this.isSameType(type);
 	}
 	
 	@Override

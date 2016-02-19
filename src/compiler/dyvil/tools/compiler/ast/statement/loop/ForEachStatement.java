@@ -80,11 +80,13 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		return this.variable;
 	}
 	
+	@Override
 	public void setAction(IValue action)
 	{
 		this.action = action;
 	}
 	
+	@Override
 	public IValue getAction()
 	{
 		return this.action;
@@ -240,7 +242,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		}
 		if (Types.ITERABLE.isSuperTypeOf(valueType))
 		{
-			IType iterableType = valueType.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE);
+			final IType iterableType = valueType.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE).getReturnType();
 			if (varType == Types.UNKNOWN)
 			{
 				this.variable.setType(varType = iterableType);

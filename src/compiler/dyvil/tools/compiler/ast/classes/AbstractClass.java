@@ -390,6 +390,10 @@ public abstract class AbstractClass implements IClass
 	public int getSuperTypeDistance(IType superType)
 	{
 		IClass iclass = superType.getTheClass();
+		if (iclass == null)
+		{
+			return 0;
+		}
 		if (this == iclass)
 		{
 			return 1;
@@ -518,8 +522,9 @@ public abstract class AbstractClass implements IClass
 		
 		if (this.superType != null)
 		{
-			if (this.superType.getTheClass().checkImplements(markers, checkedClass, candidate,
-			                                                 this.superType.getConcreteType(typeContext)))
+			final IClass superClass = this.superType.getTheClass();
+			if (superClass != null && superClass
+					.checkImplements(markers, checkedClass, candidate, this.superType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -528,8 +533,9 @@ public abstract class AbstractClass implements IClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			final IType interfaceType = this.interfaces[i];
-			if (interfaceType.getTheClass().checkImplements(markers, checkedClass, candidate,
-			                                                interfaceType.getConcreteType(typeContext)))
+			final IClass interfaceClass = interfaceType.getTheClass();
+			if (interfaceClass != null && interfaceClass
+					.checkImplements(markers, checkedClass, candidate, interfaceType.getConcreteType(typeContext)))
 			{
 				return true;
 			}

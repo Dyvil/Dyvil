@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
@@ -37,19 +38,8 @@ public interface IRawType extends IObjectType
 	@Override
 	default IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.getTheClass().resolveType(typeParameter, this);
-	}
-	
-	@Override
-	default IType resolveType(MarkerList markers, IContext context)
-	{
-		return null;
-	}
-	
-	@Override
-	default void resolve(MarkerList markers, IContext context)
-	{
-		IObjectType.super.resolve(markers, context);
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.resolveType(typeParameter, this);
 	}
 	
 	@Override

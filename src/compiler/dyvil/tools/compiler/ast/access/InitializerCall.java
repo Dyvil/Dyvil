@@ -113,12 +113,22 @@ public class InitializerCall implements ICall
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		IClass iclass = context.getThisClass();
+		if (iclass == null)
+		{
+			return null;
+		}
+
 		if (this.isSuper)
 		{
 			iclass = iclass.getSuperType().getTheClass();
+
+			if (iclass == null)
+			{
+				return null;
+			}
 		}
-		
-		IConstructor match = IContext.resolveConstructor(iclass, this.arguments);
+
+		final IConstructor match = IContext.resolveConstructor(iclass, this.arguments);
 		if (match != null)
 		{
 			this.constructor = match;
