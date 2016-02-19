@@ -672,32 +672,32 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, ITypeContext typeContext)
 	{
 		int len = arguments.size();
 		
 		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
 		{
 			IValue argument = arguments.getFirstValue();
-			arguments.setFirstValue(instance);
-			instance = argument;
+			arguments.setFirstValue(receiver);
+			receiver = argument;
 		}
 		
-		if (instance != null)
+		if (receiver != null)
 		{
 			int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == Modifiers.INFIX && instance.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
 				IParameter par = this.parameters[0];
-				IValue instance1 = IType.convertValue(instance, par.getType(), typeContext, markers, context);
+				IValue instance1 = IType.convertValue(receiver, par.getType(), typeContext, markers, context);
 				if (instance1 == null)
 				{
-					Util.createTypeError(markers, instance, par.getType(), typeContext, "method.access.infix_type",
+					Util.createTypeError(markers, receiver, par.getType(), typeContext, "method.access.infix_type",
 					                     par.getName());
 				}
 				else
 				{
-					instance = instance1;
+					receiver = instance1;
 				}
 				
 				if (this.isVarargs())
@@ -711,7 +711,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					}
 					
 					this.checkTypeVarsInferred(markers, position, typeContext);
-					return instance;
+					return receiver;
 				}
 				
 				for (int i = 0; i < this.parameterCount - 1; i++)
@@ -720,41 +720,41 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 				
 				this.checkTypeVarsInferred(markers, position, typeContext);
-				return instance;
+				return receiver;
 			}
 			
 			if ((mod & Modifiers.STATIC) != 0)
 			{
-				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(Markers.semantic(position, "method.access.static", this.name));
 				}
-				else if (instance.getType().getTheClass() != this.theClass)
+				else if (receiver.getType().getTheClass() != this.theClass)
 				{
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
 					                             this.theClass.getFullName()));
 				}
-				instance = null;
+				receiver = null;
 			}
-			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
-				if (!instance.getType().getTheClass().isObject())
+				if (!receiver.getType().getTheClass().isObject())
 				{
 					markers.add(Markers.semantic(position, "method.access.instance", this.name));
 				}
 			}
 			else
 			{
-				IValue instance1 = IType.convertValue(instance, this.receiverType, typeContext, markers, context);
-				
-				if (instance1 == null)
+				final IValue typedReceiver = IType
+						.convertValue(receiver, this.receiverType, typeContext, markers, context);
+				if (typedReceiver == null)
 				{
-					Util.createTypeError(markers, instance, this.receiverType, typeContext, "method.access.receiver_type",
-					                     this.name);
+					Util.createTypeError(markers, receiver, this.receiverType, typeContext,
+					                     "method.access.receiver_type", this.name);
 				}
 				else
 				{
-					instance = instance1;
+					receiver = typedReceiver;
 				}
 			}
 		}
@@ -767,7 +767,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
-				instance = new ThisExpr(position, this.theClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.theClass.getType(), context, markers);
 			}
 		}
 		
@@ -782,7 +782,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			
 			this.checkTypeVarsInferred(markers, position, typeContext);
-			return instance;
+			return receiver;
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -791,7 +791,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		
 		this.checkTypeVarsInferred(markers, position, typeContext);
-		return instance;
+		return receiver;
 	}
 	
 	private void inferTypes(GenericData genericData, IValue instance, IArguments arguments)
@@ -844,8 +844,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			IType type = typeContext.resolveType(typeVar);
 			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
 			{
-				markers.add(
-						Markers.semantic(position, "method.typevar.infer", this.name, typeVar.getName()));
+				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeVar.getName()));
 				typeContext.addMapping(typeVar, Types.ANY);
 			}
 		}
