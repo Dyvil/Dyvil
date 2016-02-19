@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
@@ -13,6 +14,7 @@ import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -49,6 +51,12 @@ public class PackageType implements IRawType
 	public boolean isResolved()
 	{
 		return true;
+	}
+
+	@Override
+	public IType resolveType(MarkerList markers, IContext context)
+	{
+		return this;
 	}
 
 	@Override
