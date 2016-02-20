@@ -51,7 +51,7 @@ public final class CompoundCall
 		}
 		else if (type == IValue.SUBSCRIPT_GET)
 		{
-			SubscriptGetter subscriptGetter = (SubscriptGetter) receiver;
+			SubscriptAccess subscriptAccess = (SubscriptAccess) receiver;
 			
 			// x[y...] op= z
 			// -> x[y...] = x[y...].op(z)
@@ -59,13 +59,13 @@ public final class CompoundCall
 
 			SideEffectHelper helper = new SideEffectHelper();
 
-			IValue subscriptReceiver = subscriptGetter.receiver = helper.processValue(subscriptGetter.receiver);
-			IArguments subscriptArguments = subscriptGetter.arguments = helper
-					.processArguments(subscriptGetter.arguments);
+			IValue subscriptReceiver = subscriptAccess.receiver = helper.processValue(subscriptAccess.receiver);
+			IArguments subscriptArguments = subscriptAccess.arguments = helper
+					.processArguments(subscriptAccess.arguments);
 
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
 			IArguments subscriptSetterArguments = subscriptArguments.withLastValue(Names.subscript_$eq, op);
-			IValue subscript = new SubscriptSetter(position, subscriptReceiver, subscriptSetterArguments)
+			IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptSetterArguments)
 					.resolveCall(markers, context);
 
 			return helper.finish(subscript);

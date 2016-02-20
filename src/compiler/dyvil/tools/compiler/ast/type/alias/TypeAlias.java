@@ -90,13 +90,13 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void addTypeParameter(ITypeParameter var)
+	public void addTypeParameter(ITypeParameter typeParameter)
 	{
 		if (this.typeVariables == null)
 		{
-			this.setTypeParameterized();
-			var.setIndex(0);
-			this.typeVariables[0] = var;
+			this.setTypeParametric();
+			typeParameter.setIndex(0);
+			this.typeVariables[0] = typeParameter;
 			this.typeVariableCount = 1;
 			return;
 		}
@@ -109,8 +109,8 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			this.typeVariables = temp;
 		}
 
-		var.setIndex(index);
-		this.typeVariables[index] = var;
+		typeParameter.setIndex(index);
+		this.typeVariables[index] = typeParameter;
 	}
 
 	@Override
@@ -132,28 +132,28 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public boolean isTypeParameterized()
+	public boolean isTypeParametric()
 	{
 		return this.typeVariables != null;
 	}
 
 	@Override
-	public void setTypeParameterized()
+	public void setTypeParametric()
 	{
 		this.typeVariables = new ITypeParameter[2];
 	}
 
 	@Override
-	public void setTypeParameter(int index, ITypeParameter var)
+	public void setTypeParameter(int index, ITypeParameter typeParameter)
 	{
-		var.setIndex(index);
-		this.typeVariables[index] = var;
+		typeParameter.setIndex(index);
+		this.typeVariables[index] = typeParameter;
 	}
 
 	@Override
-	public void setTypeParameters(ITypeParameter[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
 	{
-		this.typeVariables = typeVars;
+		this.typeVariables = typeParameters;
 		this.typeVariableCount = count;
 	}
 

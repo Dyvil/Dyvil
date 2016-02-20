@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.generic.type.GenericType;
@@ -342,7 +342,7 @@ public final class ClassFormat
 		return start;
 	}
 	
-	private static int readGeneric(String desc, int start, ITypeParameterized generic)
+	private static int readGeneric(String desc, int start, ITypeParametric generic)
 	{
 		int index = desc.indexOf(':', start);
 		Name name = Name.getQualified(desc.substring(start, index));

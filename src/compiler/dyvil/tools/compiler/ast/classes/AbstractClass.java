@@ -229,13 +229,13 @@ public abstract class AbstractClass implements IClass
 	// Generics
 	
 	@Override
-	public void setTypeParameterized()
+	public void setTypeParametric()
 	{
 		this.typeParameters = new ITypeParameter[2];
 	}
 	
 	@Override
-	public boolean isTypeParameterized()
+	public boolean isTypeParametric()
 	{
 		return this.typeParameters != null;
 	}
@@ -247,25 +247,25 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void setTypeParameters(ITypeParameter[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
 	{
-		this.typeParameters = typeVars;
+		this.typeParameters = typeParameters;
 		this.typeParameterCount = count;
 	}
 	
 	@Override
-	public void setTypeParameter(int index, ITypeParameter var)
+	public void setTypeParameter(int index, ITypeParameter typeParameter)
 	{
-		this.typeParameters[index] = var;
+		this.typeParameters[index] = typeParameter;
 	}
 	
 	@Override
-	public void addTypeParameter(ITypeParameter var)
+	public void addTypeParameter(ITypeParameter typeParameter)
 	{
 		if (this.typeParameters == null)
 		{
 			this.typeParameters = new ITypeParameter[3];
-			this.typeParameters[0] = var;
+			this.typeParameters[0] = typeParameter;
 			this.typeParameterCount = 1;
 			return;
 		}
@@ -277,9 +277,9 @@ public abstract class AbstractClass implements IClass
 			System.arraycopy(this.typeParameters, 0, temp, 0, index);
 			this.typeParameters = temp;
 		}
-		this.typeParameters[index] = var;
+		this.typeParameters[index] = typeParameter;
 		
-		var.setIndex(index);
+		typeParameter.setIndex(index);
 	}
 	
 	@Override
@@ -303,31 +303,31 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void setParameter(int index, IParameter param)
+	public void setParameter(int index, IParameter parameter)
 	{
-		param.setTheClass(this);
-		param.setIndex(index);
-		this.parameters[index] = param;
+		parameter.setTheClass(this);
+		parameter.setIndex(index);
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addParameter(IParameter parameter)
 	{
-		param.setTheClass(this);
+		parameter.setTheClass(this);
 		
 		if (this.parameters == null)
 		{
-			param.setIndex(0);
+			parameter.setIndex(0);
 
 			this.parameters = new ClassParameter[2];
-			this.parameters[0] = param;
+			this.parameters[0] = parameter;
 			this.parameterCount = 1;
 			return;
 		}
 		
 		final int index = this.parameterCount++;
 
-		param.setIndex(index);
+		parameter.setIndex(index);
 
 		if (this.parameterCount > this.parameters.length)
 		{
@@ -335,7 +335,7 @@ public abstract class AbstractClass implements IClass
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
-		this.parameters[index] = param;
+		this.parameters[index] = parameter;
 	}
 	
 	@Override

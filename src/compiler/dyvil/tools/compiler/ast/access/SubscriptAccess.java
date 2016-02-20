@@ -11,22 +11,22 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class SubscriptGetter extends AbstractCall
+public class SubscriptAccess extends AbstractCall
 {
-	public SubscriptGetter(ICodePosition position)
+	public SubscriptAccess(ICodePosition position)
 	{
 		this.position = position;
 		this.arguments = new ArgumentList();
 	}
 	
-	public SubscriptGetter(ICodePosition position, IValue instance)
+	public SubscriptAccess(ICodePosition position, IValue instance)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.arguments = new ArgumentList();
 	}
 	
-	public SubscriptGetter(ICodePosition position, IValue instance, IArguments arguments)
+	public SubscriptAccess(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
 		this.receiver = instance;

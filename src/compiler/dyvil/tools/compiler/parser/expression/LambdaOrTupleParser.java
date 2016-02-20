@@ -151,12 +151,12 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addParameter(IParameter parameter)
 	{
 		if (this.params == null)
 		{
 			this.params = new IParameter[3];
-			this.params[0] = param;
+			this.params[0] = parameter;
 			this.parameterCount = 1;
 			return;
 		}
@@ -168,7 +168,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			System.arraycopy(this.params, 0, temp, 0, this.params.length);
 			this.params = temp;
 		}
-		this.params[index] = param;
+		this.params[index] = parameter;
 	}
 	
 	@Override
@@ -178,7 +178,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	}
 	
 	@Override
-	public void setParameter(int index, IParameter param)
+	public void setParameter(int index, IParameter parameter)
 	{
 	}
 	

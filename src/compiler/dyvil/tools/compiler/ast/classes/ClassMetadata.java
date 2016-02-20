@@ -186,7 +186,7 @@ public class ClassMetadata implements IClassMetadata
 		
 		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
 		{
-			constructor.setVarargs();
+			constructor.setVariadic();
 		}
 		
 		constructor.resolveTypes(markers, context);

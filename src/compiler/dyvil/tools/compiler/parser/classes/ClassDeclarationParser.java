@@ -111,7 +111,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeParameterListParser(this.theClass));
-				this.theClass.setTypeParameterized();
+				this.theClass.setTypeParametric();
 				this.mode = GENERICS_END;
 				return;
 			}

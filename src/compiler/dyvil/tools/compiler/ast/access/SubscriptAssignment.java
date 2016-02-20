@@ -11,9 +11,9 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class SubscriptSetter extends AbstractCall implements IValueConsumer
+public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 {
-	public SubscriptSetter(ICodePosition position, IValue instance, IArguments arguments)
+	public SubscriptAssignment(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
 		this.receiver = instance;

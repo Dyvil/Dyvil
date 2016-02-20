@@ -70,7 +70,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
 		{
-			applyMethod.setVarargs();
+			applyMethod.setVariadic();
 		}
 
 		applyMethod.resolveTypes(markers, context);

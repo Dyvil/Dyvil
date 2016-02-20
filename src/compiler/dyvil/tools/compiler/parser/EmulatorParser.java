@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParameterParser;
@@ -143,7 +143,7 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 	}
 
 	@Override
-	public TypeParameterParser newTypeParameterParser(ITypeParameterized typeParameterized)
+	public TypeParameterParser newTypeParameterParser(ITypeParametric typeParameterized)
 	{
 		return this.pm.newTypeParameterParser(typeParameterized);
 	}

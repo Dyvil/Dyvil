@@ -106,7 +106,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.annotations = null;
 				this.modifiers = null;
 				this.varargs = false;
-				if (this.paramList instanceof IParameterized && !((IParameterized) this.paramList)
+				if (this.paramList instanceof IParametric && !((IParametric) this.paramList)
 						.setReceiverType(this.type))
 				{
 					pm.report(token, "parameter.receivertype.invalid");
@@ -119,7 +119,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				if (this.varargs)
 				{
-					this.paramList.setVarargs();
+					this.paramList.setVariadic();
 					this.type = new ArrayType(this.type);
 				}
 				

@@ -146,7 +146,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (!this.theClass.isTypeParameterized())
+		if (!this.theClass.isTypeParametric())
 		{
 			return;
 		}

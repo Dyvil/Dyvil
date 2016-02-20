@@ -51,28 +51,28 @@ public final class TypeParameter implements ITypeParameter
 
 	private int                parameterIndex;
 
-	private ITypeParameterized generic;
+	private ITypeParametric generic;
 	private ReifiedKind reifiedKind   = ReifiedKind.NOT_REIFIED;
 
 	private IType       covariantType = new CovariantTypeVarType(this);
-	public TypeParameter(ITypeParameterized generic)
+	public TypeParameter(ITypeParametric generic)
 	{
 		this.generic = generic;
 	}
 
-	public TypeParameter(ITypeParameterized generic, Name name)
+	public TypeParameter(ITypeParametric generic, Name name)
 	{
 		this.name = name;
 		this.generic = generic;
 	}
 
-	public TypeParameter(ICodePosition position, ITypeParameterized generic)
+	public TypeParameter(ICodePosition position, ITypeParametric generic)
 	{
 		this.position = position;
 		this.generic = generic;
 	}
 
-	public TypeParameter(ICodePosition position, ITypeParameterized generic, Name name, Variance variance)
+	public TypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
 		this.position = position;
 		this.name = name;
@@ -81,7 +81,7 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public ITypeParameterized getGeneric()
+	public ITypeParametric getGeneric()
 	{
 		return this.generic;
 	}

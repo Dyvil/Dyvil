@@ -6,11 +6,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
@@ -57,7 +57,7 @@ public class Util
 		parametersToString(iClass, stringBuilder);
 	}
 
-	private static void parametersToString(IParameterized parameterized, StringBuilder buf)
+	private static void parametersToString(IParametric parameterized, StringBuilder buf)
 	{
 		buf.append('(');
 
@@ -75,7 +75,7 @@ public class Util
 		buf.append(')');
 	}
 
-	private static void typeParametersToString(ITypeParameterized typeParameterized, StringBuilder buf)
+	private static void typeParametersToString(ITypeParametric typeParameterized, StringBuilder buf)
 	{
 		int typeVariables = typeParameterized.typeParameterCount();
 		if (typeVariables > 0)

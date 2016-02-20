@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type.alias;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -16,7 +16,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParameterized, IObjectCompilable
+public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParametric, IObjectCompilable
 {
 	@Override
 	void setName(Name name);
@@ -31,7 +31,7 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParameterized
 	IType getType();
 
 	@Override
-	void addTypeParameter(ITypeParameter var);
+	void addTypeParameter(ITypeParameter typeParameter);
 
 	@Override
 	int typeParameterCount();
@@ -43,16 +43,16 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParameterized
 	ITypeParameter[] getTypeParameters();
 
 	@Override
-	boolean isTypeParameterized();
+	boolean isTypeParametric();
 
 	@Override
-	void setTypeParameterized();
+	void setTypeParametric();
 
 	@Override
-	void setTypeParameter(int index, ITypeParameter var);
+	void setTypeParameter(int index, ITypeParameter typeParameter);
 
 	@Override
-	void setTypeParameters(ITypeParameter[] typeVars, int count);
+	void setTypeParameters(ITypeParameter[] typeParameters, int count);
 
 	// Phases
 	

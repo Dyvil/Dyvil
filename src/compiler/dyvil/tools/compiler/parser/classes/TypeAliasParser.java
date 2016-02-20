@@ -71,7 +71,7 @@ public class TypeAliasParser extends Parser
 		case TYPE_PARAMETERS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
-				this.typeAlias.setTypeParameterized();
+				this.typeAlias.setTypeParametric();
 				this.mode = TYPE_PARAMETERS_END;
 				pm.pushParser(new TypeParameterListParser(this.typeAlias));
 				return;

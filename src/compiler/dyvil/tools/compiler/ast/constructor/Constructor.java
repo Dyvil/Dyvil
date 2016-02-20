@@ -89,13 +89,13 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void setVarargs()
+	public void setVariadic()
 	{
 		this.modifiers.addIntModifier(Modifiers.VARARGS);
 	}
 	
 	@Override
-	public boolean isVarargs()
+	public boolean isVariadic()
 	{
 		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
@@ -116,21 +116,21 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void setParameter(int index, IParameter param)
+	public void setParameter(int index, IParameter parameter)
 	{
-		param.setMethod(this);
-		param.setIndex(index);
-		this.parameters[index] = param;
+		parameter.setMethod(this);
+		parameter.setIndex(index);
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addParameter(IParameter parameter)
 	{
-		param.setMethod(this);
+		parameter.setMethod(this);
 		
 		final int index = this.parameterCount++;
 
-		param.setIndex(index);
+		parameter.setIndex(index);
 
 		if (index >= this.parameters.length)
 		{
@@ -138,7 +138,7 @@ public class Constructor extends Member implements IConstructor
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
-		this.parameters[index] = param;
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
@@ -729,7 +729,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public String getSignature()
 	{
-		if (!this.theClass.isTypeParameterized())
+		if (!this.theClass.isTypeParametric())
 		{
 			return null;
 		}

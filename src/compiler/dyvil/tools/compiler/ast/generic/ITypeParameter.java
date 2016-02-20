@@ -29,7 +29,7 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 		REIFIED_TYPE
 	}
 
-	ITypeParameterized getGeneric();
+	ITypeParametric getGeneric();
 	
 	void setIndex(int index);
 	

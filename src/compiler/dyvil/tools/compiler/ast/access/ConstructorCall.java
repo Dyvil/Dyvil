@@ -228,7 +228,7 @@ public class ConstructorCall implements ICall
 			return null;
 		}
 		
-		if (this.constructor.getTheClass().isTypeParameterized() && !this.type.isGenericType())
+		if (this.constructor.getTheClass().isTypeParametric() && !this.type.isGenericType())
 		{
 			this.type = this.constructor.checkGenericType(markers, this.position, context, this.type, this.arguments);
 		}

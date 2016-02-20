@@ -53,7 +53,7 @@ public class ClassGenericType extends GenericType
 	@Override
 	public boolean isGenericType()
 	{
-		return this.theClass.isTypeParameterized();
+		return this.theClass.isTypeParametric();
 	}
 	
 	@Override

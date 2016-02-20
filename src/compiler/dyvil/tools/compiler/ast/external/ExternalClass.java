@@ -703,7 +703,7 @@ public final class ExternalClass extends AbstractClass
 		
 		if (signature != null)
 		{
-			method.setTypeParameterized();
+			method.setTypeParametric();
 			ClassFormat.readMethodType(signature, method);
 		}
 		else

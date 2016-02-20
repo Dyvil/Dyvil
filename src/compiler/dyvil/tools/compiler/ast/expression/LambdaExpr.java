@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.LambdaType;
@@ -509,7 +509,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this;
 	}
 	
-	private boolean checkCall(IValue instance, IArguments arguments, IParameterized p)
+	private boolean checkCall(IValue instance, IArguments arguments, IParametric p)
 	{
 		boolean receiver = false;
 		

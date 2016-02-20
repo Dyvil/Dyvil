@@ -135,7 +135,7 @@ public class NamedGenericType extends GenericType
 		// Convert the non-generic class type to a generic one
 		if (!resolved.isGenericType())
 		{
-			if (!iClass.isTypeParameterized())
+			if (!iClass.isTypeParametric())
 			{
 				markers.add(
 						Markers.semanticError(this.position, "type.generic.class_not_generic", iClass.getFullName()));
