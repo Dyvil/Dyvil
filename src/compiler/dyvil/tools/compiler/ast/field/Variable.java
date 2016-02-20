@@ -180,6 +180,11 @@ public final class Variable extends Member implements IVariable
 		{
 			this.value.resolveTypes(markers, context);
 		}
+		else
+		{
+			this.value = this.type.getDefaultValue();
+			markers.add(Markers.semanticError(this.position, "variable.value"));
+		}
 	}
 	
 	@Override
