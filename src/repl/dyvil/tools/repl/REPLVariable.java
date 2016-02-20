@@ -18,6 +18,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class REPLVariable extends Field
 {
 	private   REPLContext context;
+
+	protected String bytecodeName;
 	protected String      className;
 	private   Class       theClass;
 	
@@ -144,7 +146,8 @@ public class REPLVariable extends Field
 
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
-		String name = this.name.qualified;
+		String name = this.bytecodeName = this.name.qualified;
+
 		String extendedType = this.type.getExtendedName();
 		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
@@ -239,7 +242,7 @@ public class REPLVariable extends Field
 		}
 		
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.name.qualified, extended);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.bytecodeName, extended);
 	}
 	
 	@Override
@@ -257,6 +260,6 @@ public class REPLVariable extends Field
 		}
 		
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, this.name.qualified, extended);
+		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
 	}
 }

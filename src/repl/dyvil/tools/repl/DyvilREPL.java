@@ -60,6 +60,10 @@ public final class DyvilREPL
 		commands.put("complete", command);
 
 		commands.put("javap", new JavapCommand());
+
+		command = new RenameCommand();
+		commands.put("r", command);
+		commands.put("rename", command);
 	}
 	
 	public static void main(String[] args) throws Exception

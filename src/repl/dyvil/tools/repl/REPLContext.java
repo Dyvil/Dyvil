@@ -82,6 +82,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		return this.fields;
 	}
 
+	public Map<Name, IProperty> getProperties()
+	{
+		return this.properties;
+	}
+
 	public List<IMethod> getMethods()
 	{
 		return this.methods;
