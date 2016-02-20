@@ -125,12 +125,6 @@ public final class ClassAccess implements IValue
 			return methodCall;
 		}
 		
-		if (!this.type.isResolved())
-		{
-			markers.add(Markers.semantic(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
-			                             this.type.toString()));
-		}
-		
 		return this;
 	}
 	
@@ -138,6 +132,12 @@ public final class ClassAccess implements IValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
+
+		if (!this.type.isResolved())
+		{
+			markers.add(Markers.semantic(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
+			                             this.type.toString()));
+		}
 	}
 	
 	@Override
@@ -145,14 +145,14 @@ public final class ClassAccess implements IValue
 	{
 		this.type.check(markers, context);
 
-		IClass iclass = this.type.getTheClass();
-		if (iclass == null)
+		if (!this.type.isResolved())
 		{
-			// Already reported this in RESOLVE ^
+			// Already reported this in CHECK_TYPES
 			return;
 		}
-		
-		if (iclass.hasModifier(Modifiers.OBJECT_CLASS))
+
+		final IClass iclass = this.type.getTheClass();
+		if (iclass != null && iclass.hasModifier(Modifiers.OBJECT_CLASS))
 		{
 			// Object type, we can safely use it's instance field.
 			return;
