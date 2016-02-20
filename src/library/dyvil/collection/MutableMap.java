@@ -268,7 +268,15 @@ public interface MutableMap<K, V> extends Map<K, V>
 	{
 		return this.replace(entry.getKey(), entry.getValue());
 	}
-	
+
+	@Override
+	default V remap(Object key, K newKey)
+	{
+		final V value = this.removeKey(key);
+		this.put(newKey, value);
+		return value;
+	}
+
 	@Override
 	V removeKey(Object key);
 	

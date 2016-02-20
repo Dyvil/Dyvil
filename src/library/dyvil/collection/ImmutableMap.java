@@ -297,11 +297,18 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	@Mutating
+	default V remap(Object key, K newKey)
+	{
+		throw new ImmutableException("remap() on Immutable Map");
+	}
+
+	@Override
+	@Mutating
 	default V removeKey(Object key)
 	{
 		throw new ImmutableException("removeKey() on Immutable Map");
 	}
-	
+
 	@Override
 	@Mutating
 	default boolean removeValue(Object value)

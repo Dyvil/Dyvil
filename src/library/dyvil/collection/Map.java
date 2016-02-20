@@ -623,6 +623,8 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	V replace(K key, V newValue);
 	
 	V replace(Entry<? extends K, ? extends V> entry);
+
+	V remap(Object key, K newKey);
 	
 	V removeKey(Object key);
 	
