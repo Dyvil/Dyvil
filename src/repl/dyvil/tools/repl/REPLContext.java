@@ -169,8 +169,14 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			builder.append("Array");
 			return;
 		}
+		if (type.typeTag() == IType.REFERENCE)
+		{
+			getClassName(builder, type.getElementType());
+			builder.append("Ref");
+			return;
+		}
 		
-		builder.append(type.getTheClass().getName().unqualified);
+		builder.append(type.getName().unqualified);
 	}
 	
 	private Name getFieldName(IType type)
