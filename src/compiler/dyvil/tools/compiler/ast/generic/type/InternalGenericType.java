@@ -88,15 +88,15 @@ public class InternalGenericType extends GenericType
 		{
 		case "dyvil/ref/ObjectRef":
 			return new ReferenceType(Types.getObjectRefClass(), this.typeArguments[0]);
-		case "dyvil/collection/ImmutableMap":
-			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.MUTABLE,
-			                   MapType.MapTypes.MUTABLE_MAP_CLASS);
-		case "dyvil/collection/MutableMap":
-			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.IMMUTABLE,
-			                   MapType.MapTypes.IMMUTABLE_MAP_CLASS);
 		case "dyvil/collection/Map":
 			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.UNDEFINED,
 			                   MapType.MapTypes.MAP_CLASS);
+		case "dyvil/collection/MutableMap":
+		return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.MUTABLE,
+			                   MapType.MapTypes.MUTABLE_MAP_CLASS);
+		case "dyvil/collection/ImmutableMap":
+		return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.IMMUTABLE,
+			                   MapType.MapTypes.IMMUTABLE_MAP_CLASS);
 		}
 
 		final IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
