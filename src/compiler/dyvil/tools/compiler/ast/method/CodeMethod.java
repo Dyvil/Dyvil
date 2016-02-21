@@ -1,15 +1,19 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.collection.Set;
+import dyvil.collection.mutable.HashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -24,7 +28,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -38,8 +41,6 @@ import java.io.IOException;
 
 public class CodeMethod extends AbstractMethod
 {
-	protected IMethod[] overrideMethods;
-	
 	public CodeMethod(IClass iclass)
 	{
 		super(iclass);
@@ -295,21 +296,6 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 	
-	@Override
-	protected void addOverride(IMethod override)
-	{
-		if (this.overrideMethods == null)
-		{
-			this.overrideMethods = new IMethod[] { override };
-			return;
-		}
-		
-		IMethod[] overrideMethods = new IMethod[this.overrideMethods.length + 1];
-		System.arraycopy(this.overrideMethods, 0, overrideMethods, 0, this.overrideMethods.length);
-		overrideMethods[this.overrideMethods.length] = override;
-		this.overrideMethods = overrideMethods;
-	}
-	
 	private void checkOverride(MarkerList markers)
 	{
 		if (this.overrideMethods == null)
@@ -327,6 +313,8 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final boolean thisTypeResolved = this.type.isResolved();
+		final ITypeContext typeContext = this.theClass.getType();
+
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
 			if (overrideMethod.hasModifier(Modifiers.FINAL))
@@ -336,9 +324,10 @@ public class CodeMethod extends AbstractMethod
 
 			if (thisTypeResolved)
 			{
-				final IType type = overrideMethod.getType().getConcreteType(this.theClass.getType());
+				final IType type = overrideMethod.getType().getConcreteType(typeContext);
 				if (type != this.type && type.isResolved() && !type.isSuperTypeOf(this.type))
 				{
+					overrideMethod.getType().getConcreteType(typeContext);
 					Marker marker = Markers.semantic(this.position, "method.override.type.incompatible", this.name);
 					marker.addInfo(Markers.getSemantic("method.type", this.type));
 					marker.addInfo(Markers.getSemantic("method.override.type", type));
@@ -489,25 +478,21 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 		
-		String[] descriptors = new String[1 + this.overrideMethods.length];
-		descriptors[0] = this.descriptor;
+		final Set<String> descriptors = new HashSet<>(1 + this.overrideMethods.size());
+		descriptors.add(this.descriptor);
 
-		methodLoop:
-		for (int i = 0; i < this.overrideMethods.length; i++)
+		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			final IMethod overrideMethod = this.overrideMethods[i];
 			final String desc = overrideMethod.getDescriptor();
 
 			// Check if a bridge method for the descriptor has not yet been
 			// generated
-			for (int j = 0; j <= i; j++)
+			if (descriptors.contains(desc))
 			{
-				if (desc.equals(descriptors[j]))
-				{
-					continue methodLoop;
-				}
+				continue;
 			}
-			descriptors[i + 1] = desc;
+
+			descriptors.add(desc);
 
 			// Generate a bridge method
 			mw = new MethodWriterImpl(writer,

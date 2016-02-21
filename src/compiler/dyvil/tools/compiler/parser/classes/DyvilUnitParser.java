@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class DyvilUnitParser extends DyvilHeaderParser
@@ -23,14 +24,13 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == BaseSymbols.SEMICOLON)
+		final int type = token.type();
+		switch (type)
 		{
-			return;
-		}
-		if (type == 0) // EOF
-		{
+		case Tokens.EOF:
 			pm.popParser();
+			// Fallthrough
+		case BaseSymbols.SEMICOLON:
 			return;
 		}
 		
@@ -42,21 +42,23 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 				this.mode = IMPORT;
 				return;
 			}
+			// Fallthrough
 		case IMPORT:
 			if (this.parseImport(pm, token, type))
 			{
 				return;
 			}
+			// Fallthrough
 		case CLASS:
-			int i;
-			if ((i = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
+			final int classType;
+			if ((classType = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
 			{
 				if (this.modifiers == null)
 				{
 					this.modifiers = new ModifierList();
 				}
 
-				this.modifiers.addIntModifier(i);
+				this.modifiers.addIntModifier(classType);
 				pm.pushParser(new ClassDeclarationParser(this.unit, this.modifiers, this.annotations));
 				this.modifiers = null;
 				this.annotations = null;

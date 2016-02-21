@@ -48,7 +48,21 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 		int index = this.parameterCount();
 		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
 	}
-	
+
+	/**
+	 * Checks if this method overrides the given {@code candidate} method.
+	 *
+	 * @param markers
+	 * 		the marker list for error reporting
+	 * @param iclass
+	 * 		the class that is being checked
+	 * @param candidate
+	 * 		the potential super-method
+	 * @param typeContext
+	 * 		the type context for type specialization
+	 *
+	 * @return {@code true}, if this method overrides the given candidate
+	 */
 	boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
 	
 	// Generics

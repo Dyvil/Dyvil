@@ -128,10 +128,10 @@ public class TypeVarType implements IRawType
 			return this;
 		}
 		
-		IType t = context.resolveType(this.typeParameter);
-		if (t != null)
+		final IType concreteType = context.resolveType(this.typeParameter);
+		if (concreteType != null)
 		{
-			return t;
+			return concreteType;
 		}
 		return this.typeParameter.getDefaultType();
 	}

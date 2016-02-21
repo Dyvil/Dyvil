@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -174,6 +173,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	@Override
 	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
+		// Fail fast
 		if (name != this.name)
 		{
 			return 0;
@@ -187,22 +187,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	}
 
 	@Override
-	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	protected void checkOverride_external()
 	{
-		if (this.name != candidate.getName())
-		{
-			return false;
-		}
-
-		if (!this.returnTypeResolved)
-		{
-			this.resolveReturnType();
-		}
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();
 		}
-		return super.checkOverride(markers, iclass, candidate, typeContext);
 	}
 
 	@Override
@@ -281,11 +271,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalMet
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	protected void addOverride(IMethod override)
 	{
 	}
 	
