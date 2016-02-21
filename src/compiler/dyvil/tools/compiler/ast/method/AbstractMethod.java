@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.Mutating;
+import dyvil.collection.Set;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -77,6 +79,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected IClass        theClass;
 	protected String        descriptor;
 	protected IntrinsicData intrinsicData;
+	protected Set<IMethod>  overrideMethods;
 
 	protected boolean sideEffects = true;
 	
@@ -927,6 +930,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return false;
 		}
+
+		// The above checks are faster than searching in the override-cache, so we perform them first
+		if (this.overrideMethods != null && this.overrideMethods.contains(candidate))
+		{
+			return true;
+		}
+
+		// External Methods might need to resolve their parameters and type parameters
+		this.checkOverride_external();
+
 		// Check Parameter Types
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -937,15 +950,22 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return false;
 			}
 		}
-		
-		if (iclass == this.theClass)
+
+		// Store the method in the cache, if it originates from a
+		if (this.theClass.isSubTypeOf(candidate.getTheClass().getClassType()))
 		{
-			this.addOverride(candidate);
+			if (this.overrideMethods == null)
+			{
+				this.overrideMethods = new IdentityHashSet<>();
+			}
+			this.overrideMethods.add(candidate);
 		}
 		return true;
 	}
 	
-	protected abstract void addOverride(IMethod override);
+	protected void checkOverride_external()
+	{
+	}
 	
 	@Override
 	public boolean hasTypeVariables()

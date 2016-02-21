@@ -539,6 +539,8 @@ public class ClassBody implements IClassBody
 		}
 
 		// Check if the super class implements the method
+		// We cannot do the modifier checks beforehand, because methods need to know which methods they implement to
+		// generate bridges.
 		if (checkedClass.checkImplements(markers, checkedClass, candidate, typeContext))
 		{
 			return;
