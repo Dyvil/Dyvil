@@ -240,23 +240,14 @@ public final class Types
 		return gt;
 	}
 
-	public static String getTypeRefKeyword(IType type)
-	{
-		if (type.isPrimitive())
-		{
-			return type.getTheClass().getName().qualified;
-		}
-		return "Object";
-	}
-
 	public static String getInternalRef(IType type, String prefix)
 	{
-		return "dyvil/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
+		return "dyvil/ref/" + prefix + type.getTypePrefix() + "Ref";
 	}
 
 	public static String getReferenceFactoryName(IType type, String prefix)
 	{
-		return "new" + prefix + getTypeRefKeyword(type) + "Ref";
+		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
 	public static IType combine(IType type1, IType type2)

@@ -203,7 +203,8 @@ public final class PrimitiveType implements IType
 		return new ClassType(this.theClass);
 	}
 
-	private String classPrefix()
+	@Override
+	public String getTypePrefix()
 	{
 		switch (this.typecode)
 		{
@@ -224,7 +225,7 @@ public final class PrimitiveType implements IType
 			return this.refClass;
 		}
 
-		final String className = this.classPrefix() + "Ref";
+		final String className = this.getTypePrefix() + "Ref";
 		return this.refClass = Package.dyvilRef.resolveClass(className);
 	}
 
@@ -236,7 +237,7 @@ public final class PrimitiveType implements IType
 			return this.simpleRefType;
 		}
 
-		final String className = "Simple" + this.classPrefix() + "Ref";
+		final String className = "Simple" + this.getTypePrefix() + "Ref";
 		return this.simpleRefType = new ClassType(Package.dyvilRefSimple.resolveClass(className));
 	}
 	
@@ -287,7 +288,7 @@ public final class PrimitiveType implements IType
 		IClass iclass = this.arrayClass;
 		if (iclass == null)
 		{
-			String className = this.classPrefix() + "Array";
+			final String className = this.getTypePrefix() + "Array";
 			return this.arrayClass = Package.dyvilArray.resolveClass(className);
 		}
 		return iclass;

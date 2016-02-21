@@ -39,10 +39,10 @@ public class BridgeTest
 		Main.test("Container[int]", 3, intContainer.get)
 		
 		LongContainer lc = LongContainer(2L)
-		Main.test("LongContainer", 2, lc.get)
+		Main.test("LongContainer", 2L, lc.get)
 
 		Container[long] longContainer = lc
 		lc.set(4L)
-		Main.test("Container[long]", 4, longContainer.get)
+		Main.test("Container[long]", 4L, longContainer.get)
 	}
 }

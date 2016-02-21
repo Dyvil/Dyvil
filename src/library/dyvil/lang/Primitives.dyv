@@ -8,7 +8,7 @@ public final class Primitives
 	
 	// Wrapper and Unwrapper Methods
 
-	@Intrinsic(value: LOAD_CALL, strings : [ "dyvil/lang/Void", "apply", "()Ldyvil/lang/Void;" ])
+	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2 ], strings : [ "dyvil/lang/Void", "apply", "()Ldyvil/lang/Void;" ])
 	public static Void Void() = Void()
 
 	@Intrinsic([ /* NOOP */ ])
@@ -29,22 +29,22 @@ public final class Primitives
 
 	public static short toShort(Short value) = if (value == null) 0 else value.shortValue
 
-	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Char", "valueOf", "(C)Ljava/lang/Char;" ])
+	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Character", "valueOf", "(C)Ljava/lang/Character;" ])
 	public static Char Char(char value) = Char(value)
 
 	public static char toChar(Char value) = if (value == null) 0 else value.charValue
 
-	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Integer", "valueOf", "(I)Ljava/lang/Int;" ])
+	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;" ])
 	public static Int Int(int value) = Int(value)
 
 	public static int toInt(Int value) = if (value == null) 0 else value.intValue
 
-	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Long", "valueOf", "(L)Ljava/lang/Long;" ])
+	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;" ])
 	public static Long Long(long value) = Long(value)
 
 	public static long toLong(Long value) = if (value == null) 0 else value.longValue
 	
-	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Float", "valueOf", "(S)Ljava/lang/Float;" ])
+	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;" ])
 	public static Float Float(float value) = Float(value)
 
 	public static float toShort(Float value) = if (value == null) 0 else value.floatValue
@@ -286,7 +286,7 @@ public final class Primitives
 
 	// Float Operators
 
-	@Intrinsic([ LOAD_0, LNEG ])
+	@Intrinsic([ LOAD_0, FNEG ])
 	public static float operator -(float value) = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
