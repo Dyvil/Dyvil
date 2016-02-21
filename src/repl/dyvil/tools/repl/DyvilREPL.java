@@ -15,6 +15,7 @@ import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.repl.command.*;
 
 import java.io.*;
@@ -22,6 +23,8 @@ import java.io.*;
 public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
+
+	public static final long SLEEP_TIME = 4L;
 	
 	private static DyvilREPL instance;
 
@@ -40,11 +43,9 @@ public final class DyvilREPL
 	
 	static
 	{
-		ICommand command = new HelpCommand();
-		commands.put("?", command);
-		commands.put("help", command);
+		commands.put("help", new HelpCommand());
 		
-		command = new ExitCommand();
+		ICommand command = new ExitCommand();
 		commands.put("exit", command);
 		commands.put("quit", command);
 		commands.put("q", command);
@@ -299,7 +300,7 @@ public final class DyvilREPL
 		// Wait to make sure the output isn't messed up in IDE consoles.
 		try
 		{
-			Thread.sleep(4L);
+			Thread.sleep(SLEEP_TIME);
 		}
 		catch (InterruptedException e)
 		{
@@ -311,8 +312,10 @@ public final class DyvilREPL
 	{
 		try
 		{
-			String trim = input.trim();
-			if (trim.length() > 1 && trim.charAt(0) == ':' && trim.charAt(1) != ':')
+			final String trim = input.trim();
+			if (trim.length() > 1 // not a single colon
+					&& trim.charAt(0) == ':' // first character must be a colon
+					&& LexerUtil.isIdentifierPart(trim.charAt(1))) // next character must be a letter
 			{
 				this.runCommand(trim);
 				return;
@@ -350,14 +353,14 @@ public final class DyvilREPL
 	
 	private void runCommand(String line)
 	{
-		int index = line.indexOf(' ', 1);
-		if (index < 0)
+		final int spaceIndex = line.indexOf(' ', 1);
+		if (spaceIndex < 0)
 		{
 			this.runCommand(line.substring(1), new String[] {});
 			return;
 		}
 		
-		this.runCommand(line.substring(1, index), line.substring(index + 1).split(" "));
+		this.runCommand(line.substring(1, spaceIndex), line.substring(spaceIndex + 1).split(" "));
 	}
 	
 	public void runCommand(String name, String... arguments)
