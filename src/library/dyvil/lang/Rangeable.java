@@ -1,6 +1,6 @@
 package dyvil.lang;
 
-public interface Rangeable<T extends Rangeable<T>> extends Ordered<T>
+public interface Rangeable<T extends Rangeable<T>> extends Comparable<T>
 {
 	T next();
 	

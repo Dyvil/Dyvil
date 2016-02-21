@@ -21,7 +21,7 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 	
 	public static <T extends Rangeable<T>> ClosedRange<T> apply(T first, T last)
 	{
-		return new ClosedRange(first, last);
+		return new ClosedRange<>(first, last);
 	}
 	
 	public ClosedRange(T first, T last)
@@ -46,7 +46,7 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 	public int count()
 	{
 		int count = 0;
-		for (T current = this.first; current.$lt$eq(this.last); current = current.next())
+		for (T current = this.first; current.compareTo(this.last) <= 0; current = current.next())
 		{
 			count++;
 		}
@@ -75,12 +75,12 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 			@Override
 			public T next()
 			{
-				if (this.current.$gt(ClosedRange.this.last))
+				if (this.current.compareTo(ClosedRange.this.last) > 0)
 				{
 					throw new NoSuchElementException("End of Range");
 				}
 				
-				T c = this.current;
+				final T c = this.current;
 				this.current = this.current.next();
 				return c;
 			}
@@ -88,7 +88,7 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 			@Override
 			public boolean hasNext()
 			{
-				return this.current.$lt$eq(ClosedRange.this.last);
+				return this.current.compareTo(ClosedRange.this.last) <= 0;
 			}
 			
 			@Override
@@ -102,7 +102,7 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 	@Override
 	public void forEach(Consumer<? super T> action)
 	{
-		for (T current = this.first; current.$lt$eq(this.last); current = current.next())
+		for (T current = this.first; current.compareTo(this.last) <= 0; current = current.next())
 		{
 			action.accept(current);
 		}
@@ -111,7 +111,7 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 	@Override
 	public void toArray(int index, Object[] store)
 	{
-		for (T current = this.first; current.$lt$eq(this.last); current = current.next())
+		for (T current = this.first; current.compareTo(this.last) <= 0; current = current.next())
 		{
 			store[index++] = current;
 		}
@@ -120,9 +120,9 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 	@Override
 	public boolean contains(Object o)
 	{
-		for (Rangeable<T> current = this.first; current.$lt$eq(this.last); current = current.next())
+		for (Rangeable<T> current = this.first; current.compareTo(this.last) <= 0; current = current.next())
 		{
-			if (current.$eq$eq((T) o))
+			if (current.compareTo((T) o) == 0)
 			{
 				return true;
 			}
@@ -133,7 +133,7 @@ public class ClosedRange<T extends Rangeable<T>> implements Range<T>
 	@Override
 	public Range<T> copy()
 	{
-		return new ClosedRange(this.first, this.last);
+		return new ClosedRange<>(this.first, this.last);
 	}
 	
 	@Override

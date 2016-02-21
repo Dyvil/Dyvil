@@ -55,7 +55,7 @@ public final class EmptyRange<T> implements Range<T>
 	@Override
 	public Iterator<T> iterator()
 	{
-		return EmptyIterator.instance;
+		return (Iterator<T>) EmptyIterator.instance;
 	}
 	
 	@Override
@@ -89,11 +89,7 @@ public final class EmptyRange<T> implements Range<T>
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof Range)
-		{
-			return ((Range) obj).count() == 0;
-		}
-		return false;
+		return obj instanceof Range && ((Range) obj).count() == 0;
 	}
 	
 	@Override
