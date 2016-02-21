@@ -5,11 +5,12 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeListParser extends Parser
 {
-	private static final int TYPE = 0;
+	private static final int TYPE  = 0;
 	private static final int COMMA = 1;
 
 	protected ITypeConsumer consumer;
@@ -31,7 +32,8 @@ public final class TypeListParser extends Parser
 			pm.pushParser(pm.newTypeParser(this.consumer), true);
 			return;
 		case COMMA:
-			if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.OPEN_CURLY_BRACKET || type == BaseSymbols.SEMICOLON)
+			if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.OPEN_CURLY_BRACKET
+					|| type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
 			{
 				pm.popParser(true);
 				return;

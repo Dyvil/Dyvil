@@ -115,6 +115,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = GENERICS_END;
 				return;
 			}
+			// Fallthrough
 		case PARAMETERS:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
@@ -122,6 +123,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = PARAMETERS_END;
 				return;
 			}
+			// Fallthrough
 		case EXTENDS:
 			if (type == DyvilKeywords.EXTENDS)
 			{
@@ -136,6 +138,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.mode = EXTENDS_PARAMETERS;
 				return;
 			}
+			// Fallthrough
 		case IMPLEMENTS:
 			if (type == DyvilKeywords.IMPLEMENTS)
 			{
@@ -149,6 +152,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				}
 				return;
 			}
+			// Fallthrough
 		case BODY:
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
@@ -162,25 +166,20 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				if (token.isInferred())
 				{
-					IToken next = token.next();
-					if (next != null)
+					switch (token.next().type())
 					{
-						int nextType = next.type();
-						switch (nextType)
-						{
-						case DyvilKeywords.EXTENDS:
-							this.mode = EXTENDS;
-							return;
-						case DyvilKeywords.IMPLEMENTS:
-							this.mode = IMPLEMENTS;
-							return;
-						case BaseSymbols.OPEN_SQUARE_BRACKET:
-							this.mode = GENERICS;
-							return;
-						case BaseSymbols.OPEN_PARENTHESIS:
-							this.mode = PARAMETERS;
-							return;
-						}
+					case DyvilKeywords.EXTENDS:
+						this.mode = EXTENDS;
+						return;
+					case DyvilKeywords.IMPLEMENTS:
+						this.mode = IMPLEMENTS;
+						return;
+					case BaseSymbols.OPEN_SQUARE_BRACKET:
+						this.mode = GENERICS;
+						return;
+					case BaseSymbols.OPEN_PARENTHESIS:
+						this.mode = PARAMETERS;
+						return;
 					}
 				}
 				
@@ -188,6 +187,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				this.classList.addClass(this.theClass);
 				return;
 			}
+
 			this.mode = BODY_END;
 			pm.report(token, "class.body.separator");
 			return;
