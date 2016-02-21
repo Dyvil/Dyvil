@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.PrimitiveType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -72,11 +73,33 @@ public final class IntValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.INT || type.isSuperTypeOf(Types.INT))
+		if (type == Types.INT)
 		{
 			return this;
 		}
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS);
+		if (type.isPrimitive())
+		{
+			switch (type.getTypecode())
+			{
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
+				return this;
+			case PrimitiveType.LONG_CODE:
+				return new LongValue(this.position, this.value);
+			case PrimitiveType.FLOAT_CODE:
+				return new FloatValue(this.position, this.value);
+			case PrimitiveType.DOUBLE_CODE:
+				return new DoubleValue(this.position, this.value);
+			}
+		}
+		if (type.isSuperTypeOf(Types.INT))
+		{
+			return this;
+		}
+
+		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -132,7 +155,7 @@ public final class IntValue implements IConstantValue
 	@Override
 	public Integer toObject()
 	{
-		return Integer.valueOf(this.value);
+		return this.value;
 	}
 	
 	@Override
