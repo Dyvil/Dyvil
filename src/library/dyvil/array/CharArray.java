@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Char;
-import dyvil.lang.Int;
 import dyvil.ref.CharRef;
 import dyvil.ref.array.CharArrayRef;
 import dyvil.reflect.Modifiers;
@@ -92,9 +90,9 @@ public interface CharArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static char[] subscript(char[] array, Range<Int> range)
+	static char[] subscript(char[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = range.first();
 		int count = range.count();
 		char[] slice = new char[count];
 		System.arraycopy(array, start, slice, 0, count);
@@ -111,9 +109,9 @@ public interface CharArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(char[] array, Range<Int> range, char[] values)
+	static void subscript_$eq(char[] array, Range<Integer> range, char[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = range.first();
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -367,21 +365,21 @@ public interface CharArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static Char[] boxed(char[] array)
+	static Character[] boxed(char[] array)
 	{
 		int len = array.length;
-		Char[] boxed = new Char[len];
+		Character[] boxed = new Character[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Char.apply(array[i]);
+			boxed[i] = array[i];
 		}
 		return boxed;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static Iterable<Char> toIterable(char[] array)
+	static Iterable<Character> toIterable(char[] array)
 	{
-		return new ArrayList<Char>(boxed(array), true);
+		return new ArrayList<>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

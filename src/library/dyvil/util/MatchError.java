@@ -1,12 +1,5 @@
 package dyvil.util;
 
-import dyvil.lang.Byte;
-import dyvil.lang.*;
-import dyvil.lang.Double;
-import dyvil.lang.Float;
-import dyvil.lang.Long;
-import dyvil.lang.Short;
-
 /**
  * A <b>MatchError</b> is a {@link RuntimeException} thrown when a
  * non-exhaustive {@code match} expression receives a value that none of it's
@@ -22,40 +15,42 @@ public class MatchError extends RuntimeException
 	private static final long serialVersionUID = 2882649299151786454L;
 	
 	private Object match;
+
+	// TODO remove primitive constructors
 	
 	public MatchError(byte match)
 	{
-		this.match = Byte.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(short match)
 	{
-		this.match = Short.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(char match)
 	{
-		this.match = Char.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(int match)
 	{
-		this.match = Int.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(long match)
 	{
-		this.match = Long.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(float match)
 	{
-		this.match = Float.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(double match)
 	{
-		this.match = Double.apply(match);
+		this.match = match;
 	}
 	
 	public MatchError(Object match)

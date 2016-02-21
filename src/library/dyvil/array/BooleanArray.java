@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Boolean;
-import dyvil.lang.Int;
 import dyvil.ref.BooleanRef;
 import dyvil.ref.array.BooleanArrayRef;
 import dyvil.reflect.Modifiers;
@@ -70,11 +68,11 @@ public interface BooleanArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	static boolean[] subscript(boolean[] array, Range<Int> range)
+	static boolean[] subscript(boolean[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
-		int count = range.count();
-		boolean[] slice = new boolean[count];
+		final int start = range.first();
+		final int count = range.count();
+		final boolean[] slice = new boolean[count];
 		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
@@ -89,9 +87,9 @@ public interface BooleanArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(boolean[] array, Range<Int> range, boolean[] values)
+	static void subscript_$eq(boolean[] array, Range<Integer> range, boolean[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = range.first();
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -115,7 +113,7 @@ public interface BooleanArray
 	{
 		for (boolean v : array)
 		{
-			action.accept(Boolean.apply(v));
+			action.accept(v);
 		}
 	}
 
@@ -229,7 +227,7 @@ public interface BooleanArray
 		boolean[] res = new boolean[len];
 		for (int i = 0; i < len; i++)
 		{
-			res[i] = mapper.test(Boolean.apply(array[i]));
+			res[i] = mapper.test(array[i]);
 		}
 		return res;
 	}
@@ -242,7 +240,7 @@ public interface BooleanArray
 
 		for (boolean v : array)
 		{
-			boolean[] a = mapper.apply(Boolean.apply(v));
+			boolean[] a = mapper.apply(v);
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
@@ -266,7 +264,7 @@ public interface BooleanArray
 		boolean[] res = new boolean[len];
 		for (boolean v : array)
 		{
-			if (condition.test(Boolean.apply(v)))
+			if (condition.test(v))
 			{
 				res[index++] = v;
 			}
@@ -373,7 +371,7 @@ public interface BooleanArray
 		Boolean[] boxed = new Boolean[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Boolean.apply(array[i]);
+			boxed[i] = array[i];
 		}
 		return boxed;
 	}
@@ -381,7 +379,7 @@ public interface BooleanArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static Iterable<Boolean> toIterable(boolean[] array)
 	{
-		return new ArrayList<Boolean>(boxed(array), true);
+		return new ArrayList<>(boxed(array), true);
 	}
 
 	// equals, hashCode and toString

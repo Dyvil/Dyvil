@@ -1,7 +1,6 @@
 package dyvil.util;
 
 import dyvil.annotation.Immutable;
-import dyvil.lang.Ordered;
 import dyvil.lang.literal.StringConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
@@ -10,14 +9,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The <b>Version</b> class represents a {@link Comparable comparable} and
- * {@link Ordered ordered} model for the <a href="http://semver.org">Semantic
- * Versioning</a> format.
+ * The <b>Version</b> class represents a {@link Comparable comparable} model for the <a
+ * href="http://semver.org">Semantic Versioning</a> format.
  */
 @StringConvertible
 @TupleConvertible
 @Immutable
-public final class Version implements Ordered<Version>, Serializable
+public final class Version implements Comparable<Version>, Serializable
 {
 	public enum Element
 	{

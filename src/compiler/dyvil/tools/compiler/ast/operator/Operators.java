@@ -125,12 +125,8 @@ public interface Operators
 		boolean openRange = false;
 		if (name == Names.dotdot || (openRange = name == Names.dotdotlt))
 		{
-			RangeOperator rangeOperator = null;
-			if (arg1.isType(RangeOperator.LazyFields.RANGEABLE) && arg2.isType(RangeOperator.LazyFields.RANGEABLE))
-			{
-				rangeOperator = new RangeOperator(arg1, arg2);
-				rangeOperator.setHalfOpen(openRange);
-			}
+			final RangeOperator rangeOperator = new RangeOperator(arg1, arg2);
+			rangeOperator.setHalfOpen(openRange);
 			return rangeOperator;
 		}
 		if (name == Names.ampamp)

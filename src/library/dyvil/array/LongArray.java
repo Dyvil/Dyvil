@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Int;
-import dyvil.lang.Long;
 import dyvil.ref.LongRef;
 import dyvil.ref.array.LongArrayRef;
 import dyvil.reflect.Modifiers;
@@ -92,9 +90,9 @@ public interface LongArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static long[] subscript(long[] array, Range<Int> range)
+	static long[] subscript(long[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		long[] slice = new long[count];
 		System.arraycopy(array, start, slice, 0, count);
@@ -111,9 +109,9 @@ public interface LongArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(long[] array, Range<Int> range, long[] values)
+	static void subscript_$eq(long[] array, Range<Integer> range, long[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -373,7 +371,7 @@ public interface LongArray
 		Long[] boxed = new Long[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Long.apply(array[i]);
+			boxed[i] = (array[i]);
 		}
 		return boxed;
 	}

@@ -1,14 +1,13 @@
 package dyvil.collection;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.range.ClosedRange;
 import dyvil.collection.range.EmptyRange;
 import dyvil.collection.range.HalfOpenRange;
-import dyvil.lang.Ordered;
-import dyvil.lang.Rangeable;
+import dyvil.collection.range.Rangeable;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.annotation.Immutable;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -22,19 +21,19 @@ import java.util.function.Consumer;
 @Immutable
 public interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
-	static <T extends Ordered<T>> Range<T> apply()
+	static <T> Range<T> apply()
 	{
-		return EmptyRange.instance;
+		return (Range<T>) EmptyRange.instance;
 	}
 	
 	static <T extends Rangeable<T>> Range<T> apply(T first, T last)
 	{
-		return new ClosedRange(first, last);
+		return new ClosedRange<>(first, last);
 	}
 	
 	static <T extends Rangeable<T>> Range<T> halfOpen(T first, T last)
 	{
-		return new HalfOpenRange(first, last);
+		return new HalfOpenRange<>(first, last);
 	}
 	
 	/**
@@ -139,11 +138,7 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	
 	static boolean rangeEquals(Range<?> range, Object o)
 	{
-		if (!(o instanceof Range))
-		{
-			return false;
-		}
-		return rangeEquals(range, (Range) o);
+		return o instanceof Range && rangeEquals(range, (Range) o);
 	}
 	
 	static boolean rangeEquals(Range<?> range1, Range<?> range2)

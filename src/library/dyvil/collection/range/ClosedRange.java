@@ -1,7 +1,6 @@
 package dyvil.collection.range;
 
 import dyvil.collection.Range;
-import dyvil.lang.Rangeable;
 import dyvil.lang.literal.TupleConvertible;
 import dyvil.annotation.Immutable;
 

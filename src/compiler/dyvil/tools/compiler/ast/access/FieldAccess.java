@@ -260,7 +260,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			value = value.foldConstants();
 		}
 		while (!value.isConstantOrField());
-		
+
+		if (value == this)
+		{
+			return this;
+		}
 		return value.toConstant(markers);
 	}
 	

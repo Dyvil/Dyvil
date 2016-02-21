@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Int;
-import dyvil.lang.Short;
 import dyvil.ref.ShortRef;
 import dyvil.ref.array.ShortArrayRef;
 import dyvil.reflect.Modifiers;
@@ -103,9 +101,9 @@ public interface ShortArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static short[] subscript(short[] array, Range<Int> range)
+	static short[] subscript(short[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		short[] slice = new short[count];
 		System.arraycopy(array, start, slice, 0, count);
@@ -122,9 +120,9 @@ public interface ShortArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(short[] array, Range<Int> range, short[] values)
+	static void subscript_$eq(short[] array, Range<Integer> range, short[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -270,7 +268,6 @@ public interface ShortArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static short[] flatMapped(short[] array, IntFunction<short[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		short[] res = EMPTY;
 		
@@ -385,7 +382,7 @@ public interface ShortArray
 		Short[] boxed = new Short[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Short.apply(array[i]);
+			boxed[i] = (array[i]);
 		}
 		return boxed;
 	}
@@ -393,7 +390,7 @@ public interface ShortArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static Iterable<Short> toIterable(short[] array)
 	{
-		return new ArrayList<Short>(boxed(array), true);
+		return new ArrayList<>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

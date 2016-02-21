@@ -22,7 +22,7 @@ public class Intrinsics
 	{
 		IArguments arguments = annotation.getArguments();
 		IValue value = arguments.getValue(0, Annotation.VALUE);
-		if (value.valueTag() != IValue.ARRAY)
+		if (value == null || value.valueTag() != IValue.ARRAY)
 		{
 			return null;
 		}

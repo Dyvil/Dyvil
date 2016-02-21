@@ -30,7 +30,7 @@ public class IntValue implements Constant
 	@Override
 	public Object toObject()
 	{
-		return dyvil.lang.Int.apply(this.value);
+		return this.value;
 	}
 
 	@Override

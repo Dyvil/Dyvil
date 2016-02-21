@@ -1,4 +1,4 @@
-package dyvil.lang;
+package dyvil.collection.range;
 
 public interface Rangeable<T extends Rangeable<T>> extends Comparable<T>
 {

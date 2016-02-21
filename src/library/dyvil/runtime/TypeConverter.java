@@ -11,11 +11,11 @@ public class TypeConverter
 	private static final int NUM_WRAPPERS = Wrapper.values().length;
 	
 	private static final String NAME_OBJECT    = "java/lang/Object";
-	private static final String WRAPPER_PREFIX = "Ldyvil/lang/";
+	private static final String WRAPPER_PREFIX = "Ljava/lang/";
 	
 	// Same for all primitives; name of the boxing method
-	private static final String NAME_BOX_METHOD   = "apply";
-	private static final String NAME_UNBOX_METHOD = "unapply";
+	private static final String NAME_BOX_METHOD   = "valueOf";
+	private static final String NAME_UNBOX_METHOD = "Value";
 	
 	// Table of opcodes for widening primitive conversions
 	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];
@@ -93,17 +93,17 @@ public class TypeConverter
 	
 	private static String wrapperName(Wrapper w)
 	{
-		return "dyvil/lang/" + w.wrapperSimpleName();
+		return "java/lang/" + w.wrapperSimpleName();
 	}
 	
 	private static String boxingDescriptor(Wrapper w)
 	{
-		return "(" + w.basicTypeChar() + ")Ldyvil/lang/" + w.wrapperSimpleName() + ";";
+		return "(" + w.basicTypeChar() + ")Ljava/lang/" + w.wrapperSimpleName() + ";";
 	}
 	
 	private static String unboxingDescriptor(Wrapper w)
 	{
-		return "(Ldyvil/lang/" + w.wrapperSimpleName() + ";)" + w.basicTypeChar();
+		return "()" + w.basicTypeChar();
 	}
 	
 	static void boxIfTypePrimitive(MethodVisitor mv, Type t)
@@ -132,9 +132,10 @@ public class TypeConverter
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapperName(w), NAME_BOX_METHOD, boxingDescriptor(w), false);
 	}
 	
-	static void unbox(MethodVisitor mv, String sname, Wrapper wt)
+	static void unbox(MethodVisitor mv, String wrapperClassName, Wrapper wt)
 	{
-		mv.visitMethodInsn(Opcodes.INVOKESTATIC, sname, NAME_UNBOX_METHOD, unboxingDescriptor(wt), false);
+		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, wrapperClassName, wt.primitiveSimpleName() + NAME_UNBOX_METHOD,
+		                   unboxingDescriptor(wt), false);
 	}
 	
 	private static String descriptorToName(String desc)

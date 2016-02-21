@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Float;
-import dyvil.lang.Int;
 import dyvil.ref.FloatRef;
 import dyvil.ref.array.FloatArrayRef;
 import dyvil.reflect.Modifiers;
@@ -103,9 +101,9 @@ public interface FloatArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] subscript(float[] array, Range<Int> range)
+	static float[] subscript(float[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		float[] slice = new float[count];
 		System.arraycopy(array, start, slice, 0, count);
@@ -122,9 +120,9 @@ public interface FloatArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(float[] array, Range<Int> range, float[] values)
+	static void subscript_$eq(float[] array, Range<Integer> range, float[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -384,7 +382,7 @@ public interface FloatArray
 		Float[] boxed = new Float[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Float.apply(array[i]);
+			boxed[i] = (array[i]);
 		}
 		return boxed;
 	}
@@ -392,7 +390,7 @@ public interface FloatArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static Iterable<Float> toIterable(float[] array)
 	{
-		return new ArrayList<Float>(boxed(array), true);
+		return new ArrayList<>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString
