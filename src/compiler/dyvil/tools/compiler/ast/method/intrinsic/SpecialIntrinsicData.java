@@ -37,37 +37,39 @@ public class SpecialIntrinsicData implements IntrinsicData
 		int length = this.instructions.length;
 		for (int i = 0; i < length; i++)
 		{
-			Label label = targets[insn++];
+			Label label = this.targets[insn++];
 			if (label != null)
 			{
 				writer.writeTargetLabel(label);
 			}
 			
-			int opcode = ints[i];
+			final int opcode = ints[i];
 			if (Opcodes.isFieldOpcode(opcode))
 			{
-				String owner = strings[ints[i + 1]];
-				String name = strings[ints[i + 2]];
-				String desc = strings[ints[i + 3]];
+				final String owner = this.strings[ints[i + 1]];
+				final String name = this.strings[ints[i + 2]];
+				final String desc = this.strings[ints[i + 3]];
 				writer.writeFieldInsn(opcode, owner, name, desc);
 				i += 3;
 				continue;
 			}
 			if (Opcodes.isMethodOpcode(opcode))
 			{
-				String owner = strings[ints[i + 1]];
-				String name = strings[ints[i + 2]];
-				String desc = strings[ints[i + 3]];
+				final String owner = this.strings[ints[i + 1]];
+				final String name = this.strings[ints[i + 2]];
+				final String desc = this.strings[ints[i + 3]];
 				
-				IClass iclass = Package.rootPackage.resolveInternalClass(owner);
-				boolean isInterface = iclass.isInterface();
+				final IClass iclass = Package.rootPackage.resolveInternalClass(owner);
+				final boolean isInterface = iclass != null && iclass.isInterface();
 				writer.writeInvokeInsn(opcode, owner, name, desc, isInterface);
+
 				i += 3;
 				continue;
 			}
 			if (Opcodes.isJumpOpcode(opcode))
 			{
-				writer.writeJumpInsn(opcode, targets[ints[i + 1]]);
+				writer.writeJumpInsn(opcode, this.targets[ints[i + 1]]);
+
 				i += 1;
 				continue;
 			}
@@ -89,7 +91,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 				i++;
 				continue;
 			case Opcodes.LDC:
-				String constant = strings[ints[i + 1]];
+				final String constant = this.strings[ints[i + 1]];
 				writeLDC(writer, constant);
 				i++;
 				continue;

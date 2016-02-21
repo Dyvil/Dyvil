@@ -542,29 +542,36 @@ public class Frame
 		case DREM:
 			this.pop();
 			return;
-		case INEG:
-		case LNEG:
-		case FNEG:
-		case DNEG:
+		case INOT:
+			this.push(INT);
+			this.pop();
 			return;
+		case INEG:
 		case L2I:
 		case F2I:
 		case D2I:
 			this.pop();
 			this.push(INT);
 			return;
+		case LNEG:
+			this.push(LONG);
+			this.pop();
+			return;
+		case LNOT:
 		case I2L:
 		case F2L:
 		case D2L:
 			this.pop();
 			this.push(LONG);
 			return;
+		case FNEG:
 		case I2F:
 		case L2F:
 		case D2F:
 			this.pop();
 			this.push(FLOAT);
 			return;
+		case DNEG:
 		case I2D:
 		case L2D:
 		case F2D:

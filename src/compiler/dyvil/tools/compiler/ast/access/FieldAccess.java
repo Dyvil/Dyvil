@@ -261,10 +261,6 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		while (!value.isConstantOrField());
 
-		if (value == this)
-		{
-			return this;
-		}
 		return value.toConstant(markers);
 	}
 	
@@ -457,8 +453,8 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
 		{
-			IValue v = this.field.getValue();
-			return v != null && v.isConstantOrField() ? v : this;
+			final IValue value = this.field.getValue();
+			return value != null && value.isConstantOrField() ? value : this;
 		}
 		if (this.receiver != null)
 		{
