@@ -35,22 +35,21 @@ public enum Wrapper
 	
 	static
 	{
-		
 		for (Wrapper localWrapper : values())
 		{
-			int k = hashPrimitive(localWrapper.primitiveClass);
-			int l = hashWrapper(localWrapper.wrapperClass);
-			int i1 = hashChar(localWrapper.basicTypeChar);
-			// assert FROM_PRIMITIVE[k] == null;
-			// assert FROM_WRAPPER[l] == null;
-			// assert FROM_CHAR[i1] == null;
-			FROM_PRIMITIVE[k] = localWrapper;
-			FROM_WRAPPER[l] = localWrapper;
-			FROM_CHAR[i1] = localWrapper;
+			int primitiveHash = hashPrimitive(localWrapper.primitiveClass);
+			int wrapperHash = hashWrapper(localWrapper.wrapperClass);
+			int charHash = hashChar(localWrapper.basicTypeChar);
+			assert FROM_PRIMITIVE[primitiveHash] == null;
+			assert FROM_WRAPPER[wrapperHash] == null;
+			assert FROM_CHAR[charHash] == null;
+			FROM_PRIMITIVE[primitiveHash] = localWrapper;
+			FROM_WRAPPER[wrapperHash] = localWrapper;
+			FROM_CHAR[charHash] = localWrapper;
 		}
 	}
 	
-	Wrapper(char basicTypeChar, Class primitive, Class wrapper, int flags)
+	Wrapper(char basicTypeChar, Class<?> primitive, Class<?> wrapper, int flags)
 	{
 		this.basicTypeChar = basicTypeChar;
 		this.primitiveClass = primitive;
@@ -65,45 +64,46 @@ public enum Wrapper
 		return FROM_CHAR[hashChar(c)];
 	}
 	
-	public static Wrapper forPrimitiveType(Class c)
+	public static Wrapper forPrimitiveType(Class<?> c)
 	{
 		return FROM_PRIMITIVE[hashPrimitive(c)];
 	}
 	
-	public static Wrapper forWrapperType(Class c)
+	public static Wrapper forWrapperType(Class<?> c)
 	{
 		return FROM_WRAPPER[hashWrapper(c)];
 	}
 	
-	public static boolean isWrapperType(Class c)
+	public static boolean isWrapperType(Class<?> wrapperClass)
 	{
-		Wrapper w = FROM_WRAPPER[hashWrapper(c)];
-		return w != null && w.wrapperClass == c;
+		final Wrapper wrapper = FROM_WRAPPER[hashWrapper(wrapperClass)];
+		return wrapper != null && wrapper.wrapperClass == wrapperClass;
 	}
 	
-	private static int hashPrimitive(Class<?> paramClass)
+	private static int hashPrimitive(Class<?> primitiveClass)
 	{
-		String str = paramClass.getName();
-		if (str.length() < 3)
+		final String className = primitiveClass.getName();
+
+		if (className.length() < 3)
 		{
 			return 0;
 		}
-		return (str.charAt(0) + str.charAt(2)) & 0xF;
+		return (className.charAt(0) + className.charAt(2)) & 0xF;
 	}
 	
-	private static int hashWrapper(Class<?> paramClass)
+	private static int hashWrapper(Class<?> wrapperClass)
 	{
-		String str = paramClass.getName();
-		if (str.length() < 13)
+		final String className = wrapperClass.getName();
+		if (className.length() < 13)
 		{
 			return 0;
 		}
-		return 3 * str.charAt(12) + str.charAt(13) & 0xF;
+		return (3 * className.charAt(11) + className.charAt(12)) & 0xF;
 	}
 	
-	private static int hashChar(char paramChar)
+	private static int hashChar(char typeChar)
 	{
-		return paramChar + (paramChar >> 1) & 15;
+		return (typeChar + (typeChar >> 1)) & 15;
 	}
 	
 	public char basicTypeChar()
