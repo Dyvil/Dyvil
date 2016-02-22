@@ -30,7 +30,7 @@ public final class DyvilREPL
 
 	private PrintStream    output;
 	private PrintStream    errorOutput;
-	private BufferedReader input;
+	private InputManager inputManager;
 	
 	protected REPLContext context = new REPLContext(this);
 	protected REPLParser  parser  = new REPLParser(this.context);
@@ -91,7 +91,7 @@ public final class DyvilREPL
 		this.errorOutput = errorOutput;
 		if (input != null)
 		{
-			this.input = new BufferedReader(new InputStreamReader(input));
+			this.inputManager = new InputManager(output, input);
 		}
 	}
 
@@ -158,120 +158,6 @@ public final class DyvilREPL
 		}
 	}
 	
-	public String readInput() throws IOException
-	{
-		StringBuilder buffer = new StringBuilder();
-		int depth1 = 0;
-		int depth2 = 0;
-		int depth3 = 0;
-		byte mode = 0;
-		
-		while (true)
-		{
-			String s = this.input.readLine();
-			
-			if (s == null)
-			{
-				if (buffer.length() > 0)
-				{
-					continue;
-				}
-				
-				exit();
-				return null;
-			}
-
-			int len = s.length();
-			
-			outer:
-			for (int i = 0; i < len; i++)
-			{
-				char c = s.charAt(i);
-				
-				buffer.append(c);
-				
-				switch (c)
-				{
-				case '"':
-					if (mode == 0 || mode == 2)
-					{
-						mode ^= 2;
-					}
-					break;
-				case '\'':
-					if (mode == 0 || mode == 4)
-					{
-						mode ^= 4;
-					}
-					break;
-				case '\\':
-					if (mode >= 2)
-					{
-						mode |= 1;
-					}
-					continue outer;
-				case '{':
-					if (mode == 0)
-					{
-						depth1++;
-					}
-					break;
-				case '}':
-					if (mode == 0)
-					{
-						depth1--;
-					}
-					break;
-				case '(':
-					if (mode == 0)
-					{
-						depth2++;
-					}
-					break;
-				case ')':
-					if (mode == 0)
-					{
-						depth2--;
-					}
-					break;
-				case '[':
-					if (mode == 0)
-					{
-						depth3++;
-					}
-					break;
-				case ']':
-					if (mode == 0)
-					{
-						depth3--;
-					}
-					break;
-				}
-				
-				mode &= ~1;
-			}
-			
-			buffer.append('\n');
-			if (mode == 0 && depth1 + depth2 + depth3 <= 0)
-			{
-				break;
-			}
-			
-			this.printIndent(depth1);
-		}
-		
-		return buffer.toString();
-	}
-
-	private void printIndent(int indent)
-	{
-		this.output.print("| ");
-		for (int j = 0; j < indent; j++)
-		{
-			this.output.print("    ");
-		}
-	}
-	
 	private static void exit()
 	{
 		running = false;
@@ -284,9 +170,10 @@ public final class DyvilREPL
 		String currentCode;
 		try
 		{
-			currentCode = this.readInput();
+			currentCode = this.inputManager.readInput();
 			if (currentCode == null)
 			{
+				exit();
 				return;
 			}
 		}
