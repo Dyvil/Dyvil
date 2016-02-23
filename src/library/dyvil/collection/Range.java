@@ -6,10 +6,10 @@ import dyvil.collection.range.ClosedRange;
 import dyvil.collection.range.EmptyRange;
 import dyvil.collection.range.HalfOpenRange;
 import dyvil.collection.range.Rangeable;
-import dyvil.collection.range.primitive.DoubleRange;
-import dyvil.collection.range.primitive.FloatRange;
-import dyvil.collection.range.primitive.IntRange;
-import dyvil.collection.range.primitive.LongRange;
+import dyvil.collection.range.DoubleRange;
+import dyvil.collection.range.FloatRange;
+import dyvil.collection.range.IntRange;
+import dyvil.collection.range.LongRange;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 

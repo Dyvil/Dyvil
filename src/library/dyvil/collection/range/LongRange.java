@@ -1,4 +1,4 @@
-package dyvil.collection.range.primitive;
+package dyvil.collection.range;
 
 import dyvil.collection.Range;
 
