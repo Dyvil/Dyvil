@@ -6,6 +6,10 @@ import dyvil.collection.range.ClosedRange;
 import dyvil.collection.range.EmptyRange;
 import dyvil.collection.range.HalfOpenRange;
 import dyvil.collection.range.Rangeable;
+import dyvil.collection.range.primitive.DoubleRange;
+import dyvil.collection.range.primitive.FloatRange;
+import dyvil.collection.range.primitive.IntRange;
+import dyvil.collection.range.primitive.LongRange;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
 
@@ -18,12 +22,51 @@ import java.util.function.Consumer;
 
 @NilConvertible
 @TupleConvertible
-@Immutable
-public interface Range<@Covariant T> extends Iterable<T>, Serializable
+public @Immutable interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
 	static <T> Range<T> apply()
 	{
 		return (Range<T>) EmptyRange.instance;
+	}
+
+	static IntRange apply(int first, int last)
+	{
+		return new IntRange(first, last);
+	}
+
+	static IntRange halfOpen(int first, int last)
+	{
+		return new IntRange(first, last, true);
+	}
+
+	static LongRange apply(long first, long last)
+	{
+		return new LongRange(first, last);
+	}
+
+	static LongRange halfOpen(long first, long last)
+	{
+		return new LongRange(first, last, true);
+	}
+
+	static FloatRange apply(float first, float last)
+	{
+		return new FloatRange(first, last);
+	}
+
+	static FloatRange halfOpen(float first, float last)
+	{
+		return new FloatRange(first, last, true);
+	}
+
+	static DoubleRange apply(double first, double last)
+	{
+		return new DoubleRange(first, last);
+	}
+
+	static DoubleRange halfOpen(double first, double last)
+	{
+		return new DoubleRange(first, last, true);
 	}
 	
 	static <T extends Rangeable<T>> Range<T> apply(T first, T last)
@@ -51,18 +94,21 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	T last();
 	
 	/**
-	 * Returns the exact number of elements in this range, i.e. the number of
-	 * elements that would be returned by the {@link #iterator()}.
+	 * Returns the exact number of elements in this range, i.e. the number of elements that would be returned by the
+	 * {@link #iterator()}.
 	 *
 	 * @return the number of elements in this range
 	 */
 	int count();
+
+	default long longCount()
+	{
+		return this.count();
+	}
 	
 	/**
-	 * Returns an estimate of the number of elements in this range. If the
-	 * number of elements cannot be directly computed, {@code -1} should be
-	 * returned. Otherwise, the result should equal the result of
-	 * {@link #count()}.
+	 * Returns an estimate of the number of elements in this range. If the number of elements cannot be directly
+	 * computed, {@code -1} should be returned. Otherwise, the result should equal the result of {@link #count()}.
 	 *
 	 * @return the estimated number of elements in this range
 	 */
