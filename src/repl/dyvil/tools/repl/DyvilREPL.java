@@ -16,9 +16,13 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 public final class DyvilREPL
 {
@@ -28,8 +32,8 @@ public final class DyvilREPL
 	
 	private static DyvilREPL instance;
 
-	private PrintStream    output;
-	private PrintStream    errorOutput;
+	private PrintStream  output;
+	private PrintStream  errorOutput;
 	private InputManager inputManager;
 	
 	protected REPLContext context = new REPLContext(this);
@@ -219,22 +223,26 @@ public final class DyvilREPL
 	public void evaluate(String code)
 	{
 		this.context.startEvaluation(code);
-		
-		TokenIterator tokens = new DyvilLexer(this.context.markers, DyvilSymbols.INSTANCE).tokenize(code);
+
+		final MarkerList markers = this.context.markers;
+		final TokenIterator tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
+
 		SemicolonInference.inferSemicolons(tokens.first());
 		
-		if (this.parser.parse(null, tokens, new DyvilUnitParser(this.context, false)))
+		if (this.parser.parse(markers, tokens, new DyvilUnitParser(this.context, false), 1))
+		// 1 = DyvilHeaderParser.PACKAGE
 		{
 			this.context.reportErrors();
 			return;
 		}
-		if (this.parser.parse(null, tokens, new ClassBodyParser(this.context)))
+		if (this.parser.parse(markers, tokens, new ClassBodyParser(this.context), 2))
+		// 2 = ClassBodyParser.NAME
 		{
 			this.context.reportErrors();
 			return;
 		}
 
-		this.parser.parse(this.context.markers, tokens, new ExpressionParser(this.context));
+		this.parser.parse(markers, tokens, new ExpressionParser(this.context), -1);
 		this.context.reportErrors();
 	}
 	

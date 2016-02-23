@@ -14,7 +14,8 @@ import dyvil.tools.parsing.token.IToken;
 public class REPLParser extends ParserManager
 {
 	private REPLContext context;
-	private boolean     syntaxErrors;
+	private boolean     hasSyntaxErrors;
+	private boolean     reportErrors;
 	
 	public REPLParser(REPLContext context)
 	{
@@ -24,21 +25,22 @@ public class REPLParser extends ParserManager
 	@Override
 	public void report(Marker error)
 	{
-		this.syntaxErrors = true;
-		if (this.markers != null)
+		this.hasSyntaxErrors = true;
+		if (this.reportErrors)
 		{
 			super.report(error);
 		}
 	}
 
-	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser)
+	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser, int errorTargetMode)
 	{
 		this.tokens = tokens;
 		this.parser = parser;
 		this.skip = 0;
 		this.reparse = false;
 		this.markers = markers;
-		this.syntaxErrors = false;
+		this.hasSyntaxErrors = false;
+		this.reportErrors = errorTargetMode < 0;
 		
 		IToken token = null;
 		
@@ -78,6 +80,11 @@ public class REPLParser extends ParserManager
 			try
 			{
 				this.parser.parse(this, token);
+
+				if (this.reportErrors || this.parser.getMode() > errorTargetMode)
+				{
+					this.reportErrors = true;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -85,7 +92,7 @@ public class REPLParser extends ParserManager
 				return false;
 			}
 			
-			if (this.syntaxErrors && this.markers == null)
+			if (this.hasSyntaxErrors && !this.reportErrors)
 			{
 				return false;
 			}
@@ -93,7 +100,7 @@ public class REPLParser extends ParserManager
 		
 		this.parseRemaining(token);
 		
-		return !this.syntaxErrors;
+		return !this.hasSyntaxErrors || this.reportErrors;
 	}
 	
 	@Override
