@@ -414,12 +414,14 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
+		final boolean interfaceClass = this.theClass.isInterface();
+
 		int modifiers = this.modifiers.toFlags();
 		if (this.value == null)
 		{
 			modifiers |= Modifiers.ABSTRACT;
 		}
-		if (this.theClass.isInterface())
+		if (interfaceClass)
 		{
 			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
 		}
@@ -478,6 +480,8 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 		
+		final int lineNumber = this.getLineNumber();
+
 		final Set<String> descriptors = new HashSet<>(1 + this.overrideMethods.size());
 		descriptors.add(this.descriptor);
 
@@ -498,32 +502,30 @@ public class CodeMethod extends AbstractMethod
 			mw = new MethodWriterImpl(writer,
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
 			                                             this.name.qualified, desc, null, exceptionTypes));
-			
+
 			mw.begin();
 			mw.setThisType(internalThisClassName);
 
 			mw.writeVarInsn(Opcodes.ALOAD, 0);
-			
-			final int lineNumber = this.getLineNumber();
-			
+
+
 			for (int p = 0; p < this.parameterCount; p++)
 			{
 				final IParameter overrideParameter = overrideMethod.getParameter(p);
 				final IType parameterType = this.parameters[p].getInternalType();
 				final IType overrideParameterType = overrideParameter.getInternalType();
-				
+
 				overrideParameter.write(mw);
 				mw.writeVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
 				overrideParameterType.writeCast(mw, parameterType, lineNumber);
 			}
-			
+
 			IType overrideReturnType = overrideMethod.getType();
-			
+
 			mw.writeLineNumber(lineNumber);
-			boolean itf = this.theClass.isInterface();
 			mw.writeInvokeInsn(
-					(modifiers & Modifiers.ABSTRACT) != 0 && itf ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL,
-					internalThisClassName, this.name.qualified, this.getDescriptor(), itf);
+					(modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL,
+					internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
 			this.type.writeCast(mw, overrideReturnType, lineNumber);
 			mw.writeInsn(overrideReturnType.getReturnOpcode());
 			mw.end();

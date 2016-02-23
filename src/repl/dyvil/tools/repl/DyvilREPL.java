@@ -16,9 +16,13 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 public final class DyvilREPL
 {
@@ -28,9 +32,9 @@ public final class DyvilREPL
 	
 	private static DyvilREPL instance;
 
-	private PrintStream    output;
-	private PrintStream    errorOutput;
-	private BufferedReader input;
+	private PrintStream  output;
+	private PrintStream  errorOutput;
+	private InputManager inputManager;
 	
 	protected REPLContext context = new REPLContext(this);
 	protected REPLParser  parser  = new REPLParser(this.context);
@@ -91,7 +95,7 @@ public final class DyvilREPL
 		this.errorOutput = errorOutput;
 		if (input != null)
 		{
-			this.input = new BufferedReader(new InputStreamReader(input));
+			this.inputManager = new InputManager(output, input);
 		}
 	}
 
@@ -158,120 +162,6 @@ public final class DyvilREPL
 		}
 	}
 	
-	public String readInput() throws IOException
-	{
-		StringBuilder buffer = new StringBuilder();
-		int depth1 = 0;
-		int depth2 = 0;
-		int depth3 = 0;
-		byte mode = 0;
-		
-		while (true)
-		{
-			String s = this.input.readLine();
-			
-			if (s == null)
-			{
-				if (buffer.length() > 0)
-				{
-					continue;
-				}
-				
-				exit();
-				return null;
-			}
-
-			int len = s.length();
-			
-			outer:
-			for (int i = 0; i < len; i++)
-			{
-				char c = s.charAt(i);
-				
-				buffer.append(c);
-				
-				switch (c)
-				{
-				case '"':
-					if (mode == 0 || mode == 2)
-					{
-						mode ^= 2;
-					}
-					break;
-				case '\'':
-					if (mode == 0 || mode == 4)
-					{
-						mode ^= 4;
-					}
-					break;
-				case '\\':
-					if (mode >= 2)
-					{
-						mode |= 1;
-					}
-					continue outer;
-				case '{':
-					if (mode == 0)
-					{
-						depth1++;
-					}
-					break;
-				case '}':
-					if (mode == 0)
-					{
-						depth1--;
-					}
-					break;
-				case '(':
-					if (mode == 0)
-					{
-						depth2++;
-					}
-					break;
-				case ')':
-					if (mode == 0)
-					{
-						depth2--;
-					}
-					break;
-				case '[':
-					if (mode == 0)
-					{
-						depth3++;
-					}
-					break;
-				case ']':
-					if (mode == 0)
-					{
-						depth3--;
-					}
-					break;
-				}
-				
-				mode &= ~1;
-			}
-			
-			buffer.append('\n');
-			if (mode == 0 && depth1 + depth2 + depth3 <= 0)
-			{
-				break;
-			}
-			
-			this.printIndent(depth1);
-		}
-		
-		return buffer.toString();
-	}
-
-	private void printIndent(int indent)
-	{
-		this.output.print("| ");
-		for (int j = 0; j < indent; j++)
-		{
-			this.output.print("    ");
-		}
-	}
-	
 	private static void exit()
 	{
 		running = false;
@@ -284,9 +174,10 @@ public final class DyvilREPL
 		String currentCode;
 		try
 		{
-			currentCode = this.readInput();
+			currentCode = this.inputManager.readInput();
 			if (currentCode == null)
 			{
+				exit();
 				return;
 			}
 		}
@@ -332,22 +223,26 @@ public final class DyvilREPL
 	public void evaluate(String code)
 	{
 		this.context.startEvaluation(code);
-		
-		TokenIterator tokens = new DyvilLexer(this.context.markers, DyvilSymbols.INSTANCE).tokenize(code);
+
+		final MarkerList markers = this.context.markers;
+		final TokenIterator tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
+
 		SemicolonInference.inferSemicolons(tokens.first());
 		
-		if (this.parser.parse(null, tokens, new DyvilUnitParser(this.context, false)))
+		if (this.parser.parse(markers, tokens, new DyvilUnitParser(this.context, false), 1))
+		// 1 = DyvilHeaderParser.PACKAGE
 		{
 			this.context.reportErrors();
 			return;
 		}
-		if (this.parser.parse(null, tokens, new ClassBodyParser(this.context)))
+		if (this.parser.parse(markers, tokens, new ClassBodyParser(this.context), 2))
+		// 2 = ClassBodyParser.NAME
 		{
 			this.context.reportErrors();
 			return;
 		}
 
-		this.parser.parse(this.context.markers, tokens, new ExpressionParser(this.context));
+		this.parser.parse(markers, tokens, new ExpressionParser(this.context), -1);
 		this.context.reportErrors();
 	}
 	

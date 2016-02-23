@@ -104,7 +104,20 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		return true;
 	}
-	
+
+	@Override
+	public boolean isConstantOrField()
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (!this.values[i].isConstantOrField())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public boolean isPrimitive()
 	{

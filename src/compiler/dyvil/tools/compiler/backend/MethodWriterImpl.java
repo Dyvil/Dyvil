@@ -359,12 +359,14 @@ public final class MethodWriterImpl implements MethodWriter
 				this.writeBoolJump(Opcodes.IFEQ);
 				return;
 			case Opcodes.INOT:
+				this.frame.reserve(1);
 				this.mv.visitInsn(Opcodes.ICONST_M1);
 				this.mv.visitInsn(Opcodes.IXOR);
 				return;
 			case Opcodes.LNOT:
+				this.frame.reserve(2);
 				this.mv.visitLdcInsn(LONG_MINUS_ONE);
-				this.mv.visitInsn(Opcodes.IXOR);
+				this.mv.visitInsn(Opcodes.LXOR);
 				return;
 			case Opcodes.L2B:
 				this.frame.set(ClassFormat.BYTE);

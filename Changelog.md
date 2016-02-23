@@ -1,3 +1,37 @@
+Dyvil v0.16.1
+=============
+
+## Dyvil Library v0.16.1
+
+- Fixed the `dyvil.runtime.Wrapper` class performing it’s internal hash lookups incorrectly, leading to runtime errors.
+
+## Dyvil Compiler v0.16.1
+
+- Introduced a cache for Method Override Checking in the `AbstractMethod` class.
+- Improved Bridge Method generation.
+- Updated the `ClassDeclarationParser` and `DyvilUnitParser` implementation code.
+- Fixed Case Class Patterns working incorrectly with dynamic casts and causing JVM errors. #191
+- Fixed Mutable Maps and Immutable Maps being incorrectly mapped to Map Types with Mutability Modifiers.
+- Fixed potential infinite recursion caused by Fields when used in Annotations.
+- Fixed Constants with Arrays being inlined incorrectly in Annotations.
+- Fixed EOFs at the end of class declarations being handled incorrectly.
+- Fixed the `INOT` and `LNOT` custom instructions being handled incorrectly by max stack size calculation.
+- Fixed Variables in For Statements without an initial value causing compiler errors.
+- Fixed Class Access expressions causing compiler errors for package types.
+- Fixed the `PackageType` class not implementing a required method.
+- Fixed various compiler errors caused by unresolved types.
+- Fixed type checking with wildcard types in ForEach statements and with type parameter references.
+- Fixed a typo in the ‘Receiver Type Mismatch’ semantic error.
+- Cleaned up the `SpecialIntrinsicData` class.
+
+## Dyvil REPL v0.10.0
+
+- Improved Syntax Error reporting in the REPL for header, class and member declarations.
+- Moved REPL input handling to the new `InputManager` class.
+- Fixed backtick identifiers being supported incorrectly by the REPL.
+
+# Dyvil Property Format v0.4.0
+
 Dyvil v0.16.0
 =============
 
