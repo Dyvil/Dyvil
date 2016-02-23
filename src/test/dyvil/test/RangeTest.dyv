@@ -10,7 +10,6 @@ public class RangeTest
 	
 	private static void testInts()
 	{
-		/*
 		auto range1 = 1 .. 4
 		auto range2 = 1 ..< 4
 
@@ -37,7 +36,6 @@ public class RangeTest
 			forExclusive += i
 		}
 		Main.test("Int Range For (exclusive)", List(1, 2, 3), forExclusive)
-		*/
 	}
 	
 	private static void testOrdered()

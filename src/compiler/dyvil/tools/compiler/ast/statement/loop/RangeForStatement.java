@@ -19,7 +19,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class RangeForStatement extends ForEachStatement
 {
 	private static final int INT = 0, LONG = 1, FLOAT = 2, DOUBLE = 3;
-	private static final int ORDERED = 4;
+	private static final int RANGEABLE = 4;
 	
 	protected IValue  value1;
 	protected IValue  value2;
@@ -71,7 +71,7 @@ public class RangeForStatement extends ForEachStatement
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		// Determine the 'type' of the range to fasten up compilation.
-		byte type = ORDERED;
+		byte type = RANGEABLE;
 		IType rangeType = this.variable.getType();
 		if (rangeType.isPrimitive())
 		{
@@ -142,11 +142,11 @@ public class RangeForStatement extends ForEachStatement
 			writer.writeVarInsn(Opcodes.DLOAD, endVarIndex);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
 			break;
-		case ORDERED:
+		case RANGEABLE:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
 			writer.writeVarInsn(Opcodes.ALOAD, endVarIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "compareTo",
-			                       "(Ldyvil/lang/Rangeable;)I", true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "compareTo",
+			                       "(Ldyvil/collection/range/Rangeable;)I", true);
 			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
 			break;
 		}
@@ -182,9 +182,9 @@ public class RangeForStatement extends ForEachStatement
 			writer.writeInsn(Opcodes.DADD);
 			writer.writeVarInsn(Opcodes.DSTORE, varIndex);
 			break;
-		case ORDERED:
+		case RANGEABLE:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/lang/Rangeable", "next", "()Ldyvil/lang/Rangeable;",
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next", "()Ldyvil/collection/range/Rangeable;",
 			                       true);
 			
 			if (rangeType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
