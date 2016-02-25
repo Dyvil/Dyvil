@@ -2,8 +2,6 @@ package dyvil.tools.compiler.config;
 
 import dyvil.string.CharUtils;
 
-import java.io.File;
-
 public final class ConfigParser
 {
 	public static final int KEY    = 1;
@@ -154,7 +152,7 @@ public final class ConfigParser
 			config.excludeFile(value);
 			return;
 		case "libraries":
-			config.addLibraryFile(new File(value));
+			config.addLibraryFile(value);
 			return;
 		}
 	}

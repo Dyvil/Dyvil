@@ -87,7 +87,7 @@ public abstract class Library
 		}
 
 		final String error =
-				"Invalid Library File: " + file + (file.exists() ? " (Unsupported Format)" : " (File does not exist)");
+				"Invalid Library File: " + file.getAbsolutePath() + (file.exists() ? " (Unsupported Format)" : " (File does not exist)");
 		throw new FileNotFoundException(error);
 	}
 	

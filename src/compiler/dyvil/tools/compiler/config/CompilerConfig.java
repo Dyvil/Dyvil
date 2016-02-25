@@ -121,11 +121,11 @@ public class CompilerConfig
 		this.logFile = new File(this.directory, logFile);
 	}
 	
-	public void addLibraryFile(File file)
+	public void addLibraryFile(String file)
 	{
 		try
 		{
-			this.libraries.add(Library.load(file));
+			this.libraries.add(Library.load(new File(this.directory, file)));
 		}
 		catch (FileNotFoundException ex)
 		{
