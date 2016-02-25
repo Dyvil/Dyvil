@@ -18,7 +18,13 @@ public class MethodsCommand implements ICommand
 	{
 		return "Prints the signatures of all available methods";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":methods";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{

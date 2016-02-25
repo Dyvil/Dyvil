@@ -22,19 +22,30 @@ import dyvil.tools.repl.REPLContext;
 
 public class CompleteCommand implements ICommand
 {
-	
 	@Override
 	public String getName()
 	{
 		return "complete";
 	}
-	
+
+	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "c" };
+	}
+
 	@Override
 	public String getDescription()
 	{
 		return "Prints a list of possible completions";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":c[omplete] <identifier>[.]";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{

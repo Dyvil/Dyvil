@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class DumpCommand implements ICommand
 {
-	
 	@Override
 	public String getName()
 	{
@@ -17,9 +16,15 @@ public class DumpCommand implements ICommand
 	@Override
 	public String getDescription()
 	{
-		return "Sets the directory for Result Class Dumping.";
+		return "Sets the directory for Result Class Dumping";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":dump [path]";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{

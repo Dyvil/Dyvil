@@ -47,28 +47,16 @@ public final class DyvilREPL
 	
 	static
 	{
-		commands.put("help", new HelpCommand());
-		
-		ICommand command = new ExitCommand();
-		commands.put("exit", command);
-		commands.put("quit", command);
-		commands.put("q", command);
-
-		commands.put("dump", new DumpCommand());
-		commands.put("version", new VersionCommand());
-		commands.put("debug", new DebugCommand());
-		commands.put("variables", new VariablesCommand());
-		commands.put("methods", new MethodsCommand());
-		
-		command = new CompleteCommand();
-		commands.put("c", command);
-		commands.put("complete", command);
-
-		commands.put("javap", new JavapCommand());
-
-		command = new RenameCommand();
-		commands.put("r", command);
-		commands.put("rename", command);
+		registerCommand(new CompleteCommand());
+		registerCommand(new DebugCommand());
+		registerCommand(new DumpCommand());
+		registerCommand(new ExitCommand());
+		registerCommand(new HelpCommand());
+		registerCommand(new JavapCommand());
+		registerCommand(new MethodsCommand());
+		registerCommand(new RenameCommand());
+		registerCommand(new VariablesCommand());
+		registerCommand(new VersionCommand());
 	}
 	
 	public static void main(String[] args) throws Exception
@@ -273,6 +261,15 @@ public final class DyvilREPL
 	public static void registerCommand(ICommand command)
 	{
 		commands.put(command.getName(), command);
+
+		String[] aliases = command.getAliases();
+		if (aliases != null)
+		{
+			for (String alias : aliases)
+			{
+				commands.put(alias, command);
+			}
+		}
 	}
 	
 	public static Map<String, ICommand> getCommands()

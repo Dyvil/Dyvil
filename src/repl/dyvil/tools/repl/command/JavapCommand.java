@@ -23,11 +23,17 @@ public class JavapCommand implements ICommand
 	}
 
 	@Override
+	public String getUsage()
+	{
+		return ":javap <classname>";
+	}
+
+	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{
 		if (args.length == 0)
 		{
-			repl.getOutput().println("No class name given");
+			repl.getErrorOutput().println("Missing Class Argument. Usage: " + this.getUsage());
 			return;
 		}
 

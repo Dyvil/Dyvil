@@ -9,13 +9,25 @@ public class ExitCommand implements ICommand
 	{
 		return "exit";
 	}
-	
+
+	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "q", "quit" };
+	}
+
 	@Override
 	public String getDescription()
 	{
 		return "Exits the current REPL instance";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":<exit|q|quit> [exitcode]";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{

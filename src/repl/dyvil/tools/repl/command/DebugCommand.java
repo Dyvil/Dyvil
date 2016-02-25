@@ -16,7 +16,13 @@ public class DebugCommand implements ICommand
 	{
 		return "Enables or disables Debug Mode";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":debug [on|off|true|false|enable|disable]";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{

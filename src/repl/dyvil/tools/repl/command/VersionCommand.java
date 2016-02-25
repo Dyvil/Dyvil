@@ -14,9 +14,15 @@ public class VersionCommand implements ICommand
 	@Override
 	public String getDescription()
 	{
-		return "Prints information about the current Dyvil Installation.";
+		return "Prints information about the current Dyvil Installation";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":version";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{

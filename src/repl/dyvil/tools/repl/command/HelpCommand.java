@@ -8,6 +8,8 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.collection.mutable.TreeSet;
 import dyvil.tools.repl.DyvilREPL;
 
+import java.io.PrintStream;
+
 public class HelpCommand implements ICommand
 {
 	@Override
@@ -21,14 +23,32 @@ public class HelpCommand implements ICommand
 	{
 		return "Shows this help text";
 	}
-	
+
+	@Override
+	public String getUsage()
+	{
+		return ":help [command]";
+	}
+
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{
-		repl.getOutput().println("Available Commands:");
+		if (args.length == 0)
+		{
+			this.printAllCommands(repl);
+			return;
+		}
+
+		this.printCommandInfo(repl, args[0]);
+	}
+
+	private void printAllCommands(DyvilREPL repl)
+	{
+		final PrintStream output = repl.getOutput();
+		output.println("Available Commands:");
 
 		Map<ICommand, Set<String>> commands = new HashMap<>();
-		
+
 		for (Entry<String, ICommand> entry : DyvilREPL.getCommands())
 		{
 			final ICommand command = entry.getValue();
@@ -57,7 +77,40 @@ public class HelpCommand implements ICommand
 
 		for (Entry<String, ICommand> entry : result)
 		{
-			repl.getOutput().printf("%1$" + maxLength + "s - %2$s\n", entry.getKey(), entry.getValue().getDescription());
+			output.printf("%1$" + maxLength + "s - %2$s\n", entry.getKey(), entry.getValue().getDescription());
+		}
+	}
+
+	private void printCommandInfo(DyvilREPL repl, String commandName)
+	{
+		final ICommand command = DyvilREPL.getCommands().get(commandName);
+		if (command == null)
+		{
+			repl.getErrorOutput().println("Command not found: " + commandName);
+			return;
+		}
+
+		final PrintStream output = repl.getOutput();
+
+		output.print(':');
+		output.print(command.getName());
+		output.print(" - ");
+		output.println(command.getDescription());
+		output.print("  Usage:\t");
+		output.println(command.getUsage());
+
+		final String[] aliases = command.getAliases();
+		if (aliases != null && aliases.length > 0)
+		{
+			output.print("  Aliases:\t");
+			output.print(aliases[0]);
+			for (int i = 1; i < aliases.length; i++)
+			{
+				output.print(", ");
+				output.print(aliases[i]);
+			}
+
+			output.println();
 		}
 	}
 }

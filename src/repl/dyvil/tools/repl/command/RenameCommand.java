@@ -14,9 +14,21 @@ public class RenameCommand implements ICommand
 	}
 
 	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "r" };
+	}
+
+	@Override
 	public String getDescription()
 	{
 		return "Renames a field or method defined in the current context";
+	}
+
+	@Override
+	public String getUsage()
+	{
+		return ":r[ename] <oldname> <newname>";
 	}
 
 	@Override
@@ -24,7 +36,7 @@ public class RenameCommand implements ICommand
 	{
 		if (args.length < 2)
 		{
-			repl.getErrorOutput().println("Invalid number of arguments - member name and new name expected");
+			repl.getErrorOutput().println("Invalid Arguments. Usage: " + this.getUsage());
 			return;
 		}
 
@@ -40,7 +52,7 @@ public class RenameCommand implements ICommand
 		}
 		else
 		{
-			repl.getOutput().println("No field named '" + memberName + "' were found");
+			repl.getOutput().println("No field named '" + memberName + "' was found");
 		}
 	}
 }
