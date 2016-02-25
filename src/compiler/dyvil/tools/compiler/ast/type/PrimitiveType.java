@@ -6,12 +6,12 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -204,26 +204,41 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
+	public String getTypePrefix()
+	{
+		switch (this.typecode)
+		{
+		case INT_CODE:
+			return "Int";
+		case CHAR_CODE:
+			return "Char";
+		default:
+			return this.theClass.getName().qualified;
+		}
+	}
+
+	@Override
 	public IClass getRefClass()
 	{
-		if (this.refClass == null)
+		if (this.refClass != null)
 		{
-			final String className = this.theClass.getName().qualified + "Ref";
-			return this.refClass = Package.dyvilRef.resolveClass(className);
+			return this.refClass;
 		}
-		return this.refClass;
+
+		final String className = this.getTypePrefix() + "Ref";
+		return this.refClass = Package.dyvilRef.resolveClass(className);
 	}
 
 	@Override
 	public IType getSimpleRefType()
 	{
-		IType refType = this.simpleRefType;
-		if (refType == null)
+		if (this.simpleRefType != null)
 		{
-			String className = "Simple" + this.theClass.getName().qualified + "Ref";
-			return this.simpleRefType = new ClassType(Package.dyvilRefSimple.resolveClass(className));
+			return this.simpleRefType;
 		}
-		return refType;
+
+		final String className = "Simple" + this.getTypePrefix() + "Ref";
+		return this.simpleRefType = new ClassType(Package.dyvilRefSimple.resolveClass(className));
 	}
 	
 	@Override
@@ -273,7 +288,7 @@ public final class PrimitiveType implements IType
 		IClass iclass = this.arrayClass;
 		if (iclass == null)
 		{
-			String className = this.theClass.getName().qualified + "Array";
+			final String className = this.getTypePrefix() + "Array";
 			return this.arrayClass = Package.dyvilArray.resolveClass(className);
 		}
 		return iclass;
@@ -426,6 +441,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		Types.PRIMITIVES_CLASS.getMethodMatches(list, instance, name, arguments);
 		if (this.theClass != null)
 		{
 			this.theClass.getMethodMatches(list, instance, name, arguments);

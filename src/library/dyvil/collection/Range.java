@@ -1,14 +1,17 @@
 package dyvil.collection;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.range.ClosedRange;
 import dyvil.collection.range.EmptyRange;
 import dyvil.collection.range.HalfOpenRange;
-import dyvil.lang.Ordered;
-import dyvil.lang.Rangeable;
+import dyvil.collection.range.Rangeable;
+import dyvil.collection.range.DoubleRange;
+import dyvil.collection.range.FloatRange;
+import dyvil.collection.range.IntRange;
+import dyvil.collection.range.LongRange;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.annotation.Immutable;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -19,22 +22,61 @@ import java.util.function.Consumer;
 
 @NilConvertible
 @TupleConvertible
-@Immutable
-public interface Range<@Covariant T> extends Iterable<T>, Serializable
+public @Immutable interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
-	static <T extends Ordered<T>> Range<T> apply()
+	static <T> Range<T> apply()
 	{
-		return EmptyRange.instance;
+		return (Range<T>) EmptyRange.instance;
+	}
+
+	static IntRange apply(int first, int last)
+	{
+		return new IntRange(first, last);
+	}
+
+	static IntRange halfOpen(int first, int last)
+	{
+		return new IntRange(first, last, true);
+	}
+
+	static LongRange apply(long first, long last)
+	{
+		return new LongRange(first, last);
+	}
+
+	static LongRange halfOpen(long first, long last)
+	{
+		return new LongRange(first, last, true);
+	}
+
+	static FloatRange apply(float first, float last)
+	{
+		return new FloatRange(first, last);
+	}
+
+	static FloatRange halfOpen(float first, float last)
+	{
+		return new FloatRange(first, last, true);
+	}
+
+	static DoubleRange apply(double first, double last)
+	{
+		return new DoubleRange(first, last);
+	}
+
+	static DoubleRange halfOpen(double first, double last)
+	{
+		return new DoubleRange(first, last, true);
 	}
 	
 	static <T extends Rangeable<T>> Range<T> apply(T first, T last)
 	{
-		return new ClosedRange(first, last);
+		return new ClosedRange<>(first, last);
 	}
 	
 	static <T extends Rangeable<T>> Range<T> halfOpen(T first, T last)
 	{
-		return new HalfOpenRange(first, last);
+		return new HalfOpenRange<>(first, last);
 	}
 	
 	/**
@@ -52,18 +94,21 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	T last();
 	
 	/**
-	 * Returns the exact number of elements in this range, i.e. the number of
-	 * elements that would be returned by the {@link #iterator()}.
+	 * Returns the exact number of elements in this range, i.e. the number of elements that would be returned by the
+	 * {@link #iterator()}.
 	 *
 	 * @return the number of elements in this range
 	 */
 	int count();
+
+	default long longCount()
+	{
+		return this.count();
+	}
 	
 	/**
-	 * Returns an estimate of the number of elements in this range. If the
-	 * number of elements cannot be directly computed, {@code -1} should be
-	 * returned. Otherwise, the result should equal the result of
-	 * {@link #count()}.
+	 * Returns an estimate of the number of elements in this range. If the number of elements cannot be directly
+	 * computed, {@code -1} should be returned. Otherwise, the result should equal the result of {@link #count()}.
 	 *
 	 * @return the estimated number of elements in this range
 	 */
@@ -139,11 +184,7 @@ public interface Range<@Covariant T> extends Iterable<T>, Serializable
 	
 	static boolean rangeEquals(Range<?> range, Object o)
 	{
-		if (!(o instanceof Range))
-		{
-			return false;
-		}
-		return rangeEquals(range, (Range) o);
+		return o instanceof Range && rangeEquals(range, (Range) o);
 	}
 	
 	static boolean rangeEquals(Range<?> range1, Range<?> range2)

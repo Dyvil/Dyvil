@@ -6,13 +6,7 @@ import dyvil.annotation.Reified;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Boolean;
-import dyvil.lang.Byte;
-import dyvil.lang.*;
-import dyvil.lang.Double;
-import dyvil.lang.Float;
-import dyvil.lang.Long;
-import dyvil.lang.Short;
+import dyvil.collection.range.Rangeable;
 import dyvil.ref.ObjectRef;
 import dyvil.ref.array.ObjectArrayRef;
 import dyvil.reflect.Modifiers;
@@ -66,7 +60,7 @@ public interface ObjectArray
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end) + 1);
-		for (T current = start; current.$lt$eq(end); current = current.next())
+		for (T current = start; current.compareTo(end) <= 0; current = current.next())
 		{
 			array[i++] = current;
 		}
@@ -77,7 +71,7 @@ public interface ObjectArray
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end));
-		for (T current = start; current.$lt(end); current = current.next())
+		for (T current = start; current.compareTo(end) < 0; current = current.next())
 		{
 			array[i++] = current;
 		}
@@ -99,9 +93,9 @@ public interface ObjectArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] subscript(T[] array, Range<Int> range)
+	static <T> T[] subscript(T[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		T[] slice = (T[]) Array.newInstance(array.getClass().getComponentType(), count);
 		System.arraycopy(array, start, slice, 0, count);
@@ -118,9 +112,9 @@ public interface ObjectArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static <T> void subscript_$eq(T[] array, Range<Int> range, T[] values)
+	static <T> void subscript_$eq(T[] array, Range<Integer> range, T[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -435,7 +429,7 @@ public interface ObjectArray
 		boolean[] unboxed = new boolean[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Boolean.unapply(array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
@@ -447,7 +441,7 @@ public interface ObjectArray
 		byte[] unboxed = new byte[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Byte.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
@@ -459,31 +453,31 @@ public interface ObjectArray
 		short[] unboxed = new short[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Short.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static char[] unboxed(Char[] array)
+	static char[] unboxed(Character[] array)
 	{
 		int len = array.length;
 		char[] unboxed = new char[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Char.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static int[] unboxed(Int[] array)
+	static int[] unboxed(Integer[] array)
 	{
 		int len = array.length;
 		int[] unboxed = new int[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Int.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
@@ -495,7 +489,7 @@ public interface ObjectArray
 		long[] unboxed = new long[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Long.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
@@ -507,7 +501,7 @@ public interface ObjectArray
 		float[] unboxed = new float[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Float.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
@@ -519,7 +513,7 @@ public interface ObjectArray
 		double[] unboxed = new double[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = Double.unapply(array[i]);
+			unboxed[i] = (array[i]);
 		}
 		return unboxed;
 	}
@@ -527,7 +521,7 @@ public interface ObjectArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static <T> Iterable<T> toIterable(T[] array)
 	{
-		return new ArrayList<T>(array, true);
+		return new ArrayList<>(array, true);
 	}
 	
 	// toString, equals and hashCode

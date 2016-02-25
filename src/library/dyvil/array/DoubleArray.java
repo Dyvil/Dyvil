@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Double;
-import dyvil.lang.Int;
 import dyvil.ref.DoubleRef;
 import dyvil.ref.array.DoubleArrayRef;
 import dyvil.reflect.Modifiers;
@@ -92,9 +90,9 @@ public interface DoubleArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static double[] subscript(double[] array, Range<Int> range)
+	static double[] subscript(double[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		double[] slice = new double[count];
 		System.arraycopy(array, start, slice, 0, count);
@@ -111,9 +109,9 @@ public interface DoubleArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(double[] array, Range<Int> range, double[] values)
+	static void subscript_$eq(double[] array, Range<Integer> range, double[] values)
 	{
-		int start = Int.unapply(range.first());
+		int start = (range.first());
 		int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
@@ -373,7 +371,7 @@ public interface DoubleArray
 		Double[] boxed = new Double[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Double.apply(array[i]);
+			boxed[i] = (array[i]);
 		}
 		return boxed;
 	}
@@ -381,7 +379,7 @@ public interface DoubleArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static Iterable<Double> toIterable(double[] array)
 	{
-		return new ArrayList<Double>(boxed(array), true);
+		return new ArrayList<>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

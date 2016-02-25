@@ -5,8 +5,6 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.lang.Byte;
-import dyvil.lang.Int;
 import dyvil.ref.ByteRef;
 import dyvil.ref.array.ByteArrayRef;
 import dyvil.reflect.Modifiers;
@@ -92,11 +90,11 @@ public interface ByteArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static byte[] subscript(byte[] array, Range<Int> range)
+	static byte[] subscript(byte[] array, Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
-		int count = range.count();
-		byte[] slice = new byte[count];
+		final int start = range.first();
+		final int count = range.count();
+		final byte[] slice = new byte[count];
 		System.arraycopy(array, start, slice, 0, count);
 		return slice;
 	}
@@ -111,10 +109,10 @@ public interface ByteArray
 	
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(byte[] array, Range<Int> range, byte[] values)
+	static void subscript_$eq(byte[] array, Range<Integer> range, byte[] values)
 	{
-		int start = Int.unapply(range.first());
-		int count = range.count();
+		final int start = range.first();
+		final int count = range.count();
 		System.arraycopy(values, 0, array, start, count);
 	}
 
@@ -259,7 +257,6 @@ public interface ByteArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static byte[] flatMapped(byte[] array, IntFunction<byte[]> mapper)
 	{
-		int len = array.length;
 		int size = 0;
 		byte[] res = EMPTY;
 		
@@ -370,11 +367,11 @@ public interface ByteArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static Byte[] boxed(byte[] array)
 	{
-		int len = array.length;
-		Byte[] boxed = new Byte[len];
+		final int len = array.length;
+		final Byte[] boxed = new Byte[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = Byte.apply(array[i]);
+			boxed[i] = array[i];
 		}
 		return boxed;
 	}
@@ -382,7 +379,7 @@ public interface ByteArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static Iterable<Byte> toIterable(byte[] array)
 	{
-		return new ArrayList<Byte>(boxed(array), true);
+		return new ArrayList<>(boxed(array), true);
 	}
 	
 	// equals, hashCode and toString

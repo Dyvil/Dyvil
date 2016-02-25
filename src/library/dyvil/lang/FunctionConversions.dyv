@@ -1,4 +1,4 @@
-package dyvil.util
+package dyvil.lang
 
 import	java.util.concurrent.Callable
 

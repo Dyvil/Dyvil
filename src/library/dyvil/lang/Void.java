@@ -1,11 +1,7 @@
 package dyvil.lang;
 
-import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.reflect.Modifiers;
-
 import java.io.Serializable;
 
-@DyvilModifiers(Modifiers.INTERNAL)
 public final class Void implements Serializable
 {
 	private static final long serialVersionUID = -7512474716905358710L;

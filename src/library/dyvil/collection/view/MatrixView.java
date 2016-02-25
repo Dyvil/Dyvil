@@ -1,13 +1,12 @@
 package dyvil.collection.view;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.Matrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.iterator.ImmutableIterator;
-import dyvil.lang.Int;
 import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -122,7 +121,7 @@ public class MatrixView<E> implements ImmutableMatrix<E>
 	}
 	
 	@Override
-	public Tuple2<Int, Int> cellOf(Object element)
+	public Tuple2<Integer, Integer> cellOf(Object element)
 	{
 		return this.matrix.cellOf(element);
 	}

@@ -1,22 +1,19 @@
 package dyvil.tests;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonList;
 import dyvil.collection.immutable.SingletonSet;
-import dyvil.lang.Float;
-import dyvil.lang.Int;
-import dyvil.lang.Long;
-import dyvil.annotation.Immutable;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class CollectionTests
 {
-	private static final Object[] SAMPLES = new Object[] { "abc", "def", "Aa", "BB", null, Float.apply(3F),
-			Long.apply(1L), Int.apply(10) };
+	private static final Object[] SAMPLES = new Object[] { "abc", "def", "Aa", "BB", null, 42, 100000000000000L, 3.5F,
+			1.123D };
 	
 	@Test
 	public void testSets()

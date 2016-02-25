@@ -47,27 +47,27 @@ public interface Value extends IASTNode
 		{
 			return new StringValue((String) value);
 		}
-		if (valueClass == dyvil.lang.Int.class)
+		if (valueClass == Integer.class)
 		{
-			return new IntValue(((dyvil.lang.Int) value).intValue());
+			return new IntValue((Integer) value);
 		}
-		if (valueClass == dyvil.lang.Long.class)
+		if (valueClass == Long.class)
 		{
-			return new LongValue(((dyvil.lang.Long) value).longValue());
+			return new LongValue((Long) value);
 		}
-		if (valueClass == dyvil.lang.Float.class)
+		if (valueClass == Float.class)
 		{
-			return new FloatValue(((dyvil.lang.Float) value).floatValue());
+			return new FloatValue((Float) value);
 		}
-		if (valueClass == dyvil.lang.Double.class)
+		if (valueClass == Double.class)
 		{
-			return new DoubleValue(((dyvil.lang.Double) value).doubleValue());
+			return new DoubleValue((Double) value);
 		}
 		if (valueClass == Name.class)
 		{
 			return new NameAccess((Name) value);
 		}
-		if (valueClass == dyvil.lang.Boolean.class)
+		if (valueClass == Boolean.class)
 		{
 			return new NameAccess(Name.getSpecial(value.toString()));
 		}

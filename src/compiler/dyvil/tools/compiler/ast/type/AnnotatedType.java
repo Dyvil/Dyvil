@@ -115,6 +115,12 @@ public class AnnotatedType implements IType, ITyped
 	}
 
 	@Override
+	public String getTypePrefix()
+	{
+		return this.type.getTypePrefix();
+	}
+
+	@Override
 	public IClass getRefClass()
 	{
 		return this.type.getRefClass();

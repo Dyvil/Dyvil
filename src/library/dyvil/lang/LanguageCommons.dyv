@@ -1,4 +1,4 @@
-package dyvil.util
+package dyvil.lang
 
 using	dyvil.reflect.Opcodes._
 

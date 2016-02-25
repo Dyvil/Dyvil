@@ -2,10 +2,11 @@ package dyvil.tools.compiler.ast.type;
 
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
-import dyvil.collection.mutable.ArraySet;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
@@ -63,6 +64,8 @@ public final class Types
 	public static IClass LONG_CLASS;
 	public static IClass FLOAT_CLASS;
 	public static IClass DOUBLE_CLASS;
+
+	public static IClass PRIMITIVES_CLASS;
 	
 	public static IClass OBJECT_CLASS;
 	public static IClass STRING_CLASS;
@@ -111,14 +114,16 @@ public final class Types
 	public static void initTypes()
 	{
 		VOID.theClass = VOID_CLASS = Package.dyvilLang.resolveClass("Void");
-		BOOLEAN.theClass = BOOLEAN_CLASS = Package.dyvilLang.resolveClass("Boolean");
-		BYTE.theClass = BYTE_CLASS = Package.dyvilLang.resolveClass("Byte");
-		SHORT.theClass = SHORT_CLASS = Package.dyvilLang.resolveClass("Short");
-		CHAR.theClass = CHAR_CLASS = Package.dyvilLang.resolveClass("Char");
-		INT.theClass = INT_CLASS = Package.dyvilLang.resolveClass("Int");
-		LONG.theClass = LONG_CLASS = Package.dyvilLang.resolveClass("Long");
-		FLOAT.theClass = FLOAT_CLASS = Package.dyvilLang.resolveClass("Float");
-		DOUBLE.theClass = DOUBLE_CLASS = Package.dyvilLang.resolveClass("Double");
+		BOOLEAN.theClass = BOOLEAN_CLASS = Package.javaLang.resolveClass("Boolean");
+		BYTE.theClass = BYTE_CLASS = Package.javaLang.resolveClass("Byte");
+		SHORT.theClass = SHORT_CLASS = Package.javaLang.resolveClass("Short");
+		CHAR.theClass = CHAR_CLASS = Package.javaLang.resolveClass("Character");
+		INT.theClass = INT_CLASS = Package.javaLang.resolveClass("Integer");
+		LONG.theClass = LONG_CLASS = Package.javaLang.resolveClass("Long");
+		FLOAT.theClass = FLOAT_CLASS = Package.javaLang.resolveClass("Float");
+		DOUBLE.theClass = DOUBLE_CLASS = Package.javaLang.resolveClass("Double");
+
+		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 		
 		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
@@ -144,24 +149,26 @@ public final class Types
 		DOUBLE_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("DoubleConvertible");
 		STRING_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("StringConvertible");
 		
-		VOID.boxMethod = VOID_CLASS.getBody().getMethod(Names.apply);
-		VOID.unboxMethod = VOID_CLASS.getBody().getMethod(Names.unapply);
-		BOOLEAN.boxMethod = BOOLEAN_CLASS.getBody().getMethod(Names.apply);
-		BOOLEAN.unboxMethod = BOOLEAN_CLASS.getBody().getMethod(Names.unapply);
-		BYTE.boxMethod = BYTE_CLASS.getBody().getMethod(Names.apply);
-		BYTE.unboxMethod = BYTE_CLASS.getBody().getMethod(Names.unapply);
-		SHORT.boxMethod = SHORT_CLASS.getBody().getMethod(Names.apply);
-		SHORT.unboxMethod = SHORT_CLASS.getBody().getMethod(Names.unapply);
-		CHAR.boxMethod = CHAR_CLASS.getBody().getMethod(Names.apply);
-		CHAR.unboxMethod = CHAR_CLASS.getBody().getMethod(Names.unapply);
-		INT.boxMethod = INT_CLASS.getBody().getMethod(Names.apply);
-		INT.unboxMethod = INT_CLASS.getBody().getMethod(Names.unapply);
-		LONG.boxMethod = LONG_CLASS.getBody().getMethod(Names.apply);
-		LONG.unboxMethod = LONG_CLASS.getBody().getMethod(Names.unapply);
-		FLOAT.boxMethod = FLOAT_CLASS.getBody().getMethod(Names.apply);
-		FLOAT.unboxMethod = FLOAT_CLASS.getBody().getMethod(Names.unapply);
-		DOUBLE.boxMethod = DOUBLE_CLASS.getBody().getMethod(Names.apply);
-		DOUBLE.unboxMethod = DOUBLE_CLASS.getBody().getMethod(Names.unapply);
+		final IClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
+
+		VOID.boxMethod = primitivesBody.getMethod(Name.getQualified("Void"));
+		VOID.unboxMethod = primitivesBody.getMethod(Name.getQualified("toVoid"));
+		BOOLEAN.boxMethod = primitivesBody.getMethod(Name.getQualified("Boolean"));
+		BOOLEAN.unboxMethod = primitivesBody.getMethod(Name.getQualified("toBoolean"));
+		BYTE.boxMethod = primitivesBody.getMethod(Name.getQualified("Byte"));
+		BYTE.unboxMethod = primitivesBody.getMethod(Name.getQualified("toByte"));
+		SHORT.boxMethod = primitivesBody.getMethod(Name.getQualified("Short"));
+		SHORT.unboxMethod = primitivesBody.getMethod(Name.getQualified("toShort"));
+		CHAR.boxMethod = primitivesBody.getMethod(Name.getQualified("Char"));
+		CHAR.unboxMethod = primitivesBody.getMethod(Name.getQualified("toChar"));
+		INT.boxMethod = primitivesBody.getMethod(Name.getQualified("Int"));
+		INT.unboxMethod = primitivesBody.getMethod(Name.getQualified("toInt"));
+		LONG.boxMethod = primitivesBody.getMethod(Name.getQualified("Long"));
+		LONG.unboxMethod = primitivesBody.getMethod(Name.getQualified("toLong"));
+		FLOAT.boxMethod = primitivesBody.getMethod(Name.getQualified("Float"));
+		FLOAT.unboxMethod = primitivesBody.getMethod(Name.getQualified("toFloat"));
+		DOUBLE.boxMethod = primitivesBody.getMethod(Name.getQualified("Double"));
+		DOUBLE.unboxMethod = primitivesBody.getMethod(Name.getQualified("toDouble"));
 	}
 	
 	public static IType fromASMType(dyvil.tools.asm.Type type)
@@ -233,23 +240,14 @@ public final class Types
 		return gt;
 	}
 
-	public static String getTypeRefKeyword(IType type)
-	{
-		if (type.isPrimitive())
-		{
-			return type.getTheClass().getName().qualified;
-		}
-		return "Object";
-	}
-
 	public static String getInternalRef(IType type, String prefix)
 	{
-		return "dyvil/ref/" + prefix + getTypeRefKeyword(type) + "Ref";
+		return "dyvil/ref/" + prefix + type.getTypePrefix() + "Ref";
 	}
 
 	public static String getReferenceFactoryName(IType type, String prefix)
 	{
-		return "new" + prefix + getTypeRefKeyword(type) + "Ref";
+		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
 	public static IType combine(IType type1, IType type2)
@@ -296,7 +294,7 @@ public final class Types
 	
 	private static Set<IType> superTypes(IType type)
 	{
-		Set<IType> types = new ArraySet();
+		Set<IType> types = new IdentityHashSet<>();
 		addSuperTypes(type, types);
 		return types;
 	}

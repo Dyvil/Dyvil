@@ -27,7 +27,7 @@ public class RangeOperator implements IValue
 	{
 		public static final IClass         RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
 		public static final ClassType      RANGE           = new ClassType(RANGE_CLASS);
-		public static final IClass         RANGEABLE_CLASS = Package.dyvilLang.resolveClass("Ordered");
+		public static final IClass         RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
 		public static final ClassType      RANGEABLE       = new ClassType(RANGEABLE_CLASS);
 		public static final ITypeParameter RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeParameter(0);
 	}
@@ -122,17 +122,32 @@ public class RangeOperator implements IValue
 	@Override
 	public IType getType()
 	{
-		if (this.type == null)
+		if (this.type != null)
 		{
-			if (this.elementType == Types.UNKNOWN)
-			{
-				this.elementType = Types.combine(this.firstValue.getType(), this.lastValue.getType());
-			}
-			
-			ClassGenericType gt = new ClassGenericType(LazyFields.RANGE_CLASS);
-			gt.addType(this.elementType);
-			this.type = gt;
+			return this.type;
 		}
+
+		if (this.elementType == Types.UNKNOWN)
+		{
+			this.elementType = Types.combine(this.firstValue.getType(), this.lastValue.getType());
+		}
+
+		final ClassGenericType genericType = new ClassGenericType(LazyFields.RANGE_CLASS);
+
+		if (this.elementType.isPrimitive())
+		{
+			switch (this.elementType.getTypecode())
+			{
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+				this.elementType = Types.INT;
+				break;
+			}
+		}
+
+		genericType.addType(this.elementType);
+		this.type = genericType;
 		return this.type;
 	}
 	
@@ -171,24 +186,24 @@ public class RangeOperator implements IValue
 		this.type = type;
 		this.elementType = elementType;
 		
-		IValue value1 = this.firstValue.withType(elementType, elementType, markers, context);
-		if (value1 == null)
+		final IValue typedFirstValue = this.firstValue.withType(elementType, elementType, markers, context);
+		if (typedFirstValue != null)
+		{
+			this.firstValue = typedFirstValue;
+		}
+		else if (this.firstValue.isResolved())
 		{
 			Util.createTypeError(markers, this.firstValue, elementType, typeContext, "range.start.type");
 		}
-		else
-		{
-			this.firstValue = value1;
-		}
 		
-		IValue value2 = this.lastValue.withType(elementType, elementType, markers, context);
-		if (value2 == null)
+		final IValue typedLastValue = this.lastValue.withType(elementType, elementType, markers, context);
+		if (typedLastValue != null)
+		{
+			this.lastValue = typedLastValue;
+		}
+		else if (this.lastValue.isResolved())
 		{
 			Util.createTypeError(markers, this.lastValue, elementType, typeContext, "range.end.type");
-		}
-		else
-		{
-			this.lastValue = value2;
 		}
 		return this;
 	}
@@ -197,11 +212,7 @@ public class RangeOperator implements IValue
 	public boolean isType(IType type)
 	{
 		IType elementType = type.getElementType();
-		if (elementType == null)
-		{
-			return false;
-		}
-		return this.isElementType(elementType);
+		return elementType != null && this.isElementType(elementType);
 	}
 	
 	@Override
@@ -266,23 +277,67 @@ public class RangeOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
-			this.firstValue.writeExpression(writer, LazyFields.RANGEABLE);
-			this.lastValue.writeExpression(writer, LazyFields.RANGEABLE);
-			
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", this.halfOpen ? "halfOpen" : "apply",
-			                       "(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;)Ldyvil/collection/Range;", false);
+			this.writeRangeExpression(writer);
 			return;
 		}
 		
 		// -- Array --
-		String method = this.halfOpen ? "rangeOpen" : "range";
-		
+		this.writeArrayExpression(writer);
+	}
+
+	private void writeRangeExpression(MethodWriter writer) throws BytecodeException
+	{
+		final String method = this.halfOpen ? "halfOpen" : "apply";
+
+		if (!this.elementType.isPrimitive())
+		{
+			this.firstValue.writeExpression(writer, LazyFields.RANGEABLE);
+			this.lastValue.writeExpression(writer, LazyFields.RANGEABLE);
+
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method,
+			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;)Ldyvil/collection/Range;",
+			                       false);
+			return;
+		}
+
 		this.firstValue.writeExpression(writer, this.elementType);
 		this.lastValue.writeExpression(writer, this.elementType);
-		
+
+		switch (this.elementType.getTypecode())
+		{
+		case PrimitiveType.BYTE_CODE:
+		case PrimitiveType.SHORT_CODE:
+		case PrimitiveType.CHAR_CODE:
+		case PrimitiveType.INT_CODE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/IntRange", method,
+			                       "(II)Ldyvil/collection/range/IntRange;", false);
+			return;
+		case PrimitiveType.LONG_CODE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/LongRange", method,
+			                       "(II)Ldyvil/collection/range/LongRange;", false);
+			return;
+		case PrimitiveType.FLOAT_CODE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/FloatRange", method,
+			                       "(II)Ldyvil/collection/range/FloatRange;", false);
+			return;
+		case PrimitiveType.DOUBLE_CODE:
+			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/DoubleRange", method,
+			                       "(II)Ldyvil/collection/range/DoubleRange;", false);
+			return;
+		}
+	}
+
+	private void writeArrayExpression(MethodWriter writer) throws BytecodeException
+	{
+		final String method = this.halfOpen ? "rangeOpen" : "range";
+
+		this.firstValue.writeExpression(writer, this.elementType);
+		this.lastValue.writeExpression(writer, this.elementType);
+
 		// Reference array
 		if (!this.elementType.isPrimitive())
 		{
@@ -290,15 +345,16 @@ public class RangeOperator implements IValue
 			// method
 			String extended = this.elementType.getExtendedName();
 			writer.writeLDC(Type.getType(extended));
-			
+
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
-			                       "(Ldyvil/lang/Rangeable;Ldyvil/lang/Rangeable;Ljava/lang/Class;)[Ldyvil/lang/Rangeable;",
+			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;Ljava/lang/Class;)[Ldyvil/collection/range/Rangeable;",
 			                       false);
-			
+
 			// CheckCast so the verifier doesn't complain about mismatching types
 			writer.writeTypeInsn(Opcodes.CHECKCAST, '[' + extended);
+			return;
 		}
-		
+
 		// Primitive array
 		switch (this.elementType.getTypecode())
 		{

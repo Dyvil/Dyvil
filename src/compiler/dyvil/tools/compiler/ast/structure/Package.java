@@ -33,6 +33,7 @@ public class Package implements INamed, IDefaultContext
 	public static Package dyvilAnnotation;
 	public static Package dyvilArray;
 	public static Package dyvilCollection;
+	public static Package dyvilCollectionRange;
 	public static Package dyvilFunction;
 	public static Package dyvilLang;
 	public static Package dyvilLangLiteral;
@@ -86,6 +87,7 @@ public class Package implements INamed, IDefaultContext
 		dyvilAnnotation = dyvil.resolvePackage("annotation");
 		dyvilArray = dyvil.resolvePackage("array");
 		dyvilCollection = dyvil.resolvePackage("collection");
+		dyvilCollectionRange = dyvilCollection.resolvePackage("range");
 		dyvilFunction = dyvil.resolvePackage("function");
 		dyvilLang = dyvil.resolvePackage("lang");
 		dyvilLangLiteral = dyvilLang.resolvePackage("literal");

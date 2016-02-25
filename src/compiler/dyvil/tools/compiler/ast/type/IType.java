@@ -149,6 +149,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		return this;
 	}
 
+	String getTypePrefix();
+
 	IClass getRefClass();
 
 	default IType getRefType()

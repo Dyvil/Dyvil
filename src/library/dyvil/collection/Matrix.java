@@ -1,6 +1,5 @@
 package dyvil.collection;
 
-import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
@@ -131,7 +130,7 @@ public interface Matrix<E> extends Iterable<E>, Serializable
 	
 	int columnOf(Object element);
 	
-	Tuple2<Int, Int> cellOf(Object element);
+	Tuple2<Integer, Integer> cellOf(Object element);
 	
 	// toArray
 	

@@ -37,7 +37,13 @@ public interface IObjectType extends IType
 	{
 		return this;
 	}
-	
+
+	@Override
+	default String getTypePrefix()
+	{
+		return "Object";
+	}
+
 	@Override
 	default IType getSimpleRefType()
 	{
