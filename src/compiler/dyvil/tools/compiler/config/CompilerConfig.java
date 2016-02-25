@@ -2,11 +2,13 @@ package dyvil.tools.compiler.config;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileFinder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class CompilerConfig
 {
@@ -20,23 +22,18 @@ public class CompilerConfig
 	private File logFile;
 	private File sourceDir;
 	private File outputDir;
-	public final List<Library> libraries = new ArrayList();
+	public final List<Library> libraries = new ArrayList<>();
 	
-	public final List<String> includedFiles = new ArrayList();
-	public final List<String> excludedFiles = new ArrayList();
+	public final List<String> includedFiles = new ArrayList<>();
+	public final List<String> excludedFiles = new ArrayList<>();
 	
 	private String mainType;
-	public final List<String> mainArgs = new ArrayList();
+	public final List<String> mainArgs = new ArrayList<>();
 	
 	public CompilerConfig()
 	{
 		this.libraries.add(Library.dyvilLibrary);
 		this.libraries.add(Library.javaLibrary);
-		
-		if (Library.dyvilBinLibrary != null)
-		{
-			this.libraries.add(Library.dyvilBinLibrary);
-		}
 	}
 	
 	public void setDirectory(String directory)
@@ -126,7 +123,14 @@ public class CompilerConfig
 	
 	public void addLibraryFile(File file)
 	{
-		this.libraries.add(Library.load(file));
+		try
+		{
+			this.libraries.add(Library.load(file));
+		}
+		catch (FileNotFoundException ex)
+		{
+			DyvilCompiler.error(ex.getMessage());
+		}
 	}
 	
 	public void addLibrary(Library library)
@@ -208,15 +212,13 @@ public class CompilerConfig
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append("CompilerConfig [jarName=").append(this.getJarName());
-		builder.append(", sourceDir=").append(this.sourceDir);
-		builder.append(", outputDir=").append(this.outputDir);
-		builder.append(", libraryFiles=").append(this.libraries);
-		builder.append(", includedFiles=").append(this.includedFiles);
-		builder.append(", excludedFiles=").append(this.excludedFiles);
-		builder.append(", mainType=").append(this.mainType);
-		builder.append(", mainArgs=").append(this.mainArgs).append("]");
-		return builder.toString();
+		return "CompilerConfig [jarName=" + this.getJarName() +
+				", sourceDir=" + this.sourceDir +
+				", outputDir=" + this.outputDir +
+				", libraryFiles=" + this.libraries +
+				", includedFiles=" + this.includedFiles +
+				", excludedFiles=" + this.excludedFiles +
+				", mainType=" + this.mainType +
+				", mainArgs=" + this.mainArgs + "]";
 	}
 }

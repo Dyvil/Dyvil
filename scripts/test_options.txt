@@ -7,4 +7,4 @@ output_dir = ../testbin
 
 main_type = dyvil.test.Main
 
-libraries = []
+libraries = [ ../build/dyvilbin ]
