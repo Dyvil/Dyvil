@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.context;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -30,7 +31,13 @@ public class CombiningContext implements IContext
 	{
 		return this.inner.isStatic() && this.outer.isStatic();
 	}
-	
+
+	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return this.outer.getCompilationContext();
+	}
+
 	@Override
 	public IDyvilHeader getHeader()
 	{

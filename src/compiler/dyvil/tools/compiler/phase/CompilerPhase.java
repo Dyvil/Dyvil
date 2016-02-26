@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.DyvilCompiler;
 
 import java.util.function.Consumer;
 
@@ -9,9 +8,9 @@ public class CompilerPhase implements ICompilerPhase
 {
 	private final int                                    id;
 	private final String                                 name;
-	private final Consumer<Collection<ICompilationUnit>> apply;
+	private final Consumer<DyvilCompiler> apply;
 	
-	public CompilerPhase(int id, String name, Consumer<Collection<ICompilationUnit>> apply)
+	public CompilerPhase(int id, String name, Consumer<DyvilCompiler> apply)
 	{
 		this.id = id;
 		this.name = name;
@@ -31,9 +30,9 @@ public class CompilerPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public void apply(Collection<ICompilationUnit> units)
+	public void apply(DyvilCompiler compiler)
 	{
-		this.apply.accept(units);
+		this.apply.accept(compiler);
 	}
 	
 	@Override

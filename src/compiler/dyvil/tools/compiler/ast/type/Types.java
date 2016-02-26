@@ -4,17 +4,14 @@ import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 
@@ -98,17 +95,6 @@ public final class Types
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
-
-		if (LANG_HEADER == null)
-		{
-			DyvilCompiler
-					.log("Warning: The dyvil.Lang header could not be found. This may cause serious compilation problems.");
-			for (Library library : DyvilCompiler.config.libraries)
-			{
-				System.out.println("\tlibrary = " + library);
-			}
-			LANG_HEADER = new DyvilHeader();
-		}
 	}
 	
 	public static void initTypes()

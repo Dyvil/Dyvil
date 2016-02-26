@@ -23,53 +23,54 @@ public class FileFinder
 		this.fileTypes.put(extension, fileType);
 	}
 
-	public void process(File source, File output, Package pack)
+	public void process(DyvilCompiler compiler, File source, File output, Package pack)
 	{
 		if (source.isDirectory())
 		{
-			this.processDirectory(source, output, pack);
+			this.processDirectory(compiler, source, output, pack);
 		}
 		else
 		{
-			this.processFile((CodeFile) source, output, pack);
+			this.processFile(compiler, (CodeFile) source, output, pack);
 		}
 	}
 	
-	private void processDirectory(File source, File output, Package pack)
+	private void processDirectory(DyvilCompiler compiler, File source, File output, Package pack)
 	{
-		for (String s : source.list())
+		for (String fileName : source.list())
 		{
-			CodeFile source1 = new CodeFile(source, s);
-			File output1 = new File(output, s);
-			if (source1.isDirectory())
+			final CodeFile sourceFile = new CodeFile(source, fileName);
+			final File outputFile = new File(output, fileName);
+
+			if (sourceFile.isDirectory())
 			{
-				this.processDirectory(source1, output1, pack.createSubPackage(s));
+				this.processDirectory(compiler, sourceFile, outputFile, pack.createSubPackage(fileName));
 			}
 			else
 			{
-				this.processFile(source1, output1, pack);
+				this.processFile(compiler, sourceFile, outputFile, pack);
 			}
 		}
 	}
 	
-	private void processFile(CodeFile source, File output, Package pack)
+	private void processFile(DyvilCompiler compiler, CodeFile source, File output, Package pack)
 	{
-		String fileName = source.getPath();
-		if (!DyvilCompiler.config.isExcluded(fileName))
+		final String fileName = source.getPath();
+		if (!compiler.config.isExcluded(fileName))
 		{
 			return;
 		}
 		
 		this.files.add(output);
-		String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+		final String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
 		
-		IFileType fileType = this.fileTypes.get(extension);
+		final IFileType fileType = this.fileTypes.get(extension);
 		if (fileType == null)
 		{
 			return; // Skip: Unknown File Type
 		}
 		
-		ICompilationUnit unit = fileType.createUnit(pack, source, output);
+		final ICompilationUnit unit = fileType.createUnit(compiler, pack, source, output);
 		if (unit == null)
 		{
 			return; // Skip: Not a compilation unit

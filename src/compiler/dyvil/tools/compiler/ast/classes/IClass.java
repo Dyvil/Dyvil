@@ -34,14 +34,15 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	@Override
 	default void setTheClass(IClass iclass)
 	{
+		// TODO rename to getEnclosingClass
 	}
-	
+
 	@Override
 	default IClass getTheClass()
 	{
 		return this;
 	}
-	
+
 	void setHeader(IDyvilHeader unit);
 	
 	@Override

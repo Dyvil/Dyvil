@@ -374,12 +374,12 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers)
+	public IValue toConstant(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IValue value = this.values[i];
-			final IValue constant = value.toConstant(markers);
+			final IValue constant = value.toConstant(markers, context);
 			if (constant == null)
 			{
 				markers.add(Markers.semantic(value.getPosition(), "annotation.array.not_constant"));

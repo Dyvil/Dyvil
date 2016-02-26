@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.pattern;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -79,7 +78,7 @@ public class FieldPattern implements IPattern
 			return this;
 		}
 
-		final IValue value = toConstant(this.dataMember.getValue());
+		final IValue value = toConstant(this.dataMember.getValue(), context);
 		if (value == null)
 		{
 			return this;
@@ -103,9 +102,9 @@ public class FieldPattern implements IPattern
 		return this;
 	}
 
-	private static IValue toConstant(IValue value)
+	private static IValue toConstant(IValue value, IContext context)
 	{
-		int depth = DyvilCompiler.maxConstantDepth;
+		int depth = context.getCompilationContext().config.getMaxConstantDepth();
 
 		do
 		{

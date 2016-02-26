@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.io.AppendablePrintStream;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
@@ -112,8 +112,12 @@ public class ParserManager implements IParserManager
 			}
 			catch (Exception ex)
 			{
-				DyvilCompiler.error("ParserManager", "parseToken", ex);
-				this.markers.add(Markers.syntaxError(token, "parser.error", token, ex.getMessage()));
+				final Marker marker = Markers.syntaxError(token, "parser.error", token, ex.getMessage());
+				final StringBuilder builder = new StringBuilder();
+				ex.printStackTrace(new AppendablePrintStream(builder));
+				marker.addInfo(builder.toString());
+
+				this.markers.add(marker);
 			}
 		}
 		

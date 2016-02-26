@@ -9,15 +9,15 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 
 import java.io.*;
 
-public class ObjectFormat
+public final class ObjectFormat
 {
 	private static final int FILE_VERSION = 1;
 
-	public static void write(File file, IDyvilHeader header)
+	public static void write(DyvilCompiler compiler, File file, IDyvilHeader header)
 	{
 		if (!FileUtils.tryCreate(file))
 		{
-			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
+			compiler.error("Error during compilation of '" + file + "': could not create file");
 			return;
 		}
 		
@@ -31,13 +31,13 @@ public class ObjectFormat
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.warn("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
-			DyvilCompiler.error("ClassWriter", "compile", ex);
+			compiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
+			compiler.error("ClassWriter", "compile", ex);
 			return;
 		}
 	}
 	
-	public static DyvilHeader read(InputStream is, DyvilHeader header)
+	public static DyvilHeader read(DyvilCompiler compiler, InputStream is, DyvilHeader header)
 	{
 		try (StringPoolReader reader = new StringPoolReader(is))
 		{
@@ -51,7 +51,7 @@ public class ObjectFormat
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.error("HeaderFile", "read", ex);
+			compiler.error("HeaderFile", "read", ex);
 		}
 		return null;
 	}

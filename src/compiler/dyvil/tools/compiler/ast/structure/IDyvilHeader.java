@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.structure;
 
 import dyvil.collection.Map;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.context.IStaticContext;
@@ -23,7 +24,10 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	{
 		return true;
 	}
-	
+
+	@Override
+	DyvilCompiler getCompilationContext();
+
 	void setName(Name name);
 	
 	Name getName();

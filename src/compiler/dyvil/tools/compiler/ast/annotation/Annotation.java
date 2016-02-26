@@ -128,39 +128,39 @@ public final class Annotation implements IAnnotation
 	{
 		this.arguments.resolve(markers, context);
 		
-		IClass theClass = this.type.getTheClass();
+		final IClass theClass = this.type.getTheClass();
 		if (theClass == null)
 		{
 			return;
 		}
 		
-		int count = theClass.parameterCount();
-		for (int i = 0; i < count; i++)
+		for (int i = 0, count = theClass.parameterCount(); i < count; i++)
 		{
-			IParameter param = theClass.getParameter(i);
-			IType type = param.getType();
-			IValue value = this.arguments.getValue(i, param);
+			final IParameter parameter = theClass.getParameter(i);
+			final IType parameterType = parameter.getType();
+
+			final IValue value = this.arguments.getValue(i, parameter);
 			if (value == null)
 			{
-				if (param.getValue() == null)
+				if (parameter.getValue() == null)
 				{
 					markers.add(Markers.semantic(this.position, "annotation.parameter.missing", this.type,
-					                             param.getName()));
+					                             parameter.getName()));
 				}
 				continue;
 			}
 			
-			IValue value1 = value.withType(type, type, markers, context);
-			if (value1 == null)
+			IValue typedValue = value.withType(parameterType, parameterType, markers, context);
+			if (typedValue == null)
 			{
-				Util.createTypeError(markers, value, type, type, "annotation.parameter.type", param.getName());
+				Util.createTypeError(markers, value, parameterType, parameterType, "annotation.parameter.type", parameter.getName());
 				continue;
 			}
 			
-			value1 = Util.constant(value1, markers);
-			if (value1 != value)
+			typedValue = Util.constant(typedValue, markers, context);
+			if (typedValue != value)
 			{
-				this.arguments.setValue(i, param, value1);
+				this.arguments.setValue(i, parameter, typedValue);
 			}
 		}
 	}

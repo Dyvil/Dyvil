@@ -5,7 +5,6 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
@@ -31,6 +30,8 @@ public final class DyvilREPL
 	public static final long SLEEP_TIME = 4L;
 	
 	private static DyvilREPL instance;
+
+	protected DyvilCompiler compiler = new DyvilCompiler();
 
 	private PrintStream  output;
 	private PrintStream  errorOutput;
@@ -71,6 +72,8 @@ public final class DyvilREPL
 		{
 			instance.readAndProcess();
 		}
+
+		instance.shutdown();
 	}
 	
 	public DyvilREPL(InputStream input, PrintStream output)
@@ -80,12 +83,17 @@ public final class DyvilREPL
 
 	public DyvilREPL(InputStream input, PrintStream output, PrintStream errorOutput)
 	{
-		this.output = output;
-		this.errorOutput = errorOutput;
+		this.compiler.setOutput(this.output = output);
+		this.compiler.setErrorOutput(this.errorOutput = errorOutput);
 		if (input != null)
 		{
 			this.inputManager = new InputManager(output, input);
 		}
+	}
+
+	public DyvilCompiler getCompiler()
+	{
+		return this.compiler;
 	}
 
 	public REPLContext getContext()
@@ -124,31 +132,34 @@ public final class DyvilREPL
 
 		Names.init();
 
-		for (String arg : args)
-		{
-			DyvilCompiler.processArgument(arg);
-		}
+		this.compiler.processArguments(args);
 
-		if (DyvilCompiler.debug)
+		if (this.compiler.config.isDebug())
 		{
 			this.output.println("Dyvil Compiler Version: v" + DyvilCompiler.VERSION);
 		}
 
-		for (Library library : DyvilCompiler.config.libraries)
-		{
-			library.loadLibrary();
-		}
+		final long startTime = System.nanoTime();
 
-		long now = System.nanoTime();
+		this.compiler.loadLibraries();
 
 		Package.init();
 		Types.initHeaders();
 		Types.initTypes();
 
-		if (DyvilCompiler.debug)
+		this.compiler.checkLibraries();
+
+		if (this.compiler.config.isDebug())
 		{
-			this.output.println("Loaded REPL (" + Util.toTime(System.nanoTime() - now) + ")");
+			final long endTime = System.nanoTime();
+
+			this.output.println("Loaded REPL (" + Util.toTime(endTime - startTime) + ")");
 		}
+	}
+
+	public void shutdown()
+	{
+		this.compiler.shutdown();
 	}
 	
 	private static void exit()

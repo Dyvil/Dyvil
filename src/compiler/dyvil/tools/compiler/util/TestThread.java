@@ -13,73 +13,73 @@ import java.util.Arrays;
 
 public final class TestThread extends Thread
 {
-	private static ClassLoader createClassLoader() throws MalformedURLException
+	private final DyvilCompiler compiler;
+
+	public TestThread(DyvilCompiler compiler)
 	{
-		List<Library> libraries = DyvilCompiler.config.libraries;
-		URL[] urls = new URL[1 + libraries.size()];
-		urls[0] = DyvilCompiler.config.getOutputDir().toURI().toURL();
-		
-		int index = 1;
-		for (Library l : libraries)
-		{
-			urls[index++] = l.getURL();
-		}
-		
-		return new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
+		this.compiler = compiler;
 	}
-	
+
 	@Override
 	public void run()
 	{
-		String mainType = DyvilCompiler.config.getMainType();
-		String[] args = DyvilCompiler.config.getMainArgs();
-		
+		final String mainClassName = this.compiler.config.getMainType();
+		final String[] args = this.compiler.config.getMainArgs();
+
 		try
 		{
-			long now = System.currentTimeMillis();
-			Class c = Class.forName(mainType, false, createClassLoader());
-			Method m = c.getMethod("main", String[].class);
-			m.invoke(null, new Object[] { args });
-			
-			now = System.currentTimeMillis() - now;
-			
-			DyvilCompiler.log("Test completed (" + Util.toTime(now) + ")");
-			
+			final long startTime = System.nanoTime();
+
+			final Class<?> mainClass = Class.forName(mainClassName, false, this.createClassLoader());
+			final Method mainMethod = mainClass.getMethod("main", String[].class);
+			mainMethod.invoke(null, new Object[] { args });
+
+			final long endTime = System.nanoTime();
+
+			this.compiler.log("Test completed (" + Util.toTime(endTime - startTime) + ")");
 			return;
 		}
-		catch (VerifyError ve)
+		catch (VerifyError verifyError)
 		{
-			StringBuilder builder = new StringBuilder("BYTECODE VERIFICATION FAILED\n\n");
-			builder.append("Main Type: ").append(mainType).append('\n');
-			builder.append("Main Args: ").append(Arrays.toString(args));
-			builder.append("\n\n----- ERROR -----\n");
-			DyvilCompiler.error(builder.toString(), ve);
-			
+			final String message = "BYTECODE VERIFICATION FAILED\n\n" + "Main Type: " + mainClassName + '\n' +
+					"Main Args: " + Arrays.toString(args) +
+					"\n\n----- ERROR -----\n";
+
+			this.compiler.error(message, verifyError);
 			return;
 		}
 		catch (InvocationTargetException ex)
 		{
-			failTest(mainType, args, ex.getCause());
+			this.failTest(mainClassName, args, ex.getCause());
 			return;
 		}
 		catch (Throwable ex)
 		{
-			failTest(mainType, args, ex);
+			this.failTest(mainClassName, args, ex);
 			return;
 		}
 	}
-	
-	private static void failTest(String mainType, String[] args, Throwable ex)
-	{
-		StringBuilder builder = new StringBuilder("Test Failed\n\n");
-		builder.append("Main Type: ").append(mainType).append('\n');
-		builder.append("Main Args: ").append(Arrays.toString(args));
-		builder.append("\n\n----- ERROR -----\n");
-		DyvilCompiler.error(builder.toString(), ex);
-	}
-	
-	private static void testError(Throwable t)
-	{
 
+	private ClassLoader createClassLoader() throws MalformedURLException
+	{
+		final List<Library> libraries = this.compiler.config.libraries;
+		final URL[] urls = new URL[1 + libraries.size()];
+		urls[0] = this.compiler.config.getOutputDir().toURI().toURL();
+
+		int index = 1;
+		for (Library library : libraries)
+		{
+			urls[index++] = library.getURL();
+		}
+
+		return new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
+	}
+
+	private void failTest(String mainType, String[] args, Throwable ex)
+	{
+		final String message = "Test Failed\n\n" + "Main Type: " + mainType + '\n' +
+				"Main Args: " + Arrays.toString(args) +
+				"\n\n----- ERROR -----\n";
+		this.compiler.error(message, ex);
 	}
 }

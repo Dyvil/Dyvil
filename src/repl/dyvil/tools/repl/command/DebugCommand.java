@@ -1,6 +1,6 @@
 package dyvil.tools.repl.command;
 
-import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.repl.DyvilREPL;
 
 public class DebugCommand implements ICommand
@@ -26,6 +26,8 @@ public class DebugCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{
+		final CompilerConfig config = repl.getCompiler().config;
+
 		final boolean enableDebug;
 		if (args.length > 0)
 		{
@@ -48,10 +50,10 @@ public class DebugCommand implements ICommand
 		}
 		else
 		{
-			enableDebug = !DyvilCompiler.debug;
+			enableDebug = !config.isDebug();
 		}
 
-		DyvilCompiler.debug = enableDebug;
+		config.setDebug(enableDebug);
 		repl.getOutput().println("Setting debug mode to " + (enableDebug ? "ON" : "OFF"));
 	}
 }

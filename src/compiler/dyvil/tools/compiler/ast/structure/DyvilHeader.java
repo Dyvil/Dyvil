@@ -4,6 +4,7 @@ import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -45,6 +46,8 @@ import java.io.IOException;
 
 public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
+	protected final DyvilCompiler compiler;
+
 	public final CodeFile inputFile;
 	public final File     outputDirectory;
 	public final File     outputFile;
@@ -69,23 +72,28 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected HeaderDeclaration headerDeclaration;
 	
-	public DyvilHeader()
+	public DyvilHeader(DyvilCompiler compiler)
 	{
+		this.compiler = compiler;
 		this.inputFile = null;
 		this.outputDirectory = null;
 		this.outputFile = null;
 	}
 	
-	public DyvilHeader(Name name)
+	public DyvilHeader(DyvilCompiler compiler, Name name)
 	{
+		this.compiler = compiler;
+
 		this.inputFile = null;
 		this.outputDirectory = null;
 		this.outputFile = null;
 		this.name = name;
 	}
 	
-	public DyvilHeader(Package pack, CodeFile input, File output)
+	public DyvilHeader(DyvilCompiler compiler, Package pack, CodeFile input, File output)
 	{
+		this.compiler = compiler;
+
 		this.pack = pack;
 		this.inputFile = input;
 		
@@ -100,7 +108,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.outputDirectory = new File(name.substring(0, start));
 		this.outputFile = new File(name.substring(0, end) + DyvilFileType.OBJECT_EXTENSION);
 	}
-	
+
+	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return this.compiler;
+	}
+
 	@Override
 	public boolean isHeader()
 	{
@@ -442,7 +456,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.markers, "Dyvil Header", this.name, this.inputFile);
+		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.inputFile);
 	}
 	
 	@Override
@@ -453,7 +467,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			return;
 		}
 		
-		ObjectFormat.write(this.outputFile, this);
+		ObjectFormat.write(this.compiler, this.outputFile, this);
 	}
 	
 	@Override

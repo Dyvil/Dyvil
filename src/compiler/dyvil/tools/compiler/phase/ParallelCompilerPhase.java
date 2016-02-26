@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
 import java.util.function.Consumer;
@@ -31,9 +31,9 @@ public class ParallelCompilerPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public void apply(Collection<ICompilationUnit> units)
+	public void apply(DyvilCompiler compiler)
 	{
-		units.parallelStream().forEach(this.apply);
+		compiler.fileFinder.units.parallelStream().forEach(this.apply);
 	}
 	
 	@Override

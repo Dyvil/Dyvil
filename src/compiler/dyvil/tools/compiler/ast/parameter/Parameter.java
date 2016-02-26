@@ -261,7 +261,7 @@ public abstract class Parameter extends Member implements IParameter
 				this.defaultValue = typed;
 			}
 
-			this.defaultValue = Util.constant(this.defaultValue, markers);
+			this.defaultValue = Util.constant(this.defaultValue, markers, context);
 			return;
 		}
 	}

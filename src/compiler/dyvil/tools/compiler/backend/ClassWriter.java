@@ -30,14 +30,15 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		writer.visitEnd();
 		return writer.toByteArray();
 	}
-	
-	public static void save(File file, byte[] bytes)
+
+	public static void save(DyvilCompiler compiler, File file, byte[] bytes)
 	{
 		if (!FileUtils.tryCreate(file))
 		{
-			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
+			compiler.error("Error during compilation of '" + file + "': could not create file");
+			return;
 		}
-		
+
 		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(file)))
 		{
 			os.write(bytes, 0, bytes.length);
@@ -45,12 +46,12 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		catch (IOException ex)
 		{
 			// If file saving fails, simply report the error.
-			DyvilCompiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
-			DyvilCompiler.error("ClassWriter", "compile", ex);
+			compiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
+			compiler.error("ClassWriter", "compile", ex);
 		}
 	}
 	
-	public static void compile(File file, IClassCompilable iclass)
+	public static void compile(DyvilCompiler compiler, File file, IClassCompilable iclass)
 	{
 		byte[] bytes;
 		
@@ -62,14 +63,14 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.error("Error during compilation of '" + file + "': " + ex);
-			DyvilCompiler.error("ClassWriter", "compile", ex);
+			compiler.error("Error during compilation of '" + file + "': " + ex);
+			compiler.error("ClassWriter", "compile", ex);
 			return;
 		}
 		
 		// If the compilation was successful, we can try to write the newly
 		// created byte array to a newly created, empty file.
-		save(file, bytes);
+		save(compiler, file, bytes);
 	}
 	
 	@Override
@@ -79,14 +80,14 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		return "java/lang/Object";
 	}
 	
-	public static void generateJAR(List<File> files)
+	public static void generateJAR(DyvilCompiler compiler)
 	{
-		CompilerConfig config = DyvilCompiler.config;
-		String fileName = config.getJarName();
-		
-		File output = new File(fileName);
-		
+		final List<File> files = compiler.fileFinder.files;
+		final CompilerConfig config = compiler.config;
+		final File output = new File(config.getJarName());
+
 		FileUtils.tryCreate(output);
+
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();
 		attributes.putValue("Name", config.getJarName());
@@ -96,7 +97,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		attributes.put(Attributes.Name.MAIN_CLASS, config.getMainType());
 		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
 		
-		String outputDir = DyvilCompiler.config.getOutputDir().getAbsolutePath();
+		String outputDir = config.getOutputDir().getAbsolutePath();
 		int len = outputDir.length();
 		if (outputDir.charAt(len - 1) != File.separatorChar)
 		{
@@ -110,7 +111,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 				if (file.exists())
 				{
 					String name = file.getAbsolutePath().substring(len);
-					createEntry(file, jos, name);
+					createEntry(compiler, file, jos, name);
 				}
 			}
 			
@@ -118,11 +119,11 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		}
 		catch (Exception ex)
 		{
-			DyvilCompiler.error("ClassWriter", "jar", ex);
+			compiler.error("ClassWriter", "jar", ex);
 		}
 	}
 	
-	private static void createEntry(File input, JarOutputStream jos, String name)
+	private static void createEntry(DyvilCompiler compiler, File input, JarOutputStream jos, String name)
 	{
 		try (FileInputStream fis = new FileInputStream(input))
 		{
@@ -138,7 +139,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		}
 		catch (Exception ex)
 		{
-			DyvilCompiler.error("ClassWriter", "createEntry", ex);
+			compiler.error("ClassWriter", "createEntry", ex);
 		}
 	}
 }

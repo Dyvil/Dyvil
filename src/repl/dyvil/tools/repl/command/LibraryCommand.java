@@ -1,6 +1,5 @@
 package dyvil.tools.repl.command;
 
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.repl.DyvilREPL;
 
@@ -46,7 +45,8 @@ public class LibraryCommand implements ICommand
 		try
 		{
 			final Library library = Library.load(path);
-			DyvilCompiler.config.addLibrary(library);
+			library.loadLibrary();
+			repl.getCompiler().config.addLibrary(library);
 
 			repl.getOutput().println("Successfully added " + library + " to Classpath");
 		}

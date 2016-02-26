@@ -13,10 +13,14 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class RootPackage extends Package
 {
-	private final Map<String, IClass> internalClass = new HashMap<String, IClass>();
+	private final Map<String, IClass> internalClass = new HashMap<>();
+
+	public DyvilCompiler compiler;
 	
-	public RootPackage()
+	public RootPackage(DyvilCompiler compiler)
 	{
+		this.compiler = compiler;
+
 		this.setInternalName(this.fullName = ""); // Assignment intentional
 		this.name = Name.getQualified("");
 	}
@@ -45,10 +49,9 @@ public final class RootPackage extends Package
 	
 	public Package resolvePackageInternal(String internal)
 	{
-		Package pack;
-		for (Library lib : DyvilCompiler.config.libraries)
+		for (Library library : this.compiler.config.libraries)
 		{
-			pack = lib.resolvePackage(internal);
+			final Package pack = library.resolvePackage(internal);
 			if (pack != null)
 			{
 				return pack;
@@ -80,22 +83,21 @@ public final class RootPackage extends Package
 	
 	private IClass resolveInternalClass_(String internal)
 	{
-		int index = internal.lastIndexOf('/');
+		final int index = internal.lastIndexOf('/');
 		if (index == -1)
 		{
 			return super.resolveClass(internal);
 		}
 		
-		String packageName = internal.substring(0, index);
-		String className = internal.substring(index + 1);
-		Package pack;
-		
-		for (Library lib : DyvilCompiler.config.libraries)
+		final String packageName = internal.substring(0, index);
+		final String className = internal.substring(index + 1);
+
+		for (Library lib : this.compiler.config.libraries)
 		{
-			pack = lib.resolvePackage(packageName);
+			final Package pack = lib.resolvePackage(packageName);
 			if (pack != null)
 			{
-				IClass iclass = pack.resolveClass(className);
+				final IClass iclass = pack.resolveClass(className);
 				if (iclass != null)
 				{
 					return iclass;

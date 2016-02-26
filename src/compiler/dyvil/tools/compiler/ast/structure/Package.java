@@ -27,8 +27,8 @@ import java.io.InputStream;
 
 public class Package implements INamed, IDefaultContext
 {
-	public static RootPackage rootPackage = new RootPackage();
-	
+	public static RootPackage rootPackage;
+
 	public static Package dyvil;
 	public static Package dyvilAnnotation;
 	public static Package dyvilArray;
@@ -50,11 +50,12 @@ public class Package implements INamed, IDefaultContext
 	public static Package javaLang;
 	public static Package javaLangAnnotation;
 	public static Package javaUtil;
-	
-	protected Package parent;
-	protected Name    name;
-	protected String  fullName;
-	private   String  internalName;
+
+	protected final Package parent;
+
+	protected Name   name;
+	protected String fullName;
+	private   String internalName;
 	
 	private   List<IClass>         classes     = new ArrayList<>();
 	protected List<IDyvilHeader>   headers     = new ArrayList<>();
@@ -62,6 +63,7 @@ public class Package implements INamed, IDefaultContext
 	
 	protected Package()
 	{
+		this.parent = rootPackage;
 	}
 	
 	public Package(Package parent, Name name)
@@ -79,6 +81,16 @@ public class Package implements INamed, IDefaultContext
 			this.fullName = parent.fullName + "." + name.qualified;
 			this.setInternalName(parent.getInternalName() + name.qualified + "/");
 		}
+	}
+
+	public static void initRoot(DyvilCompiler compiler)
+	{
+		if (rootPackage != null && rootPackage.compiler == compiler)
+		{
+			return;
+		}
+
+		rootPackage = new RootPackage(compiler);
 	}
 	
 	public static void init()
@@ -172,6 +184,12 @@ public class Package implements INamed, IDefaultContext
 	}
 	
 	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return rootPackage.compiler;
+	}
+
+	@Override
 	public Package resolvePackage(Name name)
 	{
 		return this.resolvePackage(name.qualified);
@@ -179,14 +197,14 @@ public class Package implements INamed, IDefaultContext
 	
 	public Package resolvePackage(String name)
 	{
-		Package pack = this.subPackages.get(name);
+		final Package pack = this.subPackages.get(name);
 		if (pack != null)
 		{
 			return pack;
 		}
 		
 		String internal = this.internalName + name;
-		for (Library library : DyvilCompiler.config.libraries)
+		for (Library library : rootPackage.compiler.config.libraries)
 		{
 			if (library.isSubPackage(internal))
 			{
@@ -258,11 +276,11 @@ public class Package implements INamed, IDefaultContext
 	
 	private IClass loadClass(Name name, String qualifiedName)
 	{
-		String fileName = this.getInternalName() + qualifiedName + DyvilFileType.CLASS_EXTENSION;
+		final String fileName = this.getInternalName() + qualifiedName + DyvilFileType.CLASS_EXTENSION;
 		
-		for (Library library : DyvilCompiler.config.libraries)
+		for (Library library : rootPackage.compiler.config.libraries)
 		{
-			IClass iclass = this.loadClass(fileName, name, library);
+			final IClass iclass = this.loadClass(fileName, name, library);
 			if (iclass != null)
 			{
 				return iclass;
@@ -275,7 +293,7 @@ public class Package implements INamed, IDefaultContext
 	private IDyvilHeader loadHeader(Name name)
 	{
 		String fileName = this.getInternalName() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
-		for (Library library : DyvilCompiler.config.libraries)
+		for (Library library : rootPackage.compiler.config.libraries)
 		{
 			IDyvilHeader header = this.loadHeader(fileName, name, library);
 			if (header != null)
@@ -289,13 +307,13 @@ public class Package implements INamed, IDefaultContext
 	
 	public static IClass loadClass(String fileName, Name name)
 	{
-		for (Library library : DyvilCompiler.config.libraries)
+		for (Library library : rootPackage.compiler.config.libraries)
 		{
-			InputStream is = library.getInputStream(fileName);
-			if (is != null)
+			final InputStream inputStream = library.getInputStream(fileName);
+			if (inputStream != null)
 			{
-				ExternalClass bclass = new ExternalClass(name);
-				return ClassReader.loadClass(bclass, is, false);
+				final ExternalClass externalClass = new ExternalClass(name);
+				return ClassReader.loadClass(rootPackage.compiler, externalClass, inputStream);
 			}
 		}
 		return null;
@@ -303,25 +321,25 @@ public class Package implements INamed, IDefaultContext
 	
 	private IClass loadClass(String fileName, Name name, Library library)
 	{
-		InputStream is = library.getInputStream(fileName);
-		if (is != null)
+		final InputStream inputStream = library.getInputStream(fileName);
+		if (inputStream != null)
 		{
-			ExternalClass bclass = new ExternalClass(name);
-			this.classes.add(bclass);
-			return ClassReader.loadClass(bclass, is, false);
+			final ExternalClass externalClass = new ExternalClass(name);
+			this.classes.add(externalClass);
+			return ClassReader.loadClass(rootPackage.compiler, externalClass, inputStream);
 		}
 		return null;
 	}
 	
 	private IDyvilHeader loadHeader(String fileName, Name name, Library library)
 	{
-		InputStream is = library.getInputStream(fileName);
-		if (is != null)
+		InputStream inputStream = library.getInputStream(fileName);
+		if (inputStream != null)
 		{
-			DyvilHeader header = new ExternalHeader(name);
+			final DyvilHeader header = new ExternalHeader(rootPackage.compiler, name);
 			header.pack = this;
 			this.headers.add(header);
-			return ObjectFormat.read(is, header);
+			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
 		}
 		return null;
 	}

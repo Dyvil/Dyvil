@@ -12,6 +12,8 @@ import java.io.FileNotFoundException;
 
 public class CompilerConfig
 {
+	private DyvilCompiler compiler;
+
 	private String directory = ".";
 	
 	private String jarName;
@@ -29,9 +31,17 @@ public class CompilerConfig
 	
 	private String mainType;
 	public final List<String> mainArgs = new ArrayList<>();
+
+	private boolean debug;
+
+	private int constantFolding = 2;
+
+	private int maxConstantDepth = 10;
 	
-	public CompilerConfig()
+	public CompilerConfig(DyvilCompiler compiler)
 	{
+		this.compiler = compiler;
+
 		this.libraries.add(Library.dyvilLibrary);
 		this.libraries.add(Library.javaLibrary);
 	}
@@ -129,7 +139,7 @@ public class CompilerConfig
 		}
 		catch (FileNotFoundException ex)
 		{
-			DyvilCompiler.error(ex.getMessage());
+			this.compiler.error(ex.getMessage());
 		}
 	}
 	
@@ -146,6 +156,36 @@ public class CompilerConfig
 	public void excludeFile(String fileName)
 	{
 		this.excludedFiles.add(fileName);
+	}
+
+	public boolean isDebug()
+	{
+		return this.debug;
+	}
+
+	public void setDebug(boolean debug)
+	{
+		this.debug = debug;
+	}
+
+	public int getConstantFolding()
+	{
+		return this.constantFolding;
+	}
+
+	public void setConstantFolding(int constantFolding)
+	{
+		this.constantFolding = constantFolding;
+	}
+
+	public int getMaxConstantDepth()
+	{
+		return this.maxConstantDepth;
+	}
+
+	public void setMaxConstantDepth(int maxConstantDepth)
+	{
+		this.maxConstantDepth = maxConstantDepth;
 	}
 	
 	public boolean isExcluded(String name)
@@ -165,18 +205,18 @@ public class CompilerConfig
 	{
 		if (!this.includedFiles.isEmpty())
 		{
-			for (String s : this.includedFiles)
+			for (String included : this.includedFiles)
 			{
-				File source = new File(this.sourceDir, s);
-				File output = new File(this.outputDir, s);
-				Package pack = packageFromFile(s, source.isDirectory());
+				File source = new File(this.sourceDir, included);
+				File output = new File(this.outputDir, included);
+				Package pack = packageFromFile(included, source.isDirectory());
 				
-				fileFinder.process(source, output, pack);
+				fileFinder.process(this.compiler, source, output, pack);
 			}
 			return;
 		}
 		
-		fileFinder.process(this.sourceDir, this.outputDir, Package.rootPackage);
+		fileFinder.process(this.compiler, this.sourceDir, this.outputDir, Package.rootPackage);
 	}
 	
 	private static Package packageFromFile(String file, boolean isDirectory)

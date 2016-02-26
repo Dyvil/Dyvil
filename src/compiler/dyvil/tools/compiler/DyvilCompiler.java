@@ -1,8 +1,11 @@
 package dyvil.tools.compiler;
 
 import dyvil.io.AppendablePrintStream;
+import dyvil.io.BasicPrintStream;
 import dyvil.io.FileUtils;
-import dyvil.tools.asm.Opcodes;
+import dyvil.tools.compiler.ast.structure.DyvilHeader;
+import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.library.Library;
@@ -10,231 +13,234 @@ import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.CodeFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.lang.model.SourceVersion;
+import javax.tools.Tool;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.*;
 
-public final class DyvilCompiler
+public final class DyvilCompiler implements Tool
 {
 	public static final String VERSION         = "$$compilerVersion$$";
 	public static final String DYVIL_VERSION   = "$$version$$";
 	public static final String LIBRARY_VERSION = "$$libraryVersion$$";
 	
-	public static boolean debug;
-	public static int constantFolding = 2;
-	
-	
-	public static boolean compilationFailed;
-	
-	private static Logger logger;
-	private static DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
-	public static CompilerConfig      config     = new CompilerConfig();
-	public static Set<ICompilerPhase> phases     = new TreeSet<>();
-	public static FileFinder          fileFinder = new FileFinder();
-	
-	public static void log(String message)
+	private static final DateFormat DATE_FORMAT               = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final  int        OPTIMIZE_CONSTANT_FOLDING = 5;
+
+	private boolean compilationFailed;
+
+	private PrintStream output;
+	private PrintStream errorOutput;
+	private Logger      logger;
+
+	private final Set<ICompilerPhase> phases     = new TreeSet<>();
+	public final  CompilerConfig      config     = new CompilerConfig(this);
+	public final  FileFinder          fileFinder = new FileFinder();
+
+	@Override
+	public Set<SourceVersion> getSourceVersions()
 	{
-		System.out.println(message);
-		if (logger != null)
-		{
-			logger.info(message);
-		}
+		return EnumSet.allOf(SourceVersion.class);
 	}
-	
-	public static void warn(String message)
+
+	@Override
+	public int run(InputStream in, OutputStream out, OutputStream err, String... arguments)
 	{
-		System.out.println(message);
-		if (logger != null)
+		this.output = BasicPrintStream.apply(out, this.output);
+		this.errorOutput = BasicPrintStream.apply(out, this.errorOutput);
+
+		if (!this.loadConfig(arguments))
 		{
-			logger.warning(message);
+			this.shutdown();
+			return 1;
 		}
-	}
-	
-	public static void error(String message)
-	{
-		compilationFailed = true;
-		System.out.println(message);
-		if (logger != null)
+
+		this.loadLibraries();
+		this.findFiles();
+
+		if (!this.applyPhases())
 		{
-			logger.severe(message);
+			this.shutdown();
+			return 1;
 		}
+
+		this.shutdown();
+		return this.compilationFailed ? 1 : 0;
 	}
-	
-	public static void error(String message, Throwable throwable)
+
+	public boolean loadConfig(String[] arguments)
 	{
-		compilationFailed = true;
-		System.err.println(message);
-		throwable.printStackTrace();
-		if (logger != null)
-		{
-			logger.log(Level.SEVERE, message, throwable);
-		}
-	}
-	
-	public static void error(String className, String methodName, Throwable throwable)
-	{
-		compilationFailed = true;
-		throwable.printStackTrace();
-		if (logger != null)
-		{
-			logger.throwing(className, methodName, throwable);
-		}
-	}
-	
-	public static void main(String[] args)
-	{
-		long now = System.nanoTime();
-		long totalTime = now;
-		
-		System.out.println("Dyvil Compiler v" + VERSION + " for Dyvil v" + DYVIL_VERSION);
-		System.out.println();
-		
-		Names.init();
-		
+		final long startTime = System.nanoTime();
+
 		// Sets up States from arguments
-		for (String arg : args)
-		{
-			processArgument(arg);
-		}
-		
-		// Sets up the logger
-		initLogger();
-		
-		File sourceDir = config.getSourceDir();
+		this.processArguments(arguments);
+
+		File sourceDir = this.config.getSourceDir();
 		if (sourceDir == null)
 		{
-			log("No source path defined in Configuration File. Skipping Compilation.");
-			System.exit(1);
-			return;
+			this.log("No source path defined in Configuration File. Skipping Compilation.");
+			return false;
 		}
-		
+
 		if (!sourceDir.exists())
 		{
-			log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
-			System.exit(1);
+			this.log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
+			return false;
+		}
+
+		final long endTime = System.nanoTime();
+		this.log("Loaded Config (" + Util.toTime(endTime - startTime) + ")");
+
+		return true;
+	}
+
+	public void processArguments(String[] arguments)
+	{
+		for (String arg : arguments)
+		{
+			this.processArgument(arg);
+		}
+	}
+
+	private void processArgument(String arg)
+	{
+		switch (arg)
+		{
+		case "compile":
+			this.phases.add(ICompilerPhase.TOKENIZE);
+			this.phases.add(ICompilerPhase.PARSE_HEADER);
+			this.phases.add(ICompilerPhase.RESOLVE_HEADER);
+			this.phases.add(ICompilerPhase.PARSE);
+			this.phases.add(ICompilerPhase.RESOLVE_TYPES);
+			this.phases.add(ICompilerPhase.RESOLVE);
+			this.phases.add(ICompilerPhase.CHECK_TYPES);
+			this.phases.add(ICompilerPhase.CHECK);
+			this.phases.add(ICompilerPhase.COMPILE);
+			this.phases.add(ICompilerPhase.CLEANUP);
+			return;
+		case "optimize":
+			this.phases.add(ICompilerPhase.FOLD_CONSTANTS);
+			this.config.setConstantFolding(OPTIMIZE_CONSTANT_FOLDING);
+			return;
+		case "jar":
+			this.phases.add(ICompilerPhase.CLEAN);
+			this.phases.add(ICompilerPhase.JAR);
+			return;
+		case "format":
+			this.phases.add(ICompilerPhase.TOKENIZE);
+			this.phases.add(ICompilerPhase.PARSE);
+			this.phases.add(ICompilerPhase.FORMAT);
+			return;
+		case "clean":
+			this.phases.add(ICompilerPhase.CLEAN);
+			return;
+		case "print":
+			this.phases.add(ICompilerPhase.PRINT);
+			return;
+		case "test":
+			this.phases.add(ICompilerPhase.TEST);
+			return;
+		case "--debug":
+			this.phases.add(ICompilerPhase.PRINT);
+			this.phases.add(ICompilerPhase.TEST);
+			this.config.setDebug(true);
 			return;
 		}
-		
-		File outputDir = config.getOutputDir();
-		int phases = DyvilCompiler.phases.size();
-		
-		log("Loaded Config (" + Util.toTime(System.nanoTime() - now) + ")");
-		
-		int libs = 0;
-		now = System.nanoTime();
-		
+
+		if (arg.startsWith("-o"))
+		{
+			try
+			{
+				this.phases.add(ICompilerPhase.FOLD_CONSTANTS);
+				this.config.setConstantFolding(Integer.parseInt(arg.substring(2)));
+				return;
+			}
+			catch (Exception ignored)
+			{
+			}
+		}
+		if (arg.charAt(0) == '@')
+		{
+			this.loadConfig(arg.substring(1));
+			return;
+		}
+		if (arg.startsWith("print["))
+		{
+			final int index = arg.lastIndexOf(']');
+			final String phase = arg.substring(6, index);
+
+			for (ICompilerPhase compilerPhase : this.phases)
+			{
+				if (compilerPhase.getName().equalsIgnoreCase(phase))
+				{
+					this.phases.add(new PrintPhase(compilerPhase));
+					return;
+				}
+			}
+		}
+
+		if (!ConfigParser.readProperty(this.config, arg))
+		{
+			this.warn("Invalid Argument '" + arg + "'. Ignoring.");
+		}
+	}
+
+	private void loadConfig(String source)
+	{
+		this.log("Loading Configuration File from '" + source + "'");
+
+		final CodeFile file = new CodeFile(source);
+		this.config.setConfigFile(file);
+		if (!file.exists())
+		{
+			this.error("Configuration File '" + source + "' does not exist");
+			return;
+		}
+
+		ConfigParser.parse(file.getCode(), this.config);
+	}
+
+	public void loadLibraries()
+	{
+		final int libs = this.config.libraries.size();
+		final long startTime = System.nanoTime();
+
 		// Loads libraries
-		for (Library library : DyvilCompiler.config.libraries)
+		for (Library library : this.config.libraries)
 		{
 			library.loadLibrary();
-			libs++;
 		}
-		
-		long now1 = System.nanoTime();
-		now = now1 - now;
-		DyvilCompiler.log("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(now) + ")");
-		
-		now = System.nanoTime();
-		log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
-		
-		// Scan for Packages and Compilation Units
-		DyvilFileType.setupFileFinder(fileFinder);
-		config.findUnits(fileFinder);
-		
-		int fileCount = fileFinder.files.size();
-		int unitCount = fileFinder.units.size();
-		now = System.nanoTime() - now;
-		log("Found " + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount + (unitCount == 1 ?
-				" Compilation Unit)" :
-				" Compilation Units)") + " (" + Util.toTime(now) + ")");
-		log("");
-		
-		now = System.nanoTime();
-		
-		// Apply states
-		if (debug)
-		{
-			log("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + DyvilCompiler.phases);
-			for (ICompilerPhase phase : DyvilCompiler.phases)
-			{
-				now1 = System.nanoTime();
-				log("Applying " + phase.getName());
-				try
-				{
-					phase.apply(fileFinder.units);
-					now1 = System.nanoTime() - now1;
-					log(phase.getName() + " completed (" + Util.toTime(now1) + ")");
-				}
-				catch (Throwable t)
-				{
-					log(phase.getName() + " failed!");
-					error(phase.getName(), "apply", t);
-					log("");
-					log("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
-					System.exit(1);
-					return;
-				}
-			}
-		}
-		else
-		{
-			for (ICompilerPhase phase : DyvilCompiler.phases)
-			{
-				try
-				{
-					phase.apply(fileFinder.units);
-				}
-				catch (Throwable t)
-				{
-					error(phase.getName(), "apply", t);
-					log("");
-					log("Compilation FAILED (" + Util.toTime(System.nanoTime() - now) + ")");
-					System.exit(1);
-					return;
-				}
-			}
-		}
-		
-		now1 = System.nanoTime();
-		
-		log("");
-		
-		if (compilationFailed)
-		{
-			log("Compilation FAILED (" + Util.toTime(now1 - now) + ", Total Running Time: " + Util
-					.toTime(now1 - totalTime) + ")");
-			System.exit(1);
-			return;
-		}
-		
-		log("Compilation finished (" + Util.toTime(now1 - now) + ", Total Running Time: " + Util
-				.toTime(now1 - totalTime) + ")");
+
+		Package.initRoot(this);
+
+		final long endTime = System.nanoTime();
+		this.log("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(endTime - startTime)
+				         + ")");
 	}
-	
-	public static void initLogger()
+
+	private void initLogger()
 	{
-		File logFile = config.getLogFile();
+		final File logFile = this.config.getLogFile();
 		if (logFile == null)
 		{
 			return;
 		}
 
-		logger = Logger.getLogger("DYVIL-COMPILER");
-		logger.setUseParentHandlers(false);
-		logger.setLevel(Level.ALL);
+		this.logger = Logger.getLogger("DYVIL-COMPILER");
+		this.logger.setUseParentHandlers(false);
+		this.logger.setLevel(Level.ALL);
 
-		Formatter formatter = new Formatter()
+		final Formatter formatter = new Formatter()
 		{
 			@Override
 			public String format(LogRecord record)
@@ -248,9 +254,9 @@ public final class DyvilCompiler
 				Throwable thrown = record.getThrown();
 				StringBuilder builder = new StringBuilder();
 
-				if (DyvilCompiler.debug)
+				if (DyvilCompiler.this.config.isDebug())
 				{
-					builder.append('[').append(format.format(new Date(record.getMillis()))).append("] [");
+					builder.append('[').append(DATE_FORMAT.format(new Date(record.getMillis()))).append("] [");
 					builder.append(record.getLevel()).append("]: ");
 				}
 				builder.append(message).append('\n');
@@ -263,139 +269,136 @@ public final class DyvilCompiler
 			}
 		};
 
-		FileHandler fh;
 		try
 		{
-			fh = new FileHandler(logFile.getAbsolutePath(), true);
-			fh.setLevel(Level.ALL);
-			fh.setFormatter(formatter);
-			logger.addHandler(fh);
+			final FileHandler fileHandler = new FileHandler(logFile.getAbsolutePath(), true);
+			fileHandler.setLevel(Level.ALL);
+			fileHandler.setFormatter(formatter);
+			this.logger.addHandler(fileHandler);
 		}
-		catch (IOException e)
+		catch (IOException ex)
 		{
-			e.printStackTrace();
+			ex.printStackTrace();
 		}
 	}
-	
-	private static void loadConfig(String source)
+
+	private void findFiles()
 	{
-		System.out.println("Loading Configuration File from '" + source + "'");
-		CodeFile file = new CodeFile(source);
-		config.setConfigFile(file);
-		if (!file.exists())
-		{
-			System.err.println("Configuration File '" + source + "' does not exist");
-			return;
-		}
-		ConfigParser.parse(file.getCode(), config);
+		final long startTime = System.nanoTime();
+
+		final File sourceDir = this.config.getSourceDir();
+		final File outputDir = this.config.getOutputDir();
+
+		this.log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
+
+		// Scan for Packages and Compilation Units
+		DyvilFileType.setupFileFinder(this.fileFinder);
+		this.config.findUnits(this.fileFinder);
+
+		Package.init();
+
+		final int fileCount = this.fileFinder.files.size();
+		final int unitCount = this.fileFinder.units.size();
+
+		final long endTime = System.nanoTime();
+
+		this.log("Found " + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount + (unitCount == 1 ?
+				" Compilation Unit)" :
+				" Compilation Units)") + " (" + Util.toTime(endTime - startTime) + ")");
+		this.log("");
 	}
-	
-	public static void processArgument(String arg)
+
+	public boolean applyPhases()
 	{
-		switch (arg)
+		final int phases = this.phases.size();
+
+		// Apply states
+		if (this.config.isDebug())
 		{
-		case "compile":
-			phases.add(ICompilerPhase.TOKENIZE);
-			phases.add(ICompilerPhase.PARSE_HEADER);
-			phases.add(ICompilerPhase.RESOLVE_HEADER);
-			phases.add(ICompilerPhase.PARSE);
-			phases.add(ICompilerPhase.RESOLVE_TYPES);
-			phases.add(ICompilerPhase.RESOLVE);
-			phases.add(ICompilerPhase.CHECK_TYPES);
-			phases.add(ICompilerPhase.CHECK);
-			phases.add(ICompilerPhase.COMPILE);
-			phases.add(ICompilerPhase.CLEANUP);
-			return;
-		case "optimize":
-			phases.add(ICompilerPhase.FOLD_CONSTANTS);
-			constantFolding = 1;
-			return;
-		case "jar":
-			phases.add(ICompilerPhase.CLEAN);
-			phases.add(ICompilerPhase.JAR);
-			return;
-		case "format":
-			phases.add(ICompilerPhase.TOKENIZE);
-			phases.add(ICompilerPhase.PARSE);
-			phases.add(ICompilerPhase.FORMAT);
-			return;
-		case "clean":
-			phases.add(ICompilerPhase.CLEAN);
-			return;
-		case "print":
-			phases.add(ICompilerPhase.PRINT);
-			return;
-		case "test":
-			phases.add(ICompilerPhase.TEST);
-			return;
-		case "--debug":
-			phases.add(ICompilerPhase.PRINT);
-			phases.add(ICompilerPhase.TEST);
-			debug = true;
-			return;
-		}
-		
-		if (arg.startsWith("-o"))
-		{
-			try
+			this.log("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + this.phases);
+
+			for (ICompilerPhase phase : this.phases)
 			{
-				phases.add(ICompilerPhase.FOLD_CONSTANTS);
-				constantFolding = Integer.parseInt(arg.substring(2));
-				return;
-			}
-			catch (Exception ex)
-			{
-				// Ignore
-			}
-		}
-		if (arg.charAt(0) == '@')
-		{
-			loadConfig(arg.substring(1));
-			return;
-		}
-		if (arg.startsWith("print["))
-		{
-			int index = arg.lastIndexOf(']');
-			String phase = arg.substring(6, index);
-			
-			for (ICompilerPhase compilerPhase : phases)
-			{
-				if (compilerPhase.getName().equalsIgnoreCase(phase))
+				this.log("Applying " + phase.getName());
+				if (!this.applyPhaseDebug(phase))
 				{
-					phases.add(new PrintPhase(compilerPhase));
-					return;
+					return false;
 				}
 			}
+
+			return true;
 		}
-		
-		if (!ConfigParser.readProperty(config, arg))
+
+		for (ICompilerPhase phase : this.phases)
 		{
-			System.err.println("Invalid Argument '" + arg + "'. Ignoring.");
+			if (!this.applyPhase(phase))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean applyPhase(ICompilerPhase phase)
+	{
+		try
+		{
+			phase.apply(this);
+
+			return true;
+		}
+		catch (Throwable t)
+		{
+			this.error(phase.getName(), "apply", t);
+
+			return false;
+		}
+	}
+
+	private boolean applyPhaseDebug(ICompilerPhase phase)
+	{
+		try
+		{
+			final long startTime = System.nanoTime();
+
+			phase.apply(this);
+
+			final long endTime = System.nanoTime();
+			this.log(phase.getName() + " completed (" + Util.toTime(endTime - startTime) + ")");
+
+			return true;
+		}
+		catch (Throwable t)
+		{
+			this.log(phase.getName() + " failed!");
+			this.error(phase.getName(), "apply", t);
+			return false;
 		}
 	}
 	
-	public static void test()
+	public void test()
 	{
-		String mainType = config.getMainType();
+		String mainType = this.config.getMainType();
 		if (mainType == null)
 		{
 			return;
 		}
 		
-		File file = new File(config.getOutputDir(), config.getMainType().replace('.', '/') + ".class");
+		File file = new File(this.config.getOutputDir(), this.config.getMainType().replace('.', '/') + ".class");
 		if (!file.exists())
 		{
-			DyvilCompiler.log("The Main Type '" + config.getMainType()
-					                  + "' does not exist or was not compiled, skipping test.");
+			this.log("The Main Type '" + this.config.getMainType()
+					         + "' does not exist or was not compiled, skipping test.");
 			return;
 		}
 		
-		new TestThread().start();
+		new TestThread(this).start();
 	}
 	
-	public static void clean()
+	public void clean()
 	{
-		File[] files = config.getOutputDir().listFiles();
+		File[] files = this.config.getOutputDir().listFiles();
 		if (files == null)
 		{
 			return;
@@ -404,6 +407,128 @@ public final class DyvilCompiler
 		for (File s : files)
 		{
 			FileUtils.delete(s);
+		}
+	}
+
+	public void checkLibraries()
+	{
+		if (Library.dyvilLibrary == null)
+		{
+			this.error("Could not load Dyvil Runtime Library");
+		}
+		if (Library.javaLibrary == null)
+		{
+			this.error("Could not load Java Runtime Library");
+		}
+
+		if (Types.LANG_HEADER == null)
+		{
+			this.error("The dyvil.Lang header could not be found. This may cause serious compilation problems.");
+			for (Library library : this.config.libraries)
+			{
+				this.error("\tlibrary = " + library);
+			}
+			Types.LANG_HEADER = new DyvilHeader(this);
+		}
+	}
+
+	public void shutdown()
+	{
+		for (Library library : this.config.libraries)
+		{
+			library.unloadLibrary();
+		}
+	}
+
+	// ----- GETTERS AND SETTERS -----
+
+	public boolean isCompilationFailed()
+	{
+		return this.compilationFailed;
+	}
+
+	public void setCompilationFailed(boolean compilationFailed)
+	{
+		this.compilationFailed = compilationFailed;
+	}
+
+	public void failCompilation()
+	{
+		this.compilationFailed = true;
+	}
+
+	public PrintStream getOutput()
+	{
+		return this.output;
+	}
+
+	public void setOutput(PrintStream output)
+	{
+		this.output = output;
+	}
+
+	public PrintStream getErrorOutput()
+	{
+		return this.errorOutput;
+	}
+
+	public void setErrorOutput(PrintStream errorOutput)
+	{
+		this.errorOutput = errorOutput;
+	}
+
+	// ----- LOGGING METHODS -----
+
+	public void log(String message)
+	{
+		this.output.println(message);
+		if (this.logger != null)
+		{
+			this.logger.info(message);
+		}
+	}
+
+	public void warn(String message)
+	{
+		this.errorOutput.println(message);
+
+		if (this.logger != null)
+		{
+			this.logger.warning(message);
+		}
+	}
+
+	public void error(String message)
+	{
+		this.compilationFailed = true;
+		this.errorOutput.println(message);
+
+		if (this.logger != null)
+		{
+			this.logger.severe(message);
+		}
+	}
+
+	public void error(String message, Throwable throwable)
+	{
+		this.compilationFailed = true;
+		this.errorOutput.println(message);
+
+		throwable.printStackTrace(this.errorOutput);
+		if (this.logger != null)
+		{
+			this.logger.log(Level.SEVERE, message, throwable);
+		}
+	}
+
+	public void error(String className, String methodName, Throwable throwable)
+	{
+		this.compilationFailed = true;
+
+		throwable.printStackTrace(this.errorOutput);
+		if (this.logger != null)
+		{
+			this.logger.throwing(className, methodName, throwable);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.context;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -12,6 +13,12 @@ import dyvil.tools.parsing.Name;
 
 public interface IDefaultContext extends IStaticContext
 {
+	@Override
+	default DyvilCompiler getCompilationContext()
+	{
+		return null;
+	}
+
 	@Override
 	default IDyvilHeader getHeader()
 	{

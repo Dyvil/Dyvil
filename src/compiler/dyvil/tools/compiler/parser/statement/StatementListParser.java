@@ -228,26 +228,22 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		}
 		case METHOD_VALUE:
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			switch (type)
 			{
+			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.pushParser(new StatementListParser(this.method), true);
 				this.mode = SEPARATOR;
 				return;
-			}
-			if (type == BaseSymbols.EQUALS)
-			{
+			case BaseSymbols.EQUALS:
 				pm.pushParser(pm.newExpressionParser(this.method));
 				this.mode = SEPARATOR;
 				return;
-			}
-			if (type == DyvilKeywords.THROWS)
-			{
+			case DyvilKeywords.THROWS:
 				pm.pushParser(new ExceptionListParser(this.method));
 				// mode stays METHOD_VALUE
 				return;
 			}
 
-			pm.reparse();
 			pm.report(token, "method.body.separator");
 			return;
 		case SEPARATOR:

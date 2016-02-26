@@ -6,9 +6,9 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -20,7 +20,6 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
@@ -71,7 +70,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 
 	public REPLContext(DyvilREPL repl)
 	{
-		super(Name.getQualified("REPL"));
+		super(repl.compiler, Name.getQualified("REPL"));
 		this.repl = repl;
 	}
 
@@ -157,7 +156,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 			return false;
 		}
 		
-		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		final int folding = this.repl.compiler.config.getConstantFolding();
+		for (int i = 0; i < folding; i++)
 		{
 			field.foldConstants();
 		}
@@ -283,8 +283,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		{
 			return;
 		}
-		
-		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+
+		final int folding = this.repl.compiler.config.getConstantFolding();
+		for (int i = 0; i < folding; i++)
 		{
 			value = value.foldConstants();
 		}
@@ -405,8 +406,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		{
 			return;
 		}
-		
-		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+
+		final int folding = this.repl.compiler.config.getConstantFolding();
+		for (int i = 0; i < folding; i++)
 		{
 			iclass.foldConstants();
 		}
@@ -486,8 +488,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		{
 			return;
 		}
-		
-		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+
+		final int folding = this.repl.compiler.config.getConstantFolding();
+		for (int i = 0; i < folding; i++)
 		{
 			property.foldConstants();
 		}
@@ -525,8 +528,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 		{
 			return;
 		}
-		
-		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+
+		final int folding = this.repl.compiler.config.getConstantFolding();
+		for (int i = 0; i < folding; i++)
 		{
 			method.foldConstants();
 		}

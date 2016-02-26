@@ -210,7 +210,7 @@ public interface IValue extends IASTNode, ITyped
 	
 	IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
-	default IValue toConstant(MarkerList markers)
+	default IValue toConstant(MarkerList markers, IContext context)
 	{
 		return null;
 	}

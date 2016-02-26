@@ -233,7 +233,7 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	// All possible Output Files (.class, .dyo)
 	exec.outputs.dir bin
 
-	exec.main = 'dyvil.tools.compiler.DyvilCompiler'
+	exec.main = 'dyvil.tools.compiler.Main'
 	exec.classpath = sourceSets.compiler.runtimeClasspath
 	exec.args = [ "@$config", 'compile' ]
 }

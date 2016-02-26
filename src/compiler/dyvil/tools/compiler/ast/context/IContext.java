@@ -1,14 +1,15 @@
 package dyvil.tools.compiler.ast.context;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -19,13 +20,18 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.parsing.Name;
 
-public interface IContext
+public interface IContext extends IMemberContext
 {
 	byte VISIBLE   = 0;
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
 
 	boolean isStatic();
+
+	default DyvilCompiler getCompilationContext()
+	{
+		return this.getHeader().getCompilationContext();
+	}
 	
 	IDyvilHeader getHeader();
 	
@@ -33,18 +39,25 @@ public interface IContext
 
 	IType getThisType();
 	
+	@Override
 	Package resolvePackage(Name name);
 	
+	@Override
 	IClass resolveClass(Name name);
 	
+	@Override
 	IType resolveType(Name name);
 	
+	@Override
 	ITypeParameter resolveTypeVariable(Name name);
 	
+	@Override
 	IDataMember resolveField(Name name);
 	
+	@Override
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 	
+	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
 	boolean handleException(IType type);
@@ -72,7 +85,7 @@ public interface IContext
 		header.addInnerClass(compilable);
 	}
 	
-	static IClass resolveClass(IContext context, Name name)
+	static IClass resolveClass(IMemberContext context, Name name)
 	{
 		final IClass theClass = context.resolveClass(name);
 		if (theClass != null)
@@ -83,7 +96,7 @@ public interface IContext
 		return Types.LANG_HEADER.resolveClass(name);
 	}
 	
-	static IType resolveType(IContext context, Name name)
+	static IType resolveType(IMemberContext context, Name name)
 	{
 		IType itype = context.resolveType(name);
 		if (itype != null)
@@ -94,14 +107,14 @@ public interface IContext
 		return Types.LANG_HEADER.resolveType(name);
 	}
 	
-	static IConstructor resolveConstructor(IContext context, IArguments arguments)
+	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)
 	{
 		ConstructorMatchList matches = new ConstructorMatchList();
 		context.getConstructorMatches(matches, arguments);
 		return matches.getBestConstructor();
 	}
 	
-	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IMemberContext context, IValue instance, Name name, IArguments arguments)
 	{
 		MethodMatchList matches = new MethodMatchList();
 		context.getMethodMatches(matches, instance, name, arguments);

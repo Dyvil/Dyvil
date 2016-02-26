@@ -1,8 +1,7 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.Types;
 
 public class ParseHeaderPhase implements ICompilerPhase
@@ -27,12 +26,11 @@ public class ParseHeaderPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public void apply(Collection<ICompilationUnit> units)
+	public void apply(DyvilCompiler compiler)
 	{
-		Package.init();
 		Types.initHeaders();
 		
-		for (ICompilationUnit unit : units)
+		for (ICompilationUnit unit : compiler.fileFinder.units)
 		{
 			unit.parseHeader();
 		}

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.sources;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
@@ -13,7 +14,7 @@ public class DyvilFileType implements IFileType
 	@FunctionalInterface
 	interface HeaderSupplier
 	{
-		DyvilHeader newHeader(Package pack, CodeFile inputFile, File outputFile);
+		DyvilHeader newHeader(DyvilCompiler compiler, Package pack, CodeFile inputFile, File outputFile);
 	}
 	
 	public static final String CLASS_EXTENSION  = ".class";
@@ -46,9 +47,9 @@ public class DyvilFileType implements IFileType
 	}
 	
 	@Override
-	public ICompilationUnit createUnit(Package pack, CodeFile inputFile, File outputFile)
+	public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, CodeFile inputFile, File outputFile)
 	{
-		DyvilHeader header = this.headerSupplier.newHeader(pack, inputFile, outputFile);
+		DyvilHeader header = this.headerSupplier.newHeader(compiler, pack, inputFile, outputFile);
 		pack.addHeader(header);
 		return header;
 	}

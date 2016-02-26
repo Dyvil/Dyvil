@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -24,7 +23,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 *
 	 * @see DyvilCompiler#clean()
 	 */
-	ICompilerPhase CLEAN = new CompilerPhase(0, "CLEAN", units -> DyvilCompiler.clean());
+	ICompilerPhase CLEAN = new CompilerPhase(0, "CLEAN", DyvilCompiler::clean);
 	
 	/**
 	 * Splits the input file into {@link IdentifierToken Tokens} using
@@ -50,7 +49,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Saves the formatted AST to the input file
 	 */
 	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT",
-	                                                    unit -> FileUtils.write(unit.getInputFile(), unit.toString()));
+	                                                    unit -> FileUtils.tryWrite(unit.getInputFile(), unit.toString()));
 	
 	/**
 	 * Resolves packages, classes and types.
@@ -102,19 +101,18 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 * Converts the .class files in the bin directory to a JAR file, sets up the
 	 * classpath and signs the JAR.
 	 */
-	ICompilerPhase JAR = new CompilerPhase(210, "JAR",
-	                                       units -> ClassWriter.generateJAR(DyvilCompiler.fileFinder.files));
+	ICompilerPhase JAR = new CompilerPhase(210, "JAR", ClassWriter::generateJAR);
 	
 	/**
 	 * Tests the main type specified in {@link CompilerConfig#mainType}.
 	 */
-	ICompilerPhase TEST = new CompilerPhase(1000, "TEST", units -> DyvilCompiler.test());
+	ICompilerPhase TEST = new CompilerPhase(1000, "TEST", DyvilCompiler::test);
 	
 	String getName();
 	
 	int getID();
 	
-	void apply(Collection<ICompilationUnit> units);
+	void apply(DyvilCompiler compiler);
 	
 	@Override
 	default int compareTo(ICompilerPhase o)

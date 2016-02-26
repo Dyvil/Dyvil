@@ -273,8 +273,8 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value = this.value.resolve(markers, this);
 			
-			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
-			if (value1 == null)
+			final IValue typedValue = this.value.withType(Types.VOID, null, markers, context);
+			if (typedValue == null)
 			{
 				Marker marker = Markers.semantic(this.position, "constructor.return.type");
 				marker.addInfo(Markers.getSemantic("return.type", this.value.getType()));
@@ -282,7 +282,7 @@ public class Constructor extends Member implements IConstructor
 			}
 			else
 			{
-				this.value = value1;
+				this.value = typedValue;
 			}
 		}
 	}
@@ -307,7 +307,7 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		// Implicit Super Constructor
-		IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
+		final IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(Markers.semantic(this.position, "constructor.super"));

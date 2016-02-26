@@ -3,7 +3,6 @@ package dyvil.tools.compiler.library;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.ReflectUtils;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 
 import java.io.File;
@@ -37,15 +36,9 @@ public abstract class Library
 	{
 		javaLibraryLocation = getFileLocation(java.lang.String.class);
 		dyvilLibraryLocation = getFileLocation(dyvil.lang.Void.class);
-		
-		if ((dyvilLibrary = tryLoad(dyvilLibraryLocation)) == null)
-		{
-			DyvilCompiler.error("Could not load Dyvil Runtime Library");
-		}
-		if ((javaLibrary = tryLoad(javaLibraryLocation)) == null)
-		{
-			DyvilCompiler.error("Could not load Java Runtime Library");
-		}
+
+		dyvilLibrary = tryLoad(dyvilLibraryLocation);
+		javaLibrary = tryLoad(javaLibraryLocation);
 	}
 	
 	protected static final LinkOption[] emptyLinkOptions = {};
