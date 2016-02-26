@@ -607,7 +607,7 @@ public class REPLMemberClass implements IClass
 			fileName = name.substring(index + 1) + ".class";
 		}
 		
-		FileUtils.write(new File(repl.dumpDir, fileName), bytes);
+		FileUtils.tryWrite(new File(repl.dumpDir, fileName), bytes);
 	}
 	
 	protected static Class loadClass(DyvilREPL repl, String name, byte[] bytes)

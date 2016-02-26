@@ -28,7 +28,7 @@ public class Parser
 	
 	public static RootNode parse(File file)
 	{
-		return parse(FileUtils.read(file));
+		return parse(FileUtils.tryRead(file));
 	}
 	
 	public static RootNode parse(String code)

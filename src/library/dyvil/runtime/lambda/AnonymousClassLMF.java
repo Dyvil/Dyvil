@@ -227,7 +227,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		{
 			File dumpFile = new File(dumpDirectory,
 			                         this.lambdaClassName.replace('/', File.separatorChar).concat(".class"));
-			FileUtils.write(dumpFile, bytes);
+			FileUtils.tryWrite(dumpFile, bytes);
 		}
 		
 		// Define the generated class in this VM.

@@ -13,9 +13,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 /**
- * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for
- * several {@link File} -related operations such as writing or reading the file
- * both as a String or as a List of Strings or recursively deleting directories.
+ * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for several {@link File} -related operations
+ * such as writing or reading the file both as a String or as a List of Strings or recursively deleting directories.
  *
  * @author Clashsoft
  * @version 1.0
@@ -28,120 +27,91 @@ public final class FileUtils
 		// no instances
 	}
 	
-	/**
-	 * Ensures that the given {@code file} exists. If the file does not exist in
-	 * terms of it's {@link File#exists() exists()} method, the file will be
-	 * created by it's {@link File#createNewFile() createNewFile()} method.
-	 * Before that happens, this method ensures that the parent directory of the
-	 * file exists by using it's {@link File#mkdirs() mkdirs()} method.<br>
-	 * If the file exists or has been created successfully, {@code true} will be
-	 * returned from this method. If any {@link IOException} occurs,
-	 * {@code false} will be returned.
-	 *
-	 * @param file
-	 * 		the file to create
-	 *
-	 * @return true if the file exists or has been created successfully, false
-	 * otherwise
-	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean create(File file)
+	public static boolean tryCreate(File file)
 	{
 		try
 		{
-			if (!file.exists())
-			{
-				File parent = file.getParentFile();
-				if (parent != null)
-				{
-					parent.mkdirs();
-				}
-				return file.createNewFile();
-			}
-			return true;
+			return create(file);
 		}
 		catch (IOException ex)
 		{
 			return false;
 		}
 	}
-	
-	/**
-	 * Writes the given {@link String} {@code text} to the given {@link File}
-	 * {@code file}. This operation attempts to override an existing file, and
-	 * creates a new file if no existing file exists. If an {@link IOException}
-	 * occurs, the stack trace of the exception is printed using
-	 * {@link Throwable#printStackTrace()}.
-	 *
-	 * @param file
-	 * 		the file
-	 * @param text
-	 * 		the text
-	 *
-	 * @return true, if successful
-	 */
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean write(File file, String text)
+	private static boolean create(File file) throws IOException
 	{
-		return write(file, text.getBytes());
+		if (file.exists())
+		{
+			return true;
+		}
+
+		final File parent = file.getParentFile();
+		return !(parent != null && !parent.mkdirs()) && file.createNewFile();
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean tryWrite(File file, String text)
+	{
+		return tryWrite(file, text.getBytes());
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean write(File file, byte[] bytes)
+	public static boolean tryWrite(File file, byte[] bytes)
 	{
 		try
 		{
-			create(file);
-			Files.write(file.toPath(), bytes);
-			return true;
+			return write(file, bytes);
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
 			return false;
 		}
 	}
-	
-	/**
-	 * Writes the given {@link List} {@code lines} to the given {@link File}
-	 * {@code file}. This operation attempts to override an existing file, and
-	 * creates a new file if no existing file exists. If an {@link IOException}
-	 * occurs, the stack trace of the exception is printed using
-	 * {@link Throwable#printStackTrace()}.
-	 *
-	 * @param file
-	 * 		the file
-	 * @param lines
-	 * 		the lines
-	 *
-	 * @return true, if successful
-	 */
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean writeLines(File file, List<String> lines)
+	private static boolean write(File file, byte[] bytes) throws IOException
+	{
+		if (!create(file))
+		{
+			return false;
+		}
+
+		Files.write(file.toPath(), bytes);
+		return true;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean tryWriteLines(File file, List<String> lines)
 	{
 		try
 		{
-			if (!file.exists())
-			{
-				file.createNewFile();
-			}
-			
-			Files.write(file.toPath(), lines, Charset.defaultCharset());
-			return true;
+			return writeLines(file, lines);
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
 			return false;
 		}
 	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean writeLines(File file, List<String> lines) throws IOException
+	{
+		if (!create(file))
+		{
+			return false;
+		}
+
+		Files.write(file.toPath(), lines, Charset.defaultCharset());
+		return true;
+	}
 	
 	/**
-	 * Reads the content of the the given {@link File} {@code file} and returns
-	 * it as a {@link String}. If the {@code file} does not exist, it returns
-	 * {@code null}. If any other {@link IOException} occurs, the stack trace of
-	 * the exception is printed using {@link Throwable#printStackTrace()}.
+	 * Reads the content of the the given {@link File} {@code file} and returns it as a {@link String}. If the {@code
+	 * file} does not exist, it returns {@code null}. If any other {@link IOException} occurs, the stack trace of the
+	 * exception is printed using {@link Throwable#printStackTrace()}.
 	 *
 	 * @param file
 	 * 		the file
@@ -149,7 +119,7 @@ public final class FileUtils
 	 * @return the file content
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String read(File file)
+	public static String tryRead(File file)
 	{
 		if (!file.exists())
 		{
@@ -157,37 +127,43 @@ public final class FileUtils
 		}
 		try
 		{
-			byte[] bytes = Files.readAllBytes(file.toPath());
-			return new String(bytes);
+			return read(file);
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
 			return null;
 		}
 	}
+
+	private static String read(File file) throws IOException
+	{
+		byte[] bytes = Files.readAllBytes(file.toPath());
+		return new String(bytes);
+	}
 	
-	/**
-	 * Reads the content of the the given {@link File} {@code file} and returns
-	 * it as a {@link List} of lines. If the {@code file} does not exist, it
-	 * returns {@code null}. If any other {@link IOException} occurs, its stack
-	 * trace is printed.
-	 *
-	 * @param file
-	 * 		the file
-	 *
-	 * @return the file content
-	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static List<String> readLines(File file)
+	public static List<String> tryReadLines(File file)
 	{
 		if (!file.exists())
 		{
 			return null;
 		}
+		try
+		{
+			return readLines(file);
+		}
+		catch (IOException ex)
+		{
+			return null;
+		}
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static List<String> readLines(File file) throws IOException
+	{
 		try (BufferedReader reader = Files.newBufferedReader(file.toPath()))
 		{
-			List<String> result = new ArrayList();
+			final List<String> result = new ArrayList<>();
 			for (; ; )
 			{
 				String line = reader.readLine();
@@ -199,23 +175,19 @@ public final class FileUtils
 			}
 			return result;
 		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-			return null;
-		}
 	}
 	
 	/**
-	 * Recursively deletes the given {@link File} {@code file}. If the
-	 * {@code file} is a directory, this method deletes all sub-files of that
-	 * directory by calling itself on the sub-file. Otherwise, it simply deletes
-	 * the file using {@link File#delete()}.
+	 * Recursively deletes the given {@link File} {@code file}. If the {@code file} is a directory, this method deletes
+	 * all sub-files of that directory by calling itself on the sub-file. Otherwise, it simply deletes the file using
+	 * {@link File#delete()}.
 	 *
 	 * @param file
 	 * 		the file to delete
+	 *
+	 * @return {@code true} iff the file was successfully deleted, {@code false} otherwise
 	 */
-	public static void delete(File file)
+	public static boolean delete(File file)
 	{
 		if (file.isDirectory())
 		{
@@ -228,24 +200,23 @@ public final class FileUtils
 				}
 			}
 		}
-		file.delete();
+		return file.delete();
 	}
 	
 	/**
-	 * Recursively deletes the given {@link File} {@code file}. If the
-	 * {@code file} is a directory, this method deletes all sub-files of that
-	 * directory by calling itself on the sub-file. Otherwise, it simply deletes
-	 * the file using {@link File#delete()}. The given {@code maxDepth} is used
-	 * to limit the recursive process to a maximum directory depth. If it set to
-	 * {@code 0}, it is ignored whether or not the given {@code file} is a
-	 * directory.
+	 * Recursively deletes the given {@link File} {@code file}. If the {@code file} is a directory, this method deletes
+	 * all sub-files of that directory by calling itself on the sub-file. Otherwise, it simply deletes the file using
+	 * {@link File#delete()}. The given {@code maxDepth} is used to limit the recursive process to a maximum directory
+	 * depth. If it set to {@code 0}, it is ignored whether or not the given {@code file} is a directory.
 	 *
 	 * @param file
 	 * 		the file to delete
 	 * @param maxDepth
 	 * 		the maximum recursion depth
+	 *
+	 * @return {@code true} iff the file was successfully deleted, {@code false} otherwise
 	 */
-	public static void delete(File file, int maxDepth)
+	public static boolean delete(File file, int maxDepth)
 	{
 		if (maxDepth > 0 && file.isDirectory())
 		{
@@ -258,20 +229,14 @@ public final class FileUtils
 				}
 			}
 		}
-		file.delete();
+		return file.delete();
 	}
 	
 	/**
-	 * Returns the user application data directory of the host OS. Common paths
-	 * are:
-	 * <ul>
-	 * <li>Windows: {@code %appdata%/}
-	 * <li>Mac OS: {@code $username$/Library/Application Support/}
-	 * <li>Linux: {@code $username$}
-	 * <li>Every other OS: System Property {@code user.dir}
-	 * </ul>
-	 * The {@code $username$} variable is acquired via the system property
-	 * {@code user.home}.
+	 * Returns the user application data directory of the host OS. Common paths are: <ul> <li>Windows: {@code
+	 * %appdata%/} <li>Mac OS: {@code $username$/Library/Application Support/} <li>Linux: {@code $username$} <li>Every
+	 * other OS: System Property {@code user.dir} </ul> The {@code $username$} variable is acquired via the system
+	 * property {@code user.home}.
 	 *
 	 * @return the user application data directory
 	 */

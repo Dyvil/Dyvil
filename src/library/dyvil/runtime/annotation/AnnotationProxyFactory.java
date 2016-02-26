@@ -180,7 +180,7 @@ public final class AnnotationProxyFactory
 		if (dumpDirectory != null)
 		{
 			File dumpFile = new File(dumpDirectory, this.className.replace('/', File.separatorChar).concat(".class"));
-			FileUtils.write(dumpFile, bytes);
+			FileUtils.tryWrite(dumpFile, bytes);
 		}
 		
 		// Define the generated class in this VM.

@@ -15,7 +15,7 @@ public class ObjectFormat
 
 	public static void write(File file, IDyvilHeader header)
 	{
-		if (!FileUtils.create(file))
+		if (!FileUtils.tryCreate(file))
 		{
 			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
 			return;

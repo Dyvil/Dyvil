@@ -6,6 +6,19 @@ import java.util.Locale;
 
 public abstract class BasicPrintStream extends PrintStream
 {
+	public static PrintStream apply(OutputStream outputStream, PrintStream defaultNull)
+	{
+		if (outputStream == null)
+		{
+			return defaultNull;
+		}
+		if (outputStream instanceof PrintStream)
+		{
+			return (PrintStream) outputStream;
+		}
+		return new PrintStream(outputStream);
+	}
+
 	public BasicPrintStream(OutputStream out)
 	{
 		super(out);
