@@ -33,9 +33,6 @@ public final class DyvilCompiler
 	public static boolean debug;
 	public static int constantFolding = 2;
 	
-	public static final int classVersion     = Opcodes.V1_8;
-	public static final int asmVersion       = Opcodes.ASM5;
-	public static final int maxConstantDepth = 10;
 	
 	public static boolean compilationFailed;
 	

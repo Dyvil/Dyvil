@@ -5,7 +5,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.TypeReference;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
@@ -24,6 +23,7 @@ import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -408,7 +408,7 @@ public class CodeClass extends AbstractClass
 		{
 			modifiers |= Opcodes.ACC_SUPER;
 		}
-		writer.visit(DyvilCompiler.classVersion, modifiers & 0x7631, this.internalName, signature, superClass,
+		writer.visit(ClassFormat.CLASS_VERSION, modifiers & 0x7631, this.internalName, signature, superClass,
 		             interfaces);
 		
 		// Source

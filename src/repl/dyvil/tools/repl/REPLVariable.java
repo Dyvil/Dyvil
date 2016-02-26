@@ -4,7 +4,6 @@ import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -151,7 +150,7 @@ public class REPLVariable extends Field
 		String extendedType = this.type.getExtendedName();
 		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
-		cw.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className,
+		cw.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className,
 		         null, "java/lang/Object", null);
 		
 		cw.visitSource(className, null);

@@ -4,7 +4,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -20,10 +19,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
+import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -304,7 +300,7 @@ public final class PartialFunctionExpr implements IValue, ICase, IClassCompilabl
 		
 		// Header
 		String signature = builder.toString();
-		writer.visit(DyvilCompiler.classVersion, 0, this.internalClassName, signature, "java/lang/Object",
+		writer.visit(ClassFormat.CLASS_VERSION, 0, this.internalClassName, signature, "java/lang/Object",
 		             new String[] { "dyvil/function/PartialFunction" });
 		
 		// Constructor

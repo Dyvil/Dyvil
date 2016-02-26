@@ -15,7 +15,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 {
 	public ClassWriter()
 	{
-		super(DyvilCompiler.asmVersion);
+		super(ClassFormat.ASM_VERSION);
 	}
 	
 	public ClassWriter(int api)

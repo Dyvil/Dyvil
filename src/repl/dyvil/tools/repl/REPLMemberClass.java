@@ -5,7 +5,6 @@ import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.asm.Opcodes;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -32,6 +31,7 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -581,7 +581,7 @@ public class REPLMemberClass implements IClass
 	{
 		try
 		{
-			ClassWriter cw = new ClassWriter(DyvilCompiler.asmVersion);
+			ClassWriter cw = new ClassWriter(ClassFormat.ASM_VERSION);
 			iclass.write(cw);
 			cw.visitEnd();
 			byte[] bytes = cw.toByteArray();
@@ -635,7 +635,7 @@ public class REPLMemberClass implements IClass
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String name = this.name.qualified;
-		writer.visit(DyvilCompiler.classVersion, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object",
+		writer.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object",
 		             null);
 		writer.visitSource(name, null);
 		

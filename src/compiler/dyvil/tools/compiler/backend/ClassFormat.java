@@ -21,6 +21,9 @@ import dyvil.tools.parsing.Name;
 
 public final class ClassFormat
 {
+	public static final int CLASS_VERSION = Opcodes.V1_8;
+	public static final int ASM_VERSION   = Opcodes.ASM5;
+
 	public static final int H_GETFIELD         = Opcodes.H_GETFIELD;
 	public static final int H_GETSTATIC        = Opcodes.H_GETSTATIC;
 	public static final int H_PUTFIELD         = Opcodes.H_PUTFIELD;
