@@ -24,14 +24,14 @@ public class DebugCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
 		final CompilerConfig config = repl.getCompiler().config;
 
 		final boolean enableDebug;
-		if (args.length > 0)
+		if (argument != null)
 		{
-			switch (args[0].toLowerCase())
+			switch (argument.toLowerCase())
 			{
 			case "on":
 			case "true":

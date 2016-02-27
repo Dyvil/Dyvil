@@ -47,19 +47,18 @@ public class CompleteCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
 		final REPLContext context = repl.getContext();
 		
-		if (args.length == 0)
+		if (argument == null)
 		{
 			// REPL Variables
 			
 			this.printREPLMembers(repl, context, "");
 			return;
 		}
-		
-		final String argument = args[0];
+
 		final int dotIndex = argument.lastIndexOf('.');
 		if (dotIndex <= 0)
 		{

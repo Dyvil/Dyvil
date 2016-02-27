@@ -25,7 +25,7 @@ public class VariablesCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String args)
 	{
 		REPLContext context = repl.getContext();
 		for (IField field : context.getFields().values())

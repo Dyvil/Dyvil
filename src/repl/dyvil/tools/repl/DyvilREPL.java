@@ -186,14 +186,14 @@ public final class DyvilREPL
 		final int spaceIndex = line.indexOf(' ', 1);
 		if (spaceIndex < 0)
 		{
-			this.runCommand(line.substring(1), new String[] {});
+			this.runCommand(line.substring(1), null);
 			return;
 		}
 		
-		this.runCommand(line.substring(1, spaceIndex), line.substring(spaceIndex + 1).split(" "));
+		this.runCommand(line.substring(1, spaceIndex), line.substring(spaceIndex + 1));
 	}
 	
-	public void runCommand(String name, String... arguments)
+	public void runCommand(String name, String argument)
 	{
 		ICommand command = commands.get(name);
 		if (command == null)
@@ -202,7 +202,7 @@ public final class DyvilREPL
 			return;
 		}
 		
-		command.execute(this, arguments);
+		command.execute(this, argument);
 	}
 	
 	public static void registerCommand(ICommand command)

@@ -29,16 +29,16 @@ public class JavapCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
-		if (args.length == 0)
+		if (argument == null)
 		{
 			repl.getErrorOutput().println("Missing Class Argument. Usage: " + this.getUsage());
 			return;
 		}
 
 		// Construct the Command
-		String[] command = getCommand(repl, args);
+		String[] command = getCommand(repl, argument.split(" "));
 		if (command == null)
 		{
 			return;

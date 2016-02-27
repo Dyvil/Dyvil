@@ -29,24 +29,23 @@ public class ExitCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
-		if (args.length == 0)
+		if (argument == null)
 		{
 			System.exit(0);
 			return;
 		}
-		
-		int code = 0;
+
 		try
 		{
-			code = Integer.parseInt(args[0]);
+			System.exit(Integer.parseInt(argument));
 		}
 		catch (NumberFormatException ex)
 		{
-			repl.getOutput().println("Invalid Exit Code " + args[0]);
+			repl.getErrorOutput().println("Invalid Exit Code " + argument);
+			return;
 		}
-		System.exit(code);
 		return;
 	}
 }

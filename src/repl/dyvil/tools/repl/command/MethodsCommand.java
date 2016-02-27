@@ -26,7 +26,7 @@ public class MethodsCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String args)
 	{
 		REPLContext context = repl.getContext();
 		for (IMethod method : context.getMethods())
