@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.bytecode;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.util.Printer;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class InvokeDynamicInstruction implements IInstruction
@@ -35,16 +34,17 @@ public class InvokeDynamicInstruction implements IInstruction
 		buffer.append(this.bsm.getOwner()).append('.').append(this.bsm.getDesc()).append(':')
 		      .append(this.bsm.getDesc());
 		
-		int len = this.bsmArguments.length;
+		final int len = this.bsmArguments.length;
 		if (len > 0)
 		{
-			// TODO Clean this up...
-			IValue.fromObject(this.bsmArguments[0]).toString(prefix, buffer);
+			buffer.append("{ ");
+			buffer.append(this.bsmArguments[0]);
 			for (int i = 1; i < len; i++)
 			{
 				buffer.append(", ");
-				IValue.fromObject(this.bsmArguments[i]).toString(prefix, buffer);
+				buffer.append(this.bsmArguments[i]);
 			}
+			buffer.append(" }");
 		}
 		else
 		{
