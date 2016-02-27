@@ -17,6 +17,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -483,7 +484,13 @@ public final class ArrayExpr implements IValue, IValueList
 			writer.writeInsn(opcode);
 		}
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

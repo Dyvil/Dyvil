@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -84,7 +85,13 @@ public class VoidValue implements IConstantValue
 
 		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
 	}
-	
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
