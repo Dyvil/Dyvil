@@ -86,14 +86,14 @@ public class REPLParser extends ParserManager
 			{
 				this.parser.parse(this, token);
 
-				if (this.reportErrors || parser.reportErrors())
+				if (this.reportErrors || this.parser.reportErrors())
 				{
 					this.reportErrors = true;
 				}
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace(this.context.getCompilationContext().getErrorOutput());
+				this.report(Markers.parserError(token, ex));
 				return false;
 			}
 			
