@@ -150,7 +150,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.parseConstructorDeclaration(pm, token);
 				return;
 			case DyvilKeywords.NEW: // legacy, TODO drop 'new' support
-				pm.report(Markers.syntaxWarning(token, "constructor.new"));
+				pm.report(Markers.syntaxWarning(token, "constructor.declaration.new"));
 				this.parseConstructorDeclaration(pm, token);
 				return;
 			}
