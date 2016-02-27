@@ -11,10 +11,8 @@ public final class RandomUtils
 	}
 	
 	/**
-	 * Returns true with the given chance of {@code chance}. It does that by
-	 * generating a new random float using the given {@link java.util.Random
-	 * Random} {@code random} and comparing it to the given {@code float chance}
-	 * .
+	 * Returns true with the given chance of {@code chance}. It does that by generating a new random float using the
+	 * given {@link java.util.Random Random} {@code random} and comparing it to the given {@code float chance} .
 	 *
 	 * @param random
 	 * 		the random

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
@@ -7,10 +7,14 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
@@ -219,7 +223,7 @@ public final class Types
 		return OBJECT_SIMPLE_REF_CLASS;
 	}
 	
-	protected static IType getObjectSimpleRef(IType type)
+	public static IType getObjectSimpleRef(IType type)
 	{
 		ClassGenericType gt = new ClassGenericType(getObjectSimpleRefClass());
 		gt.addType(type);

@@ -14,7 +14,6 @@ public class MultiArrayInstruction implements IInstruction
 		this.dims = dims;
 	}
 	
-
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

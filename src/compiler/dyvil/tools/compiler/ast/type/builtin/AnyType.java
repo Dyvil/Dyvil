@@ -1,15 +1,16 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.raw.IRawType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
@@ -20,20 +21,18 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static dyvil.reflect.Opcodes.*;
-
-public class UnknownType implements IRawType
+public class AnyType implements IRawType
 {
 	@Override
 	public int typeTag()
 	{
-		return UNKNOWN;
+		return ANY;
 	}
 	
 	@Override
 	public Name getName()
 	{
-		return Names.auto;
+		return Names.any;
 	}
 	
 	@Override
@@ -43,27 +42,21 @@ public class UnknownType implements IRawType
 	}
 	
 	@Override
-	public IType getSuperType()
-	{
-		return null;
-	}
-	
-	@Override
-	public boolean hasTypeVariables()
+	public boolean isSuperTypeOf(IType type)
 	{
 		return true;
 	}
 	
 	@Override
-	public IType getConcreteType(ITypeContext context)
+	public boolean isSuperClassOf(IType type)
 	{
-		return Types.ANY;
+		return true;
 	}
 	
 	@Override
 	public boolean isResolved()
 	{
-		return false;
+		return true;
 	}
 	
 	@Override
@@ -73,11 +66,9 @@ public class UnknownType implements IRawType
 	}
 	
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, IType.TypePosition position)
 	{
 	}
-	
-	// IContext
 	
 	@Override
 	public IDataMember resolveField(Name name)
@@ -88,6 +79,7 @@ public class UnknownType implements IRawType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		Types.OBJECT_CLASS.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -100,8 +92,6 @@ public class UnknownType implements IRawType
 	{
 		return null;
 	}
-	
-	// Compilation
 	
 	@Override
 	public String getInternalName()
@@ -118,43 +108,14 @@ public class UnknownType implements IRawType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-	}
-	
-	@Override
-	public int getLoadOpcode()
-	{
-		return ALOAD;
-	}
-	
-	@Override
-	public int getArrayLoadOpcode()
-	{
-		return AALOAD;
-	}
-	
-	@Override
-	public int getStoreOpcode()
-	{
-		return ASTORE;
-	}
-	
-	@Override
-	public int getArrayStoreOpcode()
-	{
-		return AASTORE;
-	}
-	
-	@Override
-	public int getReturnOpcode()
-	{
-		return ARETURN;
+		buffer.append("Ljava/lang/Object;");
 	}
 	
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/UnknownType", "instance",
-		                      "Ldyvilx/lang/model/type/UnknownType;", false);
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/AnyType", "instance",
+		                      "Ldyvilx/lang/model/type/AnyType;");
 	}
 	
 	@Override
@@ -168,32 +129,32 @@ public class UnknownType implements IRawType
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "any";
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("any");
+	}
+	
+	@Override
 	public IType clone()
 	{
 		return this;
 	}
 	
 	@Override
-	public String toString()
-	{
-		return "auto";
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("auto");
-	}
-	
-	@Override
 	public boolean equals(Object obj)
 	{
-		return this == obj;
+		return this.isSameType((IType) obj);
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return UNKNOWN;
+		return ANY;
 	}
 }

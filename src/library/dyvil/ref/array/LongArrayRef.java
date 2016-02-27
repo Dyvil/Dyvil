@@ -1,7 +1,6 @@
 package dyvil.ref.array;
 
 import dyvil.ref.LongRef;
-import dyvil.ref.LongRef;
 
 public class LongArrayRef implements LongRef
 {

@@ -2,7 +2,6 @@ package dyvil.ref.simple;
 
 import dyvil.lang.literal.IntConvertible;
 import dyvil.ref.ShortRef;
-import dyvil.ref.ShortRef;
 
 @IntConvertible
 public class SimpleShortRef implements ShortRef

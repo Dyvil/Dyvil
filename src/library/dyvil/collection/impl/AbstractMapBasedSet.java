@@ -2,8 +2,6 @@ package dyvil.collection.impl;
 
 import dyvil.collection.*;
 
-import java.lang.Boolean;
-
 import java.util.Collections;
 import java.util.Iterator;
 

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.generic.type;
+package dyvil.tools.compiler.ast.type.typevar;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;

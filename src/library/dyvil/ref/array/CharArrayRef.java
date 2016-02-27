@@ -1,7 +1,6 @@
 package dyvil.ref.array;
 
 import dyvil.ref.CharRef;
-import dyvil.ref.CharRef;
 
 public class CharArrayRef implements CharRef
 {

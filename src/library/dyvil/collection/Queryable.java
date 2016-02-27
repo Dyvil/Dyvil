@@ -15,11 +15,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * A <b>Queryable</b> represents a special {@link Iterable} that includes a
- * number of special operations for querying. These operations include {@link
- * #stream()} for lazy evaluation, {@link #fold(Object, BiFunction)}, {@link
- * #reduce(BiFunction)}, {@link #map(Function)}, {@link #flatMap(Function)} and
- * {@link #filter(Predicate)}.
+ * A <b>Queryable</b> represents a special {@link Iterable} that includes a number of special operations for querying.
+ * These operations include {@link #stream()} for lazy evaluation, {@link #fold(Object, BiFunction)}, {@link
+ * #reduce(BiFunction)}, {@link #map(Function)}, {@link #flatMap(Function)} and {@link #filter(Predicate)}.
  *
  * @param <E>
  * 		the element type
@@ -34,8 +32,7 @@ public interface Queryable<E> extends Iterable<E>
 	int size();
 	
 	/**
-	 * Returns true iff this query is empty, i.e. the number of elements as
-	 * returned by {@link #size()} is {@code 0}.
+	 * Returns true iff this query is empty, i.e. the number of elements as returned by {@link #size()} is {@code 0}.
 	 *
 	 * @return true, iff this query is empty
 	 */
@@ -53,8 +50,7 @@ public interface Queryable<E> extends Iterable<E>
 	Iterator<E> iterator();
 	
 	/**
-	 * Creates and returns a {@link Spliterator} over the elements of this
-	 * query.
+	 * Creates and returns a {@link Spliterator} over the elements of this query.
 	 *
 	 * @return a spliterator over the elements of this query
 	 */
@@ -65,8 +61,8 @@ public interface Queryable<E> extends Iterable<E>
 	}
 	
 	/**
-	 * Creates and returns a sequential {@link Stream} of this query, based on
-	 * the {@link Spliterator} returned by {@link #spliterator()}.
+	 * Creates and returns a sequential {@link Stream} of this query, based on the {@link Spliterator} returned by
+	 * {@link #spliterator()}.
 	 *
 	 * @return a stream of this query
 	 */
@@ -76,8 +72,8 @@ public interface Queryable<E> extends Iterable<E>
 	}
 	
 	/**
-	 * Creates and returns a parallel {@link Stream} of this query, based on the
-	 * {@link Spliterator} returned by {@link #spliterator()}.
+	 * Creates and returns a parallel {@link Stream} of this query, based on the {@link Spliterator} returned by {@link
+	 * #spliterator()}.
 	 *
 	 * @return a parallel stream of this query
 	 */
@@ -96,12 +92,10 @@ public interface Queryable<E> extends Iterable<E>
 	}
 	
 	/**
-	 * Folds this entire query into a single value by repeatedly reducing the
-	 * elements of this query and the initial value using the given {@code
-	 * reducer}. If this query does not contain any elements, the initial value
-	 * is simply returned. Otherwise, it is repeatedly replaced with the result
-	 * of {@code reducer.apply(initialValue, element)} for every element in this
-	 * query.
+	 * Folds this entire query into a single value by repeatedly reducing the elements of this query and the initial
+	 * value using the given {@code reducer}. If this query does not contain any elements, the initial value is simply
+	 * returned. Otherwise, it is repeatedly replaced with the result of {@code reducer.apply(initialValue, element)}
+	 * for every element in this query.
 	 *
 	 * @param initialValue
 	 * 		the initial value
@@ -120,8 +114,8 @@ public interface Queryable<E> extends Iterable<E>
 	}
 	
 	/**
-	 * Reduces this entire query into a single value by repeatedly reducing the
-	 * elements using the given {@code reducer} binary operator.
+	 * Reduces this entire query into a single value by repeatedly reducing the elements using the given {@code reducer}
+	 * binary operator.
 	 *
 	 * @param reducer
 	 * 		the reducer binary operator
@@ -211,9 +205,8 @@ public interface Queryable<E> extends Iterable<E>
 	}
 	
 	/**
-	 * Returns true if and if only this query contains the given {@code element}
-	 * . By default, 'contains' in defined such that any element in this query
-	 * matches the given element in a way so that {@code
+	 * Returns true if and if only this query contains the given {@code element} . By default, 'contains' in defined
+	 * such that any element in this query matches the given element in a way so that {@code
 	 * element.equals(this.element)}.
 	 *
 	 * @param element
@@ -227,9 +220,8 @@ public interface Queryable<E> extends Iterable<E>
 	}
 	
 	/**
-	 * Maps all elements in this query using the given {@code mapper} function
-	 * by supplying them to the function and replacing them with the result of
-	 * the call {mapper.apply(element)}.
+	 * Maps all elements in this query using the given {@code mapper} function by supplying them to the function and
+	 * replacing them with the result of the call {mapper.apply(element)}.
 	 *
 	 * @param mapper
 	 * 		the mapping function
@@ -237,11 +229,9 @@ public interface Queryable<E> extends Iterable<E>
 	void map(Function<? super E, ? extends E> mapper);
 	
 	/**
-	 * Maps all elements in this query using the given {@code mapper} function
-	 * by supplying them to the function and replacing them with all results of
-	 * the call {@code mapper.apply(element)}. If the mapper returns multiple
-	 * results at once, they are 'flattened' and added to this query
-	 * sequentially as shown in the below example.
+	 * Maps all elements in this query using the given {@code mapper} function by supplying them to the function and
+	 * replacing them with all results of the call {@code mapper.apply(element)}. If the mapper returns multiple results
+	 * at once, they are 'flattened' and added to this query sequentially as shown in the below example.
 	 * <p>
 	 * <pre>
 	 * List[int] list = MutableList(1, 2, 3, 4)
@@ -255,9 +245,8 @@ public interface Queryable<E> extends Iterable<E>
 	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
 	
 	/**
-	 * Removes all elements from the query that do not fulfill the requirement
-	 * given by the {@code condition}, i.e. if {@code condition.test(element)}
-	 * returns {@code false}.
+	 * Removes all elements from the query that do not fulfill the requirement given by the {@code condition}, i.e. if
+	 * {@code condition.test(element)} returns {@code false}.
 	 *
 	 * @param condition
 	 * 		the condition

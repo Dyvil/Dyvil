@@ -1,16 +1,17 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.raw;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -117,7 +118,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		if (resolved.getTypeVariable() == null && resolved != Types.UNKNOWN)
 		{
 			// Replace Type Variable References with their default value
-			return resolved.getConcreteType(ITypeContext.DEFAULT);
+			return resolved.getConcreteType(DEFAULT);
 		}
 		// Otherwise, simply return it.
 		return resolved;

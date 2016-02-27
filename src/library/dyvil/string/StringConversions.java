@@ -5,9 +5,8 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 /**
- * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used
- * for several String-conversions such as parsing {@code boolean}s, {@code int}s
- * or {@code float}s or converting integers to roman numeral representations.
+ * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used for several String-conversions such as
+ * parsing {@code boolean}s, {@code int}s or {@code float}s or converting integers to roman numeral representations.
  *
  * @author Clashsoft
  * @version 1.0

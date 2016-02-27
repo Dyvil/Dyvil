@@ -1,6 +1,9 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.*;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.math.MathUtils;
 
 import java.io.IOException;
@@ -35,7 +38,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	
 	private static final long serialVersionUID = -2574454530914084132L;
 	
-	protected transient int           size;
+	protected transient int              size;
 	protected transient HashElement<E>[] elements;
 	
 	public AbstractHashSet()
@@ -173,7 +176,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		
 		for (int i = oldCapacity; i-- > 0; )
 		{
-			for (HashElement<E> e = oldMap[i]; e != null;)
+			for (HashElement<E> e = oldMap[i]; e != null; )
 			{
 				int index = index(e.hash, newCapacity);
 				HashElement<E> next = e.next;

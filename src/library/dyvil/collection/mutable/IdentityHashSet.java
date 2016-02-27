@@ -1,6 +1,8 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.*;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;

@@ -10,7 +10,7 @@ import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -157,8 +157,8 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		writer.writeLDC(fieldName);
 
 		// Invoke the factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName,
-		                       factoryMethodType, false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
+		                       false);
 		
 		// Assign the reference field
 		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, refFieldType);

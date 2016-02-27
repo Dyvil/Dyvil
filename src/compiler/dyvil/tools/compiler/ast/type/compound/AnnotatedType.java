@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -6,6 +6,9 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeDelegate;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -16,7 +19,6 @@ import java.lang.annotation.ElementType;
 
 public class AnnotatedType extends TypeDelegate
 {
-	private IType       type;
 	private IAnnotation annotation;
 	
 	public AnnotatedType(IAnnotation annotation)

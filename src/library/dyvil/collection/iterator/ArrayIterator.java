@@ -1,9 +1,9 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.array.ObjectArray;
 import dyvil.lang.literal.ArrayConvertible;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;

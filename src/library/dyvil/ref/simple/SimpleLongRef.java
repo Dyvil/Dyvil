@@ -2,7 +2,6 @@ package dyvil.ref.simple;
 
 import dyvil.lang.literal.LongConvertible;
 import dyvil.ref.LongRef;
-import dyvil.ref.LongRef;
 
 @LongConvertible
 public class SimpleLongRef implements LongRef

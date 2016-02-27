@@ -1,9 +1,9 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;

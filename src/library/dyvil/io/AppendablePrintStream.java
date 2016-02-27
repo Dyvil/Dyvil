@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 /**
- * A {@link PrintStream} implementation that delegates calls to {@code print()}
- * and {@code println()} methods to an underlying {@link Appendable}.
+ * A {@link PrintStream} implementation that delegates calls to {@code print()} and {@code println()} methods to an
+ * underlying {@link Appendable}.
  *
  * @author Clashsoft
  * @version 1.0
@@ -51,7 +51,8 @@ public class AppendablePrintStream extends BasicPrintStream
 		{
 			this.appendable.append(c);
 		}
-		catch (IOException ignored) {
+		catch (IOException ignored)
+		{
 		}
 	}
 }

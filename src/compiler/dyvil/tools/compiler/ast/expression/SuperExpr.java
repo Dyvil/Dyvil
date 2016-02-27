@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -112,8 +112,7 @@ public final class SuperExpr implements IValue
 			return;
 		}
 		
-		Marker marker = Markers
-				.semantic(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
+		Marker marker = Markers.semantic(this.position, distance == 0 ? "super.type.invalid" : "super.type.indirect");
 		marker.addInfo(Markers.getSemantic("type.enclosing", thisType));
 		marker.addInfo(Markers.getSemantic("super.type.requested", this.type));
 		markers.add(marker);

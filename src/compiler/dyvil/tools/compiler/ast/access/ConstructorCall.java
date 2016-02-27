@@ -2,18 +2,18 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -179,7 +179,8 @@ public class ConstructorCall implements ICall
 			ITypeParameter typeVar = this.type.getElementType().getTypeVariable();
 			if (typeVar != null)
 			{
-				Marker marker = Markers.semanticError(this.position, "constructor.access.array.typevar", typeVar.getName());
+				Marker marker = Markers
+						.semanticError(this.position, "constructor.access.array.typevar", typeVar.getName());
 				marker.addInfo(Markers.getSemantic("typevariable", typeVar));
 				markers.add(marker);
 			}

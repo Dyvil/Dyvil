@@ -17,9 +17,9 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
@@ -153,7 +153,8 @@ public final class Annotation implements IAnnotation
 			IValue typedValue = value.withType(parameterType, parameterType, markers, context);
 			if (typedValue == null)
 			{
-				Util.createTypeError(markers, value, parameterType, parameterType, "annotation.parameter.type", parameter.getName());
+				Util.createTypeError(markers, value, parameterType, parameterType, "annotation.parameter.type",
+				                     parameter.getName());
 				continue;
 			}
 			

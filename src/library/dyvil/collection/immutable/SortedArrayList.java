@@ -1,9 +1,9 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Set;
-import dyvil.annotation.Immutable;
 
 import java.util.Arrays;
 import java.util.Comparator;

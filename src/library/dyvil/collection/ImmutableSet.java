@@ -1,12 +1,12 @@
 package dyvil.collection;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.immutable.EmptySet;
 import dyvil.collection.immutable.SingletonSet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
@@ -83,8 +83,8 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	ImmutableSet<E> $plus(E element);
 	
 	/**
-	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation
-	 * and delegates to {@link #$bar(Collection)}.
+	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation and delegates to {@link
+	 * #$bar(Collection)}.
 	 */
 	@Override
 	default ImmutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
@@ -96,29 +96,25 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	ImmutableSet<E> $minus(Object element);
 	
 	/**
-	 * {@inheritDoc} This operator represents the 'subtract' ImmutableSet
-	 * operation.
+	 * {@inheritDoc} This operator represents the 'subtract' ImmutableSet operation.
 	 */
 	@Override
 	ImmutableSet<? extends E> $minus$minus(Collection<?> collection);
 	
 	/**
-	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet
-	 * operation.
+	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet operation.
 	 */
 	@Override
 	ImmutableSet<? extends E> $amp(Collection<? extends E> collection);
 	
 	/**
-	 * {@inheritDoc} This operator represents the 'union' ImmutableSet
-	 * operation.
+	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation.
 	 */
 	@Override
 	ImmutableSet<? extends E> $bar(Collection<? extends E> collection);
 	
 	/**
-	 * {@inheritDoc} This operator represents the 'exclusive OR' ImmutableSet
-	 * operation.
+	 * {@inheritDoc} This operator represents the 'exclusive OR' ImmutableSet operation.
 	 */
 	@Override
 	ImmutableSet<? extends E> $up(Collection<? extends E> collection);

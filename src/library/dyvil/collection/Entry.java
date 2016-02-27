@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * An <b>Entry</b> is a union of a Key and Value, as used in {@linkplain Map
- * maps}.
+ * An <b>Entry</b> is a union of a Key and Value, as used in {@linkplain Map maps}.
  *
  * @param <K>
  * 		the type of the key
@@ -43,9 +42,8 @@ public interface Entry<K, V> extends Serializable
 	}
 	
 	/**
-	 * Returns a comparator that compares entries by key. The ordering is
-	 * defined by the <i>natural order</i> of the key, i.e. the ordering given
-	 * by {@link Comparable#compareTo(Object)}.
+	 * Returns a comparator that compares entries by key. The ordering is defined by the <i>natural order</i> of the
+	 * key, i.e. the ordering given by {@link Comparable#compareTo(Object)}.
 	 *
 	 * @return a comparator that compares entries by key.
 	 */
@@ -55,9 +53,8 @@ public interface Entry<K, V> extends Serializable
 	}
 	
 	/**
-	 * Returns a comparator that compares entries by value. The ordering is
-	 * defined by the <i>natural order</i> of the value, i.e. the ordering given
-	 * by {@link Comparable#compareTo(Object)}.
+	 * Returns a comparator that compares entries by value. The ordering is defined by the <i>natural order</i> of the
+	 * value, i.e. the ordering given by {@link Comparable#compareTo(Object)}.
 	 *
 	 * @return a comparator that compares entries by value.
 	 */
@@ -67,8 +64,7 @@ public interface Entry<K, V> extends Serializable
 	}
 	
 	/**
-	 * Returns a comparator that compares entries by key. The ordering is
-	 * defined by the given {@code comparator}.
+	 * Returns a comparator that compares entries by key. The ordering is defined by the given {@code comparator}.
 	 *
 	 * @param cmp
 	 * 		the comparator the defines the ordering of the keys
@@ -81,8 +77,7 @@ public interface Entry<K, V> extends Serializable
 	}
 	
 	/**
-	 * Returns a comparator that compares entries by value. The ordering is
-	 * defined by the given {@code comparator}.
+	 * Returns a comparator that compares entries by value. The ordering is defined by the given {@code comparator}.
 	 *
 	 * @param cmp
 	 * 		the comparator the defines the ordering of the values

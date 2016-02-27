@@ -1,14 +1,17 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.raw.IRawType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
@@ -19,18 +22,20 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class AnyType implements IRawType
+import static dyvil.reflect.Opcodes.*;
+
+public class UnknownType implements IRawType
 {
 	@Override
 	public int typeTag()
 	{
-		return ANY;
+		return UNKNOWN;
 	}
 	
 	@Override
 	public Name getName()
 	{
-		return Names.any;
+		return Names.auto;
 	}
 	
 	@Override
@@ -40,21 +45,27 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public IType getSuperType()
+	{
+		return null;
+	}
+	
+	@Override
+	public boolean hasTypeVariables()
 	{
 		return true;
 	}
 	
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public IType getConcreteType(ITypeContext context)
 	{
-		return true;
+		return Types.ANY;
 	}
 	
 	@Override
 	public boolean isResolved()
 	{
-		return true;
+		return false;
 	}
 	
 	@Override
@@ -68,6 +79,8 @@ public class AnyType implements IRawType
 	{
 	}
 	
+	// IContext
+	
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -77,7 +90,6 @@ public class AnyType implements IRawType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		Types.OBJECT_CLASS.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
@@ -90,6 +102,8 @@ public class AnyType implements IRawType
 	{
 		return null;
 	}
+	
+	// Compilation
 	
 	@Override
 	public String getInternalName()
@@ -106,14 +120,43 @@ public class AnyType implements IRawType
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		buffer.append("Ljava/lang/Object;");
+	}
+	
+	@Override
+	public int getLoadOpcode()
+	{
+		return ALOAD;
+	}
+	
+	@Override
+	public int getArrayLoadOpcode()
+	{
+		return AALOAD;
+	}
+	
+	@Override
+	public int getStoreOpcode()
+	{
+		return ASTORE;
+	}
+	
+	@Override
+	public int getArrayStoreOpcode()
+	{
+		return AASTORE;
+	}
+	
+	@Override
+	public int getReturnOpcode()
+	{
+		return ARETURN;
 	}
 	
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/AnyType", "instance",
-		                      "Ldyvilx/lang/model/type/AnyType;");
+		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/UnknownType", "instance",
+		                      "Ldyvilx/lang/model/type/UnknownType;", false);
 	}
 	
 	@Override
@@ -127,32 +170,32 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public String toString()
-	{
-		return "any";
-	}
-	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append("any");
-	}
-	
-	@Override
 	public IType clone()
 	{
 		return this;
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "auto";
+	}
+	
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append("auto");
+	}
+	
+	@Override
 	public boolean equals(Object obj)
 	{
-		return this.isSameType((IType) obj);
+		return this == obj;
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return ANY;
+		return UNKNOWN;
 	}
 }

@@ -14,19 +14,19 @@ public interface BinaryConstants
 
 	int BOOLEAN = 16;
 
-	int BYTE = 17;
+	int BYTE  = 17;
 	int SHORT = 18;
-	int CHAR = 19;
-	int INT = 20;
+	int CHAR  = 19;
+	int INT   = 20;
 
-	int LONG   = 21;
+	int LONG = 21;
 
-	int FLOAT  = 22;
-	int DOUBLE = 23;
-	int STRING = 24;
+	int FLOAT                = 22;
+	int DOUBLE               = 23;
+	int STRING               = 24;
 	int STRING_INTERPOLATION = 25;
-	int NAME = 28;
-	int NAME_ACCESS = 29;
+	int NAME                 = 28;
+	int NAME_ACCESS          = 29;
 
 	int BUILDER = 31;
 

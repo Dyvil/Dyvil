@@ -5,9 +5,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A <b>Deque</b> (<b>D</b>ouble-<b>e</b>nded <b>Que</b>ue) is a mutable data
- * structure that supports insertion and removal of elements at both ends,
- * therefore representing both a {@link Stack} and a {@link Queue}.
+ * A <b>Deque</b> (<b>D</b>ouble-<b>e</b>nded <b>Que</b>ue) is a mutable data structure that supports insertion and
+ * removal of elements at both ends, therefore representing both a {@link Stack} and a {@link Queue}.
  *
  * @param <E>
  * 		the element type
@@ -89,9 +88,8 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	E getLast();
 	
 	/**
-	 * Removes the first occurence of the given {@code element} from this deque
-	 * and returns {@code true} if the element was removed. If the element could
-	 * not be removed or was not found, {@code false} is returned.
+	 * Removes the first occurence of the given {@code element} from this deque and returns {@code true} if the element
+	 * was removed. If the element could not be removed or was not found, {@code false} is returned.
 	 *
 	 * @param element
 	 * 		the element to remove
@@ -101,9 +99,8 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	boolean removeFirst(Object o);
 	
 	/**
-	 * Removes the last occurence of the given {@code element} from this deque
-	 * and returns {@code true} if the element was removed. If the element could
-	 * not be removed or was not found, {@code false} is returned.
+	 * Removes the last occurence of the given {@code element} from this deque and returns {@code true} if the element
+	 * was removed. If the element could not be removed or was not found, {@code false} is returned.
 	 *
 	 * @param element
 	 * 		the element to remove
@@ -162,8 +159,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	}
 	
 	/**
-	 * Returns a copy of this deque that contains the same elements as this
-	 * deque in the same order.
+	 * Returns a copy of this deque that contains the same elements as this deque in the same order.
 	 *
 	 * @return a copy of this deque.
 	 */

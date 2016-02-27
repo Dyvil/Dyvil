@@ -1,12 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.lang.reflect.Array;

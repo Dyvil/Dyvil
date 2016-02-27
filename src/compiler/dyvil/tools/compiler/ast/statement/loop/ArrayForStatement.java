@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.statement.loop;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.position.ICodePosition;

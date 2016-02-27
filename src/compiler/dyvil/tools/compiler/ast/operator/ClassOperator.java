@@ -8,12 +8,12 @@ import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -114,7 +114,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	{
 		if (this.type == null)
 		{
-			this.type = dyvil.tools.compiler.ast.type.Types.UNKNOWN;
+			this.type = dyvil.tools.compiler.ast.type.builtin.Types.UNKNOWN;
 			markers.add(Markers.semantic(this.position, "classoperator.invalid"));
 			return;
 		}

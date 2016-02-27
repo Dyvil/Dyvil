@@ -1,6 +1,8 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.*;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;

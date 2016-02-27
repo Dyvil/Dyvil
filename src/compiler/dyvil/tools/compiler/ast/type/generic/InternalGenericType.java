@@ -1,18 +1,23 @@
-package dyvil.tools.compiler.ast.generic.type;
+package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.LambdaType;
+import dyvil.tools.compiler.ast.type.compound.MapType;
+import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -92,10 +97,10 @@ public class InternalGenericType extends GenericType
 			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.UNDEFINED,
 			                   MapType.MapTypes.MAP_CLASS);
 		case "dyvil/collection/MutableMap":
-		return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.MUTABLE,
+			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.MUTABLE,
 			                   MapType.MapTypes.MUTABLE_MAP_CLASS);
 		case "dyvil/collection/ImmutableMap":
-		return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.IMMUTABLE,
+			return new MapType(this.typeArguments[0], this.typeArguments[1], Mutability.IMMUTABLE,
 			                   MapType.MapTypes.IMMUTABLE_MAP_CLASS);
 		}
 

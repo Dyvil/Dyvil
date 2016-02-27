@@ -14,12 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for
- * several String-related functions such as splitting a string into a list of
- * words, converting it to an identifier or acronym, converting to Title Case or
- * camelCase, counting the number of times a character appears a the string,
- * getting the index of a Regular Expression as well as several useful utility
- * functions.
+ * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for several String-related functions such
+ * as splitting a string into a list of words, converting it to an identifier or acronym, converting to Title Case or
+ * camelCase, counting the number of times a character appears a the string, getting the index of a Regular Expression
+ * as well as several useful utility functions.
  *
  * @author Clashsoft
  * @version 1.0
@@ -72,8 +70,8 @@ public final class StringUtils
 	}
 
 	/**
-	 * Formats the given {@link String} {@code format} with the given
-	 * {@code Object[] args} using {@link String#format(String, Object...)}.
+	 * Formats the given {@link String} {@code format} with the given {@code Object[] args} using {@link
+	 * String#format(String, Object...)}.
 	 *
 	 * @param format
 	 * 		the format String
@@ -132,10 +130,9 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Returns a list of words contained in the given {@code string}. A 'word'
-	 * is described as a sequence of letter characters, which are themselves
-	 * described in terms of {@link CharUtils#isLetter(char)}. Every other
-	 * non-etter character is simply ommitted from the list of words.
+	 * Returns a list of words contained in the given {@code string}. A 'word' is described as a sequence of letter
+	 * characters, which are themselves described in terms of {@link CharUtils#isLetter(char)}. Every other non-etter
+	 * character is simply ommitted from the list of words.
 	 *
 	 * @param string
 	 * 		the string to split
@@ -154,9 +151,8 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Splits the given {@code string} into an array of lines separated by
-	 * newline ({@code \n}) characters using it's {@link String#split(String)
-	 * split(String)} method
+	 * Splits the given {@code string} into an array of lines separated by newline ({@code \n}) characters using it's
+	 * {@link String#split(String) split(String)} method
 	 *
 	 * @param string
 	 * 		the string to split
@@ -174,9 +170,8 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Splits the given {@code string} into a {@link List} of lines separated by
-	 * newline ({@code \n}) characters using it's {@link String#split(String)
-	 * split(String)} method
+	 * Splits the given {@code string} into a {@link List} of lines separated by newline ({@code \n}) characters using
+	 * it's {@link String#split(String) split(String)} method
 	 *
 	 * @param string
 	 * 		the string to split
@@ -195,8 +190,7 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Returns the Levenshtein distance between the given {@link String Strings}
-	 * {@code s1} and {@code s2}.
+	 * Returns the Levenshtein distance between the given {@link String Strings} {@code s1} and {@code s2}.
 	 *
 	 * @param s1
 	 * 		the first string
@@ -248,10 +242,8 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Converts the given {@code string} to a valid lower-case identifier. This
-	 * is done by replacing all whitespace characters in the string with
-	 * underscores ({@code _}) and converting all other characters to
-	 * lower-case.
+	 * Converts the given {@code string} to a valid lower-case identifier. This is done by replacing all whitespace
+	 * characters in the string with underscores ({@code _}) and converting all other characters to lower-case.
 	 *
 	 * @param string
 	 * 		the string to convert
@@ -284,12 +276,10 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Converts the given {@code string} to an acronym by removing all
-	 * characters but those at the beginning of a new word.
+	 * Converts the given {@code string} to an acronym by removing all characters but those at the beginning of a new
+	 * word.
 	 * <p>
-	 * Example:<br>
-	 * {@code getAcronym("Hello World")} returns "HW";
-	 * {@code getAcronym("Half-Life 3")} returns "HL3"
+	 * Example:<br> {@code getAcronym("Hello World")} returns "HW"; {@code getAcronym("Half-Life 3")} returns "HL3"
 	 *
 	 * @param string
 	 * 		the string
@@ -337,18 +327,16 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Removes the vowels of the given {@code string} in such a way that it is
-	 * still readable and identifiable. This is done by only removing vowels
-	 * that have a consonant to the left <i>and</i> to the right.
+	 * Removes the vowels of the given {@code string} in such a way that it is still readable and identifiable. This is
+	 * done by only removing vowels that have a consonant to the left <i>and</i> to the right.
 	 * <p>
-	 * Vowels are defined in terms of {@link CharUtils#isVowel(char)}<br>
-	 * Consonants are defined in terms of {@link CharUtils#isConsonant(char)}
+	 * Vowels are defined in terms of {@link CharUtils#isVowel(char)}<br> Consonants are defined in terms of {@link
+	 * CharUtils#isConsonant(char)}
 	 *
 	 * @param string
 	 * 		the string to remove the vowels from
 	 *
-	 * @return a readable acronym-like version of the string with most vowels
-	 * removed
+	 * @return a readable acronym-like version of the string with most vowels removed
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String removeVowels(String string)
@@ -527,8 +515,7 @@ public final class StringUtils
 	}
 
 	/**
-	 * Counts the number of times the given {@code char c} appears in the given
-	 * {@link String} {@code text}.
+	 * Counts the number of times the given {@code char c} appears in the given {@link String} {@code text}.
 	 *
 	 * @param string
 	 * 		the input string
@@ -553,8 +540,7 @@ public final class StringUtils
 	}
 
 	/**
-	 * Checks if the given {@link String} {@code text} contains the given
-	 * {@code char c}.
+	 * Checks if the given {@link String} {@code text} contains the given {@code char c}.
 	 *
 	 * @param string
 	 * 		the string
@@ -570,8 +556,8 @@ public final class StringUtils
 	}
 	
 	/**
-	 * Checks if the given {@link String} {@code text} contains the regular
-	 * expression given by the {@link String} {@code regex}.
+	 * Checks if the given {@link String} {@code text} contains the regular expression given by the {@link String}
+	 * {@code regex}.
 	 *
 	 * @param string
 	 * 		the string

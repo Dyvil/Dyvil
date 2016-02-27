@@ -1,8 +1,8 @@
 package dyvil.collection.range;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Range;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.util.Iterator;

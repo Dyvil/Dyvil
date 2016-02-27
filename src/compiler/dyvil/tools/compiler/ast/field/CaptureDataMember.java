@@ -185,8 +185,8 @@ public abstract class CaptureDataMember implements IDataMember
 		{
 			if (!this.variable.isReferenceCapturable())
 			{
-				markers.add(Markers.semanticError(this.accessPosition, "variable.access.capture",
-				                                  this.variable.getName()));
+				markers.add(
+						Markers.semanticError(this.accessPosition, "variable.access.capture", this.variable.getName()));
 			}
 			else
 			{

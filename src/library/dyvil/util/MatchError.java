@@ -1,11 +1,9 @@
 package dyvil.util;
 
 /**
- * A <b>MatchError</b> is a {@link RuntimeException} thrown when a
- * non-exhaustive {@code match} expression receives a value that none of it's
- * patterns can handle. The MatchError contains the value that was attempted to
- * be matched, and it's {@link #getMessage()} method returns a string describing
- * the value as well as it's type.
+ * A <b>MatchError</b> is a {@link RuntimeException} thrown when a non-exhaustive {@code match} expression receives a
+ * value that none of it's patterns can handle. The MatchError contains the value that was attempted to be matched, and
+ * it's {@link #getMessage()} method returns a string describing the value as well as it's type.
  *
  * @author Clashsoft
  * @version 1.0

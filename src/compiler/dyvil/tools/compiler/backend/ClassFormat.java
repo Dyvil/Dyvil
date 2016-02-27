@@ -2,21 +2,21 @@ package dyvil.tools.compiler.backend;
 
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
-import dyvil.tools.compiler.ast.generic.type.InternalGenericType;
-import dyvil.tools.compiler.ast.generic.type.InternalTypeVarType;
-import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethodSignature;
-import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.InternalType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.WildcardType;
+import dyvil.tools.compiler.ast.type.generic.GenericType;
+import dyvil.tools.compiler.ast.type.generic.InternalGenericType;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
+import dyvil.tools.compiler.ast.type.typevar.InternalTypeVarType;
 import dyvil.tools.parsing.Name;
 
 public final class ClassFormat

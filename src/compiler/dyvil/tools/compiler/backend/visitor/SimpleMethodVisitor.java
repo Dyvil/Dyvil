@@ -2,12 +2,12 @@ package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.method.IExternalMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.parsing.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor

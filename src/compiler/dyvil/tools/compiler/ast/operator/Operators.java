@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringConcatExpr;
 import dyvil.tools.compiler.ast.reference.ReferenceOperator;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 

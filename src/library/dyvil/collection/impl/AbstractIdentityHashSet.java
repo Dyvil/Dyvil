@@ -1,6 +1,9 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.*;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 

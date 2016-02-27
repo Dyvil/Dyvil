@@ -37,8 +37,7 @@ public class Complex implements Serializable
 	}
 	
 	@DyvilModifiers(Modifiers.PREFIX)
-	public
-	Complex $tilde()
+	public Complex $tilde()
 	{
 		return apply(-this.real, this.imag);
 	}

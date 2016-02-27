@@ -1,15 +1,15 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvilx.lang.model.type.Type;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.reflect.EnumReflection;
 import dyvil.reflect.Modifiers;
 import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
+import dyvilx.lang.model.type.Type;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -379,6 +379,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	{
 		return this.mutableCopy();
 	}
+
 	@Override
 	public java.util.Map<K, V> toJava()
 	{
