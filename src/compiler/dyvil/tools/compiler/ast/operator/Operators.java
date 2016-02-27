@@ -25,7 +25,7 @@ public interface Operators
 				return new NotOperator(arg1);
 			}
 		}
-		if (name == Names.amp || name == Names.times) // TODO Drop * support
+		if (name == Names.times)
 		{
 			return new ReferenceOperator(arg1);
 		}

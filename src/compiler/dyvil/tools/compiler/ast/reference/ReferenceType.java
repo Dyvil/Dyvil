@@ -340,14 +340,14 @@ public class ReferenceType implements IObjectType
 	@Override
 	public String toString()
 	{
-		return this.type + "&";
+		return this.type + "*";
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.type.toString(prefix, buffer);
-		buffer.append('&');
+		buffer.append('*');
 	}
 
 	@Override
