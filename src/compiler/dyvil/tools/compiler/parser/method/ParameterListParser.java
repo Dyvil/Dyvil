@@ -17,6 +17,7 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
@@ -54,6 +55,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
+		if (type == Tokens.EOF)
+		{
+			pm.popParser();
+			return;
+		}
+
 		switch (this.mode)
 		{
 		case TYPE:

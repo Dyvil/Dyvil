@@ -176,6 +176,7 @@ public class DyvilHeaderParser extends Parser
 			}
 			// Fallthrough
 		case IMPORT:
+			this.mode = IMPORT;
 			if (this.parseImport(pm, token, type))
 			{
 				return;

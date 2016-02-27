@@ -75,21 +75,19 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
-			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "class.generic.close_bracket");
 			}
-			pm.reparse();
-			pm.report(token, "class.generic.close_bracket");
 			return;
 		case PARAMETERS_END:
 			this.mode = EXTENDS;
-			if (type == BaseSymbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				return;
+				pm.reparse();
+				pm.report(token, "class.parameters.close_paren");
 			}
-			pm.reparse();
-			pm.report(token, "class.parameters.close_paren");
 			return;
 		case GENERICS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
@@ -167,7 +165,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 					}
 				}
 				
-				pm.popParser();
+				pm.popParser(true);
 				this.consumer.addClass(this.theClass);
 				return;
 			}

@@ -162,6 +162,7 @@ public abstract class Member implements IMember
 		{
 			this.type = this.type.resolveType(markers, context);
 		}
+
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);
