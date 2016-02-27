@@ -49,46 +49,46 @@ public class CompleteCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String... args)
 	{
-		REPLContext context = repl.getContext();
+		final REPLContext context = repl.getContext();
 		
 		if (args.length == 0)
 		{
 			// REPL Variables
 			
-			this.printMembers(repl, context, "");
+			this.printREPLMembers(repl, context, "");
 			return;
 		}
 		
-		String argument = args[0];
-		int index = args[0].indexOf('.');
-		if (index <= 0)
+		final String argument = args[0];
+		final int dotIndex = argument.lastIndexOf('.');
+		if (dotIndex <= 0)
 		{
 			// REPL Variable Completions
 			
-			this.printMembers(repl, context, BaseSymbols.qualify(argument));
+			this.printREPLMembers(repl, context, BaseSymbols.qualify(argument));
 			return;
 		}
-		
-		Name varName = Name.get(argument.substring(0, index));
-		String memberStart = BaseSymbols.qualify(argument.substring(index + 1));
-		IDataMember variable = context.resolveField(varName);
-		
+
+		final Name varName = Name.get(argument.substring(0, dotIndex));
+		final String memberStart = BaseSymbols.qualify(argument.substring(dotIndex + 1));
+
+		final IDataMember variable = context.resolveField(varName);
 		if (variable != null)
 		{
 			// Field Completions
-			
-			IType type = variable.getType();
+			final IType type = variable.getType();
 			repl.getOutput().println("Available completions for '" + varName + "' of type '" + type + "':");
-			
+
 			this.printCompletions(repl, memberStart, type, false);
 			return;
 		}
 		
-		IType type = IContext.resolveType(context, varName);
+		final IType type = IContext.resolveType(context, varName);
 		if (type != null)
 		{
 			// Type Completions
 			repl.getOutput().println("Available completions for type '" + type + "':");
+
 			this.printCompletions(repl, memberStart, type, true);
 			return;
 		}
@@ -98,12 +98,60 @@ public class CompleteCommand implements ICommand
 		return;
 	}
 	
+	private void printREPLMembers(DyvilREPL repl, REPLContext context, String start)
+	{
+		final Set<String> fields = new TreeSet<>();
+		final Set<String> methods = new TreeSet<>();
+
+		for (IField variable : context.getFields().values())
+		{
+			if (variable.getName().startWith(start))
+			{
+				fields.add(getSignature(Types.UNKNOWN, variable));
+			}
+		}
+		for (IMethod method : context.getMethods())
+		{
+			if (method.getName().startWith(start))
+			{
+				methods.add(getSignature(Types.UNKNOWN, method));
+			}
+		}
+
+		boolean output = false;
+		if (!fields.isEmpty())
+		{
+			output = true;
+			repl.getOutput().println("Fields:");
+			for (String field : fields)
+			{
+				repl.getOutput().print('\t');
+				repl.getOutput().println(field);
+			}
+		}
+		if (!methods.isEmpty())
+		{
+			output = true;
+			repl.getOutput().println("Methods:");
+			for (String method : methods)
+			{
+				repl.getOutput().print('\t');
+				repl.getOutput().println(method);
+			}
+		}
+
+		if (!output)
+		{
+			repl.getOutput().println("No completions available");
+		}
+	}
+
 	private void printCompletions(DyvilREPL repl, String memberStart, IType type, boolean statics)
 	{
-		Set<String> fields = new TreeSet<>();
-		Set<String> properties = new TreeSet<>();
-		Set<String> methods = new TreeSet<>();
-		
+		final Set<String> fields = new TreeSet<>();
+		final Set<String> properties = new TreeSet<>();
+		final Set<String> methods = new TreeSet<>();
+
 		this.findCompletions(type, fields, properties, methods, memberStart, statics, new IdentityHashSet<>());
 
 		boolean output = false;
@@ -149,55 +197,7 @@ public class CompleteCommand implements ICommand
 			}
 		}
 	}
-	
-	private void printMembers(DyvilREPL repl, REPLContext context, String start)
-	{
-		Set<String> fields = new TreeSet<>();
-		Set<String> methods = new TreeSet<>();
-		
-		for (IField variable : context.getFields().values())
-		{
-			if (variable.getName().startWith(start))
-			{
-				fields.add(getSignature(Types.UNKNOWN, variable));
-			}
-		}
-		for (IMethod method : context.getMethods())
-		{
-			if (method.getName().startWith(start))
-			{
-				methods.add(getSignature(Types.UNKNOWN, method));
-			}
-		}
 
-		boolean output = false;
-		if (!fields.isEmpty())
-		{
-			output = true;
-			repl.getOutput().println("Fields:");
-			for (String field : fields)
-			{
-				repl.getOutput().print('\t');
-				repl.getOutput().println(field);
-			}
-		}
-		if (!methods.isEmpty())
-		{
-			output = true;
-			repl.getOutput().println("Methods:");
-			for (String method : methods)
-			{
-				repl.getOutput().print('\t');
-				repl.getOutput().println(method);
-			}
-		}
-
-		if (!output)
-		{
-			repl.getOutput().println("No completions available");
-		}
-	}
-	
 	private void findCompletions(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, boolean statics, Set<IClass> dejaVu)
 	{
 		IClass iclass = type.getTheClass();
