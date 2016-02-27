@@ -116,9 +116,10 @@ public final class DyvilREPL
 
 		Package.init();
 		Types.initHeaders();
-		Types.initTypes();
 
 		this.compiler.checkLibraries();
+
+		Types.initTypes();
 
 		if (this.compiler.config.isDebug())
 		{
