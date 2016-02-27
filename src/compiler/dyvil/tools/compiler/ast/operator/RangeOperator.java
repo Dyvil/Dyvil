@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Util;
@@ -26,10 +25,14 @@ public class RangeOperator implements IValue
 	public static final class LazyFields
 	{
 		public static final IClass         RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
-		public static final ClassType      RANGE           = new ClassType(RANGE_CLASS);
 		public static final IClass         RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
-		public static final ClassType      RANGEABLE       = new ClassType(RANGEABLE_CLASS);
+		public static final IType          RANGEABLE       = RANGEABLE_CLASS.getClassType();
 		public static final ITypeParameter RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeParameter(0);
+
+		public static final IClass INT_RANGE_CLASS    = Package.dyvilCollectionRange.resolveClass("IntRange");
+		public static final IClass LONG_RANGE_CLASS   = Package.dyvilCollectionRange.resolveClass("LongRange");
+		public static final IClass FLOAT_RANGE_CLASS  = Package.dyvilCollectionRange.resolveClass("FloatRange");
+		public static final IClass DOUBLE_RANGE_CLASS = Package.dyvilCollectionRange.resolveClass("DoubleRange");
 	}
 	
 	protected ICodePosition position;
@@ -132,8 +135,6 @@ public class RangeOperator implements IValue
 			this.elementType = Types.combine(this.firstValue.getType(), this.lastValue.getType());
 		}
 
-		final ClassGenericType genericType = new ClassGenericType(LazyFields.RANGE_CLASS);
-
 		if (this.elementType.isPrimitive())
 		{
 			switch (this.elementType.getTypecode())
@@ -141,11 +142,22 @@ public class RangeOperator implements IValue
 			case PrimitiveType.BYTE_CODE:
 			case PrimitiveType.SHORT_CODE:
 			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
 				this.elementType = Types.INT;
-				break;
+				return this.type = LazyFields.INT_RANGE_CLASS.getClassType();
+			case PrimitiveType.LONG_CODE:
+				this.elementType = Types.LONG;
+				return this.type = LazyFields.LONG_RANGE_CLASS.getClassType();
+			case PrimitiveType.FLOAT_CODE:
+				this.elementType = Types.FLOAT;
+				return this.type = LazyFields.FLOAT_RANGE_CLASS.getClassType();
+			case PrimitiveType.DOUBLE_CODE:
+				this.elementType = Types.DOUBLE;
+				return this.type = LazyFields.DOUBLE_RANGE_CLASS.getClassType();
 			}
 		}
 
+		final ClassGenericType genericType = new ClassGenericType(LazyFields.RANGE_CLASS);
 		genericType.addType(this.elementType);
 		this.type = genericType;
 		return this.type;
@@ -182,6 +194,7 @@ public class RangeOperator implements IValue
 		{
 			return null;
 		}
+		elementType = PrimitiveType.getPrimitiveType(elementType);
 		
 		this.type = type;
 		this.elementType = elementType;
@@ -277,7 +290,6 @@ public class RangeOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-
 		// -- Range --
 		if (!this.type.isArrayType())
 		{
@@ -293,10 +305,10 @@ public class RangeOperator implements IValue
 	{
 		final String method = this.halfOpen ? "halfOpen" : "apply";
 
-		if (!this.elementType.isPrimitive())
+		if (this.type.getTheClass() == LazyFields.RANGE_CLASS)
 		{
-			this.firstValue.writeExpression(writer, LazyFields.RANGEABLE);
-			this.lastValue.writeExpression(writer, LazyFields.RANGEABLE);
+			this.firstValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
+			this.lastValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
 
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method,
 			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;)Ldyvil/collection/Range;",
@@ -318,15 +330,15 @@ public class RangeOperator implements IValue
 			return;
 		case PrimitiveType.LONG_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/LongRange", method,
-			                       "(II)Ldyvil/collection/range/LongRange;", false);
+			                       "(JJ)Ldyvil/collection/range/LongRange;", false);
 			return;
 		case PrimitiveType.FLOAT_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/FloatRange", method,
-			                       "(II)Ldyvil/collection/range/FloatRange;", false);
+			                       "(FF)Ldyvil/collection/range/FloatRange;", false);
 			return;
 		case PrimitiveType.DOUBLE_CODE:
 			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/DoubleRange", method,
-			                       "(II)Ldyvil/collection/range/DoubleRange;", false);
+			                       "(DD)Ldyvil/collection/range/DoubleRange;", false);
 			return;
 		}
 	}
