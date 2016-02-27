@@ -273,7 +273,10 @@ public interface MutableMap<K, V> extends Map<K, V>
 	default V remap(Object key, K newKey)
 	{
 		final V value = this.removeKey(key);
-		this.put(newKey, value);
+		if (value != null)
+		{
+			this.put(newKey, value);
+		}
 		return value;
 	}
 
