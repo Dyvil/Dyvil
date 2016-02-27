@@ -7,7 +7,10 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 public final class ObjectFormat
 {
@@ -15,18 +18,17 @@ public final class ObjectFormat
 
 	public static void write(DyvilCompiler compiler, File file, IDyvilHeader header)
 	{
-		if (!FileUtils.tryCreate(file))
+		try
 		{
-			compiler.error("Error during compilation of '" + file + "': could not create file");
-			return;
-		}
-		
-		try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
-		{
-			writer.writeShort(FILE_VERSION);
-			header.write(writer);
+			FileUtils.create(file);
 
-			// Bytes are written when the StringPoolWriter closes
+			try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
+			{
+				writer.writeShort(FILE_VERSION);
+				header.write(writer);
+
+				// Bytes are written when the StringPoolWriter closes
+			}
 		}
 		catch (Throwable ex)
 		{

@@ -41,7 +41,7 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	private static boolean create(File file) throws IOException
+	public static boolean create(File file) throws IOException
 	{
 		if (file.exists())
 		{
@@ -49,7 +49,12 @@ public final class FileUtils
 		}
 
 		final File parent = file.getParentFile();
-		return !(parent != null && !parent.mkdirs()) && file.createNewFile();
+		if (parent != null && !parent.mkdirs())
+		{
+			return false;
+		}
+		final boolean newFile = file.createNewFile();
+		return !newFile;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
