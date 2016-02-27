@@ -105,7 +105,8 @@ public final class PrimitiveType implements IType
 		{
 			return type;
 		}
-		IClass iclass = type.getTheClass();
+
+		final IClass iclass = type.getTheClass();
 		if (iclass == Types.VOID_CLASS)
 		{
 			return Types.VOID;

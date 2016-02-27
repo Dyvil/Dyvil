@@ -60,8 +60,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                               "linkExtension",
 	                                               "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
-
-	static final int VARARGS_MATCH = 100;
 	
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
@@ -241,7 +239,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		if (index >= this.parameters.length)
 		{
-			MethodParameter[] temp = new MethodParameter[this.parameterCount];
+			IParameter[] temp = new IParameter[this.parameterCount];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
@@ -378,11 +376,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		switch (this.parameterCount)
 		{
 		case 0:
-			if (this.name == Names.toString)
-			{
-				return true;
-			}
-			return this.name == Names.hashCode;
+			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
 			if (this.name == Names.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
 			{
@@ -572,76 +566,78 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// infix modifier implementation
 		if (receiver != null)
 		{
-			int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
+			if (mod == 0 || receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
-				receiver = null;
-			}
-			else if (mod == Modifiers.INFIX)
-			{
-				IType t2 = this.parameters[0].getType();
-				float receiverMatch = receiver.getTypeMatch(t2);
-				if (receiverMatch == 0)
+				if (mod == Modifiers.INFIX)
 				{
+					final IType infixReceiverType = this.parameters[0].getType();
+					final float receiverMatch = receiver.getTypeMatch(infixReceiverType);
+					if (receiverMatch == 0)
+					{
+						return 0;
+					}
+
+					totalMatch += receiverMatch;
+					parameterStartIndex = 1;
+				}
+				else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
+				{
+					// Disallow non-static access to static method
 					return 0;
 				}
-				totalMatch += receiverMatch;
-				
-				parameterStartIndex = 1;
-			}
-			else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
-			{
-				// Disallow non-static access to static method
-				return 0;
-			}
-			else
-			{
-				float receiverMatch = receiver.getTypeMatch(this.theClass.getClassType());
-				if (receiverMatch <= 0)
+				else
 				{
-					return 0;
+					final float receiverMatch = receiver.getTypeMatch(this.theClass.getClassType());
+					if (receiverMatch <= 0)
+					{
+						return 0;
+					}
+					totalMatch += receiverMatch;
 				}
-				totalMatch += receiverMatch;
 			}
 		}
 		if (this.isVariadic())
 		{
-			int varargsStart = this.parameterCount - 1 - parameterStartIndex;
+			final int varargsStart = this.parameterCount - 1 - parameterStartIndex;
 			
 			for (int i = parameterStartIndex; i < varargsStart; i++)
 			{
-				IParameter par = this.parameters[i + parameterStartIndex];
-				float valueMatch = arguments.getTypeMatch(i, par);
+				final IParameter parameter = this.parameters[i + parameterStartIndex];
+				final float valueMatch = arguments.getTypeMatch(i, parameter);
 				if (valueMatch <= 0)
 				{
 					return 0;
 				}
+
 				totalMatch += valueMatch;
 			}
 			
-			IParameter varParam = this.parameters[varargsStart + parameterStartIndex];
-			float varargsMatch = arguments.getVarargsTypeMatch(varargsStart, varParam);
+			final IParameter varParam = this.parameters[varargsStart + parameterStartIndex];
+			final float varargsMatch = arguments.getVarargsTypeMatch(varargsStart, varParam);
 			if (varargsMatch <= 0)
 			{
 				return 0;
 			}
+
 			return totalMatch + varargsMatch;
 		}
 		
-		int parameterLeft = this.parameterCount - parameterStartIndex;
-		if (argumentCount > parameterLeft)
+		final int parametersLeft = this.parameterCount - parameterStartIndex;
+		if (argumentCount > parametersLeft)
 		{
 			return 0;
 		}
 		
-		for (int argumentIndex = 0; argumentIndex < parameterLeft; argumentIndex++)
+		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
-			IParameter par = this.parameters[argumentIndex + parameterStartIndex];
-			float valueMatch = arguments.getTypeMatch(argumentIndex, par);
+			final IParameter parameter = this.parameters[argumentIndex + parameterStartIndex];
+			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter);
 			if (valueMatch <= 0)
 			{
 				return 0;
 			}
+
 			totalMatch += valueMatch;
 		}
 		
@@ -676,8 +672,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, ITypeContext typeContext)
 	{
-		int len = arguments.size();
-		
 		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
 		{
 			IValue argument = arguments.getFirstValue();
@@ -775,7 +769,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		if (this.isVariadic())
 		{
-			len = this.parameterCount - 1;
+			final int len = this.parameterCount - 1;
 			arguments.checkVarargsValue(len, this.parameters[len], typeContext, markers, null);
 			
 			for (int i = 0; i < len; i++)
