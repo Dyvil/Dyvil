@@ -33,15 +33,15 @@ public class LibraryCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
-		if (args.length == 0)
+		if (argument == null)
 		{
 			repl.getErrorOutput().println("Missing Path Argument. Usage: " + this.getUsage());
 			return;
 		}
 
-		final File path = new File(args[0]);
+		final File path = new File(argument);
 		try
 		{
 			final Library library = Library.load(path);

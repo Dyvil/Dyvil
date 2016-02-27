@@ -26,16 +26,16 @@ public class DumpCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
-		if (args.length == 0)
+		if (argument == null)
 		{
 			repl.getOutput().println("Result Class Dumping disabled.");
 			repl.setDumpDir(null);
 			return;
 		}
 		
-		File dumpDir = new File(args[0]);
+		File dumpDir = new File(argument);
 		repl.setDumpDir(dumpDir);
 		
 		try

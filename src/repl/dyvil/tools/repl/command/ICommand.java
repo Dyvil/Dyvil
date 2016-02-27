@@ -15,5 +15,5 @@ public interface ICommand
 
 	String getUsage();
 	
-	void execute(DyvilREPL repl, String... args);
+	void execute(DyvilREPL repl, String args);
 }

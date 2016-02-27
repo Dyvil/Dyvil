@@ -32,16 +32,23 @@ public class RenameCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
-		if (args.length < 2)
+		if (argument == null)
 		{
-			repl.getErrorOutput().println("Invalid Arguments. Usage: " + this.getUsage());
+			repl.getErrorOutput().println("Missing Arguments. Usage: " + this.getUsage());
 			return;
 		}
 
-		final Name memberName = Name.get(args[0]);
-		final Name newName = Name.get(args[1]);
+		final String[] split = argument.split(" ", 2);
+		if (split.length < 2)
+		{
+			repl.getErrorOutput().println("Invalid Number of Arguments. Usage: " + this.getUsage());
+			return;
+		}
+
+		final Name memberName = Name.get(split[0]);
+		final Name newName = Name.get(split[1]);
 		final Map<Name, IField> fields = repl.getContext().getFields();
 		final IField field = fields.remap(memberName, newName);
 

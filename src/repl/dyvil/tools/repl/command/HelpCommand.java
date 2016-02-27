@@ -31,15 +31,15 @@ public class HelpCommand implements ICommand
 	}
 
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public void execute(DyvilREPL repl, String argument)
 	{
-		if (args.length == 0)
+		if (argument == null)
 		{
 			this.printAllCommands(repl);
 			return;
 		}
 
-		this.printCommandInfo(repl, args[0]);
+		this.printCommandInfo(repl, argument);
 	}
 
 	private void printAllCommands(DyvilREPL repl)
