@@ -6,8 +6,8 @@ import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -15,8 +15,13 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.parsing.Name;
+import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.DyvilLexer;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
 
@@ -68,33 +73,23 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 
-		final Name varName = Name.get(argument.substring(0, dotIndex));
+		final String expression = argument.substring(0, dotIndex);
 		final String memberStart = BaseSymbols.qualify(argument.substring(dotIndex + 1));
 
-		final IDataMember variable = context.resolveField(varName);
-		if (variable != null)
-		{
-			// Field Completions
-			final IType type = variable.getType();
-			repl.getOutput().println("Available completions for '" + varName + "' of type '" + type + "':");
+		final MarkerList markers = new MarkerList();
+		final TokenIterator tokenIterator = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
 
-			this.printCompletions(repl, memberStart, type, false);
-			return;
-		}
-		
-		final IType type = IContext.resolveType(context, varName);
-		if (type != null)
-		{
-			// Type Completions
-			repl.getOutput().println("Available completions for type '" + type + "':");
+		final IValueConsumer valueConsumer = value -> {
+			value.resolveTypes(markers, context);
+			value = value.resolve(markers, context);
+			value.checkTypes(markers, context);
 
-			this.printCompletions(repl, memberStart, type, true);
-			return;
-		}
-		
-		// No Completions available
-		repl.getOutput().println("'" + varName + "' could not be resolved");
-		return;
+			final IType type = value.getType();
+			repl.getOutput().println("Available completions for '" + value + "' of type '" + type + "':");
+
+			this.printCompletions(repl, memberStart, type, value.valueTag() == IValue.CLASS_ACCESS);
+		};
+		new ParserManager(new ExpressionParser(valueConsumer), markers, context).parse(tokenIterator);
 	}
 	
 	private void printREPLMembers(DyvilREPL repl, REPLContext context, String start)
