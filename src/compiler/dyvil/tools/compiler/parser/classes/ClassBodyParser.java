@@ -30,6 +30,7 @@ import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -112,6 +113,18 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				}
 				this.reset();
 				return;
+			case DyvilSymbols.AT:
+			{
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+
+				Annotation annotation = new Annotation(token.raw());
+				this.annotations.addAnnotation(annotation);
+				pm.pushParser(pm.newAnnotationParser(annotation));
+				return;
+			}
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
@@ -133,27 +146,15 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					pm.pushParser(new StatementListParser(initializer));
 					return;
 				}
-				// Fallthrough to constructor declaration
+
+				this.parseConstructorDeclaration(pm, token);
+				return;
 			case DyvilKeywords.NEW: // legacy, TODO drop 'new' support
-			{
-				final Constructor constructor = new Constructor(token.raw(), this.theClass, this.modifiers);
-				constructor.setAnnotations(this.annotations);
-				this.member = constructor;
-
-				if (this.theClass == null)
-				{
-					pm.report(token, "constructor.disallowed");
-					this.memberKind = IGNORE;
-				}
-				else
-				{
-					this.memberKind = CONSTRUCTOR;
-				}
-
-				this.mode = PARAMETERS;
+				pm.report(Markers.syntaxWarning(token, "constructor.new"));
+				this.parseConstructorDeclaration(pm, token);
 				return;
 			}
-			}
+
 			Modifier modifier;
 			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
@@ -178,18 +179,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				this.reset();
 				return;
 			}
-			if (type == DyvilSymbols.AT)
-			{
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-				
-				Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
-				pm.pushParser(pm.newAnnotationParser(annotation));
-				return;
-			}
+
 			pm.pushParser(pm.newTypeParser(this), true);
 			this.mode = NAME_OPERATOR;
 			return;
@@ -374,6 +364,25 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			this.reset();
 			return;
 		}
+	}
+
+	public void parseConstructorDeclaration(IParserManager pm, IToken token)
+	{
+		final Constructor constructor = new Constructor(token.raw(), this.theClass, this.modifiers);
+		constructor.setAnnotations(this.annotations);
+		this.member = constructor;
+
+		if (this.theClass == null)
+		{
+			pm.report(token, "constructor.disallowed");
+			this.memberKind = IGNORE;
+		}
+		else
+		{
+			this.memberKind = CONSTRUCTOR;
+		}
+
+		this.mode = PARAMETERS;
 	}
 	
 	@Override
