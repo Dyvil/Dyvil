@@ -12,7 +12,7 @@ import dyvil.tools.parsing.token.IToken;
 public final class PatternListParser extends Parser implements IPatternConsumer
 {
 	private static final int PATTERN = 0;
-	private static final int COMMA = 1;
+	private static final int COMMA   = 1;
 
 	protected IPatternList patternList;
 	

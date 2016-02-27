@@ -113,10 +113,8 @@ public final class LiteralConversion implements IValue
 			{
 				StringBuilder builder = new StringBuilder();
 				this.arguments.typesToString(builder);
-				markers.add(
-						Markers
-								.semantic(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
-								          builder));
+				markers.add(Markers.semantic(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
+				                             builder));
 				this.type = type;
 				return null;
 			}
