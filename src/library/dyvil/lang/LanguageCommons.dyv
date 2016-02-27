@@ -4,7 +4,7 @@ using	dyvil.reflect.Opcodes._
 
 public final class LanguageCommons
 {
-	private new() {}
+	private init() {}
 
 	// Assertions
 

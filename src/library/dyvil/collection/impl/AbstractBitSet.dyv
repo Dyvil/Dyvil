@@ -10,19 +10,19 @@ public abstract class AbstractBitSet implements Set[int]
 	protected @Transient int size
 	protected @Transient() [long] words
 
-	public new()
+	public init()
 	{
-		this.new(DEFAULT_CAPACITY)
+		this.init(DEFAULT_CAPACITY)
 	}
 
-	public new(int capacity)
+	public init(int capacity)
 	{
 		this.words = new [long](dyvil.math.MathUtils.ceil(capacity / 64))
 	}
 
-	public new(int... elements)
+	public init(int... elements)
 	{
-		this.new(elements.length)
+		this.init(elements.length)
 		this.size = elements.length
 
 		for (int i : elements)
@@ -32,10 +32,10 @@ public abstract class AbstractBitSet implements Set[int]
 		}
 	}
 
-	public new(Collection[int] elements)
+	public init(Collection[int] elements)
 	{
 		// Copy from above
-		this.new(elements.size)
+		this.init(elements.size)
 		this.size = elements.size
 
 		for (int i : elements)
@@ -45,7 +45,7 @@ public abstract class AbstractBitSet implements Set[int]
 		}
 	}
 
-	public new(AbstractBitSet elements)
+	public init(AbstractBitSet elements)
 	{
 		this.size = elements.size
 		this.words = elements.words.copy()

@@ -4,29 +4,29 @@ import dyvil.collection.impl.AbstractBitSet
 
 public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 {
-	public new()
+	public init()
 	{
-		super.new()
+		super.init()
 	}
 
-	public new(int capacity)
+	public init(int capacity)
 	{
-		super.new(capacity)
+		super.init(capacity)
 	}
 
-	public new(int... elements)
+	public init(int... elements)
 	{
-		super.new(elements)
+		super.init(elements)
 	}
 
-	public new(Collection[int] elements)
+	public init(Collection[int] elements)
 	{
-		super.new(elements)
+		super.init(elements)
 	}
 
-	public new(AbstractBitSet elements)
+	public init(AbstractBitSet elements)
 	{
-		super.new(elements)
+		super.init(elements)
 	}
 
 	protected override void removeAt(int bit) = throw new dyvil.util.ImmutableException("Iterator.remove() on Immutable Set")

@@ -8,7 +8,7 @@ using	dyvil.reflect.Opcodes._
 @dyvil.annotation.Experimental
 public final class LanguageFeatures
 {
-	private new() {}
+	private init() {}
 
 	// Tuples
 

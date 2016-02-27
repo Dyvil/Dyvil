@@ -4,7 +4,7 @@ using	dyvil.reflect.Opcodes._
 
 public final class StringExtensions
 {
-	private new() {}
+	private init() {}
 
 	@Intrinsic([ LOAD_0 ])
 	public static char $(char c) = c
