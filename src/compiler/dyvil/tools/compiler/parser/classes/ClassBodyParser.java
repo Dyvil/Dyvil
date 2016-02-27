@@ -113,18 +113,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				}
 				this.reset();
 				return;
-			case DyvilSymbols.AT:
-			{
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-
-				Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
-				pm.pushParser(pm.newAnnotationParser(annotation));
-				return;
-			}
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
@@ -177,6 +165,20 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				                                                           this.annotations);
 				pm.pushParser(parser);
 				this.reset();
+				return;
+			}
+
+			// This is not in the above switch because 'readClassTypeModifier' above has to check for '@ interface' first
+			if (type == DyvilSymbols.AT)
+			{
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+
+				final Annotation annotation = new Annotation(token.raw());
+				this.annotations.addAnnotation(annotation);
+				pm.pushParser(pm.newAnnotationParser(annotation));
 				return;
 			}
 
