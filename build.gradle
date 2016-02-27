@@ -45,9 +45,6 @@ if (droneBuild)
 
 // ---------------------------------------- Source Settings ----------------------------------------
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 sourceSets {
 	library {
 		java {
@@ -242,10 +239,10 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 
 task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	main = 'dyvil.test.Main'
-	classpath = files("build/dyviltestbin") + sourceSets.library.runtimeClasspath + files("build/dyvilbin")
+	classpath = sourceSets.library.runtimeClasspath + files("build/dyviltestbin") + files("build/dyvilbin")
 }
 
-test.dependsOn testDyvil
+test.dependsOn 'testDyvil'
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 
@@ -353,7 +350,7 @@ task prepareRelease(type: Copy) {
 
 if (nightly)
 {
-	build.dependsOn prepareRelease
+	build.dependsOn 'prepareRelease'
 }
 
 // ---------------------------------------- Misc. Tasks ----------------------------------------

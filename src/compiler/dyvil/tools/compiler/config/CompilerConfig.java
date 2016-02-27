@@ -14,7 +14,7 @@ public class CompilerConfig
 {
 	private DyvilCompiler compiler;
 
-	private String directory = ".";
+	private String baseDirectory;
 	
 	private String jarName;
 	private String jarVendor;
@@ -46,14 +46,14 @@ public class CompilerConfig
 		this.libraries.add(Library.javaLibrary);
 	}
 	
-	public void setDirectory(String directory)
+	public void setBaseDirectory(String baseDirectory)
 	{
-		this.directory = directory;
+		this.baseDirectory = baseDirectory;
 	}
 	
 	public void setConfigFile(File configFile)
 	{
-		this.directory = configFile.getParent();
+		this.baseDirectory = configFile.getParent();
 	}
 	
 	public void setJarName(String jarName)
@@ -108,7 +108,7 @@ public class CompilerConfig
 	
 	public void setOutputDir(String outputDir)
 	{
-		this.outputDir = new File(this.directory, outputDir);
+		this.outputDir = this.resolveFile(outputDir);
 	}
 	
 	public File getSourceDir()
@@ -118,7 +118,7 @@ public class CompilerConfig
 	
 	public void setSourceDir(String sourceDir)
 	{
-		this.sourceDir = new File(this.directory, sourceDir);
+		this.sourceDir = this.resolveFile(sourceDir);
 	}
 	
 	public File getLogFile()
@@ -128,14 +128,14 @@ public class CompilerConfig
 	
 	public void setLogFile(String logFile)
 	{
-		this.logFile = new File(this.directory, logFile);
+		this.logFile = this.resolveFile(logFile);
 	}
 	
 	public void addLibraryFile(String file)
 	{
 		try
 		{
-			this.libraries.add(Library.load(new File(this.directory, file)));
+			this.libraries.add(Library.load(this.resolveFile(file)));
 		}
 		catch (FileNotFoundException ex)
 		{
@@ -187,7 +187,20 @@ public class CompilerConfig
 	{
 		this.maxConstantDepth = maxConstantDepth;
 	}
-	
+
+	private File resolveFile(String fileName)
+	{
+		if (fileName.length() == 0)
+		{
+			return new File(this.baseDirectory);
+		}
+		if (fileName.charAt(0) == File.separatorChar)
+		{
+			return new File(fileName);
+		}
+		return new File(this.baseDirectory, fileName);
+	}
+
 	public boolean isExcluded(String name)
 	{
 		for (String s : this.excludedFiles)
