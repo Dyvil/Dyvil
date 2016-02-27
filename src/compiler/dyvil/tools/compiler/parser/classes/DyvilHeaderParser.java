@@ -218,4 +218,10 @@ public class DyvilHeaderParser extends Parser
 		pm.pushParser(pm.newAnnotationParser(annotation));
 		return;
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return this.mode > PACKAGE;
+	}
 }

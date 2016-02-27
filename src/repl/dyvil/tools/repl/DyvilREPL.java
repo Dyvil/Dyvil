@@ -164,20 +164,18 @@ public final class DyvilREPL
 
 		SemicolonInference.inferSemicolons(tokens.first());
 		
-		if (this.parser.parse(markers, tokens, new DyvilUnitParser(this.context, false), 1))
-		// 1 = DyvilHeaderParser.PACKAGE
+		if (this.parser.parse(markers, tokens, new DyvilUnitParser(this.context, false), false))
 		{
 			this.context.reportErrors();
 			return;
 		}
-		if (this.parser.parse(markers, tokens, new ClassBodyParser(this.context), 2))
-		// 2 = ClassBodyParser.NAME
+		if (this.parser.parse(markers, tokens, new ClassBodyParser(this.context), false))
 		{
 			this.context.reportErrors();
 			return;
 		}
 
-		this.parser.parse(markers, tokens, new ExpressionParser(this.context), -1);
+		this.parser.parse(markers, tokens, new ExpressionParser(this.context), true);
 		this.context.reportErrors();
 	}
 	

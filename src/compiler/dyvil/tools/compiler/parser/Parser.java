@@ -71,4 +71,9 @@ public abstract class Parser
 	}
 	
 	public abstract void parse(IParserManager pm, IToken token);
+
+	public boolean reportErrors()
+	{
+		return true;
+	}
 }

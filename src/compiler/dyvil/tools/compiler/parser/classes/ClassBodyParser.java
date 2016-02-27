@@ -62,7 +62,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	private IType type;
 	private ModifierSet modifiers = new ModifierList();
 	private AnnotationList annotations;
-	
+
 	private IMember member;
 	private byte    memberKind;
 	
@@ -380,5 +380,11 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	public void setType(IType type)
 	{
 		this.type = type;
+	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return !(this.mode == PARAMETERS && this.member instanceof IConstructor) && this.mode > NAME;
 	}
 }

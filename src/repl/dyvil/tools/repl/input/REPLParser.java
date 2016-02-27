@@ -33,7 +33,7 @@ public class REPLParser extends ParserManager
 		}
 	}
 
-	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser, int errorTargetMode)
+	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
 	{
 		this.tokens = tokens;
 		this.parser = parser;
@@ -41,7 +41,7 @@ public class REPLParser extends ParserManager
 		this.reparse = false;
 		this.markers = markers;
 		this.hasSyntaxErrors = false;
-		this.reportErrors = errorTargetMode < 0;
+		this.reportErrors = reportErrors;
 		
 		IToken token = null;
 		
@@ -82,7 +82,7 @@ public class REPLParser extends ParserManager
 			{
 				this.parser.parse(this, token);
 
-				if (this.reportErrors || this.parser.getMode() > errorTargetMode)
+				if (this.reportErrors || parser.reportErrors())
 				{
 					this.reportErrors = true;
 				}
