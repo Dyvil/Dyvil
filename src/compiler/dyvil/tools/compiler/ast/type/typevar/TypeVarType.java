@@ -261,6 +261,8 @@ public class TypeVarType implements IRawType
 	@Override
 	public void read(DataInput in) throws IOException
 	{
+		in.readUTF();
+		throw new Error("Cannot decode Type Variable Type");
 	}
 	
 	@Override

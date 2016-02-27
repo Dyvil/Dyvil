@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
+import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -107,6 +108,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	
 	// Other Types
 	int ANNOTATED = 192;
+
+	int MISSING_TAG = 255;
 	
 	@Override
 	default ICodePosition getPosition()
@@ -460,7 +463,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 		if (type == null)
 		{
-			dos.writeByte(-1);
+			dos.writeByte(MISSING_TAG);
 			return;
 		}
 		
@@ -470,7 +473,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	
 	static IType readType(DataInput dis) throws IOException
 	{
-		byte tag = dis.readByte();
+		int tag = dis.readUnsignedByte();
 		IType type;
 		switch (tag)
 		{
@@ -487,6 +490,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		case CLASS:
 			type = new ClassType();
 			break;
+		case PACKAGE:
+			type = new PackageType();
+			break;
 		case GENERIC:
 			type = new ClassGenericType();
 			break;
@@ -499,14 +505,31 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		case ARRAY:
 			type = new ArrayType();
 			break;
+		case LIST :
+			type = new ListType();
+			break;
+		case MAP:
+			type = new MapType();
+			break;
+		case OPTIONAL:
+			type = new OptionType();
+			break;
+		case REFERENCE:
+			type = new ReferenceType();
+			break;
+		case ANNOTATED:
+			type = new AnnotatedType();
+			break;
 		case TYPE_VAR_TYPE:
 			type = new NamedType();
 			break;
 		case WILDCARD_TYPE:
 			type = new WildcardType();
 			break;
-		default:
+		case MISSING_TAG:
 			return null;
+		default:
+			throw new Error("Cannot decode TypeTag " + tag);
 		}
 		
 		type.read(dis);

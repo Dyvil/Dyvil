@@ -20,7 +20,11 @@ import java.lang.annotation.ElementType;
 public class AnnotatedType extends TypeDelegate
 {
 	private IAnnotation annotation;
-	
+
+	public AnnotatedType()
+	{
+	}
+
 	public AnnotatedType(IAnnotation annotation)
 	{
 		this.annotation = annotation;

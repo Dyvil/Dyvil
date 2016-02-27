@@ -48,6 +48,10 @@ public class ListType implements IObjectType
 	// Metadata
 	private IClass theClass;
 
+	public ListType()
+	{
+	}
+
 	public ListType(IType elementType)
 	{
 		this.elementType = elementType;

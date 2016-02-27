@@ -42,7 +42,11 @@ public class OptionType implements IObjectType
 	}
 	
 	private IType type;
-	
+
+	public OptionType()
+	{
+	}
+
 	public OptionType(IType type)
 	{
 		this.type = type;

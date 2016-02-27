@@ -25,6 +25,10 @@ public class PackageType implements IRawType
 {
 	private Package thePackage;
 
+	public PackageType()
+	{
+	}
+
 	public PackageType(Package thePackage)
 	{
 		this.thePackage = thePackage;
@@ -123,7 +127,7 @@ public class PackageType implements IRawType
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		String internal = in.readUTF();
+		final String internal = in.readUTF();
 		this.thePackage = RootPackage.rootPackage.resolvePackageInternal(internal);
 	}
 

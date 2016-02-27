@@ -49,6 +49,10 @@ public class MapType implements IObjectType
 	// Metadata
 	private IClass theClass;
 
+	public MapType()
+	{
+	}
+
 	public MapType(IType keyType, IType valueType)
 	{
 		this.keyType = keyType;

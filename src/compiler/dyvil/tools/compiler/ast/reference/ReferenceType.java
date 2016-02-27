@@ -33,6 +33,10 @@ public class ReferenceType implements IObjectType
 	protected IClass theClass;
 	protected IType  type;
 
+	public ReferenceType()
+	{
+	}
+
 	public ReferenceType(IType type)
 	{
 		this.type = type;
