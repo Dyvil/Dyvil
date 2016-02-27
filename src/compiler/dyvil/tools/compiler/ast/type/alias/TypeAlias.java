@@ -209,7 +209,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	{
 		IContext combinedContext = new CombiningContext(this, context);
 
-		this.type.checkType(markers, combinedContext, TypePosition.TYPE);
+		this.type.checkType(markers, combinedContext, TypePosition.GENERIC_ARGUMENT);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{

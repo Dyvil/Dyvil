@@ -2,12 +2,12 @@ package dyvil.tools.compiler.ast.generic.type;
 
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.type.IRawType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -163,26 +162,6 @@ public class TypeVarType implements IRawType
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
-		switch (position)
-		{
-		case CLASS:
-			if (this.typeParameter.getReifiedKind() != ITypeParameter.ReifiedKind.NOT_REIFIED)
-			{
-				return;
-			}
-		case TYPE:
-			if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
-			{
-				return;
-			}
-			markers.add(Markers.semantic(this.getPosition(), "type.class.typevar"));
-			return;
-		case SUPER_TYPE:
-			markers.add(Markers.semantic(this.getPosition(), "type.super.typevar"));
-			return;
-		default:
-			return;
-		}
 	}
 	
 	@Override

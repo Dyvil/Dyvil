@@ -114,6 +114,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	default void setPosition(ICodePosition position)
 	{
 	}
+
+	default IType atPosition(ICodePosition position)
+	{
+		IType copy = this.clone();
+		copy.setPosition(position);
+		return copy;
+	}
 	
 	int typeTag();
 	
@@ -260,7 +267,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	
 	default boolean isSameType(IType type)
 	{
-		return this.getTheClass() == type.getTheClass();
+		return this == type || this.getTheClass() == type.getTheClass();
 	}
 	
 	boolean classEquals(IType type);

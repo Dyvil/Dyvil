@@ -153,13 +153,13 @@ public class NamedType implements IRawType, ITypeConsumer
 		IType primitive = Types.resolvePrimitive(this.name);
 		if (primitive != null)
 		{
-			return primitive;
+			return primitive.atPosition(this.position);
 		}
 
 		IType type = IContext.resolveType(context, this.name);
 		if (type != null)
 		{
-			return type;
+			return type.atPosition(this.position);
 		}
 
 		Package thePackage = Package.rootPackage.resolvePackage(this.name);

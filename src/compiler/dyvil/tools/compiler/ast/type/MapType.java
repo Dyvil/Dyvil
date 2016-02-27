@@ -191,8 +191,11 @@ public class MapType implements IObjectType
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
-		this.keyType.checkType(markers, context, position);
-		this.valueType.checkType(markers, context, position);
+		final TypePosition argumentPosition =
+				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+
+		this.keyType.checkType(markers, context, argumentPosition);
+		this.valueType.checkType(markers, context, argumentPosition);
 	}
 
 	@Override
@@ -266,7 +269,8 @@ public class MapType implements IObjectType
 		this.keyType.writeTypeExpression(writer);
 		this.valueType.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/MapType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/MapType;", false);
+		                       "(Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/MapType;",
+		                       false);
 	}
 
 	@Override

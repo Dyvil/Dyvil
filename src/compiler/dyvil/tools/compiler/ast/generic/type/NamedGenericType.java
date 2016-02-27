@@ -144,7 +144,7 @@ public class NamedGenericType extends GenericType
 
 			typeVariables = iClass.getTypeParameters();
 
-			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
+			concrete = new ResolvedGenericType(this.position, iClass, this.typeArguments, this.typeArgumentCount);
 		}
 		else
 		{
@@ -179,24 +179,6 @@ public class NamedGenericType extends GenericType
 		}
 
 		return concrete;
-	}
-	
-	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
-		/*
-		 * TODO Position handling
-		 * if (position == TypePosition.CLASS) {
-		 * markers.add(Markers.createMarker(this.position, "type.class.generic"));
-		 * } // If the position is a SUPER_TYPE position if (position ==
-		 * TypePosition.SUPER_TYPE || position ==
-		 * TypePosition.SUPER_TYPE_ARGUMENT) { position =
-		 * TypePosition.SUPER_TYPE_ARGUMENT; } else { // Otherwise, resolve the
-		 * type arguments with a GENERIC_ARGUMENT // position position =
-		 * TypePosition.GENERIC_ARGUMENT; }
-		 */
-
-		super.checkType(markers, context, position);
 	}
 	
 	@Override

@@ -23,6 +23,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,6 +36,8 @@ public final class TupleType implements IObjectType, ITypeList
 	
 	protected IType[] types;
 	protected int     typeCount;
+
+	protected ICodePosition position;
 	
 	public TupleType()
 	{
@@ -51,7 +54,19 @@ public final class TupleType implements IObjectType, ITypeList
 		this.types = types;
 		this.typeCount = typeCount;
 	}
-	
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
 	// ITypeList Overrides
 	
 	public static IClass getTupleClass(int count)
