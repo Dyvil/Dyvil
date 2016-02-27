@@ -1,4 +1,4 @@
-package dyvil.tools.repl;
+package dyvil.tools.repl.context;
 
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
@@ -13,6 +13,7 @@ import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.repl.DyvilREPL;
 
 public class REPLVariable extends Field
 {

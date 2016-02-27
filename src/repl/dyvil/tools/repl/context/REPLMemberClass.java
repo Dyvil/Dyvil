@@ -1,4 +1,4 @@
-package dyvil.tools.repl;
+package dyvil.tools.repl.context;
 
 import dyvil.collection.Set;
 import dyvil.io.FileUtils;
@@ -39,6 +39,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.repl.DyvilREPL;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -607,12 +608,12 @@ public class REPLMemberClass implements IClass
 			fileName = name.substring(index + 1) + ".class";
 		}
 		
-		FileUtils.tryWrite(new File(repl.dumpDir, fileName), bytes);
+		FileUtils.tryWrite(new File(repl.getDumpDir(), fileName), bytes);
 	}
 	
 	protected static Class loadClass(DyvilREPL repl, String name, byte[] bytes)
 	{
-		if (repl.dumpDir != null)
+		if (repl.getDumpDir() != null)
 		{
 			dumpClass(repl, name, bytes);
 		}
@@ -623,7 +624,7 @@ public class REPLMemberClass implements IClass
 	
 	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
 	{
-		if (repl.dumpDir != null)
+		if (repl.getDumpDir() != null)
 		{
 			dumpClass(repl, name, bytes);
 		}

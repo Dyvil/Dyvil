@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.type.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.repl.DyvilREPL;
-import dyvil.tools.repl.REPLContext;
+import dyvil.tools.repl.context.REPLContext;
 
 public class CompleteCommand implements ICommand
 {

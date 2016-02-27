@@ -1,4 +1,4 @@
-package dyvil.tools.repl;
+package dyvil.tools.repl.input;
 
 import java.io.*;
 

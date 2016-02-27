@@ -17,25 +17,17 @@ import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
+import dyvil.tools.repl.context.REPLContext;
+import dyvil.tools.repl.input.REPLParser;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 
 public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
-
-	public static final long SLEEP_TIME = 4L;
 	
-	private static DyvilREPL instance;
-
 	protected DyvilCompiler compiler = new DyvilCompiler();
-
-	private PrintStream  output;
-	private PrintStream  errorOutput;
-	private InputManager inputManager;
 	
 	protected REPLContext context = new REPLContext(this);
 	protected REPLParser  parser  = new REPLParser(this.context);
@@ -44,8 +36,6 @@ public final class DyvilREPL
 	
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
-	private static boolean running;
-	
 	static
 	{
 		registerCommand(new CompleteCommand());
@@ -61,34 +51,15 @@ public final class DyvilREPL
 		registerCommand(new VersionCommand());
 	}
 	
-	public static void main(String[] args) throws Exception
+	public DyvilREPL(PrintStream output)
 	{
-		running = true;
-
-		instance = new DyvilREPL(System.in, System.out, System.err);
-		instance.launch(args);
-		
-		while (running)
-		{
-			instance.readAndProcess();
-		}
-
-		instance.shutdown();
-	}
-	
-	public DyvilREPL(InputStream input, PrintStream output)
-	{
-		this(input, output, output);
+		this(output, output);
 	}
 
-	public DyvilREPL(InputStream input, PrintStream output, PrintStream errorOutput)
+	public DyvilREPL(PrintStream output, PrintStream errorOutput)
 	{
-		this.compiler.setOutput(this.output = output);
-		this.compiler.setErrorOutput(this.errorOutput = errorOutput);
-		if (input != null)
-		{
-			this.inputManager = new InputManager(output, input);
-		}
+		this.compiler.setOutput(output);
+		this.compiler.setErrorOutput(errorOutput);
 	}
 
 	public DyvilCompiler getCompiler()
@@ -118,17 +89,17 @@ public final class DyvilREPL
 
 	public PrintStream getOutput()
 	{
-		return this.output;
+		return this.compiler.getOutput();
 	}
 
 	public PrintStream getErrorOutput()
 	{
-		return this.errorOutput;
+		return this.compiler.getErrorOutput();
 	}
 
 	protected void launch(String[] args)
 	{
-		this.output.println("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
+		this.compiler.log("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
 
 		Names.init();
 
@@ -136,7 +107,7 @@ public final class DyvilREPL
 
 		if (this.compiler.config.isDebug())
 		{
-			this.output.println("Dyvil Compiler Version: v" + DyvilCompiler.VERSION);
+			this.compiler.log("Dyvil Compiler Version: v" + DyvilCompiler.VERSION);
 		}
 
 		final long startTime = System.nanoTime();
@@ -153,50 +124,13 @@ public final class DyvilREPL
 		{
 			final long endTime = System.nanoTime();
 
-			this.output.println("Loaded REPL (" + Util.toTime(endTime - startTime) + ")");
+			this.compiler.log("Loaded REPL (" + Util.toTime(endTime - startTime) + ")");
 		}
 	}
 
 	public void shutdown()
 	{
 		this.compiler.shutdown();
-	}
-	
-	private static void exit()
-	{
-		running = false;
-	}
-
-	public void readAndProcess()
-	{
-		this.output.print("> ");
-
-		String currentCode;
-		try
-		{
-			currentCode = this.inputManager.readInput();
-			if (currentCode == null)
-			{
-				exit();
-				return;
-			}
-		}
-		catch (IOException ignored)
-		{
-			return;
-		}
-
-		this.processInput(currentCode);
-
-		// Wait to make sure the output isn't messed up in IDE consoles.
-		try
-		{
-			Thread.sleep(SLEEP_TIME);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace(this.output);
-		}
 	}
 	
 	public void processInput(String input)
@@ -216,7 +150,7 @@ public final class DyvilREPL
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace(this.output);
+			t.printStackTrace(this.compiler.getErrorOutput());
 		}
 	}
 	
@@ -224,7 +158,7 @@ public final class DyvilREPL
 	{
 		this.context.startEvaluation(code);
 
-		final MarkerList markers = this.context.markers;
+		final MarkerList markers = this.context.getMarkers();
 		final TokenIterator tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
 
 		SemicolonInference.inferSemicolons(tokens.first());
@@ -263,11 +197,11 @@ public final class DyvilREPL
 		ICommand command = commands.get(name);
 		if (command == null)
 		{
-			this.errorOutput.println("Unknown Command: " + name);
+			this.compiler.error("Unknown Command: " + name);
 			return;
 		}
 		
-		command.execute(instance, arguments);
+		command.execute(this, arguments);
 	}
 	
 	public static void registerCommand(ICommand command)

@@ -3,7 +3,7 @@ package dyvil.tools.repl.command;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.repl.DyvilREPL;
-import dyvil.tools.repl.REPLContext;
+import dyvil.tools.repl.context.REPLContext;
 
 public class MethodsCommand implements ICommand
 {

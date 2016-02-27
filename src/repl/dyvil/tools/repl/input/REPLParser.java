@@ -1,4 +1,4 @@
-package dyvil.tools.repl;
+package dyvil.tools.repl.input;
 
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.Types;
@@ -10,6 +10,7 @@ import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
+import dyvil.tools.repl.context.REPLContext;
 
 public class REPLParser extends ParserManager
 {
@@ -88,7 +89,7 @@ public class REPLParser extends ParserManager
 			}
 			catch (Exception ex)
 			{
-				ex.printStackTrace(this.context.repl.getErrorOutput());
+				ex.printStackTrace(this.context.getCompilationContext().getErrorOutput());
 				return false;
 			}
 			
