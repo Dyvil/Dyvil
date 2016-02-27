@@ -177,6 +177,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 
 			switch (nextType)
 			{
+			case Tokens.EOF:
 			case BaseSymbols.SEMICOLON:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			{
@@ -184,6 +185,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				                               this.annotations);
 				this.consumer.addField(field);
 				this.mode = END;
+				// no need to reparse(), since we are checking the *next*Type
 				return;
 			}
 			case BaseSymbols.OPEN_PARENTHESIS:
