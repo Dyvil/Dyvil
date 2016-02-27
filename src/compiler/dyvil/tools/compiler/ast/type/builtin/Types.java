@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
+import dyvil.tools.compiler.ast.generic.CombiningTypeContext;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -114,7 +115,7 @@ public final class Types
 		DOUBLE.theClass = DOUBLE_CLASS = Package.javaLang.resolveClass("Double");
 
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
-		
+
 		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
@@ -240,23 +241,86 @@ public final class Types
 		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
+	private static IType arrayElementCombine(IType type1, IType type2)
+	{
+		if (type1.getTypecode() != type2.getTypecode())
+		{
+			return Types.ANY;
+		}
+		return new ArrayType(combine(type1, type2));
+	}
+
 	public static IType combine(IType type1, IType type2)
 	{
 		if (type1 == Types.VOID || type2 == Types.VOID)
 		{
+			// either type is void -> result void
 			return Types.VOID;
 		}
-		if (type1.isSameType(type2))
+		if (type1.isArrayType())
 		{
-			return type1;
+			if (!type2.isArrayType())
+			{
+				return Types.ANY;
+			}
+			return arrayElementCombine(type1.getElementType(), type2.getElementType());
 		}
-		if (type1.typeTag() == IType.NULL)
+		if (type2.isArrayType())
 		{
+			if (!type1.isArrayType())
+			{
+				return Types.ANY;
+			}
+			return arrayElementCombine(type1.getElementType(), type2.getElementType());
+		}
+
+		IClass class1 = type1.getTheClass();
+		if (class1 == null)
+		{
+			// type 1 unresolved -> result type 2
+			return type2;
+		}
+		if (class1 == Types.NULL_CLASS)
+		{
+			// type 1 is null -> result reference type 2
 			return type2.getObjectType();
 		}
-		if (type2.typeTag() == IType.NULL)
+		if (class1 == Types.OBJECT_CLASS)
 		{
+			// type 1 is Object -> result Object
+			return Types.ANY;
+		}
+
+		final IClass class2 = type2.getTheClass();
+		if (class2 == null)
+		{
+			// type 2 unresolved -> result type 1
+			return type1;
+		}
+		if (class2 == Types.NULL_CLASS)
+		{
+			// type 2 is Object or null -> result reference type 1
 			return type1.getObjectType();
+		}
+		if (class2 == Types.OBJECT_CLASS)
+		{
+			// type 2 is Object -> result Object
+			return Types.ANY;
+		}
+
+		if (class1 == class2)
+		{
+			return class1.getType().getConcreteType(new CombiningTypeContext(type1, type2));
+		}
+		if (type1.isSameType(type2) || type1.isSuperTypeOf(type2))
+		{
+			// same type, or type 1 is a super type of type 2 -> result type 1
+			return type1;
+		}
+		if (type2.isSuperTypeOf(type1))
+		{
+			// type 2 is a super type of type 1 -> result type 2
+			return type2;
 		}
 		
 		final Set<IType> superTypes1 = superTypes(type1);
@@ -264,7 +328,7 @@ public final class Types
 		
 		for (IType t1 : superTypes1)
 		{
-			IClass class1 = t1.getTheClass();
+			class1 = t1.getTheClass();
 			if (class1 == Types.OBJECT_CLASS)
 			{
 				continue;
@@ -274,7 +338,7 @@ public final class Types
 			{
 				if (class1 == t2.getTheClass())
 				{
-					return new ClassType(class1);
+					return class1.getType().getConcreteType(new CombiningTypeContext(type1, type2));
 				}
 			}
 		}
@@ -292,17 +356,22 @@ public final class Types
 	private static void addSuperTypes(IType type, Collection<IType> types)
 	{
 		types.add(type);
-		IType superType = type.getSuperType();
+
+		final IClass theClass = type.getTheClass();
+		if (theClass == null)
+		{
+			return;
+		}
+
+		final IType superType = theClass.getSuperType();
 		if (superType != null)
 		{
-			addSuperTypes(superType.getConcreteType(type), types);
+			addSuperTypes(superType, types);
 		}
-		
-		IClass iclass = type.getTheClass();
-		int count = iclass.interfaceCount();
-		for (int i = 0; i < count; i++)
+
+		for (int i = 0, count = theClass.interfaceCount(); i < count; i++)
 		{
-			addSuperTypes(iclass.getInterface(i).getConcreteType(type), types);
+			addSuperTypes(theClass.getInterface(i), types);
 		}
 	}
 
