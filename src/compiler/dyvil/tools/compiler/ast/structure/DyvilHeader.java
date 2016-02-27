@@ -585,7 +585,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		IClass iclass = member.getTheClass();
+		IClass iclass = member.getEnclosingClass();
 		
 		int access = member.getAccessLevel();
 		if ((access & Modifiers.INTERNAL) != 0)

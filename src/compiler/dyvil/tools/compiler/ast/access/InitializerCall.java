@@ -106,7 +106,7 @@ public class InitializerCall implements ICall
 	public void checkArguments(MarkerList markers, IContext context)
 	{
 		this.constructor
-				.checkArguments(markers, this.position, context, this.constructor.getTheClass().getType(), arguments);
+				.checkArguments(markers, this.position, context, this.constructor.getEnclosingClass().getType(), arguments);
 	}
 
 	@Override

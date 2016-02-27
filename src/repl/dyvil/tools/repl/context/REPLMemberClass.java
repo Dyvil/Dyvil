@@ -243,12 +243,12 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void setOuterClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 	}
 	
 	@Override
-	public IClass getOuterClass()
+	public IClass getEnclosingClass()
 	{
 		return null;
 	}
@@ -458,7 +458,7 @@ public class REPLMemberClass implements IClass
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		IClass iclass = member.getTheClass();
+		IClass iclass = member.getEnclosingClass();
 		if (iclass == null || iclass == this || iclass instanceof REPLMemberClass)
 		{
 			return VISIBLE;

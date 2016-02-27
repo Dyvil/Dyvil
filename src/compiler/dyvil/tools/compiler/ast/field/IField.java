@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 public interface IField extends IClassMember, IDataMember
 {
 	@Override
-	IClass getTheClass();
+	IClass getEnclosingClass();
 
 	@Override
 	default MemberKind getKind()

@@ -295,13 +295,15 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		// TODO
+		IType.writeType(this.type, out);
+		// TODO write arguments
 	}
 	
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		// TODO
+		this.type = IType.readType(in);
+		// TODO read arguments
 	}
 	
 	@Override

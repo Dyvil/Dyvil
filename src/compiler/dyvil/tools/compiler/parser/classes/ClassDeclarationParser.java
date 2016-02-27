@@ -82,7 +82,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				this.theClass = new CodeClass(token.raw(), this.header, this.modifiers);
 				this.theClass.setAnnotations(this.annotations);
-				this.theClass.setOuterClass(this.outerClass);
+				this.theClass.setEnclosingClass(this.outerClass);
 				this.theClass.setName(token.nameValue());
 				this.mode = GENERICS;
 				return;

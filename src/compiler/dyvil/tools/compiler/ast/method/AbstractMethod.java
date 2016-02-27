@@ -115,13 +115,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void setTheClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 		this.theClass = iclass;
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public IClass getEnclosingClass()
 	{
 		return this.theClass;
 	}
@@ -952,7 +952,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		// Store the method in the cache, if it originates from a
-		if (this.theClass.isSubTypeOf(candidate.getTheClass().getClassType()))
+		if (this.theClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
 		{
 			if (this.overrideMethods == null)
 			{

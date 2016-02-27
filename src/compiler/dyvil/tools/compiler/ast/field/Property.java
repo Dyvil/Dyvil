@@ -54,22 +54,22 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void setTheClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 		this.theClass = iclass;
 
 		if (this.getter != null)
 		{
-			this.getter.setTheClass(iclass);
+			this.getter.setEnclosingClass(iclass);
 		}
 		if (this.setter != null)
 		{
-			this.setter.setTheClass(iclass);
+			this.setter.setEnclosingClass(iclass);
 		}
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public IClass getEnclosingClass()
 	{
 		return this.theClass;
 	}

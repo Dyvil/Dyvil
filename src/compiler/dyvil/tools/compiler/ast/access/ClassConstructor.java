@@ -76,7 +76,7 @@ public class ClassConstructor extends ConstructorCall
 		
 		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);
 		this.nestedClass.setMetadata(this.metadata);
-		this.nestedClass.setOuterClass(context.getThisClass());
+		this.nestedClass.setEnclosingClass(context.getThisClass());
 		
 		IDyvilHeader header = context.getHeader();
 		this.nestedClass.setHeader(header);

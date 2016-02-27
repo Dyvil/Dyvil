@@ -60,12 +60,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public void setTheClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public IClass getEnclosingClass()
 	{
 		return null;
 	}

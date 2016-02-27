@@ -155,7 +155,7 @@ public final class ExternalClass extends AbstractClass
 			IClass c = Package.loadClass(fileName, name);
 			if (c != null)
 			{
-				c.setOuterClass(this);
+				c.setEnclosingClass(this);
 				this.body.addClass(c);
 			}
 		}
@@ -210,13 +210,13 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public IClass getOuterClass()
+	public IClass getEnclosingClass()
 	{
 		if (!this.innerTypesResolved)
 		{
 			this.resolveInnerTypes();
 		}
-		return super.getOuterClass();
+		return super.getEnclosingClass();
 	}
 	
 	@Override

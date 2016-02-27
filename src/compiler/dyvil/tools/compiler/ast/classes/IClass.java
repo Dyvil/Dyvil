@@ -31,26 +31,16 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 		return MemberKind.CLASS;
 	}
 
-	@Override
-	default void setTheClass(IClass iclass)
-	{
-		// TODO rename to getEnclosingClass
-	}
-
-	@Override
-	default IClass getTheClass()
-	{
-		return this;
-	}
-
 	void setHeader(IDyvilHeader unit);
 	
 	@Override
 	IDyvilHeader getHeader();
 	
-	void setOuterClass(IClass iclass);
+	@Override
+	void setEnclosingClass(IClass iclass);
 	
-	IClass getOuterClass();
+	@Override
+	IClass getEnclosingClass();
 	
 	// Modifiers
 	

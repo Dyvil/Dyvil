@@ -230,7 +230,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	private REPLMemberClass getREPLClass(IClassMember member)
 	{
 		REPLMemberClass iclass = new REPLMemberClass(Name.getQualified(this.className), member, this);
-		member.setTheClass(iclass);
+		member.setEnclosingClass(iclass);
 		member.getModifiers().addIntModifier(Modifiers.STATIC);
 		return iclass;
 	}
@@ -484,7 +484,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBo
 	{
 		REPLMemberClass iclass = this.getREPLClass(property);
 
-		property.setTheClass(iclass);
+		property.setEnclosingClass(iclass);
 		property.resolveTypes(this.markers, this);
 		property.resolve(this.markers, this);
 		property.checkTypes(this.markers, this);

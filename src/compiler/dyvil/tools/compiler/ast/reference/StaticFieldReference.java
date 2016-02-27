@@ -86,7 +86,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 			return this.fieldOriginClassName;
 		}
 
-		return this.fieldOriginClassName = this.field.getTheClass().getInternalName();
+		return this.fieldOriginClassName = this.field.getEnclosingClass().getInternalName();
 	}
 	
 	private String getRefFieldName()

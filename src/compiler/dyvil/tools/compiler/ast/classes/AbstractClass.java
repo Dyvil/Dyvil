@@ -73,13 +73,13 @@ public abstract class AbstractClass implements IClass
 	protected IType classType = new ClassType(this);
 	
 	@Override
-	public void setOuterClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 		this.outerClass = iclass;
 	}
 	
 	@Override
-	public IClass getOuterClass()
+	public IClass getEnclosingClass()
 	{
 		return this.outerClass;
 	}
@@ -305,7 +305,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public void setParameter(int index, IParameter parameter)
 	{
-		parameter.setTheClass(this);
+		parameter.setEnclosingClass(this);
 		parameter.setIndex(index);
 		this.parameters[index] = parameter;
 	}
@@ -313,7 +313,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public void addParameter(IParameter parameter)
 	{
-		parameter.setTheClass(this);
+		parameter.setEnclosingClass(this);
 		
 		if (this.parameters == null)
 		{
@@ -510,7 +510,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
 	{
-		if (candidate.getTheClass() == this)
+		if (candidate.getEnclosingClass() == this)
 		{
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
@@ -971,13 +971,13 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public boolean isMember(IClassMember member)
 	{
-		return this == member.getTheClass();
+		return this == member.getEnclosingClass();
 	}
 	
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		IClass iclass = member.getTheClass();
+		IClass iclass = member.getEnclosingClass();
 		if (iclass == this || iclass == null)
 		{
 			return VISIBLE;

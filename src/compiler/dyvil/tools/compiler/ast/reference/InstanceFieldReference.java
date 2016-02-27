@@ -47,7 +47,7 @@ public class InstanceFieldReference implements IReference
 		this.receiver.writeExpression(writer, null);
 
 		final IType fieldType = this.field.getType();
-		final String fieldClassName = this.field.getTheClass().getInternalName();
+		final String fieldClassName = this.field.getEnclosingClass().getInternalName();
 		final String fieldName = this.field.getName().qualified;
 		final String factoryMethodName = Types.getReferenceFactoryName(fieldType, "");
 		final String factoryMethodType =

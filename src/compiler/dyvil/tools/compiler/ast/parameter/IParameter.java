@@ -14,12 +14,12 @@ import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 public interface IParameter extends IVariable, IClassMember
 {
 	@Override
-	default void setTheClass(IClass iclass)
+	default void setEnclosingClass(IClass iclass)
 	{
 	}
 	
 	@Override
-	default IClass getTheClass()
+	default IClass getEnclosingClass()
 	{
 		return null;
 	}

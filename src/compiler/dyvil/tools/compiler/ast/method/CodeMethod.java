@@ -333,7 +333,7 @@ public class CodeMethod extends AbstractMethod
 					marker.addInfo(Markers.getSemantic("method.override.type", type));
 
 					marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
-					                                   overrideMethod.getTheClass().getFullName()));
+					                                   overrideMethod.getEnclosingClass().getFullName()));
 					markers.add(marker);
 				}
 			}

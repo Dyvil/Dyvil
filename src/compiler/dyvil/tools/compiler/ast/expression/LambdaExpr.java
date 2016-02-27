@@ -251,7 +251,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		ITypeContext tempContext = new MapTypeContext();
 		this.method.getType().inferTypes(valueType, tempContext);
-		IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
+		IType type1 = this.method.getEnclosingClass().getType().getConcreteType(tempContext);
 		
 		type.inferTypes(type1, typeContext);
 		
@@ -482,7 +482,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 					}
 					
 					this.name = method.getName().qualified;
-					this.owner = method.getTheClass().getInternalName();
+					this.owner = method.getEnclosingClass().getInternalName();
 					this.lambdaDesc = method.getDescriptor();
 					return this;
 				}
@@ -496,7 +496,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				{
 					this.directInvokeOpcode = ClassFormat.H_NEWINVOKESPECIAL;
 					this.name = "<init>";
-					this.owner = ctor.getTheClass().getInternalName();
+					this.owner = ctor.getEnclosingClass().getInternalName();
 					this.lambdaDesc = ctor.getDescriptor();
 					
 					return this;
