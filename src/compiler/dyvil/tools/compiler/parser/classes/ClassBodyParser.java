@@ -119,16 +119,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					final Initializer initializer = new Initializer(token.raw(), this.modifiers);
 					initializer.setAnnotations(this.annotations);
 					this.member = initializer;
-
-					if (this.theClass == null)
-					{
-						pm.report(token, "initializer.disallowed");
-						this.memberKind = IGNORE;
-					}
-					else
-					{
-						this.memberKind = INITIALIZER;
-					}
+					this.memberKind = INITIALIZER;
 
 					this.mode = METHOD_END;
 					pm.pushParser(new StatementListParser(initializer));

@@ -40,11 +40,17 @@ public class DyvilHeaderParser extends Parser
 	
 	protected IToken lastToken;
 	
+	public DyvilHeaderParser(IDyvilHeader unit)
+	{
+		this.unit = unit;
+		this.mode = PACKAGE;
+	}
+
 	public DyvilHeaderParser(IDyvilHeader unit, boolean unitHeader)
 	{
 		this.unit = unit;
-		this.unitHeader = unitHeader;
 		this.mode = PACKAGE;
+		this.unitHeader = unitHeader;
 	}
 	
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
@@ -151,14 +157,12 @@ public class DyvilHeaderParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == BaseSymbols.SEMICOLON)
+		final int type = token.type();
+		switch (type)
 		{
-			return;
-		}
-		if (type == Tokens.EOF)
-		{
+		case Tokens.EOF:
 			pm.popParser();
+		case BaseSymbols.SEMICOLON:
 			return;
 		}
 		
@@ -170,11 +174,13 @@ public class DyvilHeaderParser extends Parser
 				this.mode = IMPORT;
 				return;
 			}
+			// Fallthrough
 		case IMPORT:
 			if (this.parseImport(pm, token, type))
 			{
 				return;
 			}
+			// Fallthrough
 		case METADATA:
 			if (this.mode != METADATA)
 			{
@@ -213,7 +219,7 @@ public class DyvilHeaderParser extends Parser
 			this.annotations = new AnnotationList();
 		}
 		
-		Annotation annotation = new Annotation(token.raw());
+		final Annotation annotation = new Annotation(token.raw());
 		this.annotations.addAnnotation(annotation);
 		pm.pushParser(pm.newAnnotationParser(annotation));
 		return;
@@ -222,6 +228,6 @@ public class DyvilHeaderParser extends Parser
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode > PACKAGE;
+		return this.mode > PACKAGE && this.lastToken == null;
 	}
 }
