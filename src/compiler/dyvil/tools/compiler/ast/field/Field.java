@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -31,37 +32,35 @@ import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
-	protected IClass theClass;
+	protected IClass enclosingClass;
 	protected IValue value;
 	
-	public Field(IClass iclass)
+	public Field(IClass enclosingClass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
-	public Field(IClass iclass, Name name)
+	public Field(IClass enclosingClass, Name name)
 	{
 		super(name);
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
-	public Field(IClass iclass, Name name, IType type)
+	public Field(IClass enclosingClass, Name name, IType type)
 	{
 		super(name, type);
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
-	public Field(IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public Field(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(name, type, modifiers);
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
-	public Field(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public Field(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(name, type, modifiers);
-		this.position = position;
-		this.theClass = iclass;
+		super(position, name, type, modifiers, annotations);
 	}
 	
 	@Override
@@ -73,13 +72,13 @@ public class Field extends Member implements IField
 	@Override
 	public void setEnclosingClass(IClass iclass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = iclass;
 	}
 	
 	@Override
 	public IClass getEnclosingClass()
 	{
-		return this.theClass;
+		return this.enclosingClass;
 	}
 	
 	@Override
@@ -142,10 +141,10 @@ public class Field extends Member implements IField
 				{
 					markers.add(Markers.semantic(position, "field.access.static", this.name));
 				}
-				else if (receiver.getType().getTheClass() != this.theClass)
+				else if (receiver.getType().getTheClass() != this.enclosingClass)
 				{
 					markers.add(Markers.semantic(position, "field.access.static.type", this.name,
-					                             this.theClass.getFullName()));
+					                             this.enclosingClass.getFullName()));
 				}
 				receiver = null;
 			}
@@ -158,7 +157,7 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				IType type = this.theClass.getClassType();
+				IType type = this.enclosingClass.getClassType();
 				IValue typedReceiver = IType.convertValue(receiver, type, type, markers, context);
 				
 				if (typedReceiver == null)
@@ -180,7 +179,7 @@ public class Field extends Member implements IField
 			else
 			{
 				markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
-				receiver = new ThisExpr(position, this.theClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 			}
 		}
 		
@@ -375,7 +374,7 @@ public class Field extends Member implements IField
 		{
 			writer.writeVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
-			writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified,
+			writer.writeFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescription());
 		}
 	}
@@ -386,7 +385,7 @@ public class Field extends Member implements IField
 		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.value.writeExpression(writer, this.type);
-			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.theClass.getInternalName(), this.name.qualified,
+			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescription());
 		}
 	}
@@ -394,7 +393,7 @@ public class Field extends Member implements IField
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		String owner = this.theClass.getInternalName();
+		String owner = this.enclosingClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
@@ -411,7 +410,7 @@ public class Field extends Member implements IField
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		String owner = this.theClass.getInternalName();
+		String owner = this.enclosingClass.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))

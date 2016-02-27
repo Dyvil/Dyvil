@@ -73,17 +73,17 @@ public abstract class AbstractClass implements IClass
 	protected IType classType = new ClassType(this);
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
-	{
-		this.outerClass = iclass;
-	}
-	
-	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.outerClass;
 	}
-	
+
+	@Override
+	public void setEnclosingClass(IClass iclass)
+	{
+		this.outerClass = iclass;
+	}
+
 	@Override
 	public void setType(IType type)
 	{

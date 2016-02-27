@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -46,11 +47,9 @@ public class Property extends Member implements IProperty
 	protected MethodParameter setterParameter;
 	protected ICodePosition   initializerPosition;
 
-	public Property(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public Property(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(name, type, modifiers);
-		this.position = position;
-		this.theClass = iclass;
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override

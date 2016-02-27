@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -61,9 +62,9 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type, modifiers);
 	}
 	
-	public CodeMethod(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public CodeMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, iclass, name, type, modifiers);
+		super(position, name, type, modifiers, annotations);
 	}
 	
 	@Override

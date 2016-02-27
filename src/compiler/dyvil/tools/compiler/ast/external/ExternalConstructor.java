@@ -49,7 +49,7 @@ public final class ExternalConstructor extends Constructor implements IExternalM
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.theClass.getType();
+		this.type = this.enclosingClass.getType();
 	}
 	
 	private void resolveParameters()
@@ -57,7 +57,7 @@ public final class ExternalConstructor extends Constructor implements IExternalM
 		this.parametersResolved = true;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(null, this.theClass);
+			this.parameters[i].resolveTypes(null, this.enclosingClass);
 		}
 	}
 	

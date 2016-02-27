@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
-import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
+import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -16,7 +16,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClassBody extends IASTNode, IClassList, IClassBodyConsumer
+public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
 {
 	// Associated Class
 	

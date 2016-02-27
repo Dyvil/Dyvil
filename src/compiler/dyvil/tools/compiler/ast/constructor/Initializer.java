@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
@@ -23,6 +24,9 @@ public class Initializer extends Member implements IInitializer
 {
 	protected IValue value;
 
+	// Metadata
+	protected IClass enclosingClass;
+
 	public Initializer(ICodePosition position, ModifierSet modifiers)
 	{
 		super(position, Names.init, Types.VOID, modifiers);
@@ -38,6 +42,18 @@ public class Initializer extends Member implements IInitializer
 	public void setValue(IValue value)
 	{
 		this.value = value;
+	}
+
+	@Override
+	public IClass getEnclosingClass()
+	{
+		return this.enclosingClass;
+	}
+
+	@Override
+	public void setEnclosingClass(IClass iclass)
+	{
+		this.enclosingClass = iclass;
 	}
 
 	@Override

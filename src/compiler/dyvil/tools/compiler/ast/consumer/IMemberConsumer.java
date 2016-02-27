@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
 
-public interface IClassBodyConsumer
+public interface IMemberConsumer extends IClassConsumer
 {
 	void addField(IField field);
 	

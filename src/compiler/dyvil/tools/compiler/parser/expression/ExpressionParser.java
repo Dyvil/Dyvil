@@ -566,7 +566,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final IClass nestedClass = classConstructor.getNestedClass();
 		final IClassBody body = nestedClass.getBody();
 
-		pm.pushParser(new ClassBodyParser(nestedClass, body));
+		pm.pushParser(new ClassBodyParser(body));
 		this.mode = ANONYMOUS_CLASS_END;
 		this.value = classConstructor;
 		return;

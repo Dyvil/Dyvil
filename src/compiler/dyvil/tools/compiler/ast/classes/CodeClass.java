@@ -48,13 +48,24 @@ public class CodeClass extends AbstractClass
 	public CodeClass()
 	{
 	}
+
+	public CodeClass(ICodePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
+	{
+		this.position = position;
+		this.name = name;
+		this.modifiers = modifiers;
+		this.annotations = annotations;
+
+		this.interfaces = new IType[1];
+	}
 	
 	public CodeClass(ICodePosition position, IDyvilHeader unit)
 	{
 		this.position = position;
 		this.unit = unit;
-		this.interfaces = new IType[1];
 		this.modifiers = new ModifierList();
+
+		this.interfaces = new IType[1];
 	}
 	
 	public CodeClass(ICodePosition position, IDyvilHeader unit, ModifierSet modifiers)
@@ -62,6 +73,7 @@ public class CodeClass extends AbstractClass
 		this.position = position;
 		this.unit = unit;
 		this.modifiers = modifiers;
+
 		this.interfaces = new IType[1];
 	}
 	

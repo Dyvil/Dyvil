@@ -32,7 +32,7 @@ public final class ExternalField extends Field
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolveType(null, this.theClass);
+		this.type = this.type.resolveType(null, this.enclosingClass);
 	}
 	
 	@Override

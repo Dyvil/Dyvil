@@ -2,11 +2,13 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.classes.*;
+import dyvil.tools.compiler.ast.classes.ClassBody;
+import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -32,10 +34,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private static final int IMPLEMENTS             = 256;
 	private static final int BODY                   = 512;
 	private static final int BODY_END               = 1024;
-	
-	protected IDyvilHeader header;
-	protected IClass       outerClass;
-	protected IClassList   classList;
+
+	protected IClassConsumer consumer;
 
 	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
 	protected ModifierSet    modifiers;
@@ -43,28 +43,15 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	
 	private CodeClass theClass;
 	
-	public ClassDeclarationParser(IDyvilHeader header)
+	public ClassDeclarationParser(IClassConsumer consumer)
 	{
-		this.header = header;
-		this.classList = header;
+		this.consumer = consumer;
 		this.mode = NAME;
 	}
 	
-	public ClassDeclarationParser(IDyvilHeader header, ModifierSet modifiers, AnnotationList annotations)
+	public ClassDeclarationParser(IClassConsumer consumer, ModifierSet modifiers, AnnotationList annotations)
 	{
-		this.header = header;
-		this.classList = header;
-		
-		this.modifiers = modifiers;
-		this.annotations = annotations;
-		this.mode = NAME;
-	}
-	
-	public ClassDeclarationParser(IClass outerClass, ModifierSet modifiers, AnnotationList annotations)
-	{
-		this.outerClass = outerClass;
-		this.header = outerClass.getHeader();
-		this.classList = outerClass.getBody();
+		this.consumer = consumer;
 		
 		this.modifiers = modifiers;
 		this.annotations = annotations;
@@ -80,10 +67,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.theClass = new CodeClass(token.raw(), this.header, this.modifiers);
-				this.theClass.setAnnotations(this.annotations);
-				this.theClass.setEnclosingClass(this.outerClass);
-				this.theClass.setName(token.nameValue());
+				this.theClass = new CodeClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
 				this.mode = GENERICS;
 				return;
 			}
@@ -158,7 +142,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				IClassBody body = new ClassBody(this.theClass);
 				this.theClass.setBody(body);
-				pm.pushParser(new ClassBodyParser(this.theClass, body));
+				pm.pushParser(new ClassBodyParser(body));
 				this.mode = BODY_END;
 				return;
 			}
@@ -184,7 +168,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				}
 				
 				pm.popParser();
-				this.classList.addClass(this.theClass);
+				this.consumer.addClass(this.theClass);
 				return;
 			}
 
@@ -193,7 +177,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case BODY_END:
 			pm.popParser();
-			this.classList.addClass(this.theClass);
+			this.consumer.addClass(this.theClass);
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();

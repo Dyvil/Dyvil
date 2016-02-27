@@ -195,11 +195,10 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				}
 				else if (nextType == BaseSymbols.OPEN_PARENTHESIS)
 				{
+
+					final ModifierSet modifiers = this.modifiers == null ? new ModifierList() : this.modifiers;
 					final NestedMethod nestedMethod = new NestedMethod(token.raw(), token.nameValue(), this.type,
-					                                                   this.modifiers == null ?
-							                                                   new ModifierList() :
-							                                                   this.modifiers);
-					nestedMethod.setAnnotations(this.annotations);
+					                                                   modifiers, this.annotations);
 
 					final MethodStatement methodStatement = new MethodStatement(nestedMethod);
 					this.setValue(methodStatement);

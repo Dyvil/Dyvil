@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
@@ -15,7 +16,7 @@ import dyvil.tools.parsing.Name;
 
 import java.io.File;
 
-public class DyvilUnit extends DyvilHeader
+public class DyvilUnit extends DyvilHeader implements IClassConsumer
 {
 	private IClass[] classes = new IClass[1];
 	private int classCount;
@@ -42,6 +43,8 @@ public class DyvilUnit extends DyvilHeader
 	@Override
 	public void addClass(IClass iclass)
 	{
+		iclass.setHeader(this);
+
 		int index = this.classCount++;
 		if (index >= this.classes.length)
 		{
@@ -49,6 +52,7 @@ public class DyvilUnit extends DyvilHeader
 			System.arraycopy(this.classes, 0, temp, 0, this.classes.length);
 			this.classes = temp;
 		}
+
 		this.classes[index] = iclass;
 	}
 	

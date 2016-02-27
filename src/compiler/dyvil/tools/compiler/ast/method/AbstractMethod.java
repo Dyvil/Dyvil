@@ -8,6 +8,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
@@ -107,11 +108,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.theClass = iclass;
 	}
 	
-	public AbstractMethod(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(name, type, modifiers);
-		this.theClass = iclass;
-		this.position = position;
+		super(position, name, type, modifiers, annotations);
 	}
 	
 	@Override

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
-import dyvil.tools.compiler.ast.consumer.IClassBodyConsumer;
+import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -43,7 +43,7 @@ import dyvil.tools.repl.DyvilREPL;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IClassBodyConsumer, IClassCompilableList
+public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer, IClassCompilableList
 {
 	private static final String REPL$CLASSES     = "repl$classes/";
 	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
