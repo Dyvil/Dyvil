@@ -27,7 +27,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		return this.hasModifier(Modifiers.ENUM);
 	}
 	
-	default IClass getTheClass()
+	default IClass getEnclosingClass()
 	{
 		return null;
 	}
@@ -66,7 +66,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	{
 		if (receiver != null)
 		{
-			receiver.writeExpression(writer, this.getTheClass().getType());
+			receiver.writeExpression(writer, this.getEnclosingClass().getType());
 		}
 
 		this.writeGet_Get(writer, lineNumber);
@@ -77,7 +77,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	{
 		if (receiver != null)
 		{
-			receiver.writeExpression(writer, this.getTheClass().getType());
+			receiver.writeExpression(writer, this.getEnclosingClass().getType());
 		}
 
 		this.writeSet_PreValue(writer, lineNumber);

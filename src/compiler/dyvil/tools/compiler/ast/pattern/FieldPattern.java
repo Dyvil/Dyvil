@@ -191,7 +191,7 @@ public class FieldPattern implements IPattern
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		final IClass enclosingClass = this.dataMember.getTheClass();
+		final IClass enclosingClass = this.dataMember.getEnclosingClass();
 		if (enclosingClass != null)
 		{
 			buffer.append(enclosingClass.getName()).append('.');
