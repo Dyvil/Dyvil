@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
@@ -18,6 +18,9 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;

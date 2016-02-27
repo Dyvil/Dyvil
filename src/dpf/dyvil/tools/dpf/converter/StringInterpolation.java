@@ -9,8 +9,8 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 
 public class StringInterpolation implements StringInterpolationVisitor, Expandable
 {
-	private List<String>	strings	= new ArrayList<>();
-	private List<Object>	values	= new ArrayList<>();
+	private List<String> strings = new ArrayList<>();
+	private List<Object> values  = new ArrayList<>();
 	
 	@Override
 	public void visitStringPart(String string)

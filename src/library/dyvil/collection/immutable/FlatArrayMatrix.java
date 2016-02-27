@@ -1,10 +1,10 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
-import dyvil.annotation.Immutable;
 
 import java.util.function.Function;
 

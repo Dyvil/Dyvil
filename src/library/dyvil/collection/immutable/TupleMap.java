@@ -1,10 +1,10 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;

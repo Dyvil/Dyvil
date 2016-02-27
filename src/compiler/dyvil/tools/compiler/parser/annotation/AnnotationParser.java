@@ -5,9 +5,9 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ArgumentMap;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 

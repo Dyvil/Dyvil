@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 
 public class CompilerPhase implements ICompilerPhase
 {
-	private final int                                    id;
-	private final String                                 name;
+	private final int                     id;
+	private final String                  name;
 	private final Consumer<DyvilCompiler> apply;
 	
 	public CompilerPhase(int id, String name, Consumer<DyvilCompiler> apply)

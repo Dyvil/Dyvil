@@ -102,7 +102,8 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 

@@ -1,7 +1,6 @@
 package dyvil.ref.array;
 
 import dyvil.ref.FloatRef;
-import dyvil.ref.FloatRef;
 
 public class FloatArrayRef implements FloatRef
 {

@@ -6,11 +6,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A <b>Stack</b> represents a LIFO (<b>L</b>ast <b>I</b>n, <b>F</b>irst
- * <b>O</b>ut) mutable data structure. That means that elements will be
- * processed in the reverse order in which they were added to the queue, so that
- * the first element that was added will be the last element to be removed, and
- * vice-versa.
+ * A <b>Stack</b> represents a LIFO (<b>L</b>ast <b>I</b>n, <b>F</b>irst <b>O</b>ut) mutable data structure. That means
+ * that elements will be processed in the reverse order in which they were added to the queue, so that the first element
+ * that was added will be the last element to be removed, and vice-versa.
  *
  * @param <E>
  * 		the element type of the stack
@@ -33,8 +31,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	Iterator<E> iterator();
 	
 	/**
-	 * Returns true if and if only this stack contains the given {@code element}
-	 * .
+	 * Returns true if and if only this stack contains the given {@code element} .
 	 *
 	 * @param element
 	 * 		the element to find
@@ -53,8 +50,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	void clear();
 	
 	/**
-	 * Adds the given element to the top of this stack, so that it becomes the
-	 * first element in the stack.
+	 * Adds the given element to the top of this stack, so that it becomes the first element in the stack.
 	 *
 	 * @param element
 	 * 		the element to add
@@ -62,8 +58,8 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	void push(E e);
 	
 	/**
-	 * Adds all elements in the given collection of {@code elements} to the top
-	 * of this stack in the order in which they appear in the collection.
+	 * Adds all elements in the given collection of {@code elements} to the top of this stack in the order in which they
+	 * appear in the collection.
 	 *
 	 * @param elements
 	 * 		the elements to add
@@ -77,16 +73,16 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	}
 	
 	/**
-	 * Removes and returns the first element from the top of this stack. If this
-	 * stack is empty, {@code null} is returned.
+	 * Removes and returns the first element from the top of this stack. If this stack is empty, {@code null} is
+	 * returned.
 	 *
 	 * @return the top element of this stack.
 	 */
 	E pop();
 	
 	/**
-	 * Removes the given number of elements from the top of this stack, as if by
-	 * calling {@link #pop()} {@code count} times.
+	 * Removes the given number of elements from the top of this stack, as if by calling {@link #pop()} {@code count}
+	 * times.
 	 *
 	 * @param count
 	 * 		the number of elements to remove
@@ -100,8 +96,8 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	}
 	
 	/**
-	 * Returns the top element of this stack. Unlike {@link #pop()}, this method
-	 * does not remove the element from the top.
+	 * Returns the top element of this stack. Unlike {@link #pop()}, this method does not remove the element from the
+	 * top.
 	 *
 	 * @return the top element of this stack.
 	 */
@@ -117,8 +113,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	void filter(Predicate<? super E> condition);
 	
 	/**
-	 * Returns a copy of this stack that contains the same elements as this
-	 * stack in the same order.
+	 * Returns a copy of this stack that contains the same elements as this stack in the same order.
 	 *
 	 * @return a copy of this stack.
 	 */

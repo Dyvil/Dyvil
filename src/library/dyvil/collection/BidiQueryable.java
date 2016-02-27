@@ -9,12 +9,10 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
- * A <b>BidiQueryable</b> is a specialization of {@link Queryable} that adds
- * directed specializations for direction-dependent methods such as {@link
- * #fold(Object, BiFunction)} and {@link #reduce(BiFunction)}. These
- * specializations include {@link #reverseIterator()}, {@link #foldLeft(Object,
- * BiFunction)}, {@link #foldRight(Object, BiFunction)} , {@link
- * #reduceLeft(BiFunction)} and {@link #reduceRight(BiFunction)}.
+ * A <b>BidiQueryable</b> is a specialization of {@link Queryable} that adds directed specializations for
+ * direction-dependent methods such as {@link #fold(Object, BiFunction)} and {@link #reduce(BiFunction)}. These
+ * specializations include {@link #reverseIterator()}, {@link #foldLeft(Object, BiFunction)}, {@link #foldRight(Object,
+ * BiFunction)} , {@link #reduceLeft(BiFunction)} and {@link #reduceRight(BiFunction)}.
  *
  * @param <E>
  * 		the element type
@@ -22,8 +20,8 @@ import java.util.function.Predicate;
 public interface BidiQueryable<E> extends Queryable<E>
 {
 	/**
-	 * Creates and returns an {@link Iterator} over the elements of this query,
-	 * iterating from left to right (first to last element).
+	 * Creates and returns an {@link Iterator} over the elements of this query, iterating from left to right (first to
+	 * last element).
 	 *
 	 * @return an iterator over the elements of this query
 	 */
@@ -31,8 +29,8 @@ public interface BidiQueryable<E> extends Queryable<E>
 	Iterator<E> iterator();
 	
 	/**
-	 * Creates and returns an {@link Iterator} over the elements of this query,
-	 * iterating from right to left (last to first element).
+	 * Creates and returns an {@link Iterator} over the elements of this query, iterating from right to left (last to
+	 * first element).
 	 *
 	 * @return a reverse iterator over the elements of this query
 	 */

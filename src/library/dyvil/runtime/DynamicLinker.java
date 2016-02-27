@@ -104,7 +104,8 @@ public class DynamicLinker
 
 		final Class<?> receiverClass = receiver.getClass();
 
-		final Method implementationMethod = findMethod(receiverClass, callSite.name, type.dropParameterTypes(0, 1).parameterArray());
+		final Method implementationMethod = findMethod(receiverClass, callSite.name,
+		                                               type.dropParameterTypes(0, 1).parameterArray());
 
 		if (implementationMethod != null)
 		{

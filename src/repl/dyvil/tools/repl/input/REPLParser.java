@@ -1,7 +1,7 @@
 package dyvil.tools.repl.input;
 
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.util.Markers;

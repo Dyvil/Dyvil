@@ -79,8 +79,9 @@ public abstract class Library
 			return new JarLibrary(file);
 		}
 
-		final String error =
-				"Invalid Library File: " + file.getAbsolutePath() + (file.exists() ? " (Unsupported Format)" : " (File does not exist)");
+		final String error = "Invalid Library File: " + file.getAbsolutePath() + (file.exists() ?
+				" (Unsupported Format)" :
+				" (File does not exist)");
 		throw new FileNotFoundException(error);
 	}
 	

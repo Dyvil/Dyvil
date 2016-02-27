@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -17,7 +17,7 @@ public class IterableForStatement extends ForEachStatement
 	public static final ITypeParameter ITERABLE_TYPE  = Types.ITERABLE.getTheClass().getTypeParameter(0);
 	public static final IClass         ITERATOR_CLASS = Package.javaUtil.resolveClass("Iterator");
 	
-	protected IMethod  boxMethod;
+	protected IMethod boxMethod;
 	
 	public IterableForStatement(ICodePosition position, Variable variable)
 	{

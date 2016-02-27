@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 

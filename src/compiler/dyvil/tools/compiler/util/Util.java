@@ -240,7 +240,8 @@ public final class Util
 		final IValue constant = value.toConstant(markers, context);
 		if (constant == null)
 		{
-			markers.add(Markers.semantic(value.getPosition(), "value.constant", context.getCompilationContext().config.getMaxConstantDepth()));
+			markers.add(Markers.semantic(value.getPosition(), "value.constant",
+			                             context.getCompilationContext().config.getMaxConstantDepth()));
 			return value.getType().getDefaultValue();
 		}
 

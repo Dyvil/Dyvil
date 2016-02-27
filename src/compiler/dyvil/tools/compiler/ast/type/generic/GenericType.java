@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.generic.type;
+package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
@@ -8,9 +8,9 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IObjectType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -112,26 +112,49 @@ public abstract class GenericType implements IObjectType, ITypeList
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i].resolve(markers, context);
+		}
 	}
 	
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
+		final TypePosition argumentPosition =
+				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i].checkType(markers, context, argumentPosition);
+		}
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i].check(markers, context);
+		}
 	}
 	
 	@Override
 	public void foldConstants()
 	{
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i].foldConstants();
+		}
 	}
 	
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i].cleanup(context, compilableList);
+		}
 	}
 	
 	@Override
@@ -186,7 +209,8 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
-		                       "(Ljava/lang/String;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;", false);
+		                       "(Ljava/lang/String;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
+		                       false);
 	}
 	
 	@Override

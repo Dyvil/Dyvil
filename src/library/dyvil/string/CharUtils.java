@@ -7,10 +7,9 @@ import dyvil.reflect.Modifiers;
 import java.util.Random;
 
 /**
- * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for
- * several character-related functions such as checking if a character is a
- * letter, a digit or a whitespace, converting it to upper- or lowercase,
- * generating a random letter, consonant or vowel among others.
+ * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for several character-related functions such as
+ * checking if a character is a letter, a digit or a whitespace, converting it to upper- or lowercase, generating a
+ * random letter, consonant or vowel among others.
  *
  * @author Clashsoft
  * @version 1.0
@@ -96,9 +95,8 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns true if the given {@code char c} is an identifier character, i.e.
-	 * a letter (as defined by {@link #isLetter(char) isLetter}), a digit (as
-	 * defined by {@link #isDigit(char) isDigit}), the currency symbol '$' or
+	 * Returns true if the given {@code char c} is an identifier character, i.e. a letter (as defined by {@link
+	 * #isLetter(char) isLetter}), a digit (as defined by {@link #isDigit(char) isDigit}), the currency symbol '$' or
 	 * the underscore '_'.
 	 *
 	 * @param c
@@ -221,12 +219,10 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns the inverted case representation of the given {@code char c}.
-	 * That is, if {@code c} is an uppercase character as defined by
-	 * {@link #isUpperCase(char) isUpperCase} , the lowercase representation (as
-	 * defined by {@link #toLowerCase(char) toLowerCase}), and the uppercase
-	 * representation (as defined by {@link #toUpperCase(char) toUpperCase})
-	 * otherwise.
+	 * Returns the inverted case representation of the given {@code char c}. That is, if {@code c} is an uppercase
+	 * character as defined by {@link #isUpperCase(char) isUpperCase} , the lowercase representation (as defined by
+	 * {@link #toLowerCase(char) toLowerCase}), and the uppercase representation (as defined by {@link
+	 * #toUpperCase(char) toUpperCase}) otherwise.
 	 *
 	 * @param c
 	 * 		the character
@@ -296,8 +292,7 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns a random lowercase letter using the given {@link Random}
-	 * {@code random}.
+	 * Returns a random lowercase letter using the given {@link Random} {@code random}.
 	 *
 	 * @param random
 	 * 		the random number generator
@@ -311,8 +306,7 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns a random lowercase letter using the given {@link Random}
-	 * {@code random}.
+	 * Returns a random lowercase letter using the given {@link Random} {@code random}.
 	 *
 	 * @param random
 	 * 		the random number generator
@@ -326,8 +320,7 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns a random lowercase vowel using the given {@link Random}
-	 * {@code random}.
+	 * Returns a random lowercase vowel using the given {@link Random} {@code random}.
 	 *
 	 * @param random
 	 * 		the random number generator
@@ -341,8 +334,7 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns a random uppercase vowel using the given {@link Random}
-	 * {@code random}.
+	 * Returns a random uppercase vowel using the given {@link Random} {@code random}.
 	 *
 	 * @param random
 	 * 		the random number generator
@@ -356,8 +348,7 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns a random lowercase consonant using the given {@link Random}
-	 * {@code random}.
+	 * Returns a random lowercase consonant using the given {@link Random} {@code random}.
 	 *
 	 * @param random
 	 * 		the random number generator
@@ -371,8 +362,7 @@ public final class CharUtils
 	}
 	
 	/**
-	 * Returns a random uppercase consonant using the given {@link Random}
-	 * {@code random}.
+	 * Returns a random uppercase consonant using the given {@link Random} {@code random}.
 	 *
 	 * @param random
 	 * 		the random number generator

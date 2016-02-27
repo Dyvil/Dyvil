@@ -2,7 +2,6 @@ package dyvil.ref.simple;
 
 import dyvil.lang.literal.BooleanConvertible;
 import dyvil.ref.BooleanRef;
-import dyvil.ref.BooleanRef;
 
 @BooleanConvertible
 public class SimpleBooleanRef implements BooleanRef

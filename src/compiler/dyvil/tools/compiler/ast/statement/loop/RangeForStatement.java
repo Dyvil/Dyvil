@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -184,8 +184,8 @@ public class RangeForStatement extends ForEachStatement
 			break;
 		case RANGEABLE:
 			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next", "()Ldyvil/collection/range/Rangeable;",
-			                       true);
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next",
+			                       "()Ldyvil/collection/range/Rangeable;", true);
 			
 			if (rangeType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
 			{

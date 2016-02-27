@@ -9,13 +9,13 @@ import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -106,8 +106,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.annotations = null;
 				this.modifiers = null;
 				this.varargs = false;
-				if (this.paramList instanceof IParametric && !((IParametric) this.paramList)
-						.setReceiverType(this.type))
+				if (this.paramList instanceof IParametric && !((IParametric) this.paramList).setReceiverType(this.type))
 				{
 					pm.report(token, "parameter.receivertype.invalid");
 					return;

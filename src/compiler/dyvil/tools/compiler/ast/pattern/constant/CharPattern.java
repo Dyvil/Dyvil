@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.Pattern;
 import dyvil.tools.compiler.ast.pattern.TypeCheckPattern;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.lexer.LexerUtil;
@@ -112,7 +112,8 @@ public final class CharPattern extends Pattern
 	}
 	
 	@Override
-	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException
+	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
+			throws BytecodeException
 	{
 		if (this.type == STRING)
 		{

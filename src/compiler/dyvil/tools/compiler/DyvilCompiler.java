@@ -5,7 +5,7 @@ import dyvil.io.BasicPrintStream;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
 import dyvil.tools.compiler.library.Library;

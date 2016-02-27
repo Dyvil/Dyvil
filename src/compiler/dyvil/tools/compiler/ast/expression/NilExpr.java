@@ -80,7 +80,7 @@ public final class NilExpr implements IValue
 	@Override
 	public IType getType()
 	{
-		return this.requiredType == null ? dyvil.tools.compiler.ast.type.Types.UNKNOWN : this.requiredType;
+		return this.requiredType == null ? dyvil.tools.compiler.ast.type.builtin.Types.UNKNOWN : this.requiredType;
 	}
 	
 	@Override
@@ -101,7 +101,7 @@ public final class NilExpr implements IValue
 			return this;
 		}
 
-		if (type != dyvil.tools.compiler.ast.type.Types.UNKNOWN)
+		if (type != dyvil.tools.compiler.ast.type.builtin.Types.UNKNOWN)
 		{
 			markers.add(Markers.semantic(this.position, "nil.type", type));
 		}
@@ -214,7 +214,8 @@ public final class NilExpr implements IValue
 		}
 		else
 		{
-			this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.requiredType, this.getLineNumber());
+			this.method.writeCall(writer, null, EmptyArguments.INSTANCE, this.requiredType, this.requiredType,
+			                      this.getLineNumber());
 		}
 
 		if (type != null)

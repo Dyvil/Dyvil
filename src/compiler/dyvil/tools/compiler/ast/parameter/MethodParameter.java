@@ -135,8 +135,7 @@ public final class MethodParameter extends Parameter
 		IValue value1 = newValue.withType(this.type, null, markers, context);
 		if (value1 == null)
 		{
-			Marker marker = Markers
-					.semantic(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
+			Marker marker = Markers.semantic(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
 			marker.addInfo(Markers.getSemantic("parameter.type", this.type));
 			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
 			markers.add(marker);

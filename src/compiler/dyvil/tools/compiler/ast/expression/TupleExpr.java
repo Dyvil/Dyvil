@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.TupleType;
+import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -175,8 +175,8 @@ public final class TupleExpr implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType elementType = iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS ?
-					dyvil.tools.compiler.ast.type.Types.ANY :
+			IType elementType = iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS ?
+					dyvil.tools.compiler.ast.type.builtin.Types.ANY :
 					type.resolveTypeSafely(iclass.getTypeParameter(i));
 			
 			IValue value = this.values[i];
@@ -300,7 +300,7 @@ public final class TupleExpr implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			value.writeExpression(writer, dyvil.tools.compiler.ast.type.Types.OBJECT);
+			value.writeExpression(writer, dyvil.tools.compiler.ast.type.builtin.Types.OBJECT);
 		}
 		
 		String owner = internal;

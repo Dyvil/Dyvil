@@ -31,8 +31,8 @@ public class FieldReflection
 	}
 	
 	/**
-	 * Adds the modifiers {@code mod} to the given {@link Field} {@code field}
-	 * if {@code flag} is true, and removed them otherwise.
+	 * Adds the modifiers {@code mod} to the given {@link Field} {@code field} if {@code flag} is true, and removed them
+	 * otherwise.
 	 *
 	 * @param field
 	 * 		the field
@@ -111,8 +111,7 @@ public class FieldReflection
 	// Fields
 	
 	/**
-	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with
-	 * the name {@code name}.
+	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with the name {@code name}.
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -135,8 +134,7 @@ public class FieldReflection
 	}
 	
 	/**
-	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with a
-	 * name contained in {@code fieldNames}.
+	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with a name contained in {@code fieldNames}.
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -164,8 +162,7 @@ public class FieldReflection
 	}
 	
 	/**
-	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with
-	 * the field ID {@code fieldID}
+	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with the field ID {@code fieldID}
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -218,8 +215,7 @@ public class FieldReflection
 	}
 	
 	/**
-	 * Directly gets the value of the given {@link Field} on the given
-	 * {@link Object} {@code instance}.
+	 * Directly gets the value of the given {@link Field} on the given {@link Object} {@code instance}.
 	 *
 	 * @param field
 	 * 		the field to get
@@ -281,9 +277,8 @@ public class FieldReflection
 	}
 	
 	/**
-	 * Directly sets the value of the given {@link Field} on the given
-	 * {@link Object} {@code instance} to the given {@link Object} {@code value}
-	 * .
+	 * Directly sets the value of the given {@link Field} on the given {@link Object} {@code instance} to the given
+	 * {@link Object} {@code value} .
 	 *
 	 * @param field
 	 * 		the field to set

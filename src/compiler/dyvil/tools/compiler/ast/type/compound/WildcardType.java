@@ -1,22 +1,22 @@
-package dyvil.tools.compiler.ast.generic.type;
+package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IRawType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.IRawType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -123,11 +123,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public boolean isSameType(IType type)
 	{
-		if (this.bound != null)
-		{
-			return this.variance.checkCompatible(this.bound, type);
-		}
-		return true;
+		return this.bound == null || this.variance.checkCompatible(this.bound, type);
 	}
 	
 	@Override
@@ -362,7 +358,8 @@ public final class WildcardType implements IRawType, ITyped
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
-		                       "(Ldyvil/reflect/Variance;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/WildcardType;", false);
+		                       "(Ldyvil/reflect/Variance;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/WildcardType;",
+		                       false);
 	}
 	
 	@Override
@@ -418,11 +415,5 @@ public final class WildcardType implements IRawType, ITyped
 			this.variance.appendInfix(buffer);
 			this.bound.toString(prefix, buffer);
 		}
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return this.bound == null ? 0 : 31 * this.bound.hashCode();
 	}
 }

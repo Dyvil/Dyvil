@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 
 public class LongRange implements Range<Long>
 {
-	private final long     start;
-	private final long     end;
-	private final long     increment;
+	private final long    start;
+	private final long    end;
+	private final long    increment;
 	private final boolean halfOpen;
 
 	public static LongRange apply(long first, long last)

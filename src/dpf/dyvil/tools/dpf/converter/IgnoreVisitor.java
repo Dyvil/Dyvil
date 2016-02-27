@@ -6,7 +6,8 @@ import dyvil.tools.dpf.visitor.*;
 import dyvil.tools.parsing.Name;
 
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
-public final class IgnoreVisitor implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
+public final class IgnoreVisitor
+		implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
 {
 	public static final IgnoreVisitor instance = new IgnoreVisitor();
 

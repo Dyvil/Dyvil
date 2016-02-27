@@ -1,21 +1,24 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -191,8 +194,11 @@ public class MapType implements IObjectType
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
-		this.keyType.checkType(markers, context, position);
-		this.valueType.checkType(markers, context, position);
+		final TypePosition argumentPosition =
+				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+
+		this.keyType.checkType(markers, context, argumentPosition);
+		this.valueType.checkType(markers, context, argumentPosition);
 	}
 
 	@Override
@@ -266,7 +272,8 @@ public class MapType implements IObjectType
 		this.keyType.writeTypeExpression(writer);
 		this.valueType.writeTypeExpression(writer);
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/MapType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/MapType;", false);
+		                       "(Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/MapType;",
+		                       false);
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package dyvil.ref.array;
 
 import dyvil.ref.BooleanRef;
-import dyvil.ref.BooleanRef;
 
 public class BooleanArrayRef implements BooleanRef
 {

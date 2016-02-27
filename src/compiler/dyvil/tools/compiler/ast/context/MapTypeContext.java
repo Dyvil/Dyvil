@@ -5,7 +5,7 @@ import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 
 public final class MapTypeContext implements ITypeContext
 {

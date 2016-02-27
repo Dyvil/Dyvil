@@ -2,7 +2,7 @@ package dyvil.tools.compiler.phase;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Util;
 
 public class ResolveTypesPhase implements ICompilerPhase

@@ -1,16 +1,21 @@
-package dyvil.tools.compiler.ast.generic.type;
+package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.LambdaType;
+import dyvil.tools.compiler.ast.type.compound.TupleType;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -144,7 +149,7 @@ public class NamedGenericType extends GenericType
 
 			typeVariables = iClass.getTypeParameters();
 
-			concrete = new ClassGenericType(iClass, this.typeArguments, this.typeArgumentCount);
+			concrete = new ResolvedGenericType(this.position, iClass, this.typeArguments, this.typeArgumentCount);
 		}
 		else
 		{
@@ -179,24 +184,6 @@ public class NamedGenericType extends GenericType
 		}
 
 		return concrete;
-	}
-	
-	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
-		/*
-		 * TODO Position handling
-		 * if (position == TypePosition.CLASS) {
-		 * markers.add(Markers.createMarker(this.position, "type.class.generic"));
-		 * } // If the position is a SUPER_TYPE position if (position ==
-		 * TypePosition.SUPER_TYPE || position ==
-		 * TypePosition.SUPER_TYPE_ARGUMENT) { position =
-		 * TypePosition.SUPER_TYPE_ARGUMENT; } else { // Otherwise, resolve the
-		 * type arguments with a GENERIC_ARGUMENT // position position =
-		 * TypePosition.GENERIC_ARGUMENT; }
-		 */
-
-		super.checkType(markers, context, position);
 	}
 	
 	@Override

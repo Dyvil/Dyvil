@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.raw;
 
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IRawType extends IObjectType
@@ -43,7 +44,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default void checkType(MarkerList markers, IContext context, TypePosition position)
+	default void checkType(MarkerList markers, IContext context, IType.TypePosition position)
 	{
 	}
 	

@@ -25,8 +25,7 @@ public interface EventBus
 	}
 
 	/**
-	 * Registers the given <code>eventHandler</code> of the given <code>type</code> for this Event Bus. The even
-	 * handler
+	 * Registers the given <code>eventHandler</code> of the given <code>type</code> for this Event Bus. The even handler
 	 * can be null, in which case only dispatch to static handler methods will be enabled.
 	 *
 	 * @param eventHandler

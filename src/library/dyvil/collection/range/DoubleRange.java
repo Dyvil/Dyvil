@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 
 public class DoubleRange implements Range<Double>
 {
-	private final double     start;
-	private final double     end;
-	private final double     increment;
+	private final double  start;
+	private final double  end;
+	private final double  increment;
 	private final boolean halfOpen;
 
 	public static DoubleRange apply(double first, double last)

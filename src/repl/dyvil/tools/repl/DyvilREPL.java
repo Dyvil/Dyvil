@@ -4,7 +4,7 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;

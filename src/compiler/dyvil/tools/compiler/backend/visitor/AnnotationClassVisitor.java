@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend.visitor;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class AnnotationClassVisitor implements MethodVisitor

@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -17,11 +17,11 @@ import dyvil.tools.repl.DyvilREPL;
 
 public class REPLVariable extends Field
 {
-	private   REPLContext context;
+	private REPLContext context;
 
 	protected String bytecodeName;
-	protected String      className;
-	private   Class       theClass;
+	protected String className;
+	private   Class  theClass;
 	
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, ModifierSet modifiers)
 	{
@@ -151,8 +151,8 @@ public class REPLVariable extends Field
 		String extendedType = this.type.getExtendedName();
 		ClassWriter cw = new ClassWriter();
 		// Generate Class Header
-		cw.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className,
-		         null, "java/lang/Object", null);
+		cw.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null,
+		         "java/lang/Object", null);
 		
 		cw.visitSource(className, null);
 		

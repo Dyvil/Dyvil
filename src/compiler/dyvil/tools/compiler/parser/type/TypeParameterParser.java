@@ -11,10 +11,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.token.IToken;
 
@@ -29,8 +29,8 @@ public final class TypeParameterParser extends Parser implements ITyped
 	
 	protected ITypeParametric typeParameterized;
 	
-	private byte           boundMode;
-	private Variance       variance = Variance.INVARIANT;
+	private byte boundMode;
+	private Variance variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
 	private AnnotationList annotationList;
 	

@@ -22,7 +22,7 @@ import dyvil.tools.compiler.ast.statement.exception.ThrowStatement;
 import dyvil.tools.compiler.ast.statement.exception.TryStatement;
 import dyvil.tools.compiler.ast.statement.loop.DoStatement;
 import dyvil.tools.compiler.ast.statement.loop.WhileStatement;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;

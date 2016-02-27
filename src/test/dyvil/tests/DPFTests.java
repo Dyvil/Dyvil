@@ -2,16 +2,19 @@ package dyvil.tests;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.TreeMap;
-import dyvil.tools.dpf.converter.string.Parser;
 import dyvil.tools.dpf.ast.Expandable;
 import dyvil.tools.dpf.ast.RootNode;
 import dyvil.tools.dpf.converter.binary.BinaryReader;
 import dyvil.tools.dpf.converter.binary.BinaryWriter;
 import dyvil.tools.dpf.converter.flatmap.FlatMapConverter;
+import dyvil.tools.dpf.converter.string.Parser;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 import static org.junit.Assert.assertEquals;
 

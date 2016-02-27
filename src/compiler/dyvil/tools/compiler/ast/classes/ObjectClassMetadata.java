@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -77,7 +77,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		super.resolveTypesGenerate(markers, context);
 
 		final Field field = new Field(this.theClass, Names.instance, this.theClass.getType(),
-	                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
+		                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
 		this.instanceField = field;
 		
 		this.constructor.setModifiers(new FlagModifierSet(Modifiers.PRIVATE));

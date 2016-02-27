@@ -29,7 +29,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 	// Metadata
 	private IMethod[] getterMethods;
-	private IType[] paramTypes;
+	private IType[]   paramTypes;
 	
 	public CaseClassPattern(ICodePosition position)
 	{
@@ -77,8 +77,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		final int paramCount = caseClass.parameterCount();
 		if (this.patternCount != paramCount)
 		{
-			final Marker marker = Markers
-					.semantic(this.position, "pattern.class.count", this.type.toString());
+			final Marker marker = Markers.semantic(this.position, "pattern.class.count", this.type.toString());
 			marker.addInfo(Markers.getSemantic("pattern.class.count.pattern", this.patternCount));
 			marker.addInfo(Markers.getSemantic("pattern.class.count.class", paramCount));
 			markers.add(marker);
@@ -108,7 +107,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 				marker.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
 				marker.addInfo(Markers.getSemantic("classparameter.type", paramType));
 				markers.add(marker);
-
 			}
 			else
 			{
@@ -252,8 +250,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
 		}
 	}
-
-
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)

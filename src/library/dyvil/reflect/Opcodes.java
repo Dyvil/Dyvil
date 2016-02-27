@@ -5,8 +5,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.asm.util.Printer;
 
 /**
- * The <b>Opcodes</b> interface declares all opcodes that can be used in
- * <i>Dyvil</i> Bytecode Expressions.
+ * The <b>Opcodes</b> interface declares all opcodes that can be used in <i>Dyvil</i> Bytecode Expressions.
  *
  * @author Clashsoft
  * @version 1.0

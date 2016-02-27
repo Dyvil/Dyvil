@@ -19,7 +19,7 @@ public final class Markers
 	private static final ResourceBundle SEMANTIC_BUNDLE = ResourceBundle
 			.getBundle("dyvil.tools.compiler.lang.SemanticMarkers");
 
-	private static final ResourceBundle SYNTAX_BUNDLE   = ResourceBundle
+	private static final ResourceBundle SYNTAX_BUNDLE = ResourceBundle
 			.getBundle("dyvil.tools.compiler.lang.SyntaxMarkers");
 
 	private static final ResourceBundle MARKER_LEVEL_BUNDLE = ResourceBundle

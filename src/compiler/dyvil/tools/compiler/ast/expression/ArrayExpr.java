@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -139,17 +139,17 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		if (valueCount == 0)
 		{
-			return dyvil.tools.compiler.ast.type.Types.ANY;
+			return dyvil.tools.compiler.ast.type.builtin.Types.ANY;
 		}
 		
 		IType t = values[0].getType();
 		for (int i = 1; i < valueCount; i++)
 		{
 			IType t1 = values[i].getType();
-			t = dyvil.tools.compiler.ast.type.Types.combine(t, t1);
+			t = dyvil.tools.compiler.ast.type.builtin.Types.combine(t, t1);
 			if (t == null)
 			{
-				return dyvil.tools.compiler.ast.type.Types.ANY;
+				return dyvil.tools.compiler.ast.type.builtin.Types.ANY;
 			}
 		}
 		
@@ -194,12 +194,12 @@ public final class ArrayExpr implements IValue, IValueList
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (arrayType.classEquals(dyvil.tools.compiler.ast.type.Types.ITERABLE))
+			if (arrayType.classEquals(dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE))
 			{
 				return new LiteralConversion(this, getArrayToIterable())
 						.withType(arrayType, typeContext, markers, context);
 			}
-			if (iclass != dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS)
+			if (iclass != dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -243,16 +243,16 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return ARRAY_TO_ITERABLE;
 		}
-		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.Types.getObjectArray().getBody()
-		                                                              .getMethod(Name.getQualified("toIterable"));
+		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.builtin.Types.getObjectArray().getBody().getMethod(
+				Name.getQualified("toIterable"));
 	}
 	
 	private boolean isConvertibleFrom(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		return iclass == dyvil.tools.compiler.ast.type.Types.OBJECT_CLASS
-				|| iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null || dyvil.tools.compiler.ast.type.Types.ITERABLE
-				.isSuperClassOf(type);
+		return iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS
+				|| iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null
+				|| dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override

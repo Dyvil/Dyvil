@@ -1,22 +1,27 @@
-package dyvil.tools.compiler.ast.type;
+package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -515,7 +520,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;", false);
+		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;",
+		                       false);
 	}
 	
 	@Override

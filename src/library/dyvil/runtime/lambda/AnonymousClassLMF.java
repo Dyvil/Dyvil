@@ -109,9 +109,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 	private final String lambdaClassName;
 	
 	/**
-	 * Field that represents the return value of the {@code toString()} method
-	 * of this object. Supplied by the compiler or computed from the invoked
-	 * type, i.e. the functional interface this lambda object represents.
+	 * Field that represents the return value of the {@code toString()} method of this object. Supplied by the compiler
+	 * or computed from the invoked type, i.e. the functional interface this lambda object represents.
 	 */
 	private String toString;
 	

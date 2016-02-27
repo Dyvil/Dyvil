@@ -5,11 +5,11 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -209,7 +209,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	{
 		IContext combinedContext = new CombiningContext(this, context);
 
-		this.type.checkType(markers, combinedContext, TypePosition.TYPE);
+		this.type.checkType(markers, combinedContext, TypePosition.GENERIC_ARGUMENT);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{

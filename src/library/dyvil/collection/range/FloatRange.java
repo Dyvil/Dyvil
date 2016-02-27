@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 
 public class FloatRange implements Range<Float>
 {
-	private final float     start;
-	private final float     end;
-	private final float     increment;
+	private final float   start;
+	private final float   end;
+	private final float   increment;
 	private final boolean halfOpen;
 
 	public static FloatRange apply(float first, float last)

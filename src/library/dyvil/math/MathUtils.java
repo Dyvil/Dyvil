@@ -5,17 +5,11 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 /**
- * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for
- * several math functions such as absolute values, min, max, clamping, ranges
- * and others. Most methods of this class are declared as {@code infix}, which
- * means they can be called on their arguments in <i>Dyvil</i> code.
+ * The {@linkplain Utility utility class} <b>MathUtils</b> can be used for several math functions such as absolute
+ * values, min, max, clamping, ranges and others. Most methods of this class are declared as {@code infix}, which means
+ * they can be called on their arguments in <i>Dyvil</i> code.
  * <p>
- * <PRE>
- * int abs = -1 abs
- * int floor = 4.5 floor
- * float average = [ 1F, 2.3F, 4F ] average
- * [int] range = 1 .. 4
- * </PRE>
+ * <PRE> int abs = -1 abs int floor = 4.5 floor float average = [ 1F, 2.3F, 4F ] average [int] range = 1 .. 4 </PRE>
  *
  * @author Clashsoft
  * @version 1.0
@@ -28,23 +22,19 @@ public final class MathUtils
 		/**
 		 * Used to calculate the index of a sin value in the {@link #sinTable}.
 		 * <p>
-		 * Value:<br>
-		 * <b>3.141592653589793D * 2D / 65536D</b>
+		 * Value:<br> <b>3.141592653589793D * 2D / 65536D</b>
 		 */
 		private static final double sinFactor = 0.00009587379924285257D;
 		
 		/**
 		 * Used to calculate the index of a sin value in the {@link #sinTable}.
 		 * <p>
-		 * Value:<br>
-		 * <b>1 / sinFactor<br>
-		 * 65536D / 3.141592653589793D * 2D</b>
+		 * Value:<br> <b>1 / sinFactor<br> 65536D / 3.141592653589793D * 2D</b>
 		 */
 		private static final double sinFactor2 = 10430.378350470453D;
 		
 		/**
-		 * A table of sin values storing 65536 values between {@code 0} and
-		 * {@code PI}.
+		 * A table of sin values storing 65536 values between {@code 0} and {@code PI}.
 		 */
 		private static final float[] sinTable = new float[65536];
 		
@@ -709,8 +699,7 @@ public final class MathUtils
 	}
 	
 	/**
-	 * Returns the number of permutations of {@code n} objects when picking
-	 * {@code k} at a time. The result is equal to
+	 * Returns the number of permutations of {@code n} objects when picking {@code k} at a time. The result is equal to
 	 * <p>
 	 * n! / (n-k)!
 	 *
@@ -728,8 +717,8 @@ public final class MathUtils
 	}
 	
 	/**
-	 * Returns the number of combinations of {@code n} objects. This doesn't
-	 * regard the order of the elements, so the result is always 1.
+	 * Returns the number of combinations of {@code n} objects. This doesn't regard the order of the elements, so the
+	 * result is always 1.
 	 *
 	 * @param n
 	 * 		the number of objects
@@ -743,9 +732,8 @@ public final class MathUtils
 	}
 	
 	/**
-	 * Returns the number of combinations of {@code n} objects when picking
-	 * {@code k} at a time. This doesn't regard the order of the elements. The
-	 * result is equal to
+	 * Returns the number of combinations of {@code n} objects when picking {@code k} at a time. This doesn't regard the
+	 * order of the elements. The result is equal to
 	 * <p>
 	 * n! / (k! * (n-k)!)
 	 *

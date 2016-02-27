@@ -6,10 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a mutating method, i.e. a method that mutates the members of a mutable
- * type. If a method annotated as {@code mutating} is called on any instance of
- * the {@link Immutable} interface, the compiler should report the error specified
- * by {@link #value()}.
+ * Marks a mutating method, i.e. a method that mutates the members of a mutable type. If a method annotated as {@code
+ * mutating} is called on any instance of the {@link Immutable} interface, the compiler should report the error
+ * specified by {@link #value()}.
  *
  * @author Clashsoft
  * @version 1.0
@@ -21,15 +20,10 @@ public @interface Mutating
 	String VALUE_DEFAULT = "Invalid invocation of mutating method {method} on immutable type {type}";
 	
 	/**
-	 * Returns the error to be reported by the compiler when a mutating method
-	 * is called on an immutable callee.
+	 * Returns the error to be reported by the compiler when a mutating method is called on an immutable callee.
 	 * <p>
-	 * The compiler will automatically replace special tokens in the returned
-	 * string. These tokens include:
-	 * <ul>
-	 * <li>{@code method} - The name of the method
-	 * <li>{@code type} - The type of the callee
-	 * </ul>
+	 * The compiler will automatically replace special tokens in the returned string. These tokens include: <ul>
+	 * <li>{@code method} - The name of the method <li>{@code type} - The type of the callee </ul>
 	 *
 	 * @return the error to be reported by the compiler
 	 */

@@ -6,9 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A class marked as a <b>Utility</b> class provides utility methods for any or
- * a given type. A utility should either be an {@code interface} or a {final
- * class} without a public constructor.
+ * A class marked as a <b>Utility</b> class provides utility methods for any or a given type. A utility should either be
+ * an {@code interface} or a {final class} without a public constructor.
  *
  * @author Clashsoft
  * @version 1.0
