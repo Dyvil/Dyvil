@@ -26,7 +26,11 @@ public class REPLParser extends ParserManager
 	@Override
 	public void report(Marker error)
 	{
-		this.hasSyntaxErrors = true;
+		if (!this.hasSyntaxErrors)
+		{
+			this.hasSyntaxErrors = error.isError();
+		}
+
 		if (this.reportErrors)
 		{
 			super.report(error);
