@@ -1,0 +1,175 @@
+package dyvil.tools.compiler.ast.operator;
+
+import dyvil.tools.asm.Opcodes;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.TupleType;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
+
+public class ColonOperator implements IValue
+{
+	private IValue left;
+	private IValue right;
+
+	// Metadata
+	private ICodePosition position;
+	private IType         type;
+
+	public ColonOperator(ICodePosition position, IValue left, IValue right)
+	{
+
+		this.position = position;
+		this.left = left;
+		this.right = right;
+	}
+
+	@Override
+	public int valueTag()
+	{
+		return COLON;
+	}
+
+	public IValue getLeft()
+	{
+		return this.left;
+	}
+
+	public void setLeft(IValue left)
+	{
+		this.left = left;
+	}
+
+	public IValue getRight()
+	{
+		return this.right;
+	}
+
+	public void setRight(IValue right)
+	{
+		this.right = right;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		return this.type != null;
+	}
+
+	@Override
+	public IType getType()
+	{
+		if (this.type == null)
+		{
+			return this.type = new TupleType(this.left.getType(), this.right.getType());
+		}
+		return this.type;
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.isType(type) ? this : null;
+	}
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return type.isSuperTypeOf(this.getType());
+	}
+
+	@Override
+	public float getTypeMatch(IType type)
+	{
+		return type.getSubClassDistance(this.getType());
+	}
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		this.left.resolveTypes(markers, context);
+		this.right.resolveTypes(markers, context);
+	}
+
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.left = this.left.resolve(markers, context);
+		this.right = this.right.resolve(markers, context);
+		return this;
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.left.checkTypes(markers, context);
+		this.right.checkTypes(markers, context);
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		this.left.check(markers, context);
+		this.right.check(markers, context);
+	}
+
+	@Override
+	public IValue foldConstants()
+	{
+		this.left = this.left.foldConstants();
+		this.right = this.right.foldConstants();
+		return this;
+	}
+
+	@Override
+	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		this.left.cleanup(context, compilableList);
+		this.right.cleanup(context, compilableList);
+		return this;
+	}
+
+	@Override
+	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.left.writeExpression(writer, Types.OBJECT);
+		this.right.writeExpression(writer, Types.OBJECT);
+
+		final int lineNumber = this.getLineNumber();
+
+		writer.writeLineNumber(lineNumber);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/tuple/Tuple2", "apply",
+		                       "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;", false);
+
+		if (type != null)
+		{
+			TupleType.getTupleClass(2).getClassType().writeCast(writer, type, lineNumber);
+		}
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		this.left.toString(prefix, buffer);
+		buffer.append(" : "); // TODO Formatting
+		this.right.toString(prefix, buffer);
+	}
+}

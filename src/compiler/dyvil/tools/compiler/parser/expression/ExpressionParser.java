@@ -57,12 +57,17 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	
 	protected static final int PARAMETRIC_THIS_END  = 0x400;
 	protected static final int PARAMETRIC_SUPER_END = 0x800;
+
+	// Flags
+
+	public static final int EXPLICIT_DOT = 1;
+	public static final int IGNORE_COLON = 2;
 	
 	protected IValueConsumer valueConsumer;
 	
 	private IValue value;
 	
-	private boolean  explicitDot;
+	private int flags;
 	private Operator operator;
 	
 	public ExpressionParser(IValueConsumer valueConsumer)
@@ -75,6 +80,27 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	{
 		this.operator = operator;
 		return this;
+	}
+
+	public boolean hasFlag(int flag)
+	{
+		return (this.flags & flag) != 0;
+	}
+
+	public void addFlag(int flag)
+	{
+		this.flags |= flag;
+	}
+
+	public ExpressionParser withFlag(int flag)
+	{
+		this.flags |= flag;
+		return this;
+	}
+
+	public void removeFlag(int flag)
+	{
+		this.flags &= ~flag;
 	}
 
 	private void end(IParserManager pm)
@@ -412,9 +438,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 		
-		if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.COLON)
+		if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.COLON && this.hasFlag(IGNORE_COLON))
 		{
-			// ... ] OR ... :
+			// ... ]
 
 			// Close bracket, end expression
 			if (this.value != null)
@@ -432,11 +458,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// ... .
 
 				this.mode = DOT_ACCESS;
-				this.explicitDot = true;
+				this.addFlag(EXPLICIT_DOT);
 				return;
 			}
 			
-			this.explicitDot = false;
+			this.removeFlag(EXPLICIT_DOT);
 			
 			switch (type)
 			{
@@ -495,6 +521,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.value = new ApplyMethodCall(this.value.getPosition(), this.value,
 				                                 parseArguments(pm, token.next()));
 				this.mode = PARAMETERS_END;
+				return;
+			case BaseSymbols.COLON:
+				final ColonOperator colonOperator = new ColonOperator(token.raw(), this.value, null);
+
+				pm.pushParser(new ExpressionParser(colonOperator::setRight));
+				this.value = colonOperator;
+				this.mode = END;
 				return;
 			}
 			
@@ -627,7 +660,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 */
 	private void parseAccess(IParserManager pm, IToken token, Name name, Operator operator)
 	{
-		if (!this.explicitDot && this.operator != null)
+		if (!this.hasFlag(EXPLICIT_DOT) && this.operator != null)
 		{
 			// Handle operator precedence
 			int p;
@@ -686,7 +719,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final IToken next = token.next();
 		final int nextType = next.type();
 
-		if (operator != null && !this.explicitDot)
+		if (operator != null && !this.hasFlag(EXPLICIT_DOT))
 		{
 			if (this.value == null)
 			{
@@ -696,7 +729,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				final SingleArgument argument = new SingleArgument();
 				final MethodCall call = new MethodCall(token, null, name, argument);
 
-				call.setDotless(!this.explicitDot);
+				call.setDotless(true);
 				this.value = call;
 				this.mode = ACCESS;
 
@@ -708,7 +741,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			//            token    next
 
 			final MethodCall call = new MethodCall(token, this.value, name);
-			call.setDotless(!this.explicitDot);
+			call.setDotless(true);
 			this.value = call;
 			this.mode = ACCESS;
 
@@ -751,7 +784,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// IDENTIFIER (
 				final MethodCall call = new MethodCall(token.raw(), this.value, name);
 				call.setArguments(parseArguments(pm, next.next()));
-				call.setDotless(!this.explicitDot);
+				call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 				this.value = call;
 
 				this.mode = PARAMETERS_END;
@@ -791,7 +824,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// ... IDENTIFIER EXPRESSION-TERMINATOR
 				// e.g. this.someField ;
 				final FieldAccess access = new FieldAccess(token, this.value, name);
-				access.setDotless(!this.explicitDot);
+				access.setDotless(!this.hasFlag(EXPLICIT_DOT));
 				this.value = access;
 				this.mode = ACCESS;
 				return;
@@ -808,7 +841,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isExpressionTerminator(next.next().type()))
 				{
 					final FieldAccess access = new FieldAccess(token, this.value, name);
-					access.setDotless(!this.explicitDot);
+					access.setDotless(!this.hasFlag(EXPLICIT_DOT));
 					this.value = access;
 					this.mode = ACCESS;
 					return;
@@ -821,7 +854,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		final SingleArgument argument = new SingleArgument();
 		final MethodCall call = new MethodCall(token, this.value, name, argument);
-		call.setDotless(!this.explicitDot);
+		call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 
 		this.value = call;
 		this.mode = ACCESS;

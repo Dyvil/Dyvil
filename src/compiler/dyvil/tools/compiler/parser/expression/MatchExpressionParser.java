@@ -74,7 +74,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			if (type == DyvilKeywords.IF)
 			{
 				this.mode = ACTION;
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(pm.newExpressionParser(this).withFlag(ExpressionParser.IGNORE_COLON));
 				return;
 			}
 			// Fallthrough

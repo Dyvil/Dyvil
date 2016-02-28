@@ -85,6 +85,7 @@ public interface IValue extends IASTNode, ITyped
 	int RANGE_OPERATOR = 135;
 	int STRINGBUILDER  = 136;
 	int INC            = 137;
+	int COLON          = 138;
 	
 	// Basic Control Statements
 	int RETURN       = 192;
