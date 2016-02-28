@@ -691,7 +691,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
-		Deprecation.checkAnnotations(markers, position, this, "constructor");
+		Deprecation.checkAnnotations(markers, position, this);
 
 		switch (IContext.getVisibility(context, this))
 		{

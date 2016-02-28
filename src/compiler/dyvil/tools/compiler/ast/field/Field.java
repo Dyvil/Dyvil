@@ -183,7 +183,7 @@ public class Field extends Member implements IField
 			}
 		}
 		
-		Deprecation.checkAnnotations(markers, position, this, "field");
+		Deprecation.checkAnnotations(markers, position, this);
 
 		switch (IContext.getVisibility(context, this))
 		{

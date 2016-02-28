@@ -22,7 +22,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.MarkerLevel;
 
-public class Deprecation
+public final class Deprecation
 {
 	public static final Name Deprecated   = Name.getQualified("Deprecated");
 	public static final Name Experimental = Name.getQualified("Experimental");
@@ -54,27 +54,31 @@ public class Deprecation
 	private static final IParameter INF_DESCRIPTION_PARAM = USAGE_INFO_CLASS.getParameter(1);
 	private static final IParameter INF_MARKER_TYPE_PARAM = USAGE_INFO_CLASS.getParameter(2);
 
-	public static void checkAnnotations(MarkerList markers, ICodePosition position, IMember member, String memberType)
+	public static final String MEMBER_KIND = "{member.kind}";
+	public static final String MEMBER_NAME = "{member.name}";
+	public static final String STAGE       = "{stage}";
+
+	public static void checkAnnotations(MarkerList markers, ICodePosition position, IMember member)
 	{
 		if (member.hasModifier(Modifiers.DEPRECATED))
 		{
-			checkDeprecation(markers, position, member, memberType);
+			checkDeprecation(markers, position, member);
 		}
 
 		IAnnotation annotation = member.getAnnotation(EXPERIMENTAL_CLASS);
 		if (annotation != null)
 		{
-			checkExperimental(markers, position, member, memberType, annotation);
+			checkExperimental(markers, position, member, annotation);
 		}
 
 		annotation = member.getAnnotation(USAGE_INFO_CLASS);
 		if (annotation != null)
 		{
-			checkUsageInfo(markers, position, member, memberType, annotation);
+			checkUsageInfo(markers, position, member, annotation);
 		}
 	}
 
-	private static void checkDeprecation(MarkerList markers, ICodePosition position, IMember member, String memberType)
+	private static void checkDeprecation(MarkerList markers, ICodePosition position, IMember member)
 	{
 		IAnnotation annotation = member.getAnnotation(DEPRECATED_CLASS);
 		if (annotation == null)
@@ -95,8 +99,8 @@ public class Deprecation
 		String description = getStringValue(arguments, DEP_DESCRIPTION_PARAM);
 		String since = getStringValue(arguments, DEP_SINCE_PARAM);
 
-		value = value.replace("{membertype}", Markers.getSemantic("member." + memberType))
-		             .replace("{membername}", member.getName().toString()) //
+		value = value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
+		             .replace(MEMBER_NAME, member.getName().toString()) //
 		             .replace("{since}", since);
 
 		Marker marker = Markers.withText(position, markerLevel, value);
@@ -143,18 +147,18 @@ public class Deprecation
 		String[] replacements = getReplacements(arguments);
 		if (replacements != null)
 		{
-			StringBuilder builder = new StringBuilder("Replacements:");
+			final StringBuilder builder = new StringBuilder();
 			for (String replacement : replacements)
 			{
 				builder.append("\n\t\t").append(replacement);
 			}
-			marker.addInfo(builder.toString());
+			marker.addInfo(Markers.getSemantic("deprecated.replacements", builder.toString()));
 		}
 
 		markers.add(marker);
 	}
 
-	private static void checkExperimental(MarkerList markers, ICodePosition position, IMember member, String memberType, IAnnotation annotation)
+	private static void checkExperimental(MarkerList markers, ICodePosition position, IMember member, IAnnotation annotation)
 	{
 		IArguments arguments = annotation.getArguments();
 
@@ -169,8 +173,8 @@ public class Deprecation
 		Stage stage = getEnumValue(arguments, EXP_STAGE_PARAM, Stage.class);
 		assert stage != null;
 
-		value = value.replace("{membertype}", Markers.getSemantic("member." + memberType))
-		             .replace("{membername}", member.getName().toString()).replace("{stage}", stage.toString());
+		value = value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
+		             .replace(MEMBER_NAME, member.getName().toString()).replace(STAGE, stage.toString());
 
 		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
@@ -187,7 +191,7 @@ public class Deprecation
 		markers.add(marker);
 	}
 
-	private static void checkUsageInfo(MarkerList markers, ICodePosition position, IMember member, String memberType, IAnnotation annotation)
+	private static void checkUsageInfo(MarkerList markers, ICodePosition position, IMember member, IAnnotation annotation)
 	{
 		IArguments arguments = annotation.getArguments();
 
@@ -200,8 +204,8 @@ public class Deprecation
 		String value = getStringValue(arguments, INF_VALUE_PARAM);
 		String description = getStringValue(arguments, INF_DESCRIPTION_PARAM);
 
-		value = value.replace("{membertype}", Markers.getSemantic("member." + memberType))
-		             .replace("{membername}", member.getName().toString());
+		value = value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
+		             .replace(MEMBER_NAME, member.getName().toString());
 
 		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;

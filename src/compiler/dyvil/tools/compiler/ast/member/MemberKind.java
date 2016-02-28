@@ -12,7 +12,7 @@ public enum MemberKind
 	CLASS_PARAMETER("classparameter"),
 	VARIABLE("variable");
 
-	private String name;
+	private final String name;
 
 	MemberKind(String name)
 	{

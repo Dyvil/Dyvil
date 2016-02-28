@@ -212,7 +212,7 @@ public interface Modifiers
 	/**
 	 * The access modifiers.
 	 */
-	int ACCESS_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | DEPRECATED | INTERNAL;
+	int ACCESS_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | INTERNAL;
 	
 	/**
 	 * The modifiers that can be used on any member.

@@ -172,7 +172,7 @@ public class ClassGenericType extends GenericType
 		IClass iclass = this.theClass;
 		if (iclass != null)
 		{
-			Deprecation.checkAnnotations(markers, this.getPosition(), iclass, "type");
+			Deprecation.checkAnnotations(markers, this.getPosition(), iclass);
 
 			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
 			{

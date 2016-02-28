@@ -6,7 +6,7 @@ import dyvil.util.MarkerLevel;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 @ClassParameters(names = { "value", "description", "level" })
 public @interface UsageInfo
 {
