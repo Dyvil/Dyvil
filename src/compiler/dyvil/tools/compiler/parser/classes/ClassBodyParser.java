@@ -354,7 +354,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	@Override
 	public boolean reportErrors()
 	{
-		return !(this.mode == PARAMETERS && this.member instanceof IConstructor) && (this.mode > NAME
-				|| this.mode == END);
+		return !(this.mode == PARAMETERS && this.memberKind == CONSTRUCTOR) && (this.mode > NAME || this.mode == END);
 	}
 }

@@ -86,8 +86,13 @@ public class REPLParser extends ParserManager
 			{
 				this.parser.parse(this, token);
 
-				if (this.reportErrors || parser.reportErrors())
+				if (!this.reportErrors && parser.reportErrors())
 				{
+					if (this.hasSyntaxErrors)
+					{
+						return false;
+					}
+
 					this.reportErrors = true;
 				}
 			}
