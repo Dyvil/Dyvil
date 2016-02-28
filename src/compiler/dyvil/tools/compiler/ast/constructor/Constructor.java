@@ -929,7 +929,7 @@ public class Constructor extends Member implements IConstructor
 		super.toString(prefix, buffer);
 
 		this.modifiers.toString(buffer);
-		buffer.append("new");
+		buffer.append("init");
 		
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
 		Util.astToString(prefix, this.parameters, this.parameterCount,
