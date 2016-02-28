@@ -12,9 +12,11 @@ public final class LanguageFeatures
 
 	// Tuples
 
+	@Deprecated(description: "Support for the '->' Operator will be dropped in Dyvil v0.18.0, use the ':' operator instead" )
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
 	public infix (A, B) ->[A, B](A a, B b) = (a, b)
 
+	@Deprecated(description: "Support for the '<-' Operator will be dropped in Dyvil v0.18.0")
 	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
 	public infix (B, A) <-[A, B](A a, B b) = (b, a)
 
