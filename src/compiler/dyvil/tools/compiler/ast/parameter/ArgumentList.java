@@ -27,6 +27,12 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		this.values = new IValue[3];
 	}
+
+	public ArgumentList(IValue... values)
+	{
+		this.values = values;
+		this.size = values.length;
+	}
 	
 	public ArgumentList(int size)
 	{
@@ -47,7 +53,7 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values, this.size);
+		return new ArrayIterator<>(this.values, this.size);
 	}
 	
 	@Override

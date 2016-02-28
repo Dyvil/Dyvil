@@ -1,10 +1,15 @@
 package dyvil.tools.compiler.ast.operator;
 
 import dyvil.tools.asm.Opcodes;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
@@ -15,6 +20,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ColonOperator implements IValue
 {
+	public static final class LazyTypes
+	{
+		public static final IClass COLON_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ColonConvertible");
+	}
+
 	private IValue left;
 	private IValue right;
 
@@ -87,18 +97,30 @@ public class ColonOperator implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		final IAnnotation annotation = type.getAnnotation(LazyTypes.COLON_CONVERTIBLE);
+		if (annotation != null)
+		{
+			return new LiteralConversion(this, annotation, new ArgumentList(this.left, this.right))
+					.withType(type, typeContext, markers, context);
+		}
+
 		return this.isType(type) ? this : null;
 	}
 
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(this.getType());
+		return type.getAnnotation(LazyTypes.COLON_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 
 	@Override
 	public float getTypeMatch(IType type)
 	{
+		if (type.getAnnotation(LazyTypes.COLON_CONVERTIBLE) != null)
+		{
+			return IValue.CONVERSION_MATCH;
+		}
+
 		return type.getSubClassDistance(this.getType());
 	}
 
