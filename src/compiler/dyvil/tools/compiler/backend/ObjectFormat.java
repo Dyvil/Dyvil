@@ -7,37 +7,39 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
-public class ObjectFormat
+public final class ObjectFormat
 {
 	private static final int FILE_VERSION = 1;
 
-	public static void write(File file, IDyvilHeader header)
+	public static void write(DyvilCompiler compiler, File file, IDyvilHeader header)
 	{
-		if (!FileUtils.create(file))
+		try
 		{
-			DyvilCompiler.error("Error during compilation of '" + file + "': could not create file");
-			return;
-		}
-		
-		try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
-		{
-			writer.writeShort(FILE_VERSION);
-			header.write(writer);
+			FileUtils.create(file);
 
-			// Bytes are written when the StringPoolWriter closes
+			try (StringPoolWriter writer = new StringPoolWriter(new BufferedOutputStream(new FileOutputStream(file))))
+			{
+				writer.writeShort(FILE_VERSION);
+				header.write(writer);
+
+				// Bytes are written when the StringPoolWriter closes
+			}
 		}
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			DyvilCompiler.warn("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
-			DyvilCompiler.error("ClassWriter", "compile", ex);
+			compiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
+			compiler.error("ClassWriter", "compile", ex);
 			return;
 		}
 	}
 	
-	public static DyvilHeader read(InputStream is, DyvilHeader header)
+	public static DyvilHeader read(DyvilCompiler compiler, InputStream is, DyvilHeader header)
 	{
 		try (StringPoolReader reader = new StringPoolReader(is))
 		{
@@ -51,7 +53,7 @@ public class ObjectFormat
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.error("HeaderFile", "read", ex);
+			compiler.error("HeaderFile", "read", ex);
 		}
 		return null;
 	}

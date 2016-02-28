@@ -66,8 +66,7 @@ public abstract class AbstractLMF
 	 */
 	protected final MethodHandle     implMethod;
 	/**
-	 * Info about the implementation method handle
-	 * "MethodHandleInfo[5 CC.impl(int)String]"
+	 * Info about the implementation method handle "MethodHandleInfo[5 CC.impl(int)String]"
 	 */
 	protected final MethodHandleInfo implInfo;
 	/**

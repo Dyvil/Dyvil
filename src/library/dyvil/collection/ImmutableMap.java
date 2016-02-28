@@ -47,6 +47,11 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		return EmptyMap.apply();
 	}
+
+	static <K, V> ImmutableMap<K, V> singleton(K key, V value)
+	{
+		return new SingletonMap<>(key, value);
+	}
 	
 	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
@@ -297,11 +302,18 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	@Mutating
+	default V remap(Object key, K newKey)
+	{
+		throw new ImmutableException("remap() on Immutable Map");
+	}
+
+	@Override
+	@Mutating
 	default V removeKey(Object key)
 	{
 		throw new ImmutableException("removeKey() on Immutable Map");
 	}
-	
+
 	@Override
 	@Mutating
 	default boolean removeValue(Object value)

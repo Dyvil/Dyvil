@@ -36,7 +36,7 @@ public interface IntrinsicData
 				return;
 			}
 			
-			instance.writeExpression(writer, method.getTheClass().getType());
+			instance.writeExpression(writer, method.getEnclosingClass().getType());
 			return;
 		}
 		

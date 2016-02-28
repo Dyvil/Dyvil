@@ -1,7 +1,7 @@
 package dyvil.collection.iterator;
 
-import dyvil.annotation.Mutating;
 import dyvil.annotation.Immutable;
+import dyvil.annotation.Mutating;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;

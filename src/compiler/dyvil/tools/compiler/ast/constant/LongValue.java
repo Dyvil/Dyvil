@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -72,11 +72,24 @@ public class LongValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.LONG || type.isSuperTypeOf(Types.LONG))
+		if (type == Types.LONG)
 		{
 			return this;
 		}
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS);
+		if (type == Types.FLOAT)
+		{
+			return new FloatValue(this.position, this.value);
+		}
+		if (type == Types.DOUBLE)
+		{
+			return new DoubleValue(this.position, this.value);
+		}
+		if (type.isSuperTypeOf(Types.LONG))
+		{
+			return this;
+		}
+
+		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);

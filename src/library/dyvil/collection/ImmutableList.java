@@ -1,15 +1,14 @@
 package dyvil.collection;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.SingletonList;
-import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.annotation.Immutable;
 import dyvil.ref.ObjectRef;
 import dyvil.util.ImmutableException;
 
@@ -227,21 +226,21 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 
 	@Override
 	@Mutating
-	default List<E> subscript(Range<Int> range)
+	default List<E> subscript(Range<Integer> range)
 	{
 		throw new ImmutableException("subscript() on Immutable List");
 	}
 
 	@Override
 	@Mutating
-	default void subscript_$eq(Range<Int> range, E[] elements)
+	default void subscript_$eq(Range<Integer> range, E[] elements)
 	{
 		throw new ImmutableException("subscript_=() on Immutable List");
 	}
 
 	@Override
 	@Mutating
-	default void subscript_$eq(Range<Int> range, List<? extends E> elements)
+	default void subscript_$eq(Range<Integer> range, List<? extends E> elements)
 	{
 		throw new ImmutableException("subscript_=() on Immutable List");
 	}

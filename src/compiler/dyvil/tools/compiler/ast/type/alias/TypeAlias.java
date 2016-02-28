@@ -5,11 +5,11 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -90,13 +90,13 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void addTypeParameter(ITypeParameter var)
+	public void addTypeParameter(ITypeParameter typeParameter)
 	{
 		if (this.typeVariables == null)
 		{
-			this.setTypeParameterized();
-			var.setIndex(0);
-			this.typeVariables[0] = var;
+			this.setTypeParametric();
+			typeParameter.setIndex(0);
+			this.typeVariables[0] = typeParameter;
 			this.typeVariableCount = 1;
 			return;
 		}
@@ -109,8 +109,8 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			this.typeVariables = temp;
 		}
 
-		var.setIndex(index);
-		this.typeVariables[index] = var;
+		typeParameter.setIndex(index);
+		this.typeVariables[index] = typeParameter;
 	}
 
 	@Override
@@ -132,28 +132,28 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public boolean isTypeParameterized()
+	public boolean isTypeParametric()
 	{
 		return this.typeVariables != null;
 	}
 
 	@Override
-	public void setTypeParameterized()
+	public void setTypeParametric()
 	{
 		this.typeVariables = new ITypeParameter[2];
 	}
 
 	@Override
-	public void setTypeParameter(int index, ITypeParameter var)
+	public void setTypeParameter(int index, ITypeParameter typeParameter)
 	{
-		var.setIndex(index);
-		this.typeVariables[index] = var;
+		typeParameter.setIndex(index);
+		this.typeVariables[index] = typeParameter;
 	}
 
 	@Override
-	public void setTypeParameters(ITypeParameter[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
 	{
-		this.typeVariables = typeVars;
+		this.typeVariables = typeParameters;
 		this.typeVariableCount = count;
 	}
 
@@ -209,7 +209,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	{
 		IContext combinedContext = new CombiningContext(this, context);
 
-		this.type.checkType(markers, combinedContext, TypePosition.TYPE);
+		this.type.checkType(markers, combinedContext, TypePosition.GENERIC_ARGUMENT);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{

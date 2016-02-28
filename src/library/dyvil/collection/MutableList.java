@@ -19,7 +19,8 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		return new ArrayList<>();
 	}
 
-	static <RE> MutableList<RE> withCapacity(int capacity) {
+	static <RE> MutableList<RE> withCapacity(int capacity)
+	{
 		return new ArrayList<>(capacity);
 	}
 	

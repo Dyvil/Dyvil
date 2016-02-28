@@ -1,0 +1,35 @@
+package dyvil.util
+
+import java.time.LocalDate
+import java.time.Month
+
+public final class DateExtensions
+{
+	private init() {}
+
+	public static LocalDate Today() = LocalDate.now
+
+	public infix LocalDate January(int day, int year) = LocalDate.of(year, Month.JANUARY, day)
+
+	public infix LocalDate February(int day, int year) = LocalDate.of(year, Month.FEBRUARY, day)
+
+	public infix LocalDate March(int day, int year) = LocalDate.of(year, Month.MARCH, day)
+
+	public infix LocalDate April(int day, int year) = LocalDate.of(year, Month.APRIL, day)
+
+	public infix LocalDate May(int day, int year) = LocalDate.of(year, Month.MAY, day)
+
+	public infix LocalDate June(int day, int year) = LocalDate.of(year, Month.JUNE, day)
+
+	public infix LocalDate July(int day, int year) = LocalDate.of(year, Month.JULY, day)
+
+	public infix LocalDate August(int day, int year) = LocalDate.of(year, Month.AUGUST, day)
+
+	public infix LocalDate September(int day, int year) = LocalDate.of(year, Month.SEPTEMBER, day)
+
+	public infix LocalDate October(int day, int year) = LocalDate.of(year, Month.OCTOBER, day)
+
+	public infix LocalDate November(int day, int year) = LocalDate.of(year, Month.NOVEMBER, day)
+
+	public infix LocalDate December(int day, int year) = LocalDate.of(year, Month.DECEMBER, day)
+}

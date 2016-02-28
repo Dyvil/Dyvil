@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Util;
 
 public class ResolveTypesPhase implements ICompilerPhase
@@ -28,19 +27,21 @@ public class ResolveTypesPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public void apply(Collection<ICompilationUnit> units)
+	public void apply(DyvilCompiler compiler)
 	{
 		long now = System.nanoTime();
 		
 		// Loads primitive data types
 		Types.initTypes();
+
+		compiler.checkLibraries();
 		
-		if (DyvilCompiler.debug)
+		if (compiler.config.isDebug())
 		{
-			DyvilCompiler.log("Loaded Base Types (" + Util.toTime(System.nanoTime() - now) + ")");
+			compiler.log("Loaded Base Types (" + Util.toTime(System.nanoTime() - now) + ")");
 		}
 		
-		for (ICompilationUnit unit : units)
+		for (ICompilationUnit unit : compiler.fileFinder.units)
 		{
 			unit.resolveTypes();
 		}

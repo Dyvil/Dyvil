@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -14,7 +15,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -46,30 +47,28 @@ public class Property extends Member implements IProperty
 	protected MethodParameter setterParameter;
 	protected ICodePosition   initializerPosition;
 
-	public Property(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public Property(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(name, type, modifiers);
-		this.position = position;
-		this.theClass = iclass;
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
-	public void setTheClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 		this.theClass = iclass;
 
 		if (this.getter != null)
 		{
-			this.getter.setTheClass(iclass);
+			this.getter.setEnclosingClass(iclass);
 		}
 		if (this.setter != null)
 		{
-			this.setter.setTheClass(iclass);
+			this.setter.setEnclosingClass(iclass);
 		}
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public IClass getEnclosingClass()
 	{
 		return this.theClass;
 	}

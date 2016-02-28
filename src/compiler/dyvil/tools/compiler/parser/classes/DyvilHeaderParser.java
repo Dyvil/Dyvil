@@ -14,13 +14,13 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -40,11 +40,17 @@ public class DyvilHeaderParser extends Parser
 	
 	protected IToken lastToken;
 	
+	public DyvilHeaderParser(IDyvilHeader unit)
+	{
+		this.unit = unit;
+		this.mode = PACKAGE;
+	}
+
 	public DyvilHeaderParser(IDyvilHeader unit, boolean unitHeader)
 	{
 		this.unit = unit;
-		this.unitHeader = unitHeader;
 		this.mode = PACKAGE;
+		this.unitHeader = unitHeader;
 	}
 	
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
@@ -151,14 +157,12 @@ public class DyvilHeaderParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == BaseSymbols.SEMICOLON)
+		final int type = token.type();
+		switch (type)
 		{
-			return;
-		}
-		if (type == Tokens.EOF)
-		{
+		case Tokens.EOF:
 			pm.popParser();
+		case BaseSymbols.SEMICOLON:
 			return;
 		}
 		
@@ -170,11 +174,14 @@ public class DyvilHeaderParser extends Parser
 				this.mode = IMPORT;
 				return;
 			}
+			// Fallthrough
 		case IMPORT:
+			this.mode = IMPORT;
 			if (this.parseImport(pm, token, type))
 			{
 				return;
 			}
+			// Fallthrough
 		case METADATA:
 			if (this.mode != METADATA)
 			{
@@ -213,9 +220,15 @@ public class DyvilHeaderParser extends Parser
 			this.annotations = new AnnotationList();
 		}
 		
-		Annotation annotation = new Annotation(token.raw());
+		final Annotation annotation = new Annotation(token.raw());
 		this.annotations.addAnnotation(annotation);
 		pm.pushParser(pm.newAnnotationParser(annotation));
 		return;
+	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return this.mode > PACKAGE && this.lastToken == null;
 	}
 }

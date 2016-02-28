@@ -1,12 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;
-import dyvil.annotation.Immutable;
 
 import java.util.function.Function;
 import java.util.function.Predicate;

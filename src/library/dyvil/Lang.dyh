@@ -1,6 +1,6 @@
 package dyvil
 
-// Base imports for primitive types
+// Base imports for language features
 import	dyvil.lang._
 
 // Useful classes
@@ -28,8 +28,38 @@ import	dyvil.annotation.{
 
 import	java.lang._
 
-// Import the methods from Predef
-using	dyvil.lang.Predef._
+// Import the methods from former Predef classes
+using	dyvil.lang.{
+					Primitives._
+					LanguageCommons._
+					LanguageFeatures._
+					ObjectExtensions._
+					StringExtensions._
+					FunctionConversions._
+				   }
+
+// Primitive type aliases
+type	Void	= dyvil.lang.Void
+type	Byte	= java.lang.Byte
+type	Short	= java.lang.Short
+type	Char	= java.lang.Character
+type	Int		= java.lang.Integer
+type	Long	= java.lang.Long
+type	Float	= java.lang.Float
+type	Double	= java.lang.Double
+
+// Collection Type Aliases
+type	Array[E]			= [E]
+type	MutableArray[E]		= [var E]
+type	ImmutableArray[E]	= [final E]
+
+type	List[E]				= [E...]
+type	MutableList[E]		= [var E...]
+type	ImmutableList[E]	= [final E...]
+
+type	Map[K, V]			= [K:V]
+type	MutableMap[K, V]	= [var K : V]
+type	ImmutableMap[K, V]	= [final K : V]
 
 // Print Operators
 prefix	operator print		{ precedence 1 }

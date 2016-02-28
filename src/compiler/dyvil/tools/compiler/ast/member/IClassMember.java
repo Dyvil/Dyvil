@@ -10,9 +10,9 @@ import java.io.IOException;
 
 public interface IClassMember extends IMember, IClassCompilable, IObjectCompilable
 {
-	IClass getTheClass();
+	IClass getEnclosingClass();
 	
-	void setTheClass(IClass iclass);
+	void setEnclosingClass(IClass iclass);
 	
 	@Override
 	default void write(DataOutput out) throws IOException

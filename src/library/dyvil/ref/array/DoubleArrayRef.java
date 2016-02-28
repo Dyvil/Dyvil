@@ -1,7 +1,6 @@
 package dyvil.ref.array;
 
 import dyvil.ref.DoubleRef;
-import dyvil.ref.DoubleRef;
 
 public class DoubleArrayRef implements DoubleRef
 {

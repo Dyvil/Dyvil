@@ -2,7 +2,6 @@ package dyvil.collection;
 
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
-import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
@@ -151,7 +150,7 @@ public interface ImmutableMatrix<@Covariant E> extends Matrix<E>
 	int columnOf(Object element);
 	
 	@Override
-	Tuple2<Int, Int> cellOf(Object element);
+	Tuple2<Integer, Integer> cellOf(Object element);
 	
 	// toArray
 	

@@ -45,9 +45,6 @@ if (droneBuild)
 
 // ---------------------------------------- Source Settings ----------------------------------------
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 sourceSets {
 	library {
 		java {
@@ -114,6 +111,10 @@ dependencies {
 		builtBy 'compileLibraryDyvil'
 	}
 
+	runtime files("$buildDir/dyviltestbin") {
+		builtBy 'compileTestDyvil'
+	}
+
 	runtime files("src/resources")
 
 	// Test Dependencies
@@ -178,7 +179,7 @@ task copyReplJava(type: Copy, dependsOn: clearCopyDir) {
 
 	includeEmptyDirs = false
 	include javaFilters
-	
+
 	filter {
 		it.replace('$$replVersion$$', replVersion)
 	}
@@ -216,36 +217,36 @@ task copyTestDyvil(type: Copy, dependsOn: clearCopyDir) {
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, "build/src/dyvil/library", "build/dyvilbin"
+	runCompiler exec, 'scripts/lib_options.txt', 'src/library/', "$buildDir/dyvilbin"
 }
 
-private void runCompiler(JavaExec exec, String src, String bin)
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyTestDyvil' ]) { JavaExec exec ->
+	runCompiler exec, 'scripts/test_options.txt', 'src/test/', "$buildDir/dyviltestbin"
+}
+
+private void runCompiler(JavaExec exec, String config, String src, String bin)
 {
 	// Required to make UP-TO-DATE work
-	exec.outputs.upToDateSpec = new AndSpec()
+	exec.outputs.upToDateSpec = new AndSpec<>()
 
 	// All Dyvil Class and Header files
 	exec.inputs.dir src
 	// All possible Output Files (.class, .dyo)
 	exec.outputs.dir bin
 
-	exec.main = 'dyvil.tools.compiler.DyvilCompiler'
+	exec.main = 'dyvil.tools.compiler.Main'
 	exec.classpath = sourceSets.compiler.runtimeClasspath
-	exec.args = [ "source_dir=$src", "output_dir=$bin", 'compile' ]
-}
-
-task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, "build/src/dyvil/test", "build/dyviltestbin"
+	exec.args = [ "@$config", 'compile' ]
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
 
 task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	main = 'dyvil.test.Main'
-	classpath = files("build/dyviltestbin") + sourceSets.library.runtimeClasspath + files("build/dyvilbin")
+	classpath = sourceSets.library.runtimeClasspath + files("build/dyviltestbin") + files("build/dyvilbin")
 }
 
-test.dependsOn testDyvil
+test.dependsOn 'testDyvil'
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 
@@ -353,7 +354,7 @@ task prepareRelease(type: Copy) {
 
 if (nightly)
 {
-	build.dependsOn prepareRelease
+	build.dependsOn 'prepareRelease'
 }
 
 // ---------------------------------------- Misc. Tasks ----------------------------------------

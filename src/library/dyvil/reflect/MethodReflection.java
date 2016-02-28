@@ -30,21 +30,12 @@ public class MethodReflection
 	// Methods
 	
 	/**
-	 * Returns the method of the given {@link Class} {@code class} specified by
-	 * the given {@code object}.
-	 * <ul>
-	 * <li>If {@code object} is a {@link Method} instance, it returns the
-	 * object.
-	 * <li>If {@code object} is an integer, it returns the {@link Method} of the
-	 * given {@link Class} {@code class} with the id {@code object}.
-	 * <li>If {@code object} is an Object[] of length 2, it
-	 * <ul>
-	 * <li>Returns the method with the name {@code object[0]} if
-	 * {@code object[0]} is a String
-	 * <li>Returns the method with the name of any {@code object[0]} if
-	 * {@code object[0]} is a String[]
-	 * </ul>
-	 * </ul>
+	 * Returns the method of the given {@link Class} {@code class} specified by the given {@code object}. <ul> <li>If
+	 * {@code object} is a {@link Method} instance, it returns the object. <li>If {@code object} is an integer, it
+	 * returns the {@link Method} of the given {@link Class} {@code class} with the id {@code object}. <li>If {@code
+	 * object} is an Object[] of length 2, it <ul> <li>Returns the method with the name {@code object[0]} if {@code
+	 * object[0]} is a String <li>Returns the method with the name of any {@code object[0]} if {@code object[0]} is a
+	 * String[] </ul> </ul>
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -88,9 +79,8 @@ public class MethodReflection
 	}
 	
 	/**
-	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with
-	 * the given name {@code methodName} and the given parameter types
-	 * {@code parameterTypes}.
+	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with the given name {@code methodName} and
+	 * the given parameter types {@code parameterTypes}.
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -122,9 +112,8 @@ public class MethodReflection
 	}
 	
 	/**
-	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with
-	 * a name contained in {@code methodNames} and the given parameter types
-	 * {@code parameterTypes}.
+	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with a name contained in {@code methodNames}
+	 * and the given parameter types {@code parameterTypes}.
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -151,8 +140,7 @@ public class MethodReflection
 	}
 	
 	/**
-	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with
-	 * the given method ID {@code methodID}.
+	 * Returns the {@link Method} of the given {@link Class} {@code clazz} with the given method ID {@code methodID}.
 	 *
 	 * @param clazz
 	 * 		the clazz
@@ -205,9 +193,8 @@ public class MethodReflection
 	}
 	
 	/**
-	 * Directly invokes the given {@link Method} {@code method} on the given
-	 * {@link Object} {@code instance} with the given arguments {@code args} and
-	 * returns the result.
+	 * Directly invokes the given {@link Method} {@code method} on the given {@link Object} {@code instance} with the
+	 * given arguments {@code args} and returns the result.
 	 *
 	 * @param method
 	 * 		the method to invoke

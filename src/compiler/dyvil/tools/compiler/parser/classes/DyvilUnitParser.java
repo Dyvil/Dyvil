@@ -15,6 +15,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 	public DyvilUnitParser(IDyvilHeader unit, boolean classMode)
 	{
 		super(unit, true);
+
 		if (classMode)
 		{
 			this.mode = CLASS;

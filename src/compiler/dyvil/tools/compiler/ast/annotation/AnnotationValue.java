@@ -93,7 +93,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers)
+	public IValue toConstant(MarkerList markers, IContext context)
 	{
 		this.isAnnotationParameter = true;
 		return this;

@@ -5,12 +5,9 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.TypeReference;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -20,10 +17,13 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -48,13 +48,24 @@ public class CodeClass extends AbstractClass
 	public CodeClass()
 	{
 	}
+
+	public CodeClass(ICodePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
+	{
+		this.position = position;
+		this.name = name;
+		this.modifiers = modifiers;
+		this.annotations = annotations;
+
+		this.interfaces = new IType[1];
+	}
 	
 	public CodeClass(ICodePosition position, IDyvilHeader unit)
 	{
 		this.position = position;
 		this.unit = unit;
-		this.interfaces = new IType[1];
 		this.modifiers = new ModifierList();
+
+		this.interfaces = new IType[1];
 	}
 	
 	public CodeClass(ICodePosition position, IDyvilHeader unit, ModifierSet modifiers)
@@ -62,6 +73,7 @@ public class CodeClass extends AbstractClass
 		this.position = position;
 		this.unit = unit;
 		this.modifiers = modifiers;
+
 		this.interfaces = new IType[1];
 	}
 	
@@ -408,7 +420,7 @@ public class CodeClass extends AbstractClass
 		{
 			modifiers |= Opcodes.ACC_SUPER;
 		}
-		writer.visit(DyvilCompiler.classVersion, modifiers & 0x7631, this.internalName, signature, superClass,
+		writer.visit(ClassFormat.CLASS_VERSION, modifiers & 0x7631, this.internalName, signature, superClass,
 		             interfaces);
 		
 		// Source

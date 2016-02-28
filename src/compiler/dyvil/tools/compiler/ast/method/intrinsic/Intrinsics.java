@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.type.ArrayType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.parsing.Name;
 
 public class Intrinsics
@@ -22,7 +22,7 @@ public class Intrinsics
 	{
 		IArguments arguments = annotation.getArguments();
 		IValue value = arguments.getValue(0, Annotation.VALUE);
-		if (value.valueTag() != IValue.ARRAY)
+		if (value == null || value.valueTag() != IValue.ARRAY)
 		{
 			return null;
 		}

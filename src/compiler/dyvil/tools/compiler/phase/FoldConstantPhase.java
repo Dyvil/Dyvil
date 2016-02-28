@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
@@ -32,14 +31,15 @@ public class FoldConstantPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public void apply(Collection<ICompilationUnit> units)
+	public void apply(DyvilCompiler compiler)
 	{
-		// Apply foldConstants a given amount of time
-		for (int i = 0; i < DyvilCompiler.constantFolding; i++)
+		final int folding = compiler.config.getConstantFolding();
+
+		for (int i = 0; i < folding; i++)
 		{
-			for (ICompilationUnit cu : units)
+			for (ICompilationUnit unit : compiler.fileFinder.units)
 			{
-				cu.foldConstants();
+				unit.foldConstants();
 			}
 		}
 	}
@@ -47,6 +47,6 @@ public class FoldConstantPhase implements ICompilerPhase
 	@Override
 	public String toString()
 	{
-		return "FOLD_CONSTANTS (x" + DyvilCompiler.constantFolding + ")";
+		return "FOLD_CONSTANTS";
 	}
 }

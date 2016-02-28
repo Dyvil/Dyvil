@@ -1,10 +1,10 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.AppendIterator;
 import dyvil.collection.iterator.PrependIterator;
 import dyvil.collection.mutable.LinkedList;
-import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.util.Arrays;

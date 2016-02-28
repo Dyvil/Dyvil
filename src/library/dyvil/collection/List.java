@@ -2,7 +2,6 @@ package dyvil.collection;
 
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.ref.ObjectRef;
@@ -135,9 +134,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return this.get(index);
 	}
 
-	default List<E> subscript(Range<Int> range)
+	default List<E> subscript(Range<Integer> range)
 	{
-		int start = Int.unapply(range.first());
+		int start = range.first();
 		int length = range.count();
 		return this.subList(start, length);
 	}
@@ -299,9 +298,9 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		this.set(index, element);
 	}
 
-	default void subscript_$eq(Range<Int> range, E[] elements)
+	default void subscript_$eq(Range<Integer> range, E[] elements)
 	{
-		int start = Int.unapply(range.first());
+		int start = range.first();
 		int length = range.count();
 		for (int i = 0; i < length; i++)
 		{
@@ -309,10 +308,10 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		}
 	}
 
-	default void subscript_$eq(Range<Int> range, List<? extends E> elements)
+	default void subscript_$eq(Range<Integer> range, List<? extends E> elements)
 	{
-		int start = Int.unapply(range.first());
-		int length = Int.unapply(range.last()) - start + 1;
+		int start = range.first();
+		int length = range.last() - start + 1;
 		for (int i = 0; i < length; i++)
 		{
 			this.subscript_$eq(start, elements.subscript(i));

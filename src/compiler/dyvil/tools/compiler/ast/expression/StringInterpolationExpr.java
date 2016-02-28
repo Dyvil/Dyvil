@@ -70,20 +70,21 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public IType getType()
 	{
-		return dyvil.tools.compiler.ast.type.Types.STRING;
+		return dyvil.tools.compiler.ast.type.builtin.Types.STRING;
 	}
 	
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isSuperTypeOf(dyvil.tools.compiler.ast.type.Types.STRING))
+		if (type.isSuperTypeOf(dyvil.tools.compiler.ast.type.builtin.Types.STRING))
 		{
 			return this;
 		}
 		
 		IClass iclass = type.getTheClass();
 		IAnnotation annotation;
-		if ((annotation = iclass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS)) != null)
+		if ((annotation = iclass.getAnnotation(dyvil.tools.compiler.ast.type.builtin.Types.STRING_CONVERTIBLE_CLASS))
+				!= null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
@@ -122,7 +123,7 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type.isSuperTypeOf(dyvil.tools.compiler.ast.type.Types.STRING))
+		if (type.isSuperTypeOf(dyvil.tools.compiler.ast.type.builtin.Types.STRING))
 		{
 			return true;
 		}
@@ -133,14 +134,14 @@ public final class StringInterpolationExpr implements IValue
 	private boolean isConvertible(IType type)
 	{
 		IClass theClass = type.getTheClass();
-		return theClass.getAnnotation(dyvil.tools.compiler.ast.type.Types.STRING_CONVERTIBLE_CLASS) != null
+		return theClass.getAnnotation(dyvil.tools.compiler.ast.type.builtin.Types.STRING_CONVERTIBLE_CLASS) != null
 				|| theClass.getAnnotation(Types.STRING_INTERPOLATION_CONVERTIBLE) != null;
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		float distance = type.getSubTypeDistance(dyvil.tools.compiler.ast.type.Types.STRING);
+		float distance = type.getSubTypeDistance(dyvil.tools.compiler.ast.type.builtin.Types.STRING);
 		if (distance != 0)
 		{
 			return distance;
@@ -212,7 +213,7 @@ public final class StringInterpolationExpr implements IValue
 			IValue v = this.values[i];
 			v.check(markers, context);
 			
-			if (v.getType() == dyvil.tools.compiler.ast.type.Types.VOID)
+			if (v.getType() == dyvil.tools.compiler.ast.type.builtin.Types.VOID)
 			{
 				markers.add(Markers.semantic(v.getPosition(), "string.interpolation.void"));
 			}
@@ -275,7 +276,7 @@ public final class StringInterpolationExpr implements IValue
 
 		if (type != null)
 		{
-			dyvil.tools.compiler.ast.type.Types.STRING.writeCast(writer, type, this.getLineNumber());
+			dyvil.tools.compiler.ast.type.builtin.Types.STRING.writeCast(writer, type, this.getLineNumber());
 		}
 	}
 	

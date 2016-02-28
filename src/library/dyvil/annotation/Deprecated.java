@@ -6,7 +6,7 @@ import dyvil.util.MarkerLevel;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 @ClassParameters(names = { "value", "description", "since", "reasons", "replacements", "level" })
 public @interface Deprecated
 {
@@ -15,7 +15,7 @@ public @interface Deprecated
 		UNSPECIFIED, DANGEROUS, CONDEMNED, SUPERSEDED, UNIMPLEMENTED
 	}
 	
-	String value() default "The {membertype} {membername} is deprecated";
+	String value() default "The {member.kind} '{member.name}' is deprecated";
 
 	String description() default "";
 	

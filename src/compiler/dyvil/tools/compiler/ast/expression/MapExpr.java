@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.MapType;
 import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.compound.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -333,7 +333,7 @@ public class MapExpr implements IValue
 
 		if (type != null)
 		{
-			this.type.writeCast(writer, type, this.getLineNumber());
+			this.getType().writeCast(writer, type, this.getLineNumber());
 		}
 	}
 	

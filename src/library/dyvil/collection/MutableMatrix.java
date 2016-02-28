@@ -2,7 +2,6 @@ package dyvil.collection;
 
 import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.collection.view.MatrixView;
-import dyvil.lang.Int;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
@@ -121,7 +120,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	int columnOf(Object element);
 	
 	@Override
-	Tuple2<Int, Int> cellOf(Object element);
+	Tuple2<Integer, Integer> cellOf(Object element);
 	
 	// toArray
 	

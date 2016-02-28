@@ -3,7 +3,7 @@ package dyvil.tools.repl.command;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.repl.DyvilREPL;
-import dyvil.tools.repl.REPLContext;
+import dyvil.tools.repl.context.REPLContext;
 
 public class MethodsCommand implements ICommand
 {
@@ -18,9 +18,15 @@ public class MethodsCommand implements ICommand
 	{
 		return "Prints the signatures of all available methods";
 	}
-	
+
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public String getUsage()
+	{
+		return ":methods";
+	}
+
+	@Override
+	public void execute(DyvilREPL repl, String args)
 	{
 		REPLContext context = repl.getContext();
 		for (IMethod method : context.getMethods())

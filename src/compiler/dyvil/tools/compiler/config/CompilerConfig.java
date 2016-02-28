@@ -2,15 +2,19 @@ package dyvil.tools.compiler.config;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileFinder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class CompilerConfig
 {
-	private String directory = ".";
+	private DyvilCompiler compiler;
+
+	private String baseDirectory;
 	
 	private String jarName;
 	private String jarVendor;
@@ -20,33 +24,36 @@ public class CompilerConfig
 	private File logFile;
 	private File sourceDir;
 	private File outputDir;
-	public final List<Library> libraries = new ArrayList();
+	public final List<Library> libraries = new ArrayList<>();
 	
-	public final List<String> includedFiles = new ArrayList();
-	public final List<String> excludedFiles = new ArrayList();
+	public final List<String> includedFiles = new ArrayList<>();
+	public final List<String> excludedFiles = new ArrayList<>();
 	
 	private String mainType;
-	public final List<String> mainArgs = new ArrayList();
+	public final List<String> mainArgs = new ArrayList<>();
+
+	private boolean debug;
+
+	private int constantFolding = 2;
+
+	private int maxConstantDepth = 10;
 	
-	public CompilerConfig()
+	public CompilerConfig(DyvilCompiler compiler)
 	{
+		this.compiler = compiler;
+
 		this.libraries.add(Library.dyvilLibrary);
 		this.libraries.add(Library.javaLibrary);
-		
-		if (Library.dyvilBinLibrary != null)
-		{
-			this.libraries.add(Library.dyvilBinLibrary);
-		}
 	}
 	
-	public void setDirectory(String directory)
+	public void setBaseDirectory(String baseDirectory)
 	{
-		this.directory = directory;
+		this.baseDirectory = baseDirectory;
 	}
 	
 	public void setConfigFile(File configFile)
 	{
-		this.directory = configFile.getParent();
+		this.baseDirectory = configFile.getParent();
 	}
 	
 	public void setJarName(String jarName)
@@ -101,7 +108,7 @@ public class CompilerConfig
 	
 	public void setOutputDir(String outputDir)
 	{
-		this.outputDir = new File(this.directory, outputDir);
+		this.outputDir = this.resolveFile(outputDir);
 	}
 	
 	public File getSourceDir()
@@ -111,7 +118,7 @@ public class CompilerConfig
 	
 	public void setSourceDir(String sourceDir)
 	{
-		this.sourceDir = new File(this.directory, sourceDir);
+		this.sourceDir = this.resolveFile(sourceDir);
 	}
 	
 	public File getLogFile()
@@ -121,12 +128,19 @@ public class CompilerConfig
 	
 	public void setLogFile(String logFile)
 	{
-		this.logFile = new File(this.directory, logFile);
+		this.logFile = this.resolveFile(logFile);
 	}
 	
-	public void addLibraryFile(File file)
+	public void addLibraryFile(String file)
 	{
-		this.libraries.add(Library.load(file));
+		try
+		{
+			this.libraries.add(Library.load(this.resolveFile(file)));
+		}
+		catch (FileNotFoundException ex)
+		{
+			this.compiler.error(ex.getMessage());
+		}
 	}
 	
 	public void addLibrary(Library library)
@@ -143,7 +157,50 @@ public class CompilerConfig
 	{
 		this.excludedFiles.add(fileName);
 	}
-	
+
+	public boolean isDebug()
+	{
+		return this.debug;
+	}
+
+	public void setDebug(boolean debug)
+	{
+		this.debug = debug;
+	}
+
+	public int getConstantFolding()
+	{
+		return this.constantFolding;
+	}
+
+	public void setConstantFolding(int constantFolding)
+	{
+		this.constantFolding = constantFolding;
+	}
+
+	public int getMaxConstantDepth()
+	{
+		return this.maxConstantDepth;
+	}
+
+	public void setMaxConstantDepth(int maxConstantDepth)
+	{
+		this.maxConstantDepth = maxConstantDepth;
+	}
+
+	private File resolveFile(String fileName)
+	{
+		if (fileName.length() == 0)
+		{
+			return new File(this.baseDirectory);
+		}
+		if (fileName.charAt(0) == File.separatorChar)
+		{
+			return new File(fileName);
+		}
+		return new File(this.baseDirectory, fileName);
+	}
+
 	public boolean isExcluded(String name)
 	{
 		for (String s : this.excludedFiles)
@@ -161,18 +218,18 @@ public class CompilerConfig
 	{
 		if (!this.includedFiles.isEmpty())
 		{
-			for (String s : this.includedFiles)
+			for (String included : this.includedFiles)
 			{
-				File source = new File(this.sourceDir, s);
-				File output = new File(this.outputDir, s);
-				Package pack = packageFromFile(s, source.isDirectory());
+				File source = new File(this.sourceDir, included);
+				File output = new File(this.outputDir, included);
+				Package pack = packageFromFile(included, source.isDirectory());
 				
-				fileFinder.process(source, output, pack);
+				fileFinder.process(this.compiler, source, output, pack);
 			}
 			return;
 		}
 		
-		fileFinder.process(this.sourceDir, this.outputDir, Package.rootPackage);
+		fileFinder.process(this.compiler, this.sourceDir, this.outputDir, Package.rootPackage);
 	}
 	
 	private static Package packageFromFile(String file, boolean isDirectory)
@@ -208,15 +265,13 @@ public class CompilerConfig
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append("CompilerConfig [jarName=").append(this.getJarName());
-		builder.append(", sourceDir=").append(this.sourceDir);
-		builder.append(", outputDir=").append(this.outputDir);
-		builder.append(", libraryFiles=").append(this.libraries);
-		builder.append(", includedFiles=").append(this.includedFiles);
-		builder.append(", excludedFiles=").append(this.excludedFiles);
-		builder.append(", mainType=").append(this.mainType);
-		builder.append(", mainArgs=").append(this.mainArgs).append("]");
-		return builder.toString();
+		return "CompilerConfig [jarName=" + this.getJarName() +
+				", sourceDir=" + this.sourceDir +
+				", outputDir=" + this.outputDir +
+				", libraryFiles=" + this.libraries +
+				", includedFiles=" + this.includedFiles +
+				", excludedFiles=" + this.excludedFiles +
+				", mainType=" + this.mainType +
+				", mainArgs=" + this.mainArgs + "]";
 	}
 }

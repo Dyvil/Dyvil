@@ -382,20 +382,19 @@ public abstract class AbstractArrayList<E> implements List<E>
 	@Override
 	public String toString()
 	{
-		if (this.size == 0)
+		if (this.size <= 0)
 		{
-			return "[]";
+			return Collection.EMPTY_STRING;
 		}
 		
-		StringBuilder buf = new StringBuilder(this.size * 10).append('[');
-		buf.append(this.elements[0]);
+		final StringBuilder builder = new StringBuilder(this.size << 3).append(Collection.START_STRING);
+		builder.append(this.elements[0]);
 		for (int i = 1; i < this.size; i++)
 		{
-			buf.append(", ");
-			buf.append(this.elements[i]);
+			builder.append(Collection.ELEMENT_SEPARATOR_STRING);
+			builder.append(this.elements[i]);
 		}
-		buf.append(']');
-		return buf.toString();
+		return builder.append(Collection.END_STRING).toString();
 	}
 	
 	@Override

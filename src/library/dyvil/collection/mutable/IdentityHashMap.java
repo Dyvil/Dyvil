@@ -6,6 +6,7 @@ import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
@@ -14,6 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
+@ColonConvertible
 @ArrayConvertible
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements MutableMap<K, V>
 {
@@ -25,6 +27,13 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
 		return new IdentityHashMap<>();
+	}
+
+	public static <K, V> IdentityHashMap<K, V> apply(K key, V value)
+	{
+		final IdentityHashMap<K, V> result = new IdentityHashMap<>();
+		result.putInternal(key, value);
+		return result;
 	}
 	
 	@SafeVarargs

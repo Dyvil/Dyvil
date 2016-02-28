@@ -4,6 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import java.util.function.BiFunction;
@@ -11,6 +12,7 @@ import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
+@ColonConvertible
 @Immutable
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements ImmutableMap<K, V>
 {
@@ -50,9 +52,11 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 
 	private static final long serialVersionUID = 7106880090218416170L;
 
-	public static <K, V> IdentityHashMap<K, V> apply()
+	public static <K, V> IdentityHashMap<K, V> apply(K key, V value)
 	{
-		return new IdentityHashMap<>();
+		final IdentityHashMap<K, V> result = new IdentityHashMap<>(1);
+		result.putInternal(key, value);
+		return result;
 	}
 
 	@SafeVarargs

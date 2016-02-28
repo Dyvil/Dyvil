@@ -2,7 +2,7 @@ package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.repl.DyvilREPL;
-import dyvil.tools.repl.REPLContext;
+import dyvil.tools.repl.context.REPLContext;
 
 public class VariablesCommand implements ICommand
 {
@@ -17,14 +17,20 @@ public class VariablesCommand implements ICommand
 	{
 		return "Prints all available variables";
 	}
-	
+
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public String getUsage()
+	{
+		return ":variables";
+	}
+
+	@Override
+	public void execute(DyvilREPL repl, String args)
 	{
 		REPLContext context = repl.getContext();
-		for (IField v : context.getFields().values())
+		for (IField field : context.getFields().values())
 		{
-			repl.getOutput().println(v);
+			repl.getOutput().println(field);
 		}
 	}
 }

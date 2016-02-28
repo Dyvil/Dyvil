@@ -13,7 +13,7 @@ public class REPLApplet extends Applet
 {
 	static final long serialVersionUID = 1;
 
-	protected JTextArea textArea;
+	protected JTextArea  textArea;
 	protected JTextField textBox;
 
 	protected DyvilREPL repl;

@@ -4,6 +4,8 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
+import dyvil.lang.literal.NilConvertible;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,42 +13,26 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+@NilConvertible
 @ArrayConvertible
+@ColonConvertible
 @Immutable
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap<K, V>
 {
-	private static final long serialVersionUID = 2012245218476747334L;
-	
-	@SafeVarargs
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
-	{
-		return new TreeMap<>(entries);
-	}
-	
-	public static <K, V> Builder<K, V> builder()
-	{
-		return new Builder<>();
-	}
-	
-	public static <K, V> Builder<K, V> builder(Comparator<? super K> comparator)
-	{
-		return new Builder<>(comparator);
-	}
-	
 	protected static final class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
 		private TreeMap<K, V> map;
-		
+
 		public Builder()
 		{
 			this.map = new TreeMap<>();
 		}
-		
+
 		public Builder(Comparator<? super K> comparator)
 		{
 			this.map = new TreeMap<>(comparator);
 		}
-		
+
 		@Override
 		public void put(K key, V value)
 		{
@@ -56,7 +42,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 			}
 			this.map.putInternal(key, value);
 		}
-		
+
 		@Override
 		public ImmutableMap<K, V> build()
 		{
@@ -65,7 +51,32 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 			return map;
 		}
 	}
-	
+
+	private static final long serialVersionUID = 2012245218476747334L;
+
+	public static <K, V> TreeMap<K, V> apply(K key, V value)
+	{
+		final TreeMap<K, V> result = new TreeMap<>();
+		result.putInternal(key, value);
+		return result;
+	}
+
+	@SafeVarargs
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
+	{
+		return new TreeMap<>(entries);
+	}
+
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder<>();
+	}
+
+	public static <K, V> Builder<K, V> builder(Comparator<? super K> comparator)
+	{
+		return new Builder<>(comparator);
+	}
+
 	protected TreeMap()
 	{
 	}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.classes.AnonymousClass;
 import dyvil.tools.compiler.ast.classes.AnonymousClassMetadata;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -9,7 +10,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -73,12 +74,17 @@ public class ClassConstructor extends ConstructorCall
 		{
 			this.reportResolve(markers, context);
 		}
+
+		final IClass enclosingClass = context.getThisClass();
+		assert enclosingClass != null;
 		
 		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);
 		this.nestedClass.setMetadata(this.metadata);
-		this.nestedClass.setOuterClass(context.getThisClass());
-		
-		IDyvilHeader header = context.getHeader();
+		this.nestedClass.setEnclosingClass(enclosingClass);
+
+		final IDyvilHeader header = enclosingClass.getHeader();
+		assert header != null;
+
 		this.nestedClass.setHeader(header);
 		header.addInnerClass(this.nestedClass);
 		

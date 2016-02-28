@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.library;
 
 import dyvil.collection.Map;
-import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.ReflectUtils;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,7 +18,6 @@ public abstract class Library
 	public static final File dyvilLibraryLocation;
 	
 	public static final Library dyvilLibrary;
-	public static final Library dyvilBinLibrary;
 	public static final Library javaLibrary;
 
 	private static File getFileLocation(Class<?> klass)
@@ -38,30 +36,11 @@ public abstract class Library
 	{
 		javaLibraryLocation = getFileLocation(java.lang.String.class);
 		dyvilLibraryLocation = getFileLocation(dyvil.lang.Void.class);
-		
-		if ((dyvilLibrary = load(dyvilLibraryLocation)) == null)
-		{
-			DyvilCompiler.error("Could not load Dyvil Runtime Library");
-		}
-		if ((javaLibrary = load(javaLibraryLocation)) == null)
-		{
-			DyvilCompiler.error("Could not load Java Runtime Library");
-		}
-		
-		File bin = new File("build/dyvilbin");
-		if (bin.exists())
-		{
-			dyvilBinLibrary = load(bin);
-		}
-		else
-		{
-			dyvilBinLibrary = null;
-		}
+
+		dyvilLibrary = tryLoad(dyvilLibraryLocation);
+		javaLibrary = tryLoad(javaLibraryLocation);
 	}
 	
-	protected static final Map<String, String> env = SingletonMap.apply("create", "true");
-	
-	protected static final String[]     emptyStrings     = {};
 	protected static final LinkOption[] emptyLinkOptions = {};
 	
 	protected final File file;
@@ -71,8 +50,20 @@ public abstract class Library
 	{
 		this.file = file;
 	}
+
+	public static Library tryLoad(File file)
+	{
+		try
+		{
+			return load(file);
+		}
+		catch (FileNotFoundException ex)
+		{
+			return null;
+		}
+	}
 	
-	public static Library load(File file)
+	public static Library load(File file) throws FileNotFoundException
 	{
 		if (file == null)
 		{
@@ -87,13 +78,11 @@ public abstract class Library
 		{
 			return new JarLibrary(file);
 		}
-		String error = "Invalid Library File: " + file.getAbsolutePath();
-		if (!file.exists())
-		{
-			error += " (File does not exist)";
-		}
-		DyvilCompiler.error(error);
-		return null;
+
+		final String error = "Invalid Library File: " + file.getAbsolutePath() + (file.exists() ?
+				" (Unsupported Format)" :
+				" (File does not exist)");
+		throw new FileNotFoundException(error);
 	}
 	
 	public abstract void loadLibrary();
@@ -165,6 +154,7 @@ public abstract class Library
 	@Override
 	protected void finalize() throws Throwable
 	{
+		super.finalize();
 		this.unloadLibrary();
 	}
 }

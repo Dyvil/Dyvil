@@ -65,8 +65,7 @@ public interface Set<E> extends Collection<E>
 	Set<E> $plus(E element);
 	
 	/**
-	 * {@inheritDoc} This operator represents the 'union' Set operation and
-	 * delegates to {@link #$bar(Collection)}.
+	 * {@inheritDoc} This operator represents the 'union' Set operation and delegates to {@link #$bar(Collection)}.
 	 */
 	@Override
 	default Set<? extends E> $plus$plus(Collection<? extends E> collection)
@@ -90,30 +89,27 @@ public interface Set<E> extends Collection<E>
 	Set<? extends E> $amp(Collection<? extends E> collection);
 	
 	/**
-	 * Returns a collection that contains all elements of this collection plus
-	 * all elements of the given {@code collection} that are not currently
-	 * present in this collection. This operator represents the 'union' Set
+	 * Returns a collection that contains all elements of this collection plus all elements of the given {@code
+	 * collection} that are not currently present in this collection. This operator represents the 'union' Set
 	 * operation.
 	 *
 	 * @param collection
 	 * 		the collection of elements to be added
 	 *
-	 * @return a collection that contains all elements of this collection plus
-	 * all elements in the given collection that are not present in this
-	 * collection.
+	 * @return a collection that contains all elements of this collection plus all elements in the given collection that
+	 * are not present in this collection.
 	 */
 	Set<? extends E> $bar(Collection<? extends E> collection);
 	
 	/**
-	 * Returns a collection that contains all elements that are present in
-	 * either this or the given {@code collection}, but not in both. This
-	 * operator represents the 'exclusive OR' Set operation.
+	 * Returns a collection that contains all elements that are present in either this or the given {@code collection},
+	 * but not in both. This operator represents the 'exclusive OR' Set operation.
 	 *
 	 * @param collection
 	 * 		the collection
 	 *
-	 * @return a collection that contains all elements that are present in
-	 * either this or the given collection, but not in both.
+	 * @return a collection that contains all elements that are present in either this or the given collection, but not
+	 * in both.
 	 */
 	Set<? extends E> $up(Collection<? extends E> collection);
 	
@@ -129,8 +125,7 @@ public interface Set<E> extends Collection<E>
 	// Mutating Operations
 	
 	/**
-	 * Adds all elements of the given {@code collection} if they are not already
-	 * present in this set.
+	 * Adds all elements of the given {@code collection} if they are not already present in this set.
 	 *
 	 * @param collection
 	 * 		the collection to add
@@ -141,8 +136,8 @@ public interface Set<E> extends Collection<E>
 	}
 	
 	/**
-	 * Removes all elements of the given {@code collection} from this collection
-	 * and adds those that are not currently present in this collection.
+	 * Removes all elements of the given {@code collection} from this collection and adds those that are not currently
+	 * present in this collection.
 	 *
 	 * @param collection
 	 * 		the collection to XOR with

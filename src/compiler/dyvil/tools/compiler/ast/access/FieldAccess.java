@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IMemberContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -21,8 +21,8 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PackageType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -239,14 +239,14 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers)
+	public IValue toConstant(MarkerList markers, IContext context)
 	{
 		if (this.field == null)
 		{
 			return this; // do not create an extra error
 		}
 		
-		int depth = DyvilCompiler.maxConstantDepth;
+		int depth = context.getCompilationContext().config.getMaxConstantDepth();
 		IValue value = this;
 		
 		do
@@ -261,7 +261,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		while (!value.isConstantOrField() || value == this);
 
-		return value.toConstant(markers);
+		return value.toConstant(markers, context);
 	}
 	
 	@Override
@@ -363,8 +363,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 	private IValue resolveType(IContext context)
 	{
-		final IContext typeContext;
-		final IContext packageContext;
+		final IMemberContext typeContext;
+		final IMemberContext packageContext;
+
 		if (this.receiver == null)
 		{
 			typeContext = context;
@@ -372,7 +373,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		else if (this.receiver.valueTag() == IValue.CLASS_ACCESS)
 		{
-			typeContext = packageContext = this.receiver.getType();
+			packageContext = typeContext = this.receiver.getType();
 		}
 		else
 		{

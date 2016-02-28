@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -184,8 +184,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		if (value.valueTag() == IValue.RANGE_OPERATOR)
 		{
 			RangeOperator ro = (RangeOperator) value;
-			IValue value1 = ro.getFirstValue();
-			IValue value2 = ro.getLastValue();
+			IValue value1 = ro.getStartValue();
+			IValue value2 = ro.getEndValue();
 			IType rangeType = ro.getElementType();
 			
 			if (varType == Types.UNKNOWN)

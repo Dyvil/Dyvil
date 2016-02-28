@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class DumpCommand implements ICommand
 {
-	
 	@Override
 	public String getName()
 	{
@@ -17,20 +16,26 @@ public class DumpCommand implements ICommand
 	@Override
 	public String getDescription()
 	{
-		return "Sets the directory for Result Class Dumping.";
+		return "Sets the directory for Result Class Dumping";
 	}
-	
+
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public String getUsage()
 	{
-		if (args.length == 0)
+		return ":dump [path]";
+	}
+
+	@Override
+	public void execute(DyvilREPL repl, String argument)
+	{
+		if (argument == null)
 		{
 			repl.getOutput().println("Result Class Dumping disabled.");
 			repl.setDumpDir(null);
 			return;
 		}
 		
-		File dumpDir = new File(args[0]);
+		File dumpDir = new File(argument);
 		repl.setDumpDir(dumpDir);
 		
 		try

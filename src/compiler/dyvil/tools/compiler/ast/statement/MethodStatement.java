@@ -44,7 +44,7 @@ public class MethodStatement implements IStatement
 	{
 		markers.add(new SemanticError(this.method.getPosition(), "Nested Methods are currently disabled"));
 
-		this.method.setTheClass(context.getThisClass());
+		this.method.setEnclosingClass(context.getThisClass());
 
 		if (context.isStatic())
 		{

@@ -5,9 +5,9 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
@@ -71,7 +71,7 @@ public class TypeAliasParser extends Parser
 		case TYPE_PARAMETERS:
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
-				this.typeAlias.setTypeParameterized();
+				this.typeAlias.setTypeParametric();
 				this.mode = TYPE_PARAMETERS_END;
 				pm.pushParser(new TypeParameterListParser(this.typeAlias));
 				return;

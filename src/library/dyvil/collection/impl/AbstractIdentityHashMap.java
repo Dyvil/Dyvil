@@ -603,31 +603,24 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	{
 		if (this.size == 0)
 		{
-			return "[]";
+			return Map.EMPTY_STRING;
 		}
 		
-		StringBuilder builder = new StringBuilder("[ ");
-		int i = 0;
-		Object[] tab = this.table;
-		for (; i < tab.length; i += 2)
+		final StringBuilder builder = new StringBuilder(Map.START_STRING);
+		final Object[] table = this.table;
+
+		for (int i = 0; i < table.length; i += 2)
 		{
-			Object key = tab[i];
+			final Object key = table[i];
 			if (key != null)
 			{
-				builder.append(unmaskNull(key)).append(" -> ").append(tab[i + 1]);
-				break;
+				builder.append(unmaskNull(key)).append(Map.KEY_VALUE_SEPARATOR_STRING).append(table[i + 1])
+				       .append(Map.ENTRY_SEPARATOR_STRING);
 			}
 		}
-		
-		for (i += 2; i < tab.length; i += 2)
-		{
-			Object key = tab[i];
-			if (key != null)
-			{
-				builder.append(", ").append(key).append(" -> ").append(tab[i + 1]);
-			}
-		}
-		return builder.append(" ]").toString();
+
+		final int len = builder.length();
+		return builder.replace(len - Map.ENTRY_SEPARATOR_STRING.length(), len, Map.END_STRING).toString();
 	}
 	
 	@Override

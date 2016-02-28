@@ -37,7 +37,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(this.newExpressionParser(pm));
 			this.mode = SEPARATOR | COLON;
 			this.startPosition = token;
 			
@@ -53,7 +53,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 				this.mode = SEPARATOR;
 				this.map = true;
 				this.values = new IValue[this.keyCount];
-				pm.pushParser(new ExpressionParser(this));
+				pm.pushParser(this.newExpressionParser(pm));
 				return;
 			}
 			this.map = false;
@@ -67,7 +67,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			}
 			
 			this.mode = this.map ? COLON : SEPARATOR;
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(this.newExpressionParser(pm));
 			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.report(token, "array.separator");
@@ -82,7 +82,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			}
 			
 			this.mode = SEPARATOR;
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(this.newExpressionParser(pm));
 			if (type != BaseSymbols.COLON)
 			{
 				pm.reparse();
@@ -90,6 +90,11 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			}
 			return;
 		}
+	}
+
+	private ExpressionParser newExpressionParser(IParserManager pm)
+	{
+		return pm.newExpressionParser(this).withFlag(ExpressionParser.IGNORE_COLON);
 	}
 	
 	private void end(IToken token)

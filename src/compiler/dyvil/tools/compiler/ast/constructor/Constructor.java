@@ -4,6 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,7 +13,6 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -27,7 +27,8 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -49,7 +50,7 @@ import java.lang.annotation.ElementType;
 
 public class Constructor extends Member implements IConstructor
 {
-	protected IClass theClass;
+	protected IClass enclosingClass;
 	
 	protected IParameter[] parameters = new MethodParameter[3];
 	protected int     parameterCount;
@@ -61,41 +62,40 @@ public class Constructor extends Member implements IConstructor
 	public Constructor(IClass iclass)
 	{
 		super(Names.init, Types.VOID);
-		this.theClass = iclass;
+		this.enclosingClass = iclass;
 	}
 	
-	public Constructor(IClass iclass, ModifierSet modifiers)
-	{
-		this(null, iclass, modifiers);
-	}
-	
-	public Constructor(ICodePosition position, IClass iclass, ModifierSet modifiers)
+	public Constructor(IClass enclosingClass, ModifierSet modifiers)
 	{
 		super(Names.init, Types.VOID, modifiers);
-		this.position = position;
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
-	@Override
-	public void setTheClass(IClass iclass)
+	public Constructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
-		this.theClass = iclass;
+		super(position, Names.init, Types.VOID, modifiers, annotations);
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public void setEnclosingClass(IClass iclass)
 	{
-		return this.theClass;
+		this.enclosingClass = iclass;
 	}
 	
 	@Override
-	public void setVarargs()
+	public IClass getEnclosingClass()
+	{
+		return this.enclosingClass;
+	}
+	
+	@Override
+	public void setVariadic()
 	{
 		this.modifiers.addIntModifier(Modifiers.VARARGS);
 	}
 	
 	@Override
-	public boolean isVarargs()
+	public boolean isVariadic()
 	{
 		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
@@ -116,21 +116,21 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void setParameter(int index, IParameter param)
+	public void setParameter(int index, IParameter parameter)
 	{
-		param.setMethod(this);
-		param.setIndex(index);
-		this.parameters[index] = param;
+		parameter.setMethod(this);
+		parameter.setIndex(index);
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addParameter(IParameter parameter)
 	{
-		param.setMethod(this);
+		parameter.setMethod(this);
 		
 		final int index = this.parameterCount++;
 
-		param.setIndex(index);
+		parameter.setIndex(index);
 
 		if (index >= this.parameters.length)
 		{
@@ -138,7 +138,7 @@ public class Constructor extends Member implements IConstructor
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
-		this.parameters[index] = param;
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
@@ -246,7 +246,7 @@ public class Constructor extends Member implements IConstructor
 			this.value.resolveTypes(markers, this);
 		}
 		
-		this.type = this.theClass.getType();
+		this.type = this.enclosingClass.getType();
 	}
 	
 	@Override
@@ -273,8 +273,8 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value = this.value.resolve(markers, this);
 			
-			IValue value1 = this.value.withType(Types.VOID, null, markers, context);
-			if (value1 == null)
+			final IValue typedValue = this.value.withType(Types.VOID, null, markers, context);
+			if (typedValue == null)
 			{
 				Marker marker = Markers.semantic(this.position, "constructor.return.type");
 				marker.addInfo(Markers.getSemantic("return.type", this.value.getType()));
@@ -282,7 +282,7 @@ public class Constructor extends Member implements IConstructor
 			}
 			else
 			{
-				this.value = value1;
+				this.value = typedValue;
 			}
 		}
 	}
@@ -307,7 +307,7 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		// Implicit Super Constructor
-		IConstructor match = IContext.resolveConstructor(this.theClass.getSuperType(), EmptyArguments.INSTANCE);
+		final IConstructor match = IContext.resolveConstructor(this.enclosingClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(Markers.semantic(this.position, "constructor.super"));
@@ -381,7 +381,7 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value.check(markers, this);
 		}
-		else if (!this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.theClass.isAbstract())
+		else if (!this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.enclosingClass.isAbstract())
 		{
 			markers.add(Markers.semantic(this.position, "constructor.unimplemented", this.name));
 		}
@@ -449,43 +449,43 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public IDyvilHeader getHeader()
 	{
-		return this.theClass.getHeader();
+		return this.enclosingClass.getHeader();
 	}
 	
 	@Override
 	public IClass getThisClass()
 	{
-		return this.theClass.getThisClass();
+		return this.enclosingClass.getThisClass();
 	}
 
 	@Override
 	public IType getThisType()
 	{
-		return this.theClass.getThisType();
+		return this.enclosingClass.getThisType();
 	}
 
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		return this.theClass.resolvePackage(name);
+		return this.enclosingClass.resolvePackage(name);
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.theClass.resolveClass(name);
+		return this.enclosingClass.resolveClass(name);
 	}
 	
 	@Override
 	public IType resolveType(Name name)
 	{
-		return this.theClass.resolveType(name);
+		return this.enclosingClass.resolveType(name);
 	}
 	
 	@Override
 	public ITypeParameter resolveTypeVariable(Name name)
 	{
-		return this.theClass.resolveTypeVariable(name);
+		return this.enclosingClass.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -500,19 +500,19 @@ public class Constructor extends Member implements IConstructor
 			}
 		}
 		
-		return this.theClass.resolveField(name);
+		return this.enclosingClass.resolveField(name);
 	}
 	
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		this.theClass.getMethodMatches(list, instance, name, arguments);
+		this.enclosingClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		this.theClass.getConstructorMatches(list, arguments);
+		this.enclosingClass.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
@@ -537,7 +537,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		return this.theClass.getAccessibleThis(type);
+		return this.enclosingClass.getAccessibleThis(type);
 	}
 	
 	@Override
@@ -566,7 +566,7 @@ public class Constructor extends Member implements IConstructor
 		{
 			return variable;
 		}
-		return this.theClass.capture(variable);
+		return this.enclosingClass.capture(variable);
 	}
 	
 	@Override
@@ -625,8 +625,8 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		int typeVarCount = this.theClass.typeParameterCount();
-		ClassGenericType gt = new ClassGenericType(this.theClass, new IType[typeVarCount], typeVarCount)
+		int typeVarCount = this.enclosingClass.typeParameterCount();
+		ClassGenericType gt = new ClassGenericType(this.enclosingClass, new IType[typeVarCount], typeVarCount)
 		{
 			@Override
 			public void addMapping(ITypeParameter typeVar, IType type)
@@ -660,7 +660,7 @@ public class Constructor extends Member implements IConstructor
 				gt.setType(i, Types.ANY);
 				
 				markers.add(Markers.semantic(position, "constructor.typevar.infer",
-				                             this.theClass.getTypeParameter(i).getName(), this.theClass.getName()));
+				                             this.enclosingClass.getTypeParameter(i).getName(), this.enclosingClass.getName()));
 			}
 		}
 		
@@ -691,15 +691,15 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
-		Deprecation.checkAnnotations(markers, position, this, "constructor");
+		Deprecation.checkAnnotations(markers, position, this);
 
 		switch (IContext.getVisibility(context, this))
 		{
 		case INTERNAL:
-			markers.add(Markers.semantic(position, "constructor.access.internal", this.theClass.getName()));
+			markers.add(Markers.semantic(position, "constructor.access.internal", this.enclosingClass.getName()));
 			break;
 		case INVISIBLE:
-			markers.add(Markers.semantic(position, "constructor.access.invisible", this.theClass.getName()));
+			markers.add(Markers.semantic(position, "constructor.access.invisible", this.enclosingClass.getName()));
 			break;
 		}
 		
@@ -729,7 +729,7 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public String getSignature()
 	{
-		if (!this.theClass.isTypeParameterized())
+		if (!this.enclosingClass.isTypeParametric())
 		{
 			return null;
 		}
@@ -767,7 +767,7 @@ public class Constructor extends Member implements IConstructor
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(),
 		                                                                  this.getSignature(), this.getExceptions()));
 
-		mw.setThisType(this.theClass.getInternalName());
+		mw.setThisType(this.enclosingClass.getInternalName());
 		
 		if (this.annotations != null)
 		{
@@ -798,14 +798,14 @@ public class Constructor extends Member implements IConstructor
 		{
 			this.value.writeExpression(mw, Types.VOID);
 		}
-		this.theClass.writeInit(mw);
+		this.enclosingClass.writeInit(mw);
 
 		mw.writeLabel(end);
 		mw.end(Types.VOID);
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.writeLocal(0, "this", 'L' + this.theClass.getInternalName() + ';', null, start, end);
+			mw.writeLocal(0, "this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
@@ -820,7 +820,7 @@ public class Constructor extends Member implements IConstructor
 	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber)
 			throws BytecodeException
 	{
-		writer.writeTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
+		writer.writeTypeInsn(Opcodes.NEW, this.enclosingClass.getInternalName());
 		if (type != Types.VOID)
 		{
 			writer.writeInsn(Opcodes.DUP);
@@ -835,7 +835,7 @@ public class Constructor extends Member implements IConstructor
 	{
 		writer.writeLineNumber(lineNumber);
 		
-		String owner = this.theClass.getInternalName();
+		String owner = this.enclosingClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();
 		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
@@ -929,7 +929,7 @@ public class Constructor extends Member implements IConstructor
 		super.toString(prefix, buffer);
 
 		this.modifiers.toString(buffer);
-		buffer.append("new");
+		buffer.append("init");
 		
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
 		Util.astToString(prefix, this.parameters, this.parameterCount,

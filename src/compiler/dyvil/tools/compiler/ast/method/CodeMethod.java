@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -22,7 +23,7 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -61,9 +62,9 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type, modifiers);
 	}
 	
-	public CodeMethod(ICodePosition position, IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public CodeMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, iclass, name, type, modifiers);
+		super(position, name, type, modifiers, annotations);
 	}
 	
 	@Override
@@ -333,7 +334,7 @@ public class CodeMethod extends AbstractMethod
 					marker.addInfo(Markers.getSemantic("method.override.type", type));
 
 					marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
-					                                   overrideMethod.getTheClass().getFullName()));
+					                                   overrideMethod.getEnclosingClass().getFullName()));
 					markers.add(marker);
 				}
 			}
@@ -508,7 +509,6 @@ public class CodeMethod extends AbstractMethod
 
 			mw.writeVarInsn(Opcodes.ALOAD, 0);
 
-
 			for (int p = 0; p < this.parameterCount; p++)
 			{
 				final IParameter overrideParameter = overrideMethod.getParameter(p);
@@ -523,9 +523,9 @@ public class CodeMethod extends AbstractMethod
 			IType overrideReturnType = overrideMethod.getType();
 
 			mw.writeLineNumber(lineNumber);
-			mw.writeInvokeInsn(
-					(modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL,
-					internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
+			mw.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ?
+					                   Opcodes.INVOKEINTERFACE :
+					                   Opcodes.INVOKEVIRTUAL, internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
 			this.type.writeCast(mw, overrideReturnType, lineNumber);
 			mw.writeInsn(overrideReturnType.getReturnOpcode());
 			mw.end();

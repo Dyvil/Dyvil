@@ -4,29 +4,29 @@ import dyvil.collection.impl.AbstractBitSet
 
 public class BitSet extends AbstractBitSet implements MutableSet[int]
 {
-	public new()
+	public init()
 	{
-		super.new()
+		super.init()
 	}
 
-	public new(int capacity)
+	public init(int capacity)
 	{
-		super.new(capacity)
+		super.init(capacity)
 	}
 
-	public new(int... elements)
+	public init(int... elements)
 	{
-		super.new(elements)
+		super.init(elements)
 	}
 
-	public new(Collection[int] elements)
+	public init(Collection[int] elements)
 	{
-		super.new(elements)
+		super.init(elements)
 	}
 
-	public new(AbstractBitSet elements)
+	public init(AbstractBitSet elements)
 	{
-		super.new(elements)
+		super.init(elements)
 	}
 
 	public override void clear()
@@ -84,9 +84,7 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 		}
 	}
 
-	public override MutableSet[int] copy() = new BitSet(this)
+	public override MutableSet[int] copy() = this.mutableCopy
 
-	public override ImmutableSet[int] immutable() = null  // TODO ImmutableBitSet
-
-	public override MutableSet[R] emptyCopy[R]() = MutableSet.[R]
+	public override ImmutableSet[int] immutable() = this.immutableCopy
 }

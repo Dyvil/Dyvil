@@ -5,22 +5,26 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IStaticContext;
+import dyvil.tools.compiler.ast.context.IMemberContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.generic.type.WildcardType;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.*;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.raw.NamedType;
+import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -32,7 +36,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface IType extends IASTNode, IStaticContext, ITypeContext
+public interface IType extends IASTNode, IMemberContext, ITypeContext
 {
 	enum TypePosition
 	{
@@ -41,8 +45,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		 */
 		CLASS,
 		/**
-		 * Allows Class Types and Parameterized Types, but the latter cannot
-		 * involve any Wildcard Types.
+		 * Allows Class Types and Parameterized Types, but the latter cannot involve any Wildcard Types.
 		 */
 		SUPER_TYPE,
 		/**
@@ -50,18 +53,16 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		 */
 		TYPE,
 		/**
-		 * The type arguments of Parameterized Types used as SUPER_TYPE. Can be
-		 * Class Types, Parameterized Types and Type Variable Types.
+		 * The type arguments of Parameterized Types used as SUPER_TYPE. Can be Class Types, Parameterized Types and
+		 * Type Variable Types.
 		 */
 		SUPER_TYPE_ARGUMENT,
 		/**
-		 * Allows Class Types, Parameterized Types and Type Variable Types, but
-		 * the latter cannot be contravariant.
+		 * Allows Class Types, Parameterized Types and Type Variable Types, but the latter cannot be contravariant.
 		 */
 		RETURN_TYPE,
 		/**
-		 * Allows Class Types, Parameterized Types and Type
-		 * Variable Types, but the latter cannot be covariant.
+		 * Allows Class Types, Parameterized Types and Type Variable Types, but the latter cannot be covariant.
 		 */
 		PARAMETER_TYPE,
 		/**
@@ -89,12 +90,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	int GENERIC_INTERNAL = 26;
 	
 	// Compound Types
-	int TUPLE     = 32;
-	int LAMBDA    = 33;
+	int TUPLE  = 32;
+	int LAMBDA = 33;
 
-	int ARRAY     = 34;
-	int LIST      = 35;
-	int MAP       = 37;
+	int ARRAY = 34;
+	int LIST  = 35;
+	int MAP   = 37;
 
 	int OPTIONAL  = 48;
 	int REFERENCE = 50;
@@ -107,6 +108,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	// Other Types
 	int ANNOTATED = 192;
+
+	int MISSING_TAG = 255;
 	
 	@Override
 	default ICodePosition getPosition()
@@ -117,6 +120,13 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	@Override
 	default void setPosition(ICodePosition position)
 	{
+	}
+
+	default IType atPosition(ICodePosition position)
+	{
+		IType copy = this.clone();
+		copy.setPosition(position);
+		return copy;
 	}
 	
 	int typeTag();
@@ -148,6 +158,8 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	{
 		return this;
 	}
+
+	String getTypePrefix();
 
 	IClass getRefClass();
 
@@ -221,11 +233,12 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	}
 	
 	/**
-	 * Returns true if {@code type} is a subtype of this type
+	 * Returns {@code true} iff this type is a super type of the given {@code type}, {@code false otherwise}.
 	 *
 	 * @param type
+	 * 		the potential sub-type of this type
 	 *
-	 * @return
+	 * @return {@code true} iff this type is a super type of the given type, {@code false} otherwise
 	 */
 	default boolean isSuperTypeOf(IType type)
 	{
@@ -248,28 +261,20 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 			return false;
 		}
 		
-		IClass thatClass = type.getTheClass();
-		if (thatClass != null)
-		{
-			return thatClass == thisClass || thatClass.isSubTypeOf(this);
-		}
-		return false;
+		final IClass thatClass = type.getTheClass();
+		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
 	
 	default boolean isSuperClassOf(IType type)
 	{
-		IClass thisClass = this.getTheClass();
-		IClass thatClass = type.getTheClass();
-		if (thatClass != null)
-		{
-			return thatClass == thisClass || thatClass.isSubTypeOf(this);
-		}
-		return false;
+		final IClass thisClass = this.getTheClass();
+		final IClass thatClass = type.getTheClass();
+		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
 	
 	default boolean isSameType(IType type)
 	{
-		return this.getTheClass() == type.getTheClass();
+		return this == type || this.getTheClass() == type.getTheClass();
 	}
 	
 	boolean classEquals(IType type);
@@ -301,8 +306,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	// Generics
 	
 	/**
-	 * Returns the type argument in this generic type for the given type
-	 * variable.
+	 * Returns the type argument in this generic type for the given type variable.
 	 * <p>
 	 * Example:<br>
 	 * <p>
@@ -311,7 +315,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	 * ITypeParameter tv = type[List].getTypeVariable("E")
 	 * gt.resolveType(tv) // => String
 	 * </pre>
-	 * @param typeParameter
 	 */
 	@Override
 	IType resolveType(ITypeParameter typeParameter);
@@ -324,8 +327,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	/**
 	 * Returns true if this is or contains any type variables.
-	 *
-	 * @return
 	 */
 	boolean hasTypeVariables();
 
@@ -360,18 +361,6 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	}
 	
 	@Override
-	default IDyvilHeader getHeader()
-	{
-		return this.getTheClass().getHeader();
-	}
-	
-	@Override
-	default IClass getThisClass()
-	{
-		return this.getTheClass();
-	}
-	
-	@Override
 	default Package resolvePackage(Name name)
 	{
 		return null;
@@ -390,7 +379,14 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		final IClass theClass = this.getTheClass();
 		return theClass == null ? null : theClass.resolveType(name);
 	}
-	
+
+	@Override
+	default ITypeParameter resolveTypeVariable(Name name)
+	{
+		final IClass theClass = this.getTheClass();
+		return theClass == null ? null : theClass.resolveTypeVariable(name);
+	}
+
 	@Override
 	IDataMember resolveField(Name name);
 	
@@ -467,7 +463,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	{
 		if (type == null)
 		{
-			dos.writeByte(-1);
+			dos.writeByte(MISSING_TAG);
 			return;
 		}
 		
@@ -477,7 +473,7 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 	
 	static IType readType(DataInput dis) throws IOException
 	{
-		byte tag = dis.readByte();
+		int tag = dis.readUnsignedByte();
 		IType type;
 		switch (tag)
 		{
@@ -494,6 +490,9 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		case CLASS:
 			type = new ClassType();
 			break;
+		case PACKAGE:
+			type = new PackageType();
+			break;
 		case GENERIC:
 			type = new ClassGenericType();
 			break;
@@ -506,14 +505,31 @@ public interface IType extends IASTNode, IStaticContext, ITypeContext
 		case ARRAY:
 			type = new ArrayType();
 			break;
+		case LIST :
+			type = new ListType();
+			break;
+		case MAP:
+			type = new MapType();
+			break;
+		case OPTIONAL:
+			type = new OptionType();
+			break;
+		case REFERENCE:
+			type = new ReferenceType();
+			break;
+		case ANNOTATED:
+			type = new AnnotatedType();
+			break;
 		case TYPE_VAR_TYPE:
 			type = new NamedType();
 			break;
 		case WILDCARD_TYPE:
 			type = new WildcardType();
 			break;
-		default:
+		case MISSING_TAG:
 			return null;
+		default:
+			throw new Error("Cannot decode TypeTag " + tag);
 		}
 		
 		type.read(dis);

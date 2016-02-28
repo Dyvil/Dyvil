@@ -5,19 +5,19 @@ import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IObjectType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -32,6 +32,10 @@ public class ReferenceType implements IObjectType
 {
 	protected IClass theClass;
 	protected IType  type;
+
+	public ReferenceType()
+	{
+	}
 
 	public ReferenceType(IType type)
 	{
@@ -146,7 +150,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (!this.theClass.isTypeParameterized())
+		if (!this.theClass.isTypeParametric())
 		{
 			return;
 		}
@@ -336,14 +340,14 @@ public class ReferenceType implements IObjectType
 	@Override
 	public String toString()
 	{
-		return this.type + "&";
+		return this.type + "*";
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.type.toString(prefix, buffer);
-		buffer.append('&');
+		buffer.append('*');
 	}
 
 	@Override

@@ -1,16 +1,16 @@
 package dyvil.tools.compiler.util;
 
 import dyvil.string.CharUtils;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
@@ -20,7 +20,7 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class Util
+public final class Util
 {
 	// region Member & AST toString
 
@@ -57,7 +57,7 @@ public class Util
 		parametersToString(iClass, stringBuilder);
 	}
 
-	private static void parametersToString(IParameterized parameterized, StringBuilder buf)
+	private static void parametersToString(IParametric parameterized, StringBuilder buf)
 	{
 		buf.append('(');
 
@@ -75,7 +75,7 @@ public class Util
 		buf.append(')');
 	}
 
-	private static void typeParametersToString(ITypeParameterized typeParameterized, StringBuilder buf)
+	private static void typeParametersToString(ITypeParametric typeParameterized, StringBuilder buf)
 	{
 		int typeVariables = typeParameterized.typeParameterCount();
 		if (typeVariables > 0)
@@ -235,12 +235,13 @@ public class Util
 		return prepend;
 	}
 
-	public static IValue constant(IValue value, MarkerList markers)
+	public static IValue constant(IValue value, MarkerList markers, IContext context)
 	{
-		final IValue constant = value.toConstant(markers);
+		final IValue constant = value.toConstant(markers, context);
 		if (constant == null)
 		{
-			markers.add(Markers.semantic(value.getPosition(), "value.constant", DyvilCompiler.maxConstantDepth));
+			markers.add(Markers.semantic(value.getPosition(), "value.constant",
+			                             context.getCompilationContext().config.getMaxConstantDepth()));
 			return value.getType().getDefaultValue();
 		}
 

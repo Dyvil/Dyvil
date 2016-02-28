@@ -1,11 +1,11 @@
 package dyvil.collection.range;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
-import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -55,7 +55,7 @@ public final class EmptyRange<T> implements Range<T>
 	@Override
 	public Iterator<T> iterator()
 	{
-		return EmptyIterator.instance;
+		return (Iterator<T>) EmptyIterator.instance;
 	}
 	
 	@Override
@@ -89,11 +89,7 @@ public final class EmptyRange<T> implements Range<T>
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof Range)
-		{
-			return ((Range) obj).count() == 0;
-		}
-		return false;
+		return obj instanceof Range && ((Range) obj).count() == 0;
 	}
 	
 	@Override

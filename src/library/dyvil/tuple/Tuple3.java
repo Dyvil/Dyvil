@@ -1,9 +1,9 @@
 package dyvil.tuple;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.ClassParameters;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.Cell;
-import dyvil.annotation.Immutable;
 
 import java.util.Objects;
 

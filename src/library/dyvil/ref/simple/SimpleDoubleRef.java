@@ -2,7 +2,6 @@ package dyvil.ref.simple;
 
 import dyvil.lang.literal.DoubleConvertible;
 import dyvil.ref.DoubleRef;
-import dyvil.ref.DoubleRef;
 
 @DoubleConvertible
 public class SimpleDoubleRef implements DoubleRef

@@ -1,7 +1,6 @@
 package dyvil.math;
 
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.lang.Number;
 import dyvil.lang.literal.TupleConvertible;
 import dyvil.reflect.Modifiers;
 
@@ -9,7 +8,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 @TupleConvertible
-public class Complex implements Number, Serializable
+public class Complex implements Serializable
 {
 	private static final long serialVersionUID = 9178132461719363395L;
 	
@@ -37,67 +36,8 @@ public class Complex implements Number, Serializable
 		return this.imag;
 	}
 	
-	@Override
-	public byte byteValue()
-	{
-		return (byte) this.real;
-	}
-	
-	@Override
-	public short shortValue()
-	{
-		return (short) this.real;
-	}
-	
-	@Override
-	public char charValue()
-	{
-		return (char) this.real;
-	}
-	
-	@Override
-	public int intValue()
-	{
-		return (int) this.real;
-	}
-	
-	@Override
-	public long longValue()
-	{
-		return (long) this.real;
-	}
-	
-	@Override
-	public float floatValue()
-	{
-		return (float) this.real;
-	}
-	
-	@Override
-	public double doubleValue()
-	{
-		return this.real;
-	}
-	
-	@Override
 	@DyvilModifiers(Modifiers.PREFIX)
-	public
-	Complex $plus()
-	{
-		return this;
-	}
-	
-	@Override
-	@DyvilModifiers(Modifiers.PREFIX)
-	public
-	Complex $minus()
-	{
-		return apply(-this.real, -this.imag);
-	}
-
-	@DyvilModifiers(Modifiers.PREFIX)
-	public
-	Complex $tilde()
+	public Complex $tilde()
 	{
 		return apply(-this.real, this.imag);
 	}
@@ -106,7 +46,7 @@ public class Complex implements Number, Serializable
 	{
 		double r = this.real;
 		double i = this.imag;
-		return apply(r * r - i * i, 2D * r * i);
+		return apply(r * r - i * i, 2 * r * i);
 	}
 	
 	public Complex rec()
@@ -184,26 +124,6 @@ public class Complex implements Number, Serializable
 		return this.real != v.real || this.imag != v.imag;
 	}
 	
-	public boolean $lt(Complex v)
-	{
-		return false;
-	}
-	
-	public boolean $lt$eq(Complex v)
-	{
-		return false;
-	}
-	
-	public boolean $gt(Complex v)
-	{
-		return false;
-	}
-	
-	public boolean $gt$eq(Complex v)
-	{
-		return false;
-	}
-	
 	public Complex $plus(Complex v)
 	{
 		return apply(this.real + v.real, this.imag + v.imag);
@@ -225,96 +145,10 @@ public class Complex implements Number, Serializable
 		return apply((this.real * v.real + this.imag * v.imag) * d, (this.imag * v.real - this.real * v.imag) * d);
 	}
 	
-	// generic operators
-	
-	@Override
-	public boolean $eq$eq(Number v)
-	{
-		return this.imag == 0D && this.real == v.doubleValue();
-	}
-	
-	@Override
-	public boolean $bang$eq(Number v)
-	{
-		return this.imag != 0D || this.real != v.doubleValue();
-	}
-	
-	@Override
-	public boolean $lt(Number v)
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean $lt$eq(Number v)
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean $gt(Number v)
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean $gt$eq(Number v)
-	{
-		return false;
-	}
-	
-	@Override
-	public Complex $plus(Number v)
-	{
-		return apply(this.real + v.doubleValue(), this.imag);
-	}
-	
-	@Override
-	public Complex $minus(Number v)
-	{
-		return apply(this.real - v.doubleValue(), this.imag);
-	}
-	
-	@Override
-	public Complex $times(Number v)
-	{
-		return apply(this.real * v.doubleValue(), this.imag * v.doubleValue());
-	}
-	
-	@Override
-	public Complex $div(Number v)
-	{
-		return apply(this.real / v.doubleValue(), this.imag / v.doubleValue());
-	}
-	
-	@Override
-	public Complex $percent(Number v)
-	{
-		return apply(this.real % v.doubleValue(), this.imag % v.doubleValue());
-	}
-	
-	@Override
-	public int compareTo(Number o)
-	{
-		return java.lang.Double.compare(this.real, o.doubleValue());
-	}
-	
-	@Override
-	public Complex next()
-	{
-		return Complex.apply(this.real + 1D, this.imag);
-	}
-	
-	@Override
-	public Number previous()
-	{
-		return Complex.apply(this.real - 1D, this.imag);
-	}
-	
 	@Override
 	public java.lang.String toString()
 	{
-		return new StringBuilder(20).append(this.real).append('+').append(this.imag).append('i').toString();
+		return String.valueOf(this.real) + '+' + this.imag + 'i';
 	}
 	
 	@Override
@@ -333,11 +167,8 @@ public class Complex implements Number, Serializable
 			return false;
 		}
 		Complex other = (Complex) obj;
-		if (Double.doubleToLongBits(this.imag) != Double.doubleToLongBits(other.imag))
-		{
-			return false;
-		}
-		return Double.doubleToLongBits(this.real) == Double.doubleToLongBits(other.real);
+		return Double.doubleToLongBits(this.imag) == Double.doubleToLongBits(other.imag)
+				&& Double.doubleToLongBits(this.real) == Double.doubleToLongBits(other.real);
 	}
 	
 	@Override

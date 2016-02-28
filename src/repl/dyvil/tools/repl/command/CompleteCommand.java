@@ -6,93 +6,146 @@ import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
-import dyvil.tools.parsing.Name;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.DyvilLexer;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.DyvilREPL;
-import dyvil.tools.repl.REPLContext;
+import dyvil.tools.repl.context.REPLContext;
 
 public class CompleteCommand implements ICommand
 {
-	
 	@Override
 	public String getName()
 	{
 		return "complete";
 	}
-	
+
+	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "c" };
+	}
+
 	@Override
 	public String getDescription()
 	{
 		return "Prints a list of possible completions";
 	}
-	
+
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public String getUsage()
 	{
-		REPLContext context = repl.getContext();
+		return ":c[omplete] <identifier>[.]";
+	}
+
+	@Override
+	public void execute(DyvilREPL repl, String argument)
+	{
+		final REPLContext context = repl.getContext();
 		
-		if (args.length == 0)
+		if (argument == null)
 		{
 			// REPL Variables
 			
-			this.printMembers(repl, context, "");
+			this.printREPLMembers(repl, context, "");
 			return;
 		}
-		
-		String argument = args[0];
-		int index = args[0].indexOf('.');
-		if (index <= 0)
+
+		final int dotIndex = argument.lastIndexOf('.');
+		if (dotIndex <= 0)
 		{
 			// REPL Variable Completions
 			
-			this.printMembers(repl, context, BaseSymbols.qualify(argument));
+			this.printREPLMembers(repl, context, BaseSymbols.qualify(argument));
 			return;
 		}
-		
-		Name varName = Name.get(argument.substring(0, index));
-		String memberStart = BaseSymbols.qualify(argument.substring(index + 1));
-		IDataMember variable = context.resolveField(varName);
-		
-		if (variable != null)
-		{
-			// Field Completions
-			
-			IType type = variable.getType();
-			repl.getOutput().println("Available completions for '" + varName + "' of type '" + type + "':");
-			
-			this.printCompletions(repl, memberStart, type, false);
-			return;
-		}
-		
-		IType type = IContext.resolveType(context, varName);
-		if (type != null)
-		{
-			// Type Completions
-			repl.getOutput().println("Available completions for type '" + type + "':");
-			this.printCompletions(repl, memberStart, type, true);
-			return;
-		}
-		
-		// No Completions available
-		repl.getOutput().println("'" + varName + "' could not be resolved");
-		return;
+
+		final String expression = argument.substring(0, dotIndex);
+		final String memberStart = BaseSymbols.qualify(argument.substring(dotIndex + 1));
+
+		final MarkerList markers = new MarkerList();
+		final TokenIterator tokenIterator = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
+
+		final IValueConsumer valueConsumer = value -> {
+			value.resolveTypes(markers, context);
+			value = value.resolve(markers, context);
+			value.checkTypes(markers, context);
+
+			final IType type = value.getType();
+			repl.getOutput().println("Available completions for '" + value + "' of type '" + type + "':");
+
+			this.printCompletions(repl, memberStart, type, value.valueTag() == IValue.CLASS_ACCESS);
+		};
+		new ParserManager(new ExpressionParser(valueConsumer), markers, context).parse(tokenIterator);
 	}
 	
+	private void printREPLMembers(DyvilREPL repl, REPLContext context, String start)
+	{
+		final Set<String> fields = new TreeSet<>();
+		final Set<String> methods = new TreeSet<>();
+
+		for (IField variable : context.getFields().values())
+		{
+			if (variable.getName().startWith(start))
+			{
+				fields.add(getSignature(Types.UNKNOWN, variable));
+			}
+		}
+		for (IMethod method : context.getMethods())
+		{
+			if (method.getName().startWith(start))
+			{
+				methods.add(getSignature(Types.UNKNOWN, method));
+			}
+		}
+
+		boolean output = false;
+		if (!fields.isEmpty())
+		{
+			output = true;
+			repl.getOutput().println("Fields:");
+			for (String field : fields)
+			{
+				repl.getOutput().print('\t');
+				repl.getOutput().println(field);
+			}
+		}
+		if (!methods.isEmpty())
+		{
+			output = true;
+			repl.getOutput().println("Methods:");
+			for (String method : methods)
+			{
+				repl.getOutput().print('\t');
+				repl.getOutput().println(method);
+			}
+		}
+
+		if (!output)
+		{
+			repl.getOutput().println("No completions available");
+		}
+	}
+
 	private void printCompletions(DyvilREPL repl, String memberStart, IType type, boolean statics)
 	{
-		Set<String> fields = new TreeSet<>();
-		Set<String> properties = new TreeSet<>();
-		Set<String> methods = new TreeSet<>();
-		
+		final Set<String> fields = new TreeSet<>();
+		final Set<String> properties = new TreeSet<>();
+		final Set<String> methods = new TreeSet<>();
+
 		this.findCompletions(type, fields, properties, methods, memberStart, statics, new IdentityHashSet<>());
 
 		boolean output = false;
@@ -138,55 +191,7 @@ public class CompleteCommand implements ICommand
 			}
 		}
 	}
-	
-	private void printMembers(DyvilREPL repl, REPLContext context, String start)
-	{
-		Set<String> fields = new TreeSet<>();
-		Set<String> methods = new TreeSet<>();
-		
-		for (IField variable : context.getFields().values())
-		{
-			if (variable.getName().startWith(start))
-			{
-				fields.add(getSignature(Types.UNKNOWN, variable));
-			}
-		}
-		for (IMethod method : context.getMethods())
-		{
-			if (method.getName().startWith(start))
-			{
-				methods.add(getSignature(Types.UNKNOWN, method));
-			}
-		}
 
-		boolean output = false;
-		if (!fields.isEmpty())
-		{
-			output = true;
-			repl.getOutput().println("Fields:");
-			for (String field : fields)
-			{
-				repl.getOutput().print('\t');
-				repl.getOutput().println(field);
-			}
-		}
-		if (!methods.isEmpty())
-		{
-			output = true;
-			repl.getOutput().println("Methods:");
-			for (String method : methods)
-			{
-				repl.getOutput().print('\t');
-				repl.getOutput().println(method);
-			}
-		}
-
-		if (!output)
-		{
-			repl.getOutput().println("No completions available");
-		}
-	}
-	
 	private void findCompletions(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, boolean statics, Set<IClass> dejaVu)
 	{
 		IClass iclass = type.getTheClass();

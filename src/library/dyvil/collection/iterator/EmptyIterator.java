@@ -1,8 +1,8 @@
 package dyvil.collection.iterator;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.annotation.Immutable;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

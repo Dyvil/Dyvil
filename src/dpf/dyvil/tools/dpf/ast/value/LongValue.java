@@ -30,7 +30,7 @@ public class LongValue implements Constant
 	@Override
 	public Object toObject()
 	{
-		return dyvil.lang.Long.apply(this.value);
+		return this.value;
 	}
 
 	@Override

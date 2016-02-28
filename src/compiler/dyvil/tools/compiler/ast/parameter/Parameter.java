@@ -15,8 +15,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
@@ -231,8 +231,7 @@ public abstract class Parameter extends Member implements IParameter
 
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(
-					Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
 			this.type = Types.ANY;
 		}
 	}
@@ -261,7 +260,7 @@ public abstract class Parameter extends Member implements IParameter
 				this.defaultValue = typed;
 			}
 
-			this.defaultValue = Util.constant(this.defaultValue, markers);
+			this.defaultValue = Util.constant(this.defaultValue, markers, context);
 			return;
 		}
 	}

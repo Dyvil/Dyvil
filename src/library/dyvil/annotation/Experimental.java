@@ -6,7 +6,7 @@ import dyvil.util.MarkerLevel;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 @ClassParameters(names = { "value", "description", "stage", "level" })
 public @interface Experimental
 {
@@ -15,7 +15,7 @@ public @interface Experimental
 		DANGEROUS, UNSTABLE, UNRECOMMENDED, BETA, ALPHA, PRERELEASE
 	}
 	
-	String value() default "The {membertype} {membername} is an experimental feature";
+	String value() default "The {member.kind} '{member.name}' is an experimental feature";
 
 	String description() default "";
 	

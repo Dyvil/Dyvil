@@ -20,9 +20,13 @@ public class StringPoolReader extends FilterInputStream implements DataInput
 			this.input = new DataInputStream(input);
 		}
 
-		int constPoolSize = this.input.readShort();
-		this.constantPool = new String[constPoolSize];
-		for (int i = 0; i < constPoolSize; i++)
+		// Read constant pool entry count
+		final int constPoolCount = this.input.readUnsignedShort();
+
+		this.constantPool = new String[constPoolCount];
+
+		// Read constant pool entries
+		for (int i = 0; i < constPoolCount; i++)
 		{
 			this.constantPool[i] = this.input.readUTF();
 		}
@@ -115,6 +119,6 @@ public class StringPoolReader extends FilterInputStream implements DataInput
 	@Override
 	public String readUTF() throws IOException
 	{
-		return this.constantPool[this.input.readShort()];
+		return this.constantPool[this.input.readUnsignedShort()];
 	}
 }

@@ -30,7 +30,7 @@ public class FloatValue implements Constant
 	@Override
 	public Object toObject()
 	{
-		return dyvil.lang.Float.apply(this.value);
+		return this.value;
 	}
 
 	@Override

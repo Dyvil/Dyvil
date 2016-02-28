@@ -1,22 +1,25 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvilx.lang.model.type.Type;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.EnumReflection;
 import dyvil.reflect.Modifiers;
-import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
+import dyvilx.lang.model.type.Type;
 
 import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+@NilConvertible
 @ArrayConvertible
+@ColonConvertible
 @Immutable
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
 {
@@ -64,8 +67,15 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 
 	private static final long serialVersionUID = -2305035920228304893L;
 
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(K key, V value)
+	{
+		final EnumMap<K, V> result =  new EnumMap<>(getKeyType(key));
+		result.putInternal(key, value);
+		return result;
+	}
+
 	@SafeVarargs
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Entry<K, V>... entries)
 	{
 		return new EnumMap<>(entries);
 	}
@@ -107,9 +117,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 
 	@SafeVarargs
-	public EnumMap(Tuple2<K, V>... tuples)
+	public EnumMap(Entry<K, V>... entries)
 	{
-		super(tuples);
+		super(entries);
 	}
 
 	@Override
@@ -379,6 +389,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	{
 		return this.mutableCopy();
 	}
+
 	@Override
 	public java.util.Map<K, V> toJava()
 	{

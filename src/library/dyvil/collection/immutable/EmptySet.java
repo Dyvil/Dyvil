@@ -1,5 +1,6 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.Collection;
@@ -9,7 +10,6 @@ import dyvil.collection.Set;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
-import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -188,7 +188,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public String toString()
 	{
-		return "[]";
+		return Collection.EMPTY_STRING;
 	}
 	
 	@Override

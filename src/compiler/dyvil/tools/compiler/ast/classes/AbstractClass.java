@@ -4,6 +4,7 @@ import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -12,9 +13,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.VariableThis;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -24,9 +23,10 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -73,17 +73,17 @@ public abstract class AbstractClass implements IClass
 	protected IType classType = new ClassType(this);
 	
 	@Override
-	public void setOuterClass(IClass iclass)
-	{
-		this.outerClass = iclass;
-	}
-	
-	@Override
-	public IClass getOuterClass()
+	public IClass getEnclosingClass()
 	{
 		return this.outerClass;
 	}
-	
+
+	@Override
+	public void setEnclosingClass(IClass iclass)
+	{
+		this.outerClass = iclass;
+	}
+
 	@Override
 	public void setType(IType type)
 	{
@@ -229,13 +229,13 @@ public abstract class AbstractClass implements IClass
 	// Generics
 	
 	@Override
-	public void setTypeParameterized()
+	public void setTypeParametric()
 	{
 		this.typeParameters = new ITypeParameter[2];
 	}
 	
 	@Override
-	public boolean isTypeParameterized()
+	public boolean isTypeParametric()
 	{
 		return this.typeParameters != null;
 	}
@@ -247,25 +247,25 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void setTypeParameters(ITypeParameter[] typeVars, int count)
+	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
 	{
-		this.typeParameters = typeVars;
+		this.typeParameters = typeParameters;
 		this.typeParameterCount = count;
 	}
 	
 	@Override
-	public void setTypeParameter(int index, ITypeParameter var)
+	public void setTypeParameter(int index, ITypeParameter typeParameter)
 	{
-		this.typeParameters[index] = var;
+		this.typeParameters[index] = typeParameter;
 	}
 	
 	@Override
-	public void addTypeParameter(ITypeParameter var)
+	public void addTypeParameter(ITypeParameter typeParameter)
 	{
 		if (this.typeParameters == null)
 		{
 			this.typeParameters = new ITypeParameter[3];
-			this.typeParameters[0] = var;
+			this.typeParameters[0] = typeParameter;
 			this.typeParameterCount = 1;
 			return;
 		}
@@ -277,9 +277,9 @@ public abstract class AbstractClass implements IClass
 			System.arraycopy(this.typeParameters, 0, temp, 0, index);
 			this.typeParameters = temp;
 		}
-		this.typeParameters[index] = var;
+		this.typeParameters[index] = typeParameter;
 		
-		var.setIndex(index);
+		typeParameter.setIndex(index);
 	}
 	
 	@Override
@@ -303,31 +303,31 @@ public abstract class AbstractClass implements IClass
 	}
 	
 	@Override
-	public void setParameter(int index, IParameter param)
+	public void setParameter(int index, IParameter parameter)
 	{
-		param.setTheClass(this);
-		param.setIndex(index);
-		this.parameters[index] = param;
+		parameter.setEnclosingClass(this);
+		parameter.setIndex(index);
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addParameter(IParameter parameter)
 	{
-		param.setTheClass(this);
+		parameter.setEnclosingClass(this);
 		
 		if (this.parameters == null)
 		{
-			param.setIndex(0);
+			parameter.setIndex(0);
 
 			this.parameters = new ClassParameter[2];
-			this.parameters[0] = param;
+			this.parameters[0] = parameter;
 			this.parameterCount = 1;
 			return;
 		}
 		
 		final int index = this.parameterCount++;
 
-		param.setIndex(index);
+		parameter.setIndex(index);
 
 		if (this.parameterCount > this.parameters.length)
 		{
@@ -335,7 +335,7 @@ public abstract class AbstractClass implements IClass
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
-		this.parameters[index] = param;
+		this.parameters[index] = parameter;
 	}
 	
 	@Override
@@ -510,7 +510,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
 	{
-		if (candidate.getTheClass() == this)
+		if (candidate.getEnclosingClass() == this)
 		{
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
@@ -971,13 +971,13 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public boolean isMember(IClassMember member)
 	{
-		return this == member.getTheClass();
+		return this == member.getEnclosingClass();
 	}
 	
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		IClass iclass = member.getTheClass();
+		IClass iclass = member.getEnclosingClass();
 		if (iclass == this || iclass == null)
 		{
 			return VISIBLE;

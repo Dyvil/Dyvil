@@ -3,8 +3,6 @@ package dyvil.collection.mutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 
-import java.lang.Boolean;
-
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;

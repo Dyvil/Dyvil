@@ -3,11 +3,15 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.generic.type.GenericType;
-import dyvil.tools.compiler.ast.generic.type.NamedGenericType;
-import dyvil.tools.compiler.ast.generic.type.WildcardType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.type.*;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.*;
+import dyvil.tools.compiler.ast.type.generic.GenericType;
+import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
+import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
@@ -73,7 +77,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.type = new OptionType(this.type);
 					return;
 				}
-				if (name == Names.amp || name == Names.times) // TODO Drop * support
+				if (name == Names.times)
 				{
 					this.type = new ReferenceType(this.type);
 					return;

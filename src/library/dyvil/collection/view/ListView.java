@@ -1,11 +1,11 @@
 package dyvil.collection.view;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.ImmutableIterator;
-import dyvil.annotation.Immutable;
 
 import java.util.Collections;
 import java.util.Comparator;

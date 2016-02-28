@@ -12,7 +12,7 @@ import dyvil.tools.parsing.token.IToken;
 public final class ExpressionListParser extends Parser implements IValueConsumer
 {
 	private static final int EXPRESSION = 0;
-	private static final int COMMA = 1;
+	private static final int COMMA      = 1;
 
 	protected IValueList valueList;
 	

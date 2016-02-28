@@ -7,22 +7,22 @@ import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.context.MapTypeContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
+import dyvil.tools.compiler.ast.generic.MapTypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterized;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.LambdaType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -251,7 +251,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		ITypeContext tempContext = new MapTypeContext();
 		this.method.getType().inferTypes(valueType, tempContext);
-		IType type1 = this.method.getTheClass().getType().getConcreteType(tempContext);
+		IType type1 = this.method.getEnclosingClass().getType().getConcreteType(tempContext);
 		
 		type.inferTypes(type1, typeContext);
 		
@@ -482,7 +482,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 					}
 					
 					this.name = method.getName().qualified;
-					this.owner = method.getTheClass().getInternalName();
+					this.owner = method.getEnclosingClass().getInternalName();
 					this.lambdaDesc = method.getDescriptor();
 					return this;
 				}
@@ -496,7 +496,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				{
 					this.directInvokeOpcode = ClassFormat.H_NEWINVOKESPECIAL;
 					this.name = "<init>";
-					this.owner = ctor.getTheClass().getInternalName();
+					this.owner = ctor.getEnclosingClass().getInternalName();
 					this.lambdaDesc = ctor.getDescriptor();
 					
 					return this;
@@ -509,7 +509,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this;
 	}
 	
-	private boolean checkCall(IValue instance, IArguments arguments, IParameterized p)
+	private boolean checkCall(IValue instance, IArguments arguments, IParametric p)
 	{
 		boolean receiver = false;
 		

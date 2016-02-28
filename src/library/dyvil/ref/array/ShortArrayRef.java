@@ -1,7 +1,6 @@
 package dyvil.ref.array;
 
 import dyvil.ref.ShortRef;
-import dyvil.ref.ShortRef;
 
 public class ShortArrayRef implements ShortRef
 {

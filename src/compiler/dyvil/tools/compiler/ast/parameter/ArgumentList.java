@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Util;
@@ -26,6 +26,12 @@ public final class ArgumentList implements IArguments, IValueList
 	public ArgumentList()
 	{
 		this.values = new IValue[3];
+	}
+
+	public ArgumentList(IValue... values)
+	{
+		this.values = values;
+		this.size = values.length;
 	}
 	
 	public ArgumentList(int size)
@@ -47,7 +53,7 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values, this.size);
+		return new ArrayIterator<>(this.values, this.size);
 	}
 	
 	@Override
@@ -249,37 +255,39 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType varParamType = param.getInternalType();
+		final IType varParamType = param.getInternalType().getParameterType();
 		
 		IValue value = this.values[index];
 		if (value.isType(varParamType.getConcreteType(typeContext)))
 		{
-			IValue value1 = IType.convertValue(value, varParamType, typeContext, markers, context);
-			if (value1 != null)
+			final IValue typedValue = IType.convertValue(value, varParamType, typeContext, markers, context);
+			if (typedValue != null)
 			{
-				this.values[index] = value1;
+				this.values[index] = typedValue;
 				this.varargs = true;
 				return;
 			}
+
 			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type",
 			                     param.getName());
 			return;
 		}
 		
-		IType elementType = varParamType.getElementType();
+		final IType elementType = varParamType.getElementType();
 		
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
-			if (value1 == null)
+
+			final IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
+			if (typedValue == null)
 			{
 				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type",
 				                     param.getName());
 			}
 			else
 			{
-				this.values[index] = value1;
+				this.values[index] = typedValue;
 			}
 		}
 	}

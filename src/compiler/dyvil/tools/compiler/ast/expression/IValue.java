@@ -10,10 +10,10 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.ArrayType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -85,6 +85,7 @@ public interface IValue extends IASTNode, ITyped
 	int RANGE_OPERATOR = 135;
 	int STRINGBUILDER  = 136;
 	int INC            = 137;
+	int COLON          = 138;
 	
 	// Basic Control Statements
 	int RETURN       = 192;
@@ -210,7 +211,7 @@ public interface IValue extends IASTNode, ITyped
 	
 	IValue cleanup(IContext context, IClassCompilableList compilableList);
 	
-	default IValue toConstant(MarkerList markers)
+	default IValue toConstant(MarkerList markers, IContext context)
 	{
 		return null;
 	}

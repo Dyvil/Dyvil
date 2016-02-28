@@ -587,22 +587,22 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		if (this.size == 0)
 		{
-			return "[]";
+			return Map.EMPTY_STRING;
 		}
 		
-		StringBuilder buf = new StringBuilder("[ ");
-		for (HashEntry<K, V> e : this.entries)
+		final StringBuilder builder = new StringBuilder(Map.START_STRING);
+
+		for (HashEntry<K, V> entry : this.entries)
 		{
-			while (e != null)
+			for (; entry != null; entry = entry.next)
 			{
-				buf.append(e.key).append(" -> ").append(e.value);
-				e = e.next;
-				
-				buf.append(", ");
+				builder.append(entry.key).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry.value)
+				       .append(Map.ENTRY_SEPARATOR_STRING);
 			}
 		}
-		int len = buf.length();
-		return buf.replace(len - 2, len, " ]").toString();
+
+		final int len = builder.length();
+		return builder.replace(len - Map.ENTRY_SEPARATOR_STRING.length(), len, Map.END_STRING).toString();
 	}
 	
 	@Override

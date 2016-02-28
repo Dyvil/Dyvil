@@ -1,0 +1,162 @@
+package dyvil.collection.immutable
+
+import dyvil.collection.impl.AbstractBitSet
+
+public class BitSet extends AbstractBitSet implements ImmutableSet[int]
+{
+	public init()
+	{
+		super.init()
+	}
+
+	public init(int capacity)
+	{
+		super.init(capacity)
+	}
+
+	public init(int... elements)
+	{
+		super.init(elements)
+	}
+
+	public init(Collection[int] elements)
+	{
+		super.init(elements)
+	}
+
+	public init(AbstractBitSet elements)
+	{
+		super.init(elements)
+	}
+
+	protected override void removeAt(int bit) = throw new dyvil.util.ImmutableException("Iterator.remove() on Immutable Set")
+
+	public override BitSet +(int element)
+	{
+		if (this.bitSet(element)) return this
+
+		BitSet copy = new BitSet(this)
+		copy.setBit(element)
+		return copy
+	}
+
+	public override BitSet -(Object element)
+	{
+		if (!(element is Int)) return this
+
+		final int bit = element as int
+		if (!this.bitSet(bit)) return this
+
+		BitSet copy = new BitSet(this)
+		copy.clearBit(bit)
+		return copy
+	}
+
+	public override BitSet --(Collection[_] collection)
+	{
+		if (collection.isEmpty || this.isEmpty) return this
+
+		final BitSet copy = new BitSet(this)
+		for (Object element : collection)
+		{
+			if (element is Int)
+			{
+				copy.clearBit(element as int)
+			}
+		}
+		return copy
+	}
+
+	public override BitSet operator &(Collection[_ <: int] collection)
+	{
+		if (collection.isEmpty || this.isEmpty) return this
+
+		final BitSet copy = new BitSet(this.size)
+		for (int element : collection)
+		{
+			if (this.bitSet(element))
+			{
+				copy.setBit(element)
+			}
+		}
+		return copy
+	}
+
+	public override BitSet operator |(Collection[_ <: int] collection)
+	{
+		if (collection.isEmpty) return this
+
+		final BitSet copy = new BitSet(this)
+		for (int element : collection)
+		{
+			copy.setBit(element)
+		}
+		return copy
+	}
+
+	public override BitSet operator ^(Collection[_ <: int] collection)
+	{
+		if (collection.isEmpty) return this
+		if (this.isEmpty) return new BitSet(collection)
+
+		final BitSet copy = new BitSet
+		for (int element : collection)
+		{
+			if (!this.bitSet(element))
+			{
+				copy.setBit(element)
+			}
+		}
+
+		for (int element : this)
+		{
+			if (!collection.contains(element))
+			{
+				copy.setBit(element)
+			}
+		}
+		return copy
+	}
+
+	public override ImmutableSet[R] mapped[R](java.util.function.Function[_ >: int, _ <: R] mapper)
+	{
+		final ImmutableSet.Builder[R] builder = ImmutableSet.[R]builder
+		for (int element : this)
+		{
+			builder.add(mapper.apply(element))
+		}
+		return builder.build
+	}
+
+	public override ImmutableSet[R] flatMapped[R](java.util.function.Function[_ >: int, _ <: Iterable[_ <: R]] mapper)
+	{
+		final ImmutableSet.Builder[R] builder = ImmutableSet.[R]builder
+		for (int element : this)
+		{
+			for (R result : mapper.apply(element))
+			{
+				builder.add(result)
+			}
+		}
+		return builder.build
+	}
+
+	public override BitSet filtered(java.util.function.Predicate[_ >: int] condition)
+	{
+		final BitSet copy = new BitSet(this.size)
+		for (int element : this)
+		{
+			if (condition.test(element))
+			{
+				copy.setBit(element)
+			}
+		}
+		return copy
+	}
+
+    public override ImmutableSet[int] copy() = this.immutableCopy
+
+	public override MutableSet[int] mutable() = this.mutableCopy
+
+	public override java.util.Set[int] toJava() = java.util.Collections.unmodifiableSet(super.toJava)
+}

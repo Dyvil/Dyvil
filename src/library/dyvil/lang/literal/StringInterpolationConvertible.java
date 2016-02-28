@@ -1,9 +1,8 @@
 package dyvil.lang.literal;
 
 /**
- * Marks a class that can be instantiated with a String Interpolation. This will
- * cause the compiler to insert a call to a method of that class with the
- * signature {@code static X apply(String, Object...)}.
+ * Marks a class that can be instantiated with a String Interpolation. This will cause the compiler to insert a call to
+ * a method of that class with the signature {@code static X apply(String, Object...)}.
  * <p>
  * Example:
  * <p>

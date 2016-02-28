@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -72,11 +72,20 @@ public class FloatValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT))
+		if (type == Types.FLOAT)
 		{
 			return this;
 		}
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS);
+		if (type == Types.DOUBLE)
+		{
+			return new DoubleValue(this.position, this.value);
+		}
+		if (type.isSuperTypeOf(Types.FLOAT))
+		{
+			return this;
+		}
+
+		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -132,7 +141,7 @@ public class FloatValue implements IConstantValue
 	@Override
 	public Float toObject()
 	{
-		return Float.valueOf(this.value);
+		return this.value;
 	}
 	
 	@Override

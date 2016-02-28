@@ -1,12 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.annotation.Immutable;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -244,8 +244,11 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	public String toString()
 	{
 		final String elementToString = String.valueOf(this.element);
+
 		// No String concat to make use of the known length
-		return new StringBuilder(elementToString + 2).append('[').append(elementToString).append(']').toString();
+		return new StringBuilder(
+				elementToString.length() + Collection.START_STRING.length() + Collection.END_STRING.length())
+				.append(Collection.START_STRING).append(elementToString).append(Collection.END_STRING).toString();
 	}
 	
 	@Override

@@ -64,6 +64,15 @@ public abstract class Member implements IMember
 		this.modifiers = modifiers;
 	}
 
+	public Member(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		this.position = position;
+		this.name = name;
+		this.type = type;
+		this.modifiers = modifiers;
+		this.annotations = annotations;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -153,6 +162,7 @@ public abstract class Member implements IMember
 		{
 			this.type = this.type.resolveType(markers, context);
 		}
+
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);

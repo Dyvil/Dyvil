@@ -6,6 +6,7 @@ import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import java.util.Objects;
@@ -13,6 +14,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
+@ColonConvertible
 @ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap<K, V>
 {
@@ -21,6 +23,11 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	public static <K, V> ArrayMap<K, V> apply()
 	{
 		return new ArrayMap<>(DEFAULT_CAPACITY);
+	}
+
+	public static <K, V> ArrayMap<K, V> apply(K key, V value)
+	{
+		return new ArrayMap<>(new Object[] { key }, new Object[] { value }, true);
 	}
 	
 	@SafeVarargs

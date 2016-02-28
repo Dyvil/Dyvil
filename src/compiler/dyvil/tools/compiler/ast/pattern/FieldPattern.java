@@ -3,15 +3,14 @@ package dyvil.tools.compiler.ast.pattern;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.pattern.constant.*;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.PrimitiveType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -79,7 +78,7 @@ public class FieldPattern implements IPattern
 			return this;
 		}
 
-		final IValue value = toConstant(this.dataMember.getValue());
+		final IValue value = toConstant(this.dataMember.getValue(), context);
 		if (value == null)
 		{
 			return this;
@@ -103,9 +102,9 @@ public class FieldPattern implements IPattern
 		return this;
 	}
 
-	private static IValue toConstant(IValue value)
+	private static IValue toConstant(IValue value, IContext context)
 	{
-		int depth = DyvilCompiler.maxConstantDepth;
+		int depth = context.getCompilationContext().config.getMaxConstantDepth();
 
 		do
 		{
@@ -192,7 +191,7 @@ public class FieldPattern implements IPattern
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		final IClass enclosingClass = this.dataMember.getTheClass();
+		final IClass enclosingClass = this.dataMember.getEnclosingClass();
 		if (enclosingClass != null)
 		{
 			buffer.append(enclosingClass.getName()).append('.');

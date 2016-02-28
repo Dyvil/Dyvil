@@ -8,12 +8,12 @@ import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -151,12 +151,12 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	}
 	
 	@Override
-	public void addParameter(IParameter param)
+	public void addParameter(IParameter parameter)
 	{
 		if (this.params == null)
 		{
 			this.params = new IParameter[3];
-			this.params[0] = param;
+			this.params[0] = parameter;
 			this.parameterCount = 1;
 			return;
 		}
@@ -168,7 +168,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			System.arraycopy(this.params, 0, temp, 0, this.params.length);
 			this.params = temp;
 		}
-		this.params[index] = param;
+		this.params[index] = parameter;
 	}
 	
 	@Override
@@ -178,7 +178,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 	}
 	
 	@Override
-	public void setParameter(int index, IParameter param)
+	public void setParameter(int index, IParameter parameter)
 	{
 	}
 	

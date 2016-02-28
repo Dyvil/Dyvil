@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.statement.exception.CatchBlock;
 import dyvil.tools.compiler.ast.statement.exception.TryStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -58,7 +58,8 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			if (ParserUtil.isTerminator(type))
 			{
 				int nextType = token.next().type();
-				if (nextType == Tokens.EOF) {
+				if (nextType == Tokens.EOF)
+				{
 					pm.popParser(true);
 					return;
 				}

@@ -1,12 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
-import dyvil.annotation.Immutable;
 import dyvil.util.None;
 import dyvil.util.Option;
 
@@ -261,7 +261,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public String toString()
 	{
-		return "[]";
+		return Map.EMPTY_STRING;
 	}
 	
 	@Override

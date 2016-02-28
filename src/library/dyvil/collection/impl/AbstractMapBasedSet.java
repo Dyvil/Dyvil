@@ -2,8 +2,6 @@ package dyvil.collection.impl;
 
 import dyvil.collection.*;
 
-import java.lang.Boolean;
-
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -88,24 +86,18 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 	{
 		if (this.isEmpty())
 		{
-			return "[]";
+			return Collection.EMPTY_STRING;
 		}
 		
-		StringBuilder builder = new StringBuilder("[");
-		Iterator<? extends Entry<E, ?>> iterator = this.map().iterator();
-		while (true)
+		final StringBuilder builder = new StringBuilder(this.size() << 3).append(Collection.START_STRING);
+
+		for (Entry<E, ?> entry : this.map())
 		{
-			builder.append(iterator.next().getKey());
-			if (iterator.hasNext())
-			{
-				builder.append(", ");
-			}
-			else
-			{
-				break;
-			}
+			builder.append(entry.getKey()).append(Collection.ELEMENT_SEPARATOR_STRING);
 		}
-		return builder.append("]").toString();
+
+		final int len = builder.length();
+		return builder.replace(len, len - Collection.ELEMENT_SEPARATOR_STRING.length(), Collection.END_STRING).toString();
 	}
 	
 	@Override

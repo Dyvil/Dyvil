@@ -97,13 +97,13 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public void setTheClass(IClass iclass)
+	public void setEnclosingClass(IClass iclass)
 	{
 		this.theClass = iclass;
 	}
 	
 	@Override
-	public IClass getTheClass()
+	public IClass getEnclosingClass()
 	{
 		return this.theClass;
 	}

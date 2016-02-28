@@ -1,10 +1,12 @@
 package dyvil.collection.immutable;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
-import dyvil.annotation.Immutable;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -12,7 +14,9 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+@NilConvertible
 @ArrayConvertible
+@ColonConvertible
 @Immutable
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableMap<K, V>
 {
@@ -62,6 +66,17 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 
 	private static final long serialVersionUID = -5372836862143742212L;
+
+	public static <K, V> TupleMap<K, V> apply(K key, V value)
+	{
+		return new TupleMap<>(new Tuple2<>(key, value));
+	}
+
+	@SafeVarargs
+	public static <K, V> TupleMap<K, V> apply(Entry<K, V>... entries)
+	{
+		return new TupleMap<>(entries);
+	}
 
 	@SafeVarargs
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)

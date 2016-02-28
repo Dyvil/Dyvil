@@ -5,10 +5,10 @@ import dyvil.tools.asm.Attribute;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.type.InternalType;
-import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
+import dyvil.tools.compiler.backend.ClassFormat;
 
 public class SimpleFieldVisitor implements FieldVisitor
 {

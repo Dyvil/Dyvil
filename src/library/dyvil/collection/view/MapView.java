@@ -1,8 +1,8 @@
 package dyvil.collection.view;
 
+import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.ImmutableIterator;
-import dyvil.annotation.Immutable;
 import dyvil.util.Option;
 
 import java.util.Collections;

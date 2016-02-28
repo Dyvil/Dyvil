@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.type.CovariantTypeVarType;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.operator.ClassOperator;
@@ -19,7 +18,8 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -47,32 +47,33 @@ public final class TypeParameter implements ITypeParameter
 	protected IType lowerBound;
 
 	// Metadata
-	private int                index;
+	private int index;
 
-	private int                parameterIndex;
+	private int parameterIndex;
 
-	private ITypeParameterized generic;
-	private ReifiedKind reifiedKind   = ReifiedKind.NOT_REIFIED;
+	private ITypeParametric generic;
+	private ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
 
-	private IType       covariantType = new CovariantTypeVarType(this);
-	public TypeParameter(ITypeParameterized generic)
+	private IType covariantType = new CovariantTypeVarType(this);
+
+	public TypeParameter(ITypeParametric generic)
 	{
 		this.generic = generic;
 	}
 
-	public TypeParameter(ITypeParameterized generic, Name name)
+	public TypeParameter(ITypeParametric generic, Name name)
 	{
 		this.name = name;
 		this.generic = generic;
 	}
 
-	public TypeParameter(ICodePosition position, ITypeParameterized generic)
+	public TypeParameter(ICodePosition position, ITypeParametric generic)
 	{
 		this.position = position;
 		this.generic = generic;
 	}
 
-	public TypeParameter(ICodePosition position, ITypeParameterized generic, Name name, Variance variance)
+	public TypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
 		this.position = position;
 		this.name = name;
@@ -81,7 +82,7 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public ITypeParameterized getGeneric()
+	public ITypeParametric getGeneric()
 	{
 		return this.generic;
 	}

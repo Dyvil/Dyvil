@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -47,17 +47,17 @@ public class InstanceFieldReference implements IReference
 		this.receiver.writeExpression(writer, null);
 
 		final IType fieldType = this.field.getType();
-		final String fieldClassName = this.field.getTheClass().getInternalName();
+		final String fieldClassName = this.field.getEnclosingClass().getInternalName();
 		final String fieldName = this.field.getName().qualified;
 		final String factoryMethodName = Types.getReferenceFactoryName(fieldType, "");
-		final String factoryMethodType = "(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)L" + Types
-				.getInternalRef(fieldType, "") + ';';
+		final String factoryMethodType =
+				"(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)L" + Types.getInternalRef(fieldType, "") + ';';
 
 		writer.writeLDC(Type.getObjectType(fieldClassName));
 		writer.writeLDC(fieldName);
 
 		// Write a call to the access factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName,
-		                       factoryMethodType, false);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
+		                       false);
 	}
 }

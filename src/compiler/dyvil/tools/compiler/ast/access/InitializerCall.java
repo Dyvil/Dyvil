@@ -2,15 +2,15 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -106,7 +106,7 @@ public class InitializerCall implements ICall
 	public void checkArguments(MarkerList markers, IContext context)
 	{
 		this.constructor
-				.checkArguments(markers, this.position, context, this.constructor.getTheClass().getType(), arguments);
+				.checkArguments(markers, this.position, context, this.constructor.getEnclosingClass().getType(), arguments);
 	}
 
 	@Override

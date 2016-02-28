@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
@@ -8,7 +9,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -22,6 +23,9 @@ import java.lang.annotation.ElementType;
 public class Initializer extends Member implements IInitializer
 {
 	protected IValue value;
+
+	// Metadata
+	protected IClass enclosingClass;
 
 	public Initializer(ICodePosition position, ModifierSet modifiers)
 	{
@@ -38,6 +42,18 @@ public class Initializer extends Member implements IInitializer
 	public void setValue(IValue value)
 	{
 		this.value = value;
+	}
+
+	@Override
+	public IClass getEnclosingClass()
+	{
+		return this.enclosingClass;
+	}
+
+	@Override
+	public void setEnclosingClass(IClass iclass)
+	{
+		this.enclosingClass = iclass;
 	}
 
 	@Override

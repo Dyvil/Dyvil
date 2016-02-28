@@ -4,6 +4,8 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -11,42 +13,26 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+@NilConvertible
 @ArrayConvertible
+@ColonConvertible
 @Immutable
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap<K, V>
 {
-	private static final long serialVersionUID = -1489214367993445801L;
-	
-	@SafeVarargs
-	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)
-	{
-		return new HashMap<>(entries);
-	}
-	
-	public static <K, V> Builder<K, V> builder()
-	{
-		return new Builder<>();
-	}
-	
-	public static <K, V> Builder<K, V> builder(int capacity)
-	{
-		return new Builder<>(capacity);
-	}
-	
 	public static class Builder<K, V> implements ImmutableMap.Builder<K, V>
 	{
 		private HashMap<K, V> map;
-		
+
 		public Builder()
 		{
 			this.map = new HashMap<>();
 		}
-		
+
 		public Builder(int capacity)
 		{
 			this.map = new HashMap<>(capacity);
 		}
-		
+
 		@Override
 		public void put(K key, V value)
 		{
@@ -54,10 +40,10 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 			{
 				throw new IllegalStateException("Already built!");
 			}
-			
+
 			this.map.putInternal(key, value);
 		}
-		
+
 		@Override
 		public HashMap<K, V> build()
 		{
@@ -67,7 +53,32 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 			return map;
 		}
 	}
-	
+
+	private static final long serialVersionUID = -1489214367993445801L;
+
+	public static <K, V> HashMap<K, V> apply(K key, V value)
+	{
+		final HashMap<K, V> result = new HashMap<>(1);
+		result.putInternal(key, value);
+		return result;
+	}
+
+	@SafeVarargs
+	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)
+	{
+		return new HashMap<>(entries);
+	}
+
+	public static <K, V> Builder<K, V> builder()
+	{
+		return new Builder<>();
+	}
+
+	public static <K, V> Builder<K, V> builder(int capacity)
+	{
+		return new Builder<>(capacity);
+	}
+
 	protected HashMap()
 	{
 		super(DEFAULT_CAPACITY);

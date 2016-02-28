@@ -1,18 +1,19 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -80,6 +81,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addClass(IClass iclass)
 	{
+		iclass.setEnclosingClass(this.theClass);
+
 		if (this.classes == null)
 		{
 			this.classes = new IClass[2];
@@ -129,6 +132,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addField(IField field)
 	{
+		field.setEnclosingClass(this.theClass);
+
 		int index = this.fieldCount++;
 		if (index >= this.fields.length)
 		{
@@ -170,6 +175,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addProperty(IProperty property)
 	{
+		property.setEnclosingClass(this.theClass);
+
 		int index = this.propertyCount++;
 		if (index >= this.properties.length)
 		{
@@ -211,6 +218,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addMethod(IMethod method)
 	{
+		method.setEnclosingClass(this.theClass);
+
 		int index = this.methodCount++;
 		if (index >= this.methods.length)
 		{
@@ -292,6 +301,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{
+		constructor.setEnclosingClass(this.theClass);
+
 		int index = this.constructorCount++;
 		if (index >= this.constructors.length)
 		{
@@ -361,6 +372,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addInitializer(IInitializer initializer)
 	{
+		initializer.setEnclosingClass(this.theClass);
+
 		int index = this.initializerCount++;
 		if (index >= this.initializers.length)
 		{
@@ -382,10 +395,14 @@ public class ClassBody implements IClassBody
 	@Override
 	public void resolveTypes(MarkerList markers)
 	{
-		IContext context = this.theClass;
+		final IContext context = this.theClass;
+		final IDyvilHeader header = this.theClass.getHeader();
+
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].resolveTypes(markers, context);
+			final IClass innerClass = this.classes[i];
+			innerClass.setHeader(header);
+			innerClass.resolveTypes(markers, context);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
@@ -412,7 +429,8 @@ public class ClassBody implements IClassBody
 	@Override
 	public void resolve(MarkerList markers)
 	{
-		IContext context = this.theClass;
+		final IContext context = this.theClass;
+
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolve(markers, context);

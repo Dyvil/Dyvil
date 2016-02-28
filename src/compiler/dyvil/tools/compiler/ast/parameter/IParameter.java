@@ -7,19 +7,19 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.InternalType;
+import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 
 public interface IParameter extends IVariable, IClassMember
 {
 	@Override
-	default void setTheClass(IClass iclass)
+	default void setEnclosingClass(IClass iclass)
 	{
 	}
 	
 	@Override
-	default IClass getTheClass()
+	default IClass getEnclosingClass()
 	{
 		return null;
 	}

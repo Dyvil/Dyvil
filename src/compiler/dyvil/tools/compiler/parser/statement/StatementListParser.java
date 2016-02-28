@@ -18,11 +18,11 @@ import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -195,11 +195,10 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				}
 				else if (nextType == BaseSymbols.OPEN_PARENTHESIS)
 				{
+
+					final ModifierSet modifiers = this.modifiers == null ? new ModifierList() : this.modifiers;
 					final NestedMethod nestedMethod = new NestedMethod(token.raw(), token.nameValue(), this.type,
-					                                                   this.modifiers == null ?
-							                                                   new ModifierList() :
-							                                                   this.modifiers);
-					nestedMethod.setAnnotations(this.annotations);
+					                                                   modifiers, this.annotations);
 
 					final MethodStatement methodStatement = new MethodStatement(nestedMethod);
 					this.setValue(methodStatement);
@@ -228,26 +227,22 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		}
 		case METHOD_VALUE:
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			switch (type)
 			{
+			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.pushParser(new StatementListParser(this.method), true);
 				this.mode = SEPARATOR;
 				return;
-			}
-			if (type == BaseSymbols.EQUALS)
-			{
+			case BaseSymbols.EQUALS:
 				pm.pushParser(pm.newExpressionParser(this.method));
 				this.mode = SEPARATOR;
 				return;
-			}
-			if (type == DyvilKeywords.THROWS)
-			{
+			case DyvilKeywords.THROWS:
 				pm.pushParser(new ExceptionListParser(this.method));
 				// mode stays METHOD_VALUE
 				return;
 			}
 
-			pm.reparse();
 			pm.report(token, "method.body.separator");
 			return;
 		case SEPARATOR:

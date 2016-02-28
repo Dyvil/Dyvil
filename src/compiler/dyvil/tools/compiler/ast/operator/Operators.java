@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringConcatExpr;
 import dyvil.tools.compiler.ast.reference.ReferenceOperator;
-import dyvil.tools.compiler.ast.type.Types;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 
@@ -25,7 +25,7 @@ public interface Operators
 				return new NotOperator(arg1);
 			}
 		}
-		if (name == Names.amp || name == Names.times) // TODO Drop * support
+		if (name == Names.times)
 		{
 			return new ReferenceOperator(arg1);
 		}
@@ -125,12 +125,8 @@ public interface Operators
 		boolean openRange = false;
 		if (name == Names.dotdot || (openRange = name == Names.dotdotlt))
 		{
-			RangeOperator rangeOperator = null;
-			if (arg1.isType(RangeOperator.LazyFields.RANGEABLE) && arg2.isType(RangeOperator.LazyFields.RANGEABLE))
-			{
-				rangeOperator = new RangeOperator(arg1, arg2);
-				rangeOperator.setHalfOpen(openRange);
-			}
+			final RangeOperator rangeOperator = new RangeOperator(arg1, arg2);
+			rangeOperator.setHalfOpen(openRange);
 			return rangeOperator;
 		}
 		if (name == Names.ampamp)

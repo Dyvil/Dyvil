@@ -15,10 +15,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 /**
- * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for
- * several {@link URL}-related operations such as checking for website
- * availability, download the website as a {@code byte} array or saving it to a
- * file on the disk.
+ * The {@linkplain Utility utility interface} <b>WebUtils</b> can be used for several {@link URL}-related operations
+ * such as checking for website availability, download the website as a {@code byte} array or saving it to a file on the
+ * disk.
  *
  * @author Clashsoft
  * @version 1.0
@@ -32,9 +31,8 @@ public final class WebUtils
 	}
 	
 	/**
-	 * Checks if the website at the given {@link String} {@code url} is
-	 * available using the HTTP request {@code HEAD}. The created
-	 * {@link HttpURLConnection} is set to not follow redirects.
+	 * Checks if the website at the given {@link String} {@code url} is available using the HTTP request {@code HEAD}.
+	 * The created {@link HttpURLConnection} is set to not follow redirects.
 	 *
 	 * @param url
 	 * 		the URL of the website to check
@@ -57,9 +55,8 @@ public final class WebUtils
 	}
 
 	/**
-	 * Checks if the website at the given {@link URL} {@code url} is available
-	 * using the HTTP request {@code HEAD}. The created
-	 * {@link HttpURLConnection} is set to not follow redirects.
+	 * Checks if the website at the given {@link URL} {@code url} is available using the HTTP request {@code HEAD}. The
+	 * created {@link HttpURLConnection} is set to not follow redirects.
 	 *
 	 * @param url
 	 * 		the URL of the website to check
@@ -79,10 +76,9 @@ public final class WebUtils
 	}
 
 	/**
-	 * Downloads the website at the given {@link String} {@code url} and stores
-	 * it in a {@code byte} array. If the website is formatted as a sequence of
-	 * characters (i.e., it is a text or HTML), {@code new String(byte[])} can
-	 * be used to convert it to a String.
+	 * Downloads the website at the given {@link String} {@code url} and stores it in a {@code byte} array. If the
+	 * website is formatted as a sequence of characters (i.e., it is a text or HTML), {@code new String(byte[])} can be
+	 * used to convert it to a String.
 	 *
 	 * @param url
 	 * 		the URL of the website to check
@@ -106,10 +102,9 @@ public final class WebUtils
 	}
 	
 	/**
-	 * Downloads the website at the given {@link URL} {@code url} and stores it
-	 * in a {@code byte} array. If the website is formatted as a sequence of
-	 * characters (i.e., it is a text or HTML), {@code new String(byte[])} can
-	 * be used to convert it to a String.
+	 * Downloads the website at the given {@link URL} {@code url} and stores it in a {@code byte} array. If the website
+	 * is formatted as a sequence of characters (i.e., it is a text or HTML), {@code new String(byte[])} can be used to
+	 * convert it to a String.
 	 *
 	 * @param url
 	 * 		the URL of the website to check
@@ -128,8 +123,7 @@ public final class WebUtils
 	}
 	
 	/**
-	 * Downloads the website at the given {@link String} {@code url} and saves
-	 * it at the given file.
+	 * Downloads the website at the given {@link String} {@code url} and saves it at the given file.
 	 *
 	 * @param url
 	 * 		the URL of the website to check
@@ -154,8 +148,7 @@ public final class WebUtils
 	}
 	
 	/**
-	 * Downloads the website at the given {@link URL} {@code url} and saves it
-	 * at the given file.
+	 * Downloads the website at the given {@link URL} {@code url} and saves it at the given file.
 	 *
 	 * @param url
 	 * 		the URL of the website to check

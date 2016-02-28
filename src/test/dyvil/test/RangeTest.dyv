@@ -1,11 +1,24 @@
 package dyvil.test
 
+import dyvil.collection.range.Rangeable
+
 public class RangeTest
 {
+	case class RangeableInt(final int value) implements Rangeable[RangeableInt]
+	{
+		public override RangeableInt next() = RangeableInt(this.value + 1)
+
+		public override RangeableInt previous() = RangeableInt(this.value - 1)
+
+		public override int distanceTo(RangeableInt other) = Math.abs(this.value - other.value)
+
+		public override int compareTo(RangeableInt other) = this.value compareTo other.value
+	}
+
 	public static void main([String] args)
 	{
 		testInts()
-		testOrdered()
+		testRangeable()
 	}
 	
 	private static void testInts()
@@ -38,35 +51,36 @@ public class RangeTest
 		Main.test("Int Range For (exclusive)", List(1, 2, 3), forExclusive)
 	}
 	
-	private static void testOrdered()
+	private static void testRangeable()
 	{
-		Ordered[int] one = 1
-		Ordered[int] four = 4
+		final RangeableInt one = RangeableInt 1
+		final RangeableInt four = RangeableInt 4
+
 		auto range1 = one .. four
 		auto range2 = one ..< four
 		
-		List[Ordered] rangeInclusive = List.[Ordered]
+		auto rangeInclusive = List.[RangeableInt]
 		for (auto i : range1) {
 			rangeInclusive += i
 		}
-		Main.test("Ordered Range (inclusive)", List(1, 2, 3, 4), rangeInclusive)
+		Main.test("Rangeable Range (inclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3, RangeableInt 4), rangeInclusive)
 
-		List[Ordered] rangeExclusive = List.[Ordered]
+		auto rangeExclusive = List.[RangeableInt]
 		for (auto i : range2) {
 			rangeExclusive += i
 		}
-		Main.test("Ordered Range (exclusive)", List(1, 2, 3), rangeExclusive)
+		Main.test("Rangeable Range (exclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3), rangeExclusive)
 
-		List[Ordered] forInclusive = List.[Ordered]
+		auto forInclusive = List.[RangeableInt]
 		for (auto i : one .. four) {
 			forInclusive += i
 		}
-		Main.test("Ordered Range For (inclusive)", List(1, 2, 3, 4), forInclusive)
+		Main.test("Rangeable Range For (inclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3, RangeableInt 4), forInclusive)
 
-		List[Ordered] forExclusive = List.[Ordered]
+		auto forExclusive = List.[RangeableInt]
 		for (auto i : one ..< four) {
 			forExclusive += i
 		}
-		Main.test("Ordered Range For (exclusive)", List(1, 2, 3), forExclusive)
+		Main.test("Rangeable Range For (exclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3), forExclusive)
 	}
 }

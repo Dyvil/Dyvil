@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.collection.Collection;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 
@@ -26,18 +25,18 @@ public class PrintPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public void apply(Collection<ICompilationUnit> units)
+	public void apply(DyvilCompiler compiler)
 	{
-		DyvilCompiler.log("--- Syntax Trees at the end of " + this.predecessor.getName() + " ---");
-		for (ICompilationUnit unit : units)
+		compiler.log("--- Syntax Trees at the end of " + this.predecessor.getName() + " ---");
+		for (ICompilationUnit unit : compiler.fileFinder.units)
 		{
 			try
 			{
-				DyvilCompiler.log(unit.getInputFile() + ":\n" + unit.toString());
+				compiler.log(unit.getInputFile() + ":\n" + unit.toString());
 			}
 			catch (Throwable throwable)
 			{
-				DyvilCompiler.error("Failed to print Syntax Tree for source file " + unit.getInputFile(), throwable);
+				compiler.error("Failed to print Syntax Tree for source file " + unit.getInputFile(), throwable);
 			}
 		}
 	}

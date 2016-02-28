@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.external;
 
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -16,13 +17,14 @@ public class ExternalHeader extends DyvilHeader
 	private boolean staticImportsResolved;
 	private boolean typeAliasesResolved;
 	
-	public ExternalHeader()
+	public ExternalHeader(DyvilCompiler compiler)
 	{
+		super(compiler);
 	}
 	
-	public ExternalHeader(Name name)
+	public ExternalHeader(DyvilCompiler compiler, Name name)
 	{
-		super(name);
+		super(compiler, name);
 	}
 	
 	private void resolveImports()

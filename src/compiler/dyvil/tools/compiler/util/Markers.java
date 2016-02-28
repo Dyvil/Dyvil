@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.util;
 
+import dyvil.io.AppendablePrintStream;
 import dyvil.tools.parsing.marker.*;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.MarkerLevel;
@@ -19,7 +20,7 @@ public final class Markers
 	private static final ResourceBundle SEMANTIC_BUNDLE = ResourceBundle
 			.getBundle("dyvil.tools.compiler.lang.SemanticMarkers");
 
-	private static final ResourceBundle SYNTAX_BUNDLE   = ResourceBundle
+	private static final ResourceBundle SYNTAX_BUNDLE = ResourceBundle
 			.getBundle("dyvil.tools.compiler.lang.SyntaxMarkers");
 
 	private static final ResourceBundle MARKER_LEVEL_BUNDLE = ResourceBundle
@@ -148,6 +149,16 @@ public final class Markers
 		return new SemanticError(position, getSemantic(key, args));
 	}
 
+	public static Marker syntaxWarning(ICodePosition position, String key)
+	{
+		return new Warning(position, getSyntax(key));
+	}
+
+	public static Marker syntaxWarning(ICodePosition position, String key, Object... args)
+	{
+		return new Warning(position, getSyntax(key, args));
+	}
+
 	public static Marker syntaxError(ICodePosition position, String key)
 	{
 		return new SyntaxError(position, getSyntax(key));
@@ -156,5 +167,19 @@ public final class Markers
 	public static Marker syntaxError(ICodePosition position, String key, Object... args)
 	{
 		return new SyntaxError(position, getSyntax(key, args));
+	}
+
+	public static Marker parserError(ICodePosition position, Throwable ex)
+	{
+		final Marker marker = Markers.syntaxError(position, "parser.error", position.toString(), ex.getLocalizedMessage());
+		appendThrowable(marker, ex);
+		return marker;
+	}
+
+	public static void appendThrowable(Marker marker, Throwable ex)
+	{
+		final StringBuilder builder = new StringBuilder();
+		ex.printStackTrace(new AppendablePrintStream(builder));
+		marker.addInfo(builder.toString());
 	}
 }

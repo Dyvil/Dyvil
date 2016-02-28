@@ -1,19 +1,32 @@
 package dyvil.io;
 
+import dyvil.collection.Map;
+import dyvil.collection.mutable.HashMap;
+
 import java.io.*;
 
 public class StringPoolWriter extends FilterOutputStream implements DataOutput
 {
 	private int constantPoolSize;
-	private String[] constantPool = new String[16];
+	private String[] constantPool;
+
+	private Map<String, Integer> poolIndices;
 	
 	private ByteArrayOutputStream dataBytes;
 	private DataOutputStream      dataOutputStream;
 	
 	public StringPoolWriter(OutputStream target)
 	{
+		this(target, 16);
+	}
+
+	public StringPoolWriter(OutputStream target, int constantPoolSize)
+	{
 		super(target);
+
 		this.dataOutputStream = new DataOutputStream(this.dataBytes = new ByteArrayOutputStream());
+		this.constantPool = new String[constantPoolSize];
+		this.poolIndices = new HashMap<>(constantPoolSize);
 	}
 	
 	@Override
@@ -101,17 +114,12 @@ public class StringPoolWriter extends FilterOutputStream implements DataOutput
 		this.dataOutputStream.writeShort(index);
 	}
 
-	protected int poolIndex(String s)
+	protected int poolIndex(String constant)
 	{
-		int hash = s.hashCode();
-		for (int i = 0; i < this.constantPoolSize; i++)
+		final Integer cachedIndex = this.poolIndices.get(constant);
+		if (cachedIndex != null)
 		{
-			final String constPoolEntry = this.constantPool[i];
-			if (constPoolEntry.hashCode() == hash && s.equals(constPoolEntry))
-			{
-				// Found the string in the constant pool
-				return i;
-			}
+			return cachedIndex;
 		}
 
 		// Resize the constant pool
@@ -124,22 +132,28 @@ public class StringPoolWriter extends FilterOutputStream implements DataOutput
 			this.constantPool = temp;
 		}
 
-		this.constantPool[index] = s;
+		this.constantPool[index] = constant;
+		this.poolIndices.put(constant, index);
 		return index;
 	}
 
 	@Override
 	public void close() throws IOException
 	{
-		DataOutputStream constantPoolOutput = new DataOutputStream(this.out);
+		final ByteArrayOutputStream constantPoolBytes = new ByteArrayOutputStream(this.constantPoolSize << 2);
+		final DataOutputStream constantPoolOutput = new DataOutputStream(constantPoolBytes);
 
-		// Write the constant pool
+		// Write the constant pool entry count
 		constantPoolOutput.writeShort(this.constantPoolSize);
+
+		// Write the constant pool entries
 		for (int i = 0; i < this.constantPoolSize; i++)
 		{
 			constantPoolOutput.writeUTF(this.constantPool[i]);
 		}
 
+		// Copy temporary data buffers to output
+		constantPoolBytes.writeTo(this.out);
 		this.dataBytes.writeTo(this.out);
 
 		// No need to close dataOutputStream, dataBytes or constantPoolOutput

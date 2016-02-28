@@ -6,11 +6,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * A <b>Queue</b> represents a FIFO (<b>F</b>irst <b>I</b>n, <b>F</b>irst
- * <b>O</b>ut) mutable data structure. That means that elements will be
- * processed in the order in which they were added to the queue, so that the
- * first element that was added will be the first element to be removed, and
- * vice-versa.
+ * A <b>Queue</b> represents a FIFO (<b>F</b>irst <b>I</b>n, <b>F</b>irst <b>O</b>ut) mutable data structure. That means
+ * that elements will be processed in the order in which they were added to the queue, so that the first element that
+ * was added will be the first element to be removed, and vice-versa.
  *
  * @param <E>
  * 		the element type of the queue
@@ -33,8 +31,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	Iterator<E> iterator();
 	
 	/**
-	 * Returns true if and if only this queue contains the given {@code element}
-	 * .
+	 * Returns true if and if only this queue contains the given {@code element} .
 	 *
 	 * @param element
 	 * 		the element to find
@@ -61,8 +58,8 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	void offer(E element);
 	
 	/**
-	 * Appends all elements in the given collection of {@code elements} to the
-	 * end of this queue in the order in which they appear in the collection.
+	 * Appends all elements in the given collection of {@code elements} to the end of this queue in the order in which
+	 * they appear in the collection.
 	 *
 	 * @param elements
 	 * 		the elements to append
@@ -76,16 +73,15 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	}
 	
 	/**
-	 * Removes and returns the last element in this queue. If this queue is
-	 * empty, {@code null} is returned.
+	 * Removes and returns the last element in this queue. If this queue is empty, {@code null} is returned.
 	 *
 	 * @return the last element in this queue.
 	 */
 	E remove();
 	
 	/**
-	 * Removes the given number of elements from the end of this queue, as if by
-	 * calling {@link #remove()} {@code count} times.
+	 * Removes the given number of elements from the end of this queue, as if by calling {@link #remove()} {@code count}
+	 * times.
 	 *
 	 * @param count
 	 * 		the number of elements to remove
@@ -99,8 +95,8 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	}
 	
 	/**
-	 * Returns the last element in this queue. Unlike {@link #remove()}, this
-	 * method does not remove the element from the end.
+	 * Returns the last element in this queue. Unlike {@link #remove()}, this method does not remove the element from
+	 * the end.
 	 *
 	 * @return the last element in this queue.
 	 */
@@ -116,8 +112,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	void filter(Predicate<? super E> condition);
 	
 	/**
-	 * Returns a copy of this queue that contains the same elements as this
-	 * queue in the same order.
+	 * Returns a copy of this queue that contains the same elements as this queue in the same order.
 	 *
 	 * @return a copy of this queue.
 	 */

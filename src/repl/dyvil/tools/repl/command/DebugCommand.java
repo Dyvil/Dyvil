@@ -1,6 +1,6 @@
 package dyvil.tools.repl.command;
 
-import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.repl.DyvilREPL;
 
 public class DebugCommand implements ICommand
@@ -16,11 +16,44 @@ public class DebugCommand implements ICommand
 	{
 		return "Enables or disables Debug Mode";
 	}
-	
+
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public String getUsage()
 	{
-		DyvilCompiler.debug = !DyvilCompiler.debug;
-		repl.getOutput().println("Setting debug mode to " + (DyvilCompiler.debug ? "ON" : "OFF"));
+		return ":debug [on|off|true|false|enable|disable]";
+	}
+
+	@Override
+	public void execute(DyvilREPL repl, String argument)
+	{
+		final CompilerConfig config = repl.getCompiler().config;
+
+		final boolean enableDebug;
+		if (argument != null)
+		{
+			switch (argument.toLowerCase())
+			{
+			case "on":
+			case "true":
+			case "enable":
+				enableDebug = true;
+				break;
+			case "off":
+			case "false":
+			case "disable":
+				enableDebug = false;
+				break;
+			default:
+				repl.getErrorOutput().println("Invalid Argument. Usage: " + this.getUsage());
+				return;
+			}
+		}
+		else
+		{
+			enableDebug = !config.isDebug();
+		}
+
+		config.setDebug(enableDebug);
+		repl.getOutput().println("Setting debug mode to " + (enableDebug ? "ON" : "OFF"));
 	}
 }

@@ -16,19 +16,20 @@ public class ClassReader implements ClassVisitor
 		this.theClass = theClass;
 	}
 	
-	public static IClass loadClass(ExternalClass bclass, InputStream is, boolean decompile)
+	public static IClass loadClass(DyvilCompiler compiler, ExternalClass externalClass, InputStream inputStream)
 	{
 		try
 		{
-			dyvil.tools.asm.ClassReader reader = new dyvil.tools.asm.ClassReader(is);
-			ClassReader visitor = new ClassReader(bclass);
+			final dyvil.tools.asm.ClassReader reader = new dyvil.tools.asm.ClassReader(inputStream);
+			final ClassReader visitor = new ClassReader(externalClass);
+
 			reader.accept(visitor, dyvil.tools.asm.ClassReader.SKIP_CODE | dyvil.tools.asm.ClassReader.SKIP_FRAMES);
 			
-			return bclass;
+			return externalClass;
 		}
 		catch (Throwable ex)
 		{
-			DyvilCompiler.error("ClassReader", "loadClass", ex);
+			compiler.error("ClassReader", "loadClass", ex);
 		}
 		
 		return null;

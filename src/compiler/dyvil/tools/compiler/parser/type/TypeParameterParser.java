@@ -4,17 +4,17 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.ITypeParameterized;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.token.IToken;
 
@@ -27,14 +27,14 @@ public final class TypeParameterParser extends Parser implements ITyped
 	public static final int UPPER = 1;
 	public static final int LOWER = 2;
 	
-	protected ITypeParameterized typeParameterized;
+	protected ITypeParametric typeParameterized;
 	
-	private byte           boundMode;
-	private Variance       variance = Variance.INVARIANT;
+	private byte boundMode;
+	private Variance variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
 	private AnnotationList annotationList;
 	
-	public TypeParameterParser(ITypeParameterized typeParameterized)
+	public TypeParameterParser(ITypeParametric typeParameterized)
 	{
 		this.typeParameterized = typeParameterized;
 		// this.mode = ANNOTATIONS; // pointless assignment to 0

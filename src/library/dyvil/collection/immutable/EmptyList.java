@@ -274,7 +274,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public String toString()
 	{
-		return "[]";
+		return Collection.EMPTY_STRING;
 	}
 	
 	@Override

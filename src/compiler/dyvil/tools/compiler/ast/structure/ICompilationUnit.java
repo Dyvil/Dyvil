@@ -11,31 +11,36 @@ import java.io.File;
 
 public interface ICompilationUnit extends IASTNode
 {
-	static boolean printMarkers(MarkerList markers, String fileType, Name name, CodeFile source)
+	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, String fileType, Name name, CodeFile source)
 	{
-		int size = markers.size();
-		if (size > 0)
+		final int size = markers.size();
+		if (size <= 0)
 		{
-			StringBuilder buf = new StringBuilder("Problems in ").append(fileType).append(' ').append(source)
-			                                                     .append(":\n\n");
-			String code = source.getCode();
-			
-			int warnings = markers.getWarnings();
-			int errors = markers.getErrors();
-			markers.sort();
-			for (Marker marker : markers)
-			{
-				marker.log(code, buf);
-			}
-			buf.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings)
-			   .append(warnings == 1 ? " Warning" : " Warnings");
-			DyvilCompiler.log(buf.toString());
-			if (errors > 0)
-			{
-				DyvilCompiler.compilationFailed = true;
-				DyvilCompiler.warn(name + " was not compiled due to errors in the Compilation Unit\n");
-				return true;
-			}
+			return false;
+		}
+
+		final StringBuilder builder = new StringBuilder("Problems in ").append(fileType).append(' ').append(source)
+		                                                               .append(":\n\n");
+		final String code = source.getCode();
+
+		final int warnings = markers.getWarnings();
+		final int errors = markers.getErrors();
+
+		markers.sort();
+		for (Marker marker : markers)
+		{
+			marker.log(code, builder);
+		}
+
+		builder.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings)
+		       .append(warnings == 1 ? " Warning" : " Warnings");
+
+		compiler.log(builder.toString());
+		if (errors > 0)
+		{
+			compiler.failCompilation();
+			compiler.warn(name + " was not compiled due to errors in the Compilation Unit\n");
+			return true;
 		}
 		return false;
 	}

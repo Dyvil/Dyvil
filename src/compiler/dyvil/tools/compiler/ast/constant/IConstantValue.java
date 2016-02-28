@@ -59,7 +59,7 @@ public interface IConstantValue extends IValue
 	}
 	
 	@Override
-	default IValue toConstant(MarkerList markers)
+	default IValue toConstant(MarkerList markers, IContext context)
 	{
 		return this;
 	}

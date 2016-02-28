@@ -1,7 +1,6 @@
 package dyvil.ref.unsafe;
 
 import dyvil.ref.ShortRef;
-import dyvil.ref.ShortRef;
 import dyvil.reflect.ReflectUtils;
 
 import java.lang.reflect.Field;

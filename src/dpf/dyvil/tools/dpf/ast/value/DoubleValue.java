@@ -30,7 +30,7 @@ public class DoubleValue implements Constant
 	@Override
 	public Object toObject()
 	{
-		return dyvil.lang.Double.apply(this.value);
+		return this.value;
 	}
 
 	@Override

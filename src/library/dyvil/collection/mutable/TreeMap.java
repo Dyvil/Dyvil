@@ -6,6 +6,7 @@ import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
 
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
+@ColonConvertible
 @ArrayConvertible
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K, V>
 {
@@ -22,6 +24,13 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	public static <K, V> TreeMap<K, V> apply()
 	{
 		return new TreeMap<>();
+	}
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(K key, V value)
+	{
+		final TreeMap<K, V> result = new TreeMap<>();
+		result.putInternal(key, value);
+		return result;
 	}
 	
 	@SafeVarargs

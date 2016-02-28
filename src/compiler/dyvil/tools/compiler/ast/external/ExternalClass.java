@@ -8,19 +8,18 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassMetadata;
+import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.type.ClassGenericType;
-import dyvil.tools.compiler.ast.generic.type.TypeVarType;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -30,15 +29,16 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.ClassType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.sources.DyvilFileType;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -155,7 +155,7 @@ public final class ExternalClass extends AbstractClass
 			IClass c = Package.loadClass(fileName, name);
 			if (c != null)
 			{
-				c.setOuterClass(this);
+				c.setEnclosingClass(this);
 				this.body.addClass(c);
 			}
 		}
@@ -210,13 +210,13 @@ public final class ExternalClass extends AbstractClass
 	}
 	
 	@Override
-	public IClass getOuterClass()
+	public IClass getEnclosingClass()
 	{
 		if (!this.innerTypesResolved)
 		{
 			this.resolveInnerTypes();
 		}
-		return super.getOuterClass();
+		return super.getEnclosingClass();
 	}
 	
 	@Override
@@ -703,7 +703,7 @@ public final class ExternalClass extends AbstractClass
 		
 		if (signature != null)
 		{
-			method.setTypeParameterized();
+			method.setTypeParametric();
 			ClassFormat.readMethodType(signature, method);
 		}
 		else

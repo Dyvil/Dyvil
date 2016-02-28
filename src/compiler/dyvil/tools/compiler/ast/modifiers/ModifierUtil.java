@@ -358,7 +358,7 @@ public final class ModifierUtil
 			}
 			if (isAbstract)
 			{
-				IClass theClass = member.getTheClass();
+				IClass theClass = member.getEnclosingClass();
 				if (!theClass.isAbstract())
 				{
 					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",

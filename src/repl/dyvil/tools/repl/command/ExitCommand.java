@@ -9,32 +9,43 @@ public class ExitCommand implements ICommand
 	{
 		return "exit";
 	}
-	
+
+	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "q", "quit" };
+	}
+
 	@Override
 	public String getDescription()
 	{
 		return "Exits the current REPL instance";
 	}
-	
+
 	@Override
-	public void execute(DyvilREPL repl, String... args)
+	public String getUsage()
 	{
-		if (args.length == 0)
+		return ":<exit|q|quit> [exitcode]";
+	}
+
+	@Override
+	public void execute(DyvilREPL repl, String argument)
+	{
+		if (argument == null)
 		{
 			System.exit(0);
 			return;
 		}
-		
-		int code = 0;
+
 		try
 		{
-			code = Integer.parseInt(args[0]);
+			System.exit(Integer.parseInt(argument));
 		}
 		catch (NumberFormatException ex)
 		{
-			repl.getOutput().println("Invalid Exit Code " + args[0]);
+			repl.getErrorOutput().println("Invalid Exit Code " + argument);
+			return;
 		}
-		System.exit(code);
 		return;
 	}
 }

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.access;
 
-import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -77,9 +76,9 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers)
+	public IValue toConstant(MarkerList markers, IContext context)
 	{
-		int depth = DyvilCompiler.maxConstantDepth;
+		int depth = context.getCompilationContext().config.getMaxConstantDepth();
 		IValue v = this;
 		
 		do
@@ -93,7 +92,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		}
 		while (!v.isConstant());
 		
-		return v.toConstant(markers);
+		return v.toConstant(markers, context);
 	}
 	
 	@Override

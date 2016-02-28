@@ -7,9 +7,9 @@ import dyvil.tools.compiler.ast.header.SingleImport;
 import dyvil.tools.compiler.ast.header.WildcardImport;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -20,9 +20,9 @@ public final class ImportParser extends Parser
 	public static final Name annotation = Name.getQualified("annotation");
 	public static final Name type       = Name.getQualified("type");
 	
-	private static final int IMPORT      = 1;
-	private static final int DOT_ALIAS   = 2;
-	private static final int MULTIIMPORT = 4;
+	private static final int IMPORT           = 1;
+	private static final int DOT_ALIAS        = 2;
+	private static final int MULTI_IMPORT_END = 4;
 	
 	protected IImportConsumer consumer;
 	protected IImport         theImport;
@@ -36,14 +36,14 @@ public final class ImportParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		if (type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
+		final int type = token.type();
+		if (type == Tokens.EOF)
 		{
 			this.consumer.setImport(this.theImport);
 			pm.popParser();
 			return;
 		}
-		if (type == BaseSymbols.COMMA || this.mode == 0)
+		if (type == BaseSymbols.COMMA || this.mode == END)
 		{
 			this.consumer.setImport(this.theImport);
 			pm.popParser(true);
@@ -57,25 +57,25 @@ public final class ImportParser extends Parser
 			{
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 			{
-				MultiImport mi = new MultiImport(token);
-				mi.setParent(this.theImport);
-				this.theImport = mi;
+				final MultiImport multiImport = new MultiImport(token);
+				multiImport.setParent(this.theImport);
+				this.theImport = multiImport;
 				if (token.next().type() != BaseSymbols.CLOSE_CURLY_BRACKET)
 				{
-					pm.pushParser(new ImportListParser(mi));
-					this.mode = MULTIIMPORT;
+					pm.pushParser(new ImportListParser(multiImport));
+					this.mode = MULTI_IMPORT_END;
 					return;
 				}
-				this.mode = 0;
+				this.mode = END;
 				pm.skip();
 				return;
 			}
 			case DyvilSymbols.WILDCARD:
 			{
-				WildcardImport pi = new WildcardImport(token.raw());
-				pi.setParent(this.theImport);
-				this.theImport = pi;
-				this.mode = 0;
+				final WildcardImport wildcardImport = new WildcardImport(token.raw());
+				wildcardImport.setParent(this.theImport);
+				this.theImport = wildcardImport;
+				this.mode = END;
 				return;
 			}
 			case Tokens.IDENTIFIER:
@@ -83,9 +83,9 @@ public final class ImportParser extends Parser
 			case Tokens.SYMBOL_IDENTIFIER:
 			case Tokens.LETTER_IDENTIFIER:
 			{
-				SingleImport si = new SingleImport(token.raw(), token.nameValue());
-				si.setParent(this.theImport);
-				this.theImport = si;
+				final SingleImport singleImport = new SingleImport(token.raw(), token.nameValue());
+				singleImport.setParent(this.theImport);
+				this.theImport = singleImport;
 				this.mode = DOT_ALIAS;
 				return;
 			}
@@ -101,8 +101,8 @@ public final class ImportParser extends Parser
 				return;
 			case DyvilSymbols.ARROW_OPERATOR:
 			case DyvilKeywords.AS:
-				this.mode = 0;
-				IToken next = token.next();
+				this.mode = END;
+				final IToken next = token.next();
 				if (ParserUtil.isIdentifier(next.type()))
 				{
 					this.theImport.setAlias(next.nameValue());
@@ -111,6 +111,7 @@ public final class ImportParser extends Parser
 				}
 				pm.report(next, "import.alias.identifier");
 				return;
+			case BaseSymbols.SEMICOLON:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				this.consumer.setImport(this.theImport);
 				pm.popParser(true);
@@ -118,7 +119,7 @@ public final class ImportParser extends Parser
 			}
 			pm.report(token, "import.dot");
 			return;
-		case MULTIIMPORT:
+		case MULTI_IMPORT_END:
 			this.theImport.expandPosition(token);
 			this.consumer.setImport(this.theImport);
 			pm.popParser();

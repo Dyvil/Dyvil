@@ -7,6 +7,7 @@ import dyvil.collection.view.MapView;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.tuple.Tuple2;
 import dyvil.util.Option;
 
 import java.util.Iterator;
@@ -26,6 +27,11 @@ public interface MutableMap<K, V> extends Map<K, V>
 	static <K, V> MutableMap<K, V> withCapacity(int capacity)
 	{
 		return new HashMap<>(capacity);
+	}
+
+	static <K, V> MutableMap<K, V> singleton(K key, V value)
+	{
+		return new TupleMap<>(new Tuple2<>(key, value));
 	}
 	
 	static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
@@ -268,7 +274,18 @@ public interface MutableMap<K, V> extends Map<K, V>
 	{
 		return this.replace(entry.getKey(), entry.getValue());
 	}
-	
+
+	@Override
+	default V remap(Object key, K newKey)
+	{
+		final V value = this.removeKey(key);
+		if (value != null)
+		{
+			this.put(newKey, value);
+		}
+		return value;
+	}
+
 	@Override
 	V removeKey(Object key);
 	
