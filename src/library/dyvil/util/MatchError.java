@@ -13,43 +13,6 @@ public class MatchError extends RuntimeException
 	private static final long serialVersionUID = 2882649299151786454L;
 	
 	private Object match;
-
-	// TODO remove primitive constructors
-	
-	public MatchError(byte match)
-	{
-		this.match = match;
-	}
-	
-	public MatchError(short match)
-	{
-		this.match = match;
-	}
-	
-	public MatchError(char match)
-	{
-		this.match = match;
-	}
-	
-	public MatchError(int match)
-	{
-		this.match = match;
-	}
-	
-	public MatchError(long match)
-	{
-		this.match = match;
-	}
-	
-	public MatchError(float match)
-	{
-		this.match = match;
-	}
-	
-	public MatchError(double match)
-	{
-		this.match = match;
-	}
 	
 	public MatchError(Object match)
 	{

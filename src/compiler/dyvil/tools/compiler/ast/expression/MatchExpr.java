@@ -432,13 +432,16 @@ public final class MatchExpr implements IValue
 	
 	private void writeMatchError(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
 	{
-		String desc = matchedType.isPrimitive() ? "(" + matchedType.getExtendedName() + ")V" : "(Ljava/lang/Object;)V";
-		
+		final int lineNumber = this.getLineNumber();
+
 		writer.writeTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
+
 		writer.writeInsn(Opcodes.DUP);
 		writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
-		writer.writeLineNumber(this.getLineNumber());
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", desc, false);
+		matchedType.writeCast(writer, Types.OBJECT, lineNumber);
+
+		writer.writeLineNumber(lineNumber);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V", false);
 		writer.writeInsn(Opcodes.ATHROW);
 		writer.setHasReturn(false);
 	}
