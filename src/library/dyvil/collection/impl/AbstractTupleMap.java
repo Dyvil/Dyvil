@@ -33,6 +33,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	public AbstractTupleMap(Entry<K, V>... entries)
 	{
 		this(entries.length);
+		this.size = entries.length;
 		for (int i = 0; i < entries.length; i++)
 		{
 			this.entries[i] = entries[i].toTuple();
@@ -43,24 +44,24 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	public AbstractTupleMap(Tuple2<K, V>... entries)
 	{
 		this.size = entries.length;
-		this.entries = new Tuple2[this.size];
+		this.entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		System.arraycopy(entries, 0, this.entries, 0, this.size);
 	}
 	
 	public AbstractTupleMap(Tuple2<K, V>[] entries, int size)
 	{
 		this.size = size;
-		this.entries = new Tuple2[size];
+		this.entries = (Tuple2<K, V>[]) new Tuple2[size];
 		System.arraycopy(entries, 0, this.entries, 0, size);
 	}
 	
-	public AbstractTupleMap(Tuple2<K, V>[] entries, boolean trusted)
+	public AbstractTupleMap(Tuple2<K, V>[] entries, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.size = entries.length;
 		this.entries = entries;
 	}
 	
-	public AbstractTupleMap(Tuple2<K, V>[] entries, int size, boolean trusted)
+	public AbstractTupleMap(Tuple2<K, V>[] entries, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.size = size;
 		this.entries = entries;
@@ -69,7 +70,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	public AbstractTupleMap(Map<K, V> map)
 	{
 		this.size = map.size();
-		this.entries = new Tuple2[this.size];
+		this.entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		
 		int index = 0;
 		for (Entry<K, V> entry : map)
@@ -215,7 +216,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		if (index >= this.entries.length)
 		{
 			int newCapacity = (int) (this.size * 1.1F);
-			Tuple2[] newEntries = new Tuple2[newCapacity];
+			final Tuple2<K, V>[] newEntries = (Tuple2<K, V>[]) new Tuple2[newCapacity];
 			System.arraycopy(this.entries, 0, newEntries, 0, index);
 			this.entries = newEntries;
 		}
@@ -329,13 +330,13 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 				return new Some<>(entry._2);
 			}
 		}
-		return None.instance;
+		return (Option<V>) None.instance;
 	}
 	
 	@Override
 	public Entry<K, V>[] toArray()
 	{
-		Tuple2<K, V>[] array = new Tuple2[this.size];
+		final Tuple2<K, V>[] array = (Tuple2<K, V>[]) new Tuple2[this.size];
 		System.arraycopy(this.entries, 0, array, 0, this.size);
 		return array;
 	}
@@ -459,10 +460,10 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		in.defaultReadObject();
 		
 		this.size = in.readInt();
-		this.entries = new Tuple2[this.size];
+		this.entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		for (int i = 0; i < this.size; i++)
 		{
-			this.entries[i] = (Tuple2) in.readObject();
+			this.entries[i] = (Tuple2<K, V>) in.readObject();
 		}
 	}
 }
