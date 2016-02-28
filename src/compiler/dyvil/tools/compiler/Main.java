@@ -24,6 +24,7 @@ public final class Main
 		{
 			System.out.println("Compilation completed (" + Util.toTime(endTime - startTime) + ")");
 		}
+
 		System.exit(exitCode);
 	}
 }

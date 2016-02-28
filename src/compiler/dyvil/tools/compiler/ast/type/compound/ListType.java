@@ -262,6 +262,12 @@ public class ListType implements IObjectType
 	}
 
 	@Override
+	public String toString()
+	{
+		return "[" + this.elementType.toString() + "...]";
+	}
+
+	@Override
 	public void toString(String prefix, StringBuilder builder)
 	{
 		builder.append('[');

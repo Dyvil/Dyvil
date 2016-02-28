@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -122,19 +121,17 @@ public class NamedGenericType extends GenericType
 			}
 		}
 
-		// resolveType0 is used to avoid Type Variable -> Default Value replacement done by replaceType
+		// resolveType0 is used to avoid Type Variable -> Default Value replacement done by resolveType
 		final IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
-
-		if (!resolved.isResolved())
-		{
-			this.resolveTypeArguments(markers, context);
-			return this;
-		}
 
 		this.resolveTypeArguments(markers, context);
 
+		if (!resolved.isResolved())
+		{
+			return this;
+		}
+
 		final IClass iClass = resolved.getTheClass();
-		final ITypeParameter[] typeVariables;
 		final IType concrete;
 
 		// Convert the non-generic class type to a generic one
@@ -147,40 +144,19 @@ public class NamedGenericType extends GenericType
 				return new ClassType(iClass);
 			}
 
-			typeVariables = iClass.getTypeParameters();
-
 			concrete = new ResolvedGenericType(this.position, iClass, this.typeArguments, this.typeArgumentCount);
 		}
 		else
 		{
-			typeVariables = new ITypeParameter[this.typeArgumentCount];
-
 			// Create a concrete type and save Type Variables in the above array
 			concrete = resolved.getConcreteType(typeParameter -> {
-				int index = typeParameter.getIndex();
-
+				final int index = typeParameter.getIndex();
 				if (index >= this.typeArgumentCount)
 				{
 					return null;
 				}
-				typeVariables[index] = typeParameter;
 				return this.typeArguments[index];
 			});
-		}
-
-		// Check if the Type Variable Bounds accept the supplied Type Arguments
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			final ITypeParameter typeVariable = typeVariables[i];
-			final IType type = this.typeArguments[i];
-			if (typeVariable != null && !typeVariable.isAssignableFrom(type))
-			{
-				final Marker marker = Markers
-						.semantic(type.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified);
-				marker.addInfo(Markers.getSemantic("generic.type", type));
-				marker.addInfo(Markers.getSemantic("typevariable", typeVariable));
-				markers.add(marker);
-			}
 		}
 
 		return concrete;

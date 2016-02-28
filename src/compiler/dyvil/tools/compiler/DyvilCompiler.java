@@ -393,7 +393,15 @@ public final class DyvilCompiler implements Tool
 			return;
 		}
 		
-		new TestThread(this).start();
+		final TestThread testThread = new TestThread(this);
+		testThread.start();
+		try
+		{
+			testThread.join();
+		}
+		catch (InterruptedException ignored)
+		{
+		}
 	}
 	
 	public void clean()

@@ -395,10 +395,14 @@ public class ClassBody implements IClassBody
 	@Override
 	public void resolveTypes(MarkerList markers)
 	{
-		IContext context = this.theClass;
+		final IContext context = this.theClass;
+		final IDyvilHeader header = this.theClass.getHeader();
+
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].resolveTypes(markers, context);
+			final IClass innerClass = this.classes[i];
+			innerClass.setHeader(header);
+			innerClass.resolveTypes(markers, context);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
@@ -426,13 +430,10 @@ public class ClassBody implements IClassBody
 	public void resolve(MarkerList markers)
 	{
 		final IContext context = this.theClass;
-		final IDyvilHeader header = this.theClass.getHeader();
 
 		for (int i = 0; i < this.classCount; i++)
 		{
-			final IClass innerClass = this.classes[i];
-			innerClass.setHeader(header);
-			innerClass.resolve(markers, context);
+			this.classes[i].resolve(markers, context);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{

@@ -2,8 +2,10 @@ package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -44,6 +46,22 @@ public class ResolvedGenericType extends ClassGenericType
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
+		// Check if the Type Variable Bounds accept the supplied Type Arguments
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			final ITypeParameter typeVariable = this.theClass.getTypeParameter(i);
+			final IType type = this.typeArguments[i];
+			if (typeVariable != null && type.isResolved() && !typeVariable.isAssignableFrom(type))
+			{
+				final Marker marker = Markers
+						.semantic(type.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified,
+						          this.theClass.getFullName());
+				marker.addInfo(Markers.getSemantic("generic.type", type));
+				marker.addInfo(Markers.getSemantic("typevariable", typeVariable));
+				markers.add(marker);
+			}
+		}
+
 		if (position == TypePosition.CLASS)
 		{
 			markers.add(Markers.semanticError(this.position, "type.class.generic"));

@@ -111,6 +111,10 @@ dependencies {
 		builtBy 'compileLibraryDyvil'
 	}
 
+	runtime files("$buildDir/dyviltestbin") {
+		builtBy 'compileTestDyvil'
+	}
+
 	runtime files("src/resources")
 
 	// Test Dependencies
