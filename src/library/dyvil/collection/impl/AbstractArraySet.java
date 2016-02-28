@@ -258,16 +258,16 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	{
 		if (this.size == 0)
 		{
-			return "[]";
+			return Collection.EMPTY_STRING;
 		}
 		
-		StringBuilder builder = new StringBuilder("[");
+		final StringBuilder builder = new StringBuilder(this.size << 3).append(Collection.START_STRING);
 		builder.append(this.elements[0]);
 		for (int i = 1; i < this.size; i++)
 		{
-			builder.append(", ").append(this.elements[i]);
+			builder.append(Collection.ELEMENT_SEPARATOR_STRING).append(this.elements[i]);
 		}
-		return builder.append("]").toString();
+		return builder.append(Collection.END_STRING).toString();
 	}
 	
 	@Override

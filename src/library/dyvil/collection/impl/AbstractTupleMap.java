@@ -418,18 +418,19 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	{
 		if (this.size <= 0)
 		{
-			return "[]";
+			return Map.EMPTY_STRING;
 		}
 		
-		StringBuilder builder = new StringBuilder("[ ");
+		final StringBuilder builder = new StringBuilder(Map.START_STRING);
 		Tuple2<K, V> entry = this.entries[0];
-		builder.append(entry._1).append(" -> ").append(entry._2);
+
+		builder.append(entry._1).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry._2);
 		for (int i = 1; i < this.size; i++)
 		{
 			entry = this.entries[i];
-			builder.append(", ").append(entry._1).append(" -> ").append(entry._2);
+			builder.append(Map.START_STRING).append(entry._1).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry._2);
 		}
-		return builder.append(" ]").toString();
+		return builder.append(Map.END_STRING).toString();
 	}
 	
 	@Override

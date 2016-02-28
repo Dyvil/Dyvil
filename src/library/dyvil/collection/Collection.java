@@ -640,10 +640,26 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	java.util.Collection<E> toJava();
 	
 	// toString, equals and hashCode
+
+	String EMPTY_STRING             = "[]";
+	String START_STRING             = "[ ";
+	String END_STRING               = " ]";
+	String ELEMENT_SEPARATOR_STRING = ", ";
 	
 	@Override
 	String toString();
-	
+
+	default void toString(StringBuilder builder)
+	{
+		if (this.isEmpty())
+		{
+			builder.append(EMPTY_STRING);
+			return;
+		}
+
+		this.toString(builder, START_STRING, ELEMENT_SEPARATOR_STRING, END_STRING);
+	}
+
 	@Override
 	boolean equals(Object obj);
 	

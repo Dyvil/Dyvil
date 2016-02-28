@@ -293,7 +293,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public String toString()
 	{
-		return "[ " + this.key + " -> " + this.value + " ]";
+		return Map.START_STRING + this.key + Map.KEY_VALUE_SEPARATOR_STRING + this.value + Map.END_STRING;
 	}
 	
 	@Override

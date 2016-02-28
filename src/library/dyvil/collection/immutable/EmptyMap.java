@@ -261,7 +261,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public String toString()
 	{
-		return "[]";
+		return Map.EMPTY_STRING;
 	}
 	
 	@Override

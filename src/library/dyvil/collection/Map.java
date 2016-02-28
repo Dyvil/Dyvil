@@ -763,9 +763,20 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	java.util.Map<K, V> toJava();
 	
 	// toString, equals and hashCode
-	
+
+	String EMPTY_STRING               = "[]";
+	String START_STRING               = "[ ";
+	String END_STRING                 = " ]";
+	String ENTRY_SEPARATOR_STRING     = ", ";
+	String KEY_VALUE_SEPARATOR_STRING = ": ";
+
 	@Override
 	String toString();
+
+	default void toString(StringBuilder builder)
+	{
+		this.toString(builder, START_STRING, ENTRY_SEPARATOR_STRING, KEY_VALUE_SEPARATOR_STRING, END_STRING);
+	}
 	
 	default String toString(String prefix, String entrySeparator, String keyValueSeparator, String postfix)
 	{
@@ -783,13 +794,14 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 			return;
 		}
 
-		Iterator<Entry<K, V>> iterator = this.iterator();
-		Entry<K, V> first = iterator.next();
-		builder.append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+		final Iterator<Entry<K, V>> iterator = this.iterator();
+		Entry<K, V> entry = iterator.next();
+
+		builder.append(entry.getKey()).append(keyValueSeparator).append(entry.getValue());
 		while (iterator.hasNext())
 		{
-			first = iterator.next();
-			builder.append(entrySeparator).append(first.getKey()).append(keyValueSeparator).append(first.getValue());
+			entry = iterator.next();
+			builder.append(entrySeparator).append(entry.getKey()).append(keyValueSeparator).append(entry.getValue());
 		}
 		builder.append(postfix);
 	}
@@ -804,25 +816,25 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	{
 		if (map.isEmpty())
 		{
-			return "[]";
+			return EMPTY_STRING;
 		}
 
-		StringBuilder builder = new StringBuilder("[ ");
-		Iterator<Entry<K, V>> iterator = map.iterator();
+		final StringBuilder builder = new StringBuilder(START_STRING);
+		final Iterator<Entry<K, V>> iterator = map.iterator();
 		while (true)
 		{
-			Entry<K, V> entry = iterator.next();
-			builder.append(entry.getKey()).append(" -> ").append(entry.getValue());
+			final Entry<K, V> entry = iterator.next();
+			builder.append(entry.getKey()).append(KEY_VALUE_SEPARATOR_STRING).append(entry.getValue());
 			if (iterator.hasNext())
 			{
-				builder.append(", ");
+				builder.append(ENTRY_SEPARATOR_STRING);
 			}
 			else
 			{
 				break;
 			}
 		}
-		return builder.append(" ]").toString();
+		return builder.append(END_STRING).toString();
 	}
 
 	static <K, V> boolean mapEquals(Map<K, V> map, Object obj)

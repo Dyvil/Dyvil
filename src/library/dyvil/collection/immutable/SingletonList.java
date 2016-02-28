@@ -297,7 +297,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	{
 		final String elementToString = String.valueOf(this.element);
 		// No String concat to make use of the known length
-		return new StringBuilder(elementToString + 2).append('[').append(elementToString).append(']').toString();
+		return new StringBuilder(
+				elementToString.length() + Collection.START_STRING.length() + Collection.END_STRING.length())
+				.append(Collection.START_STRING).append(elementToString).append(Collection.END_STRING).toString();
 	}
 
 	@Override

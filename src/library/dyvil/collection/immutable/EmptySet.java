@@ -188,7 +188,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public String toString()
 	{
-		return "[]";
+		return Collection.EMPTY_STRING;
 	}
 	
 	@Override

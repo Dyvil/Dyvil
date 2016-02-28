@@ -508,17 +508,17 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	{
 		if (this.size <= 0)
 		{
-			return "[]";
+			return Map.EMPTY_STRING;
 		}
 		
-		StringBuilder builder = new StringBuilder("[ ");
-		builder.append(this.keys[0]).append(" -> ").append(this.values[0]);
+		final StringBuilder builder = new StringBuilder(Map.START_STRING);
+		builder.append(this.keys[0]).append(Map.KEY_VALUE_SEPARATOR_STRING).append(this.values[0]);
 		for (int i = 1; i < this.size; i++)
 		{
-			builder.append(", ");
-			builder.append(this.keys[i]).append(" -> ").append(this.values[i]);
+			builder.append(Map.ENTRY_SEPARATOR_STRING);
+			builder.append(this.keys[i]).append(Map.KEY_VALUE_SEPARATOR_STRING).append(this.values[i]);
 		}
-		return builder.append(" ]").toString();
+		return builder.append(END_STRING).toString();
 	}
 	
 	@Override
