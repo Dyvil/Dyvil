@@ -153,50 +153,41 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.valueCount == 1)
-		{
-			return this.values[0].withType(type, typeContext, markers, context);
-		}
-		
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
 					.withType(type, typeContext, markers, context);
 		}
-		
-		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
-		if (!tupleClass.isSubTypeOf(type))
+
+		if (!type.isSuperTypeOf(this.getType()))
 		{
 			return null;
 		}
 		
-		IClass iclass = type.getTheClass();
-		
+		final IClass iclass = type.getTheClass();
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType elementType = iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS ?
+			final IType elementType = iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS ?
 					dyvil.tools.compiler.ast.type.builtin.Types.ANY :
 					type.resolveTypeSafely(iclass.getTypeParameter(i));
 			
-			IValue value = this.values[i];
-			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
+			final IValue value = this.values[i];
+			final IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
 			
-			if (value1 == null)
+			if (typedValue != null)
 			{
-				Marker m = Markers.semantic(value.getPosition(), "tuple.element.type.incompatible");
-				m.addInfo(Markers.getSemantic("value.type", value.getType()));
-				m.addInfo(Markers.getSemantic("tuple.element.type", elementType.getConcreteType(typeContext)));
-				markers.add(m);
+				this.values[i] = typedValue;
 			}
-			else
+			else if (value.isResolved())
 			{
-				this.values[i] = value = value1;
+				final Marker marker = Markers.semantic(value.getPosition(), "tuple.element.type.incompatible");
+				marker.addInfo(Markers.getSemantic("value.type", value.getType()));
+				marker.addInfo(Markers.getSemantic("tuple.element.type", elementType.getConcreteType(typeContext)));
+				markers.add(marker);
 			}
 		}
-		
-		this.tupleType = null;
-		this.tupleType = this.getType();
+
 		return this;
 	}
 	
