@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -191,7 +192,7 @@ public class ColonOperator implements IValue
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.left.toString(prefix, buffer);
-		buffer.append(" : "); // TODO Formatting
+		Formatting.appendSeparator(buffer, "colonoperator", ':');
 		this.right.toString(prefix, buffer);
 	}
 }
