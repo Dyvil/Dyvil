@@ -308,10 +308,6 @@ public final class Types
 			return Types.ANY;
 		}
 
-		if (class1 == class2)
-		{
-			return class1.getType().getConcreteType(new CombiningTypeContext(type1, type2));
-		}
 		if (type1.isSameType(type2) || type1.isSuperTypeOf(type2))
 		{
 			// same type, or type 1 is a super type of type 2 -> result type 1
@@ -322,7 +318,11 @@ public final class Types
 			// type 2 is a super type of type 1 -> result type 2
 			return type2;
 		}
-		
+		if (class1 == class2)
+		{
+			return class1.getType().getConcreteType(new CombiningTypeContext(type1, type2));
+		}
+
 		final Set<IType> superTypes1 = superTypes(type1);
 		final Set<IType> superTypes2 = superTypes(type2);
 		
