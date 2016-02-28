@@ -152,7 +152,7 @@ public class CaptureHelper
 			final CaptureField field = (CaptureField) this.capturedFields[i];
 			writer.writeVarInsn(Opcodes.ALOAD, 0);
 			writer.writeVarInsn(field.getInternalType().getLoadOpcode(), field.getLocalIndex());
-			writer.writeFieldInsn(Opcodes.PUTFIELD, field.theClass.getInternalName(), field.name,
+			writer.writeFieldInsn(Opcodes.PUTFIELD, field.enclosingClass.getInternalName(), field.name,
 			                      field.getInternalType().getExtendedName());
 		}
 	}

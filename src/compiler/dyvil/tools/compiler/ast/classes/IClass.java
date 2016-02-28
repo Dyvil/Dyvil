@@ -37,7 +37,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	IDyvilHeader getHeader();
 	
 	@Override
-	void setEnclosingClass(IClass iclass);
+	void setEnclosingClass(IClass enclosingClass);
 	
 	@Override
 	IClass getEnclosingClass();

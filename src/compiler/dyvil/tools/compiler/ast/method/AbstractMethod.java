@@ -75,35 +75,35 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected IValue value;
 	
 	// Metadata
-	protected IClass        theClass;
+	protected IClass        enclosingClass;
 	protected String        descriptor;
 	protected IntrinsicData intrinsicData;
 	protected Set<IMethod>  overrideMethods;
 
 	protected boolean sideEffects = true;
 	
-	public AbstractMethod(IClass iclass)
+	public AbstractMethod(IClass enclosingClass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
-	public AbstractMethod(IClass iclass, Name name)
+	public AbstractMethod(IClass enclosingClass, Name name)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 		this.name = name;
 	}
 	
-	public AbstractMethod(IClass iclass, Name name, IType type)
+	public AbstractMethod(IClass enclosingClass, Name name, IType type)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 		this.type = type;
 		this.name = name;
 	}
 	
-	public AbstractMethod(IClass iclass, Name name, IType type, ModifierSet modifiers)
+	public AbstractMethod(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(name, type, modifiers);
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
@@ -112,15 +112,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	@Override
 	public IClass getEnclosingClass()
 	{
-		return this.theClass;
+		return this.enclosingClass;
 	}
 	
 	@Override
@@ -389,13 +389,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IDyvilHeader getHeader()
 	{
-		return this.theClass.getHeader();
+		return this.enclosingClass.getHeader();
 	}
 	
 	@Override
 	public IClass getThisClass()
 	{
-		return this.theClass;
+		return this.enclosingClass;
 	}
 
 	@Override
@@ -407,13 +407,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		return this.theClass.resolvePackage(name);
+		return this.enclosingClass.resolvePackage(name);
 	}
 	
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		return this.theClass.resolveClass(name);
+		return this.enclosingClass.resolveClass(name);
 	}
 	
 	@Override
@@ -428,7 +428,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 		
-		return this.theClass.resolveType(name);
+		return this.enclosingClass.resolveType(name);
 	}
 	
 	@Override
@@ -443,7 +443,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 		
-		return this.theClass.resolveTypeVariable(name);
+		return this.enclosingClass.resolveTypeVariable(name);
 	}
 	
 	@Override
@@ -458,7 +458,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 		
-		return this.theClass.resolveField(name);
+		return this.enclosingClass.resolveField(name);
 	}
 	
 	@Override
@@ -482,13 +482,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			list.add(this, selfMatch);
 		}
 		
-		this.theClass.getMethodMatches(list, instance, name, arguments);
+		this.enclosingClass.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		this.theClass.getConstructorMatches(list, arguments);
+		this.enclosingClass.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
@@ -513,7 +513,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		return this.theClass.getAccessibleThis(type);
+		return this.enclosingClass.getAccessibleThis(type);
 	}
 	
 	@Override
@@ -542,7 +542,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return variable;
 		}
-		return this.theClass.capture(variable);
+		return this.enclosingClass.capture(variable);
 	}
 	
 	@Override
@@ -588,7 +588,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 				else
 				{
-					final float receiverMatch = receiver.getTypeMatch(this.theClass.getClassType());
+					final float receiverMatch = receiver.getTypeMatch(this.enclosingClass.getClassType());
 					if (receiverMatch <= 0)
 					{
 						return 0;
@@ -725,10 +725,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				{
 					markers.add(Markers.semantic(position, "method.access.static", this.name));
 				}
-				else if (receiver.getType().getTheClass() != this.theClass)
+				else if (receiver.getType().getTheClass() != this.enclosingClass)
 				{
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
-					                             this.theClass.getFullName()));
+					                             this.enclosingClass.getFullName()));
 				}
 				receiver = null;
 			}
@@ -763,7 +763,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
-				receiver = new ThisExpr(position, this.theClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 			}
 		}
 		
@@ -798,7 +798,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			genericData.instance = new ThisExpr(this.theClass.getType());
+			genericData.instance = new ThisExpr(this.enclosingClass.getType());
 		}
 
 		int modifiers = this.modifiers.toFlags();
@@ -945,7 +945,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		// Store the method in the cache, if it originates from a
-		if (this.theClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
+		if (this.enclosingClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
 		{
 			if (this.overrideMethods == null)
 			{
@@ -963,7 +963,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return this.typeParameterCount > 0 || this.theClass.isTypeParametric();
+		return this.typeParameterCount > 0 || this.enclosingClass.isTypeParametric();
 	}
 	
 	@Override
@@ -1133,7 +1133,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return;
 			}
 			
-			receiver.writeExpression(writer, this.theClass.getType());
+			receiver.writeExpression(writer, this.enclosingClass.getType());
 		}
 	}
 	
@@ -1197,7 +1197,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int opcode;
 		int modifiers = this.modifiers.toFlags();
 		
-		String owner = this.theClass.getInternalName();
+		String owner = this.enclosingClass.getInternalName();
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
 			writer.writeInvokeDynamic(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
@@ -1217,7 +1217,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(opcode, owner, name, desc, this.theClass.isInterface());
+		writer.writeInvokeInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
 	}
 	
 	@Override
@@ -1232,7 +1232,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return Opcodes.INVOKESPECIAL;
 		}
-		if (this.theClass.isInterface())
+		if (this.enclosingClass.isInterface())
 		{
 			return Opcodes.INVOKEINTERFACE;
 		}

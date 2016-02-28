@@ -70,9 +70,9 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.enclosingClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	@Override

@@ -28,7 +28,8 @@ import java.lang.annotation.ElementType;
 
 public final class ClassParameter extends Parameter implements IField
 {
-	protected IClass theClass;
+	// Metadata
+	protected IClass enclosingClass;
 	
 	public ClassParameter()
 	{
@@ -97,15 +98,15 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	@Override
 	public IClass getEnclosingClass()
 	{
-		return this.theClass;
+		return this.enclosingClass;
 	}
 	
 	@Override
@@ -141,7 +142,7 @@ public final class ClassParameter extends Parameter implements IField
 		else if (!this.hasModifier(Modifiers.STATIC))
 		{
 			markers.add(Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
-			return new ThisExpr(position, this.theClass.getType(), context, markers);
+			return new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 		}
 		
 		return instance;
@@ -150,7 +151,7 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
 	{
-		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
+		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			markers.add(Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
@@ -206,16 +207,16 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (this.theClass.hasModifier(Modifiers.ANNOTATION))
+		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			StringBuilder desc = new StringBuilder("()");
 			this.type.appendExtendedName(desc);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.theClass.getInternalName(), this.name.qualified,
+			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.enclosingClass.getInternalName(), this.name.qualified,
 			                       desc.toString(), true);
 		}
 		else
 		{
-			writer.writeFieldInsn(Opcodes.GETFIELD, this.theClass.getInternalName(), this.name.qualified,
+			writer.writeFieldInsn(Opcodes.GETFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescription());
 		}
 	}
@@ -223,7 +224,7 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.name.qualified,
+		writer.writeFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 		                      this.getDescription());
 	}
 }

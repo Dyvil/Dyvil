@@ -78,19 +78,19 @@ public class CodeMethod extends AbstractMethod
 
 			// Check the self type for compatibility
 			final IClass selfTypeClass = this.receiverType.getTheClass();
-			if (selfTypeClass != null && selfTypeClass != this.theClass)
+			if (selfTypeClass != null && selfTypeClass != this.enclosingClass)
 			{
 				final Marker marker = Markers
 						.semanticError(this.receiverType.getPosition(), "method.receivertype.incompatible",
 						               this.getName());
 				marker.addInfo(Markers.getSemantic("method.receivertype", this.receiverType));
-				marker.addInfo(Markers.getSemantic("method.classtype", this.theClass.getFullName()));
+				marker.addInfo(Markers.getSemantic("method.classtype", this.enclosingClass.getFullName()));
 				markers.add(marker);
 			}
 		}
 		else if (!this.isStatic())
 		{
-			this.receiverType = this.theClass.getType();
+			this.receiverType = this.enclosingClass.getType();
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -112,11 +112,11 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.value.resolveTypes(markers, this);
 		}
-		else if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+		else if (this.enclosingClass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
 			this.modifiers.addIntModifier(Modifiers.ABSTRACT | Modifiers.PUBLIC);
 		}
-		else if (this.theClass.hasModifier(Modifiers.ABSTRACT))
+		else if (this.enclosingClass.hasModifier(Modifiers.ABSTRACT))
 		{
 			this.modifiers.addIntModifier(Modifiers.ABSTRACT);
 		}
@@ -276,7 +276,7 @@ public class CodeMethod extends AbstractMethod
 	private void checkDuplicates(MarkerList markers)
 	{
 		String desc = this.getDescriptor();
-		IClassBody body = this.theClass.getBody();
+		IClassBody body = this.enclosingClass.getBody();
 		if (body == null)
 		{
 			return;
@@ -314,7 +314,7 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final boolean thisTypeResolved = this.type.isResolved();
-		final ITypeContext typeContext = this.theClass.getType();
+		final ITypeContext typeContext = this.enclosingClass.getType();
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
@@ -415,7 +415,7 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final boolean interfaceClass = this.theClass.isInterface();
+		final boolean interfaceClass = this.enclosingClass.isInterface();
 
 		int modifiers = this.modifiers.toFlags();
 		if (this.value == null)
@@ -427,7 +427,7 @@ public class CodeMethod extends AbstractMethod
 			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
 		}
 
-		final String internalThisClassName = this.theClass.getInternalName();
+		final String internalThisClassName = this.enclosingClass.getInternalName();
 		final String[] exceptionTypes = this.getInternalExceptions();
 		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & ModifierUtil.JAVA_MODIFIER_MASK,
 		                                                                  this.name.qualified, this.getDescriptor(),
@@ -543,7 +543,7 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
-		if (this.receiverType != null && this.receiverType != this.theClass.getType())
+		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType())
 		{
 			final String signature = this.receiverType.getSignature();
 			if (signature != null)

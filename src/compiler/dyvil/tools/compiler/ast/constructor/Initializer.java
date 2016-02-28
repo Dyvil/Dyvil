@@ -51,9 +51,9 @@ public class Initializer extends Member implements IInitializer
 	}
 
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.enclosingClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 
 	@Override

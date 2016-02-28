@@ -243,7 +243,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
 	}
 	

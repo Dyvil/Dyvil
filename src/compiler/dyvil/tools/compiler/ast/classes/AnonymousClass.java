@@ -30,12 +30,12 @@ public class AnonymousClass extends CodeClass
 	@Override
 	public void setInnerIndex(String internalName, int index)
 	{
-		String outerName = this.outerClass.getName().qualified;
+		String outerName = this.enclosingClass.getName().qualified;
 		String indexString = Integer.toString(index);
 		
 		this.name = Name.getQualified(outerName + '$' + indexString);
-		this.fullName = this.outerClass.getFullName() + '$' + indexString;
-		this.internalName = this.outerClass.getInternalName() + '$' + indexString;
+		this.fullName = this.enclosingClass.getFullName() + '$' + indexString;
+		this.internalName = this.enclosingClass.getInternalName() + '$' + indexString;
 	}
 	
 	@Override
@@ -103,7 +103,7 @@ public class AnonymousClass extends CodeClass
 			return VariableThis.DEFAULT;
 		}
 		
-		IAccessible outer = this.outerClass.getAccessibleThis(type);
+		IAccessible outer = this.enclosingClass.getAccessibleThis(type);
 		if (outer == null)
 		{
 			return null;

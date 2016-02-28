@@ -429,9 +429,9 @@ public class CodeClass extends AbstractClass
 		
 		// Outer Class
 		
-		if (this.outerClass != null)
+		if (this.enclosingClass != null)
 		{
-			writer.visitOuterClass(this.outerClass.getInternalName(), null, null);
+			writer.visitOuterClass(this.enclosingClass.getInternalName(), null, null);
 		}
 		
 		// Annotations
@@ -440,7 +440,7 @@ public class CodeClass extends AbstractClass
 		
 		// Inner Class Info
 		
-		if (this.outerClass != null)
+		if (this.enclosingClass != null)
 		{
 			this.writeInnerClassInfo(writer);
 		}
@@ -639,7 +639,7 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void writeInnerClassInfo(ClassWriter writer)
 	{
-		if (this.outerClass != null)
+		if (this.enclosingClass != null)
 		{
 			int modifiers = this.modifiers.toFlags() & 0x761F;
 			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
@@ -650,7 +650,7 @@ public class CodeClass extends AbstractClass
 			{
 				modifiers &= ~Opcodes.ACC_STATIC;
 			}
-			writer.visitInnerClass(this.internalName, this.outerClass.getInternalName(), this.name.qualified,
+			writer.visitInnerClass(this.internalName, this.enclosingClass.getInternalName(), this.name.qualified,
 			                       modifiers);
 		}
 	}

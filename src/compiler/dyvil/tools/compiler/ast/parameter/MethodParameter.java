@@ -25,6 +25,7 @@ import java.lang.annotation.ElementType;
 
 public final class MethodParameter extends Parameter
 {
+	// Metadata
 	protected ICallableMember method;
 	
 	protected ReferenceType refType;

@@ -12,7 +12,7 @@ public interface IClassMember extends IMember, IClassCompilable, IObjectCompilab
 {
 	IClass getEnclosingClass();
 	
-	void setEnclosingClass(IClass iclass);
+	void setEnclosingClass(IClass enclosingClass);
 	
 	@Override
 	default void write(DataOutput out) throws IOException

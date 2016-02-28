@@ -50,19 +50,21 @@ import java.lang.annotation.ElementType;
 
 public class Constructor extends Member implements IConstructor
 {
-	protected IClass enclosingClass;
-	
 	protected IParameter[] parameters = new MethodParameter[3];
-	protected int     parameterCount;
+	protected int parameterCount;
+
 	protected IType[] exceptions;
 	protected int     exceptionCount;
-	
+
 	protected IValue value;
-	
-	public Constructor(IClass iclass)
+
+	// Metadata
+	protected IClass enclosingClass;
+
+	public Constructor(IClass enclosingClass)
 	{
 		super(Names.init, Types.VOID);
-		this.enclosingClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	public Constructor(IClass enclosingClass, ModifierSet modifiers)
@@ -77,9 +79,9 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.enclosingClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	@Override
@@ -307,7 +309,8 @@ public class Constructor extends Member implements IConstructor
 		}
 		
 		// Implicit Super Constructor
-		final IConstructor match = IContext.resolveConstructor(this.enclosingClass.getSuperType(), EmptyArguments.INSTANCE);
+		final IConstructor match = IContext
+				.resolveConstructor(this.enclosingClass.getSuperType(), EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(Markers.semantic(this.position, "constructor.super"));
@@ -660,7 +663,8 @@ public class Constructor extends Member implements IConstructor
 				gt.setType(i, Types.ANY);
 				
 				markers.add(Markers.semantic(position, "constructor.typevar.infer",
-				                             this.enclosingClass.getTypeParameter(i).getName(), this.enclosingClass.getName()));
+				                             this.enclosingClass.getTypeParameter(i).getName(),
+				                             this.enclosingClass.getName()));
 			}
 		}
 		

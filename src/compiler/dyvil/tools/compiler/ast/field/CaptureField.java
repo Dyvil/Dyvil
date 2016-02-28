@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 public final class CaptureField extends CaptureDataMember implements IField
 {
-	public IClass theClass;
+	public IClass enclosingClass;
 	public String name;
 
 	public static Function<? super IVariable, ? extends CaptureDataMember> factory(IClass theClass)
@@ -30,27 +30,27 @@ public final class CaptureField extends CaptureDataMember implements IField
 
 	public CaptureField(IClass iclass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = iclass;
 	}
 	
 	public CaptureField(IClass iclass, IVariable variable)
 	{
 		super(variable);
-		this.theClass = iclass;
+		this.enclosingClass = iclass;
 		
 		this.name = "this$" + variable.getName().qualified;
 	}
 	
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 	
 	@Override
 	public IClass getEnclosingClass()
 	{
-		return this.theClass;
+		return this.enclosingClass;
 	}
 	
 	@Override
@@ -66,7 +66,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 
 		if (instance == null)
 		{
-			return new ThisExpr(this.theClass.getType(), VariableThis.DEFAULT);
+			return new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
 		}
 		return instance;
 	}
@@ -83,7 +83,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 	{
 		// { int i = 0; new => int() { override int apply() = i++ } }
 
-		String owner = this.theClass.getInternalName();
+		String owner = this.enclosingClass.getInternalName();
 		String name = this.name;
 		String desc = this.getDescription();
 		writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
@@ -94,7 +94,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 	{
 		if (!this.variable.isReferenceType())
 		{
-			String owner = this.theClass.getInternalName();
+			String owner = this.enclosingClass.getInternalName();
 			String name = this.name;
 			String desc = this.variable.getInternalType().getExtendedName();
 			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);

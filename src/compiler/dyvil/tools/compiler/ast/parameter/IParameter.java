@@ -14,7 +14,7 @@ import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 public interface IParameter extends IVariable, IClassMember
 {
 	@Override
-	default void setEnclosingClass(IClass iclass)
+	default void setEnclosingClass(IClass enclosingClass)
 	{
 	}
 	

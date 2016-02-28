@@ -67,7 +67,7 @@ public abstract class AbstractClass implements IClass
 
 	// Metadata
 
-	protected IClass         outerClass;
+	protected IClass         enclosingClass;
 	protected IClassMetadata metadata;
 	protected IType          thisType;
 	protected IType classType = new ClassType(this);
@@ -75,13 +75,13 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IClass getEnclosingClass()
 	{
-		return this.outerClass;
+		return this.enclosingClass;
 	}
 
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.outerClass = iclass;
+		this.enclosingClass = enclosingClass;
 	}
 
 	@Override
@@ -705,9 +705,9 @@ public abstract class AbstractClass implements IClass
 		if (iclass != null)
 			return iclass;
 		
-		if (this.outerClass != null)
+		if (this.enclosingClass != null)
 		{
-			return this.outerClass.resolveClass(name);
+			return this.enclosingClass.resolveClass(name);
 		}
 		
 		final IDyvilHeader header = this.getHeader();
@@ -755,9 +755,9 @@ public abstract class AbstractClass implements IClass
 			return iClass.getClassType();
 		}
 
-		if (this.outerClass != null)
+		if (this.enclosingClass != null)
 		{
-			return this.outerClass.resolveType(name);
+			return this.enclosingClass.resolveType(name);
 		}
 
 		final IDyvilHeader header = this.getHeader();

@@ -42,7 +42,7 @@ public class Property extends Member implements IProperty
 
 	// Metadata
 
-	protected IClass theClass;
+	protected IClass enclosingClass;
 
 	protected MethodParameter setterParameter;
 	protected ICodePosition   initializerPosition;
@@ -53,24 +53,24 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void setEnclosingClass(IClass iclass)
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = enclosingClass;
 
 		if (this.getter != null)
 		{
-			this.getter.setEnclosingClass(iclass);
+			this.getter.setEnclosingClass(enclosingClass);
 		}
 		if (this.setter != null)
 		{
-			this.setter.setEnclosingClass(iclass);
+			this.setter.setEnclosingClass(enclosingClass);
 		}
 	}
 	
 	@Override
 	public IClass getEnclosingClass()
 	{
-		return this.theClass;
+		return this.enclosingClass;
 	}
 	
 	@Override
@@ -92,7 +92,7 @@ public class Property extends Member implements IProperty
 		{
 			return this.getter;
 		}
-		return this.getter = new CodeMethod(this.theClass, this.name, this.type, this.modifiers);
+		return this.getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class Property extends Member implements IProperty
 		}
 
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
-		this.setter = new CodeMethod(this.theClass, name, Types.VOID, this.modifiers);
+		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
 		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE);
 		this.setter.addParameter(this.setterParameter);
 
@@ -261,7 +261,7 @@ public class Property extends Member implements IProperty
 		{
 			this.initializer.check(markers, context);
 
-			if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+			if (this.enclosingClass.hasModifier(Modifiers.INTERFACE_CLASS))
 			{
 				markers.add(Markers.semantic(this.initializerPosition, "property.initializer.interface"));
 			}
@@ -349,7 +349,7 @@ public class Property extends Member implements IProperty
 
 			if ((modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setThisType(this.theClass.getInternalName());
+				mw.setThisType(this.enclosingClass.getInternalName());
 			}
 
 			this.writeAnnotations(mw, modifiers);
@@ -379,7 +379,7 @@ public class Property extends Member implements IProperty
 
 			if ((modifiers & Modifiers.STATIC) == 0)
 			{
-				mw.setThisType(this.theClass.getInternalName());
+				mw.setThisType(this.enclosingClass.getInternalName());
 			}
 			
 			this.writeAnnotations(mw, modifiers);

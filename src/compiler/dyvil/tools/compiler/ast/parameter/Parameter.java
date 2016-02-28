@@ -29,12 +29,13 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Parameter extends Member implements IParameter
 {
+	protected IValue defaultValue;
+
+	// Metadata
 	protected int     index;
 	protected int     localIndex;
 	protected boolean varargs;
-	
-	protected IValue defaultValue;
-	
+
 	public Parameter()
 	{
 	}
