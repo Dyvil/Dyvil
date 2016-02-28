@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -112,7 +113,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public Name getName()
 	{
-		return this.getTheClass().getName();
+		return Names.Function;
 	}
 
 	@Override

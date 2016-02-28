@@ -108,7 +108,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	public MarkerList getMarkers()
 	{
-		return markers;
+		return this.markers;
 	}
 	
 	protected boolean hasErrors()

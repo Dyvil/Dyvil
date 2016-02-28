@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -52,6 +53,12 @@ public final class TupleType implements IObjectType, ITypeList
 	public TupleType(int size)
 	{
 		this.types = new IType[size];
+	}
+
+	public TupleType(IType... types)
+	{
+		this.types = types;
+		this.typeCount = types.length;
 	}
 	
 	public TupleType(IType[] types, int typeCount)
@@ -147,7 +154,7 @@ public final class TupleType implements IObjectType, ITypeList
 	@Override
 	public Name getName()
 	{
-		return null;
+		return Names.Tuple;
 	}
 	
 	@Override
