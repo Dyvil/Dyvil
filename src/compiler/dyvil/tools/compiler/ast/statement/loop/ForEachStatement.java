@@ -184,8 +184,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		if (value.valueTag() == IValue.RANGE_OPERATOR)
 		{
 			RangeOperator ro = (RangeOperator) value;
-			IValue value1 = ro.getFirstValue();
-			IValue value2 = ro.getLastValue();
+			IValue value1 = ro.getStartValue();
+			IValue value2 = ro.getEndValue();
 			IType rangeType = ro.getElementType();
 			
 			if (varType == Types.UNKNOWN)

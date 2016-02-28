@@ -47,7 +47,7 @@ public final class Primitives
 	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Float", "valueOf", "(F)Ljava/lang/Float;" ])
 	public static Float Float(float value) = Float(value)
 
-	public static float toShort(Float value) = if (value == null) 0 else value.floatValue
+	public static float toFloat(Float value) = if (value == null) 0 else value.floatValue
 
 	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/Double", "valueOf", "(D)Ljava/lang/Double;" ])
 	public static Double Double(double value) = Double(value)
