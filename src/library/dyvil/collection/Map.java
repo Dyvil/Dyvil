@@ -1,6 +1,7 @@
 package dyvil.collection;
 
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.ref.ObjectRef;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @NilConvertible(methodName = "empty")
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 @MapConvertible
 public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
@@ -32,7 +34,12 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	{
 		return MutableMap.apply();
 	}
-	
+
+	static <K, V> ImmutableMap<K, V> singleton(K key, V value)
+	{
+		return ImmutableMap.singleton(key, value);
+	}
+
 	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
 		return ImmutableMap.apply(entry);

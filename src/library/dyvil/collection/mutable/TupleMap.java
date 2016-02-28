@@ -6,6 +6,7 @@ import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.tuple.Tuple2;
 
@@ -14,6 +15,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
+@ColonConvertible
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap<K, V>
 {
@@ -23,7 +25,18 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	{
 		return new TupleMap<>(DEFAULT_CAPACITY);
 	}
-	
+
+	public static <K, V> TupleMap<K, V> apply(K key, V value)
+	{
+		return new TupleMap<>(new Tuple2<>(key, value));
+	}
+
+	@SafeVarargs
+	public static <K, V> TupleMap<K, V> apply(Entry<K, V>... entries)
+	{
+		return new TupleMap<>(entries);
+	}
+
 	@SafeVarargs
 	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
 	{
@@ -44,7 +57,13 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	{
 		super(capacity);
 	}
-	
+
+	@SafeVarargs
+	public TupleMap(Entry<K, V>... entries)
+	{
+		super(entries);
+	}
+
 	@SafeVarargs
 	public TupleMap(Tuple2<K, V>... entries)
 	{

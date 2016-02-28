@@ -4,6 +4,8 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
+import dyvil.lang.literal.NilConvertible;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -11,12 +13,19 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
+@NilConvertible
 @ArrayConvertible
+@ColonConvertible
 @Immutable
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableMap<K, V>
 {
 	private static final long serialVersionUID = 4583062458335627011L;
-	
+
+	public static <K, V> ArrayMap<K, V> apply(K key, V value)
+	{
+		return new ArrayMap<>(new Object[] { key }, new Object[] { value }, 1, true);
+	}
+
 	@SafeVarargs
 	public static <K, V> ArrayMap<K, V> apply(Entry<K, V>... entries)
 	{

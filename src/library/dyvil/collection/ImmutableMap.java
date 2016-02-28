@@ -47,6 +47,11 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		return EmptyMap.apply();
 	}
+
+	static <K, V> ImmutableMap<K, V> singleton(K key, V value)
+	{
+		return new SingletonMap<>(key, value);
+	}
 	
 	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{

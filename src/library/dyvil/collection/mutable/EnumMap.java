@@ -8,9 +8,9 @@ import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ClassConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.TypeConvertible;
 import dyvil.reflect.Modifiers;
-import dyvil.tuple.Tuple2;
 import dyvilx.lang.model.type.Type;
 
 import java.util.Arrays;
@@ -20,6 +20,7 @@ import java.util.function.BiPredicate;
 
 @ClassConvertible
 @TypeConvertible
+@ColonConvertible
 @ArrayConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements MutableMap<K, V>
 {
@@ -34,15 +35,20 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	{
 		return new EnumMap<>(type);
 	}
+
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(K key, V value)
+	{
+		return new EnumMap<>(getKeyType(key), (K[]) new Object[] { key }, (V[]) new Object[] { value }, 1);
+	}
 	
 	@SafeVarargs
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Tuple2<K, V>... entries)
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Entry<K, V>... entries)
 	{
 		return new EnumMap<>(entries);
 	}
 
 	@DyvilModifiers(Modifiers.INTERNAL)
-	public EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	private EnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
 		super(type, keys, values, size);
 	}
@@ -68,9 +74,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@SafeVarargs
-	public EnumMap(Tuple2<K, V>... tuples)
+	public EnumMap(Entry<K, V>... entries)
 	{
-		super(tuples);
+		super(entries);
 	}
 	
 	@Override
