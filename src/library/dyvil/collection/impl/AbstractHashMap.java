@@ -596,10 +596,8 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		{
 			for (; entry != null; entry = entry.next)
 			{
-				builder.append(entry.key).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry.value);
-				entry = entry.next;
-				
-				builder.append(Map.ENTRY_SEPARATOR_STRING);
+				builder.append(entry.key).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry.value)
+				       .append(Map.ENTRY_SEPARATOR_STRING);
 			}
 		}
 
