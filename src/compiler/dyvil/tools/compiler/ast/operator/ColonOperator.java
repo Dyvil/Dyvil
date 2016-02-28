@@ -104,7 +104,7 @@ public class ColonOperator implements IValue
 					.withType(type, typeContext, markers, context);
 		}
 
-		return this.isType(type) ? this : null;
+		return type.isSuperTypeOf(this.type) ? this : null;
 	}
 
 	@Override

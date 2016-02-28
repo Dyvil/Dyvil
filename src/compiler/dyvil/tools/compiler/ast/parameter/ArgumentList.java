@@ -255,37 +255,39 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType varParamType = param.getInternalType();
+		final IType varParamType = param.getInternalType().getParameterType();
 		
 		IValue value = this.values[index];
 		if (value.isType(varParamType.getConcreteType(typeContext)))
 		{
-			IValue value1 = IType.convertValue(value, varParamType, typeContext, markers, context);
-			if (value1 != null)
+			final IValue typedValue = IType.convertValue(value, varParamType, typeContext, markers, context);
+			if (typedValue != null)
 			{
-				this.values[index] = value1;
+				this.values[index] = typedValue;
 				this.varargs = true;
 				return;
 			}
+
 			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type",
 			                     param.getName());
 			return;
 		}
 		
-		IType elementType = varParamType.getElementType();
+		final IType elementType = varParamType.getElementType();
 		
 		for (; index < this.size; index++)
 		{
 			value = this.values[index];
-			IValue value1 = IType.convertValue(value, elementType, typeContext, markers, context);
-			if (value1 == null)
+
+			final IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
+			if (typedValue == null)
 			{
 				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type",
 				                     param.getName());
 			}
 			else
 			{
-				this.values[index] = value1;
+				this.values[index] = typedValue;
 			}
 		}
 	}

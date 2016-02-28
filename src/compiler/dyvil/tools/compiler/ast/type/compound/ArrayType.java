@@ -358,7 +358,7 @@ public class ArrayType implements IObjectType, ITyped
 
 		if (concrete != null && concrete != this.type)
 		{
-			return concrete;
+			return new ArrayType(concrete, this.mutability);
 		}
 
 		return this;
