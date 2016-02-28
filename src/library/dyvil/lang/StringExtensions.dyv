@@ -6,8 +6,15 @@ public final class StringExtensions
 {
 	private init() {}
 
+	@Deprecated(description: "Support for the '$' Operator will be dropped in Dyvil v0.18.0, use the 'char(char)' method instead")
 	@Intrinsic([ LOAD_0 ])
 	public static char $(char c) = c
+
+	@Intrinsic([ LOAD_0 ])
+	public static char char(char c) = c
+
+	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
+	public static char char(String c) = c charAt 0
 
 	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
 
