@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.parsing.CodeFile;
 
 import java.io.File;
 
@@ -14,7 +13,7 @@ public class DyvilFileType implements IFileType
 	@FunctionalInterface
 	interface HeaderSupplier
 	{
-		DyvilHeader newHeader(DyvilCompiler compiler, Package pack, CodeFile inputFile, File outputFile);
+		DyvilHeader newHeader(DyvilCompiler compiler, Package pack, File inputFile, File outputFile);
 	}
 	
 	public static final String CLASS_EXTENSION  = ".class";
@@ -47,7 +46,7 @@ public class DyvilFileType implements IFileType
 	}
 	
 	@Override
-	public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, CodeFile inputFile, File outputFile)
+	public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File inputFile, File outputFile)
 	{
 		DyvilHeader header = this.headerSupplier.newHeader(compiler, pack, inputFile, outputFile);
 		pack.addHeader(header);

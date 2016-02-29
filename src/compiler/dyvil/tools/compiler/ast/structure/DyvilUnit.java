@@ -11,7 +11,6 @@ import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.DyvilUnitParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
-import dyvil.tools.parsing.CodeFile;
 import dyvil.tools.parsing.Name;
 
 import java.io.File;
@@ -23,7 +22,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	private IClassCompilable[] innerClasses = new IClassCompilable[2];
 	private int innerClassCount;
 	
-	public DyvilUnit(DyvilCompiler compiler, Package pack, CodeFile input, File output)
+	public DyvilUnit(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
 	}
@@ -190,7 +189,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	@Override
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Unit", this.name, this.inputFile);
+		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Unit", this.name, this.code);
 	}
 	
 	@Override

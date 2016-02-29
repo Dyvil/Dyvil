@@ -7,7 +7,6 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.parsing.CodeFile;
 
 import java.io.File;
 
@@ -31,7 +30,7 @@ public class FileFinder
 		}
 		else
 		{
-			this.processFile(compiler, (CodeFile) source, output, pack);
+			this.processFile(compiler, source, output, pack);
 		}
 	}
 	
@@ -39,7 +38,7 @@ public class FileFinder
 	{
 		for (String fileName : source.list())
 		{
-			final CodeFile sourceFile = new CodeFile(source, fileName);
+			final File sourceFile = new File(source, fileName);
 			final File outputFile = new File(output, fileName);
 
 			if (sourceFile.isDirectory())
@@ -53,7 +52,7 @@ public class FileFinder
 		}
 	}
 	
-	private void processFile(DyvilCompiler compiler, CodeFile source, File output, Package pack)
+	private void processFile(DyvilCompiler compiler, File source, File output, Package pack)
 	{
 		final String fileName = source.getPath();
 		if (!compiler.config.isExcluded(fileName))

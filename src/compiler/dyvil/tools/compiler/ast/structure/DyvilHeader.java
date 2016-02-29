@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -31,7 +32,7 @@ import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.SemicolonInference;
-import dyvil.tools.parsing.CodeFile;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -48,9 +49,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 {
 	protected final DyvilCompiler compiler;
 
-	public final CodeFile inputFile;
-	public final File     outputDirectory;
-	public final File     outputFile;
+	public final File inputFile;
+	public final File outputDirectory;
+	public final File outputFile;
+
+	protected String code;
 	
 	protected Name    name;
 	protected Package pack;
@@ -90,7 +93,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.name = name;
 	}
 	
-	public DyvilHeader(DyvilCompiler compiler, Package pack, CodeFile input, File output)
+	public DyvilHeader(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		this.compiler = compiler;
 
@@ -145,7 +148,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 	
 	@Override
-	public CodeFile getInputFile()
+	public File getInputFile()
 	{
 		return this.inputFile;
 	}
@@ -369,19 +372,39 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		return null;
 	}
+
+	protected boolean load()
+	{
+		try
+		{
+			this.code = FileUtils.read(this.inputFile);
+			return true;
+		}
+		catch (IOException ex)
+		{
+			this.markers.add(Markers.parserError(ICodePosition.ORIGIN, ex));
+			return false;
+		}
+	}
 	
 	@Override
 	public void tokenize()
 	{
-		this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.inputFile.getCode());
-		SemicolonInference.inferSemicolons(this.tokens.first());
+		if (this.load())
+		{
+			this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.code);
+			SemicolonInference.inferSemicolons(this.tokens.first());
+		}
 	}
 	
 	@Override
 	public void parseHeader()
 	{
-		ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers, this);
-		manager.parse(this.tokens);
+		if (this.tokens != null)
+		{
+			ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers, this);
+			manager.parse(this.tokens);
+		}
 	}
 	
 	@Override
@@ -389,8 +412,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			IncludeDeclaration include = this.includes[i];
-			include.resolve(this.markers, this);
+			this.includes[i].resolve(this.markers, this);
 		}
 	}
 	
@@ -456,7 +478,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.inputFile);
+		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.code);
 	}
 	
 	@Override

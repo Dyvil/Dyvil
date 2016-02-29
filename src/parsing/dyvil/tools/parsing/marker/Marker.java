@@ -78,42 +78,45 @@ public abstract class Marker implements Comparable<Marker>
 			buf.append('\n');
 		}
 
-		// Compute newline locations
-		int startIndex = this.position.startIndex();
-		int endIndex = this.position.endIndex();
-		final int codeLength = code.length();
-		if (startIndex >= codeLength)
+		if (code != null)
 		{
-			startIndex = codeLength - 1;
-		}
-		if (endIndex >= codeLength)
-		{
-			endIndex = codeLength - 1;
-		}
-		
-		final int prevNL = prevNL(code, startIndex);
-		final int nextNL = nextNL(code, endIndex);
-		final String line = code.substring(prevNL, nextNL);
-		
-		// Append Line
-		buf.append('\n').append(line).append('\n');
-		
-		// Append ^
-		for (int i = prevNL; i < startIndex; i++)
-		{
-			char c = code.charAt(i);
-			if (c == '\t')
+			// Compute newline locations
+			int startIndex = this.position.startIndex();
+			int endIndex = this.position.endIndex();
+			final int codeLength = code.length();
+			if (startIndex >= codeLength)
 			{
-				buf.append('\t');
+				startIndex = codeLength - 1;
 			}
-			else
+			if (endIndex >= codeLength)
 			{
-				buf.append(' ');
+				endIndex = codeLength - 1;
 			}
-		}
-		for (int i = startIndex; i < endIndex; i++)
-		{
-			buf.append('¯');
+
+			final int prevNL = prevNL(code, startIndex);
+			final int nextNL = nextNL(code, endIndex);
+			final String line = code.substring(prevNL, nextNL);
+
+			// Append Line
+			buf.append('\n').append(line).append('\n');
+
+			// Append ^
+			for (int i = prevNL; i < startIndex; i++)
+			{
+				char c = code.charAt(i);
+				if (c == '\t')
+				{
+					buf.append('\t');
+				}
+				else
+				{
+					buf.append(' ');
+				}
+			}
+			for (int i = startIndex; i < endIndex; i++)
+			{
+				buf.append('¯');
+			}
 		}
 
 		buf.append('\n');
