@@ -1262,12 +1262,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	{
 		final IToken next2 = next.next();
 
-		switch (next2.type())
+		if (next2.type() == DyvilKeywords.INIT)
 		{
-		case DyvilKeywords.NEW:
-			pm.report(Markers.syntaxWarning(next2, "constructor.initializer.new"));
-			// Fallthrough
-		case DyvilKeywords.INIT:
 			this.value = new InitializerCall(next2.raw(), isSuper);
 			pm.skip(2);
 			this.mode = PARAMETERS;

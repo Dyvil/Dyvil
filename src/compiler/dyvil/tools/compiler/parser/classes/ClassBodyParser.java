@@ -29,7 +29,6 @@ import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -114,11 +113,9 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					return;
 				}
 
-				this.parseConstructorDeclaration(token);
-				return;
-			case DyvilKeywords.NEW: // legacy, TODO drop 'new' support
-				pm.report(Markers.syntaxWarning(token, "constructor.declaration.new"));
-				this.parseConstructorDeclaration(token);
+				this.member = new Constructor(token.raw(), this.modifiers, this.annotations);
+				this.memberKind = CONSTRUCTOR;
+				this.mode = PARAMETERS;
 				return;
 			}
 
@@ -336,13 +333,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			pm.report(token, "class.body.declaration.end");
 			return;
 		}
-	}
-
-	public void parseConstructorDeclaration(IToken token)
-	{
-		this.member = new Constructor(token.raw(), this.modifiers, this.annotations);
-		this.memberKind = CONSTRUCTOR;
-		this.mode = PARAMETERS;
 	}
 	
 	@Override
