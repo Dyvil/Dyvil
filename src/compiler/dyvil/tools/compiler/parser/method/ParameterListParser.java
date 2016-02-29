@@ -24,17 +24,17 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 {
 	public static final int TYPE      = 1;
 	public static final int NAME      = 2;
-	public static final int SEPERATOR = 4;
+	public static final int SEPARATOR = 4;
 	
 	protected IParameterList paramList;
-	
+
+	// Metadata
 	private ModifierList   modifiers;
 	private AnnotationList annotations;
 	
-	private IType      type;
-	private IParameter parameter;
-	private boolean    varargs;
-	
+	private IType   type;
+	private boolean varargs;
+
 	public ParameterListParser(IParameterList paramList)
 	{
 		this.paramList = paramList;
@@ -43,11 +43,9 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	
 	private void reset()
 	{
-		this.mode = TYPE;
 		this.modifiers = null;
 		this.annotations = null;
 		this.type = null;
-		this.parameter = null;
 		this.varargs = false;
 	}
 	
@@ -55,11 +53,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		if (type == Tokens.EOF)
-		{
-			pm.popParser();
-			return;
-		}
 
 		switch (this.mode)
 		{
@@ -102,17 +95,23 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			pm.pushParser(pm.newTypeParser(this), true);
 			return;
 		case NAME:
-			if (type == DyvilSymbols.ELLIPSIS)
+			switch (type)
 			{
+			case Tokens.EOF:
+				pm.report(token, "parameter.identifier");
+				pm.popParser();
+				return;
+			case DyvilSymbols.ELLIPSIS:
+				if (this.varargs)
+				{
+					pm.report(token, "parameter.identifier");
+					return;
+				}
 				this.varargs = true;
 				return;
-			}
-			if (type == DyvilKeywords.THIS)
-			{
-				this.mode = SEPERATOR;
-				this.annotations = null;
-				this.modifiers = null;
-				this.varargs = false;
+			case DyvilKeywords.THIS:
+				this.mode = SEPARATOR;
+				this.reset();
 				if (this.paramList instanceof IParametric && !((IParametric) this.paramList).setReceiverType(this.type))
 				{
 					pm.report(token, "parameter.receivertype.invalid");
@@ -120,49 +119,58 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 				return;
 			}
-			this.mode = SEPERATOR;
-			if (ParserUtil.isIdentifier(type))
-			{
-				if (this.varargs)
-				{
-					this.paramList.setVariadic();
-					this.type = new ArrayType(this.type);
-				}
-				
-				this.parameter = this.paramList instanceof IClass ?
-						new ClassParameter(token.nameValue(), this.type) :
-						new MethodParameter(token.nameValue(), this.type);
-				this.parameter.setPosition(token.raw());
-				this.parameter.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
-				this.parameter.setAnnotations(this.annotations);
-				this.parameter.setVarargs(this.varargs);
-				this.paramList.addParameter(this.parameter);
 
-				this.annotations = null;
-				this.modifiers = null;
-				this.varargs = false;
-				
+			this.mode = SEPARATOR;
+			if (!ParserUtil.isIdentifier(type))
+			{
+				pm.report(token, "parameter.identifier");
 				return;
 			}
-			pm.report(token, "parameter.identifier");
+
+			if (this.varargs)
+			{
+				this.paramList.setVariadic();
+				this.type = new ArrayType(this.type);
+			}
+
+			final IParameter parameter = this.paramList instanceof IClass ?
+					new ClassParameter(token.nameValue(), this.type) :
+					new MethodParameter(token.nameValue(), this.type);
+			parameter.setPosition(token.raw());
+			parameter.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
+			parameter.setAnnotations(this.annotations);
+			parameter.setVarargs(this.varargs);
+			this.paramList.addParameter(parameter);
+
+			if (token.next().type() == BaseSymbols.EQUALS)
+			{
+				pm.skip(1);
+				pm.pushParser(pm.newExpressionParser(parameter));
+
+				return;
+			}
+
+			this.reset();
 			return;
-		case SEPERATOR:
+		case SEPARATOR:
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
 				return;
 			}
-			if (type == BaseSymbols.EQUALS)
-			{
-				pm.pushParser(pm.newExpressionParser(this.parameter));
-				return;
-			}
+
+			this.mode = TYPE;
 			this.reset();
-			if (type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON)
+			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
-				return;
+				pm.report(token, "parameter.comma");
+
+				if (type == Tokens.EOF)
+				{
+					pm.popParser();
+				}
 			}
-			pm.report(token, "parameter.comma");
+
 			return;
 		}
 	}

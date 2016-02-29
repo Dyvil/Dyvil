@@ -71,7 +71,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			this.parser = this.tryParser = new ParameterListParser(this);
 			return;
 		case PARAMETERS:
-			if (token.type() == BaseSymbols.CLOSE_PARENTHESIS && this.tryParser.isInMode(ParameterListParser.SEPERATOR))
+			if (token.type() == BaseSymbols.CLOSE_PARENTHESIS && this.tryParser.isInMode(ParameterListParser.SEPARATOR))
 			{
 				this.mode = ARROW;
 				return;
