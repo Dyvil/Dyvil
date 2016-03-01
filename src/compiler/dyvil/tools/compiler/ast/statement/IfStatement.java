@@ -120,27 +120,30 @@ public class IfStatement implements IValue
 		}
 		
 		this.commonType = type;
-		IValue value = IType.convertValue(this.then, type, typeContext, markers, context);
-		if (value == null)
+
+		final IValue typedThen = IType.convertValue(this.then, type, typeContext, markers, context);
+		if (typedThen != null)
+		{
+			this.then = typedThen;
+		}
+		else if (this.then.isResolved())
 		{
 			Util.createTypeError(markers, this.then, type, typeContext, "if.then.type");
 		}
-		else
-		{
-			this.then = value;
-		}
 		
-		if (this.elseThen != null)
+		if (this.elseThen == null)
 		{
-			value = IType.convertValue(this.elseThen, type, typeContext, markers, context);
-			if (value == null)
-			{
-				Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
-			}
-			else
-			{
-				this.elseThen = value;
-			}
+			return this;
+		}
+
+		final IValue typedElse = IType.convertValue(this.elseThen, type, typeContext, markers, context);
+		if (typedElse != null)
+		{
+			this.elseThen = typedElse;
+		}
+		else if (this.elseThen.isResolved())
+		{
+			Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
 		}
 		
 		return this;
@@ -149,15 +152,8 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
-		{
-			return true;
-		}
-		if (this.then != null && !this.then.isType(type))
-		{
-			return false;
-		}
-		return this.elseThen == null || this.elseThen.isType(type);
+		return type == Types.VOID || !(this.then != null && !this.then.isType(type)) && (this.elseThen == null
+				|| this.elseThen.isType(type));
 	}
 	
 	@Override
