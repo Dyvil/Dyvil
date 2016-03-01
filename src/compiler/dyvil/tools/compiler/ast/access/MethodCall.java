@@ -148,14 +148,11 @@ public final class MethodCall extends AbstractCall implements INamed
 					return this;
 				}
 			}
-
-			// Resolve Apply Method
-			return ApplyMethodCall
-					.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
-					              this.genericData);
 		}
-		
-		return null;
+
+		// Resolve Apply Method
+		return ApplyMethodCall.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
+		                                    this.genericData);
 	}
 
 	public IValue resolveOperator(MarkerList markers, IContext context, int args)
