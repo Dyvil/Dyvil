@@ -478,7 +478,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.code);
+		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.inputFile, this.code);
 	}
 	
 	@Override

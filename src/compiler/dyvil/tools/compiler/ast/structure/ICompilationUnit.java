@@ -10,7 +10,7 @@ import java.io.File;
 
 public interface ICompilationUnit extends IASTNode
 {
-	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, String fileType, Name name, String source)
+	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, String fileType, Name name, File inputFile, String source)
 	{
 		final int size = markers.size();
 		if (size <= 0)
@@ -18,7 +18,7 @@ public interface ICompilationUnit extends IASTNode
 			return false;
 		}
 
-		final StringBuilder builder = new StringBuilder("Problems in ").append(fileType).append(' ').append(source)
+		final StringBuilder builder = new StringBuilder("Problems in ").append(fileType).append(' ').append(inputFile)
 		                                                               .append(":\n\n");
 
 		final int warnings = markers.getWarnings();
