@@ -268,7 +268,9 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		// TODO
+		this.type.writeTypeExpression(writer);
+		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
+		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ReferenceType;", false);
 	}
 
 	@Override
