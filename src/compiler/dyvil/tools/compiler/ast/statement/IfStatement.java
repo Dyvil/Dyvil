@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -121,31 +122,17 @@ public class IfStatement implements IValue
 		
 		this.commonType = type;
 
-		final IValue typedThen = IType.convertValue(this.then, type, typeContext, markers, context);
-		if (typedThen != null)
-		{
-			this.then = typedThen;
-		}
-		else if (this.then.isResolved())
-		{
-			Util.createTypeError(markers, this.then, type, typeContext, "if.then.type");
-		}
-		
+		this.then = TypeChecker.convertValue(this.then, type, typeContext, markers, context,
+		                                     TypeChecker.markerSupplier("if.then.type"));
+
 		if (this.elseThen == null)
 		{
 			return this;
 		}
 
-		final IValue typedElse = IType.convertValue(this.elseThen, type, typeContext, markers, context);
-		if (typedElse != null)
-		{
-			this.elseThen = typedElse;
-		}
-		else if (this.elseThen.isResolved())
-		{
-			Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
-		}
-		
+		this.elseThen = TypeChecker.convertValue(this.elseThen, type, typeContext, markers, context,
+		                                         TypeChecker.markerSupplier("if.else.type"));
+
 		return this;
 	}
 	

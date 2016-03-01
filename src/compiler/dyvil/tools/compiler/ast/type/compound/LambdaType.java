@@ -296,7 +296,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			return value.withType(this, typeContext, markers, context);
 		}
 
-		final IValue typedReturnValue = IType.convertValue(value, this.returnType, typeContext, markers, context);
+		final IValue typedReturnValue = value.withType(this.returnType, typeContext, markers, context);
 		if (typedReturnValue != null)
 		{
 			return this.wrapLambda(typedReturnValue, typeContext);

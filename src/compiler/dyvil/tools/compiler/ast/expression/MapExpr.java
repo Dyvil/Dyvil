@@ -12,14 +12,17 @@ import dyvil.tools.compiler.ast.type.compound.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class MapExpr implements IValue
 {
-	
+	private static final TypeChecker.MarkerSupplier KEY_MARKER_SUPPLIER = TypeChecker
+			.markerSupplier("map.key.type.incompatible", "map.key.type.expected", "map.key.type.actual");
+	private static final TypeChecker.MarkerSupplier VALUE_MARKER_SUPPLIER = TypeChecker
+			.markerSupplier("map.value.type.incompatible", "map.value.type.expected", "map.value.type.actual");
+
 	protected ICodePosition position;
 	
 	protected IValue[] keys;
@@ -121,42 +124,16 @@ public class MapExpr implements IValue
 			return null;
 		}
 		
-		IType keyType = this.keyType = mapType.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
-		IType valueType = this.valueType = mapType.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
+		final IType keyType = this.keyType = mapType.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
+		final IType valueType = this.valueType = mapType.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
 		
 		for (int i = 0; i < this.count; i++)
 		{
-			IValue value = this.keys[i];
-			IValue value1 = IType.convertValue(value, keyType, typeContext, markers, context);
-			
-			if (value1 == null)
-			{
-				Marker marker = Markers.semantic(value.getPosition(), "map.key.type.incompatible");
-				marker.addInfo(Markers.getSemantic("type.expected", keyType.getConcreteType(typeContext)));
-				marker.addInfo(Markers.getSemantic("map.key.type", value.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				value = value1;
-				this.keys[i] = value1;
-			}
-			
-			value = this.values[i];
-			value1 = IType.convertValue(value, valueType, typeContext, markers, context);
-			
-			if (value1 == null)
-			{
-				Marker marker = Markers.semantic(value.getPosition(), "map.value.type.incompatible");
-				marker.addInfo(Markers.getSemantic("type.expected", valueType.getConcreteType(typeContext)));
-				marker.addInfo(Markers.getSemantic("map.value.type", value.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				value = value1;
-				this.values[i] = value1;
-			}
+			this.keys[i] = TypeChecker
+					.convertValue(this.keys[i], keyType, typeContext, markers, context, KEY_MARKER_SUPPLIER);
+
+			this.values[i] = TypeChecker
+					.convertValue(this.values[i], valueType, typeContext, markers, context, VALUE_MARKER_SUPPLIER);
 		}
 		
 		return this;
@@ -360,17 +337,17 @@ public class MapExpr implements IValue
 			buffer.append(' ');
 		}
 		
-		this.keys[0].toString(prefix, buffer);
+		this.keys[0].toString(mapPrefix, buffer);
 		Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
-		this.values[0].toString(prefix, buffer);
+		this.values[0].toString(mapPrefix, buffer);
 
 		for (int i = 1; i < this.count; i++)
 		{
 			Formatting.appendSeparator(buffer, "map.entry_separator", ',');
 
-			this.keys[i].toString(prefix, buffer);
+			this.keys[i].toString(mapPrefix, buffer);
 			Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
-			this.values[i].toString(prefix, buffer);
+			this.values[i].toString(mapPrefix, buffer);
 		}
 		
 		if (Formatting.getBoolean("map.close_paren.space_before"))

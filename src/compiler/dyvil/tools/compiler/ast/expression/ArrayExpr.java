@@ -14,11 +14,11 @@ import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -26,16 +26,20 @@ import java.util.Iterator;
 
 public final class ArrayExpr implements IValue, IValueList
 {
+	// TODO Rename to LazyFields
 	public static final class Types
 	{
 		public static final IClass ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
-		
+
+		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
+				                                                                          .markerSupplier("array.element.type.incompatible", "array.element.type.expected", "array.element.type.actual");
 		private Types()
 		{
 			// no instances
 		}
+
 	}
-	
+
 	protected ICodePosition position;
 	
 	protected IValue[] values;
@@ -163,12 +167,7 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return this.arrayType.isResolved();
 		}
-		if (this.elementType != null)
-		{
-			return this.elementType.isResolved();
-		}
-		
-		return false;
+		return this.elementType != null && this.elementType.isResolved();
 	}
 	
 	@Override
@@ -215,21 +214,7 @@ public final class ArrayExpr implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue value = this.values[i];
-			IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
-			
-			if (typedValue == null)
-			{
-				Marker marker = Markers.semantic(value.getPosition(), "array.element.type.incompatible");
-				marker.addInfo(Markers.getSemantic("array.type", arrayType.getConcreteType(typeContext)));
-				marker.addInfo(Markers.getSemantic("array.element.type", value.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				value = typedValue;
-				this.values[i] = typedValue;
-			}
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context, Types.ELEMENT_MARKER_SUPPLIER);
 		}
 		
 		return this;
@@ -324,7 +309,7 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values);
+		return new ArrayIterator<>(this.values, this.valueCount);
 	}
 	
 	@Override

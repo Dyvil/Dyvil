@@ -9,12 +9,12 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -81,17 +81,9 @@ public class Initializer extends Member implements IInitializer
 
 		if (this.value != null)
 		{
-			this.value = this.value.resolve(markers, context);
-
-			final IValue typed = IType.convertValue(this.value, Types.VOID, Types.VOID, markers, context);
-			if (typed == null)
-			{
-				Util.createTypeError(markers, this.value, Types.VOID, Types.VOID, "initializer.type");
-			}
-			else
-			{
-				this.value = typed;
-			}
+			final IValue resolved = this.value.resolve(markers, context);
+			this.value = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context,
+			                                      TypeChecker.markerSupplier("initializer.type"));
 		}
 	}
 

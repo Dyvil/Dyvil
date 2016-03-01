@@ -289,16 +289,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	IMethod getBoxMethod();
 	
 	IMethod getUnboxMethod();
-	
-	static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (type.hasTypeVariables())
-		{
-			type = type.getConcreteType(typeContext);
-		}
-		return type.convertValue(value, typeContext, markers, context);
-	}
-	
+
 	default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (!this.isResolved())
@@ -510,7 +501,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		case ARRAY:
 			type = new ArrayType();
 			break;
-		case LIST :
+		case LIST:
 			type = new ListType();
 			break;
 		case MAP:

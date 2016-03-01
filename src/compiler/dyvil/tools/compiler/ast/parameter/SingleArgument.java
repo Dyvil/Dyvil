@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -157,16 +157,8 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		}
 		
 		IType type = param.getInternalType().getParameterType();
-		IValue typed = IType.convertValue(this.value, type, typeContext, markers, context);
-		if (typed == null)
-		{
-			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type",
-			                     param.getName());
-		}
-		else
-		{
-			this.value = typed;
-		}
+		this.value = TypeChecker.convertValue(this.value, type, typeContext, markers, context,
+		                                      IArguments.argumentMarkerSupplier(param));
 	}
 	
 	@Override
@@ -177,25 +169,19 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getInternalType();
-		IValue value1 = IType.convertValue(this.value, type, typeContext, markers, context);
-		if (value1 != null)
+		final IType arrayType = param.getInternalType().getParameterType();
+		if (this.value.isType(arrayType.getConcreteType(typeContext)))
 		{
-			this.value = value1;
+			this.value = TypeChecker.convertValue(this.value, arrayType, typeContext, markers, context,
+			                                      IArguments.argumentMarkerSupplier(param));
 			this.varargs = true;
 			return;
 		}
-		
-		value1 = IType.convertValue(this.value, type.getElementType(), typeContext, markers, context);
-		if (value1 == null)
-		{
-			Util.createTypeError(markers, this.value, type, typeContext, "method.access.argument_type",
-			                     param.getName());
-		}
-		else
-		{
-			this.value = value1;
-		}
+
+		final IType elementType = arrayType.getElementType();
+		this.value = TypeChecker.convertValue(this.value, elementType, typeContext, markers, context,
+		                                      IArguments.argumentMarkerSupplier(param));
+		return;
 	}
 	
 	@Override

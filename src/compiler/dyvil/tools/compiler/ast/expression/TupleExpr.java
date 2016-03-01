@@ -15,9 +15,8 @@ import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -25,16 +24,21 @@ import java.util.Iterator;
 
 public final class TupleExpr implements IValue, IValueList
 {
+	// TODO Rename to LazyFields
 	public static final class Types
 	{
 		public static final IClass TUPLE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TupleConvertible");
 		
+		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
+				.markerSupplier("tuple.element.type.incompatible", "tuple.element.type.expected",
+				                "tuple.element.type.actual");
 		private Types()
 		{
 			// no instances
 		}
+
 	}
-	
+
 	protected ICodePosition position;
 	
 	protected IValue[] values;
@@ -172,20 +176,9 @@ public final class TupleExpr implements IValue, IValueList
 					dyvil.tools.compiler.ast.type.builtin.Types.ANY :
 					type.resolveTypeSafely(iclass.getTypeParameter(i));
 			
-			final IValue value = this.values[i];
-			final IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
-			
-			if (typedValue != null)
-			{
-				this.values[i] = typedValue;
-			}
-			else if (value.isResolved())
-			{
-				final Marker marker = Markers.semantic(value.getPosition(), "tuple.element.type.incompatible");
-				marker.addInfo(Markers.getSemantic("value.type", value.getType()));
-				marker.addInfo(Markers.getSemantic("tuple.element.type", elementType.getConcreteType(typeContext)));
-				markers.add(marker);
-			}
+
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
+			                                          Types.ELEMENT_MARKER_SUPPLIER);
 		}
 
 		return this;

@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -144,7 +145,7 @@ public final class Annotation implements IAnnotation
 			{
 				if (parameter.getValue() == null)
 				{
-					markers.add(Markers.semantic(this.position, "annotation.parameter.missing", this.type,
+					markers.add(Markers.semanticError(this.position, "annotation.parameter.missing", this.type,
 					                             parameter.getName()));
 				}
 				continue;
@@ -153,8 +154,8 @@ public final class Annotation implements IAnnotation
 			IValue typedValue = value.withType(parameterType, parameterType, markers, context);
 			if (typedValue == null)
 			{
-				Util.createTypeError(markers, value, parameterType, parameterType, "annotation.parameter.type",
-				                     parameter.getName());
+				markers.add(TypeChecker.typeError(value, parameterType, parameterType, "annotation.parameter.type",
+				                                  parameter.getName()));
 				continue;
 			}
 			

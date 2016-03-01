@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.util.Iterator;
@@ -234,17 +234,10 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		IType type = param.getInternalType().getParameterType();
-		IValue value = this.values[index];
-		IValue typed = IType.convertValue(value, type, typeContext, markers, context);
-		if (typed == null)
-		{
-			Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", param.getName());
-		}
-		else
-		{
-			this.values[index] = typed;
-		}
+		final IType type = param.getInternalType().getParameterType();
+
+		this.values[index] = TypeChecker.convertValue(this.values[index], type, typeContext, markers, context,
+		                                              IArguments.argumentMarkerSupplier(param));
 	}
 	
 	@Override
@@ -255,40 +248,23 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		final IType varParamType = param.getInternalType().getParameterType();
+		final IType arrayType = param.getInternalType().getParameterType();
 		
-		IValue value = this.values[index];
-		if (value.isType(varParamType.getConcreteType(typeContext)))
+		final IValue value = this.values[index];
+		if (value.isType(arrayType))
 		{
-			final IValue typedValue = IType.convertValue(value, varParamType, typeContext, markers, context);
-			if (typedValue != null)
-			{
-				this.values[index] = typedValue;
-				this.varargs = true;
-				return;
-			}
-
-			Util.createTypeError(markers, value, varParamType, typeContext, "method.access.argument_type",
-			                     param.getName());
+			this.values[index] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
+			                                              IArguments.argumentMarkerSupplier(param));
 			return;
 		}
 		
-		final IType elementType = varParamType.getElementType();
+		final IType elementType = arrayType.getElementType();
 		
 		for (; index < this.size; index++)
 		{
-			value = this.values[index];
-
-			final IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
-			if (typedValue == null)
-			{
-				Util.createTypeError(markers, value, elementType, typeContext, "method.access.argument_type",
-				                     param.getName());
-			}
-			else
-			{
-				this.values[index] = typedValue;
-			}
+			this.values[index] = TypeChecker
+					.convertValue(this.values[index], elementType, typeContext, markers, context,
+					              IArguments.argumentMarkerSupplier(param));
 		}
 	}
 	

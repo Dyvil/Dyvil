@@ -43,6 +43,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -697,16 +698,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				final IParameter parameter = this.parameters[0];
 				final IType paramType = parameter.getInternalType().getParameterType();
-				IValue typedReceiver = IType.convertValue(receiver, paramType, typeContext, markers, context);
-				if (typedReceiver == null)
-				{
-					Util.createTypeError(markers, receiver, paramType, typeContext, "method.access.infix_type",
-					                     parameter.getName());
-				}
-				else
-				{
-					receiver = typedReceiver;
-				}
+
+				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
+				                                    TypeChecker.markerSupplier("method.access.infix_type"));
 				
 				if (this.isVariadic())
 				{
@@ -753,17 +747,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			else
 			{
-				final IValue typedReceiver = IType
-						.convertValue(receiver, this.receiverType, typeContext, markers, context);
-				if (typedReceiver == null)
-				{
-					Util.createTypeError(markers, receiver, this.receiverType, typeContext,
-					                     "method.access.receiver_type", this.name);
-				}
-				else
-				{
-					receiver = typedReceiver;
-				}
+				receiver = TypeChecker.convertValue(receiver, this.receiverType, typeContext, markers, context,
+				                                    TypeChecker.markerSupplier("method.access.receiver_type"));
 			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))

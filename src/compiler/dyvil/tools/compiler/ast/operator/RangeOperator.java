@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -198,26 +198,13 @@ public class RangeOperator implements IValue
 		
 		this.type = type;
 		this.elementType = elementType;
-		
-		final IValue typedStartValue = this.startValue.withType(elementType, elementType, markers, context);
-		if (typedStartValue != null)
-		{
-			this.startValue = typedStartValue;
-		}
-		else if (this.startValue.isResolved())
-		{
-			Util.createTypeError(markers, this.startValue, elementType, typeContext, "range.start.type");
-		}
-		
-		final IValue typedEndValue = this.endValue.withType(elementType, elementType, markers, context);
-		if (typedEndValue != null)
-		{
-			this.endValue = typedEndValue;
-		}
-		else if (this.endValue.isResolved())
-		{
-			Util.createTypeError(markers, this.endValue, elementType, typeContext, "range.end.type");
-		}
+
+		this.startValue = TypeChecker.convertValue(this.startValue, elementType, typeContext, markers, context,
+		                                           TypeChecker.markerSupplier("range.start.type"));
+
+		this.endValue = TypeChecker.convertValue(this.endValue, elementType, typeContext, markers, context,
+		                                         TypeChecker.markerSupplier("range.end.type"));
+
 		return this;
 	}
 	

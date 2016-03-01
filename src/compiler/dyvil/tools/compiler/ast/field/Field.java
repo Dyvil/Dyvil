@@ -21,10 +21,9 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -32,6 +31,9 @@ import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
+	public static final TypeChecker.MarkerSupplier FIELD_MARKER_SUPPLIER = TypeChecker
+			.markerSupplier("field.type.incompatible", "field.type", "value.type");
+
 	protected IClass enclosingClass;
 	protected IValue value;
 	
@@ -158,16 +160,8 @@ public class Field extends Member implements IField
 			else
 			{
 				IType type = this.enclosingClass.getClassType();
-				IValue typedReceiver = IType.convertValue(receiver, type, type, markers, context);
-				
-				if (typedReceiver == null)
-				{
-					Util.createTypeError(markers, receiver, type, type, "field.access.receiver_type", this.name);
-				}
-				else
-				{
-					receiver = typedReceiver;
-				}
+				receiver = TypeChecker.convertValue(receiver, type, type, markers, context,
+				                                    TypeChecker.markerSupplier("field.access.receiver_type"));
 			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
@@ -223,6 +217,14 @@ public class Field extends Member implements IField
 			{
 				inferType = true;
 				this.type = this.value.getType();
+			}
+
+			this.value = TypeChecker
+					.convertValue(this.value, this.type, this.type, markers, context, FIELD_MARKER_SUPPLIER);
+
+			if (inferType)
+			{
+				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN && this.value.isResolved())
 				{
 					markers.add(Markers.semantic(this.position, "field.type.infer", this.name.unqualified));
@@ -230,32 +232,11 @@ public class Field extends Member implements IField
 				}
 			}
 			
-			IValue value1 = IType.convertValue(this.value, this.type, this.type, markers, context);
-			if (value1 == null)
-			{
-				if (this.value.isResolved())
-				{
-					Marker marker = Markers
-							.semantic(this.value.getPosition(), "field.type.incompatible", this.name.unqualified);
-					marker.addInfo(Markers.getSemantic("field.type", this.type));
-					marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
-					markers.add(marker);
-				}
-			}
-			else
-			{
-				this.value = value1;
-				if (inferType)
-				{
-					this.type = value1.getType();
-				}
-			}
-			
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(Markers.semantic(this.position, "field.type.novalue", this.name.unqualified));
+			markers.add(Markers.semantic(this.position, "field.type.infer.novalue", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 	}

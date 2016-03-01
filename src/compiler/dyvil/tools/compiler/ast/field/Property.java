@@ -22,6 +22,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -198,17 +199,10 @@ public class Property extends Member implements IProperty
 		}
 		if (this.initializer != null)
 		{
-			this.initializer = this.initializer.resolve(markers, context);
+			final IValue resolved = this.initializer.resolve(markers, context);
 
-			final IValue typed = IType.convertValue(this.initializer, Types.VOID, Types.VOID, markers, context);
-			if (typed == null)
-			{
-				Util.createTypeError(markers, this.initializer, Types.VOID, Types.VOID, "property.initializer.type");
-			}
-			else
-			{
-				this.initializer = typed;
-			}
+			this.initializer = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context,
+			                                            TypeChecker.markerSupplier("property.initializer.type"));
 		}
 	}
 	

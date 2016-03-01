@@ -5,19 +5,16 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public final class Util
@@ -250,16 +247,6 @@ public final class Util
 
 	// endregion
 
-	// region Misc
-
-	public static void createTypeError(MarkerList markers, IValue value, IType type, ITypeContext typeContext, String key, Object... args)
-	{
-		Marker marker = Markers.semantic(value.getPosition(), key, args);
-		marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
-		marker.addInfo(Markers.getSemantic("value.type", value.getType()));
-		markers.add(marker);
-	}
-
 	public static String toTime(long nanos)
 	{
 		if (nanos < 1_000_000L)
@@ -290,6 +277,4 @@ public final class Util
 
 		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
-
-	// endregion
 }

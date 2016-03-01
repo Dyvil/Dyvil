@@ -14,9 +14,9 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -165,18 +165,8 @@ public final class MatchExpr implements IValue
 				continue;
 			}
 			
-			IValue value = IType.convertValue(action, type, typeContext, markers, context);
-			if (value == null)
-			{
-				Marker marker = Markers.semantic(action.getPosition(), "match.value.type.incompatible");
-				marker.addInfo(Markers.getSemantic("type.expected", type.getConcreteType(typeContext)));
-				marker.addInfo(Markers.getSemantic("value.type", action.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				matchCase.action = value;
-			}
+			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context,
+			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
 		}
 		
 		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
@@ -441,7 +431,8 @@ public final class MatchExpr implements IValue
 		matchedType.writeCast(writer, Types.OBJECT, lineNumber);
 
 		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V", false);
+		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V",
+		                       false);
 		writer.writeInsn(Opcodes.ATHROW);
 		writer.setHasReturn(false);
 	}

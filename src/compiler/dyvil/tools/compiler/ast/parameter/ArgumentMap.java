@@ -10,8 +10,8 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -179,7 +179,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		Name key = param.getName();
+		final Name key = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
 			if (this.keys[i] != key)
@@ -187,17 +187,9 @@ public final class ArgumentMap implements IArguments, IValueMap
 				continue;
 			}
 			
-			IType type = param.getInternalType().getParameterType();
-			IValue value = this.values[i];
-			IValue typed = IType.convertValue(value, type, typeContext, markers, context);
-			if (typed == null)
-			{
-				Util.createTypeError(markers, value, type, typeContext, "method.access.argument_type", key);
-			}
-			else
-			{
-				this.values[i] = typed;
-			}
+			final IType type = param.getInternalType().getParameterType();
+			this.values[i] = TypeChecker.convertValue(this.values[i], type, typeContext, markers, context,
+			                                          IArguments.argumentMarkerSupplier(param));
 			return;
 		}
 	}
