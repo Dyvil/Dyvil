@@ -695,16 +695,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
-				IParameter par = this.parameters[0];
-				IValue instance1 = IType.convertValue(receiver, par.getType(), typeContext, markers, context);
-				if (instance1 == null)
+				final IParameter parameter = this.parameters[0];
+				final IType paramType = parameter.getInternalType().getParameterType();
+				IValue typedReceiver = IType.convertValue(receiver, paramType, typeContext, markers, context);
+				if (typedReceiver == null)
 				{
-					Util.createTypeError(markers, receiver, par.getType(), typeContext, "method.access.infix_type",
-					                     par.getName());
+					Util.createTypeError(markers, receiver, paramType, typeContext, "method.access.infix_type",
+					                     parameter.getName());
 				}
 				else
 				{
-					receiver = instance1;
+					receiver = typedReceiver;
 				}
 				
 				if (this.isVariadic())
