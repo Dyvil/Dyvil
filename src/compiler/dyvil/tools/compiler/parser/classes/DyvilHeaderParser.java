@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -88,13 +89,21 @@ public class DyvilHeaderParser extends Parser
 			return true;
 		}
 		case DyvilKeywords.OPERATOR:
-			pm.pushParser(new OperatorParser(this.unit, true), true);
+			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX_NONE), true);
 			return true;
 		case DyvilKeywords.PREFIX:
 		case DyvilKeywords.POSTFIX:
 		case DyvilKeywords.INFIX:
-			pm.pushParser(new OperatorParser(this.unit, false), true);
-			return true;
+			if (token.next().type() == DyvilKeywords.OPERATOR)
+			{
+				final OperatorParser operatorParser = new OperatorParser(this.unit, -1);
+				// Parse this token so the OperatorParser correctly detects the type (prefix, postfix, infix)
+				operatorParser.parse(pm, token);
+				pm.pushParser(operatorParser);
+				return true;
+			}
+
+			return false;
 		case DyvilKeywords.INCLUDE:
 		{
 			IncludeDeclaration i = new IncludeDeclaration(token.raw());
