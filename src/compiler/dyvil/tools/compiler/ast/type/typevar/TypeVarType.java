@@ -44,7 +44,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public Name getName()
 	{
-		return null;
+		return this.typeParameter.getName();
 	}
 	
 	@Override
