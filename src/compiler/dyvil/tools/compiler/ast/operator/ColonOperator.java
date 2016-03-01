@@ -21,9 +21,14 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ColonOperator implements IValue
 {
-	public static final class LazyTypes
+	public static final class LazyFields
 	{
 		public static final IClass COLON_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ColonConvertible");
+
+		private LazyFields()
+		{
+			// no instances
+		}
 	}
 
 	private IValue left;
@@ -98,7 +103,7 @@ public class ColonOperator implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getAnnotation(LazyTypes.COLON_CONVERTIBLE);
+		final IAnnotation annotation = type.getAnnotation(LazyFields.COLON_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.left, this.right))
@@ -111,13 +116,13 @@ public class ColonOperator implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getAnnotation(LazyTypes.COLON_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (type.getAnnotation(LazyTypes.COLON_CONVERTIBLE) != null)
+		if (type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null)
 		{
 			return IValue.CONVERSION_MATCH;
 		}

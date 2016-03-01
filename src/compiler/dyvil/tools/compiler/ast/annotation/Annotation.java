@@ -38,7 +38,7 @@ import java.lang.annotation.RetentionPolicy;
 
 public final class Annotation implements IAnnotation
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass RETENTION_CLASS = Package.javaLangAnnotation.resolveClass("Retention");
 		public static final IClass TARGET_CLASS    = Package.javaLangAnnotation.resolveClass("Target");
@@ -46,7 +46,7 @@ public final class Annotation implements IAnnotation
 		public static final IClass    ANNOTATION_CLASS = Package.javaLangAnnotation.resolveClass("Annotation");
 		public static final ClassType ANNOTATION       = new ClassType(ANNOTATION_CLASS);
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}

@@ -26,18 +26,16 @@ import java.util.Iterator;
 
 public final class ArrayExpr implements IValue, IValueList
 {
-	// TODO Rename to LazyFields
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
 
 		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
 				                                                                          .markerSupplier("array.element.type.incompatible", "array.element.type.expected", "array.element.type.actual");
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
-
 	}
 
 	protected ICodePosition position;
@@ -189,7 +187,7 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			IClass iclass = arrayType.getTheClass();
 			IAnnotation annotation;
-			if ((annotation = iclass.getAnnotation(Types.ARRAY_CONVERTIBLE)) != null)
+			if ((annotation = iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
@@ -214,7 +212,7 @@ public final class ArrayExpr implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context, Types.ELEMENT_MARKER_SUPPLIER);
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context, LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
 		
 		return this;
@@ -236,7 +234,7 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		IClass iclass = type.getTheClass();
 		return iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS
-				|| iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null
+				|| iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null
 				|| dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE.isSuperClassOf(type);
 	}
 	

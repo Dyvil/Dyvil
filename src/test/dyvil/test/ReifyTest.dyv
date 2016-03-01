@@ -38,7 +38,6 @@ public class ReifyTest
 		Type[SL] type1 = ReifyTest.[SL]typeOf
 		Type[SL] type2 = ReifyTest.typeOf(List("a", "b", "c") as SL)
 
-		// TODO Do not test for equality using toString
 		Main.test("Reify Type Test", type1, slType, type1.toString == slType.toString)
 		Main.test("Reity Type Test with Argument", type2, slType, type2.toString == slType.toString)
 	}

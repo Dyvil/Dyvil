@@ -30,12 +30,12 @@ import java.io.IOException;
 
 public class OptionType implements IObjectType
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass         OPTION_CLASS = Package.dyvilUtil.resolveClass("Option");
 		public static final ITypeParameter OPTION_TYPE  = OPTION_CLASS.getTypeParameter(0);
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -73,13 +73,13 @@ public class OptionType implements IObjectType
 	@Override
 	public IClass getTheClass()
 	{
-		return Types.OPTION_CLASS;
+		return LazyFields.OPTION_CLASS;
 	}
 	
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return typeParameter == Types.OPTION_TYPE ? this.type : null;
+		return typeParameter == LazyFields.OPTION_TYPE ? this.type : null;
 	}
 	
 	@Override
@@ -102,7 +102,7 @@ public class OptionType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		IType type = concrete.resolveType(Types.OPTION_TYPE);
+		IType type = concrete.resolveType(LazyFields.OPTION_TYPE);
 		this.type.inferTypes(type, typeContext);
 	}
 	
@@ -152,7 +152,7 @@ public class OptionType implements IObjectType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		Types.OPTION_CLASS.getMethodMatches(list, instance, name, arguments);
+		LazyFields.OPTION_CLASS.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override

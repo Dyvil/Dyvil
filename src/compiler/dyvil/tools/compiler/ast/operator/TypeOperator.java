@@ -21,14 +21,14 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TypeOperator extends AbstractValue
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass    TYPE_CLASS = Package.dyvilxLangModelType.resolveClass("Type");
 		public static final ClassType TYPE       = new ClassType(TYPE_CLASS);
 		
 		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -72,7 +72,7 @@ public final class TypeOperator extends AbstractValue
 	{
 		if (this.genericType == null)
 		{
-			ClassGenericType generic = new ClassGenericType(Types.TYPE_CLASS);
+			ClassGenericType generic = new ClassGenericType(LazyFields.TYPE_CLASS);
 			generic.addType(this.type);
 			return this.genericType = generic;
 		}
@@ -82,7 +82,7 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.TYPE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -94,13 +94,13 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return type.getTheClass().getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.TYPE_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null)
 		{
 			return CONVERSION_MATCH;
 		}
@@ -119,7 +119,7 @@ public final class TypeOperator extends AbstractValue
 		}
 		
 		this.type = this.type.resolveType(markers, context);
-		ClassGenericType generic = new ClassGenericType(Types.TYPE_CLASS);
+		ClassGenericType generic = new ClassGenericType(LazyFields.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
 	}

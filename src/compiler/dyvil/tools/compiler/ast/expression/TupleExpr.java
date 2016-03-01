@@ -24,15 +24,14 @@ import java.util.Iterator;
 
 public final class TupleExpr implements IValue, IValueList
 {
-	// TODO Rename to LazyFields
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass TUPLE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TupleConvertible");
 		
 		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
 				.markerSupplier("tuple.element.type.incompatible", "tuple.element.type.expected",
 				                "tuple.element.type.actual");
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -157,7 +156,7 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
@@ -178,7 +177,7 @@ public final class TupleExpr implements IValue, IValueList
 			
 
 			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
-			                                          Types.ELEMENT_MARKER_SUPPLIER);
+			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
 
 		return this;
@@ -193,7 +192,7 @@ public final class TupleExpr implements IValue, IValueList
 		}
 		
 		return TupleType.isSuperType(type, this.values, this.valueCount)
-				|| type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null;
+				|| type.getTheClass().getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null;
 	}
 	
 	@Override

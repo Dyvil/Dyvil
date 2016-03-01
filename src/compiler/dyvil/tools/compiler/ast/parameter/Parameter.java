@@ -216,7 +216,7 @@ public abstract class Parameter extends Member implements IParameter
 			visitor.visit("stringValue", value.stringValue());
 			return;
 		}
-		if (iClass == ClassOperator.Types.CLASS_CLASS)
+		if (iClass == ClassOperator.LazyFields.CLASS_CLASS)
 		{
 			visitor.visit("classValue", value.toObject());
 		}

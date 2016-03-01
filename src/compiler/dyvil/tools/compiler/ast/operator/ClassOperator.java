@@ -22,14 +22,14 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassOperator extends AbstractValue implements IConstantValue
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass    CLASS_CLASS = Package.javaLang.resolveClass("Class");
 		public static final ClassType CLASS       = new ClassType(CLASS_CLASS);
 
 		public static final IClass CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -67,7 +67,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	{
 		if (this.genericType == null)
 		{
-			ClassGenericType generic = new ClassGenericType(Types.CLASS_CLASS);
+			ClassGenericType generic = new ClassGenericType(LazyFields.CLASS_CLASS);
 			generic.addType(this.type);
 			return this.genericType = generic;
 		}
@@ -83,7 +83,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE);
+		IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -95,13 +95,13 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
 	}
 	
 	@Override
 	public float getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.CLASS_CONVERTIBLE) != null)
+		if (type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null)
 		{
 			return 2;
 		}
@@ -120,7 +120,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		}
 		
 		this.type = this.type.resolveType(markers, context);
-		ClassGenericType generic = new ClassGenericType(Types.CLASS_CLASS);
+		ClassGenericType generic = new ClassGenericType(LazyFields.CLASS_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
 	}

@@ -21,12 +21,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringInterpolationExpr implements IValue
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral
 				.resolveClass("StringInterpolationConvertible");
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -88,7 +88,7 @@ public final class StringInterpolationExpr implements IValue
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
-		if ((annotation = iclass.getAnnotation(Types.STRING_INTERPOLATION_CONVERTIBLE)) != null)
+		if ((annotation = iclass.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE)) != null)
 		{
 			StringValue string;
 			int len = this.count / 2;
@@ -135,7 +135,7 @@ public final class StringInterpolationExpr implements IValue
 	{
 		IClass theClass = type.getTheClass();
 		return theClass.getAnnotation(dyvil.tools.compiler.ast.type.builtin.Types.STRING_CONVERTIBLE_CLASS) != null
-				|| theClass.getAnnotation(Types.STRING_INTERPOLATION_CONVERTIBLE) != null;
+				|| theClass.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE) != null;
 	}
 	
 	@Override

@@ -56,14 +56,14 @@ public final class AnnotationMetadata implements IClassMetadata
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 		// Add the java.lang.Annotation interface
-		if (!this.theClass.isSubTypeOf(Annotation.Types.ANNOTATION))
+		if (!this.theClass.isSubTypeOf(Annotation.LazyFields.ANNOTATION))
 		{
-			this.theClass.addInterface(Annotation.Types.ANNOTATION);
+			this.theClass.addInterface(Annotation.LazyFields.ANNOTATION);
 		}
 		
 		if (this.retention == null)
 		{
-			IAnnotation retention = this.theClass.getAnnotation(Annotation.Types.RETENTION_CLASS);
+			IAnnotation retention = this.theClass.getAnnotation(Annotation.LazyFields.RETENTION_CLASS);
 			if (retention != null)
 			{
 				INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
@@ -82,7 +82,7 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 		
-		IAnnotation target = this.theClass.getAnnotation(Annotation.Types.TARGET_CLASS);
+		IAnnotation target = this.theClass.getAnnotation(Annotation.LazyFields.TARGET_CLASS);
 		if (target == null)
 		{
 			return;

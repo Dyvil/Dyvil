@@ -21,11 +21,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class NilExpr implements IValue
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass NIL_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("NilConvertible");
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -93,7 +93,7 @@ public final class NilExpr implements IValue
 			return this;
 		}
 		
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.NIL_CONVERTIBLE_CLASS);
+		IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			this.methodName = LiteralConversion.getMethodName(annotation);
@@ -115,7 +115,7 @@ public final class NilExpr implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isArrayType() || type.getTheClass().getAnnotation(Types.NIL_CONVERTIBLE_CLASS) != null;
+		return type.isArrayType() || type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS) != null;
 	}
 	
 	@Override
