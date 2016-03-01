@@ -245,11 +245,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (this.parameterCount == 0 && this.returnType.isSuperTypeOf(type))
-		{
-			return true;
-		}
-
 		if (!IObjectType.super.isSuperTypeOf(type))
 		{
 			return false;
@@ -279,6 +274,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean isAssignableFrom(IType type)
+	{
+		return this.parameterCount == 0 && this.returnType.isSuperTypeOf(type) || this.isSuperTypeOf(type);
 	}
 
 	@Override
