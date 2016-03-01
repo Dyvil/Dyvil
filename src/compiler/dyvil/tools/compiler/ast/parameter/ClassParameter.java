@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -20,7 +21,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -50,9 +50,9 @@ public final class ClassParameter extends Parameter implements IField
 		super(name, type, modifiers);
 	}
 
-	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers);
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -122,19 +122,19 @@ public final class ClassParameter extends Parameter implements IField
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		if (instance != null)
+		if (receiver != null)
 		{
 			if (this.hasModifier(Modifiers.STATIC))
 			{
-				if (instance.valueTag() != IValue.CLASS_ACCESS)
+				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
 					markers.add(Markers.semantic(position, "classparameter.access.static", this.name.unqualified));
 					return null;
 				}
 			}
-			else if (instance.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
 				markers.add(Markers.semantic(position, "classparameter.access.instance", this.name.unqualified));
 			}
@@ -145,11 +145,11 @@ public final class ClassParameter extends Parameter implements IField
 			return new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 		}
 		
-		return instance;
+		return receiver;
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
 		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
 		{
@@ -194,14 +194,6 @@ public final class ClassParameter extends Parameter implements IField
 				            this.getSignature(), null);
 		
 		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
-	}
-	
-	@Override
-	public void write(MethodWriter writer)
-	{
-		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.type, 0);
-		this.writeAnnotations(writer);
 	}
 
 	@Override

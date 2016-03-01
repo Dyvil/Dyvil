@@ -33,6 +33,7 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -336,6 +337,12 @@ public abstract class AbstractClass implements IClass
 			this.parameters = temp;
 		}
 		this.parameters[index] = parameter;
+	}
+
+	@Override
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		return new ClassParameter(position, name, type, modifiers, annotations);
 	}
 	
 	@Override

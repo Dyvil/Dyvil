@@ -1,13 +1,12 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.expression.TupleExpr;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -17,7 +16,7 @@ import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-public class LambdaOrTupleParser extends EmulatorParser implements IParameterList
+public class LambdaOrTupleParser extends EmulatorParser implements IParameterConsumer
 {
 	protected static final int START          = 1;
 	protected static final int PARAMETERS     = 2;
@@ -88,8 +87,8 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 				return;
 			}
 			this.mode = SEPARATOR;
-			final MethodParameter methodParameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
-			                                                            EmptyModifiers.INSTANCE);
+			final IParameter methodParameter = this.createParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
+			                                                            EmptyModifiers.INSTANCE, null);
 			this.addParameter(methodParameter);
 			return;
 		case SEPARATOR:
@@ -169,28 +168,5 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterLis
 			this.params = temp;
 		}
 		this.params[index] = parameter;
-	}
-	
-	@Override
-	public int parameterCount()
-	{
-		return 0;
-	}
-	
-	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-	}
-	
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return null;
-	}
-	
-	@Override
-	public IParameter[] getParameters()
-	{
-		return null;
 	}
 }

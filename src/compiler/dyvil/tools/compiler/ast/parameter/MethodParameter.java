@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
@@ -15,9 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -50,9 +49,9 @@ public final class MethodParameter extends Parameter
 		super(name, type, modifierSet);
 	}
 
-	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers);
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -116,13 +115,13 @@ public final class MethodParameter extends Parameter
 	}
 	
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		return instance;
+		return receiver;
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
 		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
 		{
@@ -177,15 +176,6 @@ public final class MethodParameter extends Parameter
 		super.check(markers, context);
 
 		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
-	}
-
-	@Override
-	public void write(MethodWriter writer)
-	{
-		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.getInternalType(), 0);
-
-		this.writeAnnotations(writer);
 	}
 
 	@Override

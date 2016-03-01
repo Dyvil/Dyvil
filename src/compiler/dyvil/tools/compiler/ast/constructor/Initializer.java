@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -27,9 +28,9 @@ public class Initializer extends Member implements IInitializer
 	// Metadata
 	protected IClass enclosingClass;
 
-	public Initializer(ICodePosition position, ModifierSet modifiers)
+	public Initializer(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, Names.init, Types.VOID, modifiers);
+		super(position, Names.init, Types.VOID, modifiers, annotations);
 	}
 
 	@Override

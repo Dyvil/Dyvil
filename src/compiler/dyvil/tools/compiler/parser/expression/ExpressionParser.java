@@ -809,7 +809,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// Lambda Expression with one untyped parameter
 
 				final MethodParameter parameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
-				                                                      EmptyModifiers.INSTANCE);
+				                                                      EmptyModifiers.INSTANCE, null);
 				final LambdaExpr lambdaExpr = new LambdaExpr(next.raw(), parameter);
 
 				this.mode = END;

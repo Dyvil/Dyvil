@@ -4,7 +4,7 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 
-public interface IExternalMethod extends ICallableMember
+public interface IExternalCallableMember extends ICallableMember
 {
 	IParameter getParameter_(int index);
 	

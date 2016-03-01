@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.Constructor;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.method.IExternalMethod;
+import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -18,7 +18,7 @@ import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ExternalConstructor extends Constructor implements IExternalMethod
+public final class ExternalConstructor extends Constructor implements IExternalCallableMember
 {
 	private boolean annotationsResolved;
 	private boolean returnTypeResolved;

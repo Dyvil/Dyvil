@@ -6,11 +6,11 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -18,7 +18,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IMethod extends IClassMember, ICallableMember, IMethodSignature, IContext
+public interface IMethod extends IClassMember, ICallableMember, ICallableSignature, ITypeParametric, IContext
 {
 	@Override
 	default MemberKind getKind()
@@ -41,13 +41,6 @@ public interface IMethod extends IClassMember, ICallableMember, IMethodSignature
 	void setHasSideEffects(boolean sideEffects);
 	
 	void setParameters(IParameter[] parameters, int parameterCount);
-	
-	@Override
-	default void addParameterType(IType type)
-	{
-		int index = this.parameterCount();
-		this.addParameter(new MethodParameter(Name.getQualified("par" + index), type));
-	}
 
 	/**
 	 * Checks if this method overrides the given {@code candidate} method.

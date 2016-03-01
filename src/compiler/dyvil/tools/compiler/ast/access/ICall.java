@@ -64,7 +64,7 @@ public interface ICall extends IValue
 		for (int i = 0; i < wildcards; i++)
 		{
 			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
-			                                    EmptyModifiers.INSTANCE);
+			                                    EmptyModifiers.INSTANCE, null);
 		}
 
 		int index = 0;

@@ -50,7 +50,7 @@ import java.lang.annotation.ElementType;
 
 public class Constructor extends Member implements IConstructor
 {
-	protected IParameter[] parameters = new MethodParameter[3];
+	protected IParameter[] parameters = new IParameter[3];
 	protected int parameterCount;
 
 	protected IType[] exceptions;
@@ -110,6 +110,13 @@ public class Constructor extends Member implements IConstructor
 		this.parameters = parameters;
 		this.parameterCount = parameterCount;
 	}
+
+	@Override
+	public void addParameterType(IType type)
+	{
+		final int parameterIndex = this.parameterCount;
+		this.addParameter(new MethodParameter(Name.getQualified("par" + parameterIndex), type));
+	}
 	
 	@Override
 	public int parameterCount()
@@ -133,6 +140,11 @@ public class Constructor extends Member implements IConstructor
 		final int index = this.parameterCount++;
 
 		parameter.setIndex(index);
+
+		if (parameter.isVarargs())
+		{
+			this.setVariadic();
+		}
 
 		if (index >= this.parameters.length)
 		{

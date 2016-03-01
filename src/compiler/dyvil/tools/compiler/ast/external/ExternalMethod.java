@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
-import dyvil.tools.compiler.ast.method.IExternalMethod;
+import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -28,7 +28,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ExternalMethod extends AbstractMethod implements IExternalMethod
+public final class ExternalMethod extends AbstractMethod implements IExternalCallableMember
 {
 	private boolean annotationsResolved;
 	private boolean returnTypeResolved;

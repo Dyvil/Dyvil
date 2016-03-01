@@ -66,7 +66,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected IType receiverType;
 
-	protected IParameter[] parameters = new MethodParameter[3];
+	protected IParameter[] parameters = new IParameter[3];
 	protected int parameterCount;
 	
 	protected IType[] exceptions;
@@ -237,6 +237,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		parameter.setMethod(this);
 		parameter.setIndex(index);
 
+		if (parameter.isVarargs())
+		{
+			this.setVariadic();
+		}
+
 		if (index >= this.parameters.length)
 		{
 			IParameter[] temp = new IParameter[this.parameterCount];
@@ -244,6 +249,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			this.parameters = temp;
 		}
 		this.parameters[index] = parameter;
+	}
+
+	@Override
+	public void addParameterType(IType type)
+	{
+		this.addParameter(new MethodParameter(Name.getQualified("par" + this.parameterCount), type));
 	}
 	
 	@Override

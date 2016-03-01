@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -55,9 +57,9 @@ public abstract class Parameter extends Member implements IParameter
 		super(name, type, modifiers);
 	}
 
-	public Parameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	public Parameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers);
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -313,6 +315,18 @@ public abstract class Parameter extends Member implements IParameter
 		{
 			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
 		}
+	}
+
+	@Override
+	public void write(MethodWriter writer)
+	{
+		final int modifiers = this.modifiers == null ?
+				0 :
+				this.modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS & ModifierUtil.JAVA_MODIFIER_MASK;
+
+		this.localIndex = writer.localCount();
+		writer.registerParameter(this.localIndex, this.name.qualified, this.getInternalType(), modifiers);
+		this.writeAnnotations(writer);
 	}
 	
 	protected void writeAnnotations(MethodWriter writer)

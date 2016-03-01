@@ -118,7 +118,7 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
-		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE);
+		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE, null);
 		this.setter.addParameter(this.setterParameter);
 
 		return this.setter;

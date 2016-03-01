@@ -103,8 +103,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
-					final Initializer initializer = new Initializer(token.raw(), this.modifiers);
-					initializer.setAnnotations(this.annotations);
+					final Initializer initializer = new Initializer(token.raw(), this.modifiers, this.annotations);
 					this.member = initializer;
 					this.memberKind = INITIALIZER;
 

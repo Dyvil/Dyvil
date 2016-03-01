@@ -2,12 +2,9 @@ package dyvil.tools.compiler.parser.method;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
-import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.modifiers.Modifier;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.*;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -26,7 +23,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final int NAME      = 2;
 	public static final int SEPARATOR = 4;
 	
-	protected IParameterList paramList;
+	protected IParameterConsumer consumer;
 
 	// Metadata
 	private ModifierList   modifiers;
@@ -35,9 +32,9 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	private IType   type;
 	private boolean varargs;
 
-	public ParameterListParser(IParameterList paramList)
+	public ParameterListParser(IParameterConsumer consumer)
 	{
-		this.paramList = paramList;
+		this.consumer = consumer;
 		this.mode = TYPE;
 	}
 	
@@ -112,7 +109,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.THIS:
 				this.mode = SEPARATOR;
 				this.reset();
-				if (this.paramList instanceof IParametric && !((IParametric) this.paramList).setReceiverType(this.type))
+				if (this.consumer instanceof IParametric && !((IParametric) this.consumer).setReceiverType(this.type))
 				{
 					pm.report(token, "parameter.receivertype.invalid");
 					return;
@@ -129,18 +126,11 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			if (this.varargs)
 			{
-				this.paramList.setVariadic();
 				this.type = new ArrayType(this.type);
 			}
 
-			final IParameter parameter = this.paramList instanceof IClass ?
-					new ClassParameter(token.nameValue(), this.type) :
-					new MethodParameter(token.nameValue(), this.type);
-			parameter.setPosition(token.raw());
-			parameter.setModifiers(this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers);
-			parameter.setAnnotations(this.annotations);
-			parameter.setVarargs(this.varargs);
-			this.paramList.addParameter(parameter);
+			final IParameter parameter = this.createParameter(token);
+			this.consumer.addParameter(parameter);
 
 			if (token.next().type() == BaseSymbols.EQUALS)
 			{
@@ -173,6 +163,15 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			return;
 		}
+	}
+
+	public IParameter createParameter(IToken token)
+	{
+		final ModifierSet modifiers = this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers;
+		final IParameter parameter = this.consumer
+				.createParameter(token.raw(), token.nameValue(), this.type, modifiers, this.annotations);
+		parameter.setVarargs(this.varargs);
+		return parameter;
 	}
 	
 	@Override
