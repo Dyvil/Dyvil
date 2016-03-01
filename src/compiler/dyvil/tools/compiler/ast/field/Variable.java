@@ -114,34 +114,10 @@ public final class Variable extends Member implements IVariable
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
-		if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.FINAL))
-		{
-			markers.add(Markers.semantic(position, "variable.assign.final", this.name.unqualified));
-		}
-		else
-		{
-			this.assigned = true;
-		}
-		
-		final IValue typedValue = this.type.convertValue(newValue, this.type, markers, context);
-		if (typedValue == null)
-		{
-			if (newValue.isResolved())
-			{
-				Marker marker = Markers.semantic(newValue.getPosition(), "variable.assign.type", this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("variable.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
-				markers.add(marker);
-			}
-		}
-		else
-		{
-			newValue = typedValue;
-		}
-		
-		return newValue;
+		this.assigned = true;
+		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);
 	}
 	
 	@Override

@@ -5,9 +5,13 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -20,7 +24,31 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	
 	IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
 	
-	IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue);
+	default IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
+	{
+		if (this.hasModifier(Modifiers.FINAL))
+		{
+			markers.add(Markers.semanticError(position, this.getKind().getName() + ".assign.final", this.getName()));
+		}
+
+		final IType type = this.getType();
+		final ITypeContext typeContext = receiver == null ? ITypeContext.NULL : receiver.getType();
+
+		final IValue typedValue = IType.convertValue(newValue, type, typeContext, markers, context);
+		if (typedValue != null)
+		{
+			newValue = typedValue;
+		}
+		else if (newValue.isResolved())
+		{
+			final Marker marker = Markers.semanticError(newValue.getPosition(), this.getKind().getName() + ".assign.type", this.getName());
+			marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", type.getConcreteType(typeContext)));
+			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
+			markers.add(marker);
+		}
+
+		return newValue;
+	}
 	
 	default boolean isEnumConstant()
 	{

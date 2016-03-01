@@ -199,33 +199,6 @@ public class Field extends Member implements IField
 	}
 	
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
-	{
-		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
-		{
-			markers.add(Markers.semantic(position, "field.assign.final", this.name.unqualified));
-		}
-		
-		IValue value1 = IType.convertValue(newValue, this.type, this.type, markers, context);
-		if (value1 == null)
-		{
-			if (newValue.isResolved())
-			{
-				Marker marker = Markers.semantic(newValue.getPosition(), "field.assign.type", this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("field.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
-				markers.add(marker);
-			}
-		}
-		else
-		{
-			newValue = value1;
-		}
-		
-		return newValue;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);

@@ -153,7 +153,7 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
 		if (!this.variable.isReferenceCapturable())
 		{
@@ -164,7 +164,7 @@ public abstract class CaptureDataMember implements IDataMember
 			this.variable.setReferenceType();
 		}
 
-		return this.variable.checkAssign(markers, context, position, instance, newValue);
+		return this.variable.checkAssign(markers, context, position, receiver, newValue);
 	}
 
 	@Override

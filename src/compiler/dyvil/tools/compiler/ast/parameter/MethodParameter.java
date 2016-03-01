@@ -123,29 +123,8 @@ public final class MethodParameter extends Parameter
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
-		{
-			markers.add(Markers.semantic(position, "parameter.assign.final", this.name.unqualified));
-		}
-		else
-		{
-			this.assigned = true;
-		}
-		
-		IValue value1 = newValue.withType(this.type, null, markers, context);
-		if (value1 == null)
-		{
-			Marker marker = Markers.semantic(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
-			marker.addInfo(Markers.getSemantic("parameter.type", this.type));
-			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
-			markers.add(marker);
-		}
-		else
-		{
-			newValue = value1;
-		}
-		
-		return newValue;
+		this.assigned = true;
+		return super.checkAssign(markers, context, position, receiver, newValue);
 	}
 	
 	@Override

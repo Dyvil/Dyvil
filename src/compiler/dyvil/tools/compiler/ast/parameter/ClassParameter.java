@@ -155,26 +155,7 @@ public final class ClassParameter extends Parameter implements IField
 		{
 			markers.add(Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
-		else if (this.hasModifier(Modifiers.FINAL))
-		{
-			markers.add(Markers.semantic(position, "classparameter.assign.final", this.name.unqualified));
-		}
-		
-		final IValue typed = newValue.withType(this.type, null, markers, context);
-		if (typed == null)
-		{
-			final Marker marker = Markers
-					.semantic(newValue.getPosition(), "classparameter.assign.type", this.name.unqualified);
-			marker.addInfo(Markers.getSemantic("classparameter.type", this.type));
-			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
-			markers.add(marker);
-		}
-		else
-		{
-			newValue = typed;
-		}
-		
-		return newValue;
+		return super.checkAssign(markers, context, position, receiver, newValue);
 	}
 
 	@Override
