@@ -31,12 +31,13 @@ public final class OperatorParser extends Parser
 	private   int          type;
 	private   Operator     operator;
 	
-	public OperatorParser(IOperatorMap map, boolean typeParsed)
+	public OperatorParser(IOperatorMap map, int type)
 	{
 		this.map = map;
 		
-		if (typeParsed)
+		if (type >= 0)
 		{
+			this.type = type;
 			this.mode = OPERATOR;
 		}
 		else
@@ -48,7 +49,7 @@ public final class OperatorParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case TYPE:

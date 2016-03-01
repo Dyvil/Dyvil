@@ -264,6 +264,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		final IClass thatClass = type.getTheClass();
 		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
+
+	default boolean isAssignableFrom(IType type)
+	{
+		return this.isSuperTypeOf(type);
+	}
 	
 	default boolean isSuperClassOf(IType type)
 	{

@@ -26,13 +26,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldAssignment implements IValue, INamed, IReceiverAccess, IValueConsumer
 {
-	protected ICodePosition position;
-	
 	protected IValue receiver;
 	protected Name   name;
 	protected IValue value;
-	
+
+	// Metadata
+	protected ICodePosition position;
+
 	protected IDataMember field;
+	protected IType type;
 	
 	public FieldAssignment(ICodePosition position)
 	{
@@ -98,7 +100,17 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public IType getType()
 	{
-		return this.field == null ? Types.UNKNOWN : this.field.getType();
+		if (this.type == null)
+		{
+			if (this.field == null)
+			{
+				return Types.UNKNOWN;
+			}
+
+			final ITypeContext typeContext = this.receiver == null ? ITypeContext.NULL : this.receiver.getType();
+			return this.type = this.field.getType().getConcreteType(typeContext).getReturnType();
+		}
+		return this.type;
 	}
 	
 	@Override
@@ -366,12 +378,12 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
 			return;
 		}
+
+		final IType fieldType = this.getType();
 		if (type == null)
 		{
-			type = this.getType();
+			type = fieldType;
 		}
-
-		final IType fieldType = this.field.getType();
 
 		if (this.receiver != null)
 		{
