@@ -9,7 +9,8 @@ public class LambdaTest
 		public Function[P, A] andThen[A](Function[R, A] other) = x => other(this(x))
 	}
 	
-	functional interface IntFunction extends Function[int, int] {
+	functional interface IntFunction extends Function[int, int]
+	{
 		public override int apply(int value)
 	}
 	
@@ -23,16 +24,20 @@ public class LambdaTest
 		compoundAssignmentTest()
 		customSAMTest()
 		partialFunctionTest()
+		curriedTest()
+		typeInferenceTest()
 	}
 	
-	private static void basicTest() {
+	private static void basicTest()
+	{
 		auto expected = [ 1 : "A", 10 : "a", 2 : "B", 20 : "b" ]
 		auto map = [ 1 : "a", 2 : "b" ].flatMapped((i, s) => [ (i, s.toUpperCase), (i * 10, s) ])
 
 		Main.test("Basic Lambda", map, expected)
 	}
 	
-	private static void chainTest() {
+	private static void chainTest()
+	{
 		auto fun1 = (int i) => i + 1
 		auto fun2 = (int i) => i * 2
 		auto fun12 = fun1 andThen fun2
@@ -41,7 +46,8 @@ public class LambdaTest
 		Main.test("Function Chain", 16, result)
 	}
 	
-	private static void compoundAssignmentTest() {
+	private static void compoundAssignmentTest()
+	{
 		int localSum = 0
 		auto list = List(1, 2, 3)
 		list.forEach(i => localSum += i)
@@ -51,14 +57,16 @@ public class LambdaTest
 		Main.test("Compound Assignment (Static)", 6, staticSum)
 	}
 	
-	private static void customSAMTest() {
+	private static void customSAMTest()
+	{
 		IntFunction intF = i => i * i
 		int result = intF(7)
 
 		Main.test("Custom SAM Interface", 49, result)
 	}
 
-	private static void closureTest() {
+	private static void closureTest()
+	{
 		List[String] result = List.[String]
 
 		() => void function1 = function { result += "a" }
@@ -74,12 +82,35 @@ public class LambdaTest
 		Main.test("Closures", expected, result)
 	}
 
-	private static void partialFunctionTest() {
+	private static void partialFunctionTest()
+	{
 		(int, int) => int compareInts = _ compareTo _
 		any => void printFun1 = Main.test("Partial Function Test 1", -1, _)
 
 		printFun1(compareInts(1, 2))
 
 		with ("A", Main.test("Partial Function Test 2", "A", _))
+	}
+
+	public static void curriedTest()
+	{
+		int => int => int add2 = i => j => i + j
+		int => int => int => int add3 = i => j => k => i + j + k
+		int => int => int => int => int add4 = i => j => k => l => i + j + k + l
+
+		Main.test("Curried Test (1 nested level)", 11, add2 1 10)
+		Main.test("Curried Test (2 nested levels)", 111, add3 1 10 100)
+		Main.test("Curried Test (3 nested levels)", 1111, add4 1 10 100 1000)
+	}
+
+	public static void typeInferenceTest()
+	{
+		auto function1 = (int i) => i
+		auto function2 = (int i, int j) => (i, j)
+		auto functionCurried = (int i) => (int j) => (i, j)
+
+		Main.test("Type Inference Test (1 Parameter)", type(int => int).toString, typeOf(function1).toString)
+		Main.test("Type Inference Test (2 Parameters", type((int, int) => (int, int)).toString, typeOf(function2).toString)
+		Main.test("Type Inference Test (Curried)", type(int => int => (int, int)).toString, typeOf(functionCurried).toString)
 	}
 }
