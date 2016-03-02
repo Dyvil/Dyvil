@@ -532,15 +532,11 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 	
-	protected void writeAnnotations(MethodWriter mw, int modifiers)
+	protected void writeAnnotations(MethodWriter writer, int modifiers)
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(mw);
-			}
+			this.annotations.write(writer);
 		}
 
 		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType())
@@ -548,23 +544,29 @@ public class CodeMethod extends AbstractMethod
 			final String signature = this.receiverType.getSignature();
 			if (signature != null)
 			{
-				AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
+				AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
 				annotationVisitor.visit("value", signature);
 				annotationVisitor.visitEnd();
 			}
 		}
 
-		ModifierUtil.writeModifiers(mw, this.modifiers);
+		ModifierUtil.writeModifiers(writer, this.modifiers);
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 
-		this.type.writeAnnotations(mw, TypeReference.newTypeReference(TypeReference.METHOD_RETURN), "");
+		// Type Variable Annotations
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].write(writer);
+		}
+
+		this.type.writeAnnotations(writer, TypeReference.newTypeReference(TypeReference.METHOD_RETURN), "");
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].writeAnnotations(mw, TypeReference.newExceptionReference(i), "");
+			this.exceptions[i].writeAnnotations(writer, TypeReference.newExceptionReference(i), "");
 		}
 	}
 

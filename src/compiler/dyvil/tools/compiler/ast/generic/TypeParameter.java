@@ -134,31 +134,31 @@ public final class TypeParameter implements ITypeParameter
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public AnnotationList getAnnotations()
 	{
 		return this.annotations;
 	}
-	
+
 	@Override
 	public void setAnnotations(AnnotationList annotations)
 	{
 		this.annotations = annotations;
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation)
 	{
@@ -166,10 +166,10 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.annotations = new AnnotationList();
 		}
-		
+
 		this.annotations.addAnnotation(annotation);
 	}
-	
+
 	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
@@ -184,26 +184,26 @@ public final class TypeParameter implements ITypeParameter
 		}
 		return true;
 	}
-	
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.annotations == null ? null : this.annotations.getAnnotation(type);
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.TYPE_PARAMETER;
 	}
-	
+
 	@Override
 	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
 	{
-		this.upperBounds[index] = IType
-				.withAnnotation(this.upperBounds[index], annotation, typePath, 0, typePath.getLength());
+		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0,
+		                                               typePath.getLength());
 	}
-	
+
 	@Override
 	public IType getDefaultType()
 	{
@@ -233,13 +233,13 @@ public final class TypeParameter implements ITypeParameter
 	{
 		return this.upperBoundCount;
 	}
-	
+
 	@Override
 	public void setUpperBound(int index, IType bound)
 	{
 		this.upperBounds[index] = bound;
 	}
-	
+
 	@Override
 	public void addUpperBound(IType bound)
 	{
@@ -252,31 +252,31 @@ public final class TypeParameter implements ITypeParameter
 		}
 		this.upperBounds[index] = bound;
 	}
-	
+
 	@Override
 	public IType getUpperBound(int index)
 	{
 		return this.upperBounds[index];
 	}
-	
+
 	@Override
 	public IType[] getUpperBounds()
 	{
 		return this.upperBounds;
 	}
-	
+
 	@Override
 	public void setLowerBound(IType bound)
 	{
 		this.lowerBound = bound;
 	}
-	
+
 	@Override
 	public IType getLowerBound()
 	{
 		return this.lowerBound;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
@@ -286,7 +286,7 @@ public final class TypeParameter implements ITypeParameter
 		}
 		return this.upperBounds[0].getTheClass();
 	}
-	
+
 	@Override
 	public boolean isAssignableFrom(IType type)
 	{
@@ -346,12 +346,12 @@ public final class TypeParameter implements ITypeParameter
 		}
 		return 2;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		IDataMember field;
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			field = this.upperBounds[i].resolveField(name);
@@ -360,10 +360,10 @@ public final class TypeParameter implements ITypeParameter
 				return field;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
@@ -372,7 +372,7 @@ public final class TypeParameter implements ITypeParameter
 			this.upperBounds[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -380,7 +380,7 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.lowerBound = this.lowerBound.resolveType(markers, context);
 		}
-		
+
 		if (this.upperBoundCount > 0)
 		{
 			// The first upper bound is meant to be a class bound.
@@ -407,7 +407,7 @@ public final class TypeParameter implements ITypeParameter
 					}
 				}
 			}
-			
+
 			// Check if the remaining upper bounds are interfaces, and remove if
 			// not.
 			for (int i = 1; i < this.upperBoundCount; i++)
@@ -442,7 +442,7 @@ public final class TypeParameter implements ITypeParameter
 			}
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -455,13 +455,13 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.lowerBound.resolve(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -474,13 +474,13 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.lowerBound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		}
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -493,13 +493,13 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.lowerBound.check(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -512,13 +512,13 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.lowerBound.foldConstants();
 		}
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -531,13 +531,13 @@ public final class TypeParameter implements ITypeParameter
 		{
 			this.lowerBound.cleanup(context, compilableList);
 		}
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
@@ -548,7 +548,7 @@ public final class TypeParameter implements ITypeParameter
 			{
 				this.upperBounds[0].appendSignature(buffer);
 			}
-			
+
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
 				buffer.append(':');
@@ -620,21 +620,29 @@ public final class TypeParameter implements ITypeParameter
 		boolean method = this.generic instanceof IMethod;
 		int typeRef = TypeReference.newTypeParameterReference(
 				method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
-		
+
 		if (this.variance != Variance.INVARIANT)
 		{
 			String type = this.variance == Variance.CONTRAVARIANT ?
-					"Ldyvil/annotation/_internal/Contravariant;" :
-					"Ldyvil/annotation/_internal/Covariant;";
+					              "Ldyvil/annotation/_internal/Contravariant;" :
+					              "Ldyvil/annotation/_internal/Covariant;";
 			visitor.visitTypeAnnotation(typeRef, null, type, true);
 		}
-		
+
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			typeRef = TypeReference.newTypeParameterBoundReference(
 					method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
 					this.index, i);
 			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
+		}
+
+		if (this.annotations != null)
+		{
+			for (int i = 0, count = this.annotations.annotationCount(); i < count; i++)
+			{
+				this.annotations.getAnnotation(i).write(visitor, typeRef, null);
+			}
 		}
 	}
 
@@ -679,7 +687,7 @@ public final class TypeParameter implements ITypeParameter
 		this.toString("", builder);
 		return builder.toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -692,10 +700,10 @@ public final class TypeParameter implements ITypeParameter
 				buffer.append(' ');
 			}
 		}
-		
+
 		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
-		
+
 		if (this.lowerBound != null)
 		{
 			Formatting.appendSeparator(buffer, "type.bound", ">:");
