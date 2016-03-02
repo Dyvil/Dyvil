@@ -1,5 +1,7 @@
 package dyvil.lang
 
+import	dyvilx.lang.model.`type`.Type
+import	dyvil.annotation.Reified
 using	dyvil.reflect.Opcodes._
 
 /**
@@ -10,15 +12,11 @@ public final class LanguageFeatures
 {
 	private init() {}
 
-	// Tuples
+	// Class and Type
 
-	@Deprecated(description: "Support for the '->' Operator will be dropped in Dyvil v0.18.0, use the ':' operator instead" )
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
-	public infix (A, B) ->[A, B](A a, B b) = (a, b)
+	public static Class[T] classOf[@Reified(true) T](T value) = class T
 
-	@Deprecated(description: "Support for the '<-' Operator will be dropped in Dyvil v0.18.0")
-	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/tuple/Tuple2", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;" ])
-	public infix (B, A) <-[A, B](A a, B b) = (b, a)
+	public static Type[T] typeOf[@Reified T](T value) = type T
 
 	// Lists
 
@@ -47,7 +45,11 @@ public final class LanguageFeatures
 	public static infix R run[T, R](T self, extension T => R f) = f(self)
 
 	@Intrinsic(value: [ LOAD_0, DUP, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2, POP ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static infix T use[T](T self, extension T => void f) { f(self); return self }
+	public static infix T use[T](T self, extension T => void f)
+	{
+		f(self)
+		return self
+	}
 
 	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
 	public static R with[T, R](T receiver, T => R f) = f(receiver)
