@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -155,6 +156,14 @@ public class AnnotationList
 		for (int i = 0; i < this.annotationCount; i++)
 		{
 			this.annotations[i].cleanup(context, compilableList);
+		}
+	}
+
+	public void write(AnnotatableVisitor writer)
+	{
+		for (int i = 0, count = this.annotationCount; i < count; i++)
+		{
+			this.annotations[i].write(writer);
 		}
 	}
 	
