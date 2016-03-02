@@ -645,6 +645,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
+	public boolean canReturn(IType type)
+	{
+		return true;
+	}
+
+	@Override
 	public boolean handleException(IType type)
 	{
 		return true;
