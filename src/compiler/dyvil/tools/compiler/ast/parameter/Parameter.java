@@ -57,6 +57,11 @@ public abstract class Parameter extends Member implements IParameter
 		super(name, type, modifiers);
 	}
 
+	public Parameter(ICodePosition position, Name name, IType type)
+	{
+		super(position, name, type);
+	}
+
 	public Parameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);

@@ -698,7 +698,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				final IParameter parameter = this.parameters[0];
 				final IType paramType = parameter.getInternalType().getParameterType();
-				
+
 				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
 				                                    TypeChecker.markerSupplier("method.access.infix_type"));
 				

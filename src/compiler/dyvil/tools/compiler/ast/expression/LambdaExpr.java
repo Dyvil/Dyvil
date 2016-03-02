@@ -409,7 +409,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			if (param.getType() == Types.UNKNOWN)
 			{
 				// Avoid invalid parameter type error
-				// TODO use custom Parameter subclass
 				param.setType(null);
 				param.resolveTypes(markers, context);
 				param.setType(Types.UNKNOWN);

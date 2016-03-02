@@ -65,7 +65,7 @@ public class Closure extends StatementList
 
 		for (int i = 0; i < parameterCount; i++)
 		{
-			parameters[i] = new MethodParameter(Name.getQualified("$" + i), Types.UNKNOWN);
+			parameters[i] = new MethodParameter(this.position, Name.getQualified("$" + i), Types.UNKNOWN);
 		}
 
 		if (type.isExtension() && parameterCount > 0)

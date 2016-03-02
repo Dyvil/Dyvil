@@ -49,6 +49,11 @@ public final class MethodParameter extends Parameter
 		super(name, type, modifierSet);
 	}
 
+	public MethodParameter(ICodePosition position, Name name, IType type)
+	{
+		super(position, name, type);
+	}
+
 	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
