@@ -80,6 +80,7 @@ public interface IStatement extends IValue
 		final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
 		marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));
 		markers.add(marker);
+
 		return resolvedValue;
 	}
 
@@ -87,14 +88,20 @@ public interface IStatement extends IValue
 	{
 		final IValue typedValue = resolvedValue.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
 
-		if (typedValue == null)
+		if (typedValue != null)
 		{
-			final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
-			marker.addInfo(Markers.getSemantic("value.type", resolvedValue.getType()));
-			markers.add(marker);
+			return typedValue;
+		}
+
+		if (!resolvedValue.isResolved())
+		{
 			return resolvedValue;
 		}
 
-		return typedValue;
+		final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
+		marker.addInfo(Markers.getSemantic("value.type", resolvedValue.getType()));
+		markers.add(marker);
+
+		return resolvedValue;
 	}
 }

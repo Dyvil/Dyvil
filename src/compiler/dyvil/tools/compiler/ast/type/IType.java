@@ -278,7 +278,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 		final IClass thisClass = this.getTheClass();
 		final IClass thatClass = type.getTheClass();
-		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
+		return thatClass != null && thisClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
 
 	default boolean isSameType(IType type)
