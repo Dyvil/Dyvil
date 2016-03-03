@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.CombiningContext;
@@ -174,6 +175,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this.method;
 	}
 
+	@Override
 	public IType getReturnType()
 	{
 		return this.returnType;
@@ -195,14 +197,14 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		if (this.type == null)
 		{
-			LambdaType lt = new LambdaType(this.parameterCount);
+			final LambdaType lambdaType = new LambdaType(this.parameterCount);
 			for (int i = 0; i < this.parameterCount; i++)
 			{
-				lt.addType(this.parameters[i].getType());
+				lambdaType.addType(this.parameters[i].getType());
 			}
-			lt.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
-			this.type = lt;
-			return lt;
+			lambdaType.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
+
+			return this.type = lambdaType;
 		}
 		return this.type;
 	}
@@ -284,10 +286,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			for (int i = 0; i < this.parameterCount; i++)
 			{
-				final IParameter param = this.parameters[i];
-				if (param.getType() == Types.UNKNOWN)
+				final IParameter parameter = this.parameters[i];
+				if (parameter.getType() == Types.UNKNOWN)
 				{
-					param.setType(this.method.getParameter(i).getType());
+					parameter.setType(this.method.getParameter(i).getType());
 				}
 			}
 
@@ -448,7 +450,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 		}
 
-		this.value.resolveTypes(markers, new CombiningContext(this, context));
+		if (this.value != null)
+		{
+			this.value.resolveTypes(markers, new CombiningContext(this, context));
+		}
+		else
+		{
+			markers.add(Markers.semantic(this.position, "lambda.value.invalid"));
+			this.value = new VoidValue(this.position);
+		}
 	}
 
 	@Override
