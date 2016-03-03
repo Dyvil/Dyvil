@@ -48,7 +48,19 @@ public interface IDefaultContext extends IStaticContext
 	{
 		return null;
 	}
-	
+
+	@Override
+	default IType getReturnType()
+	{
+		return null;
+	}
+
+	@Override
+	default byte handleException(IType type)
+	{
+		return PASS;
+	}
+
 	@Override
 	default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{

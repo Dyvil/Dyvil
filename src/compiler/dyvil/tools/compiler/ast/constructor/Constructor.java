@@ -531,22 +531,22 @@ public class Constructor extends Member implements IConstructor
 	}
 	
 	@Override
-	public boolean handleException(IType type)
+	public byte handleException(IType type)
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			if (this.exceptions[i].isSuperTypeOf(type))
 			{
-				return true;
+				return ALLOW;
 			}
 		}
-		return false;
+		return DISALLOW;
 	}
 
 	@Override
-	public boolean canReturn(IType type)
+	public IType getReturnType()
 	{
-		return type == Types.VOID;
+		return Types.VOID;
 	}
 
 	@Override

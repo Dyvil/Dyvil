@@ -395,16 +395,16 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 	
 	@Override
-	public boolean handleException(IType type)
+	public byte handleException(IType type)
 	{
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			if (this.catchBlocks[i].type.isSuperTypeOf(type))
 			{
-				return true;
+				return ALLOW;
 			}
 		}
-		return false;
+		return PASS;
 	}
 
 	@Override

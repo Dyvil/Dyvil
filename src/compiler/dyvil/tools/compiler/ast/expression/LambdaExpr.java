@@ -424,6 +424,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
+	public byte handleException(IType type)
+	{
+		return this.method != null ? this.method.handleException(type) : DISALLOW;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.parameterCount; i++)

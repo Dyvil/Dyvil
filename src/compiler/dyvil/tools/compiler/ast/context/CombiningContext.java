@@ -109,15 +109,22 @@ public class CombiningContext implements IContext
 	}
 	
 	@Override
-	public boolean handleException(IType type)
+	public byte handleException(IType type)
 	{
-		return this.inner.handleException(type) || this.outer.handleException(type);
+		final byte innerResult = this.inner.handleException(type);
+		if (innerResult == PASS)
+		{
+			return this.outer.handleException(type);
+		}
+
+		return innerResult;
 	}
 
 	@Override
-	public boolean canReturn(IType type)
+	public IType getReturnType()
 	{
-		return this.inner.canReturn(type) || this.outer.canReturn(type);
+		final IType innerReturnType = this.inner.getReturnType();
+		return innerReturnType != null ? innerReturnType : this.outer.getReturnType();
 	}
 
 	@Override

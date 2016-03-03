@@ -26,6 +26,10 @@ public interface IContext extends IMemberContext
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
 
+	byte ALLOW = 0;
+	byte DISALLOW = 1;
+	byte PASS = 2;
+
 	boolean isStatic();
 
 	default DyvilCompiler getCompilationContext()
@@ -60,9 +64,9 @@ public interface IContext extends IMemberContext
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 	
-	boolean handleException(IType type);
+	byte handleException(IType type);
 
-	boolean canReturn(IType type);
+	IType getReturnType();
 	
 	boolean isMember(IVariable variable);
 	
@@ -144,6 +148,6 @@ public interface IContext extends IMemberContext
 	static boolean isUnhandled(IContext context, IType exceptionType)
 	{
 		return Types.EXCEPTION.isSuperTypeOf(exceptionType) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(exceptionType)
-				&& !context.handleException(exceptionType);
+				&& context.handleException(exceptionType) != ALLOW;
 	}
 }

@@ -896,18 +896,6 @@ public abstract class AbstractClass implements IClass
 		
 		this.metadata.getConstructorMatches(list, arguments);
 	}
-
-	@Override
-	public boolean handleException(IType type)
-	{
-		return false;
-	}
-
-	@Override
-	public boolean canReturn(IType type)
-	{
-		return false;
-	}
 	
 	@Override
 	public IDataMember getSuperField(Name name)
@@ -939,7 +927,19 @@ public abstract class AbstractClass implements IClass
 		}
 		return null;
 	}
-	
+
+	@Override
+	public IType getReturnType()
+	{
+		return null;
+	}
+
+	@Override
+	public byte handleException(IType type)
+	{
+		return DISALLOW;
+	}
+
 	@Override
 	public boolean isMember(IVariable variable)
 	{

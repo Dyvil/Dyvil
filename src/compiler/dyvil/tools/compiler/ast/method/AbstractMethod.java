@@ -504,22 +504,22 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public boolean handleException(IType type)
+	public byte handleException(IType type)
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			if (this.exceptions[i].isSuperTypeOf(type))
 			{
-				return true;
+				return ALLOW;
 			}
 		}
-		return false;
+		return DISALLOW;
 	}
 
 	@Override
-	public boolean canReturn(IType type)
+	public IType getReturnType()
 	{
-		return this.type.isSuperTypeOf(type);
+		return this.type;
 	}
 
 	@Override

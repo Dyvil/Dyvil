@@ -65,15 +65,15 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	default boolean handleException(IType type)
+	default byte handleException(IType type)
 	{
-		return false;
+		return DISALLOW;
 	}
 
 	@Override
-	default boolean canReturn(IType type)
+	default IType getReturnType()
 	{
-		return false;
+		return null;
 	}
 
 	@Override
