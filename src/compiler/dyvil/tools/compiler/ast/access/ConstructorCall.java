@@ -191,7 +191,7 @@ public class ConstructorCall implements ICall
 			{
 				Marker marker = Markers.semantic(this.position, "constructor.access.array.length");
 				marker.addInfo(Markers.getSemantic("type.dimensions", dims));
-				marker.addInfo(Markers.getSemantic("constructor.access.array.length.count", len));
+				marker.addInfo(Markers.getSemantic("constructor.access.array.count", len));
 				markers.add(marker);
 				return this;
 			}
