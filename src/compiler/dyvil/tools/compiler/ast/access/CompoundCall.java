@@ -32,7 +32,7 @@ public final class CompoundCall
 		if (type == IValue.APPLY_CALL)
 		{
 			ApplyMethodCall applyCall = (ApplyMethodCall) receiver;
-			
+
 			// x(y...) op= z
 			// -> x(y...) = x(y...).op(z)
 			// -> x.update(y..., x.apply(y...).op(z))
@@ -41,18 +41,23 @@ public final class CompoundCall
 
 			IValue applyReceiver = applyCall.receiver = helper.processValue(applyCall.receiver);
 			IArguments applyArguments = applyCall.arguments = helper.processArguments(applyCall.arguments);
-			
+
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			if (op == null)
+			{
+				return null;
+			}
+
 			IValue update = new UpdateMethodCall(position, applyReceiver,
 			                                     applyArguments.withLastValue(Names.update, op))
-					.resolveCall(markers, context);
+				                .resolveCall(markers, context);
 
 			return helper.finish(update);
 		}
 		else if (type == IValue.SUBSCRIPT_GET)
 		{
 			SubscriptAccess subscriptAccess = (SubscriptAccess) receiver;
-			
+
 			// x[y...] op= z
 			// -> x[y...] = x[y...].op(z)
 			// -> x.subscript_=(y..., x.subscript(y...).op(z))
@@ -60,13 +65,18 @@ public final class CompoundCall
 			SideEffectHelper helper = new SideEffectHelper();
 
 			IValue subscriptReceiver = subscriptAccess.receiver = helper.processValue(subscriptAccess.receiver);
-			IArguments subscriptArguments = subscriptAccess.arguments = helper
-					.processArguments(subscriptAccess.arguments);
+			IArguments subscriptArguments = subscriptAccess.arguments = helper.processArguments(
+				subscriptAccess.arguments);
 
 			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			if (op == null)
+			{
+				return null;
+			}
+
 			IArguments subscriptSetterArguments = subscriptArguments.withLastValue(Names.subscript_$eq, op);
 			IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptSetterArguments)
-					.resolveCall(markers, context);
+				                   .resolveCall(markers, context);
 
 			return helper.finish(subscript);
 		}
@@ -101,7 +111,7 @@ public final class CompoundCall
 
 		return null;
 	}
-	
+
 	private static IncOperator getIncOperator(Name name, IArguments arguments, FieldAccess fieldAccess)
 	{
 		if ((name == Names.plus || name == Names.minus) && IncOperator.isIncConvertible(fieldAccess.getType()))
