@@ -219,4 +219,10 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		}
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return this.mode > NAME;
+	}
 }

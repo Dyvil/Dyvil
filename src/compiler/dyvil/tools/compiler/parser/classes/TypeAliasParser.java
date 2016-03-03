@@ -97,4 +97,10 @@ public class TypeAliasParser extends Parser
 			return;
 		}
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return this.mode > NAME;
+	}
 }
