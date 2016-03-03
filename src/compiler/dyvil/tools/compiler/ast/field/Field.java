@@ -36,77 +36,77 @@ public class Field extends Member implements IField
 
 	protected IClass enclosingClass;
 	protected IValue value;
-	
+
 	public Field(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	public Field(IClass enclosingClass, Name name)
 	{
 		super(name);
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	public Field(IClass enclosingClass, Name name, IType type)
 	{
 		super(name, type);
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	public Field(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(name, type, modifiers);
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	public Field(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
-	
+
 	@Override
 	public boolean isField()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public IValue getValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public String getDescription()
 	{
 		return this.type.getExtendedName();
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
 		return this.type.getSignature();
 	}
-	
+
 	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
@@ -125,13 +125,13 @@ public class Field extends Member implements IField
 		}
 		return true;
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.FIELD;
 	}
-	
+
 	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
@@ -176,7 +176,7 @@ public class Field extends Member implements IField
 				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 			}
 		}
-		
+
 		Deprecation.checkAnnotations(markers, position, this);
 
 		switch (IContext.getVisibility(context, this))
@@ -188,30 +188,30 @@ public class Field extends Member implements IField
 			markers.add(Markers.semantic(position, "field.access.invisible", this.name));
 			break;
 		}
-		
+
 		return receiver;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		
+
 		if (this.value != null)
 		{
 			this.value.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, context);
-			
+
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
@@ -231,7 +231,7 @@ public class Field extends Member implements IField
 					this.type = Types.ANY;
 				}
 			}
-			
+
 			return;
 		}
 		if (this.type == Types.UNKNOWN)
@@ -240,58 +240,58 @@ public class Field extends Member implements IField
 			this.type = Types.ANY;
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		super.checkTypes(markers, context);
-		
+
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-		
+
 		if (this.value != null)
 		{
 			this.value.check(markers, context);
 		}
-		
+
 		if (this.type == Types.VOID)
 		{
 			markers.add(Markers.semantic(this.position, "field.type.void"));
 		}
-		
+
 		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.FIELD_MODIFIERS);
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 		super.foldConstants();
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		super.cleanup(context, compilableList);
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -311,13 +311,13 @@ public class Field extends Member implements IField
 			mw.begin();
 			this.value.writeExpression(mw, this.type);
 			mw.end(this.type);
-			
+
 			return;
 		}
-		
+
 		FieldVisitor fv = writer.visitField(modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(),
 		                                    this.type.getSignature(), null);
-		
+
 		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}
 
@@ -343,7 +343,7 @@ public class Field extends Member implements IField
 			                      this.getDescription());
 		}
 	}
-	
+
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
@@ -360,7 +360,7 @@ public class Field extends Member implements IField
 			writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 		}
 	}
-	
+
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
@@ -377,7 +377,7 @@ public class Field extends Member implements IField
 			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -387,7 +387,7 @@ public class Field extends Member implements IField
 		this.type.toString("", buffer);
 		buffer.append(' ');
 		buffer.append(this.name);
-		
+
 		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
