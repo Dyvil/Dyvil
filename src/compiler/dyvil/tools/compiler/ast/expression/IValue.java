@@ -142,6 +142,11 @@ public interface IValue extends IASTNode, ITyped
 		return this.getType().isPrimitive();
 	}
 
+	default boolean isStatement()
+	{
+		return this.getType() == Types.VOID;
+	}
+
 	default boolean isUsableAsStatement()
 	{
 		return false;

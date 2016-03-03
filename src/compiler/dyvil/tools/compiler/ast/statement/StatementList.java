@@ -31,6 +31,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -121,19 +122,39 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.valueCount > 0)
+		if (this.valueCount <= 0)
 		{
-			IValue typed = this.values[this.valueCount - 1]
-					               .withType(type, typeContext, markers, new CombiningContext(this, context));
-			if (typed != null)
-			{
-				this.values[this.valueCount - 1] = typed;
-				this.returnType = typed.getType();
-				return this;
-			}
+			return type == Types.VOID ? this : null;
 		}
 
-		return type == Types.VOID ? this : null;
+		final IContext combiningContext = new CombiningContext(this, context);
+		final IValue value = this.values[this.valueCount - 1];
+		final IValue typed = value.withType(type, typeContext, markers, combiningContext);
+
+		if (typed != null)
+		{
+			this.values[this.valueCount - 1] = typed;
+			this.returnType = typed.getType();
+			return this;
+		}
+
+		if (type != Types.VOID)
+		{
+			return null;
+		}
+
+		final IValue applyStatementCall = resolveApplyStatement(markers, context, value);
+		if (applyStatementCall != null)
+		{
+			this.returnType = type;
+			this.values[this.valueCount - 1] = applyStatementCall;
+			return this;
+		}
+
+		markers.add(TypeChecker
+			            .typeError(value.getPosition(), type, value.getType(), "statementlist.return", "type.expected",
+			                       "return.type"));
+		return this;
 	}
 
 	@Override
@@ -346,7 +367,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 			// Try to resolve an applyStatement method
 
-			if (!(resolvedValue instanceof IStatement))
+			if (!resolvedValue.isStatement())
 			{
 				IValue applyStatementCall = resolveApplyStatement(markers, context, resolvedValue);
 				if (applyStatementCall != null)
@@ -356,8 +377,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				}
 			}
 
-			this.values[i] = IStatement.checkStatement(markers, combinedContext, resolvedValue,
-			                                           "statementlist.statement");
+			this.values[i] = IStatement
+				                 .checkStatement(markers, combinedContext, resolvedValue, "statementlist.statement");
 		}
 
 		// Resolved the last value
