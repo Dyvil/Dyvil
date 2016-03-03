@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -107,10 +108,35 @@ public class ColonOperator implements IValue
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.left, this.right))
-					.withType(type, typeContext, markers, context);
+					       .withType(type, typeContext, markers, context);
 		}
 
-		return type.isSuperTypeOf(this.type) ? this : null;
+		if (!type.isSuperTypeOf(this.getType()))
+		{
+			return null;
+		}
+
+		final IClass iclass = type.getTheClass();
+
+		final IType leftType;
+		final IType rightType;
+
+		if (iclass == Types.OBJECT_CLASS)
+		{
+			leftType = rightType = Types.ANY;
+		}
+		else
+		{
+			leftType = type.resolveTypeSafely(iclass.getTypeParameter(0));
+			rightType = type.resolveTypeSafely(iclass.getTypeParameter(1));
+		}
+
+		this.left = TypeChecker.convertValue(this.left, leftType, typeContext, markers, context,
+		                                     TypeChecker.markerSupplier("colon.type.left"));
+		this.right = TypeChecker.convertValue(this.right, rightType, typeContext, markers, context,
+		                                      TypeChecker.markerSupplier("colon.type.right"));
+
+		return this;
 	}
 
 	@Override
