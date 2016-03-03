@@ -21,6 +21,18 @@ public class ModifierList implements ModifierSet
 	}
 
 	@Override
+	public boolean isEmpty()
+	{
+		return this.count == 0;
+	}
+
+	@Override
+	public int count()
+	{
+		return this.count;
+	}
+
+	@Override
 	public Iterator<Modifier> iterator()
 	{
 		return new ArrayIterator<Modifier>(this.modifiers, this.count);

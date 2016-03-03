@@ -9,6 +9,13 @@ import java.util.Iterator;
 
 public interface ModifierSet extends Iterable<Modifier>
 {
+	default boolean isEmpty()
+	{
+		return this.count() == 0;
+	}
+
+	int count();
+
 	@Override
 	Iterator<Modifier> iterator();
 
