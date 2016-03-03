@@ -54,20 +54,20 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	private static final byte INITIALIZER = 5;
 
 	protected IMemberConsumer consumer;
-	
+
 	private IType type;
-	private ModifierSet modifiers = new ModifierList();
+	private ModifierList modifiers = new ModifierList();
 	private AnnotationList annotations;
 
 	private IMember member;
 	private byte    memberKind;
-	
+
 	public ClassBodyParser(IMemberConsumer consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = TYPE;
 	}
-	
+
 	private void reset()
 	{
 		this.modifiers = new ModifierList();
@@ -75,22 +75,27 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		this.type = null;
 		this.member = null;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		
+
 		switch (this.mode)
 		{
 		case TYPE:
 			switch (type)
 			{
-			case Tokens.EOF:
-				pm.popParser();
-				return;
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
-				pm.popParser(true);
+				pm.reparse();
+				// Fallthrough
+			case Tokens.EOF:
+				if (DyvilHeaderParser.hasModifiers(this.modifiers, this.annotations))
+				{
+					pm.report(token, "member.type");
+				}
+
+				pm.popParser();
 				return;
 			case BaseSymbols.SEMICOLON:
 				if (token.isInferred())
@@ -229,7 +234,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			}
-			
+
 			this.mode = END;
 			pm.report(token, "class.body.declaration.invalid");
 			return;
@@ -333,7 +338,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			return;
 		}
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{

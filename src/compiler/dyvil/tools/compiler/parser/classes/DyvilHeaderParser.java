@@ -32,15 +32,15 @@ public class DyvilHeaderParser extends Parser
 	protected static final int PACKAGE  = 1;
 	protected static final int IMPORT   = 2;
 	protected static final int METADATA = 4;
-	
+
 	protected IDyvilHeader unit;
 	protected boolean      unitHeader;
-	
+
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
-	
+
 	protected IToken lastToken;
-	
+
 	public DyvilHeaderParser(IDyvilHeader unit)
 	{
 		this.unit = unit;
@@ -53,7 +53,7 @@ public class DyvilHeaderParser extends Parser
 		this.mode = PACKAGE;
 		this.unitHeader = unitHeader;
 	}
-	
+
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
 	{
 		if (type == DyvilKeywords.PACKAGE)
@@ -65,7 +65,7 @@ public class DyvilHeaderParser extends Parser
 		}
 		return false;
 	}
-	
+
 	protected boolean parseImport(IParserManager pm, IToken token, int type)
 	{
 		switch (type)
@@ -119,7 +119,7 @@ public class DyvilHeaderParser extends Parser
 		}
 		return false;
 	}
-	
+
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
 		Modifier modifier;
@@ -149,7 +149,7 @@ public class DyvilHeaderParser extends Parser
 					pm.report(token, "header.declaration.duplicate");
 					return true;
 				}
-				
+
 				Name name = next.nameValue();
 				this.unit.setHeaderDeclaration(
 						new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
@@ -162,7 +162,7 @@ public class DyvilHeaderParser extends Parser
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -170,11 +170,16 @@ public class DyvilHeaderParser extends Parser
 		switch (type)
 		{
 		case Tokens.EOF:
+			if (hasModifiers(this.modifiers, this.annotations))
+			{
+				pm.report(token, "header.element");
+			}
 			pm.popParser();
+			// Fallthrough
 		case BaseSymbols.SEMICOLON:
 			return;
 		}
-		
+
 		switch (this.mode)
 		{
 		case PACKAGE:
@@ -202,7 +207,7 @@ public class DyvilHeaderParser extends Parser
 				return;
 			}
 		}
-		
+
 		if (this.unitHeader)
 		{
 			if (this.lastToken != null)
@@ -213,22 +218,27 @@ public class DyvilHeaderParser extends Parser
 			pm.stop();
 			return;
 		}
-		
+
 		reportInvalidElement(pm, token);
+	}
+
+	public static boolean hasModifiers(ModifierSet modifiers, AnnotationList annotations)
+	{
+		return modifiers != null && !modifiers.isEmpty() || annotations != null && annotations.annotationCount() != 0;
 	}
 
 	protected static void reportInvalidElement(IParserManager pm, IToken token)
 	{
 		pm.report(Markers.syntaxError(token, "header.element.invalid", token.toString()));
 	}
-	
+
 	private void parseAnnotation(IParserManager pm, IToken token)
 	{
 		if (this.annotations == null)
 		{
 			this.annotations = new AnnotationList();
 		}
-		
+
 		final Annotation annotation = new Annotation(token.raw());
 		this.annotations.addAnnotation(annotation);
 		pm.pushParser(pm.newAnnotationParser(annotation));
