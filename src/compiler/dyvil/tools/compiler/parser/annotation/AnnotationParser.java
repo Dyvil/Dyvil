@@ -77,4 +77,10 @@ public class AnnotationParser extends Parser
 			return;
 		}
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return false;
+	}
 }

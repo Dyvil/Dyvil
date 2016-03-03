@@ -10,6 +10,18 @@ public class EmptyModifiers implements ModifierSet
 	public static final EmptyModifiers INSTANCE = new EmptyModifiers();
 
 	@Override
+	public boolean isEmpty()
+	{
+		return true;
+	}
+
+	@Override
+	public int count()
+	{
+		return 0;
+	}
+
+	@Override
 	public Iterator<Modifier> iterator()
 	{
 		return EmptyIterator.apply();

@@ -19,6 +19,18 @@ public class FlagModifierSet implements ModifierSet
 	}
 
 	@Override
+	public boolean isEmpty()
+	{
+		return true;
+	}
+
+	@Override
+	public int count()
+	{
+		return 0;
+	}
+
+	@Override
 	public Iterator<Modifier> iterator()
 	{
 		return EmptyIterator.apply();

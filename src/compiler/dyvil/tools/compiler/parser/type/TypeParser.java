@@ -301,4 +301,10 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	{
 		this.type = type;
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return false;
+	}
 }
