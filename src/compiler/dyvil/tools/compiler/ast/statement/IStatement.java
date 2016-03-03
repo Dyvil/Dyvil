@@ -24,31 +24,31 @@ public interface IStatement extends IValue
 	{
 		return true;
 	}
-	
+
 	@Override
 	default IType getType()
 	{
 		return Types.VOID;
 	}
-	
+
 	@Override
 	default IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type == Types.VOID ? this : null;
 	}
-	
+
 	@Override
 	default boolean isType(IType type)
 	{
 		return type == Types.VOID;
 	}
-	
+
 	@Override
 	default float getTypeMatch(IType type)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	default void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -65,15 +65,16 @@ public interface IStatement extends IValue
 	{
 		final IValue typedValue = resolvedValue.withType(Types.VOID, Types.VOID, markers, context);
 
-		if (typedValue == null || !typedValue.isUsableAsStatement())
+		if (typedValue != null && typedValue.isUsableAsStatement())
 		{
-			final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
-			marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));
-			markers.add(marker);
-			return resolvedValue;
+			return typedValue;
 		}
 
-		return typedValue;
+		// Create an error
+		final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
+		marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));
+		markers.add(marker);
+		return resolvedValue;
 	}
 
 	static IValue checkCondition(MarkerList markers, IContext context, IValue resolvedValue, String key)
