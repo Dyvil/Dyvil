@@ -139,21 +139,25 @@ public interface Modifiers
 	int TRAIT_CLASS = 0x00080000 | INTERFACE_CLASS;
 	
 	// Method Modifiers
-	
+
 	/**
 	 * <i>Dyvil</i> {@code inline} modifier. If a method is marked with this modifier, it will be inlined by the
 	 * compiler to reduce method call overhead.
 	 */
 	int INLINE = 0x00010000;
-	
+
+	int INFIX_FLAG = 0x00020000;
+
 	/**
 	 * <i>Dyvil</i> {@code infix} modifier. If a method is marked with this modifier, it is a method that can be called
 	 * on any Object and virtually has the instance as the first parameter. An infix method is always static.
 	 */
-	int INFIX = 0x00020000 | STATIC;
-	
-	int EXTENSION = 0x00100000 | INFIX;
-	
+	int INFIX = INFIX_FLAG | STATIC;
+
+	int EXTENSION_FLAG = 0x00100000;
+
+	int EXTENSION = EXTENSION_FLAG | INFIX;
+
 	/**
 	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this modifier, it is a method that can be called
 	 * on any Object and virtually uses the first (and only) parameter as the instance.

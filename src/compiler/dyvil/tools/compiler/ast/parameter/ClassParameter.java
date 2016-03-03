@@ -30,11 +30,11 @@ public final class ClassParameter extends Parameter implements IField
 {
 	// Metadata
 	protected IClass enclosingClass;
-	
+
 	public ClassParameter()
 	{
 	}
-	
+
 	public ClassParameter(Name name)
 	{
 		super(name);
@@ -66,7 +66,7 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isVariable()
 	{
@@ -84,43 +84,43 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		return false;
 	}
-	
+
 	@Override
 	public IDataMember capture(IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public IDataMember capture(IContext context, IVariable variable)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
 	}
-	
+
 	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.FIELD;
 	}
-	
+
 	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
@@ -144,10 +144,10 @@ public final class ClassParameter extends Parameter implements IField
 			markers.add(Markers.semantic(position, "classparameter.access.unqualified", this.name.unqualified));
 			return new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 		}
-		
+
 		return receiver;
 	}
-	
+
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
@@ -163,17 +163,19 @@ public final class ClassParameter extends Parameter implements IField
 	{
 		super.check(markers, context);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
+		if (this.modifiers != null)
+		{
+			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
+		}
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String desc = this.getDescription();
-		FieldVisitor fv = writer
-				.visitField(this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK, this.name.qualified, desc,
-				            this.getSignature(), null);
-		
+		FieldVisitor fv = writer.visitField(this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK,
+		                                    this.name.qualified, desc, this.getSignature(), null);
+
 		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
 	}
 
@@ -193,7 +195,7 @@ public final class ClassParameter extends Parameter implements IField
 			                      this.getDescription());
 		}
 	}
-	
+
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{

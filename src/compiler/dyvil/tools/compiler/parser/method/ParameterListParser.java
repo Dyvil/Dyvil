@@ -167,9 +167,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 	public IParameter createParameter(IToken token)
 	{
-		final ModifierSet modifiers = this.modifiers == null ? EmptyModifiers.INSTANCE : this.modifiers;
 		final IParameter parameter = this.consumer
-				.createParameter(token.raw(), token.nameValue(), this.type, modifiers, this.annotations);
+				.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers, this.annotations);
 		parameter.setVarargs(this.varargs);
 		return parameter;
 	}

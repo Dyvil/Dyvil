@@ -61,12 +61,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.parameterCount = 1;
 	}
 
-	public LambdaType(TupleType tupleType)
-	{
-		this.parameterTypes = tupleType.types;
-		this.parameterCount = tupleType.typeCount;
-	}
-
 	public LambdaType(IType[] types, int typeCount, IType returnType)
 	{
 		this.parameterTypes = types;
@@ -77,6 +71,27 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public LambdaType(int typeCount)
 	{
 		this.parameterTypes = new IType[typeCount];
+	}
+
+	public LambdaType(ICodePosition position, IType receiverType, TupleType tupleType)
+	{
+		this.position = position;
+
+		if (receiverType == null)
+		{
+			this.parameterTypes = tupleType.types;
+			this.parameterCount = tupleType.typeCount;
+			return;
+		}
+
+		final int count = tupleType.typeCount + 1;
+
+		this.extension = true;
+		this.parameterCount = count;
+		this.parameterTypes = new IType[count];
+		this.parameterTypes[0] = receiverType;
+
+		System.arraycopy(tupleType.types, 0, this.parameterTypes, 1, tupleType.typeCount);
 	}
 
 	public LambdaType(ICodePosition position)
@@ -344,7 +359,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			return true;
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			if (this.parameterTypes[i].hasTypeVariables())
@@ -354,7 +369,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		return false;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
@@ -368,12 +383,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		lt.extension = this.extension;
 		return lt;
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 		boolean found = false;
-		
+
 		ITypeParameter typeVar;
 		IType concreteType;
 		IClass iclass = this.getTheClass();
@@ -387,7 +402,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				found = true;
 			}
 		}
-		
+
 		typeVar = iclass.getTypeParameter(this.parameterCount);
 		concreteType = concrete.resolveType(typeVar);
 		if (concreteType != null)
@@ -395,19 +410,19 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			this.returnType.inferTypes(concreteType, typeContext);
 			found = true;
 		}
-		
+
 		if (!found && this.parameterCount == 0 && this.returnType.isSuperTypeOf(concrete))
 		{
 			this.returnType.inferTypes(concrete, typeContext);
 		}
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
@@ -427,7 +442,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 
 		return this;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -437,7 +452,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.resolve(markers, context);
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
@@ -445,14 +460,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			markers.add(Markers.semantic(this.position, "type.class.lambda"));
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameterTypes[i].checkType(markers, context, TypePosition.PARAMETER_TYPE);
 		}
 		this.returnType.checkType(markers, context, TypePosition.RETURN_TYPE);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -462,7 +477,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.check(markers, context);
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -472,7 +487,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.foldConstants();
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -482,35 +497,35 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.cleanup(context, compilableList);
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		getLambdaClass(this.parameterCount).getMethodMatches(list, instance, name, arguments);
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return getLambdaClass(this.parameterCount).getFunctionalMethod();
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.returnType.writeTypeExpression(writer);
-		
+
 		writer.writeLDC(this.parameterCount);
 		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.parameterCount; i++)
@@ -520,24 +535,24 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			this.parameterTypes[i].writeTypeExpression(writer);
 			writer.writeInsn(Opcodes.AASTORE);
 		}
-		
+
 		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;",
 		                       false);
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return "dyvil/function/Function" + this.parameterCount;
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append(';');
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
@@ -545,7 +560,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.appendSignature(sb);
 		return sb.toString();
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
@@ -557,7 +572,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.returnType.appendSignature(buffer);
 		buffer.append(">;");
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
@@ -565,17 +580,17 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		{
 			return;
 		}
-		
+
 		int index = typePath.getStepArgument(step);
 		if (index < this.parameterCount)
 		{
-			this.parameterTypes[index] = IType
-					.withAnnotation(this.parameterTypes[index], annotation, typePath, step + 1, steps);
+			this.parameterTypes[index] = IType.withAnnotation(this.parameterTypes[index], annotation, typePath,
+			                                                  step + 1, steps);
 			return;
 		}
 		this.returnType = IType.withAnnotation(this.returnType, annotation, typePath, step + 1, steps);
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
@@ -585,7 +600,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType.writeAnnotations(visitor, typeRef, typePath + this.parameterCount + ';');
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
@@ -596,7 +611,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		IType.writeType(this.returnType, out);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
@@ -611,7 +626,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		this.returnType = IType.readType(in);
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -628,12 +643,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		sb.append(") => ").append(this.returnType);
 		return sb.toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting
-				.getBoolean("lambda.single.wrap"))
+		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting.getBoolean(
+				"lambda.single.wrap"))
 		{
 			this.parameterTypes[0].toString(prefix, buffer);
 
@@ -683,7 +698,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 
 		this.returnType.toString("", buffer);
 	}
-	
+
 	@Override
 	public IType clone()
 	{

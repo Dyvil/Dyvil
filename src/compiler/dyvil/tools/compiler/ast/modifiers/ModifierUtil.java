@@ -295,10 +295,10 @@ public final class ModifierUtil
 		return -1;
 	}
 
-	public static void checkModifiers(MarkerList markers, IMember member, ModifierSet modifierSet, int allowedModifiers)
+	public static void checkModifiers(MarkerList markers, IMember member, ModifierSet modifiers, int allowedModifiers)
 	{
 		StringBuilder stringBuilder = null;
-		for (Modifier modifier : modifierSet)
+		for (Modifier modifier : modifiers)
 		{
 			if ((modifier.intValue() & allowedModifiers) == 0)
 			{

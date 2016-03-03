@@ -26,14 +26,14 @@ public final class MethodParameter extends Parameter
 {
 	// Metadata
 	protected ICallableMember method;
-	
+
 	protected ReferenceType refType;
 	protected boolean       assigned;
-	
+
 	public MethodParameter()
 	{
 	}
-	
+
 	public MethodParameter(Name name)
 	{
 		super(name);
@@ -88,7 +88,7 @@ public final class MethodParameter extends Parameter
 	{
 		return ElementType.PARAMETER;
 	}
-	
+
 	@Override
 	public void setMethod(ICallableMember method)
 	{
@@ -106,37 +106,42 @@ public final class MethodParameter extends Parameter
 	{
 		return this.refType != null ? this.refType : this.type;
 	}
-	
+
 	@Override
 	public boolean isReferenceCapturable()
 	{
 		return this.refType != null;
 	}
-	
+
 	@Override
 	public boolean isReferenceType()
 	{
 		return this.refType != null;
 	}
-	
+
 	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
 		return receiver;
 	}
-	
+
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
 		this.assigned = true;
 		return super.checkAssign(markers, context, position, receiver, newValue);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		
+
+		if (this.type != null && this.type.isExtension())
+		{
+			this.getModifiers().addIntModifier(Modifiers.INFIX_FLAG);
+		}
+
 		if (this.modifiers != null)
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.VAR))
@@ -147,7 +152,7 @@ public final class MethodParameter extends Parameter
 				}
 				this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
 			}
-			else if (this.modifiers.hasIntModifier(Modifiers.INFIX & ~Modifiers.STATIC))
+			else if (this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
 			{
 				this.type.setExtension(true);
 			}
@@ -159,7 +164,10 @@ public final class MethodParameter extends Parameter
 	{
 		super.check(markers, context);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
+		if (this.modifiers != null)
+		{
+			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
+		}
 	}
 
 	@Override
