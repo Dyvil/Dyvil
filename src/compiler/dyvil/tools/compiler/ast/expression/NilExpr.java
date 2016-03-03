@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
@@ -93,7 +94,7 @@ public final class NilExpr implements IValue
 			return this;
 		}
 		
-		IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			this.methodName = LiteralConversion.getMethodName(annotation);
@@ -101,13 +102,10 @@ public final class NilExpr implements IValue
 			return this;
 		}
 
-		if (type != dyvil.tools.compiler.ast.type.builtin.Types.UNKNOWN)
+		if (type != Types.UNKNOWN)
 		{
+			this.requiredType = Types.UNKNOWN;
 			markers.add(Markers.semantic(this.position, "nil.type", type));
-		}
-		else
-		{
-			markers.add(Markers.semantic(this.position, "nil.untyped", type));
 		}
 		return this;
 	}
@@ -146,11 +144,11 @@ public final class NilExpr implements IValue
 	{
 		if (this.requiredType == null)
 		{
-			// markers.add(Markers.createError(this.position, "nil.untyped"));
+			markers.add(Markers.semantic(this.position, "nil.untyped"));
 			return;
 		}
 		
-		if (this.requiredType.isArrayType())
+		if (this.requiredType == Types.UNKNOWN || this.requiredType.isArrayType())
 		{
 			return;
 		}
@@ -192,7 +190,7 @@ public final class NilExpr implements IValue
 		if (this.requiredType.isArrayType())
 		{
 			IType elementType = this.requiredType.getElementType();
-			if (elementType.isPrimitive())
+			if (elementType.isPrimitive() || elementType.getTheClass() == Types.OBJECT_CLASS)
 			{
 				// Write a Field Access to the EMPTY fields in the Primitive
 				// Array Classes
