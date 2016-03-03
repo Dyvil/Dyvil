@@ -43,14 +43,14 @@ public class ApplyMethodCall extends AbstractCall
 			return null;
 		}
 
-		final IMethod match = ICall.resolveMethod(context, fieldAccess, Names.apply, arguments);
-		if (match == null)
+		final IMethod method = ICall.resolveMethod(context, fieldAccess, Names.apply, arguments);
+		if (method == null)
 		{
 			// No apply method found
 			return null;
 		}
 
-		final ApplyMethodCall call = new ApplyMethodCall(position, fieldAccess, arguments);
+		final ApplyMethodCall call = new ApplyMethodCall(position, fieldAccess, method, arguments);
 		call.genericData = genericData;
 		call.checkArguments(markers, context);
 		return call;
