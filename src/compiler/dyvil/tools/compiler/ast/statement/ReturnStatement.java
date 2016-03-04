@@ -52,7 +52,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public boolean isResolved()
 	{
-		return this.value.isResolved();
+		return this.value == null || this.value.isResolved();
 	}
 	
 	@Override

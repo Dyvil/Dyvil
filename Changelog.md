@@ -1,3 +1,35 @@
+Dyvil v0.17.1
+=============
+
+## Dyvil Library v0.17.1
+
+- Fixed Markers displaying the occurence incorrectly if the position is outside the code range (EOF).
+
+## Dyvil Compiler v0.17.1
+
+- Added the `ModifierSet.count` and `.isEmpty` methods.
+- Updated Field Access return type computation.
+- Fixed automatic Lambda conversion being applied in contexts where it will cause a runtime error. #196
+- Fixed Apply Method Calls not being resolved for ordinary method calls with a receiver. #198
+- Fixed Field Assignments not having concrete types. #199
+- Fixed Var Parameter transformations not being applied when the Reference argument is used in Receiver position. #201
+- Fixed Apply Methods not being resolved for qualified Types. #205
+- Fixed Return Statements without a return value causing NPEs in the `isResolved` method.
+- Fixed Apply Method Resolution causing compiler errors (caused by previous commit).
+- Fixed Method Type Parameter Annotations not being stored in the bytecode.
+- Fixed the `TypeVarType.getName()` method returning `null`.
+- Fixed the Implicit Closure Value not being resolved, making it unusable.
+- Fixed the `Mismatching Array Constructor Argument Count` error message localization.
+- Fixed empty Tuple Patterns causing compiler errors.
+
+## Dyvil REPL v0.11.1
+
+- Fixed the method modifiers `infix`, `prefix` and `postfix` being unusable in the REPL. #197
+- Fixed Class and Type Operators being unusable in the REPL. #200
+- Fixed Return Statements being disallowed in the REPL. #202
+
+## Dyvil Property Format v0.4.1
+
 Dyvil v0.17.0
 =============
 
@@ -93,7 +125,6 @@ Dyvil v0.17.0
 - Removed the code for hardcoded `dyvilBinLibrary` in the `Library` class.
 - Moved the `MapTypeContext` class to the `dyvil.tools.compiler.ast.generic` package.
 - Moved the `classVersion` and `asmVersion` constants from the `DyvilCompiler` class to the `ClassFormat` class.
-
 
 ## Dyvil REPL v0.11.0
 
