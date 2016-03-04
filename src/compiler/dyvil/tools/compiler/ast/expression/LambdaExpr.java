@@ -767,12 +767,14 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		                                                                                  this.getLambdaDescriptor(),
 		                                                                                  null, null));
 
+		int index = 0;
 		if (this.captureHelper.isThisCaptured())
 		{
 			methodWriter.setThisType(this.owner);
+			index = 1;
 		}
 
-		this.captureHelper.writeCaptureParameters(methodWriter, 0);
+		this.captureHelper.writeCaptureParameters(methodWriter, index);
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
