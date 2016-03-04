@@ -29,6 +29,7 @@ public class CombiningContext implements IContext
 	@Override
 	public boolean isStatic()
 	{
+		// FIXME use ALLOW, DISALLOW, PASS
 		return this.inner.isStatic() && this.outer.isStatic();
 	}
 

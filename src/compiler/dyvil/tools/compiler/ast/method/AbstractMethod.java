@@ -942,9 +942,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return this.descriptor;
 		}
-		
-		StringBuilder buffer = new StringBuilder();
+
+		// Similar copy in NestedMethod.getDescriptor
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].getInternalType().appendExtendedName(buffer);
@@ -953,8 +955,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			this.typeParameters[i].appendParameterDescriptor(buffer);
 		}
+
 		buffer.append(')');
 		this.type.appendExtendedName(buffer);
+
 		return this.descriptor = buffer.toString();
 	}
 	
@@ -1080,7 +1084,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		writer.writeJumpInsn(IFEQ, dest);
 	}
 	
-	private void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
+	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
 	{
 		if (receiver != null)
 		{
@@ -1100,7 +1104,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 	
-	private void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
 		int parIndex = 0;
 		int modifiers = this.modifiers.toFlags();
