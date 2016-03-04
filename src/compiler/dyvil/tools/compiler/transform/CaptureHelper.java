@@ -119,12 +119,6 @@ public class CaptureHelper
 
 	public int writeCaptureParameters(MethodWriter writer, int index)
 	{
-		if (this.thisClass != null)
-		{
-			writer.setThisType(this.thisClass.getInternalName());
-			index = 1;
-		}
-
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			final CaptureDataMember capture = this.capturedFields[i];

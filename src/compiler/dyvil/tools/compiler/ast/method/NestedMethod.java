@@ -3,18 +3,16 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.CaptureVariable;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -22,56 +20,27 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class NestedMethod extends CodeMethod
 {
 	private CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
-	
+
 	public NestedMethod(ICodePosition position, Name name, IType type, ModifierSet modifierSet, AnnotationList annotations)
 	{
 		super(position, name, type, modifierSet, annotations);
 	}
-	
+
 	@Override
-	public Package resolvePackage(Name name)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		return null;
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return null;
-	}
-	
-	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
-	{
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (context.isStatic())
 		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
-			{
-				return var;
-			}
+			this.modifiers.addIntModifier(Modifiers.STATIC);
 		}
-		
-		return null;
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			if (param.getName() == name)
-			{
-				return param;
-			}
-		}
-		return null;
+
+		super.resolveTypes(markers, context);
 	}
 
 	@Override
@@ -86,89 +55,94 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		final float signatureMatch = this.getSignatureMatch(name, instance, arguments);
-		if (signatureMatch > 0)
+		super.cleanup(context, compilableList);
+
+		if (!this.captureHelper.isThisCaptured())
 		{
-			list.add(this, signatureMatch);
+			this.modifiers.addIntModifier(Modifiers.STATIC);
 		}
 	}
-	
+
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public String getDescriptor()
 	{
+		if (this.descriptor != null)
+		{
+			return this.descriptor;
+		}
+
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append('(');
+
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].getInternalType().appendExtendedName(buffer);
+		}
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].appendParameterDescriptor(buffer);
+		}
+
+		this.captureHelper.appendCaptureTypes(buffer);
+
+		buffer.append(')');
+		this.type.appendExtendedName(buffer);
+
+		return this.descriptor = buffer.toString();
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int modifiers;
+		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+
+		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer
+			                                                               .visitMethod(modifiers, this.name.qualified,
+			                                                                            this.getDescriptor(),
+			                                                                            this.getSignature(),
+			                                                                            this.getInternalExceptions()));
+
+		this.writeAnnotations(methodWriter, modifiers);
+
 		if (this.captureHelper.isThisCaptured())
 		{
-			modifiers = Modifiers.PRIVATE;
+			methodWriter.setThisType(this.enclosingClass.getInternalName());
 		}
-		else
-		{
-			modifiers = Modifiers.PRIVATE | Modifiers.STATIC;
-		}
-		
-		MethodWriter mw = new MethodWriterImpl(writer,
-		                                       writer.visitMethod(modifiers, this.name.qualified, this.getDescriptor(),
-		                                                          this.getSignature(), this.getInternalExceptions()));
-
-		this.writeAnnotations(mw, modifiers);
-
-		int index = this.captureHelper.writeCaptureParameters(mw, 0);
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			param.setLocalIndex(index);
-			index = mw.registerParameter(index, param.getName().qualified, param.getType(), 0);
+			this.parameters[i].write(methodWriter);
 		}
-		
+
+		this.captureHelper.writeCaptureParameters(methodWriter, methodWriter.localCount());
+
 		Label start = new Label();
 		Label end = new Label();
-		
+
 		if (this.value != null)
 		{
-			mw.begin();
-			mw.writeLabel(start);
-			this.value.writeExpression(mw, this.type);
-			mw.writeLabel(end);
-			mw.end(this.type);
+			methodWriter.begin();
+			methodWriter.writeLabel(start);
+			this.value.writeExpression(methodWriter, this.type);
+			methodWriter.writeLabel(end);
+			methodWriter.end(this.type);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
-			              param.getSignature(), start, end);
+			final IParameter parameter = this.parameters[i];
+			methodWriter
+				.writeLocal(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getDescription(),
+				            parameter.getSignature(), start, end);
 		}
 	}
-	
+
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-			throws BytecodeException
+	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
+		super.writeArguments(writer, instance, arguments);
 		this.captureHelper.writeCaptures(writer);
-		super.writeCall(writer, instance, arguments, typeContext, targetType, lineNumber);
-	}
-	
-	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException
-	{
-		this.captureHelper.writeCaptures(writer);
-		super.writeJump(writer, dest, instance, arguments, typeContext, lineNumber);
-	}
-	
-	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException
-	{
-		this.captureHelper.writeCaptures(writer);
-		super.writeInvJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
 }

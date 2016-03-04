@@ -41,11 +41,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",
 	                                                  "(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;"
-			                                                  + "Ljava/lang/invoke/MethodType;"
-			                                                  + "Ljava/lang/invoke/MethodType;"
-			                                                  + "Ljava/lang/invoke/MethodHandle;"
-			                                                  + "Ljava/lang/invoke/MethodType;)"
-			                                                  + "Ljava/lang/invoke/CallSite;");
+		                                                  + "Ljava/lang/invoke/MethodType;"
+		                                                  + "Ljava/lang/invoke/MethodType;"
+		                                                  + "Ljava/lang/invoke/MethodHandle;"
+		                                                  + "Ljava/lang/invoke/MethodType;)"
+		                                                  + "Ljava/lang/invoke/CallSite;");
 
 	public static final TypeChecker.MarkerSupplier LAMBDA_MARKER_SUPPLIER = TypeChecker.markerSupplier("lambda.type",
 	                                                                                                   "method.type",
@@ -248,8 +248,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			this.value = TypeChecker
-					             .convertValue(this.value, this.returnType, this.returnType, markers, combinedContext,
-					                           LAMBDA_MARKER_SUPPLIER);
+				             .convertValue(this.value, this.returnType, this.returnType, markers, combinedContext,
+				                           LAMBDA_MARKER_SUPPLIER);
 
 			this.inferReturnType(type, typeContext, this.value.getType());
 		}
@@ -666,9 +666,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		final String invokedType = this.getInvokeDescriptor();
 
 		final dyvil.tools.asm.Type methodDescriptorType = dyvil.tools.asm.Type
-				                                                  .getMethodType(this.method.getDescriptor());
+			                                                  .getMethodType(this.method.getDescriptor());
 		final dyvil.tools.asm.Type lambdaDescriptorType = dyvil.tools.asm.Type
-				                                                  .getMethodType(this.getSpecialDescriptor());
+			                                                  .getMethodType(this.getSpecialDescriptor());
 		final Handle handle = new Handle(handleType, this.owner, this.name, desc);
 
 		writer.writeLineNumber(this.getLineNumber());
@@ -760,12 +760,17 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 
 		final int modifiers = this.captureHelper.isThisCaptured() ?
-				                      Modifiers.PRIVATE | Modifiers.SYNTHETIC :
-				                      Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
+			                      Modifiers.PRIVATE | Modifiers.SYNTHETIC :
+			                      Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name,
 		                                                                                  this.getLambdaDescriptor(),
 		                                                                                  null, null));
+
+		if (this.captureHelper.isThisCaptured())
+		{
+			methodWriter.setThisType(this.owner);
+		}
 
 		this.captureHelper.writeCaptureParameters(methodWriter, 0);
 
@@ -792,7 +797,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		IParameter parameter;
 		if (this.parameterCount == 1 && (parameter = this.parameters[0]).getType() == Types.UNKNOWN // single parameter
-				    && !Formatting.getBoolean("lambda.single.wrap"))
+			    && !Formatting.getBoolean("lambda.single.wrap"))
 		{
 			buffer.append(parameter.getName());
 
