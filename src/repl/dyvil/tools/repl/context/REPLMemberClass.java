@@ -401,7 +401,13 @@ public class REPLMemberClass implements IClass
 	{
 		return true;
 	}
-	
+
+	@Override
+	public byte checkStatic()
+	{
+		return TRUE;
+	}
+
 	@Override
 	public IClass getThisClass()
 	{
@@ -483,9 +489,9 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
-		return ALLOW;
+		return TRUE;
 	}
 
 	@Override

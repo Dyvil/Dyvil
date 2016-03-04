@@ -496,16 +496,16 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	}
 	
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			if (this.exceptions[i].isSuperTypeOf(type))
 			{
-				return ALLOW;
+				return TRUE;
 			}
 		}
-		return DISALLOW;
+		return FALSE;
 	}
 
 	@Override

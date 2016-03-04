@@ -356,11 +356,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public boolean isStatic()
 	{
 		return this.modifiers.hasIntModifier(Modifiers.STATIC);
+	}
+
+	@Override
+	public byte checkStatic()
+	{
+		return this.isStatic() ? TRUE : PASS;
 	}
 	
 	@Override
@@ -482,16 +488,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 	
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			if (this.exceptions[i].isSuperTypeOf(type))
 			{
-				return ALLOW;
+				return TRUE;
 			}
 		}
-		return DISALLOW;
+		return FALSE;
 	}
 
 	@Override

@@ -685,9 +685,9 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public boolean isStatic()
+	public byte checkStatic()
 	{
-		return false;
+		return FALSE;
 	}
 
 	@Override
@@ -886,9 +886,9 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
-		return DISALLOW;
+		return FALSE;
 	}
 
 	@Override

@@ -651,9 +651,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
-		return ALLOW;
+		return TRUE;
 	}
 
 	@Override

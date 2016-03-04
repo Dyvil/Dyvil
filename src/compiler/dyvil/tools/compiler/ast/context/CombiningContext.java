@@ -27,16 +27,21 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public boolean isStatic()
-	{
-		// FIXME use ALLOW, DISALLOW, PASS
-		return this.inner.isStatic() && this.outer.isStatic();
-	}
-
-	@Override
 	public IContext pop()
 	{
 		return this.inner;
+	}
+
+	@Override
+	public byte checkStatic()
+	{
+		final byte innerResult = this.inner.checkStatic();
+		if (innerResult != PASS)
+		{
+			return innerResult;
+		}
+
+		return this.outer.checkStatic();
 	}
 
 	@Override
@@ -124,15 +129,15 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
-		final byte innerResult = this.inner.handleException(type);
-		if (innerResult == PASS)
+		final byte innerResult = this.inner.checkException(type);
+		if (innerResult != PASS)
 		{
-			return this.outer.handleException(type);
+			return innerResult;
 		}
 
-		return innerResult;
+		return this.outer.checkException(type);
 	}
 
 	@Override

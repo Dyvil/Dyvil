@@ -26,11 +26,16 @@ public interface IContext extends IMemberContext
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
 
-	byte ALLOW = 0;
-	byte DISALLOW = 1;
-	byte PASS = 2;
+	byte TRUE  = 0;
+	byte FALSE = 1;
+	byte PASS  = 2;
 
-	boolean isStatic();
+	default boolean isStatic()
+	{
+		return this.checkStatic() != FALSE;
+	}
+
+	byte checkStatic();
 
 	default IContext push(IContext context)
 	{
@@ -73,8 +78,13 @@ public interface IContext extends IMemberContext
 	
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
-	
-	byte handleException(IType type);
+
+	default boolean handleException(IType type)
+	{
+		return this.checkException(type) != FALSE;
+	}
+
+	byte checkException(IType type);
 
 	IType getReturnType();
 	
@@ -158,6 +168,6 @@ public interface IContext extends IMemberContext
 	static boolean isUnhandled(IContext context, IType exceptionType)
 	{
 		return Types.EXCEPTION.isSuperTypeOf(exceptionType) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(exceptionType)
-				&& context.handleException(exceptionType) != ALLOW;
+				&& context.handleException(exceptionType);
 	}
 }

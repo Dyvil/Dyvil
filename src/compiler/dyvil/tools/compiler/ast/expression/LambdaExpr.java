@@ -426,9 +426,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public byte handleException(IType type)
+	public byte checkException(IType type)
 	{
-		return this.method != null ? this.method.handleException(type) : DISALLOW;
+		return this.method != null ? this.method.checkException(type) : FALSE;
 	}
 
 	@Override
