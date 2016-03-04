@@ -8,7 +8,6 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.MethodCall;
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -49,8 +48,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 	// Metadata
 	protected Map<Name, Variable> variables;
-	protected IType               returnType;
 	protected List<IMethod>       methods;
+	protected IType               returnType;
 
 	public StatementList()
 	{
@@ -127,9 +126,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			return type == Types.VOID ? this : null;
 		}
 
-		final IContext combiningContext = new CombiningContext(this, context);
+		context = context.push(this);
+
 		final IValue value = this.values[this.valueCount - 1];
-		final IValue typed = value.withType(type, typeContext, markers, combiningContext);
+		final IValue typed = value.withType(type, typeContext, markers, context);
+
+		context.pop();
 
 		if (typed != null)
 		{
@@ -322,6 +324,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		// We don't push this context because Statement Lists can't define any types (yet)
+
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i].resolveTypes(markers, context);
@@ -345,13 +349,13 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			return this;
 		}
 
-		IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 
 		// Resolve and check all values except the last one
 		int len = this.valueCount - 1;
 		for (int i = 0; i < len; i++)
 		{
-			final IValue resolvedValue = this.values[i] = this.values[i].resolve(markers, combinedContext);
+			final IValue resolvedValue = this.values[i] = this.values[i].resolve(markers, context);
 			final int valueTag = resolvedValue.valueTag();
 
 			if (valueTag == IValue.VARIABLE)
@@ -378,11 +382,13 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			}
 
 			this.values[i] = IStatement
-				                 .checkStatement(markers, combinedContext, resolvedValue, "statementlist.statement");
+				                 .checkStatement(markers, context, resolvedValue, "statementlist.statement");
 		}
 
 		// Resolved the last value
-		this.values[len] = this.values[len].resolve(markers, combinedContext);
+		this.values[len] = this.values[len].resolve(markers, context);
+
+		context.pop();
 
 		return this;
 	}
@@ -440,23 +446,27 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IContext combinedContext = this.variables == null ? context : new CombiningContext(this, context);
+		context = context.push(this);
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].checkTypes(markers, combinedContext);
+			this.values[i].checkTypes(markers, context);
 		}
+
+		context.pop();
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		IContext context1 = this.variables == null ? context : new CombiningContext(this, context);
+		context = context.push(this);
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].check(markers, context1);
+			this.values[i].check(markers, context);
 		}
+
+		context.pop();
 	}
 
 	@Override
@@ -477,6 +487,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		context = context.push(this);
+
 		if (this.valueCount == 1)
 		{
 			return this.values[0].cleanup(context, compilableList);
@@ -486,6 +498,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
+
+		context.pop();
 		return this;
 	}
 

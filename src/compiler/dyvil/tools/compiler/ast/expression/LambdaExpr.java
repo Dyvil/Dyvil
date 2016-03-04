@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.*;
@@ -235,7 +234,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			this.inferTypes(markers);
 
-			final IContext combinedContext = new CombiningContext(this, context);
+			final IContext combinedContext = context.push(this);
 
 			if (!this.valueResolved)
 			{
@@ -252,6 +251,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				                           LAMBDA_MARKER_SUPPLIER);
 
 			this.inferReturnType(type, typeContext, this.value.getType());
+
+			context.pop();
 		}
 
 		if (this.type.typeTag() == IType.LAMBDA)
@@ -452,7 +453,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.value.resolveTypes(markers, context);
+			context.pop();
 		}
 		else
 		{
@@ -474,7 +477,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 
 		// All parameter types are known, we can actually resolve the return value now
-		this.value = this.value.resolve(markers, new CombiningContext(this, context));
+
+		context = context.push(this);
+		this.value = this.value.resolve(markers, context);
+		context.pop();
+
 		this.valueResolved = true;
 		this.returnType = this.value.getType();
 
@@ -484,7 +491,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.value.checkTypes(markers, new CombiningContext(this, context));
+		context = context.push(this);
+
+		this.value.checkTypes(markers, context);
+
+		context = context.pop();
 
 		this.captureHelper.checkCaptures(markers, context);
 	}

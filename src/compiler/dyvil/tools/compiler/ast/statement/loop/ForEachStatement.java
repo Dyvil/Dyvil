@@ -298,13 +298,15 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		{
 			return;
 		}
+
+		context = context.push(this);
+
+		this.action = action.resolve(markers, context);
 		
-		IContext context1 = new CombiningContext(this, context);
-		this.action = action.resolve(markers, context1);
-		
-		IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context1);
+		IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context);
 		if (typedAction == null || !typedAction.isUsableAsStatement())
 		{
+			// TODO Use IStatement.checkStatement
 			Marker marker = Markers.semantic(this.action.getPosition(), "for.action.type");
 			marker.addInfo(Markers.getSemantic("action.type", this.action.getType()));
 			markers.add(marker);
@@ -313,6 +315,8 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		{
 			this.action = typedAction;
 		}
+
+		context.pop();
 	}
 	
 	@Override
@@ -324,7 +328,9 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		}
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.action.checkTypes(markers, context);
+			context.pop();
 		}
 	}
 	
@@ -337,7 +343,9 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		}
 		if (this.action != null)
 		{
-			this.action.check(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.action.check(markers, context);
+			context.pop();
 		}
 	}
 	
@@ -355,11 +363,15 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.variable.cleanup(this, compilableList);
+		context = context.push(this);
+
+		this.variable.cleanup(context, compilableList);
 		if (this.action != null)
 		{
-			this.action = this.action.cleanup(new CombiningContext(this, context), compilableList);
+			this.action = this.action.cleanup(context, compilableList);
 		}
+
+		context.pop();
 		return this;
 	}
 	

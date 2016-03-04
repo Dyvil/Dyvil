@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
@@ -78,7 +77,12 @@ public class Closure extends StatementList
 		lambdaExpr.setValue(this);
 
 		this.resolved = true;
-		return lambdaExpr.withType(type, typeContext, markers, new CombiningContext(this, context));
+
+		context = context.push(this);
+		final IValue typedLambda = lambdaExpr.withType(type, typeContext, markers, context);
+		context.pop();
+
+		return typedLambda;
 	}
 
 	@Override

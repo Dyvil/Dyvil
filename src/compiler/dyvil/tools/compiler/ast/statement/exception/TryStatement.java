@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement.exception;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -226,7 +225,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (this.action != null)
 		{
+			context = context.push(this);
 			this.action.resolveTypes(markers, context);
+			context = context.pop();
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -265,14 +266,20 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (this.action != null)
 		{
+			context = context.push(this);
 			this.action = this.action.resolve(markers, context);
+			context = context.pop();
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
 			block.type.resolve(markers, context);
-			block.action = block.action.resolve(markers, new CombiningContext(block, context));
+
+			// TODO move this code to the CatchBlock class
+			context = context.push(block);
+			block.action = block.action.resolve(markers, context);
+			context = context.pop();
 		}
 		
 		if (this.finallyBlock != null)
@@ -305,14 +312,19 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.action.checkTypes(markers, context);
+			context = context.pop();
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
 			block.type.checkType(markers, context, TypePosition.RETURN_TYPE);
-			block.action.checkTypes(markers, new CombiningContext(block, context));
+
+			context = context.push(block);
+			block.action.checkTypes(markers, context);
+			context = context.pop();
 		}
 		
 		if (this.finallyBlock != null)
@@ -326,7 +338,9 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (this.action != null)
 		{
-			this.action.check(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.action.check(markers, context);
+			context = context.pop();
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
@@ -340,8 +354,10 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 				marker.addInfo(Markers.getSemantic("exception.type", block.type));
 				markers.add(marker);
 			}
-			
+
+			context = context.push(block);
 			block.action.check(markers, context);
+			context = context.pop();
 		}
 		
 		if (this.finallyBlock != null)
@@ -377,14 +393,19 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (this.action != null)
 		{
+			context = context.push(this);
 			this.action = this.action.cleanup(context, compilableList);
+			context = context.pop();
 		}
 		
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			CatchBlock block = this.catchBlocks[i];
 			block.type.cleanup(context, compilableList);
-			block.action = block.action.cleanup(new CombiningContext(block, context), compilableList);
+
+			context = context.push(block);
+			block.action = block.action.cleanup(context, compilableList);
+			context = context.pop();
 		}
 		
 		if (this.finallyBlock != null)

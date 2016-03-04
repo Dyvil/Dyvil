@@ -38,7 +38,7 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 		return this.parameters[index];
 	}
 
-	private CombiningContext getCombiningContext()
+	private IContext getCombiningContext()
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}

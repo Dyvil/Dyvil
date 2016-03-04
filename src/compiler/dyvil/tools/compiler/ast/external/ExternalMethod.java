@@ -55,7 +55,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		return this.parameters[index];
 	}
 
-	private CombiningContext getCombiningContext()
+	private IContext getCombiningContext()
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}

@@ -80,7 +80,7 @@ public final class ExternalClass extends AbstractClass
 	{
 	}
 
-	private CombiningContext getCombiningContext()
+	private IContext getCombiningContext()
 	{
 		return new CombiningContext(this, Package.rootPackage);
 	}
