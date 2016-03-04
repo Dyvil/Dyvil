@@ -1,11 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.*;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.Name;
@@ -16,8 +12,6 @@ public class AnonymousClass extends CodeClass
 	protected CaptureHelper captureHelper = new CaptureHelper(CaptureField.factory(this));
 	
 	protected FieldThis thisField;
-	
-	public transient IContext context;
 	
 	public AnonymousClass(ICodePosition position)
 	{
@@ -36,52 +30,6 @@ public class AnonymousClass extends CodeClass
 		this.name = Name.getQualified(outerName + '$' + indexString);
 		this.fullName = this.enclosingClass.getFullName() + '$' + indexString;
 		this.internalName = this.enclosingClass.getInternalName() + '$' + indexString;
-	}
-	
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		IDataMember field = super.resolveField(name);
-		if (field != null)
-		{
-			return field;
-		}
-		return this.context.resolveField(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		IClass iclass = super.resolveClass(name);
-		if (iclass != null)
-		{
-			return iclass;
-		}
-		return this.context.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		IType type = super.resolveType(name);
-		if (type != null)
-		{
-			return type;
-		}
-		return this.context.resolveType(name);
-	}
-	
-	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
-	{
-		super.getMethodMatches(list, instance, name, arguments);
-		
-		if (!list.isEmpty())
-		{
-			return;
-		}
-		
-		this.context.getMethodMatches(list, instance, name, arguments);
 	}
 	
 	@Override

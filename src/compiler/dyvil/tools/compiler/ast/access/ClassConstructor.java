@@ -50,10 +50,8 @@ public class ClassConstructor extends ConstructorCall
 		{
 			this.nestedClass.setSuperType(this.type);
 		}
-		
-		this.nestedClass.context = context;
+
 		this.nestedClass.resolveTypes(markers, context);
-		this.nestedClass.context = null;
 	}
 	
 	@Override
@@ -87,10 +85,8 @@ public class ClassConstructor extends ConstructorCall
 
 		this.nestedClass.setHeader(header);
 		header.addInnerClass(this.nestedClass);
-		
-		this.nestedClass.context = context;
+
 		this.nestedClass.resolve(markers, context);
-		this.nestedClass.context = null;
 		return this;
 	}
 	
@@ -98,20 +94,16 @@ public class ClassConstructor extends ConstructorCall
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		super.checkTypes(markers, context);
-		
-		this.nestedClass.context = context;
+
 		this.nestedClass.checkTypes(markers, context);
-		this.nestedClass.context = null;
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.arguments.check(markers, context);
-		
-		this.nestedClass.context = context;
+
 		this.nestedClass.check(markers, context);
-		this.nestedClass.context = null;
 	}
 	
 	@Override
